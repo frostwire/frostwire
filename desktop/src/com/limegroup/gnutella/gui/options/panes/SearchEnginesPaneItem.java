@@ -76,7 +76,7 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
         panel.add(Box.createHorizontalGlue());
         panel.add(new JSeparator());
         panel.add(Box.createRigidArea(new Dimension(0,10)));
-        allCheckbox = new JCheckBox("Check/Uncheck all");
+        allCheckbox = new JCheckBox(I18n.tr("Check/Uncheck all"));
         panel.add(allCheckbox);
         allCheckbox.setSelected(areAll(true));
         allCheckbox.addItemListener(new ItemListener() {

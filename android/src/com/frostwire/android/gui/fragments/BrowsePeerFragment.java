@@ -409,7 +409,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             if (action.equals(Constants.ACTION_MEDIA_PLAYER_PLAY) ||
                     action.equals(Constants.ACTION_MEDIA_PLAYER_STOPPED) ||
                     action.equals(Constants.ACTION_MEDIA_PLAYER_PAUSED) ||
-                    action.equals(Constants.ACTION_MEDIA_PLAYER_PAUSED) ||
                     action.equals(MusicPlaybackService.PLAYSTATE_CHANGED) ||
                     action.equals(MusicPlaybackService.META_CHANGED)
                     ) {

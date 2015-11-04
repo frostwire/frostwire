@@ -46,7 +46,7 @@ public class FileTypeAssociation implements ShellAssociation {
 	    try {
     		// if no association at all, then it is available
     		Association f = SERVICE.getFileExtensionAssociation(extention); 
-    		if (f == null && f == SERVICE.getMimeTypeAssociation(mimeType))
+    		if (f != null && f == SERVICE.getMimeTypeAssociation(mimeType))
     			return true;
 	    } catch(IllegalArgumentException iae) {
 	        // SEE: LWC-1170
