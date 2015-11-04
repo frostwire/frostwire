@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:frostwire="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ProgressBar
+            android:id="@+id/fragment_search_deepsearch_progress"
+            style="@style/ProgressBarHolo.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="5dip"
+            android:indeterminate="true"
+            android:progress="25" />
+
+    <com.frostwire.android.gui.views.SearchInputView
+        android:id="@+id/fragment_search_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.frostwire.android.gui.views.RichNotification
+            android:id="@+id/fragment_search_rating_reminder_notification"
+            frostwire:rich_notification_icon="@null"
+            frostwire:rich_notification_title="@string/rate_our_app"
+            frostwire:rich_notification_title_underlined="true"
+            frostwire:rich_notification_description="@string/rating_reminder_description"
+            frostwire:rich_notification_number_of_action_links="2"
+            frostwire:rich_notification_action_links_horizontal_margin="14"
+            android:layout_width="match_parent"
+            android:layout_height="75sp"
+            android:visibility="gone"
+            />
+
+    <LinearLayout
+        android:id="@+id/fragment_search_adview_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/black"
+        android:orientation="horizontal" >
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_search_framelayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <com.frostwire.android.gui.views.PromotionsView
+            android:id="@+id/fragment_search_promos"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.frostwire.android.gui.views.SearchProgressView
+            android:id="@+id/fragment_search_search_progress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.frostwire.android.gui.views.ListView
+            android:id="@+id/fragment_search_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/body_background_gray_light"
+            android:fastScrollEnabled="true" />
+    </FrameLayout>
+
+</LinearLayout>

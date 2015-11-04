@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 Andrew Neal
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+ -->
+<resources>
+
+    <!-- Text sizes -->
+    <dimen name="text_size_extra_micro">10.0sp</dimen>
+    <dimen name="text_size_micro">12.0sp</dimen>
+    <dimen name="text_size_small">14.0sp</dimen>
+    <dimen name="text_size_medium">16.0sp</dimen>
+    <dimen name="text_size_large">18.0sp</dimen>
+    <dimen name="text_size_x_large">24.0sp</dimen>
+    <dimen name="text_size_dayum">36.0sp</dimen>
+
+    <!-- List and grid view padding -->
+    <dimen name="list_preferred_item_padding">0dp</dimen>
+    <!-- List view fast scroll padding left -->
+    <dimen name="fast_scroll_padding_left">0dp</dimen>
+    <!-- List view fast scroll padding right -->
+    <dimen name="fast_scroll_padding_right">0dp</dimen>
+    <!-- grid view vertical and horizontal spacing -->
+    <dimen name="grid_item_spacing">0dp</dimen>
+    <!-- List item detailed height -->
+    <dimen name="list_item_detailed_height">120.0dip</dimen>
+    <!-- Top margin of "line_two" -->
+    <dimen name="list_item_line_two_margin_top">4.0dip</dimen>
+    <!-- Left padding in the grid text -->
+    <dimen name="grid_item_padding_left">8.0dip</dimen>
+    <!-- Grid and list item normal height -->
+    <dimen name="item_normal_height">64.0dip</dimen>
+    <!-- Padding in simple list view -->
+	<dimen name="list_simple_horizontal_padding">12.0dip</dimen>
+	<dimen name="list_simple_vertical_padding">10.0dip</dimen>
+
+
+    <!-- Bottom Action Bar -->
+    <dimen name="bottom_action_bar_height">48.0dip</dimen>
+    <dimen name="bottom_action_bar_item_width">56.0dip</dimen>
+    <dimen name="bottom_action_bar_item_padding_left">12.0dip</dimen>
+    <dimen name="bottom_action_bar_item_padding_right">12.0dip</dimen>
+    <dimen name="bottom_action_bar_album_art_width">30.0dip</dimen>
+    <dimen name="bottom_action_bar_album_art_height">30.0dip</dimen>
+    <dimen name="bottom_action_bar_info_padding_left">5.0dip</dimen>
+    <dimen name="bottom_action_bar_button_container_width">165.0dip</dimen>
+
+    <!-- Notification template -->
+    <dimen name="notification_big_icon_height">64.0dip</dimen>
+    <dimen name="notification_big_icon_width">64.0dip</dimen>
+    <dimen name="notification_info_container_padding_left">8.0dip</dimen>
+    <dimen name="notification_info_container_padding_bottom">4.0dip</dimen>
+    <dimen name="notification_action_padding">8.0dip</dimen>
+    <dimen name="notification_action_height">48.0dip</dimen>
+    <dimen name="notification_action_width">48.0dip</dimen>
+
+    <!-- Notification template expanded -->
+    <dimen name="notification_expanded_height">128.0dip</dimen>
+    <dimen name="notification_expanded_buttons_divider_padding">12.0dip</dimen>
+    <dimen name="notification_expanded_button_height">48.0dip</dimen>
+    <dimen name="notification_expanded_button_padding">10.0dip</dimen>
+    <dimen name="notification_expanded_content_padding_top">8.0dip</dimen>
+    <dimen name="notification_expanded_collapse_padding">8.0dip</dimen>
+
+    <!-- Height of the shadow asset under the photo -->
+    <dimen name="profile_photo_shadow_height">10.0dip</dimen>
+    <!-- Height of the text label in the carousel -->
+    <dimen name="profile_carousel_label_height">45.0dip</dimen>
+    <dimen name="profile_indicator_height">5.0dip</dimen>
+    <dimen name="profile_label_padding">16.0dip</dimen>
+
+    <!-- Audio player -->
+    <dimen name="audio_player_header_height">60.0dip</dimen>
+    <dimen name="audio_player_header_padding_left">16.0dip</dimen>
+    <dimen name="audio_player_header_padding_right">16.0dip</dimen>
+    <dimen name="audio_player_switch_padding">10.0dip</dimen>
+    <dimen name="audio_player_time_width">52.0dip</dimen>
+    <dimen name="audio_player_seek_bar_margin_bottom">2.0dip</dimen>
+    <dimen name="audio_player_controls_end_button_width">50.0dip</dimen>
+    <dimen name="audio_player_controls_end_button_height">50.0dip</dimen>
+    <dimen name="audio_player_controls_main_button_width">58.0dip</dimen>
+    <dimen name="audio_player_controls_main_button_height">58.0dip</dimen>
+
+    <!-- App Widgets -->
+    <dimen name="app_widget_large_min_width">250.0dip</dimen>
+    <dimen name="app_widget_large_min_height">128.0dip</dimen>
+    <dimen name="app_widget_scrollable_min_height">180.0dip</dimen>
+    <dimen name="app_widget_scrollable_min_resize_height">110.0dip</dimen>
+    <dimen name="app_widget_large_alternate_artwork_size">80.0dip</dimen>
+    <dimen name="app_widget_small_min_width">250.0dip</dimen>
+    <dimen name="app_widget_small_min_height">40.0dip</dimen>
+    <dimen name="app_widget_small_info_container_padding_left">8.0dip</dimen>
+    <dimen name="app_widget_small_info_container_padding_right">8.0dip</dimen>
+    <dimen name="app_widget_small_artwork_size">48.0dip</dimen>
+    <dimen name="app_widget_small_button_padding">8.0dip</dimen>
+    <dimen name="app_widget_small_button_height">48.0dip</dimen>
+    <dimen name="app_widget_recents_action_bar_height">48.0dip</dimen>
+    <dimen name="app_widget_recents_action_bar_item_padding">8.0dip</dimen>
+    <dimen name="app_widget_tiny_height">70.0dip</dimen>
+    <dimen name="app_widget_tiny_width">70.0dip</dimen>
+    <dimen name="app_widget_padding">0.0dip</dimen>
+    <dimen name="app_widget_bottom_margin">4.0dip</dimen>
+
+    <!-- Shadow height -->
+    <dimen name="shadow_height">0dip</dimen>
+
+    <!-- Colorstrip -->
+    <dimen name="colorstrip_height">0.0dip</dimen>
+
+    <!-- Drag and drop -->
+    <dimen name="drag_and_drop_handle">26.0dip</dimen>
+
+    <!-- Color scheme dialog -->
+    <dimen name="color_scheme_dialog_row_padding">8.0dip</dimen>
+
+</resources>

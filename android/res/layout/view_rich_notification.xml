@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center_vertical|left"
+    android:orientation="horizontal"
+    android:padding="0sp"
+    android:background="@drawable/rich_notification_border" >
+
+    <ImageView android:id="@+id/view_rich_notification_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginLeft="5sp"
+        android:layout_marginRight="5sp"/>
+    
+    <LinearLayout 
+        android:layout_weight="1.0"
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_vertical"        
+        android:layout_marginRight="5sp">
+        
+        <TextView android:id="@+id/view_rich_notification_title"
+            android:text="@string/dummy_title"
+            android:textSize="@dimen/text_size_small"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"/>
+        
+        <TextView android:id="@+id/view_rich_notification_description"
+            android:text="@string/dummy_content_description"
+            android:textSize="@dimen/text_size_micro"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"/>
+
+        <LinearLayout android:id="@+id/view_rich_notification_action_links"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:gravity="center_vertical|right">
+
+            <TextView android:text="@string/dummy_extra"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textAppearance="@android:style/TextAppearance.Small"
+                      android:textColor="@color/basic_blue"
+                      android:singleLine="true"
+                      android:textStyle="bold"
+                      android:visibility="gone"/>
+        </LinearLayout>
+    </LinearLayout>
+    
+    <View android:id="@+id/view_rich_notification_close_button_vertical_separator"
+        android:layout_width="1sp"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="10sp"
+        android:layout_marginBottom="10sp"
+        android:layout_marginRight="5sp"
+        android:background="@color/app_rich_notification_divider"/>
+
+    <ImageButton android:id="@+id/view_rich_notification_close_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:background="@null"
+        android:layout_marginRight="5sp"
+        android:src="@drawable/clearable_edittext_clear_icon"/>
+</LinearLayout>

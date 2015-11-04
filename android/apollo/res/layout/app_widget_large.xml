@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2012 Andrew Neal
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/app_widget_large_min_height"
+    android:columnCount="2"
+    android:rowCount="3"
+    android:background="@drawable/appwidget_bg"
+    tools:ignore="ContentDescription" >
+
+    <ImageView
+        android:id="@+id/app_widget_large_image"
+        android:layout_width="@dimen/notification_expanded_height"
+        android:layout_height="@dimen/notification_expanded_height"
+        android:layout_rowSpan="3"
+        android:layout_marginBottom="@dimen/app_widget_bottom_margin"
+        android:background="@drawable/default_artwork"
+        android:scaleType="fitXY" />
+
+    <LinearLayout
+        android:id="@+id/app_widget_large_info_container"
+        android:layout_width="0dp"
+        android:layout_gravity="fill"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/notification_info_container_padding_left" >
+
+        <TextView
+            android:id="@+id/app_widget_large_line_one"
+            style="@style/NotificationText"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_medium"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/app_widget_large_line_two"
+            style="@style/NotificationText"
+            android:textColor="@color/transparent_white"
+            android:textSize="@dimen/text_size_small" />
+
+        <TextView
+            android:id="@+id/app_widget_large_line_three"
+            style="@style/NotificationText"
+            android:textColor="@color/transparent_white"
+            android:textSize="@dimen/text_size_small" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_gravity="fill_horizontal"
+        android:background="?android:dividerHorizontal" />
+
+    <LinearLayout
+        android:id="@+id/app_widget_large_buttons"
+        android:layout_width="0dp"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginBottom="@dimen/app_widget_bottom_margin"
+        android:divider="?android:listDivider"
+        android:dividerPadding="@dimen/notification_expanded_buttons_divider_padding"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:showDividers="middle" >
+
+        <ImageButton
+            android:id="@+id/app_widget_large_previous"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/notification_expanded_button_height"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@string/accessibility_prev"
+            android:padding="@dimen/notification_expanded_button_padding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/btn_playback_previous" />
+
+        <ImageButton
+            android:id="@+id/app_widget_large_play"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/notification_expanded_button_height"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:padding="@dimen/notification_expanded_button_padding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/btn_playback_pause" />
+
+        <ImageButton
+            android:id="@+id/app_widget_large_next"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/notification_expanded_button_height"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@string/accessibility_next"
+            android:padding="@dimen/notification_expanded_button_padding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/btn_playback_next" />
+    </LinearLayout>
+
+</GridLayout>

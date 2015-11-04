@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/listview_item_press_background_selector" >
+
+    <com.frostwire.android.gui.views.BrowseThumbnailImageButton
+        android:id="@+id/view_browse_peer_list_item_download"
+        android:layout_width="60dp"
+        android:layout_height="72dp"
+        android:background="@drawable/browse_peer_list_item_download_button_background"
+        android:contentDescription="@null"
+        android:paddingBottom="16dip"
+        android:paddingLeft="9dip"
+        android:paddingRight="9dip"
+        android:paddingTop="16dip"
+        android:scaleType="fitCenter" />
+
+    <FrameLayout
+        android:id="@+id/view_browse_peer_list_item_container_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true" >
+
+        <ImageButton
+            android:id="@+id/view_browse_peer_list_item_button_preview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@null"
+            android:paddingRight="6dip"
+            android:scaleType="fitCenter"
+            android:src="@drawable/browse_peer_play_icon" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/view_browse_peer_list_item_file_title"
+        style="@style/BrowsePeerList.Item.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dip"
+        android:layout_marginTop="4dip"
+        android:layout_toLeftOf="@id/view_browse_peer_list_item_container_action"
+        android:layout_toRightOf="@id/view_browse_peer_list_item_download"
+        android:text="@string/dummy_title" />
+
+    <TextView
+        android:id="@+id/view_browse_peer_list_item_extra_text"
+        style="@style/BrowsePeerList.Item.Extra"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/view_browse_peer_list_item_file_title"
+        android:layout_alignRight="@id/view_browse_peer_list_item_file_title"
+        android:layout_below="@id/view_browse_peer_list_item_file_title"
+        android:text="@string/dummy_extra" />
+
+    <TextView
+        android:id="@+id/view_browse_peer_list_item_file_size"
+        style="@style/ListItemSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/view_browse_peer_list_item_download"
+        android:layout_alignLeft="@id/view_browse_peer_list_item_extra_text"
+        android:layout_marginBottom="2dip"
+        android:text="@string/dummy_size" />
+
+    <ImageView
+        android:id="@+id/view_browse_peer_list_item_sd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/view_browse_peer_list_item_file_size"
+        android:layout_toRightOf="@id/view_browse_peer_list_item_file_size"
+        android:contentDescription="@null"
+        android:src="@drawable/browse_peer_sd_icon_inactive" />
+
+</RelativeLayout>

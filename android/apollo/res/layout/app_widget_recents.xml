@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2012 Andrew Neal
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="0dp"
+    android:background="@color/action_bar_color" >
+
+    <RelativeLayout
+        android:id="@+id/app_widget_recents_action_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/app_widget_recents_action_bar_height" >
+
+        <ImageView
+            android:id="@+id/app_widget_recents_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@string/app_name"
+            android:padding="@dimen/app_widget_recents_action_bar_item_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:id="@+id/app_widget_recents_app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/app_widget_recents_icon"
+            android:text="@string/page_recent"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_medium" />
+
+        <ImageButton
+            android:id="@+id/app_widget_recents_previous"
+            android:layout_width="@dimen/app_widget_recents_action_bar_height"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/app_widget_recents_play"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@null"
+            android:scaleType="center"
+            android:src="@drawable/btn_playback_previous" />
+
+        <ImageButton
+            android:id="@+id/app_widget_recents_play"
+            android:layout_width="@dimen/app_widget_recents_action_bar_height"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/app_widget_recents_next"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@null"
+            android:scaleType="center"
+            android:src="@drawable/btn_playback_play" />
+
+        <ImageButton
+            android:id="@+id/app_widget_recents_next"
+            android:layout_width="@dimen/app_widget_recents_action_bar_height"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@null"
+            android:scaleType="center"
+            android:src="@drawable/btn_playback_next" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/colorstrip"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/colorstrip_height"
+        android:layout_below="@+id/app_widget_recents_action_bar"
+        android:background="@color/holo_blue_light"
+        android:contentDescription="@null" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/colorstrip"
+        android:layout_centerVertical="true"
+        android:background="@drawable/appwidget_bg" >
+
+        <ListView
+            android:id="@+id/app_widget_recents_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:cacheColorHint="@color/transparent" />
+    </FrameLayout>
+
+</RelativeLayout>

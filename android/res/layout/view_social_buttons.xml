@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:weightSum="1.0">
+
+    <LinearLayout android:id="@+id/view_social_buttons_installation_complete_layout"
+                  android:orientation="vertical"
+                  android:layout_width="fill_parent"
+                  android:layout_height="0dp"
+                  android:layout_weight="0.30"
+                  android:layout_marginTop="30dp"
+                  android:visibility="gone"
+                  android:gravity="center_horizontal"
+                  android:weightSum="1.0">
+        <ImageButton android:id="@+id/view_social_buttons_dismiss_check"
+                     android:src="@drawable/social_wizard_check"
+                     android:layout_width="wrap_content"
+                     android:layout_height="0dp"
+                     android:layout_weight="0.4"
+                     android:layout_marginBottom="20dp"
+                     android:background="@color/transparent"
+                     android:scaleType="fitCenter"/>
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/your_installation_is_complete"
+                  android:textSize="@dimen/text_size_large"/>
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/thank_you"
+                  android:textSize="@dimen/text_size_large"
+                  android:textStyle="bold"/>
+    </LinearLayout>
+
+    <Space android:layout_width="fill_parent" android:layout_height="20dp"/>
+
+    <TextView android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center_horizontal"
+              android:text="@string/keep_in_touch"
+              android:textSize="20sp"
+              android:layout_marginBottom="20dp"
+            />
+
+    <LinearLayout android:orientation="horizontal"
+                  android:layout_weight="0.20"
+                  android:layout_width="fill_parent"
+                  android:layout_height="0dp"
+                  android:layout_marginBottom="50dp"
+                  android:paddingLeft="20dp"
+                  android:paddingRight="20dp"
+                  android:weightSum="1"
+                  android:gravity="center_horizontal"
+            >
+
+        <ImageButton android:id="@+id/view_social_buttons_facebook_button"
+                     android:src="@drawable/social_wizard_facebook"
+                     android:layout_width="0dp"
+                     android:layout_weight="0.22"
+                     android:layout_height="wrap_content"
+                     android:background="@color/transparent"
+                     android:layout_marginRight="20dp"
+                     android:scaleType="fitCenter"/>
+
+
+        <ImageButton android:id="@+id/view_social_buttons_twitter_button"
+                     android:src="@drawable/social_wizard_twitter"
+                     android:layout_width="0dp"
+                     android:layout_weight="0.22"
+                     android:layout_height="wrap_content"
+                     android:background="@color/transparent"
+                     android:layout_marginRight="20dp"
+                     android:scaleType="fitCenter"/>
+
+
+        <ImageButton android:id="@+id/view_social_buttons_reddit_button"
+                     android:src="@drawable/social_wizard_reddit"
+                     android:layout_width="0dp"
+                     android:layout_weight="0.22"
+                     android:layout_height="wrap_content"
+                     android:background="@color/transparent"
+                     android:scaleType="fitCenter"/>
+
+    </LinearLayout>
+</LinearLayout>

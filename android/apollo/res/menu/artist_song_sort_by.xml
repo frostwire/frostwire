@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2012 Andrew Neal
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_sort_by"
+        android:showAsAction="never"
+        android:title="@string/menu_sort_by">
+        <menu>
+            <item
+                android:id="@+id/menu_sort_by_az"
+                android:title="@string/sort_order_entry_az"/>
+            <item
+                android:id="@+id/menu_sort_by_za"
+                android:title="@string/sort_order_entry_za"/>
+            <item
+                android:id="@+id/menu_sort_by_year"
+                android:title="@string/sort_order_entry_year"/>
+            <item
+                android:id="@+id/menu_sort_by_album"
+                android:title="@string/sort_order_entry_album"/>
+            <item
+                android:id="@+id/menu_sort_by_duration"
+                android:title="@string/sort_order_entry_duration"/>
+            <item
+                android:id="@+id/menu_sort_by_date_added"
+                android:title="@string/sort_order_entry_date_added"/>
+            <item
+                android:id="@+id/menu_sort_by_filename"
+                android:title="@string/sort_order_entry_filename"/>
+        </menu>
+    </item>
+
+</menu>

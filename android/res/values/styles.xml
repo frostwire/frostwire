@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="ActionBar" parent="android:Widget.Holo.Light.ActionBar">
+        <item name="android:background">@color/action_bar_background</item>
+        <item name="android:titleTextStyle">@style/ActionBar.TitleTextStyle</item>
+        <item name="android:subtitleTextStyle">@style/ActionBar.TitleTextStyle</item>
+    </style>
+
+    <style name="ActionBar.TitleTextStyle" parent="android:TextAppearance.Medium">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="ActionBar.SubTitleTextStyle" parent="android:TextAppearance.Small">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="ActionButton.Overflow" parent="@android:style/Widget.Holo.Light.ActionButton.Overflow">
+        <item name="android:src">@drawable/ic_menu_moreoverflow</item>
+    </style>
+
+    <style name="Widget.CompoundButton.CheckBox" parent="android:Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/checkbox_button_selector</item>
+    </style>
+
+    <style name="Widget.Button" parent="android:Widget.Holo.Light.Button">
+        <item name="android:background">@android:drawable/btn_default</item>
+    </style>
+
+    <!-- styles for elements -->
+
+    <style name="SearchInputFileTypeButton" parent="android:Widget.CompoundButton.RadioButton">
+        <item name="android:layout_weight">1</item>
+        <item name="android:button">@null</item>
+        <item name="android:background">@drawable/searchinput_button_selector</item>
+        <item name="android:drawableTop">@drawable/radio_button_background_selector</item>
+        <item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
+    <style name="SearchInputFileTypeButtonLand" parent="android:Widget.CompoundButton.RadioButton">
+		<item name="android:layout_weight">1</item>
+		<item name="android:button">@null</item>
+		<item name="android:background">@drawable/searchinput_button_selector</item>
+        <item name="android:drawableLeft">@drawable/radio_button_background_selector</item>
+		<item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
+		<item name="android:textSize">14sp</item>
+		<item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+
+    <style name="BrowseFileTypeButton" parent="android:Widget.CompoundButton.RadioButton">
+		<item name="android:layout_weight">1</item>
+		<item name="android:button">@null</item>
+		<item name="android:background">@drawable/radio_button_background_selector</item>
+		<item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
+		<item name="android:textSize">10sp</item>
+		<item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_gravity">center</item>
+	</style>
+
+    <style name="TransparentListView" parent="@android:style/Widget.ListView">
+        <item name="android:cacheColorHint">@android:color/transparent</item>
+        <item name="android:dividerHeight">0dp</item>
+        <item name="android:divider">@android:color/transparent</item>
+        <item name="android:footerDividersEnabled">false</item>
+        <item name="android:headerDividersEnabled">false</item>
+        <item name="android:overScrollHeader">@null</item>
+        <item name="android:overScrollFooter">@null</item>
+    </style>
+
+    <style name="TransparentExpandableListView" parent="@android:style/Widget.ExpandableListView">
+        <item name="android:cacheColorHint">@android:color/transparent</item>
+        <item name="android:dividerHeight">0dp</item>
+        <item name="android:divider">@android:color/transparent</item>
+        <item name="android:footerDividersEnabled">false</item>
+        <item name="android:headerDividersEnabled">false</item>
+        <item name="android:overScrollFooter">@null</item>
+    </style>
+
+	<!-- Preferences -->
+
+    <style name="Preferences" parent="android:Theme.Holo.Light">
+        <item name="android:icon">@null</item>
+        <item name="android:actionBarStyle">@style/ActionBar</item>
+        <item name="android:homeAsUpIndicator">@drawable/home_as_up_padding</item>
+        <item name="android:checkboxStyle">@style/PreferencesCheckboxStyle</item>
+        <item name="android:listSeparatorTextViewStyle">@style/PreferenceListHeader</item>
+		<item name="android:textColorPrimary">@color/app_text_primary</item>
+		<item name="android:textColorSecondary">@color/app_text_secondary</item>
+    </style>
+
+    <style name="PreferenceListHeader">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="PreferencesCheckboxStyle" parent="android:Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/checkbox_button_selector</item>
+    </style>
+
+    <style name="ProgressBarHolo.Horizontal" parent="android:Widget.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_holo_light</item>
+        <item name="android:indeterminateDrawable">@drawable/progress_indeterminate_horizontal_holo</item>
+        <item name="android:minHeight">16dip</item>
+        <item name="android:maxHeight">16dip</item>
+    </style>
+
+    <!-- SlideMenu begin -->
+
+    <style name="SlideMenu"></style>
+
+    <style name="SlideMenu.List">
+        <item name="android:divider">@android:color/transparent</item>
+        <item name="android:dividerHeight">0dip</item>
+        <item name="android:listSelector">@drawable/slidemenu_list_selector</item>
+    </style>
+
+    <style name="SlideMenu.Item"></style>
+
+    <style name="SlideMenu.Item.Image">
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+    </style>
+
+    <style name="SlideMenu.Item.Text">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
+    </style>
+
+    <!-- SlideMenu end -->
+
+
+    <!-- Main Fragment Simple Header begin -->
+
+    <style name="MainFragmentSimpleHeader" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <!-- Main Fragment Simple Header end -->
+
+
+    <!-- Browse Peer fragment file counter header begin -->
+
+    <style name="BrowsePeerFragmentFileCounterHeader" parent="@android:style/TextAppearance.Small">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <!-- Browse Peer fragment file counter header end -->
+
+
+    <!-- Menu Media Type begin -->
+
+    <style name="MenuMediaType"></style>
+
+    <style name="MenuMediaType.Item"></style>
+
+    <style name="MenuMediaType.Item.Text">
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="android:textColor">#ff143149</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:paddingLeft">6dp</item>
+        <item name="android:paddingRight">18dp</item>
+    </style>
+
+    <!-- Menu Media Type end -->
+
+
+    <!-- Browse Peer list begin -->
+
+    <style name="BrowsePeerList"></style>
+
+    <style name="BrowsePeerList.Item"></style>
+
+    <style name="BrowsePeerList.Item.Title">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/browse_peer_listview_item_foreground</item>
+    </style>
+
+    <style name="BrowsePeerList.Item.Extra">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/browse_peer_listview_item_foreground</item>
+    </style>
+
+    <!-- Browse Peer list end -->
+
+
+    <!-- Transfers list begin -->
+
+    <style name="TransfersList"></style>
+
+    <style name="TransfersList.Item"></style>
+
+    <style name="TransfersList.Item.Title">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#ff3b3b3b</item>
+    </style>
+
+    <style name="TransfersList.Item.Status">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">#ff3b3b3b</item>
+    </style>
+
+    <style name="TransfersList.SubItem"></style>
+
+    <style name="TransfersList.SubItem.Title">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">#ff3b3b3b</item>
+    </style>
+
+    <!-- Transfers list end -->
+
+    <style name="TransfersButton">
+        <item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+    </style>
+
+    <!-- Transfers indicator begin -->
+
+    <style name="TransfersIndicator">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@color/app_light_gray_text</item>
+    </style>
+
+    <!-- Transfers indicator end -->
+
+    <style name="ListItemTitle">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_list_item_title_text_color</item>
+    </style>
+
+    <style name="ListItemExtra">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">14dp</item>
+        <item name="android:textColor">@color/app_list_item_title_text_color</item>
+    </style>
+
+    <style name="ListItemSize">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/app_highlight_text</item>
+    </style>
+
+    <style name="ListItemAd">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#ffffffff</item>
+        <item name="android:background">#ffedb802</item>
+        <item name="android:padding">2sp</item>
+    </style>
+
+    <style name="ListItemExt">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">13dp</item>
+        <item name="android:textColor">#ff3b3b3b</item>
+    </style>
+
+    <style name="TransferListItemSize">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">10dp</item>
+        <item name="android:textColor">#ff54afe4</item>
+    </style>
+
+    <style name="NoSearchResultsLink">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:textColor">#ff54afe4</item>
+    </style>
+
+    <style name="SearchResultListItemSource">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/basic_blue</item>
+    </style>
+
+    <style name="SearchProgressViewRetryButton">
+        <item name="android:background">@drawable/retry_search_button_basic_blue_round_background</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:height">26dp</item>
+        <item name="android:maxHeight">26dp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">middle</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">26dp</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="android:minWidth">60dp</item>
+    </style>
+
+    <style name="MediaPlayerHeaderTitle">
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="MediaPlayerHeaderTitleBold">
+        <item name="android:textStyle">bold</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="MediaPlayerNumber">
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Small</item>
+    </style>
+
+    <style name="BlueButton">
+        <item name="android:background">@drawable/blue_button_background_selector</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingLeft">17dp</item>
+        <item name="android:paddingRight">17dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="DonationButton">
+        <item name="android:background">@drawable/donation_button_background_selector</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:padding">6dp</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="DonationButton2">
+        <item name="android:background">@drawable/btn_donation_background</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="BrowsePeerActivityHeaderTitle" parent="@android:style/TextAppearance.Small">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="BrowsePeerActivityHeaderNickname" parent="@android:style/TextAppearance.Small">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+</resources>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2012 Andrew Neal
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<com.andrew.apollo.widgets.theme.ThemeableFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/body_background_gray_light">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <RelativeLayout
+            android:id="@+id/audio_player_large_album_frame"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true" >
+
+            <com.andrew.apollo.widgets.SquareImageView
+                android:id="@+id/audio_player_album_art"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:scaleType="fitXY" />
+
+            <!--<ImageView
+                android:layout_width="@dimen/shadow_height"
+                android:layout_height="match_parent"
+                android:layout_alignRight="@+id/audio_player_album_art"
+                android:contentDescription="@null"
+                android:src="@drawable/right_shadow" />-->
+        </RelativeLayout>
+
+        <FrameLayout
+            android:id="@+id/audio_player_pager_container"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/audio_player_large_album_frame"
+            android:visibility="invisible" >
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/audio_player_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:background="@drawable/layout_divider_1_gray" />
+
+            <!--<ImageView
+                android:layout_width="@dimen/shadow_height"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:contentDescription="@null"
+                android:src="@drawable/right_shadow" />-->
+        </FrameLayout>
+
+        <View
+            android:id="@+id/audio_player_footer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/audio_player_large_album_frame" />
+
+        <LinearLayout
+            android:id="@+id/audio_player_header"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/audio_player_header_height"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/audio_player_large_album_frame"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:padding="0dp"
+            android:background="@color/body_background_white">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:baselineAligned="false"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/audio_player_header_padding_left"
+                android:paddingRight="@dimen/audio_player_header_padding_right" >
+
+                <com.andrew.apollo.widgets.theme.ThemeableTextView
+                    android:id="@+id/audio_player_track_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="bottom"
+                    android:singleLine="true"
+                    android:textSize="@dimen/text_size_medium"
+                    android:textStyle="bold"
+                    app:themeResource="audio_player_line_one" />
+
+                <com.andrew.apollo.widgets.theme.ThemeableTextView
+                    android:id="@+id/audio_player_artist_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="top"
+                    android:singleLine="true"
+                    android:textSize="@dimen/text_size_medium"
+                    app:themeResource="audio_player_line_two" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/audio_player_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:focusable="true"
+                android:padding="@dimen/audio_player_switch_padding" >
+
+                <com.andrew.apollo.widgets.SquareImageView
+                    android:id="@+id/audio_player_switch_queue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null" />
+
+                <com.andrew.apollo.widgets.SquareImageView
+                    android:id="@+id/audio_player_switch_album_art"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/activity_audio_player_div3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignBottom="@+id/audio_player_header"
+            android:layout_toRightOf="@+id/audio_player_large_album_frame"
+            android:background="@drawable/layout_divider_1_gray" />
+
+        <com.andrew.apollo.widgets.theme.ThemeableTextView
+            android:id="@+id/audio_player_current_time"
+            android:layout_width="@dimen/audio_player_time_width"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@android:id/progress"
+            android:layout_alignTop="@android:id/progress"
+            android:layout_toRightOf="@+id/audio_player_large_album_frame"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_medium"
+            app:themeResource="audio_player_current_time" />
+
+        <com.andrew.apollo.widgets.theme.ThemeableTextView
+            android:id="@+id/audio_player_total_time"
+            android:layout_width="@dimen/audio_player_time_width"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@android:id/progress"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@android:id/progress"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_medium"
+            app:themeResource="audio_player_total_time" />
+
+        <com.andrew.apollo.widgets.theme.ThemeableSeekBar
+            android:id="@android:id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/audio_player_controlss"
+            android:layout_marginBottom="@dimen/audio_player_seek_bar_margin_bottom"
+            android:layout_toLeftOf="@+id/audio_player_total_time"
+            android:layout_toRightOf="@+id/audio_player_current_time"
+            android:background="@null"
+            android:max="1000" />
+
+        <LinearLayout
+            android:id="@+id/audio_player_controlss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/audio_player_large_album_frame"
+            android:baselineAligned="false"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:padding="12dp" >
+
+                <include layout="@layout/audio_player_controls" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</com.andrew.apollo.widgets.theme.ThemeableFrameLayout>

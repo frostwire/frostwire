@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2012 Andrew Neal
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <com.andrew.apollo.widgets.RepeatButton
+            android:id="@+id/action_button_repeat"
+            android:layout_width="@dimen/audio_player_controls_end_button_width"
+            android:layout_height="@dimen/audio_player_controls_end_button_height"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:contentDescription="@string/accessibility_repeat"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_playback_repeat" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <com.andrew.apollo.widgets.RepeatingImageButton
+            android:id="@+id/action_button_previous"
+            android:layout_width="@dimen/audio_player_controls_main_button_width"
+            android:layout_height="@dimen/audio_player_controls_main_button_height"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_playback_previous" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <com.andrew.apollo.widgets.PlayPauseButton
+            android:id="@+id/action_button_play"
+            android:layout_width="@dimen/audio_player_controls_main_button_width"
+            android:layout_height="@dimen/audio_player_controls_main_button_height"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:contentDescription="@string/accessibility_play"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_playback_play" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <com.andrew.apollo.widgets.RepeatingImageButton
+            android:id="@+id/action_button_next"
+            android:layout_width="@dimen/audio_player_controls_main_button_width"
+            android:layout_height="@dimen/audio_player_controls_main_button_height"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_playback_next" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <com.andrew.apollo.widgets.ShuffleButton
+            android:id="@+id/action_button_shuffle"
+            android:layout_width="@dimen/audio_player_controls_end_button_width"
+            android:layout_height="@dimen/audio_player_controls_end_button_height"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:contentDescription="@string/accessibility_shuffle"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_playback_shuffle" />
+    </FrameLayout>
+
+</merge>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2013, FrostWire(TM). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/player_menu_item_background_selector"
+    android:clickable="true"
+    tools:ignore="PxUsage" >
+
+    <View
+        android:id="@+id/view_player_menu_item_top_divider"
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_alignParentRight="true"
+        android:background="#ff1d2934" />
+
+    <ImageView
+        android:id="@+id/view_player_menu_item_thumbnail"
+        android:layout_width="68dp"
+        android:layout_height="68dp"
+        android:layout_below="@id/view_player_menu_item_top_divider"
+        android:layout_margin="6dp"
+        android:background="#ff172c40"
+        android:contentDescription="@null"
+        android:padding="1px"
+        android:scaleType="fitCenter"
+        android:src="@drawable/artwork_default_micro_kind" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/view_player_menu_item_thumbnail" >
+
+        <TextView
+            android:id="@+id/view_player_menu_item_playingnow"
+            style="@style/MediaPlayerHeaderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/playing_now_colon" />
+
+        <TextView
+            android:id="@+id/view_player_menu_item_artist"
+            style="@style/MediaPlayerHeaderTitleBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/view_player_menu_item_playingnow"
+            android:layout_below="@id/view_player_menu_item_playingnow"
+            android:text="@string/dummy_title" />
+
+        <TextView
+            android:id="@+id/view_player_menu_item_title"
+            style="@style/MediaPlayerHeaderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/view_player_menu_item_artist"
+            android:layout_below="@id/view_player_menu_item_artist"
+            android:text="@string/dummy_title" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/view_player_menu_item_thumbnail"
+        android:background="#ff1d2934" />
+
+</RelativeLayout>

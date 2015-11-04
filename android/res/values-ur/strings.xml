@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<resources>
+    <string name="activity_preferences_name">ترتیبات</string>
+    <string name="activity_browse_peers_name">قریبی لوگ</string>
+    <string name="activity_chat_name">بات چیت</string>
+    <string name="activity_downloads_name">موجودہ ڈونلوڈ</string>
+    <string name="activity_uploads_name">موجودہ اپلوڈ</string>
+    <string name="activity_about">ہمارے بارے میں</string>
+    <string name="disconnected">رابطہ منقطع</string>
+    <string name="all_transfers_will_stop_are_you_sure">سب کی منتقلی رک جائی گی . کیا آپ مطمین ہیں ؟</string>
+    <string name="connect">رابطہ قائم کریں</string>
+    <string name="connecting">رابطہ قائم ہو رہا ہے </string>
+    <string name="disconnect">رابطہ منقطع کریں  </string>
+    <string name="disconnecting">رابطہ منقطع ہو رہا ہے </string>
+    <string name="wait">انتظار فرمائیں </string>
+    <string name="exit">Exit</string>
+    <string name="no_wifi_want_to_fix_it_question"> آپ کا انٹرنیٹ سے رابطہ منقطع ہو گیا ہے . آپ رابطہ کیسے قائم کرنا چاہتے ہیں؟</string>
+    <string name="your_connection_has_dropped_stopping_services">آپ کا انٹرنیٹ سے رابطہ منقطع ہو گیا ہے .تمام کام رک رہا ہے</string>
+    <string name="wifi_network_changed_restarting_services">آپ کا انٹرنیٹ  نیٹ ورک بدل  گیا ہے .تمام کام بحال ہو رہا ہے </string>
+    <string name="no_network_connection">کوئی نیٹورک کنکشن نہیں </string>
+    <string name="leaving_already">ابھی چل دیے ؟</string>
+    <string name="search_label">ڈھونڈو </string>
+    <string name="settings_description">ڈھونڈنے کے ترتیبات</string>
+    <string name="clear_finished">مکمل صاف کریں</string>
+    <string name="waiting">انتظار ہو رها ہے</string>
+    <string name="copy">کاپی</string>
+    <string name="video">ویڈیو</string>
+    <string name="application">سافٹ ویئر</string>
+    <string name="applications">سافٹ ویئرذ</string>
+    <string name="picture">تصویر</string>
+    <string name="pictures">تصاویر</string>
+    <string name="document">دستاویز</string>
+    <string name="documents">دستاویزات</string>
+    <string name="use_mobile_data">بٹٹوررینٹ کے لئے 3G/4Gاستعمال کریں </string>
+    <string name="use_mobile_data_summary">بٹٹوررینٹ کے لئے اپبا موبائل انٹرنیٹ استعمال کریں. آپ کو پیسے چارج کیے جا سکتے ہیں .احتیاط سے استعمال کریں .</string>
+    <string name="choose_wifi_network">ایک وائی فائی نیٹ ورک کا انتخاب کریں</string>
+    <string name="cant_open_file">معاف  کریں یہ فائل کھولنیں نہیں اتی </string>
+    <string name="share_finished_downloads">مکمل ڈاونلوڈ کو وایفاے پہ تقسیم کریں</string>
+    <string name="share_finished_downloads_summary">مکمل ڈاونلوڈ آپ کے وایفاۓ پہ اور FrostWire استعمال کرنے والوں کو دستیاب ہوں گے</string>
+    <string name="are_you_sure_delete_files">کیا آپ واقعی چنی گئی فائلوں کو ہمیشہ کے لئے ختم کرنا چاہتے ہیں؟</string>
+    <string name="mobile_data">موبائل ڈیٹا</string>
+    <string name="azureus_manager_item_checking">چیکنگ</string>
+    <string name="azureus_manager_item_finishing">مکمل ہو رہا ہے</string>
+    <string name="azureus_manager_item_downloading">ڈاؤن لوڈ ہو رہا ہے</string>
+    <string name="azureus_manager_item_seeding">سید ہو رہا ہے</string>
+    <string name="azureus_manager_item_superseeding">Super-Seeding</string>
+    <string name="azureus_manager_item_stopping">بند ہو رہا ہے</string>
+    <string name="azureus_manager_item_stopped">بند ہو گیا ہے</string>
+    <string name="azureus_manager_item_paused">روکا ہوا ہے</string>
+    <string name="azureus_general_view_yes">ہاں</string>
+    <string name="azureus_general_view_no">نہیں</string>
+    <string name="pause_torrent_menu_action">روکو</string>
+    <string name="resume_torrent_menu_action">دوبارہ چلو</string>
+    <string name="peer_http_download_status_downloading">Downloading</string>
+    <string name="peer_http_download_status_complete">مکمل</string>
+    <string name="peer_http_download_status_error">Error</string>
+    <string name="peer_http_download_status_cancelled">منسوخ</string>
+    <string name="peer_http_download_status_waiting">انتظار ہو رہا ہے</string>
+    <string name="peer_http_download_status_unknown">Unknown</string>
+    <string name="peer_http_upload_status_uploading">اپلوڈنگ</string>
+    <string name="peer_http_upload_status_streaming">Streaming</string>
+    <string name="peer_http_upload_status_complete">مکمل</string>
+    <string name="peer_http_upload_status_error">خرابی</string>
+    <string name="torrent_settings">ٹوررینٹ کی ترتیبات</string>
+    <string name="torrent_max_download_speed_summary">زیادہ سے زیادہ ڈاؤن لوڈ کی رفتار</string>
+    <string name="torrent_max_download_speed">زیادہ سے زیادہ ڈاؤن لوڈ کی رفتار</string>
+    <string name="torrent_max_upload_speed_summary">زیادہ سے زیادہ اپ لوڈ کی رفتار</string>
+    <string name="torrent_max_upload_speed">زیادہ سے زیادہ اپ لوڈ کی رفتار</string>
+    <string name="torrent_max_downloads_summary">زیادہ سے زیادہ ڈاؤن لوڈذ</string>
+    <string name="torrent_max_downloads">زیادہ سے زیادہ ڈاؤن لوڈذ</string>
+    <string name="torrent_max_uploads_summary">زیادہ سے زیادہ اپ لوڈز</string>
+    <string name="torrent_max_uploads">زیادہ سے زیادہ اپ لوڈز</string>
+    <string name="torrent_max_total_connections_summary">زیادہ سے زیادہ کل کنکشن</string>
+    <string name="torrent_max_total_connections">زیادہ سے زیادہ کل کنکشن</string>
+    <string name="torrent_max_peers_summary">زیادہ سے زیادہ ساتھی</string>
+    <string name="torrent_max_peers">زیادہ سے زیادہ ساتھی</string>
+    <string name="seed_finished_torrents">مکمل ٹوررینٹ کو سید کریں </string>
+    <string name="seed_finished_torrents_summary">انٹرنیٹ پی بٹ توررینٹ کے ذریے اپنے مکمل داونلوادوں کو اور لوگوں کے ساتھ شیر کریں.</string>
+    <string name="seed_finished_torrents_wifi_only">صرف وائیفائے پے سید کریں </string>
+    <string name="seed_finished_torrents_wifi_only_summary">صرف وائیفائے پے سید کریں تاکہ آپ کا  موبائل انٹرنیٹ نہ استعمال هو </string>
+    <string name="size_unknown">نامعلوم سائز</string>
+    <string name="back">واپس</string>
+    <string name="are_you_sure">تمہیں یقین ہے؟</string>
+    <string name="stop_all_transfers">یہ تمام کی منتقلی روک دے گا</string>
+    <string name="storage_preference_title">سٹوریج کی جگہ منتخب کریں</string>
+    <string name="storage_preference_summary">آپ کے ڈونلوڈ کس جگہ پہ رکھی جاے </string>
+    <string name="loading">لوڈ ہو رہا ہے</string>
+    <string name="wifi_sharing">وایفاے پہ تقسیم</string>
+    <string name="stop">رکو</string>
+    <string name="enable_wifi_sharing">وایفاے پہ تقسیم</string>
+    <string name="crawl_cache_size">کرال کا کیشے %1$.2fMB</string>
+    <string name="deleted_crawl_cache">کرال کا کیشے صاف کریں</string>
+    <string name="clear_search_cache">سرچ کا کیشے صاف کریں</string>
+    <string name="wifi_sharing_settings">وایفاے پہ تقسیم کی ترتیبات</string>
+</resources>

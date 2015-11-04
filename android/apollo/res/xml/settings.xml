@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2012 Andrew Neal
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- UI catetgory -->
+    <PreferenceCategory android:title="@string/settings_ui_category" >
+
+        <!-- Color scheme -->
+        <Preference
+            android:key="color_scheme"
+            android:summary="@string/settings_color_scheme_summary"
+            android:title="@string/settings_color_scheme_title" />
+        <!-- Theme chooser -->
+        <Preference
+            android:key="theme_chooser"
+            android:title="@string/settings_theme_chooser_title" />
+    </PreferenceCategory>
+    <!-- Data catetory -->
+    <PreferenceCategory android:title="@string/settings_data_category" >
+
+        <!-- Only on Wi-Fi -->
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="only_on_wifi"
+            android:summary="@string/settings_download_only_on_wifi_summary"
+            android:title="@string/settings_download_only_on_wifi_title" />
+        <!-- Missing artwork -->
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="download_missing_artwork"
+            android:title="@string/settings_download_missing_artwork_title" />
+        <!-- Missing artist images -->
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="download_missing_artist_images"
+            android:title="@string/settings_download_artist_images_title" />
+    </PreferenceCategory>
+    <!-- Storage catetory -->
+    <PreferenceCategory android:title="@string/settings_storage_category" >
+
+        <!-- Delete cache -->
+        <Preference
+            android:key="delete_cache"
+            android:summary="@string/settings_delete_cache_summary"
+            android:title="@string/settings_delete_cache_title" />
+    </PreferenceCategory>
+    <!-- About -->
+    <PreferenceCategory android:title="@string/settings_about_category" >
+        <PreferenceScreen android:title="@string/settings_about_apollo" >
+            <PreferenceCategory android:title="@string/settings_about_category" >
+                <Preference
+                    android:summary="@string/settings_self_title"
+                    android:title="@string/settings_author_title" />
+                <Preference
+                    android:key="version"
+                    android:title="@string/settings_version_title" />
+                <Preference
+                    android:key="open_source"
+                    android:title="@string/settings_open_source_licenses" />
+            </PreferenceCategory>
+            <PreferenceCategory android:title="@string/settings_special_thanks" >
+                <Preference
+                    android:summary="@string/settings_lopez_summary"
+                    android:title="@string/settings_lopez_title" />
+                <Preference android:title="@string/settings_cyanogenmod_title" />
+            </PreferenceCategory>
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+</PreferenceScreen>

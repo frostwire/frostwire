@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<resources>
+	<declare-styleable name="RichNotification">
+	    <attr name="rich_notification_icon" format="reference"/>
+	    <attr name="rich_notification_title" format="string"/>
+	    <attr name="rich_notification_title_underlined" format="boolean"/>
+	    <attr name="rich_notification_description" format="string"/>
+        <attr name="rich_notification_number_of_action_links" format="integer"/>
+        <attr name="rich_notification_action_links_horizontal_margin" format="integer"/>
+	</declare-styleable>
+	
+    <declare-styleable name="SimpleActionPreference">
+        <attr name="button_text" format="string" />
+    </declare-styleable>
+    <declare-styleable name="numberpicker">
+        <attr name="picker_startRange" format="integer" />
+        <attr name="picker_endRange" format="integer" />
+        <attr name="picker_defaultValue" format="integer" />
+        <attr name="picker_maxValue" format="integer" />
+        <attr name="picker_wrap" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="NumberSpinnerPreference">
+        <attr name="spinner_startRange" format="integer" />
+        <attr name="spinner_endRange" format="integer" />
+        <attr name="spinner_defaultValue" format="integer" />
+    </declare-styleable>
+    <declare-styleable name="ClearableEditTextView">
+        <attr name="clearable_hint" format="string" />
+    </declare-styleable>
+
+    <!-- Default ListView style for drop downs. -->
+    <attr name="dropDownListViewStyle" format="reference" />
+
+    <!-- Default ListPopupWindow style. -->
+    <attr name="listPopupWindowStyle" format="reference" />
+    
+    <declare-styleable name="SlidingMenu">
+        <attr name="mode">
+            <enum name="left" value="0" />
+            <enum name="right" value="1" />
+        </attr>
+        <attr name="viewAbove" format="reference" />
+        <attr name="viewBehind" format="reference" />
+        <attr name="behindOffset" format="dimension" />
+        <attr name="behindWidth" format="dimension" />
+        <attr name="behindScrollScale" format="float" />
+        <attr name="touchModeAbove">
+            <enum name="margin" value="0" />
+            <enum name="fullscreen" value="1" />
+        </attr>
+        <attr name="touchModeBehind">
+            <enum name="margin" value="0" />
+            <enum name="fullscreen" value="1" />
+        </attr>
+        <attr name="shadowDrawable" format="reference" />
+        <attr name="shadowWidth" format="dimension" />
+        <attr name="fadeEnabled" format="boolean" />
+        <attr name="fadeDegree" format="float" />
+        <attr name="selectorEnabled" format="boolean" />
+        <attr name="selectorDrawable" format="reference" />
+    </declare-styleable>
+
+</resources>

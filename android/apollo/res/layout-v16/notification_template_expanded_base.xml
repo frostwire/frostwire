@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2012 Andrew Neal
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="128.0dip"
+    android:background="@android:color/black"
+    tools:ignore="ContentDescription" >
+
+    <!-- The height cannot be specified any other way. It must read "128.0dip" and cannot be referenced. I think it's a bug. -->
+
+    <ImageView
+        android:id="@+id/notification_expanded_base_image"
+        android:layout_width="@dimen/notification_expanded_height"
+        android:layout_height="@dimen/notification_expanded_height"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/default_artwork"
+        android:scaleType="fitXY" />
+
+    <LinearLayout
+        android:id="@+id/notification_expanded_buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/notification_expanded_base_image"
+        android:divider="?android:listDivider"
+        android:dividerPadding="@dimen/notification_expanded_buttons_divider_padding"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:showDividers="middle" >
+
+        <ImageButton
+            android:id="@+id/notification_expanded_base_previous"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/notification_expanded_button_height"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:padding="@dimen/notification_expanded_button_padding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/btn_notification_playback_previous" />
+
+        <ImageButton
+            android:id="@+id/notification_expanded_base_play"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/notification_expanded_button_height"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:padding="@dimen/notification_expanded_button_padding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/btn_notification_playback_pause" />
+
+        <ImageButton
+            android:id="@+id/notification_expanded_base_next"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/notification_expanded_button_height"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:padding="@dimen/notification_expanded_button_padding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/btn_notification_playback_next" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_above="@+id/notification_expanded_buttons"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/notification_expanded_base_image"
+        android:background="?android:dividerHorizontal" />
+
+    <ImageButton
+        android:id="@+id/notification_expanded_base_collapse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="?android:selectableItemBackground"
+        android:padding="@dimen/notification_expanded_collapse_padding"
+        android:src="@drawable/btn_notification_collapse" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_vertical"
+        android:layout_toLeftOf="@+id/notification_expanded_base_collapse"
+        android:layout_toRightOf="@+id/notification_expanded_base_image"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/notification_info_container_padding_left"
+        android:paddingTop="@dimen/notification_expanded_content_padding_top" >
+
+        <TextView
+            android:id="@+id/notification_expanded_base_line_one"
+            style="@style/NotificationText"
+            android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent.Title" />
+
+        <TextView
+            android:id="@+id/notification_expanded_base_line_two"
+            style="@style/NotificationText"
+            android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent" />
+
+        <TextView
+            android:id="@+id/notification_expanded_base_line_three"
+            style="@style/NotificationText"
+            android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent" />
+    </LinearLayout>
+
+</RelativeLayout>

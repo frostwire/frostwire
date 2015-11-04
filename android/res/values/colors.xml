@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<resources>
+
+    <!-- Basic colors -->
+    <color name="basic_white">@android:color/white</color>
+    <color name="basic_blue">#ff38536a</color>
+    <color name="basic_blue_highlight">#ff33b5e5</color>
+    <color name="basic_gray">#ffeceff1</color>
+    <color name="basic_gray_light">#fff5f7f8</color>
+    <color name="basic_gray_dark">#ffdddddd</color>
+
+    <!-- General app colors -->
+    <color name="app_background">@color/basic_blue</color>
+    <color name="app_text_primary">#ff323538</color>
+    <color name="app_text_secondary">#ff696c6f</color>
+    <color name="app_text_disabled">#ffb5b5b5</color>
+    <color name="app_boder_gray_dark">@color/basic_gray_dark</color>
+    <color name="action_bar_background">@color/basic_blue</color>
+    <color name="body_background_white">@color/basic_white</color>
+    <color name="body_background_gray">@color/basic_gray</color>
+    <color name="body_background_gray_light">@color/basic_gray_light</color>
+    <color name="btn_background_on_light">@color/basic_blue</color>
+    <color name="app_text_highlight">@color/basic_blue_highlight</color>
+    <color name="app_rich_notification_background">#ffffedad</color>
+    <color name="app_rich_notification_divider">#ffe7d58f</color>
+    <color name="app_list_item_title_text_color">#ff3b3b3b</color>
+
+    <!-- Other colors (old) -->
+    <color name="frostwire_light_blue">#ff7adafa</color>
+    <color name="frostwire_orange">#ffe9a54c</color>
+    <color name="frostwire_gray_explanation_text">#ff99aabb</color>
+
+    <!-- General application colors -->
+    <color name="app_search_blue">#ff375065</color>
+    <color name="app_dark_blue">#ff264053</color>
+    <color name="app_dark_blue_highlight">#ff21313f</color>
+    <color name="app_dark_blue_selector">#ff233d4e</color>
+    <color name="app_ligh_background">#fff8f8f8</color>
+    <color name="app_dark_icons">#ff546676</color>
+    <color name="app_light_icons">#ffe7ebee</color>
+    <color name="app_highlight_text">#ff33b5e5</color>
+    <color name="app_list_cell_line">#ffdae2e9</color>
+    <color name="all_list_cell_background_visited">#ffe9eef3</color>
+    <color name="app_menu_item_pressed">#ff314c61</color>
+    <color name="app_menu_item_line">#ff1d2934</color>
+    <color name="app_light_gray_text">#ffbfcfdc</color>
+
+    <color name="browse_peer_listview_item_inactive_background">#ffeff0f1</color>
+    <color name="browse_peer_listview_item_foreground">@color/app_list_item_title_text_color</color>
+    <color name="browse_peer_listview_item_inactive_foreground">#ffb1b1b1</color>
+
+    <color name="tpi_unselected_text_color">@color/basic_white</color>
+    <color name="warning_red">#ffff0000</color>
+
+</resources>

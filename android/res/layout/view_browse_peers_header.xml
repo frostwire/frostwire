@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:paddingRight="20dip" >
+
+        <TextView
+            android:id="@+id/view_browse_peers_header_text_title"
+            style="@style/MainFragmentSimpleHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dummy_title" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/view_browse_peers_header_image_button_toggle_wifi_sharing"
+        android:layout_width="28dip"
+        android:layout_height="28dip"
+        android:layout_marginRight="5dip"
+        android:layout_marginTop="3dip"
+        android:layout_alignParentRight="true"
+        android:background="@null"
+        android:contentDescription="@null"
+        android:scaleType="centerInside"
+        android:src="@drawable/wifi_switch"
+        android:text="@null" />
+
+</RelativeLayout>

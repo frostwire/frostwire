@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2012 Andrew Neal
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/notification_base"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:background="@android:color/black"
+    tools:ignore="ContentDescription" >
+
+    <ImageView
+        android:id="@+id/notification_base_image"
+        android:layout_width="@dimen/notification_big_icon_width"
+        android:layout_height="@dimen/notification_big_icon_height"
+        android:background="@drawable/default_artwork"
+        android:gravity="center" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/notification_info_container_padding_left"
+        android:paddingBottom="@dimen/notification_info_container_padding_bottom" >
+
+        <TextView
+            android:id="@+id/notification_base_line_one"
+            style="@style/NotificationText"
+            android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent.Title" />
+
+        <TextView
+            android:id="@+id/notification_base_line_two"
+            style="@style/NotificationText"
+            android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/notification_base_previous"
+        style="@style/NotificationAction.Previous" />
+
+    <ImageButton
+        android:id="@+id/notification_base_play"
+        style="@style/NotificationAction.Play" />
+
+    <ImageButton
+        android:id="@+id/notification_base_next"
+        style="@style/NotificationAction.Next" />
+
+    <ImageButton
+        android:id="@+id/notification_base_collapse"
+        style="@style/NotificationAction.Collapse" />
+
+</LinearLayout>

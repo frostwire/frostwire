@@ -1,0 +1,1047 @@
+FrostWire 1.6.5 - OCTOBER/28/2015
+ - Fixes bug where search results that have finished didn't refresh
+   user interface and users would think FrostWire was searching forever.
+ - Compatible with Android 6 (Marshmallow) new permissions framework.
+ - Won't crash on Android 6.
+ - Apk search results icon is now an Android head.
+ - Fixes SoundCloud search.
+ - Multiple crash fixes.
+ - New Keep In Touch dialog after the installation wizard.
+ - New Copy Magnet action on transfers.
+ - New Copy Infohash action on transfers.
+ - New "Help" menu entry.
+ - Updated Spanish, Polish, Croatian translations.
+ - Fixes bug where it wouldn't open finished .apk files from transfers screens.
+ - Fixes TPB search.
+ - Fixes BTjunkie search.
+ - Fixes Torlock search.
+ - Simpler versionCode based update check will allow us to roll out incremental/hotfix
+   builds to users running same version with older builds.
+
+FrostWire 1.6.4 - SEPTEMBER/24/2015
+ - New http engine based on okhttp, uses pooled connections, less threads, less memory.
+ - Visited previews also marked as visited and remembered during session.
+ - Fixes SoundCloud.
+ - Fixes KAT search.
+ - Fixes BitSnoop search.
+ - Browse and manage your .torrent files.
+ - Browsing document files now reveals all saved .apk files.
+ - Multiple crash fixes on audio player.
+ - No more annoying yellow notification messages when removing tracks.
+ - UX: My files won't forget your search filter if you overscroll for a refresh.
+
+FrostWire 1.6.3 - SEPTEMBER/06/2015
+ - Upgraded Picasso library for image caching.
+ - Code/library cleanup.
+ - New 'Remove Torrent and Data' action on finished torrent transfers.
+ - Clicked search results are marked as visited and remembered during session.
+ - jlibtorrent update 1.1.0.7, rebuilt with new swig library, memory optimizations, crashes fixed.
+ - Fixes EZTV, BtJunkie search.
+ - Fixes issue where torrent downloads would start on 3g/4g disregarding setting.
+ - Multiple crash fixes on audio player.
+
+FrostWire 1.6.2 - AUGUST/14/2015
+ - Multiple crash fixes on audio player.
+ - Updated jlibtorrent library to version 1.1.0.5.
+ - Improvement of file type selector look, better layouts for tablets.
+ - FrostWire Plus YouTube search fixed.
+
+FrostWire 1.6.1 - AUGUST/10/2015
+ - Fixes TorLock search.
+ - Crash fixes on libtorrent/jlibtorrent.
+ - Considerably faster search source processing.
+ - Search engines maintenance fix high cpu usage.
+ - Brings back "Send to/Upload" feature. Deleted by mistake.
+
+FrostWire 1.6.0 - AUGUST/03/2015
+ - Streaming Previews on search results before download. (FrostWire Plus only)
+ - Play .torrent media files while downloading.
+ - Upgrade bittorrent engine to jlibtorrent 1.0
+ - Updated SoundCloud search & download api.
+ - Improved search suggestions.
+ - Improved transition between My Music and Home screens.
+ - Multiple crash fixes in music player.
+
+FrostWire 1.5.8 - JUNE/16/2015
+ - Search performance improvements.
+ - Issues where subsequent searches would stop working fixed.
+ - TorLock search fixed.
+ - Added SSL (https) support for torrent web seeds.
+ - Icons/graphics update.
+ - New 'Rate us' reminder notification.
+ - WiFi sharing functionality removed. Less than 0.2% of the user
+   base making use of this, despite multiple rewrites we never
+   managed to get it to work 100% of the time.
+ - frostwire-jlibtorrent library updates.
+
+FrostWire 1.5.7 - MAY/15/2015
+ - KAT search fixed.
+ - Monova search fixed.
+ - EZTV search fixed.
+ - Bitsnoop downloads fixed.
+ - BTJunkie downloads fixed.
+
+FrostWire 1.5.6 - MAY/08/2015
+ - Further YouTube search fixes for non-english users.
+
+FrostWire 1.5.5 - MAY/07/2015
+ - YouTube search fixed. (FrostWire Plus only)
+ - Domain alias manager removed.
+
+FrostWire 1.5.4 - MAY/04/2015
+ - Crash fixes.
+ - Major icons make over. Crisp look on higher density screens.
+
+FrostWire 1.5.3 - APRIL/23/2015
+ - Crash fixes.
+ - Reduced installer size to 7.6 MB.
+ - Lollipop compatibility fixes.
+ - Bitsnoop search faster for individual files.
+ - Binary Optimizations.
+ - libtorrent updates.
+ - Spanish, Portuguese, Polish translation updates.
+
+FrostWire 1.5.2 - APRIL/17/2015
+ - Significant improvements in search results for individual files.
+ - Significant reduction of DHT queries, freeing up networking resources.
+ - Faster torrent download start.
+ - Fixes download error on some Archive.org search results.
+ - When no search results are found, search suggestions are calculated from search keywords.
+ - Fixes Yify search.
+ - Icon/buttons refresh on transfer screen.
+ - Fixes issues with SD Card storage on Android 5.0 (Lollipop)
+ - FrostWire notification icon now Lollipop compatible.
+
+FrostWire 1.5.1 - APRIL/07/2015
+ - Removed all notifications explaining why no more YouTube search results on Basic version.
+ - Updated about screen to denote what FrostWire distribution is installed.
+
+FrostWire 1.5.0 - APRIL/03/2015
+ - Upgraded frostwire-jlibtorrent to the latest code from libtorrent.
+ - Users can now donate to torrent creators, both Fiat and Bitcoin when available.
+ - TPB, BTJunkie, KAT, Monova searches fixed.
+ - New Bittorrent setting to enable/disable DHT connectivity.
+ - YouTube search disabled for Google Play distribution.
+ - Fixes annoying bug where user would be notified for old finished downloads.
+ - Fixes bug where songs that were deleted were not being cleared from playlists.
+ - Fixes bug where removing last song from Favorites playlist would not clear.
+ - Fixes bug where it would show "Play All" menu action on empty playlists.
+ - Fixes bug where sharing on WiFi from certain 3rd-party file explorers wouldn't work.
+ - Fixes bug where file descriptors fetched by content:// uris wouldn't have a disk path available.
+ - Fixes 2 crashes on music player.
+ - Chinese, Polish, Spanish translations update.
+
+FrostWire 1.4.9 - MARCH/03/2015
+ - New KAT search.
+ - Fixed BTJunkie search issues causing ANR crashes.
+ - Fixed Mininova search. Few results coming in due to low seed numbers.
+ - Removed Appia Search.
+ - Clean up: Removed Appia, RevMob, Google In-App purchasing libraries.
+ - Updated Croatian translation. Thanks @win32re.
+ - Refactors, cleanup, misc fixes.
+
+FrostWire 1.4.8 - FEBRUARY/25/2015
+ - Fixes YT file save issue.
+
+FrostWire 1.4.7 - FEBRUARY/23/2015
+ - TPB search fixed.
+ - Monova search fixed.
+ - Removed Support FrostWire controls.
+ - SoundCloud download issue fixed.
+ - RevMob integration.
+ - Crashes and bug fixes.
+ - Croatian translation update.
+
+FrostWire 1.4.6 - FEBRUARY/09/2015
+ - Fixes issue where finished torrents would re-download the last pieces on startup.
+ - Updated Picasso image caching library.
+
+FrostWire 1.4.5 - FEBRUARY/06/2015
+ - Youtube search improvements.
+ - Removed Torrents.fm search, service was shutdown.
+ - Fixes issue when removing last song on a playlist.
+
+FrostWire 1.4.4 - JANUARY/29/2015
+ - Finished transfers no longer should show as paused.
+ - Fixes issue adding a whole torrent after having added a single
+   file belonging to that same torrent to transfers. Now the whole
+   torrent will be downloaded as expected.
+ - Fixes Out of memory errors on MobileCore library.
+ - Fixes possible crash when exiting the app right after launching it.
+ - If storage location has ran out of space available FrostWire
+   will show a descriptive error message explaining why the download
+   has failed.
+ - Removes free apps ads from home page and sticky ads on transfer screens.
+ - Fixes issue where toast about shared file would not go away.
+ - Fixes settings screen issue where some android devices would automatically
+   toggle the BitTorrent connection.
+ - Fixes issues with YouTube search.
+ - Urdu translation started.
+
+FrostWire 1.4.3 - JANUARY/05/2015
+ - Player un/favorites current track on double tap. Thanks @votaguz.
+ - Music Player database errors reported fixed.
+ - MobileCore ads integration. Ads can be turned off under settings.
+
+FrostWire 1.4.2 - DECEMBER/22/2014
+ - New: Music Player (forked out of Apollo Player).
+ - New: Playlist support.
+ - New: Browse music by Recent, Artists, Albums, Songs, Genres.
+ - New: Change cover art on Playlists, Songs.
+ - New: Shuffle All music.
+ - Torrent/Magnet caching improvements reduce the number of DHT
+   requests when searching, which makes search result parsing faster
+   in most cases.
+ - When sharing files from 3rd party apps with FrostWire, the file
+   shared will be displayed by FrostWire as available via Wi-Fi sharing.
+   If the file is a .torrent the torrent transfer will start.
+ - Not using wifi multicast lock for energy savings.
+ - 'Preferences' renamed to 'Settings'
+ - About activity moved out of navigation menu and into Settings screen.
+ - Audio files can now be set as ringtones from My Files > Audio.
+ - Settings screen rearrangement.
+
+FrostWire 1.4.1 - DECEMBER/02/2014
+ - Updated jlibtorrent binaries.
+ - Resilience to file disk permission errors causing the app to
+   not start in some environments.
+ - Improved disk I/O when persisting states of torrent transfers.
+ - Refactors, Cleanups and other misc. bug fixes.
+ - Improved user experience on transfer list actions.
+ - Preferences screen won't automatically kick user to search screen
+   when BitTorrent connectivity changes.
+
+FrostWire 1.4.0 - NOVEMBER/08/2014
+ - Replaced Vuze Bittorrent engine for frostwire-jlibtorrent,
+   a java wrapper to the native libtorrent BitTorrent library.
+ - Peak memory usage dropped 50% when searching.
+ - Peak memory usage dropped 16% when downloading torrents.
+ - Number of threads dropped 41% when searching.
+ - Number of threads dropped 60% when downloading torrents.
+ - Peak CPU usage dropped 66% when searching.
+ - Peak CPU usage dropped 44% when downloading torrents.
+ - Got rid of over 2,000 classes.
+ - New Shutdown feature, stops all services and activities,
+   FrostWire process ends gracefully.
+ - Upgraded Picasso library to 2.4.0.
+ - More responsive and stable torrent state handling experience.
+ - Torrent downloads start faster.
+ - Torrent downloads connect to more peers.
+ - Updated German translation.
+ - Updated Croatian translation.
+ - Updated Polish translation.
+ - Updated Spanish translation.
+ - Updated Russian translation.
+ - Gets rid of Transcommu.
+ - Project is now built using gradle script.
+ - Updated Preferences screen BitTorrent connection status button.
+ - Fixes severe startup crash on Samsung Galaxy Mini devices.
+ - Multiple bug fixes and crashes.
+ 
+
+FrostWire 1.3.8 - SEPTEMBER/18/2014
+ - Fixes issue where FrostWire would think a Wi-Fi shared file belonged 
+   to a removed SD card.
+
+FrostWire 1.3.7 - AUGUST/23/2014
+ - Japanese translation update. Thank you @naofum!
+ - Fixes on cloud search/download.
+
+FrostWire 1.3.6 - AUGUST/12/2014
+ - Improved cloud search results.
+ - Transcommu community based translation tool integrated.
+ - Chinese translation update.
+
+FrostWire 1.3.5 - AUGUST/08/2014
+ - Major updates to mp4 parsing code.
+ - Updated image cache Picasso library to 2.3.3.
+ - Fixes possible crash when browsing files on device.
+ - Fixes crash when playing a ringtone (Kindle Fire HD, Android 4.0.3 devices)
+ - Fixes Transfer screen rendering issue on startup.
+ - Fixes soundcloud track/sets download by url.
+
+FrostWire 1.3.4 - JULY/20/2014
+ - Large torrent downloads start a lot faster. Prevents possible
+   freezing (ANR) on some devices.
+ - Restored SD Card writing capabilities under new Android rules.
+   WARNING: All files stored to the application's SD Card folder
+   will be lost in the event of uninstalling. This is a problem
+   for every application on Android, not by our design.
+   Make sure to backup or sync files saved to the SD Card.
+ - Doesn't prefer external storage as the app install path.
+ - Opens Music Player window when playing a song from My Music.
+ - Moved vuze settings files to primary external private folder.
+ - Updated Preferences screen, setting groups now in separate sub-screens.
+ - Cleans up empty .torrent placeholder files when single torrent file download complete.
+ - Translation updates for Spanish, French, Polish, Portuguese.
+
+FrostWire 1.3.3 - JUNE/27/2014
+ - Improvements in memory consumption and performance for image caching.
+ - Download Soundcloud Tracks and Playlists by entering URL on search box.
+ - Download Soundcloud Tracks and Playlists by entering URL on Transfer "+" control.
+ - Search YouTube videos by pasting YouTube URL on search box.
+ - Fixes YouTube download error.
+ - Fixes issue with Connect/Disconnect preferences button.
+ - Fixes issues with Torrents.fm search.
+ - Transparent use of ViewHolder pattern in ListViews.
+ - GSON library update.
+ - Picasso library update.
+
+FrostWire 1.3.2 - MAY/29/2014
+ - Fixes audio player crash.
+
+FrostWire 1.3.1 - MAY/15/2014
+ - Fixes issue where torrent transfers would start even after user disconnected
+   in the preferences screen.
+ - Fixes ConcurrentModificationException crash on transfer manager.
+ - Fixes Unable to Pause Activity on MediaPlayer screen.
+ - Fixes reported crash starting a transfer.
+ - Fixes issues with EZTV search.
+
+FrostWire 1.3.0 - APR/30/2014
+ - Upgraded BitTorrent engine with latest code from Azureus project.
+ - Added uTP packet congestion support.
+ - Added Canonical Peer Priority support. (BEP40)
+ - Upgraded Android SDK target to Ice Cream Sandwich's API (15 - Android 4.0.3).
+   Users on Android devices running older versions will have to use FrostWire 1.2.3
+   or upgrade their operating system to +4.0.3 to receive further updates.
+ - Removed cling library for Local peer discovery, switched to JmDNS compatible with
+   frostwire for desktop 5.7.1.
+ - Considerable memory handling improvements, lots of leaks fixed which should lead
+   to very little out of memory errors from crashing the app.
+ - Added optional sponsored search results by Appia.
+ - Minor upgrades to audio player and Frostclick.com's free promotional downloads.
+ - Added TPB, Torrents.fm, Monova and Yify search. Search results available only when on a Wi-Fi connection.
+ - Magnet URI support when touching a magnet link on a web site.
+ - Paste a magnet or .torrent URI on the Transfers screen to start a download.
+ - Some search results now have image thumbnails. More coming.
+ - When internet connection is dropped, ongoing transfers are automatically paused and
+   restored when internet connection comes back.
+ - Corrected file sizes on SoundCloud search results.
+ - Multiple bug fixes.
+
+FrostWire 1.2.3 - DEC/10/2013
+ - Fixes crash when stopping a 1080p video transfer from cloud service.
+ - Player status bar removes words 'Playing' and 'Paused' instead uses icons.
+ - Number of search results under file type is now the same color as the file type icon.
+
+FrostWire 1.2.2 - DEC/02/2013
+ - Insanely faster cloud search results.
+ - Significant memory optimizations on search result parsing and display.
+ - Major update in cloud downloading architecture, Dynamic Adaptative Streaming over HTTP downloads supported.
+ - Removed jDownloader libraries, less complexity, lighter app.
+ - Fixes bug where transfer progress bar would fill up before download was complete.
+ - Throttles down CPU consumption when updating the audio player timers during playback.
+ - Fixes issue where search file type selector would hide after an orientation change
+   upon no results on the selected file type.
+
+FrostWire 1.2.1 - NOV/04/2013
+ - Fixes focus annoyance on search box after orientation change.
+ - Fixes CPU usage issues with Monova search.
+ - New search engine Eztv.
+ - Fixed crashes and NPEs.
+
+FrostWire 1.2.0 - NOV/01/2013
+ - New Flat Skin makes screens rendering faster.
+ - New, more stable, slide in navigation menu.
+ - Considerable memory usage optimizations.
+ - Fixed skip-song gesture on top of player seek bar.
+ - New icons.
+ - After opening one of My Files, FrostWire will now remember the position of the list of files, no more scrolling down to continue browsing your own files.
+ - Current song being played now is displayed at the bottom of the navigation menu.
+ - Current song being played now shows "Stop" icon when browsing your own audio files.
+ - Updated turkish translation, thanks @Serrae.
+ - New BitSnoop metasearch.
+ - New TorLock metasearch.
+ - Removed ISOHunt metasearch.
+ - Fixed Monova metasearch.
+ - French translation updated.
+
+FrostWire 1.1.4 - OCT/11/2013
+ - Audio player shows correct android notification when paused.
+ - Fixes ExtraTorrent meta search.
+ - Removed Vertor meta search. No longer serving .torrents without captcha.
+ - Updated arabic translation, thanks @nisrmasr.
+ - Updated spanish translation, thanks @muckachina.
+ - Updated portuguese translation, thanks @tati110.
+ - Updated french translation.
+ - Updated turkish translation.
+ - Updated polish translation.
+ - New anonymous usage stats.
+ - Fixed crashes and NPEs.
+
+FrostWire 1.1.3 - SEP/30/2013
+ - Upgrades to SoundCloud meta search.
+ - Kindle Fire and OUYA users can now support FrostWire with donations. 
+
+FrostWire 1.1.2 - SEP/03/2013
+ - Removed offers during installation to comply with new Google Play guidelines.
+ - New: Stop music playback completely by long pressing the play/pause button.
+ - New: Audio Player menu now has "Delete this track" feature, get rid of songs
+   you don't like on your device next time you come across them and keep playing.
+ - New: Turn on/off wifi sharing from Wi-Fi sharing screen. Turning off Wi-Fi
+   sharing results in considerable battery savings since the radio is not being
+   used constantly to discover and announce to other peers on the local network.
+ - Sources on search results are now underlined to hint user of sourc checking feature.
+ - Fixes issues parsing some YouTube urls.
+ - Fixes soundcloud search.
+ - Improved memory usage and multiple memory leaks fixes will avoid a multiple
+   number of crashes due to out of memory errors, specially on older devices
+   with limited memory availability.
+ - Fixes issue with double memory allocation related to
+   first creen's grid view.
+ - Fixed some memory leaks related to picasso bitmap
+    allocations.
+
+FrostWire 1.1.1 - JUN/26/2013
+ - Fixes "Error: Inconsistent download state" bug when connectivity is lost and resumed.
+
+FrostWire 1.1.0 - JUN/10/2013
+ - Upgrades to HTTP client.
+ - Upgrades to Cloud search.
+ - Disables Google Play donations for Kindle Devices.
+
+FrostWire 1.0.9 - JUN/04/2013
+ - Fixed crashes on devices with little memory when trying to load high resolution bitmaps.
+ - Fixed Bug where files with invalid characters would not be transfered via Wi-Fi.
+
+FrostWire 1.0.8 - MAY/31/2013
+ - New main menu entry to launch "FrostWire TV" app.
+ - Search algorithm improvement brings better quality and missing search results.
+ - Local audio files now show album art making local music browsing friendlier.
+ - Fixes bug where audio player would stop instead of pausing when removing headphones.
+ - Updated Image caching based on Picasso, better frame rate overall, should see
+   less Out of memory error reports.
+ - Fixes bug where the search cache couldn't purge old entries nor it could be deleted.
+ - Fix for parsing torrents with minor mistakes in trackers list.
+ - Less intensive HTML detection during torrent parsing
+ - Added jdk14 logging library.
+ - Fixes bug where .torrent files and magnets would not open with some file/web browsers.
+ - Fixes crash reported when there is no access to the image cache folder.
+ - Fixes crash initializing donations Billing Service.
+ - Better description for mobile network data usage and bittorrent preferences.
+ - Removed Google AdMob.
+ - Added donations request component instead of ads.
+ - Integrates Offercast offers on installation.
+ - Experimental OUYA compatibility.
+
+FrostWire 1.0.7 - APR/10/2013
+ - 3 crashes fixed.
+ - Partial file torrent download bug fixed.
+
+FrostWire 1.0.6 - APR/08/2013
+ - Faster search results. Search architecture revised and improved.
+ - Includes search results from archive.org, which indexes millions
+   of public domain and creative commons works from all over the
+   internet.
+ - Reduces CPU and battery consumption up to 84%.
+ - FrostWire won't disable screen locking during audio playback.
+   It's now up to the user to set longer auto-locking timeouts if
+   they want to use FrostWire as an audio player in their vehicles.
+ - UI fix, media player screen is correctly updated if a song starts
+   while the screen was locked.
+ - Updated icons and graphics.
+ - Improved mime type detection.
+ - Supports WebM video search results.
+ - Updated UPnP cling libraries for better Wi-Fi sharing discovery.
+ - Multiple crashes and freezes fixed.
+ - Opens .torrent files from urls and from any file browser.
+ - Faster hashing and checking of ongoing and finished torrent downloads.
+ - Fixes a crash when sharing files from third party apps like FileKicker
+   which pass filepath uris instead of android provider uris.
+ - Fixes double audio playback issue with third party media playing apps.
+ - Fixes bug where the app would force close and restart on phones without SD cards.
+ - Fixes bug on Android 4.x where finished document downloads wouldn't appear under
+   documents.
+ - Avoids crash caused by AdMobSDK and WebView's cache being null.
+ - Fixes bug where sharing files from a third party app would open FrostWire
+   in a way that hitting the back button would take the user to the desktop and
+   not back into the third party app.
+ - Replaced navigation menu for a better one that presents itself with a smooth
+   brief zoom-in animation.
+ - Navigation menu and transfer screen looks properly on Motorola Razor
+ - More efficient use of Bitmaps should cut down on the number of Out of Memory errors on most devices.
+ 
+FrostWire 1.0.5
+ - Kindle Fire HD Compatible.
+ - UX fix, transfers window is shown after starting a peer download,
+   respecting the user setting for this behavior.
+ - Fixes reported crashes on 1.0.4.
+ - MediaPlayer uses Image Loader Cache in hopes to reduce Out of memory errors
+   on older devices.
+ - Updated sharing help images.
+
+FrostWire 1.0.4
+ - UX Improvement on internet search box, hints the user current
+   search context.
+ - UX Improvement, easier to read help on Wi-Fi sharing.
+ - UI fix, search on clearable textboxes no longer goes behind
+   clear icon.
+ - UI fix, avoids duplicated Wi-Fi ongoing downloads.
+ - UI fix, stops Http transfers (Cloud, Peer, Uploads)
+ - Fixes multiple NPEs reported by 1.0.3 users on Google Play.
+ - Updates sharing help imagery.
+
+FrostWire 1.0.3
+ - Multiple fixes upon transfer completion.
+ - Peer announcement/discovery now done using standard UPnP protocol.
+ - Fixes aac/mp4 audio demuxing/boxing incompatibilities 
+   with some Samsung devices.
+ - Audio downloads from SoundCloud now include album art.
+ - Browsing a user sharing only one kind of files is
+   now done proactivey by showing that file type to the
+   user automatically.
+ - Lots of user experience upgrades.
+ - NPE fixes.
+
+FrostWire 1.0.2
+ - New FrostWire 1.0 skin by designer Marcelina Knitter.
+   Complete graphics and experience overhaul.
+ - New vertical navigation menu, solves fragmentation issues
+   on devices that had no way of bringing the preferences menu.
+ - Multiple optimizations for speed and battery life savings.
+ - New music player, still supports gestures to switch, pause,
+   resume songs. Stop button gone.
+ - Share files from the music player. No need to navigate
+   back to 'My Files' to share the song you are enjoying.
+ - Share files on the WiFi network from other applications.
+   FrostWire now will appear as a 'Send' or 'Share' option
+   on third party apps.
+ - Simplified Transfers screen (awesome updates coming)
+ - New design for Setup Wizard.
+
+FrostWire 0.9.14
+ - Search suggestions in Unicode.
+ - Now users can choose the default storage device.
+
+FrostWire 0.9.12
+ - Search performance improvements.
+ - Better international search thanks to improved special character support.
+ - Search status UI feedback improvemens.
+ - Search results remain on screen when the device is tilted.
+ - Search results remain after a transfer has been started.
+ - New animated media player status bar for easy access to media player.
+
+FrostWire 0.9.11
+ - Fixed caching policy.
+ - Fixed feedback while streaming or uploading files.
+ - UX upgrade on transfer manager.
+
+FrostWire 0.9.10
+ - Updated Tabbed interface with Swipey Tabs.
+ - UX upgrades to make local file browsing easier to find.
+ - Fixes issue with Motorola Droid's physical keyboard.
+ - Fixes several crashes.
+ - Fixes NPEs in Media Player.
+ - Fixes important bug on transfer from search result.
+ - WebView caching mode fixed for faster startup.
+ - Removed KAT.ph from search engines.
+
+FrostWire 0.9.9
+ - Fixes NPE in Media Player.
+ - Fixed important bug related to new downloads from search results.
+
+FrostWire 0.9.8
+ - Accepts uploads from FrostWire for Desktop.
+ - 24 Force close errors and freezes fixed.
+
+Frostwire 0.9.7
+ - Media Player is now car driver safe. Skip songs with swipe gestures,
+   pause and play songs by tapping the screen with two or more fingers.
+ - When a user makes or receives a call, if the Media player was active it
+   will pause and rewind two seconds so the user won't miss a beat.
+ - Media player will now create an automatic playlist using the files on the
+   same folder as the one the user started playing.
+ - Media player is always shown when the user starts playback. Users didn't
+   look at the notification toolbar icon and were getting lost.
+ - Media player has support for previous and next media item.
+ - Media player will pause if another player is started.
+ - Fixes freeze when stopping torrent transfer.
+ 
+FrostWire 0.9.6
+ - Supports installation on external storage.
+ - Sends date added, date modified data to FrostWire for desktop when browsed.
+ - Improvements in search performance.
+ - Improvements in search experience.
+ - FrostClick promotions can be downloaded via HTTP.
+ - Multiple UI fixes.
+ - Fixes NPE issues.
+
+FrostWire 0.9.5:
+ - Search box provides hints for less touch typing (powered by Google)
+ - Application translated to 16 languages: Chinese, Czech, Danish
+   Dutch, French, German, Hindi, Indonesian, Italian, Japanese, Korean,
+   Polish, Portuguese, Russian, Spanish, Turkish, Vietnamese
+ - Timeout adjustments for Wi-Fi browsing and compatibility enhancements
+   for FrostWire for Desktop.
+ - Removed support to defunct BTJunkie.org search, added KAT.ph search engine.
+ - When unmounting and mounting the SD card transfers work and shared states
+   are not reset.
+ 
+FrostWire 0.9.4:
+ - Fixes Issue #1 reported by @untaimed18.
+ - Upgrades to system update mechanism. Keeps backwards compatibility
+   with 0.6.x.
+
+FrostWire 0.9.2:
+ - FrostWire will now start downloading torrents if the user clicks 
+   on a torrent URL or tries to open a .torrent file with other app.
+ - Fixed logic for back button press in Main activity.
+ - Added search button press logic to Main activity.
+ - Fixed logic error in http download handler.
+ - Minor refactor in stop media logic in engine service.
+ - Updated android-support-v4 library to revision 6.
+ - Adjustments in the button layout of the Transfer toolbar buttons.
+ - Fixed toast messages when connecting and disconnecting. Thanks untaimed18
+
+FrostWire 0.9.1:
+ - Fixed issues with local file sharing on the receiving end.
+ - Adjustments on list adapter layouts.
+ - New icons for "Library" and "padlocks".
+ - Added infographic to explain local file sharing.
+ - Made source code publicly available on GitHub.
+ - FrostClick promos are now hidden as soon as a search is started.
+
+FrostWire 0.9.0:
+ - Core-upgrades: BitTorrent support. Metafrost protocol dropped.
+ - Chat dropped.
+ - Local Network transfers now over HTTP.
+ - BitTorrent Smart Search. Searches 
+
+FrostWire 0.6.3:
+ - Core-upgrade: Peer manager performance upgrades should allow faster peer
+   retrieval, peer list sharing, peer browsing.
+ - Core-upgrade: Metafrost cache reset on restart to avoid file transfer errors
+   due to previous miss calculations of metafrost files.
+ - Core-fix: Multiple crashes reported were fixed.
+
+FrostWire 0.6.2:
+ - Core-upgrade: Avoids connecting to too many peers.
+ - UI-upgrade: Shared finished downloads configuration is available on startup.
+ - UI-upgrade: Asks for confirmation before deleting files.
+
+FrostWire 0.6.1:
+ - UI-upgrade: Simpler sharing controls, categories cannot be disabled,
+   checkboxes are always shown when browsing yourself.
+ - UI-upgrade: New FrostWire application icon.
+ - UI-upgrade: New setting to automatically share finished downloads.
+ - UI-fix: Crash when trying to 'Show Love' from context menu.
+ - Core-fix: Crash trying to close an already removed communication channel.
+
+FrostWire 0.6.0:
+ - Core-Upgrade: Inspired by Twitter's Engineering blog http://goo.gl/bg5jk the protocol stack 
+   was rewritten using NIO/Netty. Reducing the numbers of threads, memory and battery consumption
+   considerably. The Application should now be able to browse more peers and feel a lot snappier.
+ - UX-upgrade: See what files are being uploaded.   
+ - UX-upgrade: The multiple selection checkboxes are now available for unshared files.
+ - UX-upgrade: Long pressing on an unshared file and sharing it will now ask
+   to enable sharing for the file type if it was disabled, just like on the padlock icon.
+   The current file type being browsed will also be reloaded to show the user this file type
+   is now available for sharing.
+ - Core-fix: Makes sure FrostWire won't go beyond the max number of peers.
+ - Bug-fix: Crash when trying to check all files when there are no files.
+
+FrostWire 0.5.9:
+ - UI-update: Updated language on initial settings dialog and how to share 
+   dialog. Added scroll bars, which also help if the user is holding the 
+   phone horizontally.
+ - UI-update: Touching files brings up the context menu. Most users are 
+   probably not aware of these menus since they don't know about the long touch.
+ - UI-update: How to share dialog shows the icons related to sharing control 
+   and file selection.
+ - UI-update: A new button is shown next to the user to open the How to 
+   Share/Unshare dialog.
+
+FrostWire 0.5.8:
+ - UI-update: Update messages can now be customized depending on the update being released.
+
+FrostWire 0.5.7:
+ - Bug-fix: Force close on individual file deletion.
+
+FrostWire 0.5.6:
+ - UI-update: New feature to select/unselect all files of a type.
+ - UI-update: When a category is disabled for sharing, padlock icons appear gray.
+ - UI-update: Wording on sharing settings changed to reflect Category Sharing Enablement.
+ - UI-update: Users can only send up to 3 files at the time to the chat to avoid flooding.
+ - UI-policy-update: Users can only batch up to 30 files for downloading to 
+   avoid too many download requests.
+ - Bug-fix: Long timeouts preventing 3G/4G connectivity fixed.
+ 
+FrostWire 0.5.5:
+ - Fixes several crashes.
+ - Revamped initial sharing dialog and instructions on how to share. 
+   Users now have more control over what's being shared.
+ - Bug-fix: Peers removed from the Browse Peer list are correctly banned for the session.
+
+FrostWire 0.5.4:
+ - Better UI refresh when it comes to peers leaving.
+ - Bug-fix: Fixes bug that was breaking file downloads.
+ - Bug-fix: Says good bye to all peers when disconnecting.
+ - Fixes 2 crashes.
+
+FrostWire 0.5.3:
+ - Hotfix release. FrostWire was allowing too many peers in. 
+ 
+FrostWire 0.5.2:
+ - UI-fix: Search box has round borders and shaded background.
+ - Bug-fix: Several reported crashes.
+ - Bug-fix: Fixes issue where peers would not send pings correctly and connections got stale
+   thus breaking Browseability and Connectivity on the network.
+   
+FrostWire 0.5.1:
+ - Bug-fix: Possible NPE for peers not sending Geo-Location when exchanging Peer Lists.
+ - Bug-fix: Coloring issue on Search Results that hadn't been downloaded.
+
+FrostWire 0.5.0:
+ - New Feature: 3G/4G support. Use FrostWire outside your Wi-Fi network.
+ - New Feature: Send file(s) to chat. Long press on a file or select many, then send to the chatroom.
+ - UI-love: Updated look of Screen Headers. Tabs and Headers have new gradient looks and look well across all devices.
+   Better looking buttons on Transfers screen.
+ - UI-fix: Updated "Love FrostWire" section. No more donations until we integrate payment system. 
+   Please rate us 5 stars on the Android Market if you like the app instead.
+ - UX-upgrade: Distances to peers now shown in both miles and kilometers (by popular demand)
+ - UX-upgrade: Peer Browsing is more frugal in screen real-state. Good for small screens.
+ - Drops support for Android 1.6 to favor health of the network with faster/better peers.
+ - Bug-fix: Fixes several reported (NPE) crashes.
+ 
+FrostWire 0.4.28:
+ - Bug-fix: 2 Force Closes that appeared since 0.4.25 finally fixed.
+
+FrostWire 0.4.27:
+ - Better Search Routing & Browsing connectivity.
+ - Bug-fix: Multiple force close issues fixed.
+ - Bug-fix: Fix for Samsung Galaxy Tab crashes.
+ - Bug-fix: Removed Peers will disappear right away from the list.
+
+FrostWire 0.4.26
+ - Core-Upgrade: Better p2p search algorithm and new peer management heuristics to find and keep closer peers.
+ - Bug-fix: workaround to WiFi lock/sleeping bug on some Android versions/devices.
+ - Bug-fix: multiple force close issues fixed.
+ - UX-Upgrade: Internationalization: Italian Support (i18n).
+ - UX-Upgrade: Remotely firewalled peers appear in light blue color.
+
+FrostWire 0.4.25
+ - Core-Upgrade: Improves WiFi network detection logic.
+ - UX-Upgrade: Connection Status now shows if user is firewalled or not, along the connection type.
+ - Bug-fix: fixes locking bootstrapping issues which caused connections to drop and affect search.
+
+FrostWire 0.4.24
+ - Core-Upgrade: Socket management rewritten to connect behind most firewall configurations (almost ready for 3G/4G support)
+ - Core-Upgrade: Rewrite of Application Provider.
+ - UX-Upgrade: Internationalization: French Support (i18n).
+ - UX-Upgrade: When browsing your own apps you now see their corresponding icons.
+ - UX-Upgrade: New setting to control vibration notifications upon finished downloads.
+ - Bug-fix: Crash when opening an old notification if the app wasn't running.
+ - Bug-fix: Copying .apk files from the phone to the desktop didn't work.
+ - Bug-fix: Possible search result filtering Exception fixed. Better search results for the network.
+ - Bug-Fix: Fixes obscure FC when starting a batch download then hitting the Back button right away.
+ - Bug-Fix: Fixes I/O bug that should result in less "Waiting..." cases when browsing peers.
+ - UI-Fix: Smoother scrolling and updating of Peer list.
+
+FrostWire 0.4.23
+ - UX-Upgrade: Internationalization: Spanish Support (i18n).
+ - Bug-Fix: Issue where apps were not being shared.
+ - Core-Upgrade: Support for file transfers to FrostWire for Desktop > 4.21.2 
+ - UI-Fix: Search results you started downloading appear in blue without having to scroll.
+ - UI-Upgrade: Peers appear sorted by Geo-Distance if available, otherwise alphabetically by nickname.
+ - UI-Upgrade: Core message handling optimizations for faster UI response.
+ - Bug-Fix: 4 commonly reported crashes fixed.
+
+FrostWire 0.4.22
+ - UI-Fix: The Browse Peer List stops refreshing for 2 seconds after it receives a touch event.
+           Real time refreshes was making it too hard to perform long presses and even single presses.
+ - Core-Fix: Fixed bug on disconnect message.
+ - Core-Upgrade: Support for FrostWire for Desktop file transfers and streaming. Compatible with the upcoming FrostWire 4.21.2 for Desktop.
+ 
+FrostWire 0.4.21
+ - Core-Upgrade: More strict search results and huge bandwidth savings for the network as a whole.
+ - Bug-Fix: Android Core-UI Messaging Memory leak would kill the application after ~10 hours. Lower memory usage. 
+
+FrostWire 0.4.20
+ - Core-Upgrade: Smarter search results. Ignores english conjunctions, prepositions, pronouns and articles whenever possible.
+ - Bug-Fix: Issue with fine grained shared states getting lost.
+ - Bug-Fix: Force close when changing nickname while disconnected.
+
+FrostWire 0.4.19
+ - UX-Upgrade: When Browsing a peer Long Pressing on it's name shows possible actions on the peer.
+ - UX-Upgrade: Fresh installs ask user about nickname and what files to share from the beginning to do away with any privacy issues.
+ - UX-Upgrade: Set Audio file as ringtone on Long Press.
+ - UX-Upgrade: Set Picture as wallpaper.
+ - UX-Upgrade: Clicking on the connection bars brings out the Preference Menu, for users that are not familiar with Android and looking to connect.
+ - UX-Fix: Copying and sharing finished downloads on the Chat now links to the copy on your phone.
+ - Bug-fix: Fixes issue with UDP broadcasts not being received correctly.
+ - Bug-fix: Fixes force close when changing nickname during application startup.
+ - Bug-fix: Fixes issue with negative number of shared files.
+ - Core-Upgrade: Faster counting of Shared/Unshared files.
+ - Core-Upgrade: Faster Browse responses.
+ - Core-Upgrade: Faster startup.
+ - Core-Upgrade: Faster scanning of local peers.
+ - Core-Upgrade: Faster shutdown.
+
+FrostWire 0.4.18
+ - Bug-fix: Issue with Menu and Search buttons on Browse Peers fixed.
+
+FrostWire 0.4.17
+ - UX-Upgrade: When user hits Back button, it's asked if they actually want to leave FrostWire.
+ - UX-Upgrade: When user tries the Android physical search button it's taken to the search screen.
+ - Core-Upgrade: Faster peer management.
+
+FrostWire 0.4.16
+ - UX-Upgrade: After typing a search for the wrong file type, changing the file type will start another search for the same keywords. 
+   No need to bring up the keyboard out.
+ - Core-Upgrade: Revised time outs for persistent connections. Better maintenance and reuse of persistent connections.
+ - Core-Upgrade: Better management of unresponsive peers.
+ - Bug-Fix: Fixes core issue that was causing Chat messages to appear as coming from somebody else and browsing someone you didn't click on.
+ - Bug-Fix: Possible Force closes on application Shutdown and in other situations.
+
+FrostWire 0.4.15
+ - UX-Upgrade: New option to navigate to downloads from FrostWire Logo's Menu (only present if there are any Downloads [active or finished])
+ - UX-Upgrade: Hitting "Back" on Chat or Search tabs won't get you back to the Desktop, you'll be taken to the Browse screen. Too many users getting lost.
+ - UX-Fix: Tab heights should now look the same across all devices [slimmer] (Thanks Dan Jackson for screenshot)
+ - UX-Fix: When submitting a search, File Type selectors are automatically hidden to have more space for search results.
+ - UX-Fix: When typing a search with the virtual keyboard, hitting 'Return' now hides the virtual keyboard.
+ - UX-Fix: Focus bug when trying to long press on yourself in Browse Peer Screen.
+ - Core-Upgrade: Rewrote delivery mechanism of 'Browse Host' messages. Browsing now works 99% of the time. 
+ - Core-Upgrade: FrostWire can now be _configured_ to send messages via TCP or UDP as need be.
+ - Bug-Fix: Possible Force Close when sea rch results arrived.
+
+FrostWire 0.4.12
+ - New Feature: Delete files from the "Downloads" screen. (featured invented by Travis Rhodes, thanks)
+ - New Feature: "Cancel all Downloads". Stops and removes ALL unfinished transfers, no matter what their state is.
+ - New Feature: The first time the application runs the user must accept the terms of use or else the application won't continue.
+ - UX-Upgrade: Search is now friendlier and more obvious to use for the new user.
+ - UX-Upgrade: When browsing a peer the last clicked file type button will appear selected (like in Search)
+ - UX-Upgrade: D-Pad can now be used to click on items.
+ - UX-Upgrade: Visual Feedback upon List Item Touch.
+ - UX-Upgrade: Pressing 'Done' on search virtual keyboard starts a search.
+ - UX-Fix: Manual Listening Port couldn't be set higher than 65000 (thanks votaguz)
+ - Core-Upgrade: Flood control mechanisms to reduce message forwarding.
+ - Core-Upgrade: Smarter search algorithm, improved result accuracy, reduces network load. 
+ - Bug-Fix: Searches with single quotes would yield no results.
+ - Bug-Fix: Now the application shuts down properly.
+ 
+FrostWire 0.4.11
+ - Core-Upgrade: Revised Peer crawling strategy when FrostWire finds itself almost alone.
+ - Bug-Fix: A lagged Browse response from another peer could interfere when browsing a new peer.
+
+FrostWire 0.4.10
+ - Bug-Fix: Chat issues fixed.
+
+FrostWire 0.4.9
+ - Upgrade: FrostWire will find better quality peers based on both Geo Location and Network Distance. Better experience when browsing.
+ - Bug-Fix: FrostWire should not display chat messages from unknown peers (issue with empty chat messages)
+ - Bug-Fix: FrostWire would return negative numbers of shared files if users would delete Unshared files outside FrostWire. 
+
+FrostWire 0.4.8
+ - New Feature: Remove Peer. It will remove the peer from your list and black list it during the session's lifetime.9
+ - UX-Upgrade: Typos and updates in the UI's text (thanks James W. Wilson)
+ - UX-Upgrade: Warning on disconnect if there are any active transfers.
+ - Bug-Fix: Issue with shared file count if user unshared all files one by one and then unshared all in bulk.
+ - Bug-Fix: Generic socket errors caused by older clients in the network.
+ - Bug-Fix: Issues with GPS and Network location providers. Location updates will only be requested every 5 minutes if location providers are available.
+
+FrostWire 0.4.7
+ - Installer size reduced to 357K
+ - New Feature: "/me" in the Chat room is replaced with your nickname. IRC old school 3rd person.
+ - UX-Upgrade: Peer list shows the version number. If your FrostWire is old, it will appear in red.
+ - UX-Upgrade: Search and Chat tabs are disabled when disconnected. 
+ - UX-Upgrade: Context aware display of Go to: Home | My Files.
+ - UX-Upgrade: Offer to change nickname for first time users will re-appear if the user tilts the phone to use keyboard.
+ - Core-Upgrade: Improved port handling for LAN interaction.
+ - Core-Upgrade: Better maintenance of Peer List and revisited ping heuristics.
+ - Bug-Fix: Force Close when trying to browse yourself if disconnected.
+ - Bug-Fix: Force Closes when trying to manage incoming and outgoing candidate peer lists.
+ 
+FrostWire 0.4.6
+ - New Feature: Go to My Files
+ - New Feature: Clear Chat. Long press on the text box to make this appear.
+ - New Feature: Share your Documents,Pictures,Photos and Audio via email, android's bluetooth service, sms and via web services (e.g. twitter, facebook, flickr)
+ - New Feature: "Copy" search a result (to share it via private message or to everyone in the chat).
+ - Upgrade: Considerable optimization of object management when displaying peers, files, transfers and chat messages.
+ - Bug-fix: Deleting too many individually unshared files could cause a bug where no files of that type would be shared.
+ - Bug-fix: Cleans all temporary files on exit.
+ - Installer size reduced 16%.
+ 
+FrostWire 0.4.5
+ - Networking-Upgrade: Fixes in search routing algorithm to avoid redundant message forwarding.
+ - UX-Upgrade: Touching the FrostWire logo shows a menu to Go Home, See About or Show FrostWire some love.
+ - UX-Upgrade: Several optimizations for smoother scrolling and better resource management.
+ - UX-Upgrade: Tapping on someone's nickname on the Chat will autotype @Nickname on the text box.
+ - UX-Upgrade: New icons for Settings, Home and Love.
+ - UX-Fix: Private messages take you to the Chat tab, not the Chat Activity by itself.
+ - UX-Fix: When a file's shared state is changed using the padlod icon the number of shared files of its kind gets updated.
+ - UX-Fix: Padlock icons are not shown on search results.
+ - Bug-fix: Downloading the same file twice from the same peer would fail. Memory referencing issues fixed.
+
+FrostWire 0.4.4
+ - New Feature: Auto update.
+ - New Feature: Change your nickname by long pressing on your own name on the Browse Peers screen.
+ - New Feature: "Padlock" button when browsing your shared files to toggle sharing status without much hassle.
+ - Networking-Upgrade: New Peer Exchange policies result in considerable bandwidth.
+ - Search/Transfer-Upgrade: All peers involved in a file transfer are now keeping a metafrost file when finished, thus announcing themselves in search results as confirmed sources for that file. Metafrost files are now kept in folders by type to not put a strain on the file system as more and more files are shared.
+ - UX-Upgrade: Chat tab now shows the number of unread messages.
+ - UX-Upgrade: When starting up FrostWire will ask new users to change their nickname.
+ - UX-Upgrade: When disconnected you are taken to the home screen so you won't be confused by things not working.
+ - UX-Upgrade: Application search results now include version number.
+ - UX-Upgrade: Search Result Batch Downloads (using checkboxes)
+ - UX-Upgrade: Search results are cleared before new results are in.
+ - UX-Upgrade: Checkboxes auto-clear when you start a batch download.
+ - UX-Upgrade: Failed, Out of sources and Timed out transfers can now be individually deleted from the list of transfers.
+ - Bug Fix: Fixes SQLite 'where' clause bug with multiple keyword queries. Search will yield more results as everyone updates.
+ - Bug Fix: Incoming repeated Search responses are short circuited. Distinct results are forwarded only once. Traffic savings. 
+ - Bug Fix: Fixes logic issues for optimal LAN packet delivery. You should feel faster peer browsing and discovery. 
+ - Bug Fix: Audio player when browsing yourself works as expected.
+ - Bug Fix: Possible Force Close when pinging peer list and a peer says good bye.
+
+FrostWire 0.4.3
+ - UX-Upgrade: Chat window should receive messages even if you're not looking at it. Layout updates.
+ - UX-Upgrade: Transfer screen will autoscroll to the bottom to show the newest additions.
+ - UX-Upgrade: When files are downloaded file names are marked in a different color.
+ - UX-Upgrade: No more multiple FrostWire icons on the notification bar. A number will display how many finished transfers you have.
+ - UX-Upgrade: Download indicator now stays after all downloads are finished if transfers have not been cleared. It will display in orange the number of finished transfers so you can go back to your finished downloads even if disconnected.
+ - UX-Fix: Fixed size of "Delete" icon.
+ - Bug Fix: Internet Discovery toggle bug fix.
+ - Bug Fix: Force Close when starting a download of more than 15 checked files. 
+ - Bug Fix: Force Close when setting Simultaneous Uploads to 0. (thanks Steven Peterson, Eric O'Brian)
+
+FrostWire 0.4.2
+ - New Feature: New Setting to discover (or not) peers over the internet. Limit your searching to your LAN only if you need to.
+ - UX-Upgrade: Thumbnails are shown when browsing your own pictures and videos. 
+ - UX-Upgrade: New search controls.
+ - UX-Upgrade: Batched downloads start faster.
+ - UX-Bug Fix: Force close when changing manual listening port fixed.
+ - UX-Bug Fix: Clicking on the Active Downloads button won't reload the Transfer's screens if you're already standing on it.
+ - UX-Bug Fix: About screen can be scrolled down. Includes Thanks to alpha testers.
+ - Bug Fix: Search results outside local Wi-Fi network couldn't start a download.
+
+FrostWire 0.4.1
+ - Bug Fix: NPE when changing simultaneous upload setting.
+ - Bug Fix: Multiple NPEs when handling Search Requests and Search Responses.
+ - Bug Fix: Chat messages and Private Messages back to work.
+
+FrostWire 0.4.0
+ - New Feature: Search.
+ - Bug Fix: Completed,Failed,Cancelled,Timed Out file transfers won't change status to "Out of Sources" if peer leaves.
+
+FrostWire 0.3.10 (file transfer breaks backwards compatibility)
+ - New Feature: New Setting to limit the number of concurrent uploads.
+ - Upgrade: Better rendering of active download(s) progress.
+ - Upgrade: File transfer management optimizations (which break compatibility)
+ - Bug Fix: Correct display of concurrent uploads and downloads.
+ - Bug Fix: 'Application' Download bug fixed.
+ - Bug Fix: Multiple Force Close issues fixed.
+
+FrostWire 0.3.9 (breaks backwards compatibility):
+ - Upgrade: Rewrite File transfer. Considerably faster transfer startup, progressive file validation, 
+   Minimizes Disk/IO and Garbage Collection. Swarming friendly algorithm.
+ - Upgrade: New File Transfer state: 'Waiting...' at start of transfer. (Cancellable state)
+ - Upgrade: Improves robustness of Message delivery.
+ - Upgrade: Automatic Peer Browse retries, updates peer list when peer is unreachable.
+ - Upgrade: Faster internal messaging between network core and UI. 
+ - Upgrade: Protocol Message Types re-arranged for new message queue management strategies.
+ - Upgrade: About page shows name of current Wi-Fi network
+ - Bug Fix: Peers leaving won't appear again on Peer List.
+ - Bug Fix: Multiple NPEs on Browse Peer when a responses would arrive too soon.
+ 
+FrostWire 0.3.8:
+ - Upgrade: Improved Peer Discovery and Peer List maintenance.
+ - Upgrade: Adds new 'failed' state to downloads. We were abusing the 'timeout' state.
+ - Upgrade: Smarter caching of file counts by kind should yield faster browsing responses.
+ - Upgrade: Fixes potential IO (Index Out of Bounds) errors when reading the last part of a file from the socket.
+ - Upgrade: When user is leaving it will also be asked if it's ok to leave while UPLOADs are going on.
+ - Bug Fix: When user is leaving now there's a negative option on the dialog. (thanks Phase3d)
+ - Bug Fix: Patches a NPE when fecthing Application info from .apks that have not been installed. Still to be fixed.
+
+FrostWire 0.3.7:
+ - Update: Longer TCP timeouts (20 seconds)
+ - Bug Fix: Found NPE when fetching Application info on some phones.
+ - Bug Fix: Misc. NPEs handled.
+
+FrostWire 0.3.6:
+ - New Feature: Sharing Android Package Files (.apk)
+ - New Feature: Configuring an arbitrary manual port when UPnP is not an option (between 1000 and 65535 inclusive)
+ - Bug Fix: Several force close issues fixed.
+
+FrostWire 0.3.5:
+ - New Feature: Show number of active Uploads.
+ - New Feature: Delete multiple (checked) files.
+ - Upgrade: Refactors on File Transfer, leaner code.
+ - Upgrade: Faster Ping message creation (battery savings)
+ - Bug Fix: Right text coloring, Numbering on Shared/Unshared files.
+ - Bug Fix: File transfer errors and time outs are displayed correctly.
+ - Bug Fix: Tilting the phone while browsing remote files recovers state as expected.
+ - Bug Fix: No more repeated files when browsing peer.
+
+FrostWire 0.3.4
+ - Bug Fix: Private messages and "Copy & Share" over the internet work
+
+FrostWire 0.3.3
+ - New Feature: Fine grained sharing.
+ - Upgrade: Faster retrieval of shared files.
+ - Upgrade: Faster browsing of your own files.
+ - Upgrade: P2P Peer List Exchange on 'handshake' and when you have few Peers available.
+ - Upgrade: Support for remote chat, remote private message, remote "copy & share" file.
+ - Upgrade: Audio playback is now done through a much simpler audio player inside the application (works for now)
+
+FrostWire 0.3.2
+ - Bug Fix: Internal and Visible Peer lists are cleared upon disconnection.
+ - Bug Fix: FrostWire says good bye properly to all peers and to altamira.
+ - Bug Fix: Memory Leaks fixed in Altamira.
+ - Upgrade: Altamira keeps track of the last time a peer received a peer list for smarter behaviour.
+ - Upgrade: FrostWire now says hello back to unknown peers (pong upon first encounter)
+
+FrostWire 0.3.1
+ - Bug Fix: Android XML Parsing patch for all phones running < Froyo. UPnP should work on all pre-Froyo phones.
+ - Bug Fix: Fixes issue where UPnP map attempt would happen only the first time FrostWire opened.
+ - Update: Distances between peers shown in meter,meters,Km.,Kms.
+ - Update: About screen now shows information about internal & external ports.
+
+FrostWire 0.3.0
+ - New Feature: NAT-UPnP support to connect to other FrostWire's over the Internet (via Wi-Fi only)
+ - New Feature: Ability to select multiple files and perform other actions on them.
+ - New Feature: Ability to rename files. This will make it easier to search images and videos taken with Android phones.
+ - Bug Fix: Fixes WiFi auto connect/disconnect issues.
+ - Bug Fix: Fixes WiFi connectivity issues when switching to other hotspots.
+ - Bug Fix: Fixes intermittent (double connected message) connection issues.
+ - Bug Fix: When disconnected FrostWire won't try to connect if you tilt the device.
+
+FrostWire 0.2.0
+ - Bug Fix: Fixes crash when sending a message to the chat if user is not connected (thanks adwin)
+ - Bug Fix: When the phone was tilted during file browsing the current list of files got lost.
+ - Upgrade: Avoids possible situation where FrostWire cannot know about itself. Faster startup.
+ - Upgrade: Custom looking checkboxes. (FrostWire.Theme in place)
+ - Upgrade: Multiple UI/Text corrections.
+ - New Feature: Select multiple files from another user to perform batched downloads. (download enquement pending, so take it easy)
+
+FrostWire 0.1.0 - code name "Von Neumann"
+ - New Feature: Peer auto discovery on the Wi-Fi network.
+ - New Feature: Wi-Fi network availability awareness.
+ - New Feature: Introducing MetaFrost Mobile P2P protocol version 1
+ - New Feature: Setting to send Geo-Location information to other peers.
+ - New Feature: Displays distance to other peers if available.
+ - New Feature: Settings to Share/Unshare files by file type.
+ - New Feature: Users can be identified by nickname.
+ - New Feature: Community Chatroom over Wi-Fi.
+ - New Feature: Sends private chatroom message to another user.
+ - New Feature: "Copy & Share" your own files in the Community Chatroom to all participants.
+ - New Feature: "Copy & Share" other user's files in the Community Chatroom to all participants.
+ - New Feature: "Copy & Share" files with another user via Private Message.
+ - New Feature: Community Chatroom has 'history' support if user presses D-pad up or down.
+ - New Feature: Community Chatroom has 'history' support if user gestures up or down on the text field.
+ - New Feature: Community Chatroom messages can be cleaned with commands "/cls","/clear" and "clear screen".
+ - New Feature: Browse, Filter, Open and Delete your own shared files.
+ - New Feature: Browse, Filter and Open other user's files.
+ - New Feature: Download other user's files when browsing.
+ - New Feature: Download shared files from chat.
+ - New Feature: Download multiple files at the same time.
+ - New Feature: Open downloaded files.
+ - New Feature: Context menues are available upon Long Click on almost every user interface element.
+ - New Feature: Screen orientation awareness on every screen.
+ - New Feature: FrostWire Status bar indicates number of ongoing downloads.
+ - New Feature: Share picture files.
+ - New Feature: Share video files.
+ - New Feature: Share document files.
+ - New Feature: Share audio files.
+ - New Feature: Connect/Disconnect from local p2p network.
+ - New Feature: "Love FrostWire?" Tip/Donation support to development team.
+ - Pending Feature: Share application files (.apk)

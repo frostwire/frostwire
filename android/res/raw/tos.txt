@@ -1,0 +1,97 @@
+Terms and Conditions
+
+CONDUCT OF USERS
+
+All FrostWire for Android users agree to act responsibly, and in an intelligent and mature manner. Obsessive Flaming, Harassment or Disparaging remarks to other users will not be tolerated.
+
+In your use of FrostWire for Android, you may not:
+
+Infringe any patent, trademark, trade secret, copyright, right of publicity or other right of any party; disrupt or interfere with the security or use of the FrostWire.com sites; interfere with or damage the Sites, including, without limitation, through the use of viruses, cancel bots, Trojan horses, harmful code, flood pings, denial of service attacks, packet or IP spoofing, forged routing or electronic mail address information or similar methods or technology; attempt to use another user's account, impersonate another person or entity, misrepresent your affiliation with a person or entity, including (without limitation) Frostwire, federal, state, or municipal government, or a political candidate; or create or use a false identity; attempt to obtain unauthorized access to the Sites or portions of the Sites that are restricted from general access; engage, directly or indirectly, in transmission of spam, chain letters, junk mail or any other type of unsolicited solicitation, except in those areas of the Sites that are designated for solicitations; collect, manually or through an automatic process, information about other users without their express consent or other information relating to the Sites; use any meta tags or any other hidden text utilizing Frostwire's name, trademarks, or product names; advertise, offer to sell, or sell any goods or services, except as expressly permitted by Frostwire; engage in any activity that interferes with any third party's ability to use or enjoy the Sites; or assist any third party in engaging in any activity prohibited by these TOS.
+
+FrostWire for Android is a peer-to-peer program for sharing authorized files only.  Installing and using the program does not consitute a license for obtaining or distributing unauthorized content.
+
+FrostWire for Android Users may not use FrostWire for copyright infringement.
+
+INTELLECTUAL PROPERTY
+
+Original materials posted by Frostwire are protected by intellectual property laws. Your use of this grants you a non-exclusive license to use the Sites and its materials, but only during access of this site. Except as expressly provided, ALL RIGHTS RESERVED.
+
+Frostwire recognizes that you may want to use trademark, copyright information and other publicly available information belonging to Frostwire on frostwire.com. Frostwire allows for such use and requests that you adhere to the following guidelines:
+
+1. No use of the Frostwire Name, Trademark, and Logo. The Frostwire Name, Trademark, and Logo design may not be used by a third party, unless upon receiving written consent from Frostwire.
+
+2. Hosting and Redistribution of Frostwire Software for profit: Frostwire Software may be hosted or redistributed with Frostwire's Name, Trademark or Logo as long as there's no commercial gain from it's distribution, the software can only be redistributed for free. according to the Creative Commons License under which use of the Software is governed.
+
+3. Any websites or distribution methods owned, operated, or controlled by you shall not be used for sale or redistribution of Frostwire products or materials. Frostwire permits use of Frostwire trademarks only for promotional, instructional or reference materials.
+
+4. Frostwire will not acquire an ownership interest in the materials you post, input or submit to any web site and web site housed or displayed in the Network, but will acquire a non-exclusive license.
+
+SEARCH RESULTS
+
+Search results on FrostWire are drawn from multiple sites across the web. The content may or may not comply with copyright laws in your territory, and FrostWire, LLC is not responsible for content you may download.
+
+DATA PLAN AND MOBILE WIRELESS NETWORKS
+
+FrostWire can connect to the P2P network using Wi-Fi networking or your Wireless Carrier Mobile Data Network. FrostWire is not liable for any additional charges you may incur by exceeding the data quota set on your Wireless Data plan.
+
+Make sure you know the terms of your Wireless Data Plan Carrier in regards to Peer to Peer Networking applications before using FrostWire outside of Wi-Fi networks, FrostWire is not liable for any consequential damages or additional charges that may arise through the use of FrostWire on a Wireless Data plan.
+
+When you use 3G/4G network connectivity you do so at your own risk.
+
+PRIVACY
+
+Frostwire respects the integrity and protection of user's personally identifiable information. All information collected by Frostwire is governed by the Privacy Policy listed on frostwire.com. Please familiarize yourself with this policy.
+
+CHAT GUIDELINES
+
+FrostWire for Android provides a public chatroom where users can establish live conversation. Due to the nature of the immediate ability for members to post comments, questions, and discuss matters of various content, it is impossible for Frostwire to prevent the posting of Obscene Content or Infringing Material. Frostwire may have volunteer moderators which respond to requests by users and or third parties to remove Obscene Content or Infringing Material. The volunteer moderators are under no obligation to perform these duties save there is a court order or legal notice from a court of law.
+
+You are solely responsible for your interactions with other users of the Chat and any content that you post. Frostwire will not be liable for any damage or harm any content or your interactions with other users of the Chat. Frostwire reserves the right, but has no obligation, to monitor interactions between you and other users of the Chat take any other action to restrict access to or the availability of any material another user of the Chat may consider to be obscene, lewd, lascivious, excessive, violent, harassing or otherwise objectionable (including, without limitation, because it violates these TOS).
+
+You may not post, submit or transmit any content that: (i) is libelous, defamatory or slanderous; (ii) advocates the violent overthrow of the government of the United States; (iii) incites, encourages or threatens immediate physical harm against another; (iv) presents an immediate and genuine danger to another person or entity; or (v) violates any applicable law, regulation, or rule.
+
+By posting, storing or transmitting any content on or to the Chat, you hereby grant Frostwire.com a perpetual, worldwide, non-exclusive, royalty-free, sublicensable, right and license to use, copy, display, perform, create derivative works from , distribute, have distributed, transmit and sublicense such content in any form, in all media now known or hereinafter created, anywhere in the world. You hereby irrevocably waive any claims based on moral rights, if any.
+
+
+SUBPOENAS
+
+Frostwire may be required to disclose information to individuals asserting rights under the Digital Millennium Copyright Act. You hereby authorize Frostwire to release information about you if required by law or subpoena without notice to you.
+
+INDEMNIFICATION
+
+You will indemnify Frostwire and its agents, affiliates, and employees from any liability, loss, or expense (including but not limited to reasonable attorneys' fees and costs) resulting from any third-party claim or proceeding in which it is alleged that any content posted by You or the use thereof infringes or violates the intellectual property rights, privacy rights, publicity rights, or moral rights of another or is unlawful.
+
+DISCLAIMER OF WARRANTIES.
+
+YOUR USE OF ANY AND ALL SOFTWARE PROVIDED BY FROSTWIRE ON THE SITES IS WITHOUT WARRANTY, AND IN AN AS-IS CONDITION AND ON AN AS AVAILABLE BASIS. THERE IS NO ABILITY FOR FROSTWIRE TO MONITOR TRANSMISSIONS, USERS, OR CONTENT WHICH MAY BE TRANSFERRED THROUGH USE OF THE SOFTWARE.
+
+FROSTWIRE DOES NOT REPRESENT OR WARRANT THAT THE SITES OR SOFTWARE OR THEIR USE (I) WILL BE UNINTERRUPTED, (II) WILL BE FREE OF DEFECTS, INACCURACIES OR ERRORS, (III) WILL MEET YOUR REQUIREMENTS, OR (IV) WILL OPERATE IN THE CONFIGURATION OR WITH OTHER HARDWARE OR SOFTWARE YOU USE. FROSTWIRE MAKES NO WARRANTIES OTHER THAN THOSE MADE EXPRESSLY IN THESE TOS, AND HEREBY DISCLAIMS ANY AND ALL IMPLIED WARRANTIES, INCLUDING WITHOUT LIMITATION, WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY AND NONINFRINGEMENT.
+EXCLUSION OF DAMAGES.
+
+FROSTWIRE WILL NOT BE LIABLE TO YOU OR ANY THIRD PARTY FOR ANY CONSEQUENTIAL, INCIDENTAL, INDIRECT, PUNITIVE OR SPECIAL DAMAGES (INCLUDING DAMAGES RELATING TO LOST PROFITS, LOST DATA OR LOSS OF GOODWILL) ARISING OUT OF, RELATING TO OR CONNECTED WITH THE USE OF THE SITE, BASED ON ANY CAUSE OF ACTION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+LIMITATION OF LIABILITY.
+
+EXCEPT FOR A BREACH OF A PARTY'S REPRESENTATIONS AND WARRANTIES UNDER THESE TOS OR IN CONNECTION WITH YOUR INDEMNITY OBLIGATIONS UNDER THESE TOS, IN NO EVENT WILL THE LIABILITY OF EITHER PARTY IN CONNECTION WITH THESE TOS, THE SITES EXCEED THE GREATER OF (I) THE AMOUNT PAID BY YOU TO FROSTWIRE DURING THE SIX MONTHS IMMEDIATELY PRECEDING THE EVENT THAT GIVES RISE TO SUCH LIABILITY.
+
+Force Majeure.
+
+Frostwire will not be liable for failing to perform under these TOS by the occurrence of any event beyond its reasonable control, including, without limitation, a labor disturbance, an Internet outage or interruption of service, a communications outage, failure by a service provider to Frostwire to perform, fire, terrorism, natural disaster or war, or sheer laziness. 
+
+LICENSE
+
+Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

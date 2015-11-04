@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false"
+    android:orientation="horizontal" >
+
+    <com.frostwire.android.gui.views.SearchThumbnailImageView
+        android:id="@+id/view_bittorrent_search_result_list_item_filetype_icon"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center|center_vertical"
+        android:contentDescription="@null"
+         />
+
+    <ImageView
+        android:id="@+id/view_bittorrent_search_result_list_item_download_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/browse_peer_list_item_download_button_background"
+        android:contentDescription="@null"
+        android:paddingBottom="21dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="21dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/download_icon" />
+
+    <RelativeLayout
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/listview_item_press_background_selector"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/view_bittorrent_search_result_list_item_title"
+            style="@style/ListItemTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="@string/dummy_title" />
+
+        <TextView
+            android:id="@+id/view_bittorrent_search_result_list_item_ad_indicator"
+            style="@style/ListItemAd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/view_bittorrent_search_result_list_item_title"
+            android:layout_marginBottom="4dp"
+            android:text="Ad" />
+
+        <TextView
+            android:id="@+id/view_bittorrent_search_result_list_item_file_size"
+            style="@style/ListItemSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/view_bittorrent_search_result_list_item_ad_indicator"
+            android:layout_below="@id/view_bittorrent_search_result_list_item_title"
+            android:layout_marginBottom="4dp"
+            android:layout_marginRight="6dp"
+            android:text="@string/dummy_size" />
+
+        <TextView
+            android:id="@+id/view_bittorrent_search_result_list_item_text_extra"
+            style="@style/ListItemExt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/view_bittorrent_search_result_list_item_file_size"
+            android:layout_toRightOf="@id/view_bittorrent_search_result_list_item_file_size"
+            android:text="@string/dummy_extra" />
+
+        <TextView
+            android:id="@+id/view_bittorrent_search_result_list_item_text_source"
+            style="@style/SearchResultListItemSource"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/view_bittorrent_search_result_list_item_file_size"
+            android:layout_marginRight="6dp"
+            android:clickable="true"
+            android:text="@string/dummy_engine" />
+
+        <TextView
+            android:id="@+id/view_bittorrent_search_result_list_item_text_seeds"
+            style="@style/ListItemExtra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/view_bittorrent_search_result_list_item_text_source"
+            android:layout_toRightOf="@id/view_bittorrent_search_result_list_item_text_source"
+            android:text="@string/dummy_sources" />
+    </RelativeLayout>
+
+</LinearLayout>

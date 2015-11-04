@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="0dp">
+    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+               android:id="@+id/view_promotions_item_image"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:padding="0sp"
+               android:scaleType="matrix"
+               android:layout_weight="1"
+               android:adjustViewBounds="true"
+            />
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal">
+
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:background="@color/black"
+                      android:padding="2dp"
+                      android:layout_weight="1"
+                      android:gravity="center_vertical">
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/application_label"
+                      android:textColor="@color/white"
+                      android:textSize="10sp"
+                      android:layout_marginLeft="3dp"
+                    />
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/free_download"
+                      android:textColor="@color/white"
+                      android:textStyle="bold"
+                      android:textSize="14sp"
+                      android:layout_marginLeft="3dp"/>
+        </LinearLayout>
+
+        <TextView
+                android:id="@+id/view_promotions_item_download_button"
+                android:layout_width="@dimen/promo_download_button_width"
+                android:layout_height="match_parent"
+                android:padding="7dp"
+                android:layout_margin="0dp"
+                android:background="@color/holo_blue_light"
+                android:drawableLeft="@drawable/promo_download_arrow_button"
+                android:text="@string/download"
+                android:drawablePadding="8dp"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:clickable="false"/>
+
+    </LinearLayout>
+</LinearLayout>

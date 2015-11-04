@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2012 Andrew Neal
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/grid_base_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/list_preferred_item_padding" >
+
+    <TextView
+        android:id="@+id/empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center"
+        android:textColor="@color/holo_blue_light"
+        android:textSize="@dimen/text_size_large"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <GridView
+        android:id="@+id/grid_base"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:cacheColorHint="@color/transparent"
+        android:drawSelectorOnTop="true"
+        android:fadingEdge="vertical"
+        android:fastScrollEnabled="true"
+        android:horizontalSpacing="@dimen/grid_item_spacing"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical"
+        android:verticalSpacing="@dimen/grid_item_spacing" />
+
+</FrameLayout>
