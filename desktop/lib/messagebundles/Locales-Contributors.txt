@@ -1,0 +1,195 @@
+(C) 2001-2003 The Lime Group. All Rights Reserved.
+
+This is a small list of supported locales for LimeWire, with their
+contributors, and their area of work.  Mainly, supporting a locale is a matter
+of translating appropriate resources used by LimeWire.
+
+This list is maintained separately in order to remove contact information in
+distributed localized files when this is requested by the sender.
+
+If the contributor is registered, then the email address in the limewire.org
+domain should be preferably used.  Search for it in the online Members list.
+
+If the contribution was purposely anonymous, this list should not contain the
+contact information.  And a registered user may review it and take the lead on
+it.
+
+There may be multiple area of work in the future, including new input methods
+and specific resource bundles. For now, only the Messages area designates the
+translation of the generic "MessagesBundle.properties".
+
+Codes   Locale name             Area of work  Contact
+------- ----------------------- ------------- -------------------------------
+******* Languages with Basic Latin characters *******************************
+------- ----------------------- ------------- -------------------------------
+(none)  (Default)               Messages      "LimeWire Developers Team"
+en      American English        About page    mail: translate AT limewire.org
+en_US   /United States          Download page "Adam Fisk, LimeWire"
+en_CA   /Canada                               mail: afisk AT limewire.org
+en_PR   /Puerto Rico                          "Greg Bildson, GUI project owner"
+                                              mail: gbildson AT limewire.org
+------- ----------------------- ------------- -------------------------------
+en_GB   English/United Kingdom  Messages      Reviewer needed?
+en_ZA   /South Africa                         
+en_AU   /Australia                            
+en_NZ   /New Zealand                          
+en_IN   /India                                
+------- ----------------------- ------------- -------------------------------
+fr      French/France           Messages      "Philippe Verdy"
+fr_FR   Français/France         About page    mail: translate AT limewire.org
+fr_BE   /Belgique               Download page 
+fr_CH   /Suisse                               
+fr_LU   /Luxembourg                           
+fr_CA   /Canada                               
+fr_DZ   /Algérie                              
+fr_MA   /Maroc                                
+fr_TU   /Tunisie                              
+fr_LB   /Liban                                
+------- ----------------------- ------------- -------------------------------
+de      German/Germany          Messages      "Stephan Staub"
+de_DE   Deutsch/Deutschland     About page    mail: macstst AT bluewin.ch
+de_AT   /Österreich             Download page "Armin Florian Märk"
+de_CH   /Schweiz                              mail: csab8232 AT uibk.ac.at
+de_LU   /Luxembürg                            "Niels Heidenreich"
+                                              mail: niels.heidenreich AT gestaltung.uni-weimar.de
+                                              "Ralf Peter Bosse"
+                                              mail: kilovolt AT t-online.de
+                                              "Jens-Uwe Mager"
+                                              mail: jum AT anubis.han.de
+------- ----------------------- ------------- -------------------------------
+es      Spanish/Spain           Messages      "Thinkdiff"
+es_ES   Español/España          About page    mail: thnkdff AT yahoo.com
+es_MX   /Mexico                 Download page 
+es_US   /United States                        
+es_PR   /Puerto Rico                          
+es_CU   /Cuba                                 
+es_AG   /Argentina                            
+es_PE   /Peru                                 
+es_CL   /Chile                                
+------- ----------------------- ------------- -------------------------------
+sv      Swedish/Sweden          Messages      "Fredrik Olsson"
+sv_SE   Svenska/Sverige         Download page mail: peylow AT atari.org
+                                              "Christopher D."
+                                              mail: cdi AT spray.se
+------- ----------------------- ------------- -------------------------------
+it      Italian/Italy           Messages      "Matteo"
+it_IT   Italiano/Italia         Download page mail: bazzu AT tecna.it
+                                              "Toti Calò"
+                                              mail: tical AT inwind.it
+------- ----------------------- ------------- -------------------------------
+nl      Dutch/The Netherlands   Messages      "Willem Broekema"
+nl_NL   Nederlands/Nederland    Download page mail: willem AT limewire.org
+nl_BE   /België                               "Reinier Bergwerf"
+nl_NA   /Nederlands Antillas                  mail: tool AT lycos.nl
+                                              "Edwin van Ouwerkerk Moria"
+                                              mail: edwin AT cadwal.org
+------- ----------------------- ------------- -------------------------------
+da      Danish/Denmark          Messages      "Jesper Stemann Andersen"
+da_DK   Dansk/Danmark           Download page mail: jsa AT vennet.dk
+------- ----------------------- ------------- -------------------------------
+pt      Portuguese/Brazil       Messages      "Waldir Diniz"
+pt_BR   Português/Brasileiro    Download page mail: wdiniz AT giovannifcb.com.br
+                                              "Marcelo Alves"
+                                              mail: mbalves AT uol.com.br
+------- ----------------------- ------------- -------------------------------
+pt_PT   Portuguese/Portugal     Messages      Revision needed ?
+        Português/Standart                    mail: ? AT ?
+------- ----------------------- ------------- -------------------------------
+ca      Catalan/Spain           Messages      "Joan Ensesa"
+ca_ES   Català/Espanya                        mail: jensesa AT pobox.com
+ca_AD   /Andorra                              
+------- ----------------------- ------------- -------------------------------
+is      Icelandic/Iceland       Messages      "Eyþór Ívarsson"
+is_IS   Islensk                               mail: ertx AT ertx.net
+------- ----------------------- ------------- -------------------------------
+no      Norwegian (Books)/Norway Messages     "Sondre Rønjom"
+no_NO   Norsk (Bokmal)/Norge                  mail: s1465 AT lstud.ii.uib.no
+                                              "John Christian Engelsen"
+                                              mail: john.chr AT engelsen.org
+------- ----------------------- ------------- -------------------------------
+no__NY  New Norwegian/Norway    Messages      New translator needed ?
+no_NO_NY Nynorsk/Norge                        mail: ? AT ?
+------- ----------------------- ------------- -------------------------------
+fi      Finnish/Finland         Messages      "Ilkka Mäkelä"
+fi_FI   Suomi/Finland                         mail: ilkka.makela AT wsoy.fi
+------- ----------------------- ------------- -------------------------------
+ms      Malay/Malaysia          Messages      "Mohan Namasivayam"
+ms_MY   Melayu Bahasa                         mail: mohan.n AT technologist.com
+------- ----------------------- ------------- -------------------------------
+id      Indonenian/Indonesia    Messages      New translator needed !
+id_ID   Bahasa Indonesia                      mail: ? AT ?
+------- ----------------------- ------------- -------------------------------
+******* Languages with Extended Latin characters ****************************
+------- ----------------------- ------------- -------------------------------
+pl      Polish/Poland           Messages      "Gregory Javorek"
+pl_PL   Polski                  About         mail: g.javorek AT hoga.pl
+------- ----------------------- ------------- -------------------------------
+hu      Hungarian/Hangary       Messages      "Laszlo Toth"
+hu_HU   Magyar/Magyarorszag                   mail: thlacus AT freemail.hu
+------- ----------------------- ------------- -------------------------------
+sl      Slovenian/Slovenia      Messages      "Aleks Reinhardt"
+sl_SI   Slovenski/Slovenija                   mail: aleks.reinhardt AT pivot.si
+------- ----------------------- ------------- -------------------------------
+ro      Romanian/Romania        Messages      "Celestin Stahie"
+ro_RO   Romana/Romania                        mail: endless_point AT gmx.net
+------- ----------------------- ------------- -------------------------------
+tr      Turkish/Turkey          Messages      "E. Hakan Duran"
+tr_TR   Türkçe/Türkiye                        mail: hakan_duran AT hotmail.com
+tr_CY   /Kibris                               
+------- ----------------------- ------------- -------------------------------
+cs      Czech/Czech Rep.        Messages      New translator needed !
+cs_CZ   Ceski/Ceski Rep.                      mail: ? AT ?
+------- ----------------------- ------------- -------------------------------
+******* Languages with simple left-to-right non Latin characters ************
+------- ----------------------- ------------- -------------------------------
+el      Greek/Greece            Messages      New translator needed !
+el_GR   Ellenikà                              mail: ? AT ?
+------- ----------------------- ------------- -------------------------------
+ru      Russian/Russia          Messages      New translator needed !
+ru_RU   PUCCKIH                               mail: ? AT ?
+------- ----------------------- ------------- -------------------------------
+******* Languages with complex or ideographic left-to-right characters ******
+------- ----------------------- ------------- -------------------------------
+ja      Japanese/Japan          Messages      "T. Yuji"
+ja_JP   Nihongo/Nippon                        mail: yujit AT hotmail.com
+        (Hiragana,Katakana,Kanji)             "Takahiro Kawaguchi"
+                                              mail: esperoboy AT mac.com
+                                              "Takanobu Torigoe"
+                                              mail: heavy_baby AT yahoo.co.jp
+                                              "Shinada Atsuchi"
+                                              mail: shinada AT gmx.net
+------- ----------------------- ------------- -------------------------------
+zh      Simplified Chinese      Messages      "Shawn (Xiao Kehua)"
+zh_CN   Han Zhuong/P.R.China    Download page mail: xiao_khua AT cvicse.com
+zh_SG   /Singapore                            
+zh__GB                                        
+------- ----------------------- ------------- -------------------------------
+zh_TW   Chinese/Taiwan          Messages      "Zou Ciyouan"
+zh_HK   Han Wu/Taiwan                         mail: zouciyouan AT yeah.net
+zh_MO   /Hong-Kong                            
+zh__Big5 /Macau                               
+------- ----------------------- ------------- -------------------------------
+ko      Korean/Korea            Messages      New translator needed !
+ko_KR   (Hangul)                              mail: ? AT ?
+ko_KP   /Dem.Rep.Korea                        
+------- ----------------------- ------------- -------------------------------
+hi      Hindi/India             Messages      New translator needed !
+hi_IN   (Devanagari)                          mail: ? AT ?
+------- ----------------------- ------------- -------------------------------
+vi      Vietnamese/Vietnam      Messages      New translator needed !
+vi_VN   Tieng Viêt Nâm/Viêt Nâm               mail: ? AT ?
+------- ----------------------- ------------- -------------------------------
+******* Languages with right-to-left non Latin characters *******************
+------- ----------------------- ------------- -------------------------------
+iw      Hebrew/Israel           Messages      "Udi Wertheimer"
+iw_IL                                         mail: feuer_frei AT myrealbox.com
+------- ----------------------- ------------- -------------------------------
+ar      Arabic/Egypt            Messages      New translator needed !
+ar_EG                                         mail: ? AT ?
+ar_SA                                         mail: ? AT ?
+ar_TU                                         mail: ? AT ?
+ar_DZ                                         mail: ? AT ?
+------- ----------------------- ------------- -------------------------------
+th      Thai/Thailand           Messages      New translator needed !
+th_TH                                         mail: ? AT ?
+------- ----------------------- ------------- -------------------------------

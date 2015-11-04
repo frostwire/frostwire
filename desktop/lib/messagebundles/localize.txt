@@ -1,0 +1,1253 @@
+﻿Localization notes:
+Copyright (c)2002 the LimeWire project team. www.limewire.com
+
+This is the current list of supported locales.
+
+This file contains the current codes used by LimeWire to load
+locale-specific resources.
+
+Definitions of each defined locale (language or country) is made
+of the following entries:
+
+- the locale code:
+	Either an uppercase 2-letters code conforming to the ISO639 standard
+	for languages, or a lowercase 2-letters code conforming to the
+	ISO3166-1 standard for countries.
+	Only territories which have a ISO3166-1 code are listed.
+	If other subnational areas must be added, it should follow the
+	ISO3166-2 standard (with the 2-letters country code used as prefixes
+	immediately followed by other uppercase letters, with no underscore,
+	but dashes if needed), for example:
+	US-CA: the California state in the United States.
+	ES-CT: the Catalonia region in Spain.
+	FR-BR: the Britanny region in France.
+	FR-75: the Paris department in France.
+	For areas which do not map correctly with the ISO3166-1 standard,
+	the code used should be "X-" followed by the uppercase full English
+	name of the area.
+
+- the english name of the language or country or territory:
+	The language may have several well-known names, listed with commas,
+	but the first name should be the most widely used one;
+	only territories that have awhich are not independent countries
+
+- the code-name used to load icons within the images/flags directory:
+	Icons are 34x18 GIF images including a 3D raised 1-pixel gray border
+	and they should use the Internet palette, with R,G,B values within
+	the following set: 0,3,6,9,C,F (1-digit hexadecimal value).
+
+- the list of defined locales from the second set of locale definitions:
+	The current definition uses ethnologic sources, but may contain
+	errors or lacks. This list is mainly untested and still unused.
+	It could be used to sort the second set of locales when a selection
+	is made by the user in one set, so that the second set lists them
+	at the top. The list should start with the most probably used one,
+	i.e. the population of countries speaking the currently defined
+	language, or the population speaking these langages and living in the
+	currently defined country.
+
+The "speaking" population definition is preferable to the "reading"
+population, to promote litteracy teaching, even if a language is
+not as widely written, due to lower average incomes for that
+population:
+
+The Chinese language is the most widely spoken language of the World,
+followed by Spanish and then English, but the English language is
+the most widely written language, and is too commonly thought as
+an universally understood language by software developers. And even in
+countries with high litteracy rates, English is not very common for
+moderate readers and Internet users for whom the English language
+is not their mother tongue. This also applies to countries such as
+India, where English is an official common language.
+
+Some languages are widely spoken, but have low support in applications,
+such as Bengali, Hindi or Vietnamese, which are much more used than
+many European languages such as German or Italian. Java is promoting
+Unicode for applications and operating systems, and Internet resources.
+
+A large adoption of Unicode could change this "speaking" against
+"reading" anomaly, and could help provide a wider access to literacy
+and to the Internet for all populations in the world using their own
+language.
+
+For now, Java properties file are only using the ISO3166-1 character
+set. They should switch to the Unicode UTF-8 encoding.
+Promote internationalization. The world speaks Unicode !
+
+For languages that can't fit with the ISO-8859-1 character set encoding,
+note that the ASCII backslash (\) is specially treated within properties
+file. The escape-sequence \uNNNN where NNNN is a four-digits hex number,
+or \UNNNNNNNN where NNNNNNNN is a eight-digits hex number can be used
+to designate chracters by their Unicode assigned position.
+
+Note however that the eight-digits \UNNNNNNNN notation will probably not
+work on current releases of Java. This would prevent using languages that
+need access to the full Unicode repertoire, but in fact Java will
+support the Unicode "surrogates", where codes with more than 16-bits are
+mapped into a sequence of surrogates (sometimes misnamed "half-characters"),
+each one being assigned a code-position in a reserved part of the 16-bit
+Unicode encoding (which will never map characters in those positions). So
+the actualencoding would need to encode characters with sequences of \uNNNN,
+using the same algorithm as defined for the UTF-16 encoding.
+
+UTF-16 Surrogate codes are NOT valid Unicode characters, and are invalid if
+isolated in a string encoding. As the whole Unicode repertoire defines code
+positions with up to 21 bits, at most two surrogates are needed to encode
+positions with more than 16 significant bits (for all valid Unicode
+positions between 0x10000 and 0x1FFFFF), using a "leading" most-significant
+surrogate, and a "trailing" least-significant surrogate. Both classes of
+surrogate codes are assigned in a reserved consecutive area of the UTF-16
+encoding, where Unicode will never map any valid character.
+
+Java follows this rule when handling character strings, because it is
+compatible with the UTF-16 encoding; this means that internally Java will
+never map characters within code positions reserved for high-order and
+low-order surrogates.
+
+However, Java still lacks support for UTF-16 string parsing, and may
+return invalid surrogate characters instead of decoding them in a single
+Unicode character); this may change in future releases of Java, this would
+imply that the strings length (in "Character" objects) may no more be
+necessarily equal to the number of 16-bit code positions ("char" basic
+type) used to store them. The Character.charValue() method would also be
+changed to return something appropriate in case of Unicode characters in
+higher encoding planes, that can't map into a single "char", or would
+be changed to return only the high-order surrogate, with an extra method
+to compute further surrogates that constitute the character. Java could
+also introduce a new "long char" basic type to extend the current "char"
+type from 16 unsigned bits to 32 unsigned bits, or use the existing "int"
+basic type to support them in a Unicode class derivated from Character.
+
+The Java SDK provides a small tool "native2ascii" that can convert
+any text file created in a native format with a different encoding into
+a file suitable with the ISO-8859-1 requirements of *.properties files
+used by ResourcesBundle instances. This tool will be very useful for
+texts in Greek, Cyrillic, Chinese, Japanese, Korean, Arabic, Hebrew,
+Vietnamese, Thai, and many other Latin-based languages with diacritics
+or non latin alphabets, with complex combining rules, or with
+ideographic characters.
+
+/**
+ * Array of constant codes for languages,
+ * as assigned by ISO 639 (lowercase 2-letter code elements).
+ * Listed as of the August 1999 document:
+ * http://www.w3.org/WAI/ER/IG/ert/iso639.htm (warning: outdated)
+ * Here we only list main languages, excluding country variants
+ * in Java Locales (we assume that the choice of a language and a
+ * subsequent country will work with the standard Java fallback
+ * mechanism, so that a user can select a country for which there is
+ * no specific Java or LimeWire defined locale for the selected
+ * language). The list is sorted by worlwide usage.
+ * We supply displayable language names, only as a fallback if the
+ * run-time JVM does not reference this name in its own locales.
+ * The list of country codes is useful to provide other fallback
+ * mechanisms, if multiple languages are spoken in a country, and
+ * the designated language is not supported by the current
+ * implementation.
+ */
+private final LocaleDef[] LANGUAGES = {
+	/*
+	** Languages with simple Latin-based left-to-right scripts
+	*/
+	new LocaleDef("en", new String[] {"en_US",	// Generic
+		 "en_CA", "en_JM", "en_BS", "en_BZ", "en_TT", "en_SA", "en_IN",
+		 "en_PH", "en_AU", "en_NZ", "en_GB", "en_IE", "en_ZA", "en_ZW",
+		 "en_HK",
+		}, new String[] {"English",
+		 "fr", "Anglais",
+		 "de", "Englisch",
+		}, new String[] {
+		 "IN", "EU",
+		 "BH", "BM", "BN", "BU", "BW",
+		 "CY", "FJ", "FK", "FM", "GA", "GG", "GH",
+		 "GI", "GM", "GS", "GY", "HK", "HM", "IM", "IO", "JE",
+		 "LS", "JO", "KE", "KI", "KW", "KY", "LR", "LS",
+		 "MS", "MT", "MU", "MV", "MW", "MY", "NA", "NG", "NM", "NR",
+		 "NT", "NU", "PG", "PK", "PW", "SB", "SC", "SG",
+		 "SH", "SL", "SM", "SR", "SW", "TG", "UM",
+		 "YA", "YE", "ZB", "ZM",
+		}),
+	new LocaleDef("en_US", new String[] {"en_US",	// Specialization
+		}, new String[] {"English (US)",
+		 "fr", "Anglais (Etats-Unis)",
+		 "de", "Englisch (USA)",
+		}, new String[] {"US",
+		 "PR", "VG",
+		}),
+	new LocaleDef("en_CA", new String[] {"en_CA",	// Specialization
+		}, new String[] {"English (Canada)",
+		 "fr", "Anglais (Canada)",
+		 "de", "Englisch (Canada)",
+		}, new String[] {"CA",
+		}),
+	new LocaleDef("en_JM", new String[] {"en_JM",	// Specialization
+		}, new String[] {"English (Jamaica)",
+		 "fr", "Anglais (Jama�que)",
+		 "de", "Englisch (Jamaica)",
+		}, new String[] {"JM",
+		}),
+	new LocaleDef("en_BS", new String[] {"en_BS",	// Specialization
+		}, new String[] {"English (Caribbean)",
+		 "fr", "Anglais (Cara�bes)",
+		 "de", "Englisch (Caribbean)",
+		}, new String[] {"BS",
+		 "BS", "AG", "AI", "BB", "DM", "GD", "TC", "VG", "VI",
+		}),
+	new LocaleDef("en_TT", new String[] {"en_TT",	// Specialization
+		}, new String[] {"English (Trinitad & Tobago)",
+		 "fr", "Anglais (Trinitad & Tobago)",
+		 "de", "Englisch (Trinitad & Tobago)",
+		}, new String[] {"TT",
+		}),
+	new LocaleDef("en_BZ", new String[] {"en_BZ",	// Specialization
+		}, new String[] {"English (Belize)",
+		 "fr", "Anglais (Belize)",
+		 "de", "Englisch (Belize)",
+		}, new String[] {"BZ",
+		}),
+	new LocaleDef("en_SA", new String[] {"en_SA",	// Specialization
+		}, new String[] {"English (Middle-East)",
+		 "fr", "Anglais (Moyen Orient)",
+		 "de", "Englisch (Moyen Orient)",
+		}, new String[] {"SA",
+		 "AE", "QA", "SY", "EG", "IL",
+		}),
+	new LocaleDef("en_PH", new String[] {"en_PH",	// Specialization
+		}, new String[] {"English (Philippines)",
+		 "fr", "Anglais (Philippines)",
+		 "de", "Englisch (Philippines)",
+		}, new String[] {"PH",
+                 "MH",
+		}),
+	new LocaleDef("fr", new String[] {"fr_FR",	// Generic
+		 "fr_CA", "fr_BE", "fr_CH", "fr_LU", "fr_MC",
+		}, new String[] {"Fran�ais",
+		 "en", "French",
+		 "de", "Franz�sich",
+		}, new String[] {
+		 "FR", "CA", "BE", "CH", "LU", "MC", "AD", "GP", "MQ", "RE",
+		 "GF", "PM", "MQ", "NC", "PF", "TF", "YT", "MA", "DZ", "TN",
+		 "LB", "US", "BF", "BU", "CM", "CO", "CD", "KM", "DJ", "RW",
+		 "HT", "LA", "MR", "GN", "SN", "SY", "MG", "VN", "VU",
+		}),
+	new LocaleDef("de", new String[] {"de_DE",	// Generic
+		}, new String[] {"Deutsch",
+		 "en", "German",
+		 "fr", "Allemand",
+		}, new String[] {"DE",
+		 "AT", "CH", "LU", "PL", "HU", "DA", "IT", "LI", "RU",
+		 "CZ", "SK", "KZ", "PY", "BO"}),
+	new LocaleDef("es", new String[] {"es_ES",	// Generic
+		}, new String[] {"Espa�ol",
+		 "en", "Spanish",
+		 "fr", "Espagnol",
+		 "de", "Spanish",
+		}, new String[] {"ES",
+		 "MX", "AD", "AR", "BO", "CL", "CO", "CR", "CU", "DO", "EC",
+		 "EH", "GQ", "GT", "HN", "NI", "PA", "PE", "PH", "PR", "PY",
+		 "SV", "TT", "UY", "VE", "US",
+		}),
+	new LocaleDef("pt", new String[] {"pt_PT",	// Generic
+		 "pt_BR",
+		}, new String[] {"Portugu�s (standart)",
+		 "en", "Portuguese (standard)",
+		 "fr", "Portugais (standard)",
+		 "de", "Portugiese (standart)",
+		}, new String[] {"PT",
+		 "AO", "CV", "FR", "MO", "MZ", "OM", "TP",
+		}),
+	new LocaleDef("pt_BR", new String[] {"pt",	// Alias
+		}, new String[] {"Portugu�s (Brasileiro)",
+		 "en", "Portuguese (Brasilian)",
+		 "fr", "Portugais (Br�silien)",
+		 "de", "Portugiese (Brasil)",
+		}, new String[] {"BR"
+		 "GW", "GF", "SN",
+		}),
+	new LocaleDef("sv", new String[] {"sv_SE",	// Generic
+		}, new String[] {"Svenska",
+		 "en", "Swedish", 
+		 "fr", "Su�dois",
+		 "de", "Schwede",
+		}, new String[] {"SE",
+		}),
+	new LocaleDef("it", new String[] {"it_IT",	// Generic
+		}, new String[] {"Italiano",
+		 "en", "Italian",
+		 "fr", "Italien",
+		 "de", "Italiener",
+		}, new String[] {"IT",
+		 "CH", "SM", "VA", "FR", "ER", "SI",
+		}),
+	new LocaleDef("nl", new String[] {"nl_NL",	// Generic
+		}, new String[] {"Nederlands",
+		 "en", "Dutch",
+		 "fr", "N�erlandais",
+		 "de", "Niederl�ndisch",
+		}, new String[] {"NL",
+		 "SN", "NA", "ZA",
+		}),
+	new LocaleDef("nl_BE", new String[] {"nl",	// Alias
+		}, new String[] {"Nederlands (Flanders)",
+		 "en", "Dutch (Flemisch)",
+		 "fr", "N�erlandais (Flamand)",
+		 "de", "Niederl�ndisch (Flemisch)",
+		}, new String[] {"BE",
+		 "FR", "GP",
+		}),
+	// Partial support by Java:
+	new LocaleDef("vi", new String[] {"vi_VN",	// Generic
+		}, new String[] {"Ti\u1EBFng Vi\u1EC7t Nam",
+		 "en", "Vietnamese",
+		 "fr", "Vietnamien",
+		}, new String[] {"VN",
+		 "CN",
+		}),
+	new LocaleDef("tr", new String[] {"tr_TR",	// Generic
+		}, new String[] {"T�rk�e",
+		 "en", "Turkish",
+		 "fr", "Turc",
+		 "de", "Turkisch",
+		}, new String[] {"TR",
+		 "BG", "CY", "DE", "GR", "MK", "RO", "UZ",
+		}),
+	new LocaleDef("pl", new String[] {"pl_PL",	// Generic
+		}, new String[] {"Polski",
+		 "en", "Polish",
+		 "fr", "Polonais",
+		 "de", "Polen",
+		}, new String[] {"PL",
+		 "DE", "CZ", "IL", "RO", "SK",
+		}),
+	new LocaleDef("ro", "Romanian", "Romania", // Partial support in ISO-8859-2
+		"RO", new String[]              // Full support needs ISO-8859-16 (Latin10)
+		{"RO", "HU", "MD", "YU", "UK", "IL"}),
+	new LocaleDef("hr", "Croatian", "Hrvatski",	// Latin-based script
+		"HR", new String[]
+		{"HR", "BH", "SI", "SRB"}),
+	new LocaleDef("da", "Danish", "Dansk",
+		"DK", new String[]
+		{"DK"}),
+	new LocaleDef("fi", "Finnish", "Suomi",
+		"FI", new String[]
+		{"FI", "RU"}),
+	new LocaleDef("no", "Norwegian (standard)", "Norsk (Bokm�l)",
+		"NO", new String[]
+		{"NO"}),
+	new LocaleDef("is", "Icelandic", "�slenska",
+		"IS", new String[]
+		{"IS"}),
+	new LocaleDef("et", "Estonian", "Eesti",
+		"EE", new String[]
+		{"EE", "RU", "LT", "LV", "PL", "SE"}),
+	new LocaleDef("lt", "Lituanian", "Lietuvi\u0173",
+		"LT", new String[]
+		{"LT", "RU", "LT", "LV", "PL", "SE"}),
+	new LocaleDef("lv", "Latvian, Lettish", "Latvie\u0161u",
+		"LV", new String[]
+		{"LV", "RU", "EE", "LV", "PL", "SE"}),
+	new LocaleDef("sk", "Slovakian", "Sloven\u010Dina",
+		"SK", new String[]
+		{"SK", "CS", "HU"}),
+	new LocaleDef("sl", "Slovenian", "Slovenski",
+		"SI", new String[]
+		{"SI", "HU", "IT", "DE"}),
+	new LocaleDef("sq", "Albanese", "Shqipe",
+		"AL", new String[]
+		{"AL", "YU", "MK", "HR", "BH", "GR"}),
+	new LocaleDef("ms", "Malay", "Bahasa Malaysia",
+		"MY", new String[]
+		{"MY"}),
+	new LocaleDef("my", "Burmese", "Myanmarese",
+		"MM", new String[]
+		{"MM", "BD"}),
+	new LocaleDef("sw", "Swahili", "Swahili",
+		"SN", new String[]
+		{"SN"}),
+	new LocaleDef("mg", "Malagasy", "Malagasy",
+		"MG", new String[]
+		{"MG"}),
+	new LocaleDef("ha", "Hausa", "Haoussa", // Missing in JDK
+		"NI", new String[]
+		{"NI", "BJ", "BF", "CM", "NG", "SD", "TG"}),
+	new LocaleDef("yo", "Yoruba", "Yoruba", // Missing in JDK
+		"NG", new String[]
+		{"NG", "BJ"}),
+	new LocaleDef("hy", "Armenian", "Armenian", // Missing in JDK
+		"AM", new String[]
+		{"AM", "TR", "AZ", "SY", "GE", "RU", "FR"}),
+	new LocaleDef("ml", "Maltese", "Maltese",
+		"MT", new String[]
+		{"MT", "IT", "TU"}),
+	new LocaleDef("fo", "Faeroese", "Faroese",
+		"DK", new String[]
+		{"FO", "DK", "GB"}),
+	new LocaleDef("af", "Afrikaans", "Afrikaans",
+		"ZA", new String[]
+		{"ZA", "ZB"}),
+	new LocaleDef("ca", "Catalan",  "Catal�",
+		"_ca", new String[]
+		{"ES", "FR"}),
+	new LocaleDef("gl", "Gallician",  "Gallego",
+		"GL", new String[]	// note: uses country flag instead of "gl_ES"
+		{"ES", "PT"}),
+	new LocaleDef("eu", "Basque", "Euskara",
+		"ES", new String[]	// note: uses main country flag
+		{"ES", "FR"}),
+	new LocaleDef("ga", "Irish Gaelic", "Irish Gaelic",
+		"IE", new String[]
+		{"IE", "GB"}),
+	new LocaleDef("gd", "Scottish Gaelic", "Scottish Gaelic",
+		"GB", new String[]
+		{"GB"}),
+	new LocaleDef("cy", "Welsh Gaelic", "Welsh Gaelic",
+		"GB", new String[]	// note: uses country flag instead of "cy_GB"
+		{"GB"}),
+	new LocaleDef("mx", "Manx Gaelic", "Manx Gaelic", // note: 2-letter code not official, 3letter is "max"
+		"GB", new String[]	// note: uses country flag instead of "mx_IM"
+		{"IM", "GB"}),
+	new LocaleDef("br", "Breton", "Brezhoneg",
+		"FR", new String[]	// note: uses country flag instead of "br_FR"
+		{"FR", "PM", "US"}),
+	new LocaleDef("co", "Corsican", "Corsu",
+		"FR", new String[]	// note: uses country flag instead of "co_FR"
+		{"FR", "IT"}),
+	new LocaleDef("oc", "Occitan, Langue d'Oc", "Occitan",
+		"FR", new String[]	// note: uses country flag instead of "oc_FR"
+		{"FR", "ES"}),
+	new LocaleDef("fy", "Frisian", "Frisian",
+		"DE", new String[]
+		{"DE", "AT"}),
+	new LocaleDef("rm", "Rhaeto-Roman", "Rhaeto-Roman",
+		"CH", new String[]
+		{"CH"}),
+	new LocaleDef("yi", "Yiddish", "Yiddish",
+		"IL", new String[]
+		{"IL", "US", "PL", "RU", "DE"}),
+	new LocaleDef("la", "Latin", "Latin",
+		"VA", new String[]	// note: uses country flag
+		{"VA"}),
+	new LocaleDef("eo", "Esperanto", "Esperanto",
+		"__", new String[]
+		{}),
+	new LocaleDef("ia", "Interlingua", "Interlingua",
+		"__", new String[]	// note: uses world flag
+		{}),
+	new LocaleDef("ie", "Interlingue", "Interlingue",
+		"__", new String[]	// note: uses world flag
+		{"VA"}),
+
+	/*
+	** Other languages with simple left-to-right scripts
+	*/
+	  new LocaleDef("ru", "Russian", "\u0420\u0443\u0441\u0441\u043a\u0438\u0439",
+		"RU", new String[]
+		{"RU", "CH", "MG", "IL", "US"}),
+	  new LocaleDef("uk", "Ukrainian", "\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430 \u043c\u043e\u0432\u0430",
+		"UA", new String[]
+		{"UA", "PO", "SK"}),
+	  new LocaleDef("sr", "Serbian (Cyrillic)", "\u0421\u0440\u043f\u0441\u043a\u0438"
+		"YU", new String[]
+		{"YU", "BH", "MK"}),
+// Defined in Java, but deprecated by sr, sr__L, hr
+//	  new LocaleDef("sh", "Serbo-Croatian", // Cyrillic version
+//		"YU", new String[]		// No more an ISO639 standard
+//		{"YU", "HR", "BH", "MK", "SV"}),
+	  new LocaleDef("be", "Belarussian",
+		"BY", new String[]
+		{"BY", "GE", "RU", "PO"}),
+	  new LocaleDef("bg", "Bulgarish",
+		"BG", new String[]
+		{"BG", "TR", "RO"}),
+	  new LocaleDef("cs", "Czech",
+		"CZ", new String[]
+		{"CZ", "SK", "HU", "DE"}),
+	  new LocaleDef("el", "Greek",
+		"GR", new String[]
+		{"GR", "CY", "TR", "MK"}),
+	  new LocaleDef("hu", "Hungarish",
+		"HU", new String[]
+		{"HU"}),
+	  new LocaleDef("mk", "Macedonian",
+		"MK", new String[]
+		{"MK", "AL", "GR"}),
+//	  new LocaleDef("ka", "Georgian, K'art'velo",
+//		"GE", new String[]
+//		{"GE"}),
+//	  new LocaleDef("mo", "Moldavian",
+//		"MO", new String[]
+//		{"MD"}),
+//	  new LocaleDef("tt", "Tatar",
+//		"RU", new String[]
+//		{"RU"}),
+//	  new LocaleDef("kk", "Kazakh",
+//		"KZ", new String[]
+//		{"KZ"}),
+
+	/*
+	** Other Languages with simple right-to-left scripts
+	*/
+  	  new LocaleDef("ar", "Arabic",	// Generic
+		"SA", new String[]
+		{"EG", "DZ", "AE", "BH", "IQ", "JO", "KW", "LB", "MA", "OM",
+		 "PS", "QA", "SA", "SD", "SY", "TN", "YE", "AR"}),
+	  new LocaleDef("iw", "Hebrew",	// Note: "iw" deprecated, "he" is ISO639 standard
+		"IL", new String[]	// however Java still uses "iw"
+		{"IL", "US"}),
+//	  new LocaleDef("az", "Azerbaijani, South",	// Currently not supported by Java
+//		"AZ", new String[]
+//		{"IR", "IQ", "AF", "SY", "TR", "AZ"}),
+//	  new LocaleDef("fa", "Farsi Western, Persian",	// Currently not supported by Java
+//		"IR", new String[]
+//		{"IR", "IQ", "OM", "QA", "TJ", "AE"}),
+//	  new LocaleDef("pa", "Panjabi, Punjabi",	// Generic	// Currently not supported by Java
+//		"PK", new String[]
+//		{"PK", "IN"}),
+
+	/*
+	** Asian languages with complex scripts
+	*/
+	  new LocaleDef("zh", "Chinese",	// Generic
+		"CN", new String[]
+		{"CN", "BN", "CR", "ID", "KH", "MG", "MY", "PA", "PH", "SG",
+		 "TH", "TW", "VN", "ZA"}),
+//	  new LocaleDef("bn", "Bengali, Bangla",	// Currently not supported by Java
+//		"BD", new String[]
+//		{"BD", "IN", "SG"}),
+//	  new LocaleDef("hi", "Hindi",	// Currently not supported by Java
+//		"IN", new String[]
+//		{"IN", "NP", "SG", "ZA", "UG"}),
+	  new LocaleDef("ja", "Japanese",
+		"JP", new String[]
+		{"JP", "SG", "TW"}),
+//	  new LocaleDef("jw", "Javanese",	// Currently not supported by Java
+//		"ID", new String[]
+//		{"ID", "MY", "SG"}),
+//	  new LocaleDef("jv", "Javanese",	// Alternate ISO639-1 bibliographic code
+//		"ID", new String[]		// Prefered standard code is "jw"
+//		{"ID", "MY", "SG"}),
+	  new LocaleDef("th", "Thai",
+		"TH", new String[]
+		{"TH", "LA", "SG"}),
+	  new LocaleDef("lo", "Lao",
+		"LA", new String[]
+		{"LA", "SG"}),
+	  new LocaleDef("ko", "Korean",
+		"KR", new String[]
+		{"KR", "KP", "CH", "JP", "TH"}),
+//	  new LocaleDef("te", "Telugu",	// Currently not supported by Java
+//		"IN", new String[]
+//		{"IN", "SG"}),
+//	  new LocaleDef("mr", "Marathi",	// Currently not supported by Java
+//		"IN", new String[]
+//		{"IN"}),
+//	  new LocaleDef("ta", "Tamil",
+//		"IN", new String[]
+//		{"IN", "MY", "MC", "SG", "ZA", "SL"}),
+//	  new LocaleDef("gj", "Gujarati",	// Currently not supported by Java
+//		"IN", new String[]
+//		{"IN", "KE", "PK", "SG", "ZA", "TZ", "UG", "ZB", "ZI"}),
+//	  new LocaleDef("ur", "Urdu",	// Currently not supported by Java
+//		"PK", new String[]
+//		{"PK", "AF", "IN", "MC", "ZA", "SL"}),
+//	  new LocaleDef("ml", "Malayalam",	// Currently not supported by Java
+//		"IN", new String[]
+//		{"IN, "SG"}),
+//	  new LocaleDef("kn", "Kannada",	// Currently not supported by Java
+//		"IN", new String[]
+//		{"IN"}),
+//	  new LocaleDef("or", "Oriya",	// Currently not supported by Java
+//		"IN", new String[]
+//		{"IN"}),
+//	  new LocaleDef("in", "Indonesian, Sunda",	// Currently not supported by Java
+//		"ID", new String[]
+//		{"ID"}),
+//	  new LocaleDef("bh", "Bhojpuri",	// Currently not supported by Java
+//		"IN", new String[]
+//		{"IN", "NP", "MC"}),
+//	  new LocaleDef("ma", "Maithili",	// Currently not supported by Java
+//		"IN", new String[]
+//		{"IN", "NP"}),
+//	  new LocaleDef("aw", "Awadhi",	// Currently not supported by Java
+//		"IN", new String[]
+//		{"IN", "NP"}),
+//	  new LocaleDef("si", "Singhalese",	// Currently not supported by Java
+//		"ID", new String[]
+//		{"ID", "SG"}),
+//	  new LocaleDef("sd", "Sindhi",	// Currently not supported by Java
+//		"PK", new String[]
+//		{"PK", "IN", "AF", "SG"}),
+//	  new LocaleDef("mn", "Mongolian",	// Currently not supported by Java
+//		"MN", new String[]
+//		{"MN"}),
+//	  new LocaleDef("km", "Khmer, Cambodian",
+//		"KM", new String[]
+//		{"KM"}),
+//	  new LocaleDef("ne", "Nepali",
+//		"NE", new String[]
+//		{"NE", "IN"}),
+//	  new LocaleDef("bo", "Tibetan",
+//		"BT", new String[]
+//		{"BT", "IN", "CN"}),
+
+	/*
+	** Other standardized languages with (still) unknown scripts
+	** Some of them may work with Java 2 v.1.3, but support is not tested.
+	*/
+//	  new LocaleDef("aa", "Afar",
+//		"DJ", new String[]
+//		{"DJ"}),
+//	  new LocaleDef("iu", "Inuktikut",
+//		"CA", new String[]
+//		{"CA"}),
+//	  new LocaleDef("ik", "Inupiak",
+//		"CA", new String[]
+//		{"CA"}),	//????????
+//	  new LocaleDef("kl", "Greenlandic",
+//		"GL", new String[]
+//		{"GL"}),
+//	  new LocaleDef("ku", "Kurd",
+//		"TR", new String[]
+//		{"TR", "IQ", "IR", "SY"}),
+//	  new LocaleDef("ks", "Kashmiri",
+//		"IN", new String[]
+//		{"IN", "PK", "CN"}),
+//	  new LocaleDef("ky", "Kyrghiz",
+//		"KG", new String[]
+//		{"KG"}),
+//	  new LocaleDef("na", "Nauru",
+//		"NR", new String[]
+//		{"NR"}),
+//	  new LocaleDef("ps", "Pashto",
+//		"AF", new String[]
+//		{"AF"}),
+//	  new LocaleDef("qu", "Quechua",
+//		"BR", new String[]	//????????
+//		{"BR", "PE"}),	//????????
+//	  new LocaleDef("rw", "Kinyarwanda",
+//		"RW", new String[]
+//		{"RW", "KE"}),
+//	  new LocaleDef("sm", "Samoan",
+//		"WS", new String[]
+//		{"WS", "SA"}),
+//	  new LocaleDef("so", "Somali",
+//		"SO", new String[]
+//		{"SO"}),
+//	  new LocaleDef("tg", "Tajik",
+//		"TJ", new String[]
+//		{"TJ"}),
+//	  new LocaleDef("tk", "Turkmen",
+//		"TM", new String[]
+//		{"TM"}),
+//	  new LocaleDef("to", "Tonga, Nyasa",
+//		"TO", new String[]
+//		{"TO"}),
+//	  new LocaleDef("uz", "Uzbek",
+//		"UZ", new String[]
+//		{"UZ", "AF"}),
+//	  new LocaleDef("zu", "Zulu",
+//		"ZA", new String[]
+//		{"ZA"}),
+//	  new LocaleDef("ab", "Abkhazian",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("am", "Amharic",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("as", "Assamese",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("ay", "Aymara",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("ba", "Bashkir",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("bh", "Bihari",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("bi", "Bislama",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("dz", "Dzongkha",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("ln", "Lingala",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("mi", "Maori",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("om", "Oromo",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("rn", "Rundi",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("sg", "Sango",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("sn", "Shona",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("ss", "Siswant",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("st", "Sotho, Southern",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("ti", "Tigrinya",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("tl", "Tagalog",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("tn", "Tswana",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("ts", "Tsonga",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("tw", "Twi",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("ui", "Uighur",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("vo", "Volap�k",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("wo", "Wolof",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("za", "Zhuang",
+//		"__", new String[]	//unknown main country, uses world flag
+//		{}),	//????????
+//	  new LocaleDef("sa", "Sanskrit",
+//		"__", new String[]	//uses world flag
+//		{}),	//????????
+};
+
+/**
+ * Array of constant codes for countries and territories,
+ * as assigned by ISO 3166 (uppercase 2-letter code elements).
+ * Official list from the DIN maintenance agency at:
+ * http://www.din.de/gremien/nas/nabd/iso3166ma/codlstp1/en_listp1.html
+ * See also a commented list with historical notes at:
+ * http://www.davros.org/misc/iso3166.html
+ * For a (non-normative) cross-reference list of country code systems:
+ * http://www.unicode.org/unicode/onlinedat/countries.html
+ * IANA uses the ISO list for Internet ccTLDs, with the exception of
+ * United Kingdom, for history reasons, which is assigned "GB" by ISO,
+ * but "UK" by IANA. Some country codes have been also withdrawn for
+ * use by ISO, but are still maintained or used by IANA (such as "SU"
+ * for the former Soviet Union, and "FX" for French main land). For
+ * the localization usage, we should use the official ISO code, which
+ * does not designate a whole country, but a contiguous territory of
+ * the same country. For countries which have several separate
+ * territories, ISO assigned both a code for the country and a "?X"
+ * code for its mainland, and assigns distinct codes for dependencies
+ * (for example FR and FX). The "?X" codes have been withdrawn by ISO,
+ * so we should not use them for localisation (so "fr_FR" designates
+ * the French language as spoken in Metropolitan France, and "fr_RE"
+ * can designate the French language as spoken in the Reunion, despite
+ * the "RE" code designates a subterritory of "FR").
+ */
+private final LocaleDef[] COUNTRIES = {
+	  new LocaleDef("AD", "Andorra",
+		"AD", new String[]{"es", "fr"}),
+	  new LocaleDef("AE", "United Arab Emirates",
+		"AE", new String[]{"ar"}),
+	  new LocaleDef("AF", "Afghanistan",
+		"AF", new String[]{"pa", "ar", "az"}), //??????????????
+	  new LocaleDef("AG", "Antigua and Barduda",
+		"AG", new String[]{"en"}),
+	  new LocaleDef("AI", "Anguilla (GB)",
+		"GB", new String[]{"en"}),
+	  new LocaleDef("AL", "Albania",
+		"AL", new String[]{"sq"}),
+	  new LocaleDef("AM", "Armenia",
+		"AM", new String[]{"hy", "ru", "tr"}),
+	  new LocaleDef("AN", "Netherlands Antilla (NL)",
+		"NL", new String[]{"nl", "fr"}),
+	  new LocaleDef("AO", "Angola",
+		"AO", new String[]{"en"}), //??????????
+	  new LocaleDef("AQ", "Antarctica",
+		"AQ", new String[]{"en", "fr", "es"}), //??????????
+	  new LocaleDef("AR", "Argentina",
+		"AR", new String[]{"es"}),
+	  new LocaleDef("AS", "American Samoa (US)",
+		"US", new String[]{"en", "sm"}),
+	  new LocaleDef("AT", "Austria",
+		"AT", new String[]{"de"}),
+	  new LocaleDef("AU", "Australia",
+		"AU", new String[]{"en"}),
+	  new LocaleDef("AW", "Aruba Island (NL)",
+		"NL", new String[]{"en"}),
+	  new LocaleDef("AZ", "Azerbaijan",
+		"AZ", new String[]{"az"}),
+	  new LocaleDef("BA", "Bosnia & Herzegovina",
+		"BA", new String[]{"hr", "sr"}),
+	  new LocaleDef("BB", "Barbados",
+		"BB", new String[]{"en"}),
+	  new LocaleDef("BD", "Bengladesh",
+		"BD", new String[]{"bn", "en"}),
+	  new LocaleDef("BE", "Belgium",
+		"BE", new String[]{"fr", "nl"}),
+	  new LocaleDef("BF", "Burkina Faso",
+		"BF", new String[]{"fr"}),
+	  new LocaleDef("BG", "Bulgary",
+		"BG", new String[]{"bg", "ro"}),
+	  new LocaleDef("BH", "Bahrein",
+		"BH", new String[]{"ar"}),
+	  new LocaleDef("BI", "Burundi",
+		"BI", new String[]{"fr"}),
+	  new LocaleDef("BJ", "Benin",
+		"BJ", new String[]{"fr"}),
+	  new LocaleDef("BM", "Bermuda (GB)",
+		"GB", new String[]{"en"}),
+	  new LocaleDef("BN", "Brunei Darrussalam",
+		"BN", new String[]{"ar"}),
+	  new LocaleDef("BO", "Bolivia",
+		"BO", new String[]{"es"}),
+	  new LocaleDef("BR", "Brasil",
+		"BR", new String[]{"pt"}),
+	  new LocaleDef("BS", "Bahamas",
+		"BS", new String[]{"en"}),
+	  new LocaleDef("BT", "Bhutan",
+		"BT", new String[]{"en"}), //??????????
+	  new LocaleDef("BU", "Myanmar, former Burma",	// See MM (Myanmar)
+		"MM", new String[]{"en"}),
+	  new LocaleDef("BV", "Bouvet Island (NO)",
+		"NO", new String[]{"no"}),
+	  new LocaleDef("BW", "Botswana",
+		"BW", new String[]{"en"}), //?????????
+	  new LocaleDef("BY", "Belarus",
+		"BY", new String[]{"be"}),
+	  new LocaleDef("BZ", "Belize",
+		"BZ", new String[]{"en", "es"}),
+	  new LocaleDef("CA", "Canada",
+		"CA", new String[]{"en", "fr"}),
+	  new LocaleDef("CC", "Cocos (Keeling) Islands (AU)",
+		"AU", new String[]{"en"}),
+	  new LocaleDef("CD", "Congo, Dem.Rep., Kinshasa",
+		"CD", new String[]{"fr"}),
+	  new LocaleDef("CF", "Central African Rep.",
+		"CF", new String[]{"fr"}),
+	  new LocaleDef("CG", "Congo, Brazzaville",
+		"CG", new String[]{"fr"}),
+	  new LocaleDef("CH", "Switzerland",
+		"CH", new String[]{"de", "fr", "it"}),
+	  new LocaleDef("CI", "C�te d'Ivoire",
+		"CI", new String[]{"fr"}),
+	  new LocaleDef("CK", "Cook Islands",
+		"NZ", new String[]{"en"}),
+	  new LocaleDef("CL", "Chile",
+		"CL", new String[]{"es"}),
+	  new LocaleDef("CM", "Cameroon",
+		"CM", new String[]{"fr"}),
+	  new LocaleDef("CN", "China",
+		"CN", new String[]{"zh"}),
+	  new LocaleDef("CO", "Colombia",
+		"CO", new String[]{"es"}),
+	  new LocaleDef("CR", "Costa Rica",
+		"CR", new String[]{"es"}),
+//	  new LocaleDef("CS", "Czechoslovakia",	// See CZ and SL
+//		"CZ", new String[]{"cs", "sk"}),
+	  new LocaleDef("CU", "Cuba",
+		"CU", new String[]{"es"}),
+	  new LocaleDef("CV", "Cape Verde",
+		"CV", new String[]{"pt"}),
+	  new LocaleDef("CX", "Christmas Island (AU)",
+		"AU", new String[]{"en"}),
+	  new LocaleDef("CY", "Cyprus",
+		"CY", new String[]{"el", "tr", "en"}),
+	  new LocaleDef("CZ", "Czech Republic",
+		"CZ", new String[]{"cs"}),
+	  new LocaleDef("DD", "Germany, Dem. Rep.", // Unified with DE
+		"DD", new String[]{"de", "pl"}),
+	  new LocaleDef("DE", "Germany",
+		"DE", new String[]{"de", "pl", "tr"}),
+	  new LocaleDef("DJ", "Djibouti",
+		"DJ", new String[]{"fr", "aa"}),
+	  new LocaleDef("DK", "Denmark",
+		"DK", new String[]{"da"}),
+	  new LocaleDef("DM", "Dominica, Commonwealth",
+		"DM", new String[]{"en"}),
+	  new LocaleDef("DO", "Dominican Republic",
+		"DO", new String[]{"es"}),
+	  new LocaleDef("DZ", "Algeria",
+		"DZ", new String[]{"ar", "fr"}),
+	  new LocaleDef("EC", "Ecuador",
+		"EC", new String[]{"es"}),
+	  new LocaleDef("EE", "Estonia",
+		"EE", new String[]{"et"}),
+	  new LocaleDef("EG", "Egypt",
+		"EG", new String[]{"ar", "en"}),
+	  new LocaleDef("EH", "Western Sahara",
+		"MA", new String[]{"es", "ar", "fr"}),
+	  new LocaleDef("ER", "Erithrea",
+		"ER", new String[]{"ar"}),	//?????????
+	  new LocaleDef("ES", "Spain",
+		"ES", new String[]{"es", "ca", "eu"}),
+	  new LocaleDef("ET", "Ethiopia",
+		"ET", new String[]{"ar", "it"}),	//?????????
+	  new LocaleDef("EU", "European Union",	// not officially assigned
+		"EU", new String[]{"de", "fr", "en", "nl", "it", "es", "pt", "el", "fi", "da", "se"}),
+	  new LocaleDef("FI", "Finland",
+		"FI", new String[]{"fi", "sv"}),
+	  new LocaleDef("FJ", "Fiji",
+		"FJ", new String[]{"en"}),
+	  new LocaleDef("FK", "Falklands Islands (GB)",
+		"GB", new String[]{"en"}),
+	  new LocaleDef("FM", "Micronesia, Fed.States",
+		"FM", new String[]{"en"}),
+	  new LocaleDef("FO", "Faeroe Islands (DK)",
+		"DK", new String[]{"da", "en"}),
+	  new LocaleDef("FR", "France",
+		"FR", new String[]{"fr", "br", "ca", "co", "eu", "oc", "de", "it"}),
+	  new LocaleDef("FX", "France, Metropolitan",	// Deleted
+		"FR", new String[]{"fr", "br", "ca", "co", "eu", "oc", "de", "it"}),
+	  new LocaleDef("GA", "Gabon",
+		"GA", new String[]{"fr"}),
+	  new LocaleDef("GB", "United Kingdom",
+		"GB", new String[]{"en", "cy", "gd"}),
+	  new LocaleDef("GD", "Grenada",
+		"GD", new String[]{"en"}),
+	  new LocaleDef("GE", "Georgia",
+		"GE", new String[]{"ge", "ru"}),
+	  new LocaleDef("GF", "French Guiana (FR)",
+		"FR", new String[]{"fr"}),
+	  new LocaleDef("GG", "Guernsey, Bailiwick (GB)",	//Reserved ISO639-1 entry
+		"GB", new String[]{"en"}),
+	  new LocaleDef("GH", "Ghana",
+		"GH", new String[]{"en"}),
+	  new LocaleDef("GI", "Gibraltar",
+		"GB", new String[]{"en", "es"}),
+	  new LocaleDef("GL", "Greenland (DK)",
+		"DK", new String[]{"da"}),
+	  new LocaleDef("GM", "Gambia",
+		"GM", new String[]{"en"}),
+	  new LocaleDef("GN", "Guinea",
+		"GN", new String[]{"fr"}),
+	  new LocaleDef("GP", "Guadeloupe (FR)",
+		"FR", new String[]{"fr"}),
+	  new LocaleDef("GQ", "Equatorial Guinea",
+		"GQ", new String[]{"es"}),
+	  new LocaleDef("GR", "Greece",
+		"GR", new String[]{"el", "mk", "tr"}),
+	  new LocaleDef("GS", "South Georgia & Sandwich (GB)",
+		"GB", new String[]{"en"}),
+	  new LocaleDef("GT", "Guatemala",
+		"GT", new String[]{"es"}),
+	  new LocaleDef("GU", "Guam (US)",
+		"US", new String[]{"en"}),
+	  new LocaleDef("GW", "Guinea-Bissau",
+		"GW", new String[]{"pt"}),
+	  new LocaleDef("GY", "Guyana, Coop. Rep.",
+		"GY", new String[]{"en"}),
+	  new LocaleDef("HK", "Hong Kong, S.A.R. (CN)",
+		"CN", new String[]{"en", "zh"}),
+	  new LocaleDef("HM", "Heard & McDonald Islands (AU)",
+		"AU", new String[]{"en"}),
+	  new LocaleDef("HN", "Honduras",
+		"HN", new String[]{"es"}),
+	  new LocaleDef("HR", "Croatia, Hrvatska",
+		"HR", new String[]{"hr"}),
+	  new LocaleDef("HT", "Haiti",
+		"HT", new String[]{"fr"}),
+	  new LocaleDef("HU", "Hungary",
+		"HU", new String[]{"hu"}),
+	  new LocaleDef("ID", "Indonesia",
+		"ID", new String[]{"in", "nl", "jw", "zh", "si"}),
+	  new LocaleDef("IE", "Ireland",
+		"IE", new String[]{"en", "ga"}),
+	  new LocaleDef("IL", "Hebrew",
+		"IL", new String[]{"il", "ar", "ru"}),
+	  new LocaleDef("IM", "Isle of Man (GB)",
+		"GB", new String[]{"en", "ma"}),
+	  new LocaleDef("IN", "India",		// Many important languages !
+		"IN", new String[]{"en", "bn", "hi", "mr", "ta", "gj", "ur", "kg", "kn", "or", "bh", "ma", "aw", "si", "ne", "pa"}),
+	  new LocaleDef("IO", "Indian Ocean, Terr. (GB)",
+		"GB", new String[]{"ar"}),
+	  new LocaleDef("IQ", "Iraq",
+		"IQ", new String[]{"ar"}),
+	  new LocaleDef("IQ", "Iran",
+		"IQ", new String[]{"fa", "ar"}),
+	  new LocaleDef("IS", "Iceland",
+		"IS", new String[]{"is", "en"}),
+	  new LocaleDef("IT", "Italy",
+		"IT", new String[]{"it", "fr"}),
+	  new LocaleDef("JE", "Jersey, Bailiwick (GB)",	//Reserved ISO639-1 entry
+		"GB", new String[]{"en", "fr"}),
+	  new LocaleDef("JM", "Jamaica",
+		"JM", new String[]{"en"}),
+	  new LocaleDef("JO", "Jordania",
+		"JO", new String[]{"ar", "fr", "en"}),
+	  new LocaleDef("JP", "Japan",
+		"JP", new String[]{"ja"}),
+	  new LocaleDef("KE", "Kenya",
+		"KE", new String[]{"en", "rw"}),
+	  new LocaleDef("KG", "Kyrgyzstan",
+		"KG", new String[]{"ky", "ru"}),
+	  new LocaleDef("KH", "Cambodia, Khmer Kingdom",
+		"KH", new String[]{"km", "fr"}),
+	  new LocaleDef("KI", "Kiribati Islands (AU)",
+		"AU", new String[]{"en"}),
+	  new LocaleDef("KM", "Comoros",
+		"KM", new String[]{"fr"}),
+	  new LocaleDef("KN", "Saint Kitts & Nevis",
+		"KN", new String[]{"en"}),
+	  new LocaleDef("KP", "Korea, Dem. Republic",
+		"KP", new String[]{"ko"}),
+	  new LocaleDef("KR", "Korea, South",
+		"KR", new String[]{"ko"}),
+	  new LocaleDef("KW", "Kuwait",
+		"KW", new String[]{"ar"}),
+	  new LocaleDef("KY", "Cayman Islands (GB)",
+		"GB", new String[]{"en"}),
+	  new LocaleDef("KZ", "Kazakhstan",
+		"KZ", new String[]{"kk", "ru"}),
+	  new LocaleDef("LA", "Lao, People's Dem. Rep.",
+		"LA", new String[]{"lo", "th"}),
+	  new LocaleDef("LB", "Lebanon",
+		"LB", new String[]{"ar", "fr"}),
+	  new LocaleDef("LC", "Saint Lucia",
+		"LC", new String[]{"en"}),
+	  new LocaleDef("LI", "Liechstenstein",
+		"LI", new String[]{"de"}),
+	  new LocaleDef("LK", "Sri Lanka",
+		"LK", new String[]{"en"}),	//????????
+	  new LocaleDef("LR", "Liberia",
+		"LR", new String[]{"en"}),	//????????
+	  new LocaleDef("LS", "Lesotho",
+		"LS", new String[]{"en"}),	//????????
+	  new LocaleDef("LT", "Littuania",
+		"LT", new String[]{"lt", "ru"}),
+	  new LocaleDef("LU", "Luxembourg, Gr. Duc.",
+		"LU", new String[]{"fr", "de"}),
+	  new LocaleDef("LV", "Latvia",
+		"LV", new String[]{"lv", "ru"}),
+	  new LocaleDef("LY", "Lybia",
+		"LY", new String[]{"ar"}),
+	  new LocaleDef("MA", "Morocco",
+		"MA", new String[]{"ar", "fr"}),
+	  new LocaleDef("MD", "Moldova",
+		"MD", new String[]{"ro", "ru"}),
+	  new LocaleDef("MC", "Monaco, Principality",
+		"MC", new String[]{"fr"}),
+	  new LocaleDef("MG", "Madagascar",
+		"MC", new String[]{"mg", "fr"}),
+	  new LocaleDef("MH", "Marshall Islands",
+		"MH", new String[]{"en"}),
+	  new LocaleDef("MK", "Macedonia, F.Y.Rep.",
+		"MK", new String[]{"mk", "sr", "gr"}),
+	  new LocaleDef("ML", "Mali",
+		"ML", new String[]{"fr"}),
+	  new LocaleDef("MM", "Myanmar, former Burma",
+		"MM", new String[]{"my"}),
+	  new LocaleDef("MN", "Mongolia",
+		"MN", new String[]{"mn", "ru"}),
+	  new LocaleDef("MO", "Macau, S.A.R. (CN)",
+		"CN", new String[]{"pt", "zh"}),
+	  new LocaleDef("MP", "Mariana Islands, Northern (US)",
+		"US", new String[]{"en"}),
+	  new LocaleDef("MQ", "Martinique (FR)",
+		"FR", new String[]{"fr"}),
+	  new LocaleDef("MR", "Mauritania",
+		"MR", new String[]{"ar", "fr"}),
+	  new LocaleDef("MS", "Montserrat Island (GB)",
+		"GB", new String[]{"en"}),
+	  new LocaleDef("MT", "Malta",
+		"MT", new String[]{"ml", "en"}),
+	  new LocaleDef("MU", "Mauritius",
+		"MU", new String[]{"en"}),
+	  new LocaleDef("MV", "Maldives",
+		"MV", new String[]{"en"}),
+	  new LocaleDef("MW", "Malawi",
+		"MW", new String[]{"en"}),
+	  new LocaleDef("MX", "Mexico, Fed. Union",
+		"MX", new String[]{"es"}),
+	  new LocaleDef("MY", "Malaysia",
+		"MY", new String[]{"ms", "en"}),
+	  new LocaleDef("MZ", "Mozambique",
+		"MZ", new String[]{"pt"}),
+	  new LocaleDef("NA", "Namibia",
+		"NA", new String[]{"en"}),
+	  new LocaleDef("NC", "New Caledonia (FR)",
+		"FR", new String[]{"fr"}),
+	  new LocaleDef("NE", "Niger",
+		"NE", new String[]{"fr"}),
+	  new LocaleDef("NF", "Norfolk Islands (AU)",
+		"AU", new String[]{"en"}),
+	  new LocaleDef("NG", "Nigeria",
+		"NG", new String[]{"en"}),
+	  new LocaleDef("NI", "Nicaragua",
+		"NI", new String[]{"es"}),
+	  new LocaleDef("NL", "Netherlands",
+		"NL", new String[]{"nl", "de"}),
+	  new LocaleDef("NO", "Norwegian",
+		"NO", new String[]{"no", "sv"}),
+	  new LocaleDef("NP", "Nepal",
+		"NP", new String[]{"ne"}),
+	  new LocaleDef("NR", "Nauru",
+		"NR", new String[]{"na", "en"}),
+	  new LocaleDef("NT", "Neutral Zone (CY)",	// deleted
+		"CY", new String[]{"en", "el", "tr"}),
+	  new LocaleDef("NU", "Niue",
+		"NU", new String[]{"en"}),
+	  new LocaleDef("NZ", "New Zealand",
+		"NZ", new String[]{"en"}),
+	  new LocaleDef("OM", "Oman, Sultanate",
+		"OM", new String[]{"ar"}),
+	  new LocaleDef("PA", "Panama",
+		"PA", new String[]{"es", "en"}),
+	  new LocaleDef("PC", "Paracel Islands (CN)",
+		"CN", new String[]{"zh", "en"}),
+	  new LocaleDef("PE", "Peru",
+		"PE", new String[]{"es"}),
+	  new LocaleDef("PF", "Polynesia, French (FR)",
+		"FR", new String[]{"fr"}),
+	  new LocaleDef("PG", "Papua New Guinea",
+		"PG", new String[]{"en"}),	//???????? probably many other languages
+	  new LocaleDef("PH", "Philipines",
+		"PH", new String[]{"en"}),
+	  new LocaleDef("PK", "Pakistan",
+		"PK", new String[]{"ps", "en"}),
+	  new LocaleDef("PL", "Poland",
+		"PL", new String[]{"pl", "de"}),
+	  new LocaleDef("PM", "Saint-Pierre & Miquelon (FR)",
+		"FR", new String[]{"fr"}),
+	  new LocaleDef("PN", "Pitcairn Islands (NZ)",
+		"NZ", new String[]{"en"}),
+	  new LocaleDef("PR", "Porto Rico",
+		"US", new String[]{"en", "es"}),
+	  new LocaleDef("PS", "Palestine, Occupied Terr. (IL)",
+		"PS", new String[]{"ar"}),
+	  new LocaleDef("PT", "Portugal",
+		"PT", new String[]{"PT", "ES"}),
+	  new LocaleDef("PW", "Palau",
+		"PW", new String[]{"en"}),
+	  new LocaleDef("PY", "Paraguay",
+		"PY", new String[]{"es"}),
+	  new LocaleDef("PZ", "Panamean Canal Zone (PA)",	// deleted
+		"PA", new String[]{"es", "en"}),
+	  new LocaleDef("QA", "Qatar",
+		"QA", new String[]{"ar"}),
+	  new LocaleDef("RE", "Reunion (FR)",
+		"FR", new String[]{"fr"}),
+	  new LocaleDef("RO", "Romania",
+		"RO", new String[]{"ro", "fr"}),
+	  new LocaleDef("RU", "Russia, Federation",
+		"RU", new String[]{"ru", "pl", "ua", "be", "ge", "de", "zh"}),
+	  new LocaleDef("RW", "Rwanda",
+		"RW", new String[]{"fr", "rw"}),
+	  new LocaleDef("SA", "Saudi Arabia",
+		"SA", new String[]{"ar"}),
+	  new LocaleDef("SB", "Solomon Islands",
+		"SB", new String[]{"en"}),
+	  new LocaleDef("SC", "Seychelles",
+		"SC", new String[]{"en"}),
+	  new LocaleDef("SD", "Sudan",
+		"SD", new String[]{"ar"}),
+	  new LocaleDef("SE", "Sweden",
+		"SE", new String[]{"sv", "no", "fi", "da"}),
+	  new LocaleDef("SG", "Singapore",
+		"SG", new String[]{"zh"}),
+	  new LocaleDef("SH", "Saint-Helena (GB)",
+		"GB", new String[]{"en"}),
+	  new LocaleDef("SI", "Slovenia",
+		"SI", new String[]{"sl", "de", "hr", "hu"}),
+	  new LocaleDef("SK", "Slovakia",
+		"SK", new String[]{"sk", "cz", "hu"}),
+	  new LocaleDef("SL", "Sierra Leone",
+		"SL", new String[]{"pt"}),	//????????
+	  new LocaleDef("SM", "San Marino",
+		"SM", new String[]{"it"}),	//????????
+	  new LocaleDef("SO", "Somalia",
+		"SO", new String[]{"so", "en"}),	//????????
+	  new LocaleDef("SU", "C.I.S., Former Soviet Union",
+		"SU", new String[]{"ru", "am", "az", "be", "de", "ee", "ka", "ky", "lt", "lv", "md", "pl", "ro", "kk", "tk", "tg", "uk", "uz"}),
+	  new LocaleDef("SV", "El Salvador",
+		"SV", new String[]{"es"}),
+	  new LocaleDef("SY", "Syria",
+		"SY", new String[]{"ar"}),
+	  new LocaleDef("SZ", "Swaziland",
+		"SZ", new String[]{"en"}),	//????????
+	  new LocaleDef("TC", "Turks & Caicos Islands (GB)",
+		"GB", new String[]{"en"}),
+	  new LocaleDef("TD", "Chad",
+		"TD", new String[]{"fr", "ar"}),
+	  new LocaleDef("TF", "Antarctic Ocean Terr., Kerghelen (FR)",
+		"FR", new String[]{"fr"}),
+	  new LocaleDef("TG", "Togo",
+		"TG", new String[]{"fr"}),
+	  new LocaleDef("TH", "Thailand",
+		"TH", new String[]{"th"}),
+	  new LocaleDef("TJ", "Tajikistan",
+		"TJ", new String[]{"tg", "ru"}),
+	  new LocaleDef("TM", "Turkmenistan",
+		"TM", new String[]{"tk", "ru"}),
+	  new LocaleDef("TN", "Tunisia",
+		"TN", new String[]{"ar", "fr"}),
+	  new LocaleDef("TO", "Tonga",
+		"TO", new String[]{"to", "en"}),
+	  new LocaleDef("TP", "Timor, East (ID)",
+		"ID", new String[]{"in", "pt"}),
+	  new LocaleDef("TR", "Turkey",
+		"TR", new String[]{"tr", "ar", "ro", "gr"}),
+	  new LocaleDef("TT", "Trinidad & Tobago",
+		"TT", new String[]{"es"}),
+	  new LocaleDef("TW", "Taiwan",
+		"TW", new String[]{"zh"}),
+	  new LocaleDef("TZ", "Tanzania",
+		"TZ", new String[]{"en"}),	//????????
+	  new LocaleDef("UA", "Ukrainia",
+		"UA", new String[]{"uk", "ru"}),
+	  new LocaleDef("UG", "Uganda",
+		"UG", new String[]{"en"}),	//????????
+	  new LocaleDef("UM", "Minor Outlying Islands (US)",
+		"US", new String[]{"en"}),	//????????
+	  new LocaleDef("UN", "United Nations",	// Not really a country
+                "UN", new String[]{"en", "fr", "zh"}),
+	  new LocaleDef("US", "United States",
+		"US", new String[]{"en", "es", "fr"}),
+	  new LocaleDef("UY", "Uruguay",
+		"UY", new String[]{"es"}),
+	  new LocaleDef("UZ", "Uzbekistan",
+		"UZ", new String[]{"uz", "ru"}),
+	  new LocaleDef("VA", "Holy See, State of Vatican City",
+		"VA", new String[]{"la", "it"}),
+	  new LocaleDef("VC", "Saint-Vincent & Grenadines",
+		"VC", new String[]{"es", "en"}),
+	  new LocaleDef("VE", "Venezuela",
+		"VE", new String[]{"es"}),
+	  new LocaleDef("VG", "Virgin Islands (GB)",
+		"GB", new String[]{"en"}),
+	  new LocaleDef("VI", "Virgin Islands (US)",
+		"US", new String[]{"en"}),
+	  new LocaleDef("VN", "Viet Nam",
+		"VN", new String[]{"vi"}),
+	  new LocaleDef("VU", "Vanuatu",
+		"VU", new String[]{"fr"}),
+	  new LocaleDef("WF", "Wallis & Futuna (FR)",
+		"FR", new String[]{"fr"}),
+	  new LocaleDef("WS", "Samoa, Western, Ind. State",
+		"WS", new String[]{"sm", "en"}),
+	  new LocaleDef("YA", "Former Yemen Arab Rep. (YE)",	// Deleted
+		"YE", new String[]{"ar"}),
+	  new LocaleDef("YE", "Yemen Dem. Rep.",
+		"YE", new String[]{"ar"}),
+	  new LocaleDef("YT", "Mayotte (FR)",
+		"FR", new String[]{"fr"}),
+	  new LocaleDef("YU", "Yougoslav Fed. Serbia & Montenegro",
+		"YU", new String[]{"sr", "hr"}),
+	  new LocaleDef("ZA", "South Africa",
+		"ZA", new String[]{"en"}),
+	  new LocaleDef("ZB", "Zimbabwe",
+		"ZB", new String[]{"en"}),
+	  new LocaleDef("ZM", "Zambia",
+		"ZM", new String[]{"en"}),
+	  new LocaleDef("ZR", "Former Zaire, Congo Dem. (CD)",	// Deleted
+		"CD", new String[]{"en"}),
+};

@@ -1,0 +1,1507 @@
+frostwire (6.1.6) stable; urgency=high
+  * Fixes drag and drop freezes introduced by new Java Runtime Environment 1.8.0_60.
+  * Fixes SoundCloud search.
+  * Fixes TPB search.
+  * Fixes BTJunkie search.
+  * Fixes TorLock search.
+  * Updates to Spanish and Romanian translations.
+  * Chat button on header moved to Tools menu. More space for search bar.
+	
+ -- FrostWire Team <contact@frostwire.com>  Nov, 02 Sep 2015 13:04:00 -0500
+
+frostwire (6.1.5) stable; urgency=high
+  * New http engine based on okhttp, uses pooled connections, less threads,
+    less memory. Faster and more reliable search & cloud downloads.
+  * libtorrent/jlibtorrent core update (v 1.1.0.9).
+  * Fixes KAT search.
+  * Fixes Bitsnoop search.
+  * Fixes EZTV search.
+  * Removes Radio functionality from Library.
+  * When the search options are opened, the keyword textfield is autofocused.
+  * Java Runtime upgrade to v1.8.0_60.
+  * Codebase cleanup and refactors.
+	
+ -- FrostWire Team <contact@frostwire.com>  Thu, 25 Sep 2015 11:04:00 -0500
+
+frostwire (6.1.4) stable; urgency=high
+  * libtorrent/jlibtorrent core update (v 1.1.0.5).
+  * Torrent settings issues fixed.
+  * Fixes TorLock search.
+  * Considerably faster search source processing (new regex engine).
+  * Fixes YouTube search.
+	
+ -- FrostWire Team <contact@frostwire.com>  Aug, 14 Jul 2015 16:15:00 -0500
+
+frostwire (6.1.3) stable; urgency=high
+  * libtorrent/jlibtorrent core update.
+  * Archive.org downloads are pausable/resumable.
+  * Soundcloud search & download API update.
+  * Hungarian translation update.
+  * Simplified seeding settings. No more need to treat handpicked/partial
+    downloads differently with jlibtorrent updates.
+  * Fixes crash when setting default save folder to the root
+    of a drive.
+	
+ -- FrostWire Team <contact@frostwire.com>  Wed, 29 Jul 2015 10:04:32 -0500
+
+frostwire (6.1.2) stable; urgency=high
+  * Search performance improvements. New RxJava-based implementation.
+  * Search box suggestions improved.
+  * New Check/uncheck all search engines checkbox.
+  * TorLock search fixed.
+  * Added SSL (https) support for torrent web seeds.
+  * Options window remembers last pane opened.
+  * Fixes painting issues when searching Starred audio files on the library.
+  * frostwire-jlibtorrent library updates.
+  * Library user experience bug fixes.
+	
+ -- FrostWire Team <contact@frostwire.com>  Wed, 24 Jun 2015 11:44:00 -0500
+
+frostwire (6.1.1) stable; urgency=high
+  * TPB search fixed.
+  * KAT search fixed.
+  * Monova search fixed.
+  * Bitsnoop downloads fixed.
+  * BTJunkie downloads fixed.
+  * EZTV search engine removed after scammers took over.	
+  * YouTube search fixes for non-english users.
+  * Russian translation update.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 12 May 2015 15:20:28 -0500
+
+frostwire (6.1.0) stable; urgency=high
+  * YouTube search fixes.
+  * Domain alias manager removed.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 7 May 2015 14:31:08 -0500
+ 
+frostwire (6.0.9) stable; urgency=high
+  * Jlibtorrent updates.
+  * Crash fixes.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 5 May 2015 10:30:00 -0500
+
+frostwire (6.0.8) stable; urgency=high
+  * Significant improvements in search result availability.
+  * Faster Bitsnoop, Extratorrent and KAT individual file search results.
+  * Reduced use of DHT network for search.
+  * Faster torrent download start time.
+  * Fixes download error on some Archive.org search results.
+  * Fixes Yify search.
+  * Misc fixes in Library functionality.
+  * Crash fixes.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 24 April 2015 04:44:00 -0500
+
+frostwire (6.0.7) stable; urgency=high
+  * New feature: Preview while you download.	
+  * Memory and CPU savings when parsing search results on some search engines.
+  * BTJunkie fixed.
+  * TPB search fixed.
+  * KAT search fixed.
+  * Monova search fixed.
+  * Fixes bug where soundcloud, archive.org audio downloads would not be automatically
+    be scanned by iTunes.
+  * Croatian translation updates.
+  * Torrent creation and parsing now done using frostwire-jlibtorrent api. More
+    Azureus cleanups.
+  * Fixes run on startup issue on Windows. Thanks to @win32re.
+  * Upgraded java virtual machine to 1.8.0_40 with hundreds of fixes and upgrades.
+  * Upgraded H2 database engine.
+  * Upgraded frostwire-jlibtorrent to the latest code from libtorrent.
+  * UX-improvement: A repeated search will honor active search engines.
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 08 April 2015 22:24:00 -0500
+
+frostwire (6.0.6) stable; urgency=high
+  * Fixes bug where default save location for torrents would not be accounted for.
+  * New: When changing default save location, any ongoing torrent transfers are
+    moved to the new location.
+  * Romanian and Finnish translation updates.
+  * New: Option to turn off Bittorrent DHT.
+  * YT search upgrades.
+  * New: Supports shortened y2u.be url searches.
+  * OSX: When shutting down to start the installer for an update
+    now the window is focused to make sure the user doesn't get lost during the
+    update process.
+	
+ -- FrostWire Team <contact@frostwire.com>  Thu, 17 February 2015 14:44:30 -0500
+
+frostwire (6.0.5) stable; urgency=high
+  * Fixes out of memory crash and freeze when importing lots of songs from the FrostWire
+    library to iTunes.
+  * Removed Litecoin and Dogecoin from torrent creation dialog, Bitcoin and payment
+    urls only. Litecoin and Dogecoin are pretty much dead compared to Bitcoin.
+  * Remove Download and Data now enabled for http downloads too.
+  * Fixes possible errors for SoundCloud downloads.
+  * Updates on Hungarian and Romanian translations.
+  * Fixes YT search issues.
+  * New mplayer binaries with HTTPS support.
+	
+ -- FrostWire Team <contact@frostwire.com>  Wed, 28 January 2015 14:18:12 -0500
+
+frostwire (6.0.4) stable; urgency=high
+  * Implements torrent loading algorithm to avoid CPU overuse when checking
+    torrent integrity.
+  * When transfers are finished they no longer show as 'Paused', 
+    they show as 'Finished'.
+  * Fixes issues with incomplete files.
+  * Fixes issues importing too many songs to iTunes playlist.
+  * Fixes issue on which adding a whole torrent after starting a partial
+    download would not merge the two and continue to download the rest
+    of the torrent.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 16 January 2015 14:31:06 -0500
+
+frostwire (6.0.3) stable; urgency=high
+  * Solves issue getting correct single file location from transfer manager.
+  * Improved MD5 verification. Thanks @abderraouf-adjal
+  * Important UI transfer related actions restored for Linux users.
+  * Updated frostwire-jlibtorrent libraries,
+    now built with older Boost 1.55, fixes Windows UI Freeze issue.
+  * CPU usage reduced managing transfer items.
+  * Croatian, Bulgarian, Polish, translation updates.
+  * More cleanups and refactors.
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 3 December 2014 16:53:57 -0500
+
+frostwire (6.0.2) stable; urgency=high
+  * Maximum concurrent torrent download settings defaults raised to 10.
+  * KAT search fix.
+  * Prevents possible out of memory error.
+  * Croatian translation update.
+  * Minor refactors
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 19 November 2014 16:26:00 -0500
+
+frostwire (6.0.1) stable; urgency=high
+  * Fixes YouTube download Error.
+  * Updated splash screen.
+  * Misc. bugs.
+
+  TRANSLATIONS:
+  * Croatian translation updates. Thanks @win32re, @darthxjanus.
+  * Polish translation updates. Thanks @nalesnikld, @paulinka.
+  * Spanish translation updates.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 17 November 2014 14:16:00 -0500
+
+frostwire (6.0.0) stable; urgency=high
+  PERFORMANCE:
+  * New BitTorrent engine based on frostwire-jlibtorrent,
+    a libtorrent wrapper api created by FrostWire.
+  * Fixes EzTV search, now with https support.
+  * Multiple bug fixes.
+  * Improved OS event handling in MacOSX.
+  * Extensive cleanup.
+  * Fixes issues opening .torrents and magnets outside of FrostWire.
+
+  USER INTERFACE:
+  * Icons refreshed.
+
+  TRANSLATIONS:
+  * Russian translation updates. Thanks @X-NicON.
+  * Croatian translation updates. Thanks @win32re, @darthxjanus.
+  * Polish translation updates. Thanks @nalesnikld, @paulinka.
+  * Simplified Chinese translation updates. Thanks @eudaemon01.
+  * German translation updates. Thanks @paulinka.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 10 November 2014 18:18:00 -0500
+
+frostwire (5.7.7) stable; urgency=high
+  * New: VPN connection status indicator.
+  * New: Stop media playback by long pressing play/pause button.
+  * Fix: Freeze when opening FrostWire from the first time out of
+    clicking on a magnet link or .torrent file.
+  * Fix: Bug where files couldn't be played with the main player button.
+  * Fix: Bug where the speaker icon on the library would still show
+    after the media player had stopped.
+  * Fix: Bug after 5.7.5 in which the buttons of the Create Torrent
+    dialog were not visible unless the window was resized.
+  * Fixes issue on Linux when player window pixel translucency could
+    not be set. Thanks @foutrelis.
+  * Fixes Null Pointer Exception when trying to shutdown and hide
+    an MPlayerWindow that may have not been instantiated.
+  * Fixes issue where user could not create new playlist by dropping
+    songs from existing playlist into 'New Playlist' list item in
+    the library.
+  * Updated MigLayout source code to version 4.0
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 01 October 2014 17:00:00 -0500
+
+frostwire (5.7.6) stable; urgency=high
+  * New: Filter search results by file extension, source name.
+  * UI: Now table rows have a subtle bevel effect.
+  * UI: Adds support for full screen mode on Mac OSX. Thanks to Tim Farris.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 21 August 2014 23:53:35 -0500
+
+frostwire (5.7.5) stable; urgency=high
+  * Improved mp4 parser.
+  * Improved cloud search results.
+  * Now FrostWire runs with Java8 technology.
+  * Fixes player control layout issues when resizing the main window.
+  * Fixes soundcloud url track/set downloads.
+  * Fixes possible cloud download errors.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 11 August 2014 17:46:15 -0500
+
+frostwire (5.7.4) stable; urgency=high
+  * Fixes issues with youtube downloads.
+  * Recovered ability to download soundcloud urls.
+  * Can download entire soundcloud playlists from playlist url.
+  * Fixed broken Torrents.fm search.
+  * Updated Gson library, included the sources into our repo.
+	
+ -- FrostWire Team <contact@frostwire.com>  Thu, 26 June 2014 15:44:35 -0500
+
+frostwire (5.7.3) stable; urgency=high
+  * New Yifi search.
+  * Added Canonical Peer Priority support. (BEP40)
+  * Fixed broken EZTV search.
+  * Removed apache httpclient and httpcore libraries.
+	
+ -- FrostWire Team <contact@frostwire.com>  Fri, 23 May 2014 16:20:00 -0500
+
+frostwire (5.7.2) stable; urgency=high
+  * uTP support enabled.
+  * Multiple crash fixes.
+  * UX: playable single file torrents now can be played from transfer list.
+  * UX: Fixes UI Thread freeze when opening Options > Search.
+  * UX: Better error reporting when a torrent can't be fetched from a 
+        magnet connection.
+  * Spanish translation update by @dennistobar.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 11 Apr 2014 14:22:10 -0500
+	
+frostwire (5.7.1) stable; urgency=high
+  * Wi-Fi sharing discovery improved considerably with JmDNS.
+    Removed cling library.
+  * Improvements in .torrent creation window:
+     1. Web seed url(s) (GetRight style) support.
+     2. Associate a Creative Commons, Open Source, or Public Domain license.	
+     3. Associate a Bitcoin address for Name-your-price/tips support.
+     4. Associate a Litecoin address for Name-your-price/tips support.
+     5. Associate a Dogecoin address for Name-your-price/tips support.
+     6. Associate a Paypal url for Name-your-price/tips support.
+  * Transfers and Library tables now able display Tips/Payment options column.
+  * Transfers and Library tables now able display License column.
+  * Updated Torrents.fm search engine.
+  * Removed Clearbits search engine, service offline for ~2 months now.
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 12 Mar 2014 16:25:42 -0500
+
+frostwire (5.7.0) stable; urgency=high
+  * Updated BitTorrent engine from Azureus/Vuze project.
+  * New Torrents.fm meta search integration.
+  * Brings back cloud downloads by entering url on search box or open dialog.
+  * Chat Tab gone. Chat button now points to http://frostwire.com/chat. 
+    Faster startup time.
+ -- FrostWire Team <contact@frostwire.com>  Fri, 17 Jan 2014 00:21:30 -0500
+
+frostwire (5.6.9) stable; urgency=high
+  * Insanely faster cloud search results.
+  * Significant memory optimizations on search result parsing and display.
+  * Removed jDownloader libraries, less complexity, lighter app.
+  * Cloud audio downloads are much smaller, no audio demuxing necessary from
+    video services.
+  * Cloud video DASH download support.
+  * Smarter playlist name suggestion algorithm takes into account ID3 tags.
+  * Fixes bug where new playlists wouldn't be saved if default name was used.
+ -- FrostWire Team <contact@frostwire.com>  Mon, 2 Dec 2013 17:49:38 -0500
+
+frostwire (5.6.8) stable; urgency=high
+  * Fixes cloud search issues.
+  * Considerable Spanish translation updates by @dennistobar.
+ -- FrostWire Team <contact@frostwire.com>  Mon, 11 Nov 2013 13:34:30 -0500
+
+frostwire (5.6.7) stable; urgency=high
+  * New Advanced Feature: Edit Trackers.
+  * New Advanced Feature: Scrape Trackers.
+  * New Advanced Feature: Update Trackers.
+  * New BitSnoop meta search.
+  * New TorLock meta search.
+  * New EZTV meta search.
+  * Fixes Monova meta search.
+  * Removes ISOHunt meta search.
+  * Tips of the day updated.
+  * Updated Catalonian flag.
+ -- FrostWire Team <contact@frostwire.com>  Mon, 4 Nov 2013 11:06:30 -0500
+
+frostwire (5.6.6) stable; urgency=high
+  * Fixes ExtraTorrent meta search.
+  * Polish translation updated.
+  * New support for anonymous user experience statistics.
+ -- FrostWire Team <contact@frostwire.com>  Fri, 11 Oct 2013 15:38:32 -0500
+
+frostwire (5.6.5) stable; urgency=high
+
+  * Upgrades Soundcloud search, download, streaming.
+  * Fixes issue when starting downloads made of multiple single files
+    that belong to the same .torrent.
+  * When opening finished transfers on the library with a double click
+    FrostWire will no longer type the name of the file on the library
+    search box.
+  * Fixes bugs where magnets crawled would leave .torrent files behind
+    inside default torrents folder.
+ -- FrostWire Team <contact@frostwire.com>  Wed, 25 Sep 2013 15:16:32 -0500
+
+frostwire (5.6.4) stable; urgency=high
+  * Fixes issues parsing some cloud urls.
+  * Fixes issues with soundcloud meta search.
+  * Spanish translation updated.
+  * French translation updated. Thanks @jeromemorignot.
+  * Portuguese translation updated. Thanks @tati110.
+  * Brazilian Portuguese translation updated. Thanks @tati110.
+  * Arabic translation updated. Thanks @nisrmasr.
+  * Turkish translation updated. Thanks @Serrae.
+ -- FrostWire Team <contact@frostwire.com>  Tue, 03 Sep 2013 14:49:33 -0500
+
+frostwire (5.6.3) stable; urgency=high
+  * New Feature: Preview audio search results from Archive.org.
+  * New Feature: Decide wether or not to seed handpicked files
+    of torrents (aka Partial Downloads).
+  * New Hacker Feature: Change the location of FrostWire's settings folder.
+    Great if you want to install FrostWire on a removable disk and
+    you want to maintain settings and download states.
+  * Fixes bug where the internet search box would be disabled after
+    sending file to friend.
+  * Updated shutdown screen lets users know about Android app when they
+    might be headed outside.
+ -- FrostWire Team <contact@frostwire.com>  Sun, 04 Aug 2013 12:14:13 -0500
+
+frostwire (5.6.2) stable; urgency=high
+  * Improved readability of stream sources in player title.
+  * Fixed bug where media source icon for internet streams wouldn't be shown
+    more than once on search result preview playback.
+  * UX Patch: New 'Search' tab acts also as a search button.
+ -- FrostWire Team <contact@frostwire.com>  Thu, 04 Jul 2013 00:00:00 -0500
+
+frostwire (5.6.1) stable; urgency=high
+  * New Feature: New simplified, more responsive, faster user interface.
+  * New Feature: Audio player can detect Facebook and Twitter urls
+    inside .mp3 ID3 Tags to display Facebook and Twitter icons of the
+    the corresponding artists.
+  * fwplayer.exe improved unicode and HLS (Http Live Streaming) support.
+  * New Feature: Change font size with Ctrl/Cmd + '+', Ctrl/Cmd + '-'.
+  * New Feature: Close search tabs with Ctrl/Cmd + 'w'.
+  * New Feature: Switch search tabs with Ctrl+Tab, Ctrl+Shift+Tab
+  * New Feature: Switch search tabs with Cmd+Shift+[, Cmd+Shift+]
+  * New Feature: Search engines can be disabled in global options.
+  * Improved and optimized table rendering for search results and library files.
+  * Refreshed presentation of search results.
+  * New splash screen format.
+  * Fixed issue related to smart search configuration.
+  * Fixed NPE that would cause library table rendering issues.
+  * Fixed NPE while searching in starred.
+  * Fixed popup menu in search result displayer.
+  * Fixed DnD between playlists (some inconsistencies with order index).
+  * All FrostWire libraries now come in a single FrostWire.jar file.
+  * Major cleanup of the FrostWire code base.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 20 Jun 2013 00:12:08 -0500
+
+frostwire (5.5.6) stable; urgency=high
+  * New Feature: Includes search results from archive.org, which indexes
+    millions of public domain and creative commons works from all over the
+    internet.
+  * New Feature: playlist songs can be re-ordered with drag and drop.
+  * New Feature: all songs in a playlist can now be exported to a folder.
+  * Upgrade: Improved Unicode support for Chinese characters.
+  * Upgrade: mplayer update for unicode character file playback support.
+  * Upgrade: Search architecture upgrade for much faster search results.
+  * Upgrade: Considerably faster mp3,mp4 parsing in the library, creating
+    playlists is now faster than ever.
+  * Upgrade: New more explicit Wi-Fi sharing icons.
+  * Upgrade: Updated radio station database.
+  * Upgrade: up to 20% faster listing of files in the Library.
+  * Upgrade: Video player upgrades for better experience.
+  * Bug fix: screen-saver no longer kicks in during video playback.
+  * Bug fix: UPnP Wi-Fi sharing discovery consumes 84% less CPU on
+    congested local networks. Fixing reported slowdowns and reducing
+    considerable power consumption for laptop users.
+  * Bug fix: X11 related error fix.
+  * Bug fix: Number of files being shared includes the number of torrents
+    being seeded.
+  * Bug fix: Library search issues related to unicode characters.
+  * Bug fix: Multiple null pointer exceptions and crashes fixed.
+  * Bug fix: Fixed rendering issue related to wrong parsing of bitrate
+    string data.
+  * Upgrade: (Developers) ant compilation scripts cleanup.
+  * Upgrade: (Developers) use of 'frostwire-commons' repository to share
+    common code between FrostWire for Android and Desktop projects.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 22 Apr 2013 05:58:00 -0500
+
+frostwire (5.5.5) stable; urgency=high
+  * Bug fix: Null pointer exceptions in Media Player.
+  * Bug fix: Multiple User Interface thread violations fixed.
+  * Bug fix: Setup Wizard painting issues in Linux resolved.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 28 Feb 2013 17:00:00 -0500
+
+frostwire (5.5.4) stable; urgency=high
+  * New Feature: extract audio (.m4a) from (.mp4) videos on right click.
+  * New Core Feature: HTTP resumeable large transfer support.
+  * Upgrade: Default save folder for cloud downloads is updated without
+    restarting.
+  * Upgrade: 'Repeat song' playback mode now available.
+  * Upgrade: Enriched promotion display, now with audio and video previews and
+    shortcuts to content creator's social media channels/streams.
+  * Upgrade: binary compatibility improved for Windows releases.
+  * Bug fix: if default save folder is changed it's now part of library scanned
+    folders.
+  * Bug fix: smart search engine wasn't notifying when it was done if there
+    were no results.
+  * Bug fix: several crashes and errors fixed.
+  * Bug fix: partial download dialog for cloud downloads would sometimes appear
+    empty.
+  * Bug fix: out of memory error by UPnP-cling creating an infinite number
+    of threads.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 21 Feb 2013 14:38:57 -0500
+
+frostwire (5.5.3) stable; urgency=high
+  * Bug fix: freeze on Windows XP. (Windows release only)
+ -- FrostWire Team <contact@frostwire.com>  Tue, 05 Feb 2013 19:00:00 -0500
+
+frostwire (5.5.2) stable; urgency=high
+  * Upgrade: Now 'Movies' or 'My Videos' folder is included by default on new
+    installs since we now have a built-in video player.
+  * Upgrade: The Smart Search engine can now be disabled. No torrents will be
+    indexed and no search against the local database will be performed if
+    disabled.
+  * UI fix: Video Player Window Title now shows the file name being played.
+  * UI fix: Library > "Finished Downloads" renamed to "Default Save Folder"
+  * UI fix: When browsing another device on the Wi-Fi network newest shared
+    files are shown at the top of the table.
+  * Bug fix: On first installation FrostWire wasn't able to add 'From Devices'
+    folder to the Library.
+  * Bug fix: When restoring default settings FrostWire was not restoring 
+    default library folders.
+  * Bug fix: Player remembers volume level from last song played.
+  * Bug fix: Sends correct file sizes on HTTP headers for shared files that
+    have changed in size after being shared.
+  * Bug fix: Repeat media play setting with only one item.
+  * Bug fix: New mime detector based on a bigger table.
+  * Bug fix: Video player doesn't skip frames when resuming from pause.
+  * Bug fix: Video player doesn't move frames when paused and volume slider
+    is being moved.
+  * Bug fix: Dropping a .torrent starts a download and doesn't ask to send to
+    a friend.
+  * Bug fix: (Windows) can delete files that are being played or seeded
+    from the Library.
+  * Bug fix: (Mac) compatibility with Mac OSX 10.5.x restored.
+  * Bug fix: (Windows) media player can open files with long paths.
+  * Bug fix: prevents NPE when opening a .torrent and trying to show icons when
+    the file system chooser wasn't available.
+  
+ -- FrostWire Team <contact@frostwire.com>  Tue, 15 Jan 2013 20:00:00 -0500
+
+frostwire (5.5.1) stable; urgency=high
+  * New Clear Inactive button on transfers.
+  * New setting to use the default system media player instead of
+    FrostWire's.
+  * New Download Cloud URLs, Torrents and Magnets by entering
+    urls on the search field.
+  * New toggle full screen video playback with double click.
+  * Enhancement: Library file tables now show file modified date field and
+    files are sorted by it in descending order so user can easily find
+    newest files added to the library.
+  * Enhancement: Playlist tables now show the track number column and
+    are by default sorted by it in ascending order to enjoy
+    albums in the order they were meant to be heard by the content
+    creators.
+  * Enhancement: mime type guessing is faster when sharing files on Wi-Fi
+  * Bug fix: Library was getting confused with file extensions as part of file
+    names.
+  * Bug fix: sharing/unsharing popup menu behavior while sharing on Wi-Fi
+  * Bug fix: resizing issues on preview download dialogs.
+  * Bug fix: filtering on torrent detail dialog was broken.
+  * Bug fix: Library continuous playback working from play button.
+  * Bug fix: Cloud download error fixed.
+  * Bug fix: Media lib unicode issue.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 10 Dec 2012 20:00:00 -0500
+
+frostwire (5.5.0) stable; urgency=high
+  * New FrostWire video player.
+  * New audio preview on cloud based audio search results.
+  * New video preview on cloud based video search results.
+  * New Wi-Fi sharing between FrostWire for Desktop and Android.
+  * New Wi-Fi sharing/announcement/discovery protocol via UPnP standards.
+  * New Stream Video/Audio stored shared on Android devices.
+  * UX Improvement: Add folders to library with drag and drop on
+    library tree.
+  * UX Improvement: cloud audio downloads now have album art.
+  * Core Search Performance lowers CPU usage dramatically while indexing.
+  * Core Improvement: broader compatibility on cloud demuxed downloads.
+  * UI Improvement: partial download/torrent content window now includes
+    file extension, file type icon.
+  * UI Improvement: when opening youtube url, the file selection dialog
+    has type/quality hints to guide user on the options available for
+    download.
+  * UI Improvement: audio player simplified, no stop button.
+  * UI Improvement: Transfer manager now has 'Clear Inactive' button.
+  * Bug fix: Run on startup for Mac finally works. The BitTorrent network
+    will get a boost of upstream bandwidth.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 29 Nov 2012 16:00:00 -0500
+
+frostwire (5.4.0) stable; urgency=high
+  * No more sound distortion with the FrostWire player volume levels.
+  * Search engines update.
+  * UX Upgrade: Only one file type per search. Users were getting confused
+    with mixed file types in results.
+  * UX Upgrade: Forbid multiple selection on partial file selection dialog.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 17 Sep 2012 18:00:00 -0500
+
+frostwire (5.3.9) stable; urgency=high
+  * BEP 34 compliant. FrostWire now checks DNS TXT records for tracker 
+    config.
+  * Soundcloud integration (Search, Streaming and Downloads).
+  * Fixes issue with partial download title window not showing the name
+    of the torrent correctly.
+  * UI Improvement: Action hints on top of search results to stream or
+    download or see the contents of the torrent.
+  * UI Improvement: Action hint on top of playable contents in the
+    library.
+  * UI Improvement: Search result Source now includes the name of the
+    author if available.
+  * UI Improvement: Search keywords are bolded in the titles of search
+    results.
+  * UI Improvement: Creation date for non-torrent search results available.
+  * UI Improvement: File size of non-torrent search results available.
+  * UI Improvement: Opening 'Configure Options' on the Library takes user
+    to the Library Settings pane.
+  * UI Improvement: Right clicking on the title of a search tab now
+    shows the only action available (Repeat Search) directly.
+  * UI Improvement: A FrostWire update can now be invoked from the 'Tools'
+    menu.
+  * UI Improvement: New Notification update button will be available on
+    the Window header to let the user know visually that there's a 
+    FrostWire update available.
+  * UI Improvement: Added 'Cleanup Playlist' right click menu item in 
+    playlists.
+  * UX Improvement: When saving a newly created .torrent, FrostWire
+    will make sure the file is saved with the .torrent extension.
+  * Fixes issue with file names downloaded from FrostWire for Android.
+  * Fixes issue adding new radio stations to the library.
+  * Fix of MP3 ID3 tags unicode parsing.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 24 Aug 2012 20:43:35 -0500
+
+frostwire (5.3.8) stable; urgency=high
+  * Sends MP4 files (videos) to iTunes.
+  * Better language auto-detection on configuration wizard.
+  * Fixes Drag and Drop issue with iTunes >= 10.6.3.
+  * Fixes issues with Monova search.
+	
+ -- FrostWire Team <contact@frostwire.com>  Thu, 5 Jul 2012 14:10:15 -0500
+	
+frostwire (5.3.7) stable; urgency=high
+  * New Feature: Export playlist to iTunes. 
+  * Core upgrade: Better support for UTF-8 torrent contents.
+  * Faster startup time. No more waiting around 31% on splash screen.
+	
+ -- FrostWire Team <contact@frostwire.com>  Thu, 14 Jun 2012 08:07:05 -0500
+
+frostwire (5.3.6) stable; urgency=high
+  * Full support for .m4a audio files (thumbnails, seek)
+  * AAC downloads from YouTube.
+  * Fixes issue with search suggestions where the popup wouldn't 
+    hide correctly.
+  * Chinese, Korean character display fixed for Windows and Linux (Gnome only)
+  * Fixes issue where it was hard to select more than one search result for
+    batch downloads.
+  * Fixes issue with search results from KAT.ph. Now downloads are started
+    using magnet links instead of .torrents.
+  * Supports dragging files from transfer manager. 
+    Useful to send files to iTunes as soon as transfers are done.
+  * Adds links to Facebook and Google Plus pages on status bar.
+  * Single file search results now are launched on double click.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 14 May 2012 14:47:00 -0500
+
+frostwire (5.3.5) stable; urgency=high
+  * Drag and drop files and folders to your Android device running FrostWire.
+    You can upload files to 3 different devices at the same time.
+  * Fixes glitch where the file explorer would reset the split pane position.
+  * Removes flickering on album arts when resizing library explorer
+  * When the FrostWire window is resized to be very small the search
+    filters no longer overlap the "Open" and "Send to" buttons.
+  * Search box on the Library is now on the upper left and 
+    offers contextual hint.
+  * Search boxes everywhere now have a clear button.
+  * Playlists are now sorted alphabetically.
+  * Option panes UI upgrades.
+  * Better suggestion for a playlist name when a folder is dropped on
+    "New Playlist".
+  * German translation updated.
+  * French translation updated.
+  * Norwegian translation updated.
+  * Dutch translation updated.
+  * Japanese translation updated.
+  * Filipino translation updated.
+  * Chinese (Hong Kong) translation updated.
+  * Chinese (Taiwan) translation updated.
+  * Chinese (Mainland) translation updated.
+  * Turkish translation updated.
+  * Portuguese (Brazilian) updated.
+  * Korean translation updated.
+  * Italian translation updated.
+  * Hindi translation updated.
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 18 Apr 2012 18:00:00 -0500
+
+frostwire (5.3.4) stable; urgency=high
+  * New frostwire.exe launcher with extended Unicode support now able to
+    handle .torrent file names with extended Unicode characters.
+  * Windows build is Windows 8 compatible.
+  * Windows build will prefer Java 7 if not JRE is found.
+  * Improvements when sending files on a local area network via magnet link
+    or send file to friend.
+  * Bug fix when opening magnets from a website when FrostWire 
+    was already running.
+  * User experience improvements on the transfer manager.
+  * Spanish translation update (93% translated)
+  * YouTube video search and download support.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 26 Mar 2012 18:00:00 -0500
+
+frostwire (5.3.3) stable; urgency=high
+  * Noticeable improvements in CPU performance.
+  * Noticeable improvements in search result quality.
+  * Updated TPB search to support magnet link search results.
+  * Added UT_METADATA extension to Vuze Core for improved magnet link support.
+  * Upgraded Lucene library to v3.5.0.
+  * Upgraded H2 to v1.3.164.
+  * When browsing FrostWire for Android devices (0.9.6+), date added
+    and date modified fields are available on all file types.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 08 Mar 2012 16:07:46 -0500
+
+frostwire (5.3.2) stable; urgency=high
+  * Reverted H2 library to v1.3.160
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, 12 Feb 2012 09:09:46 -0500
+
+frostwire (5.3.1) stable; urgency=high
+  * Updated default album cover image with an anti-aliased frostwire sphere.
+  * Fixes bug where clicking on the current song would switch to the library
+    but the button on the top would not be selected.
+  * Adds missing icon for "copy magnet" on Send file dialog.
+  * Library explorer and Playlist explorer are now divided by a split pane
+    for a better experience.
+  * Hides hints popup when search is triggered with a mouse click.
+  * Updated search icon (magnifier).
+  * Fonts are reset when the setup wizard is shown so the wizard can work
+    properly.
+  * New View > Reset Font Sizes action.
+  * The first time the Library button is used "Finished Downloads" is
+    preselected to give the user a clue of what can be done.
+  * When a new playlist is created, a graphic is shown to hint the user
+    about dragging audio files there.
+  * Updated H2 library to v1.3.164
+
+ -- FrostWire Team <contact@frostwire.com>  Sat, 11 Feb 2012 18:22:15 -0500
+
+frostwire (5.3.0) stable; urgency=high
+  * Search form looks similar to FrostWire 4 but now allows user to search
+    for more than one file type at once.
+  * Improvements in search algorithm.
+  * Send file/folder feature more effective between just 2 peers.
+  * Simplification of search form interface, looks similar to FrostWire 4
+  * Phone & Tablets tab is gone, integration with Android devices is now
+    part of the Library under a "Devices" tree item.
+  * Browses, Streams audio, and downloads files made public by Android devices
+    in the same network.
+  * When entering a search hints are shown to type less (powered by Google).
+  * Sorts transfers by "Seeds" correctly.
+  * Improvements on Library action buttons, now a "Launch" action is available
+    and buttons are shown/hidden depending on context.
+  * Fixes bugs where files on a audio playlist could not be dragged out.
+  * Fixes bugs where deleted files would still appear on the library.
+  * When right clicking on selected finished transfers and copying an infohash
+    you won't end up with a trailing newline on the clipboard.
+  * Sharing ratio of a torrent that you stopped and started seeding again
+    will not be infinite and will be based on the total sizes of the files
+    being shared.
+  * Now when the transfer split pane is dragged up, the pane border is painted
+    correctly on top of the image overlay.
+  * Fixes repainting glitch when moving split pane on top of promotional
+    graphic.
+  * Lots of icons have been revamped for a more uniform look.
+  * Null Pointer Exception issues #100, #103, #104.
+  * Fixes issue #93 chat action causing frostwire crash.
+  * Flickering issue on song progress bar resolved.
+  * Simplified torrent creation. User now doesn't have to make up her mind
+    about choosing a file or a folder, the file selection dialog now
+    handles this for her.
+  * Brought back "Stop" search button.
+  * Removed lingering "Show/Hide player" menu entry on status bar context menu.
+  * If seeding transfers are meant to be finished, newly finished transfers
+    are not hidden for that session.
+  * Audio files can be launched using the operating system's default player
+    Right click on a file "Launc in <OS>"
+  * Removed BTJunkie search engine.
+  * Added KickAssTorrents (kat.ph) search engine.
+  * Fixes issue where downloading removing a partial transfer would
+    delete previously completed downloads of that same torrent.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 10 Feb 2012 13:14:10 -0500
+
+frostwire (5.2.11) stable; urgency=high
+  * Fixes bugs where some BitTorrent configuration settings were reset
+    on startup.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 28 Nov 2011 16:58:31 -0500
+
+frostwire (5.2.10) stable; urgency=high
+  * Upload ratios will not be enforced to 30% of downloads anymore.
+    Users will have free will to set the upload ratio of their preference.
+  * Update autodownload now supported for mac.
+  * Updates can now be distributed via both BitTorrent and HTTP.
+  * HttpFetcher improvements for less resource consumption.
+  * HttpFetcher now supports large HTTP file downlods (progressive download).
+  * Improvements to Send File to a friend.
+  * Fixes bug where some finished Downloads wouldn't "Show in Library"
+  * Bug report system revised.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 22 Nov 2011 16:34:04 -0500
+
+frostwire (5.2.9) stable; urgency=high
+  * Enhancement: Lucene full text indexing for Smart Search database to
+    allow for fuzzy searches.
+  * Enhancement: Lucene full text indexing for Library database allows
+    better search results on Radio search and playlist search.
+  * Enhancement: Audio player will start playing currently selected audio
+    source if it's on a stopped state.
+  * Bug Fix: Finished Downloads shows only finished downloads.
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 9 Nov 2011 12:11:10 -0500
+
+frostwire (5.2.8) stable; urgency=high
+  * Smart search updates uses less DHT resources and fixes logic bugs
+    that results into faster and better search results.
+  * New Internet Radio functionality on the Library. Play, Add, Remove
+    and bookmark your favorite Internet Radio Stations.
+  * Book/Document search now crawls for .cbr, .cbz, .cb7, .cbt and .cba
+    file formats.
+  * New "Show in Library" action for finished transfers. It is now the
+    default action when a finished transfer has been double clicked.
+  * Clicking on the currently played audio control should always take
+    the user to the currently played audio file.
+  * Top Library tree nodes re-arranged.
+  * When downloading a single partial file, the transfer manager shows
+    the proper icon based on the file type of the file being downloaded.
+  * Add partial downloads, and multiple transfers that contain audio files
+    to playlists right from the transfer manager.
+  * The library can now be configured to scan any folder the user desires.
+  * Files can be added to playlists right out of search results.
+  * New explore action button on the Library tab.
+  * New send to friend action button on the Library tab.
+  * Faster loading of Finished Downloads.
+  * Library search behaves as expected for all kinds of searches.
+  * A lot of bug fixes.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 7 Nov 2011 17:02:29 -0500
+
+frostwire (5.2.3) stable; urgency=high
+  * Change the order of an audio file on playlist with drag and drop.
+  * Change the order of multiple audio files on a playlist with drag and drop.
+  * Drop audio files and folders at a specific position inside a playlist.
+  * Remembers the column and order you last set on the transfer manager
+    after restart.
+  * Remembers the last file type you searched for after restart.
+  * New FrostWire icon compatible with Ubuntu 11.10
+  * Bug fix, now if you're playing a song and you resort the playlist by
+    any of the columns, the next song to be played will be the one below
+    the current song in the new order.
+  * Searching inside "Finished Downloads" now yields folder names as search
+    results.
+  * Fixes lingering popup menu issue.
+  * Fixed DNS query issue affecting Linux.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 20 Oct 2011 17:42:08 -0500
+
+frostwire (5.2.2) stable; urgency=high
+  * Library tables are now cached in memory, searches are done in the cache
+    speeding up the experience considerably for users with several thousand
+    files.
+  * Create or add audio files to a playlist right from the Transfer manager.
+  * iTunes importing after audio transfers finish turned off by default.
+  * Completed transfers that contain at least one audio file can be sent
+    to iTunes from the Transfer manager.
+  * Audio status component recognizes an Audio Stream, from an Audio file
+    from an internet stream url. Clicking on it will take you to the
+    Android Tab if it's an android stream or to the Library otherwise.
+  * Fixes issues with download mediator refresh.
+  * Fixes out of memory error.
+  * Real time UI feedback as audio files are being imported into playlist.
+  * F5, Cmd+R or Ctrl+R will refresh the current Library table.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 10 Oct 2011 18:03:10 -0500
+
+frostwire (5.2.1) stable; urgency=high
+  * Play/Pause player buttons now share the same button depending on state.
+  * Mac OSX threading bug when importing .m3u playlist to new playlist fixed.
+  * Pressing space bar pauses/resumes currently played audio.
+  * Playlist files can be sorted correctly by track number when available.
+  * FLAC playback support.
+  * When a playlist has finished importing files, it's shown to the user.
+  * Transfer manager remembers the position of its JSplitPane.
+  * Transfer manager sorts downloads by default based on their creation date.
+  * Transfer manager has new column "Started On" showing the date the transfer
+    first started.
+  * Drag and drop issues on playlist component for Mac OSX fixed.
+  * Partial download dialog table can adjust column widths, a horizontal
+    scrollbar will appear if the sum of the columns is wider than the dialog.
+  * When playing an audio file, if it gets deleted FROM DISK from inside
+    FrostWire, the audio file will stop playing.
+  * Files can be dragged to the "Starred" playlist and they will be marked
+    as starred. If files are dragged from Disk, creating a new playlist
+    will be offered, and all the elements on the playlist will be starred.
+  * Files can be deleted from the "Starred" playlist. This will cause the
+    files to be unstarred on every other playlist where they belong.
+  * The tables on the library remember the last position of their scrollbars
+    during the session.
+  * Double clicking on a playlist name starts editing the playlist name.
+  * Fixes bug where downloading an individual file in a torrent wouldn't
+    be marked in the search results as downloading.
+  * Fixes a memory leak when importing ID3 tags into a playlist.
+  * Fixes bug where the duration of an MP3 file wasn't calculated correctly
+    by MPlayer, duration is now being calculated with Java library.
+  * Fixes bug where it would import torrent skipped files to iTunes.
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 05 Oct 2011 13:14:11 -0500
+
+frostwire (5.2.0) stable; urgency=high
+
+  * New Library Tab, code named "Alexandria"
+  * New Audio Player controls
+  * New controls to create and manage playlists
+  * Drag and drop files from Finished Downloads, Audio, File explorer
+    into new or existing playlists.
+  * New control on status bar that shows current audio file being played
+    with a "Send to friend" button. Clicking on the file name bring user
+    back to where the audio file is being played.
+  * Export playlists to .m3u
+  * Import .m3u into new or existing playlists.
+  * Filter files inside currently selected file type or playlist.
+  * Audio player can randomize playback order, or repeat playlist.
+  * New icons all over the application.
+  * Album art is displayed when an audio file is selected on a playlist.
+  * Album art can be scaled in real time with split pane.
+  * Songs on playlists can be starred, Starred songs are added to "Starred"
+  * Selected songs on a playlist can be deleted with the Delete key, or
+    on right click Delete from playlist.
+  * Playlists can be renamed.
+  * Playlists can be deleted.
+  * When songs that have been deleted from disk are attempted to be played
+    they will be highlighted in red and with an exclamation mark.
+  * Right clicking on any song on a playlist > Cleanup removes all songs
+    on a playlist that have been deleted physically from disk.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 26 Sep 2011 18:00:00 -0500
+
+frostwire (5.1.5) stable; urgency=high
+
+  * Bug fix on setup wizard for some window configurations where controls
+    would not appear unless the user resized the window.
+  * Bug fix on keyword search filter, wrong keyboard event was being used.
+  * UX adjustement in the way transfers are sorted when the application is
+    launched.
+  * UX upgrade where Search Field on the Library now reacts to the DELETE key.
+  * UX upgrade where the FrostWire left hand side components are laid out
+    correctly after the user resizes the window from much smaller dimensions.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 16 Sep 2011 18:51:34 -0500
+
+frostwire (5.1.4) stable; urgency=high
+
+  * Bug fix where it would not index torrents when the
+    file type filter was in use.
+  * Bug fix when downloading a secondary file from the second torrent
+    download would not start and would appear as seeding.
+  * Cleans all empty folders created by a partial download once the download
+    is removed from the transfer manager.
+  * Fixes issue with transfer manager resetting the order of columns.
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 24 Aug 2011 00:57:38 -0500
+
+frostwire (5.1.3) stable; urgency=high
+
+  * Search results now arrive under 200ms, aka, Instant Search.
+  * New FrostWire "Smart Torrent" search. FrostWire will search inside
+    top matching torrents for individual files matching the current query.
+  * Core upgrade, if a .torrent fails to download from its HTTP location
+    FrostWire will download it from the DHT if it can find it there.
+  * Functionality to see the size of the Search DB and to reset it.
+  * UX upgrade, ability to hide/show seeding torrents on transfer manager.
+  * UX upgrade, Phone & Tablets desktop explorer asks before deleting files.
+  * UX upgrade, New file "Extension" column on search results.
+  * UX upgrade, Search tabs now have animated indicator to let user know
+    a search is still going on.
+  * UX upgrade, New filter by file type. Filter controls re-arranged.
+  * UX fix, search results can now be sorted by file type.
+  * TPB has been added to the list of search engines.
+  * Mininova is back.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 18 Aug 2011 18:50:00 -0500
+
+frostwire (5.0.8) stable; urgency=high
+
+  * Shows torrent details after a download starts to bring traffic back
+    to the search engine that provided the result as a default setting.
+  * Shows FrostWire icon for search results to which we can't resolve the
+    file extension.
+  * Removes Mininova from search engines.
+
+ -- FrostWire Team <contact@frostwire.com>  Sat, 16 Jul 2011 19:41:08 -0500
+
+frostwire (5.0.7) stable; urgency=high
+
+  * UX upgrade, send file or send folder support when a file or folder
+    is dropped on FrostWire.
+  * UX upgrade, file choosing dialogs on Mac now also show mounted volumes.
+  * UX upgrade, playback support for m4a files.
+  * UX upgrade, search result filters re-arranged.
+  * UX upgrade, main search button gone, updated search text box to include
+    clickable search icon.
+  * UX upgrade, filters re-arranged.
+  * UX upgrade, searches can be up to 50 characters long.
+  * UX upgrade, either disconnected or turbocharged, no idle state.
+  * UX upgrade, search as you type on the library, no more search button.
+    Disconnected only if it cannot connect to the internet.
+  * UX bugfix, iTunes options were not visible for Windows users.
+  * UX bugfix, fixes possible UI freeze on startup.
+  * UI bugfix, sending songs to iTunes on Mac is now done in a single process.
+  * Mac OSX Lion compatible.
+  * Bugfix, issue where opening a torrent from maglnk.com would result in a
+    double invocation of the Partial Dialog window.
+  * Bugfix, when user didn't start a partial download the torrent wouldn't be
+    deleted.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 15 Jul 2011 15:13:16 -0500
+
+frostwire (5.0.6) stable; urgency=high
+
+  * New feature, Send file. Available on File Menu and Transfer Manager.
+  * New feature, Send folder. Available on File Menu and Transfer Manager.
+  * UX upgrade, we now have a [+] icon next to search result file names to
+    show partial download dialog.
+  * UX upgrade, when a partial download is cancelled, the entry is removed
+    from transfers.
+  * UX update on partial download dialog. Includes new text filter.
+  * UX fix, Library search now also looks for .torrents on "Torrents" folder.
+  * UX fix, Mac OSX file menu does no longer show "Exit" action.
+  * Fixes bug, incomplete files are no longer exported to iTunes playlist.
+  * UX update, Help Menu now says "Sharing Help". Items rearranged.
+  * UX update, rearranged View options into single panel.
+  * UX update, torrent seeding settings are now a control of its own with
+    an explanation of what seeding is.
+  * UX update, the installation wizard now forces the user to decide if
+    she wants to seed or not seed to continue. Links to what is seeding
+    are in place.
+  * UX update, in Windows and Linux, when the user Xs the window the user is
+    explained that the application will be hidden and is given the option
+    to exit.
+  * UX bugfix, font size can now be increased.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 27 Jun 2011 10:57:00 -0500
+
+frostwire (5.0.4) stable; urgency=high
+
+  * UI upgrade, Create and seed New Torrents.
+  * UI upgrade, Ability to throttle torrent transfer speeds
+  * UI upgrade, Copy info hash from torrent.
+  * UI upgrade, Copy magnet link url from torrent.
+  * UI upgrade, Searchable library. Searches recursively downloaded
+    files, folders and torrents.
+  * UI upgrade, Search results filterable by Torrent Search Engine.
+  * UI upgrade, Search results filterable by file size.
+  * UI upgrade, Search results filterable by number of seeds.
+  * UI upgrade, Search results filterable by keywords as you type.
+  * UI upgrade, Ability to download partial files.
+  * UI upgrade, Promotional slides can now be switched by the user.
+  * UI upgrade and bug fixes on Phone & Tablets tab.
+  * UI upgrade, Ability to rebuild "FrostWire" playlist on iTunes.
+  * UI upgrade, Replaced legacy skinning code for "Substance" skinning system.
+  * Core update, audio playback is now done using mplayer.
+  * Core update, Vuze core integration with transfer manager.
+    re-written from scratch.
+  * Core update, No Gnutella support. Multiple library dependencies gone.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 24 Jun 2011 12:00:00 -0500
+
+frostwire (4.21.8) stable; urgency=high
+
+  * Fixes a possible freeze reported by some users when the configuration
+    wizard is shown.
+  * Fixes issue when a user changes default Gnutella Save Folder
+    and unchecks Sharing finished downloads. Individually shared
+    files from the old Save Folder would still be shared.
+    Now all individually shared files will be unshared if you uncheck
+    this setting.
+  * Now users don�t have to re-start to stop seeding after they�ve changed
+    their torrent Seeding Configuration. All torrents old and new will stop
+    seeding as soon as the setting is applied.
+  * Better wording to explain on which networks files are being shared on,
+    Gnutella or BitTorrent.
+  * Changed color of "Sharing Options" gear icon to blue, gray
+    icon may have seemed as if the button was disabled.
+  * Added "Sharing Options" gear button on Search Tab. It's only visible
+    once a search has been started.
+  * Added Help Menu options to learn about how to share/unshare files,
+    torrent seeding, and how to avoid being scammed into paying for
+    FrostWire. DO NOT PAY FOR FROSTWIRE.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 9 June 2011 17:40:20 -0500
+
+frostwire (4.21.7) stable; urgency=high
+
+  * Makes sure cancelling torrents that have finished are not deleted.
+  * Folders created by torrents that are cancelled during download are deleted
+    to avoid any unwanted file sharing.
+  * Fixes a bug when migrating from an older version of FrostWire on which
+    previously Saved and individually shared files would still be shared after
+    not sharing finished downloads on the migration wizard.
+  * Fixes a bug on configuration screens that could make the application freeze
+    for a few seconds before moving towards the next screen.
+  * Migration wizard will always be shown to make sure users are aware of what
+    they're sharing.
+  * Sharing completed files is always set to off by default on the
+    configuration wizard.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 16 May 2011 17:10:25 -0500
+
+frostwire (4.21.6) stable; urgency=high
+
+  * Fixes a bug where some Debian systems that didn't support the
+    Icon Tray would crash on startup.
+  * Fixes a bug where running FrostWire for the very first time
+    (and later) display Uploads number -1 in the bottom status bar.
+  * UX improvement Junk & Block. When marking Junk Results
+    UI offers to block malicious hosts that haven't blocked already.
+  * Policy update, Incomplete files are not shared by default to avoid
+    sharing files you started downloading and didn't want.
+  * Policy update, Finished downloads are not shared by default to
+    avoid confusion between files on Shared folder versus files
+    on Save folder.
+  * Policy update, .torrent files are not shared by default.
+  * UX improvement, better explanation and option to turn on/off
+    individual sharing of finished downloads (that end up in Saved
+    Folder) during FrostWire setup wizard.
+  * UX improvement, when user turns off Finished Download sharing
+    those files that were shared as individual files inside
+    the 'Saved Folder' will not be shared anymore.
+  * UX improvement, File menu now has option to Exit FrostWire completely.
+  * UX improvement, File menu now says "Open Torrent/Magnet" instead
+    of "Download Torrent/Magnet" for clarity.
+  * Bug Fix: The Torrent Save folder is now considered correctly,
+    now users can set a Torrent Save folder on external drives.
+  * Bug Fix: Slideshow component had an issue where it would not update
+    correctly the URL of the currently displayed slice if it had issues
+    fetching the image file, this could in turn sometimes cause 100% CPU
+    utilization.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 5 May 2011 11:03:14 -0500
+
+frostwire (4.21.5) stable; urgency=high
+
+  * Fixes newly introduced bug where it would not recursively share the
+    files in a folder. Thanks File_Girl71.
+  * Fixes newly introduced bug where it wouldn't correctly display the
+    title of a file on the Playlist.
+  * Fixes issue where it would not kill torrent uploads until
+    the next restart.
+  * Fixes NPE on HttpFetcher.fetch()
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 21 Mar 2011 19:33:12 -0500
+
+frostwire (4.21.4) stable; urgency=low
+
+  * New setting to turn off automatic installer downloads.
+  * New setting to limit the speed of BitTorrent downloads.
+  * New Galician flag added.
+  * UX improvements when creating new folders on the Phones and Tablets UI.
+  * Fixes bug when dropping files on an Android device that hasn't been
+    selected.
+  * UX change. FrostWire will now seed torrents that have not been removed
+    from it's download manager. Completed torrents now will appear as
+    "Completed/Seeding"
+  * UX change. Default save location folder in Windows Vista and Windows7 is
+    now the user's default "~Downloads/FrostWire" folder.
+  * UX improvements when showing FrostClick overlays. No more flickering.
+    Overlays are now shown in an animated slideshow. More than 2 artists
+    can now be promoted.
+  * Fixes bug when copying .apk files from Android device to desktop computer.
+  * Fixes bug when saving torrents to it's default Save location if that
+    folder has been deleted.
+  * Fixes bug on which removed Torrent downloads would reappear.
+  * Updated Mojito DHT integration. Mojito DHT is now active.
+  * Upgraded anti-spam mechanisms.
+  * Removed all remnant code related to LimeWire Store.
+  * Cleanup to use a single logging library.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 21 Jan 2011 20:00:00 -0500
+
+frostwire (4.21.3) stable; urgency=low
+
+  * New "Phones and Tablets" tab. Tools to share files with Android
+  devices on a Wi-Fi network.
+  * New debian source packages available.
+  * Upgrades to HttpFetcher performance. Cleanups and refactors.
+  * Upgrades java compatibility to Java 6.
+  * Upgrades Mojito-DHT to the latest version found on the LimeWire
+  repository. Tune ups.
+  * Removed dependencies on Linux native libraries. JDIC is no more
+  for Linux releases.
+  * Fixes issues when rendering and scrolling torrent search results.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 16 Dec 2010 20:00:00 -0500
+
+frostwire (4.21.1) stable; urgency=low
+
+  * New auto-update support for Windows and Ubuntu.
+  * Upgrades Azureus Core (bittorrent engine) to version 4.5.0.4.
+  Thanks to the Azureus Team for their hard work and support through the
+  integration.
+  * New setting pane to allow user to turn off FrostClick promotions.
+  * Fixes issue with Application Icon. New high resolution icon now
+  in place.
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 22 Sep 2010 20:48:18 -0500
+
+frostwire (4.20.9) stable; urgency=low
+
+  * Fixes bug where FrostWire would not try to open exclusively UDP tracked
+  torrents.
+  * New option -Dultrapeer=1 forces FrostWire to run as Ultrapeer. Only for
+  hackers that build FrostWire.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 17 Aug 2010 11:36:22 -0500
+
+frostwire (4.20.8) stable; urgency=low
+
+  * Upgrades search, now powered with ClearBits.net results a service
+  that indexes thousands of legal torrent files. (formerly known as
+  LegalTorrents.com)
+  * New BitTorrent Connection Settings Available.
+  * New ability to configure the max. number of active torrent downloads.
+  * New ability to configure the max. number of peers per torrent.
+  * New ability to configure the max. number of torrent connections.
+  * New ability to configure the max. number of torrent uploads.
+  * Fixes torrent auto resume bug.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 05 Aug 2010 21:16:17 -0500
+
+frostwire (4.20.7) stable; urgency=low
+
+  * Improves Torrent search dramatically.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 01 Jul 2010 15:26:46 -0500
+
+frostwire (4.20.6) stable; urgency=low
+
+  * Upgrades Azureus Core to version 4.4.0.0 - Thanks to the
+  Vuze/Azureus team for their hard work.
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, 25 Apr 2010 00:00:00 -0500
+
+frostwire (4.20.5) stable; urgency=low
+
+  * Fixes audio player issues. Now all MP3s should support skipping
+  and gain control.  * Fixes bug on status bar speed meter. Now
+  BitTorrent uploads speeds are added up and shown correctly in it.
+  * Fixes High CPU usage bug while loading hostiles ip list.  *
+  Fixes a bug on MacOSX on which FrostWire would only start
+  downloading a .torrent only if FrostWire was already running.  *
+  The FrostWire windows installer will now clean FrostWire Desktop
+  shortcuts if uninstalled.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 06 Apr 2010 00:00:00 -0500
+
+frostwire (4.20.4) stable; urgency=low
+
+  * Fixes connectivity issues for Mac version.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 28 Mar 2010 00:00:00 -0500
+
+frostwire (4.20.3) stable; urgency=low
+
+  * Fixes a bug where files couldn't be dragged out of the Library.
+  * Fixes a bug where opening a magnet link would freeze the UI
+  while it was being fetched in the DHT.  * Fixes a bug where magnet
+  links that were dropped on FrostWire wouldn't start downloading.
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 15 Mar 2010 00:00:00 -0500
+
+frostwire (4.20.2) stable; urgency=low
+
+  * Fixes a bug on torrent resume * Installer sizes reduced over 58%
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 02 Feb 2010 00:00:00 -0500
+
+frostwire (4.20.1) stable; urgency=low
+
+  * Major Upgrade: BitTorrent Engine replaced for a lightweight
+  version of the Azureus BitTorrent core.  FrostWire has become a
+  far superior BitTorrent client starting version 4.20.x now
+  supporting: - Trackerless Torrents (via Azureus DHT) - Improved
+  Magnet link support (BTIH Magnet Links) - SuperSeeding - +100%
+  Faster Torrent Connection Bootstraping (No more "sources needed"
+  for some .torrents) - +100% Faster Torrent Downloads in some
+  ocassions than 4.18.x - Transport Encryption capabilities -
+  Improved UPnP implementation * New Feature: The Download Manager
+  now has a new column showing the amount of bytes downloaded per
+  download.  * Update: The "Refresh Connections" Tool is now
+  available even if you are Turbo Charged.  * Fixes a bug where
+  Crash Reports would always show an old version number.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 01 Feb 2010 00:00:00 -0500
+
+frostwire (4.18.6) stable; urgency=low
+
+  * New Feature: Right clicking on the tabs brings out a context
+  popup menu to Show/Hide any of the tabs.  * New Feature: Gnutella
+  Torrent Search. FrostWire now can search for .torrent metadata
+  files in the Gnutella network.  * Upgraded feature: Optionally
+  FrostWire will copy all .torrent meta files to a shared torrent
+  folder.  * Fixes a bug where FrostWire would not recognize or
+  switch Themes/Skins correctly.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 01 Jan 2010 00:00:00 -0500
+
+frostwire (4.18.5) stable; urgency=low
+
+  * Fixes two NPEs that were causing FrostWire to kill
+  uploads. (related to httpcomponent/nio) * Fixes a crash under some
+  Windows JREs when the windows firewall is turned off.  * Fixes a
+  freeze in Windows after the user would switch to the "Windows
+  Theme".  * Updates: License is upgraded from GPLv2 to GPLv3 to
+  allow proper license compatibility with Apache Licensed
+  components.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 01 Dec 2009 00:00:00 -0500
+
+frostwire (4.18.4) stable; urgency=low
+
+  * New: "Tools > Refresh Connections". A network of FrostWire
+  Sentinels mantains a list of reliable nodes that can be used to
+  bootstrap your connection.  * FrostWire IP BlackList technology
+  updated to get rid of over 70% of spam and fakes (thanks
+  Aaron.Walkhouse).  * Update: latest UPnP code merged from LimeWire
+  Codebase for better connectivity.  * Update: Network core more
+  efficient and stable thanks to the latest Apache HttpComponents
+  (httpcore-4.0.1 and httpclient-4.0) * Update: Random Splash
+  Screens. Now showing different community submitted Splash Screens
+  to spread the FrostWire culture.  * Update: The Chat Server is now
+  a parameter on frostwire.props.  * Fix: Connection Doctor
+  addresses more connection bootstrapping issues.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 01 Nov 2009 00:00:00 -0500
+
+frostwire (4.18.3) stable; urgency=low
+
+  * Fixes connectivity issues on Snow Leopard where FrostWire would
+  not attempt to open any connections.  * Bug fix on Connection
+  Doctor. It would continue to run even though FrostWire was already
+  connected.  * FrostWire for Mac is now compiled with 64-bit JDK
+  and it's backwards compatible with Leopard (10.5)
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 30 Aug 2009 00:00:00 -0500
+
+frostwire (4.18.2) stable; urgency=low
+
+  * Ads .wma and .au extension to the default excluded shared
+  formats. Also they are filtered from search results by default to
+  protect windows users from malicious installers invoked from
+  Windows Media Player when fake .au and .wma are opened. This also
+  gives preference to .mp3 content which has no DRM.  * Updated
+  Adult Filter keywords.  * Fixes compatibility issues with Snow
+  Leopard for Mac users.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 15 Aug 2009 00:00:00 -0500
+
+frostwire (4.18.1) stable; urgency=low
+
+  * Updates on the "Connection Doctor" component, to address
+  connection issues. Connects to new network of UHC servers.  *
+  Updates on secondary (after-search) loading logic. Loads secondary
+  overlay on the spot, more room for FrostClick artist promotions.
+  * Fixes a bug where some mp3 would not play. Volume, Pause and
+  skip are disabled intentionally during workaround.  * Fixes a bug
+  where the media player would loop non-stop without playing all the
+  songs on a playlist once it found an mp3 it could not play * Fixes
+  a bug on for Mac OSX where FrostWire would only download torrents
+  opened via Finder if it was already running. Torrents now launch
+  FrostWire and start downloading at once.  * Updates video help
+  link to point to YouTube video of how to install FrostWire on
+  Mac. http://www.youtube.com/watch?v=hakWq8q8CHQ * Fixes Windows
+  Uninstaller issue where it would leave behind a Start Menu entry *
+  Fixes a bug on the .deb (Ubuntu/Debian) installer and GDebi. The
+  FrostWire icon is now shown correctly in Ubuntu 9.04 "Applications
+  > Internet" menu. (Thanks Telkwa)
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 01 Aug 2009 00:00:00 -0500
+
+frostwire (4.18.0) stable; urgency=low
+
+  * Fixes Bittorrent Incompatibilities.  * Mac launcher fixes bug
+  where FrostWire would not allow itself to run on a external disk.
+  * Fixes bug on Welcome Screen, now you don't need to open
+  FrostWire twice to get the latest welcome screen.  * FrostWire
+  caches the last 2 images shown on the Welcome Screen to save
+  bandwidth from static servers.  * Tools > Check for Updates. Now
+  FrostWire can check for configuration updates, community messages,
+  new FrostWire releases and welcome screen promotion updates during
+  runtime.  * The welcome screen can be customized for every
+  language, giving the chance to more content creators to be
+  promoted every week to different audiences that speak their
+  language.  * The Buttons of the Download Manager have been
+  rearranged to avoid mistakes when trying to resume downloads. The
+  Clear and Cancel Buttons are all the way to the right. Thanks to
+  'ssome' for the suggestion.  * New Splash Screen.  * Anti spam
+  filters updated to filter out new keywords used by spammers.  *
+  New "Buy" icon.  * The community chat 'Connect' button now checks
+  if a nickname has been set and helps the user set a default
+  nickname using an input dialog.  * When users issue the "/nick"
+  command on the chat, FrostWire will remember the new nickname as
+  the default nickname.  * Updates to debian package fix issues with
+  unpack200 and performs a cleaner uninstall.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 01 May 2009 00:00:00 -0500
+
+frostwire (4.17.2) stable; urgency=low
+
+  * Fixes a newly introduced bug in Windows which would make
+  FrostWire(tm) take over the .bittorrent file association without
+  asking the user.  * Reduces network load. The LimeWire team found
+  out that "store forwarding" would not provide extra data
+  availability, so it's been turned off from the DHT * FrostWire.ico
+  has been updated. Now when FrostWire(tm) is associated to
+  .bittorrent files, .bittorrent files will use the FrostWire(tm)
+  icon.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 30 Nov 2008 00:00:00 -0500
+
+frostwire (4.17.1) stable; urgency=low
+
+  * Heavy work on all translations. Translation files now work with
+  launchpad.net for more open collaboration of worldwide translator
+  volunteers * Default Community Chat chatroom auto join will now be
+  more friendly to non-english speaking users. Users that speak the
+  following languages will be able to foster new communities to help
+  others in their native language. Dutch, Portuguese, French,
+  German, Spanish, Turkish, Norwegian, Danish, Italian, Swedish,
+  Polish, Czech, Filipino, Japanese, Finnish and Hungarian. No more
+  unexplained kicks to international users!  * Icons updated *
+  Volume toolbar graphic replaced * Fixed playback Issue when
+  continuous playback was selected * Valid Chatroom links will now
+  open on the user's default browser * Smaller Windows Installer
+  (2.1 times smaller helping us double our available bandwidth) * It
+  will attempt to add the default Library folder of 4.13.5 so users
+  won't feel like they lost their old library * FrostWire(tm) now
+  can be auto-started when Windows starts. This setting is available
+  from the 'Option' menu ('Windows boot') and from the initial
+  setup.  * File Association issues fixed. FrostWire(tm) will open
+  automatically on Windows and MacOSX upon clicking on .torrent
+  files and links, as well as for magnet links.  * Fixes
+  compatibility issues with iTunes 8.  * Updated "FrostWire" font
+  logo on the Logo Pane
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 01 Nov 2008 00:00:00 -0500
+
+frostwire (4.17.0) stable; urgency=low
+
+  * Completely new FrostWire(tm) based on the core of LimeWire
+  4.17.4 * Faster, Improved Networking * Capable of using Mojito DHT
+  technology
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 01 Jul 2008 00:00:00 -0500
+
+frostwire (4.13.5) stable; urgency=low
+
+  * More fixes on peer discovery on connection bootstraping.  *
+  FrostWire(tm) is now capable of remembering announcements sent via
+  the update system, that way users won't be annoyed by reading the
+  same announcements for as long as we have them up.  * Added Smiley
+  support to the Chatroom. Developer note: irc.jar is now part of
+  our build process, One step build scripts for all distros.  *
+  Fixed wording on spanish translation.  * Fixed bugs on the media
+  player and playlists on Preview.  * Fixed bug on search box
+  auto-focusing while a search was running.  * Fixed typo in
+  Polish. Thanks Radek.  * Fixed i18n bug, where non english
+  operating system could never keep english as the preferred
+  language, it would always default to the OS systema affer
+  restarting FW. Thanks to FTA our new dev team member.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 01 Feb 2008 00:00:00 -0500
+
+frostwire (4.13.4) stable; urgency=low
+
+  * Connection Bootstrapping problems should be gone. TurboCharged
+  connection is achieved on average under 5 seconds after launch.  *
+  "Buy" button on the search result panel.  * Polish Translation
+  Included. Finally got around Encoding issues of the Java
+  ResourceBundle class. More translations with their correct
+  characters coming in the future. (thanks Paulinka for the
+  translation) * New FrostWire(tm) Icon on the Icon Tray for Windows
+  XP (thanks to sw1tch) * The Bugmanager window still said
+  "LimeWire" (it was very well hidden in the code). Thanks to
+  Marcelina Knitter for reporting.  * Fixes on Update Notification
+  Mechanism.  * Fixes on Chat Banner Loading Mechanism, banner
+  reloading interval from server is now configurable. Banners can
+  now be delivered per FrostWire(tm) version. Faster startup and
+  savings on bandwidth.  * Cleaning of IRC Stack traces.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 22 Nov 2007 00:00:00 -0500
+
+frostwire (4.13.3) stable; urgency=low
+
+  * New Update Manager. Also allows delivery of special
+  announcements to the community. We won't use this feature for
+  spam, only for special announcements to the community, or special
+  downloads.  * The Update Manager supports the delivery of torrent
+  broadcasting to all the FrostWire(tm) community. This will allow
+  us to lower bandwidth costs if we decide to distribute an upload
+  using bittorrent trackers.  * FrostWire(tm) startup time back to
+  normal, no more waiting for Chat window to load, the chat is now
+  loaded on a background thread.
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 01 Aug 2007 00:00:00 -0500
+
+frostwire (4.13.2) stable; urgency=low
+
+  * No more BETA, this is the final release of the 4.13.1.8 branch *
+  Included translation to Portuguese (Since our Brazilian User Base
+  is the second biggest one out there).  * Cleaner debian installer
+  (Thanks to the "Ubunteros" that kept complaining).  *
+  Compatibility fix for Beryl (Thanks to the "Ubunteros" again) *
+  Frostwire will actually shutdown on Linux without you having to
+  set up the Tray System settings.  * Updates on Chat Banner
+  system. Memory Leak fixed, Banners can be targetted by language,
+  ip range and country. (Want to advertise on the FrostWire(tm)
+  Chat? - write to contact@frostwire.com) * Misc Updates to the Chat
+  and Lots to the Chat Server (Ianw's the man ruling those lands).
+  * When music files are launched they're automatically added to the
+  playlist (Finally).  * Fixed bug on "Explore" button where it'd
+  launch the file instead of the folder that contains the file.  *
+  Dev. tools to synchronize translation files, and quick build
+  script.  * Removed all Simpp messages
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 22 Jul 2007 00:00:00 -0500
+
+frostwire (4.13.1) stable; urgency=low
+
+  * Added IRC Chat (only for Windows and Mac until we resolve AWT
+  Font bug for Linux on PJIRC) * Merged Bittorrent support * Merged
+  Several Core and GUI Improvements * New Building Scripts will
+  automate further releases. build/ directory added to the frostwire
+  trunk * Magnetmix button gone, we need help from the community to
+  keep going
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 22 Jun 2007 00:00:00 -0500

@@ -1,0 +1,72 @@
+#!/bin/bash
+### Run script for FrostWire.
+### Builds a classpath for all jars & components.
+if [ -z ${JAVA_HOME} ]; then
+   echo "Error: I don't know where is your Java Virtual Machine."
+   echo "Please make sure to set your JAVA_HOME environment variable."
+   exit 1
+fi
+
+CLASSPATH=build/libs/frostwire.jar
+PS=":"
+
+OPTS="-Xms64m -Xmx256m -Djava.net.preferIPV6Addresses=false -ea -Djava.net.preferIPv4stack=true"
+
+#setup the java options & initial system-dependent classpath
+PLATFORM=`uname`
+case ${PLATFORM} in 
+    Linux)
+        OPTS="${OPTS} -Djava.library.path=lib/native";
+        OPTS="${OPTS} -XX:-UseSplitVerifier ";
+        export PATH="${PATH}:lib/native";
+        ADDITIONAL=linux
+    ;;
+    Darwin)
+        CLASSPATH="${CLASSPATH}:/System/Library/Java";
+        OPTS="${OPTS} -Djava.library.path=lib/native";
+        OPTS="${OPTS} -Djava.endorsed.dirs=\"\"";
+        OPTS="${OPTS} -Djava.nio.preferSelect=true";
+        OPTS="${OPTS} -Xdock:icon=FrostWire.icns";
+        OPTS="${OPTS} -Dcom.sun.management.jmxremote.port=9595";
+        OPTS="${OPTS} -Dcom.sun.management.jmxremote.ssl=false";
+        OPTS="${OPTS} -Dcom.sun.management.jmxremote.authenticate=false";
+	OPTS="${OPTS} -Djava.rmi.server.hostname=127.0.0.1";
+        OPTS="${OPTS} -Dawt.useSystemAAFontSettings=on";
+        OPTS="${OPTS} -Dswing.aatext=true";
+        OPTS="${OPTS} -Dsun.java2d.opengl=True";
+        ADDITIONAL=osx
+        export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+    ;;
+    CYGWIN*)
+        PS=";"
+        export PATH=$PATH:lib/native
+        ADDITIONAL=windows
+        
+    ;;
+    *)
+        echo "Sorry, platform '${platform}' is not recognized.";
+        exit 1;
+    ;;
+esac
+export CLASSPATH
+echo Classpath:
+echo $CLASSPATH
+
+export JAVA_BIN=${JAVA_HOME}/bin/java
+
+echo Java Home:
+echo ${JAVA_HOME}
+
+echo Java Binary:
+echo ${JAVA_BIN}
+echo Java Version:
+$JAVA_BIN -version
+echo
+echo "Let's go!"
+
+case ${PLATFORM} in
+    Darwin)
+        ${JAVA_BIN} ${OPTS} -Xdock:name="FrostWire GIT" -Ddebug=1 com.limegroup.gnutella.gui.Main $* ;;
+    *)
+        ${JAVA_BIN} ${OPTS} -Ddebug=1 com.limegroup.gnutella.gui.Main $* ;;
+esac

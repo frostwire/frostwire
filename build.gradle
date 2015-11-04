@@ -1,0 +1,154 @@
+/*
+ Usage:
+ gradle build - builds code and creates a single jar in build/libs/frostwire.jar
+ gradle clean - cleans the build.
+ gradle tasks - shows available tasks.
+
+ gradle gettextExtract - extract all the strings from the sourcecode into frostwire.pot
+ gradle gettextBundle  - create messages.jar with the extracted strings.
+
+*/
+
+group 'com.frostwire'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply from: "$rootDir/common/dependencies.gradle"
+
+sourceCompatibility = 1.7
+
+compileJava {
+    options.encoding = '8859_1'
+}
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url  "http://dl.bintray.com/ijabz/maven"
+    }
+}
+
+dependencies {
+    compile 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
+    compile 'com.h2database:h2:1.4.186'
+    compile 'org.apache.lucene:lucene-core:3.5.0'
+    compile 'net.jthink:jaudiotagger:2.2.4'
+
+    compile fileTree(dir: 'desktop/lib/jars', include: ['*.jar'])
+}
+
+sourceSets {
+    main {
+        java {
+            // frostwire-common
+            srcDir 'common/src/main/java'
+            srcDir 'desktop/src'
+        }
+
+        resources {
+            srcDir 'common/src/main/resources'
+
+            srcDir 'desktop/resources'
+            include '**/*.properties'
+            include '**/*.png'
+            include '**/*.gif'
+            include '**/*.jpg'
+            include '**/*.html'
+            include '**/*.js'
+            include '**/*.sh'
+            include '**/*.dat'
+            include '**/*.icc'
+            exclude '**/*.DS_Store'
+        }
+    }
+}
+
+jar {
+    archiveName = 'frostwire.jar'
+
+    exclude('META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF')
+
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+
+    manifest {
+        attributes 'Main-Class': 'com.limegroup.gnutella.gui.Main'
+    }
+}
+
+// gettext tasks
+
+task gettextInit {
+    description 'Loads and define the ant gettext related tasks'
+
+    doLast {
+        ant.taskdef(name: 'gettextExtract', classname: 'org.xnap.commons.ant.gettext.GettextExtractKeysTask', classpath: 'lib/jars/gettext-ant-tasks-0.9.7.jar')
+        ant.taskdef(name: 'gettextMerge', classname: 'org.xnap.commons.ant.gettext.GettextMergeKeysTask', classpath: 'lib/jars/gettext-ant-tasks-0.9.7.jar')
+        ant.taskdef(name: 'gettextGenerateDefault', classname: 'org.xnap.commons.ant.gettext.GenerateDefaultBundleTask', classpath: 'lib/jars/gettext-ant-tasks-0.9.7.jar')
+        ant.taskdef(name: 'gettextDist', classname: 'org.xnap.commons.ant.gettext.GettextDistTask', classpath: 'lib/jars/gettext-ant-tasks-0.9.7.jar')
+    }
+}
+
+task gettextExtract {
+    description 'Extracts message keys from the source code'
+
+    doLast {
+        println 'gettext extract...'
+        ant.gettextExtract(keysFile: 'frostwire.pot',
+                poDirectory: 'lib/messagebundles',
+                keywords: '-kgetStringResource -kgetFormattedStringResource -ktrc -ktr -ktrn:1,2 -ktrl') {
+            fileset(dir: "src") {
+                include(name: '**/*.java')
+            }
+        }
+
+        println 'gettext merge...'
+        ant.gettextMerge(keysFile: "frostwire.pot", poDirectory: "lib/messagebundles")
+    }
+}
+
+task gettextBundle {
+    description 'Rebuilds messages and bundles them into messages.jar'
+
+    doLast {
+        // clean up
+        println 'gettext bundle...'
+        println 'cleaning up...'
+        delete 'lib/messagebundles/org'
+
+        // generate default bundle for complete messages
+        println 'gettext generate default'
+        ant.gettextGenerateDefault(targetBundle: 'org.limewire.i18n.Messages',
+                outputDirectory: 'lib/messagebundles',
+                potfile: 'lib/messagebundles/frostwire.pot')
+
+        // generate complete bundles
+        println 'gettext dist (complete bundles)'
+        ant.gettextDist(targetBundle: 'org.limewire.i18n.Messages',
+                poDirectory: 'lib/messagebundles',
+                outputDirectory: 'lib/messagebundles',
+                percentage: '35')
+
+        // generate the empty en.po file without percentage
+        println 'gettext dist (empty en.po file without percentage)'
+        ant.gettextDist(targetBundle: 'org.limewire.i18n.Messages',
+                outputDirectory: 'lib/messagebundles') {
+            fileset(dir: 'lib/messagebundles') {
+                include(name: 'en.po')
+            }
+        }
+
+        // jar them
+        println 'jar it...'
+        ant.jar(destfile: 'lib/jars/messages.jar',
+                basedir: 'lib/messagebundles',
+                includes: "org/**")
+
+        // clean up
+        println 'cleaning up...'
+        delete 'lib/messagebundles/org'
+    }
+}
+
+gettextExtract.dependsOn gettextInit
+gettextBundle.dependsOn gettextInit
