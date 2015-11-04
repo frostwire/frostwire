@@ -7,41 +7,24 @@ if [ -z ${JAVA_HOME} ]; then
    exit 1
 fi
 
-CLASSPATH=build/libs/frostwire.jar
+CLASSPATH=../build/libs/frostwire.jar
 PS=":"
 
-OPTS="-Xms64m -Xmx256m -Djava.net.preferIPV6Addresses=false -ea -Djava.net.preferIPv4stack=true"
+OPTS="-Xms64m -Xmx512m -Djava.library.path=lib/native"
 
 #setup the java options & initial system-dependent classpath
 PLATFORM=`uname`
 case ${PLATFORM} in 
     Linux)
-        OPTS="${OPTS} -Djava.library.path=lib/native";
-        OPTS="${OPTS} -XX:-UseSplitVerifier ";
-        export PATH="${PATH}:lib/native";
         ADDITIONAL=linux
     ;;
     Darwin)
-        CLASSPATH="${CLASSPATH}:/System/Library/Java";
-        OPTS="${OPTS} -Djava.library.path=lib/native";
-        OPTS="${OPTS} -Djava.endorsed.dirs=\"\"";
-        OPTS="${OPTS} -Djava.nio.preferSelect=true";
         OPTS="${OPTS} -Xdock:icon=FrostWire.icns";
         OPTS="${OPTS} -Dcom.sun.management.jmxremote.port=9595";
         OPTS="${OPTS} -Dcom.sun.management.jmxremote.ssl=false";
         OPTS="${OPTS} -Dcom.sun.management.jmxremote.authenticate=false";
-	OPTS="${OPTS} -Djava.rmi.server.hostname=127.0.0.1";
-        OPTS="${OPTS} -Dawt.useSystemAAFontSettings=on";
-        OPTS="${OPTS} -Dswing.aatext=true";
-        OPTS="${OPTS} -Dsun.java2d.opengl=True";
+        OPTS="${OPTS} -Djava.rmi.server.hostname=127.0.0.1";
         ADDITIONAL=osx
-        export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
-    ;;
-    CYGWIN*)
-        PS=";"
-        export PATH=$PATH:lib/native
-        ADDITIONAL=windows
-        
     ;;
     *)
         echo "Sorry, platform '${platform}' is not recognized.";
