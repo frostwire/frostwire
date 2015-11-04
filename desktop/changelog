@@ -7,7 +7,7 @@ frostwire (6.1.6) stable; urgency=high
   * Updates to Spanish and Romanian translations.
   * Chat button on header moved to Tools menu. More space for search bar.
 	
- -- FrostWire Team <contact@frostwire.com>  Nov, 02 Sep 2015 13:04:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Wed, 04 Nov 2015 13:04:00 -0500
 
 frostwire (6.1.5) stable; urgency=high
   * New http engine based on okhttp, uses pooled connections, less threads,
