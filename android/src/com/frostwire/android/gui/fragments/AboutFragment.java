@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
@@ -63,7 +64,7 @@ public class AboutFragment extends Fragment implements MainFragment {
         title.setText("FrostWire " + basicOrPlus + " v" + Constants.FROSTWIRE_VERSION_STRING);
 
         final TextView buildNumber = (TextView) view.findViewById(R.id.fragment_about_build_number);
-        buildNumber.setText("\nbuild " + Constants.FROSTWIRE_BUILD);
+        buildNumber.setText("\nbuild " + BuildConfig.VERSION_CODE);
 
         final TextView content = (TextView) view.findViewById(R.id.fragment_about_content);
         content.setText(Html.fromHtml(getAboutText()));

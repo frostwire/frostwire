@@ -287,8 +287,18 @@ public final class SoftwareUpdater {
     }
 
     private boolean isFrostWireOld(int myBuild, String latestBuild) {
+        // IntelliJ will default its build flavor to basic. However, we don't consider DEBUG builds
+        // to be part of Google Play distros, which is the discriminatory flag we use to ask for the update message.
+        // If the following happens it means we're running from IntelliJ, but since the flavor is "basic" the
+        // myBuild number received here will be in the lower range (8000xxx's) that we use for Google Play (basic) builds.
+        final boolean IS_IDEA_BUILD = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
+        if (IS_IDEA_BUILD) {
+            myBuild += 1000000;
+        }
+
         boolean result;
         try {
+
             int latestBuildNum = Integer.parseInt(latestBuild);
             result = myBuild < latestBuildNum;
         } catch(Throwable ignored) {
