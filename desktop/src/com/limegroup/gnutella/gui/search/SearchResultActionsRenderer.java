@@ -129,6 +129,10 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     private void updateUIData(SearchResultActionsHolder actionsHolder, JTable table, int row, int column) {
         searchResult = actionsHolder.getSearchResult();
+        if (searchResult==null) {
+            return;
+        }
+
         showSolid = mouseIsOverRow(table, row);
         updatePlayButton();
         labelPlay.setVisible(isSearchResultPlayable());
