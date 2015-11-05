@@ -338,7 +338,7 @@ public final class GUIMediator {
                         ErrorService.error(t);
                 }
                 if (visible) {
-                    SearchMediator.requestSearchFocus();
+                    //SearchMediator.requestSearchFocus();
                     // forcibly revalidate the FRAME
                     // after making it visible.
                     // on Java 1.5, it does not validate correctly.
