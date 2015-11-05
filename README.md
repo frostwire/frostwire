@@ -13,8 +13,8 @@ In the past these sources were held at [frostwire-android](https://github.com/fr
 
 # Tip 4 commit?
 
-We're trying to contact the tip4commit team to help us migrate the balances left on those old repositories into this one.
-However, it seems as if it was not possible to add new projects to tip4commit, so maybe we'll get the bitcoins refunded and we'll look for an alternate solution to tip contributors.
+We've contacted the tip4commit team to help us migrate the balances left on those old repositories into this one.
+They've promised to add this new project and to move the balances left on the old repos into this one.
 
 # How to build
 
