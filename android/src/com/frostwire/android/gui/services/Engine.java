@@ -93,7 +93,7 @@ public final class Engine implements IEngineService {
                 e.printStackTrace();
                 LOG.error("Could not create notified.dat",e);
             }
-        } else {
+        } else if (notifiedDat.length() > 0) {
             try {
                 ObjectInputStream ois = new ObjectInputStream(new FileInputStream(notifiedDat));
                 int numberOfElements = ois.readInt();
