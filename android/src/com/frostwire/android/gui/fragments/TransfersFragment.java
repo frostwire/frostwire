@@ -65,7 +65,7 @@ import java.util.*;
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
-    private final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 30;
+    private final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 10;
     private final Comparator<Transfer> transferComparator;
     private final ButtonAddTransferListener buttonAddTransferListener;
     private final ButtonMenuListener buttonMenuListener;

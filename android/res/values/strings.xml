@@ -549,4 +549,6 @@
     <string name="help">Help</string>
     <string name="request_again">Request Again</string>
     <string name="frostwire_is_running">FrostWire is running</string>
+    <string name="vpn_found">VPN found. Connection encrypted.</string>
+    <string name="vpn_not_found">No VPN. Consider encrypting connection.</string>
 </resources>

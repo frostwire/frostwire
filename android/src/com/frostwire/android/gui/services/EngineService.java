@@ -49,6 +49,8 @@ import com.frostwire.util.ThreadPool;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -59,24 +61,17 @@ import java.util.concurrent.ExecutorService;
 public class EngineService extends Service implements IEngineService {
 
     private static final Logger LOG = Logger.getLogger(EngineService.class);
-
     private static final String TAG = "FW.EngineService";
-
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
-
     private final static int FROSTWIRE_STATUS_NOTIFICATION = 0x4ac4642a; // just a random number
-
+    private static final int VPN_CHECK_INTERVAL_IN_MILLIS = 20000;
+    private static boolean isVPNactive = false;
+    private static long lastVPNcheck = 0;
     private final IBinder binder;
-
     static final ExecutorService threadPool = ThreadPool.newThreadPool("Engine");
-
     // services in background
-
     private final CoreMediaPlayer mediaPlayer;
-
     private byte state;
-
-    private OnSharedPreferenceChangeListener preferenceListener;
 
     public EngineService() {
         binder = new EngineServiceBinder();
@@ -187,6 +182,7 @@ public class EngineService extends Service implements IEngineService {
             return;
         }
         final Context context = contextRef.get();
+        asyncCheckVPNStatus();
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
                 R.layout.view_permanent_status_notification);
@@ -200,8 +196,27 @@ public class EngineService extends Service implements IEngineService {
                                 Intent.FLAG_ACTIVITY_CLEAR_TOP),
                 0);
 
+        PendingIntent showVPNIntent = PendingIntent.getActivity(context,
+                1,
+                new Intent(context,
+                        MainActivity.class).
+                        setAction(Constants.ACTION_SHOW_VPN_EXPLANATION).
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|
+                                Intent.FLAG_ACTIVITY_CLEAR_TASK),
+                0);
+
+        // VPN status
+        CharSequence vpnCharSequence = context.getString(isVPNactive ? R.string.vpn_found : R.string.vpn_not_found);
+        remoteViews.setTextViewText(R.id.view_permanent_status_text_vpn, vpnCharSequence);
+        remoteViews.setImageViewResource(R.id.view_permanent_status_vpn_icon, isVPNactive ?
+                R.drawable.vpn_on : R.drawable.vpn_off);
+        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_vpn, showVPNIntent);
+        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_vpn_icon, showVPNIntent);
+
+        // Transfers status.
         remoteViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
         remoteViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
+
 
         Notification notification = new NotificationCompat.Builder(context).
                 setSmallIcon(R.drawable.app_icon).
@@ -236,17 +251,12 @@ public class EngineService extends Service implements IEngineService {
     public void notifyDownloadFinished(String displayName, File file) {
         try {
             Context context = getApplicationContext();
-
             Intent i = new Intent(context, MainActivity.class);
-
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION, true);
             i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH, file.getAbsolutePath());
-
             PendingIntent pi = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
-
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
             Notification notification = new Notification.Builder(context)
                     .setWhen(System.currentTimeMillis())
                     .setContentText(getString(R.string.download_finished))
@@ -254,7 +264,6 @@ public class EngineService extends Service implements IEngineService {
                     .setSmallIcon(getNotificationIcon())
                     .setContentIntent(pi)
                     .build();
-
             notification.vibrate = ConfigurationManager.instance().vibrateOnFinishedDownload() ? VENEZUELAN_VIBE : null;
             notification.number = TransferManager.instance().getDownloadsToReview();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
@@ -264,14 +273,20 @@ public class EngineService extends Service implements IEngineService {
         }
     }
 
-    private int getNotificationIcon() {
-        return Build.VERSION.SDK_INT >= 21 ? R.drawable.frostwire_notification_flat : R.drawable.frostwire_notification;
-    }
-
     @Override
     public void shutdown() {
         stopForeground(true);
         stopSelf();
+    }
+
+    public class EngineServiceBinder extends Binder {
+        public EngineService getService() {
+            return EngineService.this;
+        }
+    }
+
+    private int getNotificationIcon() {
+        return Build.VERSION.SDK_INT >= 21 ? R.drawable.frostwire_notification_flat : R.drawable.frostwire_notification;
     }
 
     private static long[] buildVenezuelanVibe() {
@@ -285,9 +300,38 @@ public class EngineService extends Service implements IEngineService {
         return new long[] { 0, shortVibration, longPause, shortVibration, shortPause, shortVibration, shortPause, shortVibration, mediumPause, mediumVibration };
     }
 
-    public class EngineServiceBinder extends Binder {
-        public EngineService getService() {
-            return EngineService.this;
+    private static void asyncCheckVPNStatus() {
+        final long NOW = System.currentTimeMillis();
+        if (NOW - lastVPNcheck < VPN_CHECK_INTERVAL_IN_MILLIS) {
+            return;
         }
+
+        lastVPNcheck = NOW;
+        threadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                isVPNactive = isAnyNetworkInterfaceATunnel();
+            }
+        });
     }
+
+    private static boolean isAnyNetworkInterfaceATunnel() {
+        boolean result = false;
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface iface = networkInterfaces.nextElement();
+                LOG.info("isAnyNetworkInterfaceATunnel() -> " + iface.getDisplayName());
+                if (iface.getDisplayName().contains("tun")) {
+                    result = true;
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            LOG.error(e.getMessage(), e);
+        }
+
+        return result;
+    }
+
 }

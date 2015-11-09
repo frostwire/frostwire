@@ -19,7 +19,7 @@
                       android:orientation="vertical">
             <TextView android:text="@string/frostwire_is_running"
                       android:layout_height="fill_parent"
-                      android:layout_width="fill_parent"
+                      android:layout_width="wrap_content"
                       android:textColor="@color/white"
                       android:textSize="@dimen/text_size_medium"
                       android:gravity="left"/>
@@ -29,17 +29,21 @@
                           android:orientation="horizontal"
                           android:weightSum="1.0">
 
-                <TextView android:layout_width="wrap_content"
+                <TextView android:id="@+id/view_permanent_status_text_vpn"
+                          android:layout_width="wrap_content"
                           android:layout_height="fill_parent"
                           android:layout_weight="1.0"
                           android:gravity="left|center_vertical"
                           android:layout_gravity="center_horizontal"
                           android:textColor="#999999"
                           android:textSize="@dimen/text_size_micro"
-                          android:text="Unencrypted connection. Privacy at risk"/>
-                <ImageView android:layout_width="wrap_content"
-                           android:layout_height="20dp"
-                           android:src="@drawable/menu_icon_peers"/>
+                          android:text="@string/dummy_hint"/>
+                <ImageView android:id="@+id/view_permanent_status_vpn_icon"
+                           android:layout_width="wrap_content"
+                           android:layout_height="30dp"
+                           android:src="@drawable/vpn_off"
+                           android:layout_marginRight="10dp" android:scaleType="fitCenter"
+                           android:background="@color/transparent"/>
             </LinearLayout>
 
 
@@ -57,8 +61,7 @@
                         android:paddingRight="8dp"
                         android:textColor="#999999"
                         android:text="@string/dummy_downloads_indicator"/>
-                <TextView
-                        android:id="@+id/view_permanent_status_text_uploads"
+                <TextView android:id="@+id/view_permanent_status_text_uploads"
                         style="@style/TransfersIndicator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -66,6 +69,18 @@
                         android:paddingRight="8dp"
                         android:textColor="#999999"
                         android:text="@string/dummy_uploads_indicator"/>
+                <!-- possible exit button
+                <View android:layout_height="fill_parent"
+                      android:layout_width="wrap_content"
+                      android:layout_weight="1.0"></View>
+
+                <ImageView android:id="@+id/view_permanent_status_exit_button"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:src="@drawable/menu_icon_exit"
+                             android:background="@color/transparent"
+                             android:layout_gravity="right"/>
+                             -->
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
