@@ -175,11 +175,14 @@ public class EngineService extends Service implements IEngineService {
 
         state = STATE_STARTED;
 
-        updatePermanentStatusNotification(new WeakReference<Context>(this));
+        updatePermanentStatusNotification(new WeakReference<Context>(this),
+                0, "0 " + UIUtils.GENERAL_UNIT_KBPSEC,
+                0, "0 " + UIUtils.GENERAL_UNIT_KBPSEC);
+
         Log.v(TAG, "Engine started");
     }
 
-    public static void updatePermanentStatusNotification(WeakReference<Context> contextRef) {
+    public static void updatePermanentStatusNotification(WeakReference<Context> contextRef, int downloads, String sDown, int uploads, String sUp) {
         if (!Ref.alive(contextRef)) {
             return;
         }
@@ -196,15 +199,11 @@ public class EngineService extends Service implements IEngineService {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|
                                 Intent.FLAG_ACTIVITY_CLEAR_TOP),
                 0);
-        final int downloads = TransferManager.instance().getActiveDownloads();
-        final String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth()/1024);
-        remoteViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
 
-        final String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth()/1024);
-        final int uploads = TransferManager.instance().getActiveUploads();
+        remoteViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
         remoteViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
 
-        Notification notification = new Notification.Builder(context).
+        Notification notification = new NotificationCompat.Builder(context).
                 setSmallIcon(R.drawable.app_icon).
                 setContentIntent(showFrostWireIntent).
                 setContent(remoteViews).

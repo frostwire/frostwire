@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ExpandableListView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -66,6 +65,7 @@ import java.util.*;
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
+    private final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 30;
     private final Comparator<Transfer> transferComparator;
     private final ButtonAddTransferListener buttonAddTransferListener;
     private final ButtonMenuListener buttonMenuListener;
@@ -79,6 +79,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TransferListAdapter adapter;
     private TransferStatus selectedStatus;
     private TimerSubscription subscription;
+    private int androidNotificationUpdateTick;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -161,7 +162,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         textDownloads.setText(downloads + " @ " + sDown);
         textUploads.setText(uploads + " @ " + sUp);
 
-        //EngineService.updatePermanentStatusNotification(new WeakReference<Context>(getActivity()));
+        if (++androidNotificationUpdateTick >= FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS) {
+            androidNotificationUpdateTick = 0;
+            EngineService.updatePermanentStatusNotification(new WeakReference<Context>(getActivity()), downloads, sDown, uploads, sUp);
+        }
     }
 
     @Override
@@ -316,7 +320,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         MenuItem pause = new MenuItem(PAUSE_MENU_DIALOG_ID, R.string.transfers_context_menu_pause_stop_all_transfers, R.drawable.contextmenu_icon_pause_transfer);
         MenuItem resume = new MenuItem(RESUME_MENU_DIALOG_ID, R.string.transfers_context_resume_all_torrent_transfers, R.drawable.contextmenu_icon_play);
 
-        List<MenuItem> dlgActions = new ArrayList<MenuItem>();
+        List<MenuItem> dlgActions = new ArrayList<>();
 
         TransferManager tm = TransferManager.instance();
         boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
@@ -455,7 +459,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 CharSequence charSequence = itemAt.getText();
 
                 if (charSequence != null) {
-                    String text = null;
+                    String text;
 
                     if (charSequence instanceof String) {
                         text = (String) charSequence;
@@ -475,8 +479,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                         }
                     }
                 }
-            } catch (Throwable t) {
-
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -507,7 +510,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     /**
      * Is it using the SD Card's private (non-persistent after uninstall) app folder to save
      * downloaded files?
-     * @return
      */
     public static boolean isUsingSDCardPrivateStorage() {
         String primaryPath = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -518,8 +520,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     /**
      * Iterates over all the secondary external storage roots and returns the one with the most bytes available.
-     * @param context
-     * @return
      */
     private static File getBiggestSDCardDir(Context context) {
         try {
