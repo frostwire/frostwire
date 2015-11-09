@@ -192,10 +192,10 @@ public class EngineService extends Service implements IEngineService {
                 0,
                 new Intent(context,
                            MainActivity.class).
+                        setAction(Constants.ACTION_SHOW_TRANSFERS).
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|
                                 Intent.FLAG_ACTIVITY_CLEAR_TOP),
                 0);
-
         final int downloads = TransferManager.instance().getActiveDownloads();
         final String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth()/1024);
         remoteViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);

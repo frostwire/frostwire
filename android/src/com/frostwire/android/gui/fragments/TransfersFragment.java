@@ -560,7 +560,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    public static enum TransferStatus {
+    public enum TransferStatus {
         ALL, DOWNLOADING, COMPLETED
     }
 
