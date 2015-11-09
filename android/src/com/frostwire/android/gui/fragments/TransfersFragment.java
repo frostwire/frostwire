@@ -42,6 +42,7 @@ import com.frostwire.android.gui.activities.PreferencesActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.dialogs.MenuDialog;
 import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.*;
 import com.frostwire.android.gui.util.UIUtils;
@@ -159,6 +160,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
         textDownloads.setText(downloads + " @ " + sDown);
         textUploads.setText(uploads + " @ " + sUp);
+
+        //EngineService.updatePermanentStatusNotification(new WeakReference<Context>(getActivity()));
     }
 
     @Override

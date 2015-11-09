@@ -548,4 +548,5 @@
     <string name="shutting_down">Shutting down…</string>
     <string name="help">Help</string>
     <string name="request_again">Request Again</string>
+    <string name="frostwire_is_running">FrostWire is running</string>
 </resources>

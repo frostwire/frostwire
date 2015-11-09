@@ -18,21 +18,20 @@
 
 package com.frostwire.android.gui.services;
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.*;
+import android.os.Binder;
+import android.os.Build;
+import android.os.IBinder;
 import android.os.Process;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
+import android.widget.RemoteViews;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -40,11 +39,17 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.logging.Logger;
+import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
+
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author gubatron
@@ -58,6 +63,8 @@ public class EngineService extends Service implements IEngineService {
     private static final String TAG = "FW.EngineService";
 
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
+
+    private final static int FROSTWIRE_STATUS_NOTIFICATION = 0x4ac4642a; // just a random number
 
     private final IBinder binder;
 
@@ -167,7 +174,47 @@ public class EngineService extends Service implements IEngineService {
         BTEngine.getInstance().resume();
 
         state = STATE_STARTED;
+
+        updatePermanentStatusNotification(new WeakReference<Context>(this));
         Log.v(TAG, "Engine started");
+    }
+
+    public static void updatePermanentStatusNotification(WeakReference<Context> contextRef) {
+        if (!Ref.alive(contextRef)) {
+            return;
+        }
+        final Context context = contextRef.get();
+
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+                R.layout.view_permanent_status_notification);
+
+        PendingIntent showFrostWireIntent = PendingIntent.getActivity(context,
+                0,
+                new Intent(context,
+                           MainActivity.class).
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP),
+                0);
+
+        final int downloads = TransferManager.instance().getActiveDownloads();
+        final String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth()/1024);
+        remoteViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
+
+        final String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth()/1024);
+        final int uploads = TransferManager.instance().getActiveUploads();
+        remoteViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
+
+        Notification notification = new Notification.Builder(context).
+                setSmallIcon(R.drawable.app_icon).
+                setContentIntent(showFrostWireIntent).
+                setContent(remoteViews).
+                build();
+        notification.flags |= Notification.FLAG_NO_CLEAR;
+
+        final NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.notify(FROSTWIRE_STATUS_NOTIFICATION, notification);
+        }
     }
 
     public synchronized void stopServices(boolean disconnected) {

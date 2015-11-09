@@ -25,6 +25,5 @@ package com.frostwire.android.gui.views;
  * 
  */
 public interface TimerObserver {
-
-    public void onTime();
+    void onTime();
 }
