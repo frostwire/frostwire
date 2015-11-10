@@ -81,11 +81,7 @@ public final class HttpDownload implements DownloadTransfer {
         this.savePath = new File(savePath, link.getFileName());
         this.status = STATUS_DOWNLOADING;
 
-        if (savePath == null) {
-            this.status = STATUS_SAVE_DIR_ERROR;
-        }
-
-        if (!savePath.isDirectory() && !savePath.mkdirs()) {
+        if (savePath == null || !savePath.isDirectory() && !savePath.mkdirs()) {
             this.status = STATUS_SAVE_DIR_ERROR;
         }
 

@@ -112,11 +112,7 @@ public final class YouTubeDownload implements DownloadTransfer {
     }
 
     private void ensureDirectoryExits(File dir) {
-        if (dir == null) {
-            this.status = STATUS_SAVE_DIR_ERROR;
-        }
-
-        if (!dir.isDirectory() && !dir.mkdirs()) {
+        if (dir == null || !dir.isDirectory() && !dir.mkdirs()) {
             this.status = STATUS_SAVE_DIR_ERROR;
         }
     }

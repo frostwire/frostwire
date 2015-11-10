@@ -50,7 +50,6 @@ public class SendBitcoinTipAction extends MenuAction {
         if (Ref.alive(poRef)) {
             final PaymentOptions paymentOptions = poRef.get();
             final String bitcoinAddress = paymentOptions.bitcoin;
-            final String itemName = paymentOptions.getItemName();
 
             try {
                 String bitcoinUriPrefix = "bitcoin:";
