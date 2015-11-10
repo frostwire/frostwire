@@ -34,8 +34,19 @@ we can discuss a solution.
 
 Please follow the following procedure when creating features to avoid unnecessary rejections:
 
-* Fork the source.
-* Clone it locally
+Do this the first time (Cloning & Forking):
+* Clone https://github.com/frostwire/frostwire to your computer. This will be the `origin` repo. 
+```bash
+git clone https://github.com/frostwire/frostwire
+```
+* Make a Fork of the `origin` repo into your github account.
+* On your local copy, add your fork as a remote under your username as the remote alias.
+```bash
+cd frostwire
+git remote add your_github_username_here https://github.com/your_github_username_here/frostwire
+```
+
+For further contributions
 * Create a branch with a descriptive name of the issue you are solving.
 * Make sure the name of your feature branch describes what you're trying to fix. If you don't know what to name it and there's an issue created for it, name your branch issue-233 (where 233 would be the number of the issue you're fixing).
 * Focus on your patch, do not waste time re-formatting code too much as it makes it hard
@@ -49,13 +60,12 @@ Please follow the following procedure when creating features to avoid unnecessar
 
 If your branch has taken a while to be accepted for merging into `master`, it's very likely that the `master` branch will have moved forward while you work. In this case, make sure to sync your `master`.
 
-    git checkout master
-    git pull upstream master
+    git fetch upstream master
 
 and then rebase your branch to bring it up to speed so it can be merged properly (do not merge `master` into your branch):
 
     git checkout my-branch
-    git rebase master
+    git rebase origin/master
 
 As you do this you may have to fix any possible conflicts, just follow the instruction git gives you if this is your first time.
 
