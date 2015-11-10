@@ -203,14 +203,18 @@ public final class YouTubeExtractor {
             fileNameFound = true;
         }
 
-       String html5player = br.getRegex("(?s)(html5player\\-.+?\\.js)").getMatch(0);
-        YouTubeSig ytSig = getYouTubeSig("http://s.ytimg.com/yts/jsbin/" + html5player);
+        final String page = br.toString();
+        final String prefix = "<script src=\"//s.ytimg.com/yts/jsbin/player-";
+        final int startIndex = page.indexOf(prefix) + prefix.length();
+        final int endIndex = page.indexOf("/base.js\" name=\"player/base\"></script>", startIndex); //don't search from the start
+        final String playerId = page.substring(startIndex,
+                                               endIndex);
+        YouTubeSig ytSig = getYouTubeSig("http://s.ytimg.com/yts/jsbin/player-" + playerId + "/base.js");
         currentYTSig = ytSig;
 
         /* html5_fmt_map */
         if (br.getRegex(FILENAME_PATTERN).count() != 0 && fileNameFound == false) {
             filename = Encoding.htmlDecode(br.getRegex(FILENAME_PATTERN).getMatch(0).trim());
-            fileNameFound = true;
         }
 
         return parseLinks(br, video, filename, false, false, ytSig);

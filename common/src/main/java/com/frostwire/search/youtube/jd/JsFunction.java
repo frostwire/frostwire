@@ -272,7 +272,7 @@ public final class JsFunction<T> {
     }
 
     private static LambdaN extract_function(final JsContext ctx, String funcname) {
-        String func_mRegex = String.format("(function %1$s|[\\{;]%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*function)", escape(funcname)) + "\\((?<args>[a-z,]+)\\)\\{(?<code>[^\\}]+)\\}";
+        String func_mRegex = String.format("(function %1$s|[\\{;][a-zA-Z0-9]+\\.%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*function)", escape(funcname)) + "\\((?<args>[a-z,]+)\\)\\{(?<code>[^\\}]+)\\}";
         final Matcher func_m = Pattern.compile(func_mRegex).matcher(ctx.jscode);
         if (!func_m.find()) {
             throw new JsError("Could not find JS function " + funcname);
