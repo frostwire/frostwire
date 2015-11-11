@@ -335,6 +335,10 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             menu.add(createSearchAgainMenu(lines[0]));
         } else {
             menu.add(new SkinMenuItem(new RepeatSearchAction()));
+            menu.add(new JSeparator(JSeparator.HORIZONTAL));
+            menu.add(new SkinMenuItem(new CloseTabAction()));
+            menu.add(new SkinMenuItem(new CloseOtherTabsAction()));
+            menu.add(new SkinMenuItem(new CloseTabsToTheRight()));
         }
 
         return (new SearchResultMenu(this)).addToMenu(menu, lines);
@@ -836,6 +840,47 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
         public void actionPerformed(ActionEvent e) {
             repeatSearch();
+        }
+    }
+
+    private final class CloseTabAction extends AbstractAction {
+        public CloseTabAction() {
+            putValue(Action.NAME, SearchMediator.CLOSE_TAB_STRING);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SearchMediator.getSearchResultDisplayer().closeCurrentTab();
+        }
+    }
+
+    private final class CloseOtherTabsAction extends AbstractAction {
+        public CloseOtherTabsAction() {
+            putValue(Action.NAME, SearchMediator.CLOSE_OTHER_TABS_STRING);
+            setEnabled(SearchMediator.getSearchResultDisplayer().tabCount() > 1);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SearchMediator.getSearchResultDisplayer().closeOtherTabs();
+        }
+    }
+
+    private final class CloseTabsToTheRight extends AbstractAction {
+        public CloseTabsToTheRight() {
+            putValue(Action.NAME, SearchMediator.CLOSE_TABS_TO_THE_RIGHT);
+            final SearchResultDisplayer searchResultDisplayer = SearchMediator.getSearchResultDisplayer();
+            setEnabled(searchResultDisplayer.currentTabIndex() < (searchResultDisplayer.tabCount()-1));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            final SearchResultDisplayer searchResultDisplayer = SearchMediator.getSearchResultDisplayer();
+            int tabsToRemove = searchResultDisplayer.tabCount() - searchResultDisplayer.currentTabIndex() - 1;
+            while (tabsToRemove > 0) {
+                searchResultDisplayer.closeTabAt(searchResultDisplayer.currentTabIndex()+1);
+                tabsToRemove--;
+            }
         }
     }
 

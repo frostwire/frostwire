@@ -85,7 +85,14 @@ public final class SearchMediator {
 
     static final String ARCHIVEORG_DETAILS_STRING = I18n.tr("View in Archive.org");
 
+    static final String CLOSE_TAB_STRING = I18n.tr("Close Tab");
+
+    static final String CLOSE_OTHER_TABS_STRING = I18n.tr("Close Other Tabs");
+
+    static final String CLOSE_TABS_TO_THE_RIGHT = I18n.tr("Close Tabs to the Right");
+
     private static final int SEARCH_MANAGER_NUM_THREADS = 6;
+
 
     private final SearchManager manager;
 
