@@ -1,3 +1,11 @@
+frostwire (6.1.7) stable; urgency=high
+  * Youtube audio search fixed.
+  * New 'Close Tab' action for search result tabs.
+  * New 'Close Other Tabs' action for search result tabs.
+  * New 'Close Tabs to the Right' action for search result tabs.
+	
+ -- FrostWire Team <contact@frostwire.com>  Wed, 11 Nov 2015 05:24:15 -0500
+
 frostwire (6.1.6) stable; urgency=high
   * Fixes drag and drop freezes introduced by new Java Runtime Environment 1.8.0_60.
   * Fixes SoundCloud search.
