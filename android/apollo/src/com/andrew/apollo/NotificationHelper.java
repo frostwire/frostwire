@@ -118,7 +118,7 @@ public class NotificationHelper {
     }
 
     private int getNotificationIcon() {
-        return Build.VERSION.SDK_INT >= 21 ? R.drawable.frostwire_notification_flat : R.drawable.frostwire_notification;
+        return R.drawable.frostwire_notification_flat;
     }
 
     /**
