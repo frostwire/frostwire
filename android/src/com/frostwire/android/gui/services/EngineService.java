@@ -219,7 +219,7 @@ public class EngineService extends Service implements IEngineService {
 
 
         Notification notification = new NotificationCompat.Builder(context).
-                setSmallIcon(R.drawable.app_icon).
+                setSmallIcon(R.drawable.frostwire_notification_flat).
                 setContentIntent(showFrostWireIntent).
                 setContent(remoteViews).
                 build();
@@ -286,7 +286,7 @@ public class EngineService extends Service implements IEngineService {
     }
 
     private int getNotificationIcon() {
-        return Build.VERSION.SDK_INT >= 21 ? R.drawable.frostwire_notification_flat : R.drawable.frostwire_notification;
+        return R.drawable.frostwire_notification_flat;
     }
 
     private static long[] buildVenezuelanVibe() {
