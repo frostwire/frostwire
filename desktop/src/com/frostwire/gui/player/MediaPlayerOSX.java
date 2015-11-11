@@ -26,7 +26,10 @@ public class MediaPlayerOSX extends MediaPlayer {
 
     @Override
     protected String getPlayerPath() {
-        boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire-desktop");
+        //System.out.println("MediaPlayerOSX: getFrostWireJarPath() -> " + FrostWireUtils.getFrostWireJarPath());
+        // Path running from command line:  .../frostwire/build/libs
+        // Path running from IntelliJ:      .../frostwire/build/classes
+        boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire/build");
         return (isRelease) ? getReleasePlayerPath() : getNonReleasePlayerPath();
     }
 
@@ -48,8 +51,11 @@ public class MediaPlayerOSX extends MediaPlayer {
     }
 
     private String getNonReleasePlayerPath() {
-        String frostWireJarPath = FrostWireUtils.getFrostWireJarPath();
-        String pathPreffix = frostWireJarPath.substring(0, frostWireJarPath.indexOf("frostwire-desktop"));
-        return pathPreffix + "frostwire-desktop/lib/native/fwplayer_osx";
+        //FrostWireUtils.getFrostWireJarPath();
+        // Path running from command line:  .../frostwire/build/libs
+        // Path running from IntelliJ:      .../frostwire/build/classes
+        // we want pathPrefix to be .../frostwire/
+        String pathPrefix = new File(FrostWireUtils.getFrostWireJarPath()).getParentFile().getParentFile().getAbsolutePath() + "/";
+        return pathPrefix + "desktop/lib/native/fwplayer_osx";
     }
 }
