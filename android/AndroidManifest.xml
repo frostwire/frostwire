@@ -20,7 +20,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.frostwire.android" android:installLocation="auto"
-	android:versionCode="211" android:versionName="1.6.6">
+	android:versionCode="212" android:versionName="1.6.6">
 	<!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
 	<!-- Plus  android:versionCode="9000xyz" (always commit like this, plus!)-->
 	<!-- Basic android:versionCode="8100xyz" (don't commit like this) -->
@@ -256,7 +256,8 @@
 		</activity>
 		<!-- VPN Status -->
 		<activity android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
-				  android:excludeFromRecents="true"/>
+				  android:excludeFromRecents="true"
+				  android:noHistory="true"/>
 
 		<!-- mobile core -->
 		<!--

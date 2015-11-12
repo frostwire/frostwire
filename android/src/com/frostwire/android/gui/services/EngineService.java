@@ -191,19 +191,17 @@ public class EngineService extends Service implements IEngineService {
                 new Intent(context,
                            MainActivity.class).
                         setAction(Constants.ACTION_SHOW_TRANSFERS).
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|
-                                Intent.FLAG_ACTIVITY_CLEAR_TOP),
+                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
                 0);
 
         PendingIntent showVPNIntent = PendingIntent.getActivity(context,
                 1,
                 new Intent(context,
-                        MainActivity.class).
+                        VPNStatusDetailActivity.class).
                         setAction(isVPNactive ?
                                 Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
                                 Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|
-                                Intent.FLAG_ACTIVITY_CLEAR_TASK),
+                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
                 0);
 
 
