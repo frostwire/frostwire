@@ -3,5 +3,4 @@ dependencies {
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
     compile 'io.reactivex:rxjava:1.0.15'
-    compile 'com.frostwire:jlibtorrent:1.1.0.9'
 }
