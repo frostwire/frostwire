@@ -171,7 +171,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private boolean isShutdown() {
         Intent intent = getIntent();
-        boolean result = intent == null && intent.getBooleanExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), false);
+        boolean result = intent != null && intent.getBooleanExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), false);
         if (result) {
             shutdown();
         }
@@ -232,6 +232,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     @Override
     protected void onNewIntent(Intent intent) {
+        if (intent == null) {
+            return;
+        }
+
         String action = intent.getAction();
 
         if (action != null) {
@@ -251,10 +255,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                     SearchFragment.startDownload(this, NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
                     UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE_FROM_PREVIEW);
                 }
-            } else if (action.equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED) || action.equals(Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED)) {
-                Intent vpnIntent = new Intent(this, VPNStatusDetailActivity.class);
-                vpnIntent.setAction(action);
-                startActivity(vpnIntent);
             }
         }
 
