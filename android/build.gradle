@@ -122,7 +122,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("../frostwire-tools/installer_builders/android.keystore/frostwire.keystore")
+            storeFile file("../../frostwire-tools/installer_builders/android.keystore/frostwire.keystore")
             storePassword ""
             keyAlias ""
             keyPassword ""
