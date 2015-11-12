@@ -509,7 +509,6 @@
     <string name="help">Pomoc</string>
     <string name="frostwire_shutting_down_no_permissions">Przepraszamy, FrostWire nie może kontynuować bez twojego zezwolenia na dostęp to dysku.</string>
     <string name="ringtone_not_set">Dzwonek nie został zmieniony, nie wystarczające pozwolenia.</string>
-    <string name="why_we_need_settings_access_summary">Zmiana dzwonka wymaga dostępu to ustawień systemowych.\n\nChcesz spróbować jeszcze raz?</string>
     <string name="transfers_context_menu_copy_infohash_copied">Infohash skopiowana do schowka</string>
     <string name="shutting_down">Wyłączanie…</string>
     <string name="transfers_context_menu_copy_infohash">Copy InfoHash</string>
