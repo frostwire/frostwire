@@ -118,7 +118,8 @@ public final class Constants {
 
     public static final String ACTION_OPEN_TORRENT_URL = "android.intent.action.VIEW";
     public static final String ACTION_SHOW_TRANSFERS = "com.frostwire.android.ACTION_SHOW_TRANSFERS";
-    public static final String ACTION_SHOW_VPN_EXPLANATION = "com.frostwire.android.ACTION_SHOW_VPN_EXPLANATION";
+    public static final String ACTION_SHOW_VPN_STATUS_PROTECTED = "com.frostwire.android.ACTION_SHOW_VPN_STATUS_PROTECTED";
+    public static final String ACTION_SHOW_VPN_STATUS_UNPROTECTED = "com.frostwire.android.ACTION_SHOW_VPN_STATUS_UNPROTECTED";
     public static final String ACTION_START_TRANSFER_FROM_PREVIEW = "com.frostwire.android.ACTION_START_TRANSFER_FROM_PREVIEW";
     public static final String ACTION_MEDIA_PLAYER_PLAY = "com.frostwire.android.ACTION_MEDIA_PLAYER_PLAY";
     public static final String ACTION_MEDIA_PLAYER_STOPPED = "com.frostwire.android.ACTION_MEDIA_PLAYER_STOPPED";
@@ -171,4 +172,6 @@ public final class Constants {
     public static final String SOCIAL_URL_FACEBOOK_PAGE = "https://www.facebook.com/FrostwireOfficial";
     public static final String SOCIAL_URL_TWITTER_PAGE = "https://twitter.com/frostwire";
     public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
+
+    public static final String PIA_URL = "https://www.privateinternetaccess.com/pages/android-vpn-app/FROSTWIRE";
 }

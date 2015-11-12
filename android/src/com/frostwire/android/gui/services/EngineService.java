@@ -24,9 +24,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.Process;
 import android.support.v4.app.NotificationCompat;
@@ -38,6 +36,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.ImageLoader;
@@ -200,10 +199,13 @@ public class EngineService extends Service implements IEngineService {
                 1,
                 new Intent(context,
                         MainActivity.class).
-                        setAction(Constants.ACTION_SHOW_VPN_EXPLANATION).
+                        setAction(isVPNactive ?
+                                Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
+                                Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|
                                 Intent.FLAG_ACTIVITY_CLEAR_TASK),
                 0);
+
 
         // VPN status
         CharSequence vpnCharSequence = context.getString(isVPNactive ? R.string.vpn_found : R.string.vpn_not_found);
@@ -213,10 +215,12 @@ public class EngineService extends Service implements IEngineService {
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_vpn, showVPNIntent);
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_vpn_icon, showVPNIntent);
 
+        // Click on title takes to transfers.
+        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
+
         // Transfers status.
         remoteViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
         remoteViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
-
 
         Notification notification = new NotificationCompat.Builder(context).
                 setSmallIcon(R.drawable.frostwire_notification_flat).
@@ -321,7 +325,7 @@ public class EngineService extends Service implements IEngineService {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
             while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface iface = networkInterfaces.nextElement();
-                LOG.info("isAnyNetworkInterfaceATunnel() -> " + iface.getDisplayName());
+                //LOG.info("isAnyNetworkInterfaceATunnel() -> " + iface.getDisplayName());
                 if (iface.getDisplayName().contains("tun")) {
                     result = true;
                     break;

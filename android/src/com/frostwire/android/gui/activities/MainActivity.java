@@ -234,53 +234,27 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     protected void onNewIntent(Intent intent) {
         String action = intent.getAction();
 
-        if (action != null && action.equals(Constants.ACTION_SHOW_TRANSFERS)) {
-            controller.showTransfers(TransferStatus.ALL);
-        } else if (action != null && action.equals(Constants.ACTION_OPEN_TORRENT_URL)) {
-            //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
-            /**
-             * TODO: Ask @aldenml the best way to plug in NewTransferDialog.
-             * I've refactored this dialog so that it is forced (no matter if the setting
-             * to not show it again has been used) and when that happens the checkbox is hidden.
-             *
-             * However that dialog requires some data about the download, data which is not
-             * obtained until we have instantiated the Torrent object.
-             *
-             * I'm thinking that we can either:
-             * a) Pass a parameter to the transfer manager, but this would probably
-             * not be cool since the transfer manager (I think) should work independently from
-             * the UI thread.
-             *
-             * b) Pass a "listener" to the transfer manager, once the transfer manager has the torrent
-             * it can notify us and wait for the user to decide whether or not to continue with the transfer
-             *
-             * c) Forget about showing that dialog, and just start the download, the user can cancel it.
-             */
-
-            //Show me the transfer tab
-            Intent i = new Intent(this, MainActivity.class);
-            i.setAction(Constants.ACTION_SHOW_TRANSFERS);
-            i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(i);
-
-            //go!
-            final String uri = intent.getDataString();
-            if (uri != null) {
-                TransferManager.instance().downloadTorrent(uri);
-            } else {
-                LOG.warn("MainActivity.onNewIntent(): Couldn't start torrent download from Intent's URI, intent.getDataString() -> null");
-                LOG.warn("(maybe URI is coming in another property of the intent object - #fragmentation)");
+        if (action != null) {
+            if (action.equals(Constants.ACTION_SHOW_TRANSFERS)) {
+                controller.showTransfers(TransferStatus.ALL);
+            } else if (action.equals(Constants.ACTION_OPEN_TORRENT_URL)) {
+                openTorrentUrl(intent);
             }
-        }
-        // When another application wants to "Share" a file and has chosen FrostWire to do so.
-        // We make the file "Shared" so it's visible for other FrostWire devices on the local network.
-        else if (action != null && (action.equals(Intent.ACTION_SEND) || action.equals(Intent.ACTION_SEND_MULTIPLE))) {
-            controller.handleSendAction(intent);
-            intent.setAction(null);
-        } else if (action != null && action.equals(Constants.ACTION_START_TRANSFER_FROM_PREVIEW)) {
-            if (Ref.alive(NewTransferDialog.srRef)) {
-                SearchFragment.startDownload(this, NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
-                UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE_FROM_PREVIEW);
+            // When another application wants to "Share" a file and has chosen FrostWire to do so.
+            // We make the file "Shared" so it's visible for other FrostWire devices on the local network.
+            else if (action.equals(Intent.ACTION_SEND) ||
+                     action.equals(Intent.ACTION_SEND_MULTIPLE)) {
+                controller.handleSendAction(intent);
+                intent.setAction(null);
+            } else if (action.equals(Constants.ACTION_START_TRANSFER_FROM_PREVIEW)) {
+                if (Ref.alive(NewTransferDialog.srRef)) {
+                    SearchFragment.startDownload(this, NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
+                    UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE_FROM_PREVIEW);
+                }
+            } else if (action.equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED) || action.equals(Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED)) {
+                Intent vpnIntent = new Intent(this, VPNStatusDetailActivity.class);
+                vpnIntent.setAction(action);
+                startActivity(vpnIntent);
             }
         }
 
@@ -299,6 +273,43 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             } catch (Throwable e) {
                 LOG.warn("Error handling download complete notification", e);
             }
+        }
+    }
+
+    private void openTorrentUrl(Intent intent) {
+        //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
+        /**
+         * TODO: Ask @aldenml the best way to plug in NewTransferDialog.
+         * I've refactored this dialog so that it is forced (no matter if the setting
+         * to not show it again has been used) and when that happens the checkbox is hidden.
+         *
+         * However that dialog requires some data about the download, data which is not
+         * obtained until we have instantiated the Torrent object.
+         *
+         * I'm thinking that we can either:
+         * a) Pass a parameter to the transfer manager, but this would probably
+         * not be cool since the transfer manager (I think) should work independently from
+         * the UI thread.
+         *
+         * b) Pass a "listener" to the transfer manager, once the transfer manager has the torrent
+         * it can notify us and wait for the user to decide whether or not to continue with the transfer
+         *
+         * c) Forget about showing that dialog, and just start the download, the user can cancel it.
+         */
+
+        //Show me the transfer tab
+        Intent i = new Intent(this, MainActivity.class);
+        i.setAction(Constants.ACTION_SHOW_TRANSFERS);
+        i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(i);
+
+        //go!
+        final String uri = intent.getDataString();
+        if (uri != null) {
+            TransferManager.instance().downloadTorrent(uri);
+        } else {
+            LOG.warn("MainActivity.onNewIntent(): Couldn't start torrent download from Intent's URI, intent.getDataString() -> null");
+            LOG.warn("(maybe URI is coming in another property of the intent object - #fragmentation)");
         }
     }
 
