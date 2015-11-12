@@ -209,7 +209,7 @@ public class EngineService extends Service implements IEngineService {
         CharSequence vpnCharSequence = context.getString(isVPNactive ? R.string.vpn_found : R.string.vpn_not_found);
         remoteViews.setTextViewText(R.id.view_permanent_status_text_vpn, vpnCharSequence);
         remoteViews.setImageViewResource(R.id.view_permanent_status_vpn_icon, isVPNactive ?
-                R.drawable.vpn_on : R.drawable.vpn_off);
+                R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_vpn, showVPNIntent);
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_vpn_icon, showVPNIntent);
 

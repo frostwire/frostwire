@@ -1,87 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+              android:orientation="horizontal"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@android:color/black">
+              android:layout_height="wrap_content"
+              android:weightSum="1"
+              android:background="@android:color/white">
 
-    <LinearLayout android:layout_width="fill_parent"
+    <!-- left hand icon with gray circle background a-la lollypop. -->
+    <ImageView android:src="@drawable/frostwire_notification_flat"
+               android:layout_width="40dp"
+               android:layout_height="40dp"
+               android:padding="9dp"
+               android:layout_margin="12dp"
+               android:layout_gravity="center"
+               android:background="@drawable/notification_background_circle"/>
+
+    <!-- mid section container -->
+    <LinearLayout android:layout_width="0px"
                   android:layout_height="wrap_content"
-                  android:orientation="horizontal">
+                  android:layout_weight="1.0"
+                  android:weightSum="1.0"
+                  android:orientation="vertical">
 
-        <ImageView android:src="@drawable/app_icon"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:padding="10dp"/>
+        <!-- Top Title -->
+        <TextView android:text="@string/frostwire_is_running"
+                  android:layout_height="fill_parent"
+                  android:layout_width="wrap_content"
+                  android:textColor="@color/black"
+                  android:textSize="@dimen/text_size_small"
+                  android:gravity="left"
+                  android:layout_marginTop="2dp"/>
 
-        <LinearLayout android:layout_width="fill_parent"
+        <!-- VPN Hint -->
+        <TextView android:id="@+id/view_permanent_status_text_vpn"
+                  android:layout_weight="1.0"
+                  android:layout_width="fill_parent"
+                  android:layout_height="15dp"
+                  android:gravity="left|center_vertical"
+                  android:layout_gravity="center_horizontal"
+                  android:textColor="#999999"
+                  android:textSize="@dimen/text_size_micro"
+                  android:text="@string/dummy_hint"/>
+
+        <!-- transfer container -->
+        <LinearLayout
+                android:id="@+id/view_permanent_status_transfers_indicators"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical">
+
+            <!-- downward arrow in unicode -->
+            <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:orientation="vertical">
-            <TextView android:text="@string/frostwire_is_running"
-                      android:layout_height="fill_parent"
-                      android:layout_width="wrap_content"
-                      android:textColor="@color/white"
-                      android:textSize="@dimen/text_size_medium"
-                      android:gravity="left"/>
+                      android:textColor="@color/black"
+                      android:textSize="14dp"
+                      android:text="\u2193"
+                      android:layout_margin="4dp"/>
 
-            <LinearLayout android:layout_width="fill_parent"
-                          android:layout_height="wrap_content"
-                          android:orientation="horizontal"
-                          android:weightSum="1.0">
-
-                <TextView android:id="@+id/view_permanent_status_text_vpn"
-                          android:layout_width="wrap_content"
-                          android:layout_height="fill_parent"
-                          android:layout_weight="1.0"
-                          android:gravity="left|center_vertical"
-                          android:layout_gravity="center_horizontal"
-                          android:textColor="#999999"
-                          android:textSize="@dimen/text_size_micro"
-                          android:text="@string/dummy_hint"/>
-                <ImageView android:id="@+id/view_permanent_status_vpn_icon"
-                           android:layout_width="wrap_content"
-                           android:layout_height="30dp"
-                           android:src="@drawable/vpn_off"
-                           android:layout_marginRight="10dp" android:scaleType="fitCenter"
-                           android:background="@color/transparent"/>
-            </LinearLayout>
-
-
-            <LinearLayout
-                    android:id="@+id/view_permanent_status_transfers_indicators"
-                    android:layout_width="match_parent"
+            <!-- downloads @ download rate -->
+            <TextView
+                    android:id="@+id/view_permanent_status_text_downloads"
+                    style="@style/TransfersIndicator"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="left|center_vertical">
-                <TextView
-                        android:id="@+id/view_permanent_status_text_downloads"
-                        style="@style/TransfersIndicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawableLeft="@drawable/transfers_triangle_downward"
-                        android:paddingRight="8dp"
-                        android:textColor="#999999"
-                        android:text="@string/dummy_downloads_indicator"/>
-                <TextView android:id="@+id/view_permanent_status_text_uploads"
-                        style="@style/TransfersIndicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawableLeft="@drawable/transfers_triangle_upward"
-                        android:paddingRight="8dp"
-                        android:textColor="#999999"
-                        android:text="@string/dummy_uploads_indicator"/>
-                <!-- possible exit button
-                <View android:layout_height="fill_parent"
-                      android:layout_width="wrap_content"
-                      android:layout_weight="1.0"></View>
+                    android:gravity="center_vertical"
+                    android:paddingRight="8dp"
+                    android:textColor="#999999"
+                    android:text="@string/dummy_downloads_indicator"
+                    android:textSize="@dimen/text_size_extra_micro"/>
 
-                <ImageView android:id="@+id/view_permanent_status_exit_button"
-                             android:layout_width="wrap_content"
-                             android:layout_height="wrap_content"
-                             android:src="@drawable/menu_icon_exit"
-                             android:background="@color/transparent"
-                             android:layout_gravity="right"/>
-                             -->
-            </LinearLayout>
+            <!-- upward arrow in unicode -->
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textColor="@color/black"
+                      android:textSize="14dp"
+                      android:text="\u2191"
+                      android:layout_margin="4dp"/>
+
+            <!-- uploads @ upload rate -->
+            <TextView android:id="@+id/view_permanent_status_text_uploads"
+                    style="@style/TransfersIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="8dp"
+                    android:textColor="#999999"
+                    android:text="@string/dummy_uploads_indicator"
+                    android:textSize="@dimen/text_size_extra_micro"/>
+
         </LinearLayout>
     </LinearLayout>
+
+    <!-- VPN status icon -->
+    <ImageView android:id="@+id/view_permanent_status_vpn_icon"
+               android:layout_width="wrap_content"
+               android:layout_height="30dp"
+               android:src="@drawable/notification_vpn_off"
+               android:scaleType="fitCenter"
+               android:layout_gravity="center|center_horizontal"
+               android:layout_margin="15dp"
+               android:background="@color/transparent"/>
+
 </LinearLayout>
