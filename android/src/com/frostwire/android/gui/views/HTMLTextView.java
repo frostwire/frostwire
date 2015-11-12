@@ -31,9 +31,18 @@ import android.widget.TextView;
  */
 public class HTMLTextView extends TextView {
 
-
     public HTMLTextView(Context context) {
         super(context);
+        init();
+    }
+
+    public HTMLTextView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public HTMLTextView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
         init();
     }
 
@@ -45,15 +54,5 @@ public class HTMLTextView extends TextView {
         String htmlText = prefix + textString + suffix;
         setText(Html.fromHtml(htmlText));
 
-    }
-
-    public HTMLTextView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public HTMLTextView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        init();
     }
 }
