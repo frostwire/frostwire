@@ -156,8 +156,9 @@ dependencies {
     compile 'com.android.support:support-v4:23.1.0'
     compile 'com.google.android.gms:play-services-ads:8.3.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.frostwire:jlibtorrent:1.1.0.9'
-    compile 'com.frostwire:jlibtorrent-android:1.1.0.9'
+    compile 'com.frostwire:jlibtorrent:1.1.0.10'
+    compile 'com.frostwire:jlibtorrent-android-arm:1.1.0.10'
+    compile 'com.frostwire:jlibtorrent-android-x86:1.1.0.10'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
