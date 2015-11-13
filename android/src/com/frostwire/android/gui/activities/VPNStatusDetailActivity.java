@@ -93,8 +93,17 @@ public class VPNStatusDetailActivity extends AbstractActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        Intent newIntent = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        // if we came from Transfers, make sure to go have the tranfer fragment shown by MainActivity.
+        Intent i = getIntent();
+        if (i != null && i.getExtras() != null &&
+                i.getExtras().containsKey("from") &&
+                i.getExtras().get("from").equals("transfers")) {
+            newIntent.setAction(Constants.ACTION_SHOW_TRANSFERS);
+        }
+
+        startActivity(newIntent);
         super.onBackPressed();
     }
 

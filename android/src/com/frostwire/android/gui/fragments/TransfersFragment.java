@@ -42,7 +42,6 @@ import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.dialogs.MenuDialog;
 import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.*;
@@ -247,13 +246,15 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         vpnStatusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(),
+                Intent i = new Intent(getActivity(),
                         VPNStatusDetailActivity.class).
 
                         setAction(TransfersFragment.isVPNactive ?
                                 Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
                                 Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
-                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                i.putExtra("from","transfers");
+                startActivity(i);
             }
         });
     }
