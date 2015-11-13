@@ -36,7 +36,7 @@
 
     <!-- mid section container -->
     <LinearLayout android:layout_width="0px"
-                  android:layout_height="wrap_content"
+                  android:layout_height="fill_parent"
                   android:layout_weight="1.0"
                   android:weightSum="1.0"
                   android:orientation="vertical">
@@ -44,31 +44,20 @@
         <!-- Top Title -->
         <TextView android:text="@string/frostwire_is_running"
                   android:id="@+id/view_permanent_status_text_title"
-                  android:layout_height="fill_parent"
+                  android:layout_height="0dp"
                   android:layout_width="fill_parent"
                   android:textColor="@color/black"
-                  android:textSize="@dimen/text_size_small"
-                  android:gravity="left"
-                  android:layout_marginTop="2dp"/>
-
-        <!-- VPN Hint -->
-        <TextView android:id="@+id/view_permanent_status_text_vpn"
-                  android:layout_weight="1.0"
-                  android:layout_width="fill_parent"
-                  android:layout_height="15dp"
-                  android:gravity="left|center_vertical"
-                  android:layout_gravity="center_horizontal"
-                  android:textColor="#999999"
-                  android:textSize="@dimen/text_size_micro"
-                  android:text="@string/dummy_hint"/>
+                  android:textSize="@dimen/text_size_large"
+                  android:gravity="left|bottom"
+                  android:layout_marginTop="2dp" android:layout_weight="0.5"/>
 
         <!-- transfer container -->
         <LinearLayout
                 android:id="@+id/view_permanent_status_transfers_indicators"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_vertical">
+                android:layout_height="0dp"
+                android:gravity="left|center_vertical" android:layout_weight="0.5">
 
             <!-- downward arrow in unicode -->
             <TextView android:layout_width="wrap_content"

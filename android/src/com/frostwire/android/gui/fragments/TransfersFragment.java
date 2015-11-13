@@ -171,6 +171,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             EngineService.updatePermanentStatusNotification(new WeakReference<Context>(getActivity()), downloads, sDown, uploads, sUp);
         }
 
+
+        updateVPNButtonIfStatusChanged(TransfersFragment.isVPNactive);
         EngineService.asyncCheckVPNStatus(onVPNStatusCallback);
     }
 
@@ -183,6 +185,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private class OnVPNStatusCallback implements EngineService.VpnStatusCallback {
         @Override
         public void onVpnStatus(boolean vpnActive) {
+            LOG.info("TransfersFragment.OnVPNStatusCallback.onVpnStatus("+vpnActive+")");
             TransfersFragment.this.updateVPNButtonIfStatusChanged(vpnActive);
         }
     }
