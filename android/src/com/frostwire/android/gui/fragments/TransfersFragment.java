@@ -66,7 +66,7 @@ import java.util.*;
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
-    private final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
+    private static final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
     private final Comparator<Transfer> transferComparator;
     private final ButtonAddTransferListener buttonAddTransferListener;
     private final ButtonMenuListener buttonMenuListener;
@@ -74,6 +74,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private Button buttonSelectDownloading;
     private Button buttonSelectCompleted;
     private ExpandableListView list;
+    private TextView textDHTPeers;
     private TextView textDownloads;
     private TextView textUploads;
     private ClearableEditTextView addTransferUrlTextView;
@@ -83,6 +84,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private int androidNotificationUpdateTick;
     private static boolean isVPNactive;
     private final OnVPNStatusCallback onVPNStatusCallback;
+    private final EngineService.CheckDHTUICallback onDHTCheckCallback;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -91,6 +93,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         this.buttonMenuListener = new ButtonMenuListener(this);
         selectedStatus = TransferStatus.ALL;
         this.onVPNStatusCallback = new OnVPNStatusCallback();
+        this.onDHTCheckCallback = new OnCheckDHTCallback();
     }
 
     @Override
@@ -163,17 +166,29 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         int downloads = TransferManager.instance().getActiveDownloads();
         int uploads = TransferManager.instance().getActiveUploads();
 
+        updatePermanentStatusNotification(sDown, sUp, downloads, uploads);
+        updateStatusBar(sDown, sUp, downloads, uploads);
+    }
+
+    private void updateStatusBar(String sDown, String sUp, int downloads, int uploads) {
         textDownloads.setText(downloads + " @ " + sDown);
         textUploads.setText(uploads + " @ " + sUp);
+        updateVPNButtonIfStatusChanged(TransfersFragment.isVPNactive);
+        EngineService.asyncCheckVPNStatus(getView(), onVPNStatusCallback);
+        EngineService.asyncCheckDHTPeers(getView(), onDHTCheckCallback);
+    }
 
+    private void updatePermanentStatusNotification(String sDown, String sUp, int downloads, int uploads) {
         if (++androidNotificationUpdateTick >= FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS) {
             androidNotificationUpdateTick = 0;
-            EngineService.updatePermanentStatusNotification(new WeakReference<Context>(getActivity()), downloads, sDown, uploads, sUp);
+            EngineService.updatePermanentStatusNotification(
+                    new WeakReference<Context>(getActivity()),
+                    new WeakReference<>(getView()),
+                    downloads,
+                    sDown,
+                    uploads,
+                    sUp);
         }
-
-
-        updateVPNButtonIfStatusChanged(TransfersFragment.isVPNactive);
-        EngineService.asyncCheckVPNStatus(onVPNStatusCallback);
     }
 
     private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
@@ -182,11 +197,24 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
     }
 
-    private class OnVPNStatusCallback implements EngineService.VpnStatusCallback {
+    private class OnVPNStatusCallback implements EngineService.VpnStatusUICallback {
         @Override
-        public void onVpnStatus(boolean vpnActive) {
-            LOG.info("TransfersFragment.OnVPNStatusCallback.onVpnStatus("+vpnActive+")");
+        public void onVpnStatus(final boolean vpnActive) {
             TransfersFragment.this.updateVPNButtonIfStatusChanged(vpnActive);
+        }
+    }
+
+    private class OnCheckDHTCallback implements EngineService.CheckDHTUICallback {
+        @Override
+        public void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
+            if (textDHTPeers==null) {
+                return;
+            }
+            textDHTPeers.setVisibility(dhtEnabled ? View.VISIBLE : View.GONE);
+            if (!dhtEnabled) {
+                return;
+            }
+            textDHTPeers.setText(dhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
         }
     }
 
@@ -238,6 +266,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
         list = findView(v, R.id.fragment_transfers_list);
 
+        textDHTPeers = findView(v, R.id.fragment_transfers_dht_peers);
+        textDHTPeers.setVisibility(View.GONE);
         textDownloads = findView(v, R.id.fragment_transfers_text_downloads);
         textUploads = findView(v, R.id.fragment_transfers_text_uploads);
 

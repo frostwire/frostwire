@@ -29,6 +29,7 @@ import android.os.IBinder;
 import android.os.Process;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -42,6 +43,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.Session;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
@@ -49,6 +51,7 @@ import com.frostwire.util.ThreadPool;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.concurrent.ExecutorService;
 
@@ -63,9 +66,7 @@ public class EngineService extends Service implements IEngineService {
     private static final String TAG = "FW.EngineService";
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
     private final static int FROSTWIRE_STATUS_NOTIFICATION = 0x4ac4642a; // just a random number
-    private static final int VPN_CHECK_INTERVAL_IN_MILLIS = 20000;
     private static boolean isVPNactive = false;
-    private static long lastVPNcheck = 0;
     private final IBinder binder;
     static final ExecutorService threadPool = ThreadPool.newThreadPool("Engine");
     // services in background
@@ -88,7 +89,9 @@ public class EngineService extends Service implements IEngineService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
-
+        LOG.info("FrostWire's EngineService started by this intent:");
+        LOG.info("FrostWire:" + intent.toString());
+        LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
         return START_STICKY;
     }
 
@@ -170,18 +173,25 @@ public class EngineService extends Service implements IEngineService {
         state = STATE_STARTED;
 
         updatePermanentStatusNotification(new WeakReference<Context>(this),
+                null,
                 0, "0 " + UIUtils.GENERAL_UNIT_KBPSEC,
                 0, "0 " + UIUtils.GENERAL_UNIT_KBPSEC);
 
         Log.v(TAG, "Engine started");
     }
 
-    public static void updatePermanentStatusNotification(WeakReference<Context> contextRef, int downloads, String sDown, int uploads, String sUp) {
-        if (!Ref.alive(contextRef)) {
+    public static void updatePermanentStatusNotification(WeakReference<Context> contextRef,
+                                                         WeakReference<View> viewRef,
+                                                         int downloads,
+                                                         String sDown,
+                                                         int uploads,
+                                                         String sUp) {
+        if (!Ref.alive(contextRef) || !Ref.alive(viewRef)) {
             return;
         }
         final Context context = contextRef.get();
-        asyncCheckVPNStatus();
+        final View view = viewRef.get();
+        asyncCheckVPNStatus(view);
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
                 R.layout.view_permanent_status_notification);
@@ -278,24 +288,60 @@ public class EngineService extends Service implements IEngineService {
         stopSelf();
     }
 
-    public static void asyncCheckVPNStatus() {
-        asyncCheckVPNStatus(null);
+    public static void asyncCheckVPNStatus(View view) {
+        asyncCheckVPNStatus(view, null);
     }
 
-    public static void asyncCheckVPNStatus(final VpnStatusCallback callback) {
-        final long NOW = System.currentTimeMillis();
-        if (NOW - lastVPNcheck < VPN_CHECK_INTERVAL_IN_MILLIS) {
-            return;
-        }
-
-        lastVPNcheck = NOW;
+    public static void asyncCheckVPNStatus(final View view, final VpnStatusUICallback callback) {
         threadPool.submit(new Runnable() {
             @Override
             public void run() {
-                isVPNactive = isAnyNetworkInterfaceATunnel();
+                isVPNactive = isTunnelUp();
+
                 if (callback != null) {
-                    callback.onVpnStatus(isVPNactive);
+                    // execute the UI update on the UI thread.
+                    view.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onVpnStatus(isVPNactive);
+                        }
+                    });
+
                 }
+            }
+        });
+    }
+
+    public static void asyncCheckDHTPeers(final View view, final CheckDHTUICallback callback) {
+        threadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    BTEngine engine = BTEngine.getInstance();
+                    final Session session = engine.getSession();
+                    if (session != null && session.isDHTRunning()) {
+                        session.postDHTStats();
+                        final int totalDHTNodes = engine.getTotalDHTNodes();
+                        if (totalDHTNodes != -1) {
+                            view.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    callback.onCheckDHT(true, totalDHTNodes);
+                                }
+                            });
+
+                        }
+                    } else {
+                        view.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.onCheckDHT(false, 0);
+                            }
+                        });
+                    }
+                } catch (Throwable ignored) {
+                }
+
             }
         });
     }
@@ -306,8 +352,14 @@ public class EngineService extends Service implements IEngineService {
         }
     }
 
-    public interface VpnStatusCallback {
-        void onVpnStatus(boolean vpnActive);
+    public interface VpnStatusUICallback {
+        // Code inside this method must be for UI changes, meant to be executed on UI Thread
+        void onVpnStatus(final boolean vpnActive);
+    }
+
+    public interface CheckDHTUICallback {
+        // Code inside this method must be for UI changes, meant to be executed on UI Thread
+        void onCheckDHT(final boolean dhtEnabled, final int dhtPeers);
     }
 
     private int getNotificationIcon() {
@@ -325,6 +377,19 @@ public class EngineService extends Service implements IEngineService {
         return new long[] { 0, shortVibration, longPause, shortVibration, shortPause, shortVibration, shortPause, shortVibration, mediumPause, mediumVibration };
     }
 
+    /** takes 0ms (135052 ns) - checks diretory, and reads corresponding file to create NetworkInterface object. */
+    private static boolean isTunnelUp() {
+        NetworkInterface tun0 = null;
+        try {
+            tun0 = NetworkInterface.getByName("tun0");
+        } catch (SocketException e) {
+            LOG.error(e.getMessage(), e);
+            return isAnyNetworkInterfaceATunnel();
+        }
+        return tun0 != null;
+    }
+
+    /* takes between 15ms to 65ms up to 300ms, will use as fallback. */
     private static boolean isAnyNetworkInterfaceATunnel() {
         boolean result = false;
         try {

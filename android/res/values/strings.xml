@@ -554,6 +554,7 @@
     <string name="unprotected_connection">Unprotected Connection</string>
     <string name="protected_connection">Protected Connection</string>
     <string name="protect_my_privacy">Protect my privacy</string>
+    <string name="dht_contacts">DHT contacts</string>
 
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Your privacy is a fundamental human right.</b>]]></string>
