@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -237,13 +237,6 @@
     <string name="ringtone_set">Установка рингтона</string>
     <string name="search">Поиск</string>
     <string name="transfers">Загрузки</string>
-    
-    
-    
-    
-    
-    
-    
     <string name="view_transfer_item_list_item_icon">Иконка для типа файла</string>
     <string name="nickname_sharing_count_files">%1$s - Раздаёт %2$d файлы</string>
     <string name="play_image_description">Включить</string>
@@ -295,8 +288,6 @@
     <string name="clear_complete">Удалить завершенные</string>
     <string name="downloading_promotion">Скачивается %s</string>
     <string name="activity_about_droidwire_description">FrostWire для Android</string>
-    
-    
     <string name="download_type_not_supported">Скачиваемый тип не поддерживается</string>
     <string name="im_on_it">Я в...</string>
     <string name="hint_transfers">Используйте "Меню" для большинства действий</string>
@@ -350,9 +341,7 @@
     <string name="are_you_sure">Вы уверены?</string>
     <string name="stop_all_transfers">Это остановит все передачи</string>
     <string name="clear_complete_transfers">Это очистит все завершенные передачи</string>
-    
     <string name="playing_song_name">Проигрывается %s</string>
-    
     <string name="invalid_torrent_file">Недействительный торрент</string>
     <string name="type_here_to_filter">Печатайте здесь, чтобы установить фильтр</string>
     <string name="type_here_to_search">Печатайте слова здесь для поиска</string>
@@ -506,4 +495,39 @@
     <string name="love_frostwire">Люблю FrostWire</string>
     <string name="send_feedback">Оставить отзыв</string>
     <string name="choose_email_app">Выберите приложение эл.почты...</string>
+    <string name="remove_torrent_and_data">Удалить торрент и данные</string>
+    <string name="ringtone_not_set">Рингтон не может быть установлен</string>
+    <string name="wifi_seeding_has_been_turned_off">Wi-Fi недоступен, раздача была прекращена</string>
+    <string name="transfers_context_menu_copy_infohash_copied">ИнфоХеш скопирован в буфер обмена</string>
+    <string name="transfers_context_menu_copy_magnet_copied">Магнет-ссылка скопирована в буфер обмена</string>
+    <string name="transfers_context_menu_copy_magnet">Копировать Магнет-ссылку</string>
+    <string name="transfers_context_menu_copy_infohash">Копировать ИнфоХеш</string>
+    <string name="torrent_transfer_aborted_on_mobile_data">Раздача торрентов не начнётся, пока вы не подключитесь к Wi-Fi сети. (Проверьте настройки сети относительно использования 3G/4G данных)</string>
+    <string name="menu_enter_shortcut_label">Enter</string>
+    <string name="menu_delete_shortcut_label">Del</string>
+    <string name="menu_space_shortcut_label">Space</string>
+    <string name="try_frostwire_plus_for_more_results">Попробуйте FrostWire Plus с большим количеством результатов</string>
+    <string name="media_preview">%s превью</string>
+    <string name="your_installation_is_complete">Установка завершена.</string>
+    <string name="thank_you">Спасибо!</string>
+    <string name="keep_in_touch">Оставайся на связи!</string>
+    <string name="frostwire_shutting_down_no_permissions">К сожалению, FrostWire не может продолжить без разрешения доступа к диску.</string>
+    <string name="restarting">Перезапуск…</string>
+    <string name="restarting_summary">FrostWire будет перезапущен, чтобы предоставленные разрешения вступили в силу</string>
+    <string name="why_we_need_storage_permissions">Зачем нам нужен доступ для хранения данных.</string>
+    <string name="why_we_need_storage_permissions_summary">FrostWire является файл-браузером и загрузчиком, поэтому он должен получить возможность сохранять файлы на диск.\n\nБез предоставленных прав FrostWire не может работать.\n\nХотите попробовать снова?</string>
+    <string name="shutting_down">Выключение…</string>
+    <string name="help">Помощь</string>
+    <string name="request_again">Повторить запрос</string>
+    <string name="frostwire_is_running">FrostWire запущен</string>
+    <string name="vpn_found">Найден VPN. Соединение зашифрованно.</string>
+    <string name="vpn_not_found">Без VPN. Подумайте о шифровании соединения.</string>
+    <string name="unprotected_connection">Незащищенное соединение</string>
+    <string name="protected_connection">Защищенное соединение</string>
+    <string name="protect_my_privacy">Защита моей приватности</string>
+
+    <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
+    <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Ваша приватность является основополагающим правом человека.</b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p><b> *Вам НЕ ОБЯЗАТЕЛЬНО использовать VPN для FrostWire</b>, но мы НАСТОЯТЕЛЬНО РЕКОМЕНДУЕМ это делать, чтобы защитить свое право на неприкосновенность Вам не нужен VPN использовать FrostWire, но мы настоятельно рекомендуем это, чтобы защитить свое право на неприкосновенность частной жизни. жизни.</p>]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[<b> Незащищенное соединение делает все, что вы делаете в интернете видным</b> для вашего интернет-провайдер и всех пользователей вашей сети, в том числе когда вы пользуетесь поиском, просматриваете веб-страницы, обмениваетесь сообщениями, а так же электронную почту и загрузки.]]></string>
 </resources>
