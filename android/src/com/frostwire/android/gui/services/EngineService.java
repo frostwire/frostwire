@@ -97,13 +97,13 @@ public class EngineService extends Service implements IEngineService {
         LOG.debug("EngineService onDestroy");
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
+
         stopServices(false);
 
         mediaPlayer.stop();
         mediaPlayer.shutdown();
 
         BTEngine.getInstance().stop();
-
         ImageLoader.getInstance(this).shutdown();
 
         new Thread("shutdown-halt") {
@@ -210,7 +210,6 @@ public class EngineService extends Service implements IEngineService {
         remoteViews.setTextViewText(R.id.view_permanent_status_text_vpn, vpnCharSequence);
         remoteViews.setImageViewResource(R.id.view_permanent_status_vpn_icon, isVPNactive ?
                 R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
-        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_vpn, showVPNIntent);
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_vpn_icon, showVPNIntent);
 
         // Click on title takes to transfers.
