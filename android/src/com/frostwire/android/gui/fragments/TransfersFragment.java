@@ -38,9 +38,11 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.activities.PreferencesActivity;
+import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.dialogs.MenuDialog;
 import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.*;
@@ -80,6 +82,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TransferStatus selectedStatus;
     private TimerSubscription subscription;
     private int androidNotificationUpdateTick;
+    private boolean isVPNactive = false;
+    private final OnVPNStatusCallback onVPNStatusCallback;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -87,6 +91,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         this.buttonAddTransferListener = new ButtonAddTransferListener(this);
         this.buttonMenuListener = new ButtonMenuListener(this);
         selectedStatus = TransferStatus.ALL;
+        this.onVPNStatusCallback = new OnVPNStatusCallback();
     }
 
     @Override
@@ -166,6 +171,25 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             androidNotificationUpdateTick = 0;
             EngineService.updatePermanentStatusNotification(new WeakReference<Context>(getActivity()), downloads, sDown, uploads, sUp);
         }
+
+        EngineService.asyncCheckVPNStatus(onVPNStatusCallback);
+    }
+
+    private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
+        boolean oldValue = this.isVPNactive;
+        if (oldValue != vpnActive) {
+            ImageView view = findView(getView(), R.id.fragment_transfers_status_vpn_icon);
+            view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
+            this.isVPNactive = vpnActive;
+        }
+
+    }
+
+    private class OnVPNStatusCallback implements EngineService.VpnStatusCallback {
+        @Override
+        public void onVpnStatus(boolean vpnActive) {
+            TransfersFragment.this.updateVPNButtonIfStatusChanged(vpnActive);
+        }
     }
 
     @Override
@@ -218,6 +242,23 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
         textDownloads = findView(v, R.id.fragment_transfers_text_downloads);
         textUploads = findView(v, R.id.fragment_transfers_text_uploads);
+
+        initVPNStatusButton(v);
+    }
+
+    private void initVPNStatusButton(View v) {
+        final ImageView vpnStatusButton = findView(v, R.id.fragment_transfers_status_vpn_icon);
+        vpnStatusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(),
+                        VPNStatusDetailActivity.class).
+                        setAction(isVPNactive ?
+                                Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
+                                Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
+                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            }
+        });
     }
 
 	public void initStorageRelatedRichNotifications(View v) {

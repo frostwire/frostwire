@@ -281,10 +281,36 @@ public class EngineService extends Service implements IEngineService {
         stopSelf();
     }
 
+    public static void asyncCheckVPNStatus() {
+        asyncCheckVPNStatus(null);
+    }
+
+    public static void asyncCheckVPNStatus(final VpnStatusCallback callback) {
+        final long NOW = System.currentTimeMillis();
+        if (NOW - lastVPNcheck < VPN_CHECK_INTERVAL_IN_MILLIS) {
+            return;
+        }
+
+        lastVPNcheck = NOW;
+        threadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                isVPNactive = isAnyNetworkInterfaceATunnel();
+                if (callback != null) {
+                    callback.onVpnStatus(isVPNactive);
+                }
+            }
+        });
+    }
+
     public class EngineServiceBinder extends Binder {
         public EngineService getService() {
             return EngineService.this;
         }
+    }
+
+    public interface VpnStatusCallback {
+        void onVpnStatus(boolean vpnActive);
     }
 
     private int getNotificationIcon() {
@@ -300,21 +326,6 @@ public class EngineService extends Service implements IEngineService {
         long longPause = 180;
 
         return new long[] { 0, shortVibration, longPause, shortVibration, shortPause, shortVibration, shortPause, shortVibration, mediumPause, mediumVibration };
-    }
-
-    private static void asyncCheckVPNStatus() {
-        final long NOW = System.currentTimeMillis();
-        if (NOW - lastVPNcheck < VPN_CHECK_INTERVAL_IN_MILLIS) {
-            return;
-        }
-
-        lastVPNcheck = NOW;
-        threadPool.submit(new Runnable() {
-            @Override
-            public void run() {
-                isVPNactive = isAnyNetworkInterfaceATunnel();
-            }
-        });
     }
 
     private static boolean isAnyNetworkInterfaceATunnel() {
@@ -335,5 +346,4 @@ public class EngineService extends Service implements IEngineService {
 
         return result;
     }
-
 }
