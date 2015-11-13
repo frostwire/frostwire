@@ -82,7 +82,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TransferStatus selectedStatus;
     private TimerSubscription subscription;
     private int androidNotificationUpdateTick;
-    private boolean isVPNactive = false;
+    private static boolean isVPNactive;
     private final OnVPNStatusCallback onVPNStatusCallback;
 
     public TransfersFragment() {
@@ -176,13 +176,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
-        boolean oldValue = this.isVPNactive;
-        if (oldValue != vpnActive) {
-            ImageView view = findView(getView(), R.id.fragment_transfers_status_vpn_icon);
-            view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
-            this.isVPNactive = vpnActive;
-        }
-
+        TransfersFragment.isVPNactive = vpnActive;
+        final ImageView view = findView(getView(), R.id.fragment_transfers_status_vpn_icon);
+        view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
     }
 
     private class OnVPNStatusCallback implements EngineService.VpnStatusCallback {
@@ -253,7 +249,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(),
                         VPNStatusDetailActivity.class).
-                        setAction(isVPNactive ?
+
+                        setAction(TransfersFragment.isVPNactive ?
                                 Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
                                 Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
