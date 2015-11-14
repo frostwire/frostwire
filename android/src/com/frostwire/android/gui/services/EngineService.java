@@ -325,7 +325,7 @@ public class EngineService extends Service implements IEngineService {
                     if (session != null && session.isDHTRunning()) {
                         session.postDHTStats();
                         final int totalDHTNodes = engine.getTotalDHTNodes();
-                        if (totalDHTNodes != -1) {
+                        if (totalDHTNodes != -1 && view != null) {
                             view.post(new Runnable() {
                                 @Override
                                 public void run() {
