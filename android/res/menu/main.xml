@@ -41,19 +41,18 @@
         android:title="@string/transfers">
     </item>
     <item
-        android:id="@+id/menu_main_preferences"
-        android:icon="@drawable/menu_icon_preferences"
-        android:title="@string/preferences">
-    </item>
-    <item
         android:id="@+id/menu_main_support"
         android:icon="@drawable/menu_icon_support"
         android:title="@string/help">
+    </item>
+    <item
+            android:id="@+id/menu_main_settings"
+            android:icon="@drawable/menu_icon_settings"
+            android:title="@string/settings">
     </item>
     <item
         android:id="@+id/menu_main_shutdown"
         android:icon="@drawable/menu_icon_exit"
         android:title="@string/exit">
     </item>
-
 </menu>

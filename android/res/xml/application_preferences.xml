@@ -167,6 +167,11 @@
         android:title="@string/other_settings"
         android:persistent="false" >
         <CheckBoxPreference
+                android:key="frostwire.prefs.gui.enable_permanent_status_notification"
+                android:title="@string/notify_frostwire_is_running"
+                android:summary="@string/notify_frostwire_is_running_summary"/>
+
+        <CheckBoxPreference
                 android:key="frostwire.prefs.gui.show_transfers_on_download_start"
                 android:title="@string/show_transfers_on_download_start" />
         <CheckBoxPreference

@@ -98,7 +98,7 @@
     <string name="my_files">Arsip-arsip saya</string>
     <string name="clear_messages">Bersihkan Pesan</string>
     <string name="chat_actions">Tindakan Percakapan</string>
-    <string name="preferences">Preferensi</string>
+    <string name="settings">Preferensi</string>
     <string name="please_connect">Silahkan sambungkan untuk menggunakan fitur ini</string>
     <string name="remove">Hapus</string>
     <string name="try_valid_port_next_time">Cobalah Port 1000 dan 65500 yang benar lain kali</string>

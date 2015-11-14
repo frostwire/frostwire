@@ -27,7 +27,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.activities.PreferencesActivity;
+import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.WizardActivity;
 import com.frostwire.android.gui.fragments.BrowsePeerFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment;
@@ -66,7 +66,7 @@ public final class MainController {
     }
 
     public void showPreferences() {
-        Intent i = new Intent(activity, PreferencesActivity.class);
+        Intent i = new Intent(activity, SettingsActivity.class);
         activity.startActivity(i);
     }
 

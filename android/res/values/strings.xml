@@ -98,7 +98,7 @@
     <string name="my_files">My Files</string>
     <string name="clear_messages">Clear messages</string>
     <string name="chat_actions">Chat Actions</string>
-    <string name="preferences">Settings</string>
+    <string name="settings">Settings</string>
     <string name="please_connect">Please connect to use this feature</string>
     <string name="remove">Remove</string>
     <string name="try_valid_port_next_time">Try a valid port next time 1000 and 65500</string>
@@ -555,6 +555,8 @@
     <string name="protected_connection">Protected Connection</string>
     <string name="protect_my_privacy">Protect my privacy</string>
     <string name="dht_contacts">DHT contacts</string>
+    <string name="notify_frostwire_is_running">Notify FrostWire is running</string>
+    <string name="notify_frostwire_is_running_summary">Show a permanent Android notification with status of transfers</string>
 
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Your privacy is a fundamental human right.</b>]]></string>

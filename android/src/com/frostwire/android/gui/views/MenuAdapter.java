@@ -43,7 +43,7 @@ public class MenuAdapter extends BaseAdapter {
     private final List<MenuAction> items;
 
     public MenuAdapter(Context context, String title, List<MenuAction> items) {
-        this.contextRef = new WeakReference<Context>(context);
+        this.contextRef = new WeakReference<>(context);
         this.inflater = LayoutInflater.from(context);
         this.title = title;
         this.items = items;

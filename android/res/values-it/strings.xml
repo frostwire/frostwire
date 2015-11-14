@@ -98,7 +98,7 @@
     <string name="my_files">I miei file</string>
     <string name="clear_messages">Cancella i messaggi</string>
     <string name="chat_actions">Azioni Chat</string>
-    <string name="preferences">Preferenze</string>
+    <string name="settings">Preferenze</string>
     <string name="please_connect">Connettiti per usare questa opzione</string>
     <string name="remove">Rimuovi</string>
     <string name="try_valid_port_next_time">Prova una porta valida la prossima volta 1000 e 65500</string>

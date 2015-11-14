@@ -98,7 +98,7 @@
     <string name="my_files">Moje Pliki</string>
     <string name="clear_messages">Wyczyść wiadomości</string>
     <string name="chat_actions">Akcje Czatu</string>
-    <string name="preferences">Ustawienia</string>
+    <string name="settings">Ustawienia</string>
     <string name="please_connect">Proszę połączyć się aby korzystać z tej funkcji</string>
     <string name="remove">Usuń</string>
     <string name="try_valid_port_next_time">Spróbuj poprawny port następnym razem 1000 i 65500</string>

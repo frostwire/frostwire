@@ -98,7 +98,7 @@
     <string name="my_files">Tập tin của tôi</string>
     <string name="clear_messages">Xóa tin nhắn</string>
     <string name="chat_actions">Các hoạt động chat</string>
-    <string name="preferences">Tùy chọn</string>
+    <string name="settings">Tùy chọn</string>
     <string name="please_connect">Vui lòng kết nối để sử dụng chức năng này</string>
     <string name="remove">Xóa</string>
     <string name="try_valid_port_next_time">Hãy nhập một port khả dụng từ 1000 đến 65500 valid port next time</string>

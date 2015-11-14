@@ -98,7 +98,7 @@
     <string name="my_files">Τα αρχεία μου</string>
     <string name="clear_messages">Καθαρισμός μηνυμάτων</string>
     <string name="chat_actions">Ενέργειες Chat</string>
-    <string name="preferences">Προτιμήσεις</string>
+    <string name="settings">Προτιμήσεις</string>
     <string name="please_connect">Συνδέσου για να χρησιμοποιήσεις αυτή τη δυνατότητα</string>
     <string name="remove">Αφαίρεση</string>
     <string name="try_valid_port_next_time">Δοκίμασε ένα έγκυρο port την επόμενη φορά 1000 και 65500</string>

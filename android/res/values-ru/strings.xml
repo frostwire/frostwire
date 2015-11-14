@@ -97,7 +97,7 @@
     <string name="my_files">Мои файлы</string>
     <string name="clear_messages">Удалить сообщения</string>
     <string name="chat_actions">Действия в чате</string>
-    <string name="preferences">Настройки</string>
+    <string name="settings">Настройки</string>
     <string name="please_connect">Пожалуйста, подключитесь, чтобы воспользоваться данной функцией</string>
     <string name="remove">Удалить</string>
     <string name="try_valid_port_next_time">В следующий раз попробуйте действующий порт 1000 и 65500</string>

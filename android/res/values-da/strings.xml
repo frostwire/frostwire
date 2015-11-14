@@ -98,7 +98,7 @@
     <string name="my_files">Mine filer</string>
     <string name="clear_messages">Slet besked</string>
     <string name="chat_actions">Chat handlinger</string>
-    <string name="preferences">Indstillinger</string>
+    <string name="settings">Indstillinger</string>
     <string name="please_connect">Opret forbindelse at bruge denne funktion</string>
     <string name="remove">Fjern</string>
     <string name="try_valid_port_next_time">Prøv en gyldig port næste gang 1000 og 65500</string>

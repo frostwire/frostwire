@@ -99,7 +99,7 @@
     <string name="my_files">Mes fichiers</string>
     <string name="clear_messages">Effacer les messages</string>
     <string name="chat_actions">Actions chat</string>
-    <string name="preferences">Préférences</string>
+    <string name="settings">Préférences</string>
     <string name="please_connect">Veuillez-vous connecter pour utiliser cette fonction</string>
     <string name="remove">Supprimer</string>
     <string name="try_valid_port_next_time">La prochaine fois essayez un port valide de 1000 et 65500</string>

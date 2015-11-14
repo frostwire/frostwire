@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Emil Suleymanov (sssemil)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,11 +21,13 @@ package com.frostwire.android.gui.activities;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.*;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,10 +43,10 @@ import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.preference.SimpleActionPreference;
-import com.frostwire.android.gui.views.preference.StoragePreference;
+import com.frostwire.android.gui.views.preference.*;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.DHT;
 import com.frostwire.jlibtorrent.Session;
@@ -60,9 +62,9 @@ import com.frostwire.uxstats.UXStats;
  * @author aldenml
  * @author sssemil
  */
-public class PreferencesActivity extends PreferenceActivity {
+public class SettingsActivity extends PreferenceActivity {
 
-    private static final Logger LOG = Logger.getLogger(PreferencesActivity.class);
+    private static final Logger LOG = Logger.getLogger(SettingsActivity.class);
     private static String currentPreferenceKey = null;
 
     @Override
@@ -105,12 +107,36 @@ public class PreferencesActivity extends PreferenceActivity {
 
     private void setupComponents() {
         setupConnectSwitch();
+        setupOtherOptions();
         setupSeedingOptions();
         setupNickname();
         setupClearIndex();
         setupSearchEngines();
         setupUXStatsOption();
         setupAbout();
+    }
+
+    private void setupOtherOptions() {
+        setupPermanentStatusNotificationOption();
+    }
+
+    private void setupPermanentStatusNotificationOption() {
+        final CheckBoxPreference enablePermanentStatusNotification = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION);
+        if (enablePermanentStatusNotification != null) {
+            enablePermanentStatusNotification.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    final boolean notificationEnabled = (boolean) newValue;
+                    if (!notificationEnabled) {
+                        NotificationManager notificationService =  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                        if (notificationService != null) {
+                            notificationService.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                        }
+                    }
+                    return true;
+                }
+            });
+        }
     }
 
     @Override
@@ -146,7 +172,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
                     if (!newVal) { // not seeding at all
                         TransferManager.instance().stopSeedingTorrents();
-                        UIUtils.showShortMessage(PreferencesActivity.this, R.string.seeding_has_been_turned_off);
+                        UIUtils.showShortMessage(SettingsActivity.this, R.string.seeding_has_been_turned_off);
                     }
 
                     if (preferenceSeedingWifiOnly != null) {
@@ -165,7 +191,7 @@ public class PreferencesActivity extends PreferenceActivity {
                     boolean newVal = (Boolean) newValue;
                     if (newVal && !NetworkManager.instance().isDataWIFIUp()) { // not seeding on mobile data
                         TransferManager.instance().stopSeedingTorrents();
-                        UIUtils.showShortMessage(PreferencesActivity.this, R.string.wifi_seeding_has_been_turned_off);
+                        UIUtils.showShortMessage(SettingsActivity.this, R.string.wifi_seeding_has_been_turned_off);
                     }
                     return true;
                 }
@@ -197,7 +223,7 @@ public class PreferencesActivity extends PreferenceActivity {
             preference.setOnActionListener(new OnClickListener() {
                 public void onClick(View v) {
                     LocalSearchEngine.instance().clearCache();
-                    UIUtils.showShortMessage(PreferencesActivity.this, R.string.deleted_crawl_cache);
+                    UIUtils.showShortMessage(SettingsActivity.this, R.string.deleted_crawl_cache);
                     updateIndexSummary(preference);
                 }
             });

@@ -62,10 +62,10 @@ import java.util.concurrent.ExecutorService;
  */
 public class EngineService extends Service implements IEngineService {
 
+    public final static int FROSTWIRE_STATUS_NOTIFICATION = 0x4ac4642a; // just a random number
     private static final Logger LOG = Logger.getLogger(EngineService.class);
     private static final String TAG = "FW.EngineService";
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
-    private final static int FROSTWIRE_STATUS_NOTIFICATION = 0x4ac4642a; // just a random number
     private static boolean isVPNactive = false;
     private final IBinder binder;
     static final ExecutorService threadPool = ThreadPool.newThreadPool("Engine");
@@ -189,7 +189,8 @@ public class EngineService extends Service implements IEngineService {
                                                          String sDown,
                                                          int uploads,
                                                          String sUp) {
-        if (!Ref.alive(contextRef) || !Ref.alive(viewRef)) {
+        if (!Ref.alive(contextRef) || !Ref.alive(viewRef) ||
+            !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
             return;
         }
         final Context context = contextRef.get();

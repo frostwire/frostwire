@@ -98,7 +98,7 @@
     <string name="my_files">ملفاتيs</string>
     <string name="clear_messages">حذف الرسائل</string>
     <string name="chat_actions">تأثيرات الدردشة</string>
-    <string name="preferences">التفضيلات</string>
+    <string name="settings">التفضيلات</string>
     <string name="please_connect">يرجى الاتصال لاستخدام هذه الخاصية</string>
     <string name="remove">إزالة</string>
     <string name="try_valid_port_next_time">حاول باستخدام منفذ صالح المرة القادمة 1000 و 65500</string>

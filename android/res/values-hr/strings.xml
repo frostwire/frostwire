@@ -98,7 +98,7 @@
     <string name="my_files">Moji dokumenti</string>
     <string name="clear_messages">Izbriši poruku</string>
     <string name="chat_actions">Akcije razgovora</string>
-    <string name="preferences">Postavke</string>
+    <string name="settings">Postavke</string>
     <string name="please_connect">Spojite se kako biste koristili ovu opciju</string>
     <string name="remove">Maknuti</string>
     <string name="try_valid_port_next_time">Pokušajte valjani port sljedeći put 1000 i 65500</string>

@@ -594,7 +594,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 syncSlideMenu();
                 controller.closeSlideMenu();
                 try {
-                    if (id == R.id.menu_main_preferences) {
+                    if (id == R.id.menu_main_settings) {
                         controller.showPreferences();
                     } else if (id == R.id.menu_main_shutdown) {
                         showShutdownDialog();

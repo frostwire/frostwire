@@ -98,7 +98,7 @@
     <string name="my_files">मेरी फ़ाइलें</string>
     <string name="clear_messages">संदेश  स्पष्ट करें  </string>
     <string name="chat_actions">चॅट एक्शन</string>
-    <string name="preferences">वरीयताएँ</string>
+    <string name="settings">वरीयताएँ</string>
     <string name="please_connect">इस सुविधा का उपयोग करने के लिए कनेक्ट करें </string>
     <string name="remove">हटाना</string>
     <string name="try_valid_port_next_time">अगली बार कोई मान्य पोर्ट  कोशिश करें 1000 और 65,500</string>

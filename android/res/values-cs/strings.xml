@@ -98,7 +98,7 @@
     <string name="my_files">Moje soubory</string>
     <string name="clear_messages">Odstranit Zprávy</string>
     <string name="chat_actions">Akce Chat</string>
-    <string name="preferences">Preference</string>
+    <string name="settings">Preference</string>
     <string name="please_connect">Prosím připojte se pomocí této funkce</string>
     <string name="remove">Odstranit</string>
     <string name="try_valid_port_next_time">Zkuste platný port příště 1000 a 65500</string>

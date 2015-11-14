@@ -98,7 +98,7 @@
     <string name="my_files">Mijn files</string>
     <string name="clear_messages">Verwijder berichten</string>
     <string name="chat_actions">Chat Opties</string>
-    <string name="preferences">Voorkeuren</string>
+    <string name="settings">Voorkeuren</string>
     <string name="please_connect">Maak alsjeblieft verbinding om dit onderdeel te gebruiken</string>
     <string name="remove">Verwijder</string>
     <string name="try_valid_port_next_time">Probeer volgende keer een geldige poort 1000 en 65500</string>

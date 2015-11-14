@@ -98,7 +98,7 @@
     <string name="my_files">我的文件</string>
     <string name="clear_messages">清除信息</string>
     <string name="chat_actions">聊天记录</string>
-    <string name="preferences">首选项</string>
+    <string name="settings">首选项</string>
     <string name="please_connect">请连接使用此功能</string>
     <string name="remove">移除</string>
     <string name="try_valid_port_next_time">下一次尝试有效端口1000 和 65500</string>

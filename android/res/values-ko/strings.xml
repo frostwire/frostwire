@@ -98,7 +98,7 @@
     <string name="my_files">내 파일</string>
     <string name="clear_messages">메세지 모두 비우기</string>
     <string name="chat_actions">채팅 액션</string>
-    <string name="preferences">환경설정</string>
+    <string name="settings">환경설정</string>
     <string name="please_connect">이 기능을 사용하시려면 인터넷에 연결해주세요.</string>
     <string name="remove">지우기</string>
     <string name="try_valid_port_next_time">유효한 포트를 사용해주세요 (1000과 65500)</string>

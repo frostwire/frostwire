@@ -98,7 +98,7 @@
     <string name="my_files">Dosyalarım</string>
     <string name="clear_messages">Mesajları temizle</string>
     <string name="chat_actions">Sohbet Faaliyetleri</string>
-    <string name="preferences">Tercihler</string>
+    <string name="settings">Tercihler</string>
     <string name="please_connect">Bu özelliği kullanmak için lütfen bağlanın</string>
     <string name="remove">Kaldır</string>
     <string name="try_valid_port_next_time">Gelecek sefer 1000 ile 65000 arasında geçerli bir port deneyin</string>

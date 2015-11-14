@@ -98,7 +98,7 @@
     <string name="my_files">Meine Dateien</string>
     <string name="clear_messages">Nachrichten löschen</string>
     <string name="chat_actions">Chat Aktivitäten</string>
-    <string name="preferences">Einstellungen</string>
+    <string name="settings">Einstellungen</string>
     <string name="please_connect">Stelle bitte eine Verbindung her, um diese Funktion zu nutzen.</string>
     <string name="remove">Entfernen</string>
     <string name="try_valid_port_next_time">Versuche es das nächste Mal mit einem gültigen Port 1000 und 65500</string>
