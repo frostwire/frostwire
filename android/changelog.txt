@@ -1,5 +1,6 @@
-FrostWire 1.6.6 - NOVEMBER/12/2015
+FrostWire 1.6.6 - NOVEMBER/13/2015
  - Fixes YouTube search.
+ - Transfer screen's status bar now shows number of DHT hosts known
  - New permanent notification lets you know FrostWire is running, how much bandwidth
    it's using and whether or not your connection is encrypted with a VPN to protect
    your fundamental human right to privacy.
