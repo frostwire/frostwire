@@ -89,6 +89,9 @@ public class EngineService extends Service implements IEngineService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
+        if (intent==null) {
+            return 0;
+        }
         LOG.info("FrostWire's EngineService started by this intent:");
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
@@ -298,7 +301,7 @@ public class EngineService extends Service implements IEngineService {
             public void run() {
                 isVPNactive = isTunnelUp();
 
-                if (callback != null) {
+                if (callback != null && view != null) {
                     // execute the UI update on the UI thread.
                     view.post(new Runnable() {
                         @Override
