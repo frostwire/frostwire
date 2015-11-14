@@ -37,7 +37,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.activities.PreferencesActivity;
+import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.dialogs.MenuDialog;
@@ -194,7 +194,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
         TransfersFragment.isVPNactive = vpnActive;
         final ImageView view = findView(getView(), R.id.fragment_transfers_status_vpn_icon);
-        view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
+        if (view != null) {
+            view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
+        }
     }
 
     private class OnVPNStatusCallback implements EngineService.VpnStatusUICallback {
@@ -721,7 +723,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     	
 		@Override
 		public void onClick(TransfersFragment owner, View v) {
-	        Intent i = new Intent(owner.getActivity(), PreferencesActivity.class);
+	        Intent i = new Intent(owner.getActivity(), SettingsActivity.class);
 	        i.setAction(Constants.ACTION_SETTINGS_SELECT_STORAGE);
 	        owner.getActivity().startActivity(i);
 		}
