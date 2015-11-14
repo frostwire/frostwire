@@ -20,7 +20,6 @@ package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -34,7 +33,6 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.ClickAdapter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -70,11 +68,11 @@ public class AboutFragment extends Fragment implements MainFragment {
         content.setText(Html.fromHtml(getAboutText()));
         content.setMovementMethod(LinkMovementMethod.getInstance());
 
-        final Button helpTranslateButton = (Button) view.findViewById(R.id.fragment_about_help_translate_frostwire_button);
-        helpTranslateButton.setOnClickListener(new View.OnClickListener() {
+        final Button loveFrostWireButton = (Button) view.findViewById(R.id.fragment_about_love_frostwire);
+        loveFrostWireButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onHelpTranslate();
+                onLoveFrostWire();
             }
         });
 
@@ -108,8 +106,8 @@ public class AboutFragment extends Fragment implements MainFragment {
         return view;
     }
 
-    private void onHelpTranslate() {
-        UIUtils.openURL(getActivity(), "https://github.com/frostwire/frostwire-android/wiki/Help-Translate-FrostWire");
+    private void onLoveFrostWire() {
+        UIUtils.openURL(getActivity(), "http://www.frostwire.com/give");
     }
 
     @Override
