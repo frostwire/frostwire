@@ -133,20 +133,24 @@ public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRende
     }
 
     private void labelBitcoin_mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1 && labelBitcoin.isActionEnabled()) {
-            if (paymentOptions != null && !StringUtils.isNullOrEmpty(paymentOptions.bitcoin)) {
-                openPaymentOptionsURL(paymentOptions, PaymentMethod.BITCOIN);
-                UXStats.instance().log(UXAction.DOWNLOAD_CLICK_BITCOIN_PAYMENT);
-            }
+        if (e.getButton() == MouseEvent.BUTTON1
+            && labelBitcoin.isActionEnabled()
+            && paymentOptions != null
+            && !StringUtils.isNullOrEmpty(paymentOptions.bitcoin)) {
+
+            openPaymentOptionsURL(paymentOptions, PaymentMethod.BITCOIN);
+            UXStats.instance().log(UXAction.DOWNLOAD_CLICK_BITCOIN_PAYMENT);
         }
     }
 
     private void labelPaypal_mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1 && labelPaypal.isActionEnabled()) {
-            if (paymentOptions != null && !StringUtils.isNullOrEmpty(paymentOptions.paypalUrl)) {
-                openPaymentOptionsURL(paymentOptions, PaymentMethod.PAYPAL);
-                UXStats.instance().log(UXAction.DOWNLOAD_CLICK_PAYPAL_PAYMENT);
-            }
+        if (e.getButton() == MouseEvent.BUTTON1
+            && labelPaypal.isActionEnabled()
+            && paymentOptions != null
+            && !StringUtils.isNullOrEmpty(paymentOptions.paypalUrl)) {
+
+            openPaymentOptionsURL(paymentOptions, PaymentMethod.PAYPAL);
+            UXStats.instance().log(UXAction.DOWNLOAD_CLICK_PAYPAL_PAYMENT);
         }
     }
 }

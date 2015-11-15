@@ -201,14 +201,11 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
             }
             return root.setKeyValue(key, value);
             
-        } else if (isEqualBitKey(bitIndex)) {
+        } else if (isEqualBitKey(bitIndex) && found != root) {
             // This is a very special and rare case.
-            
-            /* REPLACE OLD KEY+VALUE */
-            if (found != root) {
-                incrementModCount();
-                return found.setKeyValue(key, value);
-            }
+            // REPLACE OLD KEY+VALUE
+            incrementModCount();
+            return found.setKeyValue(key, value);
         }
         
         throw new IndexOutOfBoundsException("Failed to put: " + key + " -> " + value + ", " + bitIndex);

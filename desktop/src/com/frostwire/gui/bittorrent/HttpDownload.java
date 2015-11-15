@@ -285,10 +285,8 @@ public class HttpDownload implements BTDownload {
                         return;
                     }
 
-                    if (resume) {
-                        if (incompleteFile.exists()) {
-                            bytesReceived = incompleteFile.length();
-                        }
+                    if (resume && incompleteFile.exists()) {
+                        bytesReceived = incompleteFile.length();
                     }
 
                     httpClient.save(url, incompleteFile, resume);
@@ -466,15 +464,14 @@ public class HttpDownload implements BTDownload {
             //try figuring out file size from HTTP headers depending on the response.
             if (size < 0) {
                 String responseCodeStr = headerFields.get(null).get(0);
-                
-                if (responseCodeStr.contains(String.valueOf(HttpURLConnection.HTTP_OK))) {
-                    if (headerFields.containsKey("Content-Length")) {
-                        try {
-                            size = Long.valueOf(headerFields.get("Content-Length").get(0));
-                        } catch (Exception e) {}
-                    }
-                } 
-            } 
+
+                if (responseCodeStr.contains(String.valueOf(HttpURLConnection.HTTP_OK))
+                    && headerFields.containsKey("Content-Length")) {
+                    try {
+                        size = Long.valueOf(headerFields.get("Content-Length").get(0));
+                    } catch (Exception e) {}
+                }
+            }
         }
     }
 

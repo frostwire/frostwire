@@ -422,10 +422,11 @@ public class SoundcloudDownload implements BTDownload {
                 }
                 state = TransferState.FINISHED;
 
-                if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(completeFile)) {
-                    if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                        iTunesMediator.instance().scanForSongs(completeFile);
-                    }
+                if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue()
+                    && !iTunesMediator.instance().isScanned(completeFile)
+                    && (OSUtils.isMacOSX() || OSUtils.isWindows())) {
+
+                    iTunesMediator.instance().scanForSongs(completeFile);
                 }
 
                 cleanupIncomplete();

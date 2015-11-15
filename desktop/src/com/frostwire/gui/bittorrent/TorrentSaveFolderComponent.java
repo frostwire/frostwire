@@ -108,12 +108,12 @@ public final class TorrentSaveFolderComponent extends JPanel {
      */
     public static boolean isTorrentSaveFolderPathValid(boolean checkExist, File folder) {
 
-        if (checkExist) {
+        if (checkExist
             //is folder useable
-            if (!(folder.exists() && folder.isDirectory() && folder.canWrite())) {
-                errorMessage = I18n.tr("Please enter a valid path for the Torrent Data Folder");
-                return false;
-            }
+            && !(folder.exists() && folder.isDirectory() && folder.canWrite())) {
+
+            errorMessage = I18n.tr("Please enter a valid path for the Torrent Data Folder");
+            return false;
         }
         String lowerCaseFolderPath = folder.getAbsolutePath().toLowerCase();
 

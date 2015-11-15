@@ -441,12 +441,12 @@ public class YouTubeDownload implements BTDownload {
                 cleanupIncomplete();
             }
 
-            if (completeFile.exists()) {
-                if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(completeFile)) {
-                    if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                        iTunesMediator.instance().scanForSongs(completeFile);
-                    }
-                }
+            if (completeFile.exists()
+                && iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue()
+                && !iTunesMediator.instance().isScanned(completeFile)
+                && (OSUtils.isMacOSX() || OSUtils.isWindows())) {
+
+                iTunesMediator.instance().scanForSongs(completeFile);
             }
         }
 

@@ -829,16 +829,14 @@ public class WinRegistryUtil {
         }
         
         Action oneAction;
-        if (clsID != null) {
-            if (actionList != null) {
-                Iterator<Action> actionIter = actionList.iterator();
-                // Add action to under the class ID key one by one
-                while (actionIter.hasNext()) {
-                    oneAction = (Action) actionIter.next();
-                    if ((oneAction != null) && (clsID != null)) {
-                        addActionByClsID(oneAction, clsID, regLevel);
-                    }
-                }  
+        if (clsID != null && actionList != null) {
+            Iterator<Action> actionIter = actionList.iterator();
+            // Add action to under the class ID key one by one
+            while (actionIter.hasNext()) {
+                oneAction = (Action) actionIter.next();
+                if ((oneAction != null) && (clsID != null)) {
+                    addActionByClsID(oneAction, clsID, regLevel);
+                }
             }
         }
     }
@@ -976,11 +974,9 @@ public class WinRegistryUtil {
                         regDeleteKey(clsIDKey, regLevel);
                 }
             }
-            if (fileExtKey != null) {
+            if (fileExtKey != null && isSubKeyExist(fileExtKey, regLevel)) {
                 // Delete the key from registry table
-                if (isSubKeyExist(fileExtKey, regLevel)) {
-                    regDeleteKey(fileExtKey, regLevel);
-                }
+                regDeleteKey(fileExtKey, regLevel);
             }
             //For windows 2000, we still need to check if the file ext in
             //Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts
@@ -1049,10 +1045,8 @@ public class WinRegistryUtil {
             /* If the classID does not exist in the registry table
              * Add it first
              */
-            if (!isSubKeyExist(clsIDKey, regLevel)) {
-                if (clsIDKey != null) {
-                    regCreateKeyEx(clsIDKey, regLevel);
-                }
+            if (clsIDKey != null && !isSubKeyExist(clsIDKey, regLevel)) {
+                regCreateKeyEx(clsIDKey, regLevel);
             }
             setDefaultValue(fileExtKey, classID, regLevel);
         }
@@ -1069,11 +1063,9 @@ public class WinRegistryUtil {
     public static String getClassIDByFileExt(String fileExt, int regLevel) {
         //Retrieves the relevant file extension key
         String fileExtKey = getFileExtKey(fileExt, regLevel);
-        if (fileExtKey != null) {
-           if (isSubKeyExist(fileExtKey, regLevel)) {
-           	   //in case of having CurVer key
-           	   return getCurVerClassID(getDefaultValue(fileExtKey,regLevel),regLevel);
-           }
+        if (fileExtKey != null && isSubKeyExist(fileExtKey, regLevel)) {
+            //in case of having CurVer key
+            return getCurVerClassID(getDefaultValue(fileExtKey,regLevel),regLevel);
         }
         return null;
     }
@@ -1115,9 +1107,11 @@ public class WinRegistryUtil {
         String mimeKey = getMimeTypeKey(mimeType, regLevel);
         String fileExtKey = getFileExtKey(fileExt, regLevel);
 
-        if ((mimeKey != null) && (fileExtKey != null)) {
-            if ((isSubKeyExist(fileExtKey, regLevel))
-                    && (isSubKeyExist(mimeKey, regLevel))) {
+        if (mimeKey != null
+            && fileExtKey != null
+            && isSubKeyExist(fileExtKey, regLevel)
+            && isSubKeyExist(mimeKey, regLevel)) {
+
                 setMimeTypeByFileExt(mimeType, fileExt, regLevel);
                 setFileExtByMimeType(fileExt, mimeType, regLevel); 
             }
