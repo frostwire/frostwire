@@ -938,11 +938,9 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     @Override
                     protected void onComplete() {
                         final File savedFile = getSaveLocation();
-                        if (savedFile.exists()) {
-                            if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
-                                if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                                    iTunesMediator.instance().scanForSongs(savedFile);
-                                }
+                        if (savedFile.exists() && iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
+                            if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
+                                iTunesMediator.instance().scanForSongs(savedFile);
                             }
                         }
                     }

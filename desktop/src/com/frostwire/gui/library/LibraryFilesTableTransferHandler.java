@@ -111,10 +111,8 @@ class LibraryFilesTableTransferHandler extends TransferHandler {
                 for (File file : files) {
                     if (MediaPlayer.isPlayableFile(file)) {
                         return true;
-                    } else if (file.isDirectory()) {
-                        if (LibraryUtils.directoryContainsAudio(file)) {
-                            return true;
-                        }
+                    } else if (file.isDirectory() && LibraryUtils.directoryContainsAudio(file)) {
+                        return true;
                     }
                 }
                 if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {

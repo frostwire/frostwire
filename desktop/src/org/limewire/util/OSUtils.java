@@ -154,32 +154,30 @@ public class OSUtils {
         
     	_isSolaris = os.indexOf("solaris") != -1;
     	_isLinux   = os.indexOf("linux")   != -1;
-        _isOS2     = os.indexOf("os/2")    != -1;
-        
-        if (_isLinux) {
-        	String unameStr = UnameReader.read();
-        	_isUbuntu = unameStr.contains("buntu") || unameStr.contains("ebian");
-        	_isFedora = unameStr.contains("edora") || unameStr.contains("ed Hat");
-        }
-        
-        if(_isWindows || _isLinux)
-            _supportsTray = true;
-        
-    	if(os.startsWith("mac os")) {
-    		if(os.endsWith("x")) {
+      _isOS2     = os.indexOf("os/2")    != -1;
+
+      if (_isLinux) {
+        String unameStr = UnameReader.read();
+        _isUbuntu = unameStr.contains("buntu") || unameStr.contains("ebian");
+        _isFedora = unameStr.contains("edora") || unameStr.contains("ed Hat");
+      }
+
+      if(_isWindows || _isLinux)
+          _supportsTray = true;
+
+      if(os.startsWith("mac os") && os.endsWith("x")) {
     			_isMacOSX = true;
-    			
+
     			if (System.getProperty("os.version").startsWith("10.5"))
     			    _isMacOSX105 = true;
-    			
+
     			if (System.getProperty("os.version").startsWith("10.6"))
     			    _isMacOSX106 = true;
-    			
+
     			if (System.getProperty("os.version").startsWith("10.7"))
     				_isMacOSX107 = true;
-    		}
     	}
-    }    
+    }
 
     /**
      * Returns the operating system.

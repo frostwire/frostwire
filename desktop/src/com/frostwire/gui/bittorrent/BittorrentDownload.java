@@ -340,10 +340,11 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
             File saveLocation = new File(dl.getSavePath(), dl.getName());
 
-            if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(saveLocation)) {
-                if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                    iTunesMediator.instance().scanForSongs(saveLocation);
-                }
+            if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue()
+                && !iTunesMediator.instance().isScanned(saveLocation)
+                && (OSUtils.isMacOSX() || OSUtils.isWindows())) {
+
+                iTunesMediator.instance().scanForSongs(saveLocation);
             }
 
             if (!LibraryMediator.instance().isScanned(dl.hashCode())) {

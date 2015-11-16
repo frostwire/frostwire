@@ -1980,29 +1980,23 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         }
 
         public void mouseExited(MouseEvent evt) {
-            if (evt.getSource() instanceof JList) {
-                // Forward event to Basic
-                if (getDoubleClickListener() != null) {
-                    getDoubleClickListener().mouseExited(evt);
-                }
+                                                    // Forward event to Basic
+            if (evt.getSource() instanceof JList && getDoubleClickListener() != null) {
+                getDoubleClickListener().mouseExited(evt);
             }
         }
 
         public void mousePressed(MouseEvent evt) {
-            if (evt.getSource() instanceof JList) {
-                // Forward event to Basic
-                if (getDoubleClickListener() != null) {
-                    getDoubleClickListener().mousePressed(evt);
-                }
+                                                    // Forward event to Basic
+            if (evt.getSource() instanceof JList && getDoubleClickListener() != null) {
+                getDoubleClickListener().mousePressed(evt);
             }
         }
 
         public void mouseReleased(MouseEvent evt) {
-            if (evt.getSource() instanceof JList) {
-                // Forward event to Basic
-                if (getDoubleClickListener() != null) {
-                    getDoubleClickListener().mouseReleased(evt);
-                }
+                                                    // Forward event to Basic
+            if (evt.getSource() instanceof JList && getDoubleClickListener() != null) {
+                getDoubleClickListener().mouseReleased(evt);
             }
         }
 

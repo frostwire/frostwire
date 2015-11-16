@@ -55,10 +55,7 @@ public class UrlUtils
 		new String[] { "'", "&apos;" },
 	};
 
-	public static String
-	getMagnetURI(
-		byte[]		hash )
-	{
+	public static String getMagnetURI( byte[] hash ) {
 		return( "magnet:?xt=urn:btih:" + Base32.encode( hash ));
 	}
 
@@ -242,54 +239,40 @@ public class UrlUtils
 		 * @return
 		 */
 	
-	public static String
-	normaliseMagnetURI(
-		String		base_hash )
-	{
+	public static String normaliseMagnetURI( String	base_hash ) {
 		byte[]	hash = decodeSHA1Hash( base_hash );
-		
+
 		if ( hash != null ){
-			
-			return( getMagnetURI( hash ));
+			return getMagnetURI( hash );
 		}
-		
-		return( null );
+
+		return null;
 	}
-	
-	public static byte[]
-	decodeSHA1Hash(
-		String	str )
-	{
-		if ( str == null ){
-			
-			return( null );
+
+	public static byte[] decodeSHA1Hash( String	str ) {
+		if ( str == null ) {
+			return null;
 		}
-		
+
 		str = str.trim();
-		
+
 		byte[] hash = null;
-		
+
 		try{
 			if ( str.length() == 40 ){
-				
 				hash = ByteFormatter.decodeString( str );
-				
+
 			}else if ( str.length() == 32 ){
-				
 				hash = Base32.decode( str );
 			}
 		}catch( Throwable e ){
 		}
-		
-		if ( hash != null ){
-			
-			if ( hash.length != 20 ){
-								
+
+		if ( hash != null && hash.length != 20 ){
 				hash = null;
-			}
 		}
-		
-		return( hash );
+
+		return hash;
 	}
 
 	private static String parseHTMLforURL(String text) {

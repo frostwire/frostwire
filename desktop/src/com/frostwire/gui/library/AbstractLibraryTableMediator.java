@@ -199,13 +199,10 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
 
     private void adjustmentListener_adjustmentValueChanged(AdjustmentEvent e) {
         try {
-            int value = needToScrollTo;
-            if (value >= 0) {
-                if (SCROLL_PANE.getVerticalScrollBar().getMaximum() >= value) {
-                    SCROLL_PANE.getVerticalScrollBar().setValue(value);
-                    Toolkit.getDefaultToolkit().sync();
-                    needToScrollTo = -1;
-                }
+            if (needToScrollTo >= 0 && SCROLL_PANE.getVerticalScrollBar().getMaximum() >= needToScrollTo) {
+                SCROLL_PANE.getVerticalScrollBar().setValue(needToScrollTo);
+                Toolkit.getDefaultToolkit().sync();
+                needToScrollTo = -1;
             }
         } catch (Exception ex) {
             needToScrollTo = -1;
