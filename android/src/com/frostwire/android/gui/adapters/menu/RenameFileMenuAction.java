@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,20 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
-import org.apache.commons.io.FilenameUtils;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.widget.EditText;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author gubatron
@@ -50,7 +51,7 @@ public class RenameFileMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    protected void onClick(final Context context) {
         String filePath = fd.filePath;
 
         String name = FilenameUtils.getBaseName(filePath);
@@ -67,21 +68,24 @@ public class RenameFileMenuAction extends MenuAction {
                     renameFile(newFileName);
                     adapter.notifyDataSetChanged();
                 } else {
-                    // FIXME
+                    UIUtils.showLongMessage(context, R.string.invalid_filename);
                 }
             }
         });
     }
 
     private boolean isValidFileName(String newFileName) {
-        // FIXME
+        final String[] reservedChars = {"|", "\\", "?", "*", "<", "\"", ":", ">"};
+        for (String c : reservedChars) {
+            if (newFileName.contains(c)) {
+                return false;
+            }
+        }
         return true;
     }
 
     private void renameFile(String newFileName) {
-        String newPath = Librarian.instance().renameFile(fd, newFileName);
-
-        fd.filePath = newPath;
+        fd.filePath = Librarian.instance().renameFile(fd, newFileName);
         fd.title = FilenameUtils.getBaseName(newFileName);
     }
 }
