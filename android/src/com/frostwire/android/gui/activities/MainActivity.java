@@ -743,10 +743,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void setupActionBar() {
         ActionBar bar = getActionBar();
-        bar.setCustomView(R.layout.view_custom_actionbar);
-        bar.setDisplayShowCustomEnabled(true);
-        bar.setDisplayHomeAsUpEnabled(true);
-        bar.setHomeButtonEnabled(true);
+        if (bar != null) {
+            bar.setCustomView(R.layout.view_custom_actionbar);
+            bar.setDisplayShowCustomEnabled(true);
+            bar.setDisplayHomeAsUpEnabled(true);
+            bar.setHomeButtonEnabled(true);
+        }
     }
 
     private void setupDrawer() {
