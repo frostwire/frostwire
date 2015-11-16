@@ -43,6 +43,7 @@ import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
+import com.frostwire.search.WebSearchPerformer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import org.apache.commons.io.FilenameUtils;
@@ -63,22 +64,19 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     private final ViewOnLongClickListener viewOnLongClickListener;
     private final OpenOnClickListener playOnClickListener;
 
-    // TODO: DRY refactor
-    private static final String[] STREAMABLE_EXTENSIONS = new String[] { "mp3", "ogg", "wma", "wmv", "m4a", "aac", "flac", "mp4", "flv", "mov", "mpg", "mpeg", "3gp", "m4v", "webm" };
-
     /**
      * Keep track of all dialogs ever opened so we dismiss when we leave to avoid memleaks
      */
     private final List<Dialog> dialogs;
     private List<Transfer> list;
-    private final Map<String, String> TRANSFER_STATE_STRING_MAP = new Hashtable<String, String>();
+    private final Map<String, String> TRANSFER_STATE_STRING_MAP = new Hashtable<>();
 
     public TransferListAdapter(Context context, List<Transfer> list) {
-        this.context = new WeakReference<Context>(context);
+        this.context = new WeakReference<>(context);
         this.viewOnClickListener = new ViewOnClickListener();
         this.viewOnLongClickListener = new ViewOnLongClickListener();
         this.playOnClickListener = new OpenOnClickListener(context);
-        this.dialogs = new ArrayList<Dialog>();
+        this.dialogs = new ArrayList<>();
         this.list = list.equals(Collections.emptyList()) ? new ArrayList<Transfer>() : list;
         initTransferStateStringMap();
     }
@@ -258,7 +256,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     private MenuAdapter getMenuAdapter(View view) {
         Object tag = view.getTag();
         String title = "";
-        List<MenuAction> items = new ArrayList<MenuAction>();
+        List<MenuAction> items = new ArrayList<>();
 
         if (tag instanceof BittorrentDownload) {
             BittorrentDownload download = (BittorrentDownload) tag;
@@ -480,9 +478,11 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         final PaymentOptions paymentOptions = download.getPaymentOptions();
         final Resources r = context.get().getResources();
         Drawable tipDrawable = (paymentOptions.bitcoin != null) ? r.getDrawable(R.drawable.contextmenu_icon_donation_bitcoin) : r.getDrawable(R.drawable.contextmenu_icon_donation_fiat);
-        final int iconHeightInPixels = r.getDimensionPixelSize(R.dimen.view_transfer_list_item_title_left_drawable);
-        tipDrawable.setBounds(0, 0, iconHeightInPixels, iconHeightInPixels);
-        title.setCompoundDrawables(tipDrawable, null, null, null);
+        if (tipDrawable  != null) {
+            final int iconHeightInPixels = r.getDimensionPixelSize(R.dimen.view_transfer_list_item_title_left_drawable);
+            tipDrawable.setBounds(0, 0, iconHeightInPixels, iconHeightInPixels);
+            title.setCompoundDrawables(tipDrawable, null, null, null);
+        }
     }
 
     private void populateHttpDownload(View view, HttpDownload download) {
@@ -505,25 +505,13 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         size.setText(UIUtils.getBytesInHuman(download.getSize()));
 
         File previewFile = download.previewFile();
-        if (previewFile != null && isStreamable(previewFile.getName())) {
+        if (previewFile != null && WebSearchPerformer.isStreamable(previewFile.getName())) {
             buttonPlay.setTag(previewFile);
             buttonPlay.setVisibility(View.VISIBLE);
             buttonPlay.setOnClickListener(playOnClickListener);
         } else {
             buttonPlay.setVisibility(View.GONE);
         }
-    }
-
-    // TODO: DRY refactor
-    private static boolean isStreamable(String filename) {
-        String ext = FilenameUtils.getExtension(filename);
-        for (String s : STREAMABLE_EXTENSIONS) {
-            if (s.equals(ext)) {
-                return true; // fast return
-            }
-        }
-
-        return false;
     }
 
     private void populateBittorrentDownloadItem(View view, TransferItem item) {
