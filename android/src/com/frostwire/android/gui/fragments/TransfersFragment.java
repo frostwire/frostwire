@@ -202,14 +202,16 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private class OnVPNStatusCallback implements EngineService.VpnStatusUICallback {
         @Override
         public void onVpnStatus(final boolean vpnActive) {
-            TransfersFragment.this.updateVPNButtonIfStatusChanged(vpnActive);
+            if (TransfersFragment.this.isAdded()) {
+                TransfersFragment.this.updateVPNButtonIfStatusChanged(vpnActive);
+            }
         }
     }
 
     private class OnCheckDHTCallback implements EngineService.CheckDHTUICallback {
         @Override
         public void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
-            if (textDHTPeers==null) {
+            if (textDHTPeers==null || !TransfersFragment.this.isAdded()) {
                 return;
             }
             textDHTPeers.setVisibility(dhtEnabled ? View.VISIBLE : View.GONE);
