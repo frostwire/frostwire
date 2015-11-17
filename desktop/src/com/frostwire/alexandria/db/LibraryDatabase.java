@@ -1,20 +1,13 @@
 package com.frostwire.alexandria.db;
 
+import com.frostwire.alexandria.Playlist;
+import com.frostwire.alexandria.PlaylistItem;
+
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.frostwire.alexandria.Playlist;
-import com.frostwire.alexandria.PlaylistItem;
-import org.h2.fulltext.FullTextLucene;
 
 public class LibraryDatabase {
 
@@ -23,7 +16,7 @@ public class LibraryDatabase {
     public static final int STARRED_PLAYLIST_ID = -3;
 
     public static final int LIBRARY_VERSION_PLAYLIST_SORT_INDEXES = 4; // indicates db version when playlist sort indexes were added
-    public static final int LIBRARY_DATABASE_VERSION = 5;
+    public static final int LIBRARY_DATABASE_VERSION = 4;
     
     private final File _databaseFile;
     private final String _name;
@@ -151,12 +144,15 @@ public class LibraryDatabase {
             setupPlaylistIndexes(connection);
         }
 
+        /**
         if (oldVersion == 4 && newVersion == 5) {
             // back to official h2/lucene packages on maven, no FullTexteLucene2 hack.
             dropOldFullTextLucene2SchemaEntries_patch_fw_6_1_8_b169(connection);
             setupLuceneIndex(connection);
             reconnect = true;
         }
+        */
+
         update(connection, "UPDATE Library SET version = ?", LIBRARY_DATABASE_VERSION);
         return reconnect;
     }
@@ -342,14 +338,6 @@ public class LibraryDatabase {
         update(connection, "CALL FTL_CREATE_INDEX('PUBLIC', 'PLAYLISTITEMS', 'FILEPATH, TRACKTITLE, TRACKARTIST, TRACKALBUM, TRACKGENRE, TRACKYEAR')");
     }
 
-    private void dropOldFullTextLucene2SchemaEntries_patch_fw_6_1_8_b169(final Connection connection) {
-        try {
-            FullTextLucene.dropAll(connection);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
     private void setupPlaylistIndexes(final Connection connection) {
         
         // add new column
