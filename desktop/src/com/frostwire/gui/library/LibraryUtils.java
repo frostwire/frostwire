@@ -49,7 +49,6 @@ import java.util.concurrent.ExecutorService;
 /**
  * @author gubatron
  * @author aldenml
- * 
  */
 public class LibraryUtils {
 
@@ -189,13 +188,13 @@ public class LibraryUtils {
         final StringBuilder plBuilder = new StringBuilder();
 
         GUIMediator.safeInvokeAndWait(new Runnable() {
-        
+
             @Override
             public void run() {
                 File[] mediaFiles = files;
 
                 if (files.length == 1 && files[0].isDirectory()) {
-                    mediaFiles = FileUtils.getFilesRecursive(files[0],null);
+                    mediaFiles = FileUtils.getFilesRecursive(files[0], null);
                 }
                 String input = (String) ThemeMediator.showInputDialog(GUIMediator.getAppFrame(),
                         I18n.tr("Playlist name"),
@@ -203,8 +202,8 @@ public class LibraryUtils {
                         JOptionPane.PLAIN_MESSAGE, null, null,
                         suggestPlaylistName(mediaFiles));
                 if (!StringUtils.isNullOrEmpty(input, true)) {
-		            plBuilder.append(input);
-		        }
+                    plBuilder.append(input);
+                }
             }
         });
 
@@ -542,7 +541,7 @@ public class LibraryUtils {
         Set<File> ignore = TorrentUtil.getIgnorableFiles();
         return directoryContainsExtension(directory, depth, ignore, MediaPlayer.getPlayableExtensions());
     }
-    
+
     public static boolean directoryContainsASinglePlayableFile(File directory, int depth) {
         return directoryContainsPlayableExtensions(directory, depth) && directory.listFiles().length == 1;
     }
@@ -593,7 +592,7 @@ public class LibraryUtils {
         HistoHashMap<String> artistsAlbums = new HistoHashMap<String>();
         HistoHashMap<String> albumNames = new HistoHashMap<String>();
         HistoHashMap<String> genres = new HistoHashMap<String>();
-        
+
         for (File mf : mediaFiles) {
             if (MediaPlayer.isPlayableFile(mf)) {
                 TagsData mt = new TagsReader(mf).parse();
@@ -603,22 +602,22 @@ public class LibraryUtils {
                 genres.update("(" + mt.getGenre() + ")");
             }
         }
-        
+
         Entry<String, Integer>[] histogramArtistNames = artistNames.histogram();
         Entry<String, Integer>[] histogramArtistsAlbums = artistsAlbums.histogram();
         Entry<String, Integer>[] histogramAlbumNames = albumNames.histogram();
         Entry<String, Integer>[] histogramGenres = genres.histogram();
-        
-        String topArtistName = histogramArtistNames[histogramArtistNames.length-1].getKey();
-        int topArtistNameCount = histogramArtistNames[histogramArtistNames.length-1].getValue();
-        
-        String topArtistAlbum = histogramArtistsAlbums[histogramArtistsAlbums.length-1].getKey();
-        int topArtistAlbumCount = histogramArtistsAlbums[histogramArtistsAlbums.length-1].getValue();
 
-        String topAlbumName = histogramAlbumNames[histogramAlbumNames.length-1].getKey();
-        int topAlbumNameCount = histogramAlbumNames[histogramAlbumNames.length-1].getValue();
+        String topArtistName = histogramArtistNames[histogramArtistNames.length - 1].getKey();
+        int topArtistNameCount = histogramArtistNames[histogramArtistNames.length - 1].getValue();
 
-        String topGenre = histogramGenres[histogramGenres.length-1].getKey();
+        String topArtistAlbum = histogramArtistsAlbums[histogramArtistsAlbums.length - 1].getKey();
+        int topArtistAlbumCount = histogramArtistsAlbums[histogramArtistsAlbums.length - 1].getValue();
+
+        String topAlbumName = histogramAlbumNames[histogramAlbumNames.length - 1].getKey();
+        int topAlbumNameCount = histogramAlbumNames[histogramAlbumNames.length - 1].getValue();
+
+        String topGenre = histogramGenres[histogramGenres.length - 1].getKey();
 
         String suggestedPlaylistName = topArtistName;
         if (topArtistAlbumCount >= topArtistNameCount) {
@@ -629,11 +628,11 @@ public class LibraryUtils {
                 suggestedPlaylistName = topArtistName + " - " + suggestedPlaylistName;
             }
         }
-        
+
         if (!topGenre.equals("()")) {
             suggestedPlaylistName = suggestedPlaylistName + " " + topGenre;
         }
-        
+
         return suggestedPlaylistName;
     }
 

@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
+import org.h2.fulltext.FullTextLucene;
 
 public class LibraryDatabase {
 
@@ -22,7 +23,7 @@ public class LibraryDatabase {
     public static final int STARRED_PLAYLIST_ID = -3;
 
     public static final int LIBRARY_VERSION_PLAYLIST_SORT_INDEXES = 4; // indicates db version when playlist sort indexes were added
-    public static final int LIBRARY_DATABASE_VERSION = 4;
+    public static final int LIBRARY_DATABASE_VERSION = 5;
     
     private final File _databaseFile;
     private final String _name;
@@ -71,8 +72,6 @@ public class LibraryDatabase {
     /**
      * This method is synchronized due to possible concurrent issues, specially
      * during recently generated id retrieval.
-     * @param expression
-     * @return
      */
     public synchronized int update(String statementSql, Object... arguments) {
         if (isClosed()) {
@@ -85,8 +84,6 @@ public class LibraryDatabase {
     /**
      * This method is synchronized due to possible concurrent issues, specially
      * during recently generated id retrieval.
-     * @param expression
-     * @return
      */
     public synchronized int insert(String statementSql, Object... arguments) {
         if (isClosed()) {
@@ -132,7 +129,15 @@ public class LibraryDatabase {
         }
     }
 
-    protected void onUpdateDatabase(Connection connection, int oldVersion, int newVersion) {
+    /**
+     *
+     * @param connection
+     * @param oldVersion
+     * @param newVersion
+     * @return true if we should close and reconnect again.
+     */
+    protected boolean onUpdateDatabase(Connection connection, int oldVersion, int newVersion) {
+        boolean reconnect = false;
 
         if (oldVersion == 1 && newVersion > 2) {
             setupLuceneIndex(connection);
@@ -142,11 +147,18 @@ public class LibraryDatabase {
             setupLuceneIndex(connection);
         }
         
-        if (newVersion == 4) {
+        if (oldVersion == 3 && newVersion == 4) {
             setupPlaylistIndexes(connection);
         }
 
+        if (oldVersion == 4 && newVersion == 5) {
+            // back to official h2/lucene packages on maven, no FullTexteLucene2 hack.
+            dropOldFullTextLucene2SchemaEntries_patch_fw_6_1_8_b169(connection);
+            setupLuceneIndex(connection);
+            reconnect = true;
+        }
         update(connection, "UPDATE Library SET version = ?", LIBRARY_DATABASE_VERSION);
+        return reconnect;
     }
 
     private Connection openConnection(File path, String name, boolean createIfNotExists) {
@@ -196,8 +208,19 @@ public class LibraryDatabase {
             connection = createDatabase(path, name);
         } else {
             int version = getDatabaseVersion(connection);
+            boolean reconnect = false;
             if (version < LIBRARY_DATABASE_VERSION) {
-                onUpdateDatabase(connection, version, LIBRARY_DATABASE_VERSION);
+               reconnect = onUpdateDatabase(connection, version, LIBRARY_DATABASE_VERSION);
+            }
+
+            if (reconnect) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    connection = openConnection(path, name, false);
+                }
             }
         }
         
@@ -314,10 +337,17 @@ public class LibraryDatabase {
     }
 
     private void setupLuceneIndex(final Connection connection) {
-        update(connection, "CREATE ALIAS IF NOT EXISTS FTL_INIT FOR \"org.h2.fulltext.FullTextLucene2.init\"");
+        update(connection, "CREATE ALIAS IF NOT EXISTS FTL_INIT FOR \"org.h2.fulltext.FullTextLucene.init\"");
         update(connection, "CALL FTL_INIT()");
-
         update(connection, "CALL FTL_CREATE_INDEX('PUBLIC', 'PLAYLISTITEMS', 'FILEPATH, TRACKTITLE, TRACKARTIST, TRACKALBUM, TRACKGENRE, TRACKYEAR')");
+    }
+
+    private void dropOldFullTextLucene2SchemaEntries_patch_fw_6_1_8_b169(final Connection connection) {
+        try {
+            FullTextLucene.dropAll(connection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     
     private void setupPlaylistIndexes(final Connection connection) {
