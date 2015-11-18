@@ -133,14 +133,14 @@ android {
 
         debug {
             minifyEnabled true
-            proguardFiles 'proguard.cfg'
+            proguardFiles 'proguard-rules.pro'
         }
 
         release {
             signingConfig signingConfigs.release
 
             minifyEnabled true
-            proguardFiles 'proguard.cfg'
+            proguardFiles 'proguard-rules.pro'
         }
     }
 
