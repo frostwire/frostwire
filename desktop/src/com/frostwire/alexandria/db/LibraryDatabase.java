@@ -50,7 +50,7 @@ public class LibraryDatabase {
     }
 
     public LibraryDatabase(File databaseFile) {
-        if (databaseFile != null && databaseFile.isFile() && databaseFile.canRead() && databaseFile.canWrite()) {
+        if (databaseFile != null && databaseFile.isDirectory() && databaseFile.canRead() && databaseFile.canWrite()) {
             _databaseFile = databaseFile;
             _name = databaseFile.getName();
             _connection = openOrCreateDatabase(databaseFile, _name);
