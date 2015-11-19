@@ -39,7 +39,6 @@ public class ArchiveorgItem {
     public int num_reviews;
     public float avg_rating;
     public String identifier;
-    public List<String> subject;
     public List<String> format;
     public List<String> collection;
 }
