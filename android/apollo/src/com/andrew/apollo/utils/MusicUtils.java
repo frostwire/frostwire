@@ -920,7 +920,11 @@ public final class MusicUtils {
             "count(*)"
         };
         final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistid);
-        Cursor cursor = resolver.query(uri, projection, null, null, null);
+        Cursor cursor;
+        try {
+            cursor = resolver.query(uri, projection, null, null, null);
+        } catch (Throwable ignored) {}
+
         if (cursor != null) {
             cursor.moveToFirst();
             final int base = cursor.getInt(0);
