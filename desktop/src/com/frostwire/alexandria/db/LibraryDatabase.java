@@ -1,3 +1,21 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.frostwire.alexandria.db;
 
 import com.frostwire.alexandria.Playlist;
@@ -14,8 +32,6 @@ public class LibraryDatabase {
     public static final int OBJECT_NOT_SAVED_ID = -1;
     public static final int OBJECT_INVALID_ID = -2;
     public static final int STARRED_PLAYLIST_ID = -3;
-
-    public static final int LIBRARY_VERSION_PLAYLIST_SORT_INDEXES = 4; // indicates db version when playlist sort indexes were added
     public static final int LIBRARY_DATABASE_VERSION = 4;
     
     private final File _databaseFile;
@@ -34,16 +50,12 @@ public class LibraryDatabase {
     }
 
     public LibraryDatabase(File databaseFile) {
-        _databaseFile = databaseFile;
-
-        File path = databaseFile;
-        _name = databaseFile.getName();
-
-        _connection = openOrCreateDatabase(path, _name);
-    }
-
-    public File getDatabaseFile() {
-        return _databaseFile;
+        if (databaseFile != null && databaseFile.isFile() && databaseFile.canRead() && databaseFile.canWrite()) {
+            _databaseFile = databaseFile;
+            _name = databaseFile.getName();
+            _connection = openOrCreateDatabase(databaseFile, _name);
+        } else
+            throw new IllegalArgumentException("Invalid database file parameter received.");
     }
 
     public String getName() {
@@ -56,7 +68,7 @@ public class LibraryDatabase {
 
     public synchronized List<List<Object>> query(String statementSql, Object... arguments) {
         if (isClosed()) {
-            return new ArrayList<List<Object>>();
+            return new ArrayList<>();
         }
 
         return query(_connection, statementSql, arguments);
@@ -122,16 +134,7 @@ public class LibraryDatabase {
         }
     }
 
-    /**
-     *
-     * @param connection
-     * @param oldVersion
-     * @param newVersion
-     * @return true if we should close and reconnect again.
-     */
-    protected boolean onUpdateDatabase(Connection connection, int oldVersion, int newVersion) {
-        boolean reconnect = false;
-
+    protected void onUpdateDatabase(Connection connection, int oldVersion, int newVersion) {
         if (oldVersion == 1 && newVersion > 2) {
             setupLuceneIndex(connection);
         }
@@ -144,17 +147,7 @@ public class LibraryDatabase {
             setupPlaylistIndexes(connection);
         }
 
-        /**
-        if (oldVersion == 4 && newVersion == 5) {
-            // back to official h2/lucene packages on maven, no FullTexteLucene2 hack.
-            dropOldFullTextLucene2SchemaEntries_patch_fw_6_1_8_b169(connection);
-            setupLuceneIndex(connection);
-            reconnect = true;
-        }
-        */
-
         update(connection, "UPDATE Library SET version = ?", LIBRARY_DATABASE_VERSION);
-        return reconnect;
     }
 
     private Connection openConnection(File path, String name, boolean createIfNotExists) {
@@ -204,12 +197,9 @@ public class LibraryDatabase {
             connection = createDatabase(path, name);
         } else {
             int version = getDatabaseVersion(connection);
-            boolean reconnect = false;
-            if (version < LIBRARY_DATABASE_VERSION) {
-               reconnect = onUpdateDatabase(connection, version, LIBRARY_DATABASE_VERSION);
-            }
 
-            if (reconnect) {
+            if (version < LIBRARY_DATABASE_VERSION) {
+                onUpdateDatabase(connection, version, LIBRARY_DATABASE_VERSION);
                 try {
                     connection.close();
                 } catch (SQLException e) {
@@ -228,10 +218,10 @@ public class LibraryDatabase {
         int numColums = meta.getColumnCount();
         int i;
 
-        List<List<Object>> result = new LinkedList<List<Object>>();
+        List<List<Object>> result = new LinkedList<>();
 
         while (resultSet.next()) {
-            List<Object> row = new ArrayList<Object>(numColums);
+            List<Object> row = new ArrayList<>(numColums);
             for (i = 1; i <= numColums; i++) {
                 row.add(resultSet.getObject(i));
             }
@@ -246,7 +236,7 @@ public class LibraryDatabase {
         }
 
         Statement statement = null;
-        ResultSet resultSet = null;
+        ResultSet resultSet;
 
         try {
             statement = _connection.createStatement();
@@ -261,7 +251,7 @@ public class LibraryDatabase {
             if (statement != null) {
                 try {
                     statement.close();
-                } catch (SQLException e) {
+                } catch (SQLException ignored) {
                 }
             }
         }
@@ -271,7 +261,7 @@ public class LibraryDatabase {
 
     private List<List<Object>> query(Connection connection, String statementSql, Object... arguments) {
         PreparedStatement statement = null;
-        ResultSet resultSet = null;
+        ResultSet resultSet;
 
         try {
             statement = connection.prepareStatement(statementSql);
@@ -291,12 +281,12 @@ public class LibraryDatabase {
             if (statement != null) {
                 try {
                     statement.close();
-                } catch (SQLException e) {
+                } catch (SQLException ignored) {
                 }
             }
         }
 
-        return new ArrayList<List<Object>>();
+        return new ArrayList<>();
     }
 
     private int update(Connection connection, String statementSql, Object... arguments) {
@@ -319,7 +309,7 @@ public class LibraryDatabase {
             if (statement != null) {
                 try {
                     statement.close();
-                } catch (SQLException e) {
+                } catch (SQLException ignored) {
                 }
             }
         }

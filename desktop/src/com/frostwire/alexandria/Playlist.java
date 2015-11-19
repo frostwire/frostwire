@@ -54,7 +54,7 @@ public class Playlist extends LibraryDatabaseEntity {
         _id = id;
         _name = name;
         _description = description;
-        _items = new LinkedList<PlaylistItem>();
+        _items = new LinkedList<>();
         this.deleted = false;
     }
 

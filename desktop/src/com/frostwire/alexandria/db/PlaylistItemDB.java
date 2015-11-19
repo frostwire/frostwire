@@ -1,14 +1,32 @@
-package com.frostwire.alexandria.db;
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-import java.util.ArrayList;
-import java.util.List;
+package com.frostwire.alexandria.db;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PlaylistItemDB {
 
-    private PlaylistItemDB() {} // don't construct this direclty
+    private PlaylistItemDB() {}
 
     public static void fill(LibraryDatabase db, PlaylistItem obj) {
         List<List<Object>> result = db
@@ -38,7 +56,7 @@ public class PlaylistItemDB {
         String trackYear = (String) row.get(14);
         boolean starred = (Boolean) row.get(15);
         
-        int sortIndex = row.size() < 17 || (Integer) row.get(16) == null ? 0 : (Integer) row.get(16);
+        int sortIndex = row.size() < 17 || row.get(16) == null ? 0 : (Integer) row.get(16);
 
         obj.setId(id);
         obj.setFilePath(filePath);
@@ -89,7 +107,7 @@ public class PlaylistItemDB {
 
         List<List<Object>> result = db.query(query, playlist.getId());
 
-        List<PlaylistItem> items = new ArrayList<PlaylistItem>(result.size());
+        List<PlaylistItem> items = new ArrayList<>(result.size());
 
         for (List<Object> row : result) {
             PlaylistItem item = new PlaylistItem(playlist);

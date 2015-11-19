@@ -45,7 +45,7 @@ public class PlaylistDB {
             db.update((String) statementObjects[0], (Object[]) statementObjects[1]);
         }
         
-        List<PlaylistItem> items = new ArrayList<PlaylistItem>(obj.getItems());
+        List<PlaylistItem> items = new ArrayList<>(obj.getItems());
 
         for (PlaylistItem item : items) {
             item.setId(LibraryDatabase.OBJECT_NOT_SAVED_ID);
@@ -61,7 +61,7 @@ public class PlaylistDB {
     public static List<Playlist> getPlaylists(LibraryDatabase db) {
         List<List<Object>> result = db.query("SELECT playlistId, name, description FROM Playlists");
 
-        List<Playlist> playlists = new ArrayList<Playlist>(result.size());
+        List<Playlist> playlists = new ArrayList<>(result.size());
 
         for (List<Object> row : result) {
             Playlist playlist = new Playlist(db);
@@ -90,8 +90,8 @@ public class PlaylistDB {
 
         Playlist playlist = new Playlist(db, LibraryDatabase.STARRED_PLAYLIST_ID, "starred", "starred");
 
-        List<PlaylistItem> items = new ArrayList<PlaylistItem>(result.size());
-        Set<String> paths = new HashSet<String>();
+        List<PlaylistItem> items = new ArrayList<>(result.size());
+        Set<String> paths = new HashSet<>();
 
         for (List<Object> row : result) {
             PlaylistItem item = new PlaylistItem(playlist);
