@@ -525,4 +525,19 @@
     <string name="help">Ayuda</string>
     <string name="request_again">Intenta Nuevamente</string>
     <string name="ringtone_not_set">El Ringtone no pudo ser cambiado</string>
+    <string name="vpn_not_found">Sin VPN. Considere encryptar conexión.</string>
+    <string name="protected_connection">Conexión Protegida</string>
+    <string name="vpn_found">VPN activo. Conexión encriptada.</string>
+    <string name="notify_frostwire_is_running_summary">Mostrar una notificación permanente de Android con el estado de las transferencias.</string>
+    <string name="frostwire_is_running">FrostWire está corriendo</string>
+    <string name="invalid_filename">Nombre de archivo Inválido</string>
+    <string name="notify_frostwire_is_running">Notificar cuando FrostWire corre</string>
+    <string name="dht_contacts">Contactos DHT</string>
+    <string name="unprotected_connection">Conexión Desprotegida</string>
+    <string name="protect_my_privacy">Protege mi privacidad</string>
+
+    <!-- Important: Android tiene bugs con HTML, no dejes etiquetas HTML pegadas al texto, deja espacios. De otro modo android cuenta las etiquetas como parte de la longitud del texto y luego las lineas se cortan de forma prematura. -->
+    <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Tu privacidad es un derecho humano fundamental.</b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p><b> *NO HACE FALTA TENER VPN para usar FrostWire </b> pero LO RECOMENDAMOS ENORMEMENTE para proteger tu privacidad.</p>]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[<b> Una conexión desprotegida hace visible todo lo que haces en línea </b> a los ojos de tu proveedor de Internet y a todos los que se conectan a tu red, esto incluye tus búsquedas, navegación web, mensajería, correos electrónicos y descargas.]]></string>
 </resources>
