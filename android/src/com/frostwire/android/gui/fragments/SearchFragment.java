@@ -609,6 +609,8 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                 String url = String.format("%s?from=android&fw=%s&sdk=%s", Constants.SERVER_PROMOTIONS_URL, Constants.FROSTWIRE_VERSION_STRING, Build.VERSION.SDK_INT);
                 String json = http.get(url);
                 SlideList slides = JsonUtils.toObject(json, SlideList.class);
+                // yes, these requests are done only once per session.
+                //LOG.info("SearchFragment.LoadSlidesTask performed http request to " + url);
                 return slides.slides;
             } catch (Throwable e) {
                 LOG.error("Error loading slides from url", e);
