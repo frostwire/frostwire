@@ -1,6 +1,8 @@
-FrostWire 1.6.7 - NOVEMBER/16/2015
+FrostWire 1.6.7 - NOVEMBER/19/2015
  - Library updates (support-v4, rxjava, gradle plugin)
  - Fixes bug where invalid names could be used to rename files.
+ - Spanish translation update.
+ - Fixes issues with archive.org search, download. Thanks @X-NicON.
 
 FrostWire 1.6.6 - NOVEMBER/13/2015
  - Fixes YouTube search.
