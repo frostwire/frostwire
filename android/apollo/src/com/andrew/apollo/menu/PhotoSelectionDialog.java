@@ -74,18 +74,20 @@ public class PhotoSelectionDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         final String title = getTitle();
-        switch (mProfileType) {
-            case ARTIST:
-                setArtistChoices();
-                break;
-            case ALBUM:
-                setAlbumChoices();
-                break;
-            case OTHER:
-                setOtherChoices();
-                break;
-            default:
-                break;
+        if (mProfileType != null) {
+            switch (mProfileType) {
+                case ARTIST:
+                    setArtistChoices();
+                    break;
+                case ALBUM:
+                    setAlbumChoices();
+                    break;
+                case OTHER:
+                    setOtherChoices();
+                    break;
+                default:
+                    break;
+            }
         }
         // Dialog item Adapter
         final ProfileActivity activity = (ProfileActivity) getActivity();
