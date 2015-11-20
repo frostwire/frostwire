@@ -920,7 +920,7 @@ public final class MusicUtils {
             "count(*)"
         };
         final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistid);
-        Cursor cursor;
+        Cursor cursor = null;
         try {
             cursor = resolver.query(uri, projection, null, null, null);
         } catch (Throwable ignored) {}
@@ -929,7 +929,6 @@ public final class MusicUtils {
             cursor.moveToFirst();
             final int base = cursor.getInt(0);
             cursor.close();
-            cursor = null;
             int numinserted = 0;
             for (int offSet = 0; offSet < size; offSet += 1000) {
                 makeInsertItems(ids, offSet, 1000, base);
@@ -937,7 +936,7 @@ public final class MusicUtils {
             }
             final String message = context.getResources().getQuantityString(
                     R.plurals.NNNtrackstoplaylist, numinserted, numinserted);
-            AppMsg.makeText((Activity) context, message, AppMsg.STYLE_CONFIRM).show();
+            AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
         } else {
             LOG.warn("Unable to complete addToPlaylist, review the logic");
         }
