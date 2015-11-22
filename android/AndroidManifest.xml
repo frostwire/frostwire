@@ -150,6 +150,8 @@
 			android:label="@string/activity_preferences_name" android:theme="@style/Preferences" />
 		<activity android:name="com.frostwire.android.gui.activities.AboutActivity"
 				  android:label="@string/about" />
+		<activity android:name="com.frostwire.android.gui.activities.StoragePickerActivity"
+				  android:label="@string/about" />
 		<activity android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
 				  android:label="@string/playing"
                   android:configChanges="orientation|screenSize" />

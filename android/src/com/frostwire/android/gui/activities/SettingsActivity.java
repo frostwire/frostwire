@@ -18,17 +18,19 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.NotificationManager;
+import android.app.*;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.storage.StorageManager;
 import android.preference.*;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.provider.DocumentsContract;
+import android.support.v4.provider.DocumentFile;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,6 +44,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.gui.StoragePicker;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -54,6 +57,10 @@ import com.frostwire.logging.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+
+import java.io.File;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 
 /**
  * See {@link ConfigurationManager}
@@ -128,7 +135,7 @@ public class SettingsActivity extends PreferenceActivity {
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     final boolean notificationEnabled = (boolean) newValue;
                     if (!notificationEnabled) {
-                        NotificationManager notificationService =  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                        NotificationManager notificationService = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                         if (notificationService != null) {
                             notificationService.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
                         }
@@ -292,7 +299,7 @@ public class SettingsActivity extends PreferenceActivity {
 
                     if (dhtCurrentStatus && !dhtExpectedValue) {
                         dht.stop();
-                    }  else if (!dhtCurrentStatus && dhtExpectedValue) {
+                    } else if (!dhtCurrentStatus && dhtExpectedValue) {
                         dht.start();
                     }
 
@@ -337,7 +344,8 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupAbout() {
         Preference p = findPreference(Constants.PREF_KEY_SHOW_ABOUT);
-        p.setIntent(new Intent(this, AboutActivity.class));
+        //p.setIntent(new Intent(this, AboutActivity.class));
+        p.setIntent(new Intent(this, StoragePickerActivity.class));
     }
 
     private void connect() {
@@ -404,6 +412,7 @@ public class SettingsActivity extends PreferenceActivity {
      * if we want to hide the icon on those, we need to get their dialog.getActionBar()
      * instance, hide the icon, and then we need to set the click listeners for the
      * dialog's laid out views. Here we do all that.
+     *
      * @param preferenceScreen
      */
     private void initializePreferenceScreen(PreferenceScreen preferenceScreen) {
