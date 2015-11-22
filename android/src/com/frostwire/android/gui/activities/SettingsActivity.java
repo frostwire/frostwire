@@ -345,7 +345,26 @@ public class SettingsActivity extends PreferenceActivity {
     private void setupAbout() {
         Preference p = findPreference(Constants.PREF_KEY_SHOW_ABOUT);
         //p.setIntent(new Intent(this, AboutActivity.class));
-        p.setIntent(new Intent(this, StoragePickerActivity.class));
+        p.setIntent(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE));
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        if (intent != null && Intent.ACTION_OPEN_DOCUMENT_TREE.equals(intent.getAction())) {
+            StoragePicker.show(this);
+        } else {
+            super.startActivity(intent);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
+            String path = StoragePicker.handle(this, requestCode, resultCode, data);
+            System.out.println(path);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void connect() {
