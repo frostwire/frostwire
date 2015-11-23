@@ -370,7 +370,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     public void startActivity(Intent intent) {
-        if (intent != null && Intent.ACTION_OPEN_DOCUMENT_TREE.equals(intent.getAction())) {
+        if (intent != null && StoragePicker.ACTION_OPEN_DOCUMENT_TREE.equals(intent.getAction())) {
             StoragePicker.show(this);
         } else {
             super.startActivity(intent);

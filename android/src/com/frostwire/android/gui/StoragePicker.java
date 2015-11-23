@@ -19,17 +19,19 @@
 package com.frostwire.android.gui;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.storage.StorageManager;
-import android.provider.DocumentsContract;
 import android.support.v4.provider.DocumentFile;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.logging.Logger;
 
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -37,17 +39,23 @@ import java.lang.reflect.Method;
  */
 public final class StoragePicker {
 
+    private static final Logger LOG = Logger.getLogger(StoragePicker.class);
+
+    public static final String ACTION_OPEN_DOCUMENT_TREE = "android.intent.action.OPEN_DOCUMENT_TREE";
+
     public static final int SELECT_FOLDER_REQUEST_CODE = 1000;
 
     private static final String EXTRA_SHOW_ADVANCED = "android.content.extra.SHOW_ADVANCED";
 
     private static final String PRIMARY_VOLUME_NAME = "primary";
 
+    private static final String PATH_TREE = "tree";
+
     private StoragePicker() {
     }
 
     public static void show(Activity activity) {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        Intent intent = new Intent(ACTION_OPEN_DOCUMENT_TREE);
         intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
         intent.putExtra(EXTRA_SHOW_ADVANCED, true);
         activity.startActivityForResult(intent, SELECT_FOLDER_REQUEST_CODE);
@@ -56,27 +64,35 @@ public final class StoragePicker {
     public static String handle(Context context, int requestCode, int resultCode, Intent data) {
         String result = null;
 
-        if (resultCode == Activity.RESULT_OK && requestCode == SELECT_FOLDER_REQUEST_CODE) {
-            Uri treeUri = data.getData();
+        try {
 
-            context.getContentResolver().takePersistableUriPermission(treeUri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            if (resultCode == Activity.RESULT_OK && requestCode == SELECT_FOLDER_REQUEST_CODE) {
+                Uri treeUri = data.getData();
 
-            if (treeUri == null) {
-                UIUtils.showShortMessage(context, "[treeUri null]");
-                result = null;
-            } else {
-                DocumentFile file = DocumentFile.fromTreeUri(context, treeUri);
-                if (!file.isDirectory()) {
-                    UIUtils.showShortMessage(context, "[file is not a directory]");
-                    result = null;
-                } else if (!file.canWrite()) {
-                    UIUtils.showShortMessage(context, "[file can't write]");
+                ContentResolver cr = context.getContentResolver();
+
+                Method takePersistableUriPermissionM = cr.getClass().getMethod("takePersistableUriPermission", Uri.class, int.class);
+                takePersistableUriPermissionM.invoke(cr, treeUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+                if (treeUri == null) {
+                    UIUtils.showShortMessage(context, "[treeUri null]");
                     result = null;
                 } else {
-                    result = getFullPathFromTreeUri(context, treeUri);
+                    DocumentFile file = DocumentFile.fromTreeUri(context, treeUri);
+                    if (!file.isDirectory()) {
+                        UIUtils.showShortMessage(context, "[file is not a directory]");
+                        result = null;
+                    } else if (!file.canWrite()) {
+                        UIUtils.showShortMessage(context, "[file can't write]");
+                        result = null;
+                    } else {
+                        result = getFullPathFromTreeUri(context, treeUri);
+                    }
                 }
             }
+        } catch (Throwable e) {
+            LOG.error("Error handling folder selection", e);
         }
 
         return result;
@@ -150,7 +166,7 @@ public final class StoragePicker {
     }
 
     private static String getVolumeIdFromTreeUri(final Uri treeUri) {
-        final String docId = DocumentsContract.getTreeDocumentId(treeUri);
+        final String docId = getTreeDocumentId(treeUri);
         final String[] split = docId.split(":");
 
         if (split.length > 0) {
@@ -161,12 +177,23 @@ public final class StoragePicker {
     }
 
     private static String getDocumentPathFromTreeUri(final Uri treeUri) {
-        final String docId = DocumentsContract.getTreeDocumentId(treeUri);
+        final String docId = getTreeDocumentId(treeUri);
         final String[] split = docId.split(":");
         if ((split.length >= 2) && (split[1] != null)) {
             return split[1];
         } else {
             return File.separator;
         }
+    }
+
+    /**
+     * Extract the via {@link Document#COLUMN_DOCUMENT_ID} from the given URI.
+     */
+    public static String getTreeDocumentId(Uri documentUri) {
+        final List<String> paths = documentUri.getPathSegments();
+        if (paths.size() >= 2 && PATH_TREE.equals(paths.get(0))) {
+            return paths.get(1);
+        }
+        throw new IllegalArgumentException("Invalid URI: " + documentUri);
     }
 }
