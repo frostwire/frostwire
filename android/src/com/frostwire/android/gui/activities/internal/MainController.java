@@ -88,12 +88,6 @@ public final class MainController {
         }
     }
 
-    public void showMyFiles() {
-        if (!(activity.getCurrentFragment() instanceof BrowsePeerFragment)) {
-            switchFragment(R.id.menu_main_library);
-        }
-    }
-
     public void startWizardActivity() {
         Intent i = new Intent(activity, WizardActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
