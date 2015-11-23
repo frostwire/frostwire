@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.storage.StorageManager;
 import android.support.v4.provider.DocumentFile;
+import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
 
@@ -76,15 +77,15 @@ public final class StoragePicker {
                         Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
                 if (treeUri == null) {
-                    UIUtils.showShortMessage(context, "[treeUri null]");
+                    UIUtils.showShortMessage(context, R.string.storage_picker_treeuri_null);
                     result = null;
                 } else {
                     DocumentFile file = DocumentFile.fromTreeUri(context, treeUri);
                     if (!file.isDirectory()) {
-                        UIUtils.showShortMessage(context, "[file is not a directory]");
+                        UIUtils.showShortMessage(context, R.string.storage_picker_treeuri_not_directory);
                         result = null;
                     } else if (!file.canWrite()) {
-                        UIUtils.showShortMessage(context, "[file can't write]");
+                        UIUtils.showShortMessage(context, R.string.storage_picker_treeuri_cant_write);
                         result = null;
                     } else {
                         result = getFullPathFromTreeUri(context, treeUri);
@@ -92,6 +93,7 @@ public final class StoragePicker {
                 }
             }
         } catch (Throwable e) {
+            UIUtils.showShortMessage(context, R.string.storage_picker_treeuri_error);
             LOG.error("Error handling folder selection", e);
         }
 

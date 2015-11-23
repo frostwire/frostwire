@@ -558,6 +558,10 @@
     <string name="notify_frostwire_is_running">Notify FrostWire is running</string>
     <string name="notify_frostwire_is_running_summary">Show a permanent Android notification with status of transfers</string>
     <string name="invalid_filename">Invalid file name</string>
+    <string name="storage_picker_treeuri_null">[MSG: storage_picker_treeuri_null]</string>
+    <string name="storage_picker_treeuri_not_directory">[MSG: storage_picker_treeuri_not_directory]</string>
+    <string name="storage_picker_treeuri_cant_write">[MSG: storage_picker_treeuri_cant_write]</string>
+    <string name="storage_picker_treeuri_error">[MSG: storage_picker_treeuri_error]</string>
 
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Your privacy is a fundamental human right.</b>]]></string>
