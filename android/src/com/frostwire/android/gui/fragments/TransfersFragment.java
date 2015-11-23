@@ -307,8 +307,13 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         internalMemoryNotification.setVisibility(View.GONE);
 
         if (isUsingSDCardPrivateStorage() && !sdCardNotification.wasDismissed()) {
-            sdCardNotification.setVisibility(View.VISIBLE);
-            sdCardNotification.setOnClickListener(new SDCardNotificationListener(this));
+            String currentPath = ConfigurationManager.instance().getStoragePath();
+            boolean inPrivateFolder = currentPath.contains("Android/data");
+
+            if (inPrivateFolder) {
+                sdCardNotification.setVisibility(View.VISIBLE);
+                sdCardNotification.setOnClickListener(new SDCardNotificationListener(this));
+            }
         }
 		
 		//if you do have an SD Card mounted and you're using internal memory, we'll let you know
