@@ -156,9 +156,13 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void invokeStoragePreference() {
-        final StoragePreference storagePreference = (StoragePreference) findPreference(Constants.PREF_KEY_STORAGE_PATH);
-        if (storagePreference != null) {
-            storagePreference.showDialog(null);
+        if (SystemUtils.hasLollipop()) {
+            StoragePicker.show(this);
+        } else {
+            final StoragePreference storagePreference = (StoragePreference) findPreference(Constants.PREF_KEY_STORAGE_PATH);
+            if (storagePreference != null) {
+                storagePreference.showDialog(null);
+            }
         }
     }
 
@@ -378,8 +382,11 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             String selectedPath = StoragePicker.handle(this, requestCode, resultCode, data);
-            ConfigurationManager.instance().setStoragePath(selectedPath);
-            BTEngine.ctx.dataDir = new File(selectedPath).getAbsoluteFile();
+            if (selectedPath != null) {
+                selectedPath = selectedPath + "/FrostWire/";
+                ConfigurationManager.instance().setStoragePath(selectedPath);
+                BTEngine.ctx.dataDir = new File(selectedPath).getAbsoluteFile();
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
