@@ -38,6 +38,7 @@ import android.widget.LinearLayout;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SearchEngine;
@@ -56,8 +57,6 @@ import com.frostwire.logging.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
-
-import java.io.File;
 
 /**
  * See {@link ConfigurationManager}
@@ -383,9 +382,9 @@ public class SettingsActivity extends PreferenceActivity {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             String selectedPath = StoragePicker.handle(this, requestCode, resultCode, data);
             if (selectedPath != null) {
-                selectedPath = selectedPath + "/FrostWire/";
                 ConfigurationManager.instance().setStoragePath(selectedPath);
-                BTEngine.ctx.dataDir = new File(selectedPath).getAbsoluteFile();
+                BTEngine.ctx.dataDir = SystemPaths.getTorrentData();
+                BTEngine.ctx.torrentsDir = SystemPaths.getTorrents();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

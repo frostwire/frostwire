@@ -117,7 +117,7 @@ public class StoragePreference extends DialogPreference {
         if (dialog != null && dialog.equals(confirmDlg)) {
             if (which == Dialog.BUTTON_POSITIVE && selectedPath != null) {
                 ConfigurationManager.instance().setStoragePath(selectedPath);
-                BTEngine.ctx.dataDir = new File(selectedPath).getAbsoluteFile();
+                BTEngine.ctx.dataDir = SystemPaths.getTorrentData();
                 BTEngine.ctx.torrentsDir = SystemPaths.getTorrents();
                 dismissPreferenceDialog();
                 uxLogSelection();
