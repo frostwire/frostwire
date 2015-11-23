@@ -21,7 +21,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
 				  xmlns:frostwire="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory>
+    <PreferenceCategory android:key="frostwire.prefs.general">
         <SwitchPreference android:key="frostwire.prefs.internal.connect_disconnect"
            android:summary="@string/bittorrent_network_summary"
            android:title="@string/bittorrent" />
@@ -29,6 +29,12 @@
                 android:key="frostwire.prefs.storage.path"
                 android:summary="@string/storage_preference_summary"
                 android:title="@string/storage_preference_title" />
+        <Preference
+                android:key="frostwire.prefs.storage.path_asf"
+                android:summary="@string/storage_preference_summary"
+                android:title="@string/storage_preference_title">
+            <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE" />
+        </Preference>
     </PreferenceCategory>
 
     <PreferenceScreen

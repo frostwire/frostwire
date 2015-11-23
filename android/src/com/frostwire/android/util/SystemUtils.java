@@ -44,6 +44,8 @@ public final class SystemUtils {
 
     private static final int VERSION_CODE_KITKAT = 19;
 
+    private static final int VERSION_CODE_LOLLIPOP = 21;
+
     private SystemUtils() {
     }
 
@@ -195,5 +197,16 @@ public final class SystemUtils {
      */
     public static final boolean hasKitKat() {
         return hasSdk(VERSION_CODE_KITKAT);
+    }
+
+    /**
+     * Used to determine if the device is running
+     * Lollipop (Android 5.0) or greater
+     *
+     * @return True if the device is running KitKat or greater,
+     * false otherwise
+     */
+    public static final boolean hasLollipop() {
+        return hasSdk(VERSION_CODE_LOLLIPOP);
     }
 }

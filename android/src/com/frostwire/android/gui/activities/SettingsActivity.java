@@ -18,19 +18,16 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.*;
+import android.app.ActionBar;
+import android.app.Activity;
+import android.app.Dialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.storage.StorageManager;
 import android.preference.*;
-import android.preference.CheckBoxPreference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.provider.DocumentsContract;
-import android.support.v4.provider.DocumentFile;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -49,7 +46,9 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.preference.*;
+import com.frostwire.android.gui.views.preference.SimpleActionPreference;
+import com.frostwire.android.gui.views.preference.StoragePreference;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.DHT;
 import com.frostwire.jlibtorrent.Session;
@@ -59,8 +58,6 @@ import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
 import java.io.File;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 
 /**
  * See {@link ConfigurationManager}
@@ -114,6 +111,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupComponents() {
         setupConnectSwitch();
+        setupStorageOption();
         setupOtherOptions();
         setupSeedingOptions();
         setupNickname();
@@ -344,8 +342,27 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupAbout() {
         Preference p = findPreference(Constants.PREF_KEY_SHOW_ABOUT);
-        //p.setIntent(new Intent(this, AboutActivity.class));
-        p.setIntent(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE));
+        p.setIntent(new Intent(this, AboutActivity.class));
+    }
+
+    private void setupStorageOption() {
+        // intentional repetition of preference value here
+        String kitkatKey = "frostwire.prefs.storage.path";
+        String lollipopKey = "frostwire.prefs.storage.path_asf";
+
+        PreferenceCategory category = (PreferenceCategory) findPreference("frostwire.prefs.general");
+
+        if (SystemUtils.hasLollipop()) {
+            Preference p = findPreference(kitkatKey);
+            if (p != null) {
+                category.removePreference(p);
+            }
+        } else {
+            Preference p = findPreference(lollipopKey);
+            if (p != null) {
+                category.removePreference(p);
+            }
+        }
     }
 
     @Override
@@ -360,8 +377,9 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
-            String path = StoragePicker.handle(this, requestCode, resultCode, data);
-            System.out.println(path);
+            String selectedPath = StoragePicker.handle(this, requestCode, resultCode, data);
+            ConfigurationManager.instance().setStoragePath(selectedPath);
+            BTEngine.ctx.dataDir = new File(selectedPath).getAbsoluteFile();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
