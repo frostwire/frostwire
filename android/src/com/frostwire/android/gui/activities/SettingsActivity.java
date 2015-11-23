@@ -286,30 +286,6 @@ public class SettingsActivity extends PreferenceActivity {
         preference.setOnPreferenceChangeListener(onPreferenceChangeListener);
     }
 
-    private void setupEnableDHTOption() {
-        final SwitchPreference preferenceEnableDHT = (SwitchPreference) findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-        if (preferenceEnableDHT != null) {
-            preferenceEnableDHT.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    boolean dhtExpectedValue = (Boolean) newValue;
-                    final BTEngine btEngine = BTEngine.getInstance();
-                    final Session session = btEngine.getSession();
-                    boolean dhtCurrentStatus = session.isDHTRunning();
-                    DHT dht = new DHT(session);
-
-                    if (dhtCurrentStatus && !dhtExpectedValue) {
-                        dht.stop();
-                    } else if (!dhtCurrentStatus && dhtExpectedValue) {
-                        dht.start();
-                    }
-
-                    return false;
-                }
-            });
-        }
-    }
-
     private void setupConnectSwitch() {
         SwitchPreference preference = (SwitchPreference) findPreference("frostwire.prefs.internal.connect_disconnect");
         if (preference != null) {
@@ -360,10 +336,32 @@ public class SettingsActivity extends PreferenceActivity {
             if (p != null) {
                 category.removePreference(p);
             }
+            p = findPreference(lollipopKey);
+            if (p != null) {
+                p.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        updateStorageOptionSummary(newValue.toString());
+                        return true;
+                    }
+                });
+                updateStorageOptionSummary(ConfigurationManager.instance().getStoragePath());
+            }
         } else {
             Preference p = findPreference(lollipopKey);
             if (p != null) {
                 category.removePreference(p);
+            }
+        }
+    }
+
+    private void updateStorageOptionSummary(String newPath) {
+        // intentional repetition of preference value here
+        String lollipopKey = "frostwire.prefs.storage.path_asf";
+        if (SystemUtils.hasLollipop()) {
+            Preference p = findPreference(lollipopKey);
+            if (p != null) {
+                p.setSummary(newPath);
             }
         }
     }
