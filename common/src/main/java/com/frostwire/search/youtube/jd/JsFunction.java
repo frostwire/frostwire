@@ -253,7 +253,7 @@ public final class JsFunction<T> {
 
     private static JsObject extract_object(final JsContext ctx, String objname) {
         JsObject obj = new JsObject();
-        String obj_mRegex = String.format("(var[ \\t\\n\\x0B\\f\\r]+)?%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*\\{", escape(objname)) + "[ \\t\\n\\x0B\\f\\r]*(?<fields>([a-zA-Z$0-9]+[ \\t\\n\\x0B\\f\\r]*:[ \\t\\n\\x0B\\f\\r]*function\\(.*?\\)[ \\t\\n\\x0B\\f\\r]*\\{.*?\\})*)\\}[ \\t\\n\\x0B\\f\\r]*;";
+        String obj_mRegex = String.format("(var[ \\t\\n\\x0B\\f\\r]+)?%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*\\{", escape(objname)) + "[ \\t\\n\\x0B\\f\\r]*(?<fields>([a-zA-Z$0-9]+[ \\t\\n\\x0B\\f\\r]*:[ \\t\\n\\x0B\\f\\r]*function\\(.*?\\)[ \\t\\n\\x0B\\f\\r]*\\{.*?\\}(,[ \\t\\n\\x0B\\f\\r])*)*)\\}[ \\t\\n\\x0B\\f\\r]*;";
         final Matcher obj_m = Pattern.compile(obj_mRegex).matcher(ctx.jscode);
         obj_m.find();
         String fields = obj_m.group("fields");
@@ -295,7 +295,7 @@ public final class JsFunction<T> {
                 }
                 Object res = null;
                 for (String stmt : stmts) {
-                    res = interpret_statement(ctx, stmt, local_vars, 20);
+                    res = interpret_statement(ctx, stmt, local_vars, 100);
                 }
                 return res;
             }
