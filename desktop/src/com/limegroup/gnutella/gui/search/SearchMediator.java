@@ -87,6 +87,8 @@ public final class SearchMediator {
 
     static final String CLOSE_TAB_STRING = I18n.tr("Close Tab");
 
+    static final String CLOSE_ALL_TABS = I18n.tr("Close All Tabs");
+
     static final String CLOSE_OTHER_TABS_STRING = I18n.tr("Close Other Tabs");
 
     static final String CLOSE_TABS_TO_THE_RIGHT = I18n.tr("Close Tabs to the Right");
@@ -412,7 +414,7 @@ public final class SearchMediator {
      * Downloads all the selected table lines from the given result panel.
      */
     public static void downloadFromPanel(SearchResultMediator rp, SearchResultDataLine[] lines) {
-        downloadAll(lines, rp.getSearchInformation());
+        downloadAll(lines);
         rp.refresh();
     }
 
@@ -424,7 +426,7 @@ public final class SearchMediator {
         final SearchResultDataLine[] lines = rp.getAllSelectedLines();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                SearchMediator.downloadAll(lines, rp.getSearchInformation());
+                SearchMediator.downloadAll(lines);
                 rp.refresh();
             }
         });
@@ -433,9 +435,15 @@ public final class SearchMediator {
     /**
      * Downloads all the selected lines.
      */
-    private static void downloadAll(SearchResultDataLine[] lines, SearchInformation searchInfo) {
+    private static void downloadAll(SearchResultDataLine[] lines) {
+        if (lines == null || lines.length == 0) {
+            return;
+        }
+
         for (int i = 0; i < lines.length; i++) {
-            downloadLine(lines[i], null, null, false, searchInfo);
+            if (lines[i] != null) {
+                downloadLine(lines[i]);
+            }
         }
     }
 
@@ -443,14 +451,8 @@ public final class SearchMediator {
      * Downloads the given TableLine.
      *
      * @param line
-     * @param guid
-     * @param saveDir    optionally the directory where the final file should be
-     *                   saved to, can be <code>null</code>
-     * @param fileName   the optional filename of the final file, can be
-     *                   <code>null</code>
-     * @param searchInfo The query used to find the file being downloaded.
      */
-    private static void downloadLine(SearchResultDataLine line, File saveDir, String fileName, boolean saveAs, SearchInformation searchInfo) {
+    private static void downloadLine(SearchResultDataLine line) {
         if (line == null) {
             throw new NullPointerException("Tried to download null line");
         }

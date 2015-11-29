@@ -453,6 +453,12 @@ public final class SearchResultDisplayer implements RefreshListener {
         return closed;
     }
 
+    public void closeAllTabs() {
+        while (entries != null && entries.size() > 0) {
+            closeTabAt(0);
+        }
+    }
+
     public void closeOtherTabs() {
         if (entries == null || entries.size() < 2) {
             //nothing to close.

@@ -34,6 +34,7 @@ import com.limegroup.gnutella.gui.GUIConstants;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.PaddedPanel;
+import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.SearchAction;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.dnd.MulticastTransferHandler;
@@ -337,6 +338,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             menu.add(new SkinMenuItem(new RepeatSearchAction()));
             menu.add(new JSeparator(JSeparator.HORIZONTAL));
             menu.add(new SkinMenuItem(new CloseTabAction()));
+            menu.add(new SkinMenuItem(new CloseAllTabsAction()));
             menu.add(new SkinMenuItem(new CloseOtherTabsAction()));
             menu.add(new SkinMenuItem(new CloseTabsToTheRight()));
         }
@@ -851,6 +853,19 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         @Override
         public void actionPerformed(ActionEvent e) {
             SearchMediator.getSearchResultDisplayer().closeCurrentTab();
+        }
+    }
+
+    private final class CloseAllTabsAction extends AbstractAction {
+        public CloseAllTabsAction() {
+            putValue(Action.NAME, SearchMediator.CLOSE_ALL_TABS);
+            setEnabled(SearchMediator.getSearchResultDisplayer().tabCount() > 0);
+        }
+
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SearchMediator.getSearchResultDisplayer().closeAllTabs();
         }
     }
 
