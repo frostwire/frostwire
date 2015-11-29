@@ -1,3 +1,8 @@
+frostwire (6.1.8) stable; urgency=high
+  * New 'Close All Tabs' action for search result tabs.
+	
+ -- FrostWire Team <contact@frostwire.com>  Sat, 28 Nov 2015 21:24:51 -0500
+
 frostwire (6.1.7) stable; urgency=high
   * Youtube audio search fixed.
   * New 'Close Tab' action for search result tabs.
