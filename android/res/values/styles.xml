@@ -260,6 +260,17 @@
     </style>
 
     <!-- Transfers indicator end -->
+    <style name="TransfersNotificationTitle">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
+    </style>
+
+    <style name="TransfersNotificationSub">
+        <item name="android:textColor">@color/app_dark_grey_text</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
 
     <style name="ListItemTitle">
         <item name="android:singleLine">true</item>
