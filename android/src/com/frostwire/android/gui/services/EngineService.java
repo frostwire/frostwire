@@ -221,7 +221,7 @@ public class EngineService extends Service implements IEngineService {
 
         // VPN status
         remoteViews.setImageViewResource(R.id.view_permanent_status_vpn_icon, isVPNactive ?
-                R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
+                R.drawable.notification_shutdown : R.drawable.notification_shutdown);
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_vpn_icon, showVPNIntent);
 
         // Click on title takes to transfers.
