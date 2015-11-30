@@ -555,7 +555,7 @@
     <string name="protected_connection">Protected Connection</string>
     <string name="protect_my_privacy">Protect my privacy</string>
     <string name="dht_contacts">DHT contacts</string>
-    <string name="notify_frostwire_is_running">Notify FrostWire is running</string>
+    <string name="notify_frostwire_is_running">Notify if FrostWire is running</string>
     <string name="notify_frostwire_is_running_summary">Show a permanent Android notification with status of transfers</string>
     <string name="invalid_filename">Invalid file name</string>
     <string name="storage_picker_treeuri_null">[MSG: storage_picker_treeuri_null]</string>
