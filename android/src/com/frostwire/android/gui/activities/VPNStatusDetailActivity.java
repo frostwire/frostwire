@@ -66,7 +66,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
         // By default the layout has icon and title set to unprotected.
         if (isProtectedConnection) {
             // Current Status Icon
-            headerIcon.setImageResource(R.drawable.notification_shutdown);
+            headerIcon.setImageResource(R.drawable.notification_vpn_on);
             // Current Status Title
             headerTitle.setText(R.string.protected_connection);
         }
