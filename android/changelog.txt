@@ -3,6 +3,7 @@ FrostWire 1.6.7 - NOVEMBER/30/2015
    your FrostWire download folders to be.
  - New: Exit/Shutdown button replaces VPN button on FrostWire status
    notification.
+ - YouTube search improvements.
  - Library updates (support-v4, rxjava, gradle plugin)
  - Fixes bug where invalid names could be used to rename files.
  - Spanish translation update.
