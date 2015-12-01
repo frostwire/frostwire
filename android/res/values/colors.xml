@@ -63,6 +63,7 @@
     <color name="app_menu_item_pressed">#ff314c61</color>
     <color name="app_menu_item_line">#ff1d2934</color>
     <color name="app_light_gray_text">#ffbfcfdc</color>
+    <color name="app_dark_grey_text">#ff737373</color>
 
     <color name="browse_peer_listview_item_inactive_background">#ffeff0f1</color>
     <color name="browse_peer_listview_item_foreground">@color/app_list_item_title_text_color</color>
