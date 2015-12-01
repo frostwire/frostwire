@@ -37,7 +37,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.ImageLoader;
@@ -208,21 +207,33 @@ public class EngineService extends Service implements IEngineService {
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
                 0);
 
-        PendingIntent showVPNIntent = PendingIntent.getActivity(context,
+//        PendingIntent showVPNIntent = PendingIntent.getActivity(context,
+//                1,
+//                new Intent(context,
+//                        VPNStatusDetailActivity.class).
+//                        setAction(isVPNactive ?
+//                                Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
+//                                Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
+//                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
+//                0);
+
+        PendingIntent shutdownIntent = PendingIntent.getActivity(context,
                 1,
                 new Intent(context,
-                        VPNStatusDetailActivity.class).
-                        setAction(isVPNactive ?
-                                Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
-                                Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
+                        MainActivity.class).
+                        setAction(Constants.ACTION_REQUEST_SHUTDOWN).
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
                 0);
 
 
         // VPN status
-        remoteViews.setImageViewResource(R.id.view_permanent_status_vpn_icon, isVPNactive ?
-                R.drawable.notification_shutdown : R.drawable.notification_shutdown);
-        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_vpn_icon, showVPNIntent);
+//        remoteViews.setImageViewResource(R.id.view_permanent_status_vpn_icon, isVPNactive ?
+//                R.drawable.notification_shutdown : R.drawable.notification_shutdown);
+//        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_vpn_icon, showVPNIntent);
+
+
+        // Click on shutdown image button.
+        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
 
         // Click on title takes to transfers.
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);

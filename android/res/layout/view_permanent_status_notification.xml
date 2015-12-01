@@ -104,7 +104,7 @@
     <!-- Shutdown icon -->
 
     <ImageView
-        android:id="@+id/view_permanent_status_vpn_icon"
+        android:id="@+id/view_permanent_status_shutdown"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"

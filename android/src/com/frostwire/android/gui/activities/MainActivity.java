@@ -255,6 +255,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                     SearchFragment.startDownload(this, NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
                     UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE_FROM_PREVIEW);
                 }
+            } else if (action.equals(Constants.ACTION_REQUEST_SHUTDOWN)) {
+                showShutdownDialog();
             }
         }
 
