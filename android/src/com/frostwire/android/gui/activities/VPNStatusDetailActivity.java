@@ -42,6 +42,7 @@ import com.frostwire.android.gui.views.ClickAdapter;
 public class VPNStatusDetailActivity extends AbstractActivity {
 
     private final OnGetVPNClickListener onGetVPNClickListener;
+    private boolean isProtectedConnection;
 
     public VPNStatusDetailActivity() {
         super(R.layout.view_vpn_status_detail);
@@ -55,20 +56,31 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             getActionBar().setDisplayHomeAsUpEnabled(true);
             getActionBar().setIcon(android.R.color.transparent);
         }
-
         final Intent intent = getIntent();
-        final boolean isProtectedConnection = intent.getAction() != null &&
+        isProtectedConnection = intent.getAction() != null &&
                 intent.getAction().equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED);
+        
         final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
         final TextView headerTitle = findView(R.id.view_vpn_status_header_title);
         final Button button = findView(R.id.view_vpn_status_get_vpn_button);
+        final TextView VPNText = findView(R.id.VPNText);
 
         // By default the layout has icon and title set to unprotected.
         if (isProtectedConnection) {
             // Current Status Icon
-            headerIcon.setImageResource(R.drawable.notification_vpn_on);
+            headerIcon.setImageResource(R.drawable.vpn_icon_on_info);
             // Current Status Title
             headerTitle.setText(R.string.protected_connection);
+            VPNText.setText(R.string.protected_connections_visibility_bullet);
+            button.setText(R.string.learn_more);
+        }
+        else {
+            // Current Status Icon
+            headerIcon.setImageResource(R.drawable.vpn_icon_off_info);
+            // Current Status Title
+            headerTitle.setText(R.string.unprotected_connection);
+            VPNText.setText(R.string.unprotected_connections_visibility_bullet);
+            button.setText(R.string.protect_my_privacy);
         }
 
         headerIcon.setOnClickListener(onGetVPNClickListener);
@@ -95,7 +107,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
     public void onBackPressed() {
         Intent newIntent = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        // if we came from Transfers, make sure to go have the tranfer fragment shown by MainActivity.
+        // if we came from Transfers, make sure to go have the transfer fragment shown by MainActivity.
         Intent i = getIntent();
         if (i != null && i.getExtras() != null &&
                 i.getExtras().containsKey("from") &&
@@ -116,7 +128,13 @@ public class VPNStatusDetailActivity extends AbstractActivity {
 
         @Override
         public void onClick(VPNStatusDetailActivity owner, View v) {
-            UIUtils.openURL(owner, Constants.PIA_URL);
+            if (owner.isProtectedConnection) {
+                UIUtils.openURL(owner, Constants.VPN_LEARN_MORE_URL);
+            }
+            else {
+                UIUtils.openURL(owner, Constants.PIA_URL);
+            }
+
         }
     }
 }
