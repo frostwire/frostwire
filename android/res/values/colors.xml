@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), and
+ * Marcelina Knitter (@marclinkaaa)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,14 +26,15 @@
     <color name="basic_blue_highlight">#ff33b5e5</color>
     <color name="basic_gray">#ffeceff1</color>
     <color name="basic_gray_light">#fff5f7f8</color>
-    <color name="basic_gray_dark">#ffdddddd</color>
+    <color name="basic_gray_medium">#d1dddddd</color>
+    <color name="basic_gray_dark">#76dddddd</color>
 
     <!-- General app colors -->
     <color name="app_background">@color/basic_blue</color>
     <color name="app_text_primary">#ff323538</color>
     <color name="app_text_secondary">#ff696c6f</color>
     <color name="app_text_disabled">#ffb5b5b5</color>
-    <color name="app_boder_gray_dark">@color/basic_gray_dark</color>
+    <color name="app_body_gray_dark">@color/basic_gray_medium</color>
     <color name="action_bar_background">@color/basic_blue</color>
     <color name="body_background_white">@color/basic_white</color>
     <color name="body_background_gray">@color/basic_gray</color>
@@ -54,7 +55,7 @@
     <color name="app_dark_blue">#ff264053</color>
     <color name="app_dark_blue_highlight">#ff21313f</color>
     <color name="app_dark_blue_selector">#ff233d4e</color>
-    <color name="app_ligh_background">#fff8f8f8</color>
+    <color name="app_light_background">#fff8f8f8</color>
     <color name="app_dark_icons">#ff546676</color>
     <color name="app_light_icons">#ffe7ebee</color>
     <color name="app_highlight_text">#ff33b5e5</color>
@@ -62,7 +63,7 @@
     <color name="all_list_cell_background_visited">#ffe9eef3</color>
     <color name="app_menu_item_pressed">#ff314c61</color>
     <color name="app_menu_item_line">#ff1d2934</color>
-    <color name="app_light_gray_text">#ffbfcfdc</color>
+    <color name="app_light_gray_text">#d9d9d9</color>
     <color name="app_dark_grey_text">#ff737373</color>
 
     <color name="browse_peer_listview_item_inactive_background">#ffeff0f1</color>
