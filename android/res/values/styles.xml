@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), and
+ * Marcelina Knitter (@marclinkaaa)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -257,6 +258,8 @@
     <style name="TransfersIndicator">
         <item name="android:gravity">center_vertical</item>
         <item name="android:textColor">@color/app_light_gray_text</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">@dimen/text_size_micro</item>
     </style>
 
     <!-- Transfers indicator end -->
@@ -366,7 +369,7 @@
     </style>
 
     <style name="GetVPNButton">
-        <item name="android:background">@drawable/vpn_button_background_selector_on</item>
+        <item name="android:background">@drawable/vpn_button_background_selector</item>
         <item name="android:textColor">#3c4310</item>
         <item name="android:paddingTop">0dp</item>
         <item name="android:paddingBottom">0dp</item>
@@ -399,6 +402,21 @@
     <style name="BrowsePeerActivityHeaderNickname" parent="@android:style/TextAppearance.Small">
         <item name="android:gravity">center</item>
         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <!-- VPN Activity -->
+    <style name="VPNTitle">
+        <item name="android:textSize">@dimen/text_size_x_large</item>
+        <item name="android:fontFamily">sans-serif-regular</item>
+    </style>
+    <style name="VPNSubTitle">
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="VPNText">
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/app_text_secondary</item>
     </style>
 
 </resources>
