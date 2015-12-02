@@ -21,6 +21,8 @@ package com.frostwire.gui.library;
 import com.frostwire.gui.theme.ThemeMediator;
 
 import javax.swing.*;
+import javax.swing.border.AbstractBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 
@@ -31,6 +33,10 @@ import java.awt.*;
  *
  */
 public class NodeRenderer extends DefaultTreeCellRenderer {
+    private static AbstractBorder DIRECTORY_HOLDER_NODE_BORDER = new EmptyBorder(5,5,5,5);
+    public NodeRenderer() {
+        super();
+    }
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -50,6 +56,7 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
             Icon icon = dh.getIcon();
             if (icon != null) {
                 setIcon(icon);
+                setBorder(DIRECTORY_HOLDER_NODE_BORDER);
             }
         }
 

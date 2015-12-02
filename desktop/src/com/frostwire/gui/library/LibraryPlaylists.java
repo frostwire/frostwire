@@ -52,6 +52,8 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
+import javax.swing.border.AbstractBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
@@ -612,6 +614,8 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
 
     private class LibraryPlaylistsCellRenderer extends DefaultListCellRenderer {
 
+        private final AbstractBorder border = new EmptyBorder(5,5,5,5);
+
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -622,6 +626,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             Icon icon = cell.getIcon();
             if (icon != null) {
                 setIcon(icon);
+                setBorder(border);
             }
 
             this.setFont(list.getFont());
