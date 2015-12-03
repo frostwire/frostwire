@@ -41,12 +41,8 @@ import com.frostwire.android.gui.views.ClickAdapter;
  */
 public class VPNStatusDetailActivity extends AbstractActivity {
 
-    private final OnGetVPNClickListener onGetVPNClickListener;
-    private boolean isProtectedConnection;
-
     public VPNStatusDetailActivity() {
         super(R.layout.view_vpn_status_detail);
-        onGetVPNClickListener = new OnGetVPNClickListener(this);
     }
 
     @Override
@@ -57,7 +53,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             getActionBar().setIcon(android.R.color.transparent);
         }
         final Intent intent = getIntent();
-        isProtectedConnection = intent.getAction() != null &&
+        final boolean isProtectedConnection = intent.getAction() != null &&
                 intent.getAction().equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED);
         
         final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
@@ -83,6 +79,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             button.setText(R.string.protect_my_privacy);
         }
 
+        final OnGetVPNClickListener onGetVPNClickListener = new OnGetVPNClickListener(this, isProtectedConnection);
         headerIcon.setOnClickListener(onGetVPNClickListener);
         headerTitle.setOnClickListener(onGetVPNClickListener);
         button.setOnClickListener(onGetVPNClickListener);
@@ -122,13 +119,16 @@ public class VPNStatusDetailActivity extends AbstractActivity {
     // Let's minimize the use of anonymous classes $1, $2 for every listener out there. DRY principle is the prime coding directive.
     private static class OnGetVPNClickListener extends ClickAdapter<VPNStatusDetailActivity> {
 
-        public OnGetVPNClickListener(VPNStatusDetailActivity owner) {
+        private final boolean isProtectedConnection;
+
+        public OnGetVPNClickListener(VPNStatusDetailActivity owner, boolean isProtectedConnection) {
             super(owner);
+            this.isProtectedConnection = isProtectedConnection;
         }
 
         @Override
         public void onClick(VPNStatusDetailActivity owner, View v) {
-            if (owner.isProtectedConnection) {
+            if (isProtectedConnection) {
                 UIUtils.openURL(owner, Constants.VPN_LEARN_MORE_URL);
             }
             else {
