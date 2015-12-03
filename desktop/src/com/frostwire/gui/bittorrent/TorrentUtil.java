@@ -19,8 +19,7 @@
  * 8 Allee Lenotre, La Grille Royale, 78600 Le Mesnil le Roi, France.
  */
 /*
- * File    : ManagerUtils.java
- * Created : 7 d�c. 2003}
+ * Created : 7 dec. 2003
  * By      : Olivier
  *
  * Copyright (C) 2004, 2005, 2006 Aelitis SAS, All rights Reserved
@@ -45,15 +44,33 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.jlibtorrent.AnnounceEntry;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.Vectors;
+import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.uxstats.UXAction;
+import com.frostwire.uxstats.UXStats;
+import com.limegroup.gnutella.gui.DialogOption;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.SharingSettings;
+import com.limegroup.gnutella.util.FrostWireUtils;
 import org.gudy.azureus2.core3.util.UrlUtils;
 
+import javax.swing.*;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public final class TorrentUtil {
+
+    public interface UITorrentMakerListener {
+        void onCreateTorrentError(final error_code ec);
+        void beforeOpenForSeedInUIThread();
+        void onException();
+    }
 
     public static BittorrentDownload getDownloadManager(File f) {
         List<BTDownload> downloads = BTDownloadMediator.instance().getDownloads();
@@ -76,7 +93,7 @@ public final class TorrentUtil {
     }
 
     private static Set<File> getIncompleteFiles() {
-        Set<File> set = new HashSet<File>();
+        Set<File> set = new HashSet<>();
 
         List<BTDownload> downloads = BTDownloadMediator.instance().getDownloads();
         for (BTDownload d : downloads) {
@@ -91,7 +108,7 @@ public final class TorrentUtil {
     }
 
     private static Set<File> getPartsFiles() {
-        Set<File> set = new HashSet<File>();
+        Set<File> set = new HashSet<>();
 
         List<BTDownload> downloads = BTDownloadMediator.instance().getDownloads();
         for (BTDownload d : downloads) {
@@ -113,7 +130,8 @@ public final class TorrentUtil {
         StringBuilder sb = new StringBuilder();
 
         //dn
-        sb.append("dn=" + UrlUtils.encode(torrent.getName()));
+        sb.append("dn=");
+        sb.append(UrlUtils.encode(torrent.getName()));
 
         final List<AnnounceEntry> trackers = torrent.getTrackers();
         for (AnnounceEntry tracker : trackers) {
@@ -129,5 +147,91 @@ public final class TorrentUtil {
         Set<File> set = TorrentUtil.getIncompleteFiles();
         set.addAll(getPartsFiles());
         return set;
+    }
+
+    public static boolean askForPermissionToSeedAndSeedDownloads(BTDownload[] downloaders) {
+        boolean allowedToResume = true;
+        boolean oneIsCompleted = false;
+        for (BTDownload downloader : downloaders) {
+            if (downloader.isCompleted()) {
+                oneIsCompleted = true;
+                break;
+            }
+        }
+
+        if (oneIsCompleted && !SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
+            DialogOption answer;
+            String message1 = (downloaders.length > 1) ? I18n.tr("One of the transfers is complete and resuming will cause it to start seeding") : I18n.tr("This transfer is already complete, resuming it will cause it to start seeding");
+            String message2 = I18n.tr("Do you want to enable torrent seeding?");
+            answer = GUIMediator.showYesNoMessage(message1 + "\n\n" + message2, DialogOption.YES);
+            allowedToResume = answer.equals(DialogOption.YES);
+
+            if (allowedToResume) {
+                SharingSettings.SEED_FINISHED_TORRENTS.setValue(true);
+            }
+        }
+
+        if (allowedToResume) {
+            for (BTDownload downloader : downloaders) {
+                downloader.resume();
+            }
+        }
+
+        UXStats.instance().log(UXAction.DOWNLOAD_RESUME);
+        return allowedToResume;
+    }
+
+    public static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog) {
+        try {
+            file_storage fs = new file_storage();
+            libtorrent.add_files(fs, file.getAbsolutePath());
+            create_torrent torrentCreator = new create_torrent(fs);
+            torrentCreator.add_tracker("udp://tracker.openbittorrent.com:80");
+            torrentCreator.add_tracker("udp://tracker.publicbt.com:80");
+            torrentCreator.add_tracker("udp://open.demonii.com:1337");
+            torrentCreator.add_tracker("udp://tracker.coppersurfer.tk:6969");
+            torrentCreator.add_tracker("udp://tracker.leechers-paradise.org:6969");
+            torrentCreator.add_tracker("udp://exodus.desync.com:6969");
+            torrentCreator.add_tracker("udp://tracker.pomf.se");
+
+            torrentCreator.set_priv(false);
+            torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireJarPath() + " build " + FrostWireUtils.getBuildNumber());
+            final File torrentFile = new File(SharingSettings.TORRENTS_DIR_SETTING.getValue(), file.getName() + ".torrent");
+            final error_code ec = new error_code();
+            libtorrent.set_piece_hashes(torrentCreator,file.getParentFile().getAbsolutePath(), ec);
+            if (ec.value() != 0 && uiTorrentMakerListener != null) {
+                uiTorrentMakerListener.onCreateTorrentError(ec);
+                return;
+            }
+
+            final entry torrentEntry = torrentCreator.generate();
+            byte[] bencoded_torrent_bytes = Vectors.char_vector2bytes(torrentEntry.bencode());
+            FileOutputStream fos = new FileOutputStream(torrentFile);
+            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            bos.write(bencoded_torrent_bytes);
+            bos.flush();
+            bos.close();
+
+            final TorrentInfo torrent = TorrentInfo.bdecode(bencoded_torrent_bytes);
+
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (uiTorrentMakerListener != null) {
+                        uiTorrentMakerListener.beforeOpenForSeedInUIThread();
+                    }
+
+                    GUIMediator.instance().openTorrentForSeed(torrentFile, file.getParentFile());
+                    if (showShareTorrentDialog) {
+                        new ShareTorrentDialog(torrent).setVisible(true);
+                    }
+                }
+            });
+
+        } catch (final Exception e) {
+            e.printStackTrace();
+            if (uiTorrentMakerListener != null) {
+                uiTorrentMakerListener.onException();
+            }
+        }
     }
 }

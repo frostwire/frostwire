@@ -32,7 +32,6 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.settings.ApplicationSettings;
-import com.limegroup.gnutella.settings.SharingSettings;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -163,9 +162,6 @@ final class BTDownloadActions {
     }
 
     private static class ShowInLibraryAction extends RefreshingAction {
-        /**
-         *
-         */
         private static final long serialVersionUID = -4648558721588938475L;
 
         public ShowInLibraryAction() {
@@ -190,12 +186,6 @@ final class BTDownloadActions {
     }
 
     private static class ResumeAction extends RefreshingAction {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = -4449981369424872994L;
-
         public ResumeAction() {
             putValue(Action.NAME, I18n.tr("Resume Download"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Resume"));
@@ -204,42 +194,12 @@ final class BTDownloadActions {
         }
 
         public void performAction(ActionEvent e) {
-            boolean oneIsCompleted = false;
-
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
-
-            for (int i = 0; i < downloaders.length; i++) {
-                if (downloaders[i].isCompleted()) {
-                    oneIsCompleted = true;
-                    break;
-                }
-            }
-
-            boolean allowedToResume = true;
-            DialogOption answer = null;
-            if (oneIsCompleted && !SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
-                String message1 = (downloaders.length > 1) ? I18n.tr("One of the transfers is complete and resuming will cause it to start seeding") : I18n.tr("This transfer is already complete, resuming it will cause it to start seeding");
-                String message2 = I18n.tr("Do you want to enable torrent seeding?");
-                answer = GUIMediator.showYesNoMessage(message1 + "\n\n" + message2, DialogOption.YES);
-                allowedToResume = answer.equals(DialogOption.YES);
-
-                if (allowedToResume) {
-                    SharingSettings.SEED_FINISHED_TORRENTS.setValue(true);
-                }
-            }
-
-            if (allowedToResume) {
-                for (int i = 0; i < downloaders.length; i++) {
-                    downloaders[i].resume();
-                }
-            }
-
-            UXStats.instance().log(UXAction.DOWNLOAD_RESUME);
+            TorrentUtil.askForPermissionToSeedAndSeedDownloads(downloaders);
         }
     }
 
     private static class PauseAction extends RefreshingAction {
-
         public PauseAction() {
             putValue(Action.NAME, I18n.tr("Pause Download"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Pause"));

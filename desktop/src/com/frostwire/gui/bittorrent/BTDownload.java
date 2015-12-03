@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,63 +31,63 @@ import java.util.Date;
  */
 public interface BTDownload {
 
-    public long getSize();
+    long getSize();
 
-    public String getName();
+    String getName();
 
-    public String getDisplayName();
+    String getDisplayName();
 
-    public boolean isResumable();
+    boolean isResumable();
 
-    public boolean isPausable();
+    boolean isPausable();
 
-    public boolean isCompleted();
+    boolean isCompleted();
 
-    public TransferState getState();
+    TransferState getState();
 
-    public void remove();
+    void remove();
 
-    public void pause();
+    void pause();
 
-    public File getSaveLocation();
+    File getSaveLocation();
 
-    public void resume();
+    void resume();
 
-    public int getProgress();
+    int getProgress();
 
-    public long getBytesReceived();
+    long getBytesReceived();
 
-    public long getBytesSent();
+    long getBytesSent();
 
-    public double getDownloadSpeed();
+    double getDownloadSpeed();
 
-    public double getUploadSpeed();
+    double getUploadSpeed();
 
-    public long getETA();
+    long getETA();
 
-    public String getPeersString();
+    String getPeersString();
 
-    public String getSeedsString();
+    String getSeedsString();
 
-    public void setDeleteTorrentWhenRemove(boolean deleteTorrentWhenRemove);
+    void setDeleteTorrentWhenRemove(boolean deleteTorrentWhenRemove);
 
-    public void setDeleteDataWhenRemove(boolean deleteDataWhenRemove);
+    void setDeleteDataWhenRemove(boolean deleteDataWhenRemove);
 
-    public String getHash();
+    String getHash();
 
-    public String getSeedToPeerRatio();
+    String getSeedToPeerRatio();
 
-    public String getShareRatio();
+    String getShareRatio();
 
-    public boolean isPartialDownload();
+    boolean isPartialDownload();
 
-    public Date getDateCreated();
+    Date getDateCreated();
 
-    public PaymentOptions getPaymentOptions();
+    PaymentOptions getPaymentOptions();
 
-    public CopyrightLicenseBroker getCopyrightLicenseBroker();
+    CopyrightLicenseBroker getCopyrightLicenseBroker();
 
-    public boolean canPreview();
+    boolean canPreview();
 
-    public File getPreviewFile();
+    File getPreviewFile();
 }

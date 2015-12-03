@@ -42,6 +42,7 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
     private static final AlphaIcon play_transparent;
 
     private JLabel labelPlay;
+    private JLabel labelShare;
     private boolean showSolid;
     private BTDownload dl;
 
@@ -63,13 +64,29 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
         labelPlay.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                labelPlay_mouseReleased(e);
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    onPlay();
+                }
             }
         });
+
         c = new GridBagConstraints();
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelPlay, c);
+
+        labelShare = new JLabel("share");
+        labelShare.setToolTipText(I18n.tr("Share the download url/magnet of this seeding transfer"));
+        labelShare.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    onShareTransfer();
+                }
+            }
+        });
+
+        add(labelShare,c);
 
         setEnabled(true);
     }
@@ -84,21 +101,39 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
         showSolid = mouseIsOverRow(table, row);
         updatePlayButton();
         labelPlay.setVisible(dl.canPreview());
+        labelShare.setVisible(dl instanceof BittorrentDownload || dl.isCompleted());
     }
 
     private void updatePlayButton() {
         labelPlay.setIcon((isDlBeingPlayed()) ? GUIMediator.getThemeImage("speaker") : (showSolid) ? play_solid : play_transparent);
     }
 
-    private void labelPlay_mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            if (dl.canPreview() && !isDlBeingPlayed()) {
-                File file = dl.getPreviewFile();
-                if (file != null) {
-                    GUIMediator.instance().launchMedia(new MediaSource(file), !dl.isCompleted());
-                }
-                updatePlayButton();
+    private void onPlay() {
+        if (dl.canPreview() && !isDlBeingPlayed()) {
+            File file = dl.getPreviewFile();
+            if (file != null) {
+                GUIMediator.instance().launchMedia(new MediaSource(file), !dl.isCompleted());
             }
+            updatePlayButton();
+        }
+    }
+
+    private void onShareTransfer() {
+        if (dl instanceof BittorrentDownload) {
+          // ask for permission to seed, start seeding, or just start seeding.
+          if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(new BTDownload[] { dl })) {
+              new ShareTorrentDialog(((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
+          }
+        } else if (dl instanceof SoundcloudDownload) {
+          // TODO: make torrent and show send dialog.
+        } else if (dl instanceof YouTubeDownload) {
+          // TODO: normalize file, make torrent and show send dialog.
+        }
+    }
+
+    private void seedTransfer() {
+        if (dl instanceof BittorrentDownload) {
+            TorrentUtil.askForPermissionToSeedAndSeedDownloads(new BTDownload[] { dl });
         }
     }
 
