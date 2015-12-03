@@ -256,6 +256,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                     UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE_FROM_PREVIEW);
                 }
             } else if (action.equals(Constants.ACTION_REQUEST_SHUTDOWN)) {
+                UXStats.instance().log(UXAction.MISC_NOTIFICATION_EXIT);
                 showShutdownDialog();
             }
         }
