@@ -523,4 +523,10 @@
     <string name="transfers_context_menu_copy_magnet">Skopiuj Magnet</string>
     <string name="thank_you">Wielkie Dzięki!</string> 
     <string name="rate_our_app">Oceń Aplikację</string>
+
+    <string name="your_privacy_is_a_fundamental_right_html">Twoja prywatność jest podstawowym prawem człowieka.</string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * Chociaż bardzo zalecamy, <b> nie musisz mieć VPN aby korzystać z FrostWire. </b></p>]]></string>
+    <string name="unprotected_connections_visibility_bullet">Niezabezpieczone połączenie sprawia, że wszystko co robisz w Internecie, jak wyszukiwania, przeglądanie stron internetowych, wysłane wiadomości, e-maile i pobrane pliki, jest widoczne dla dostawcy Internetu jak i wszystkich w Twojej sieci. Rozważ VPN.</string>
+    <string name="protected_connections_visibility_bullet">Cieszymy się że ochraniasz swoją prywatność używając VPN. Twoje połączenie jest bezpieczne.</string>
+    <string name="learn_more">Learn more</string>
 </resources>

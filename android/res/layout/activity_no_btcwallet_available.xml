@@ -22,7 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/app_ligh_background" >
+    android:background="@color/app_light_background" >
 
     <TextView
         style="@style/ListItemTitle"

@@ -176,4 +176,5 @@ public final class Constants {
     public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
 
     public static final String PIA_URL = "https://www.privateinternetaccess.com/pages/android-vpn-app/FROSTWIRE";
+    public static final String VPN_LEARN_MORE_URL = "http://www.frostwire.com/vpn";
 }

@@ -22,6 +22,6 @@
 
     <size android:width="1dp" />
 
-    <solid android:color="@color/app_boder_gray_dark" />
+    <solid android:color="@color/app_body_gray_dark" />
 
 </shape>
