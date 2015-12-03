@@ -1,4 +1,4 @@
-FrostWire 1.6.7 - NOVEMBER/30/2015
+FrostWire 1.6.7 - DECEMBER/03/2015
  - New: Select storage location. Down to the folder where you want
    your FrostWire download folders to be.
  - New: Exit/Shutdown button replaces VPN button on FrostWire status
@@ -8,6 +8,7 @@ FrostWire 1.6.7 - NOVEMBER/30/2015
  - Fixes bug where invalid names could be used to rename files.
  - Spanish translation update.
  - Fixes issues with archive.org search, download. Thanks @X-NicON.
+ - Fixes back to home arrow dissapearing bug on My Music screens.
 
 FrostWire 1.6.6 - NOVEMBER/13/2015
  - Fixes YouTube search.
