@@ -242,7 +242,8 @@
 		</activity>
 		<!-- Search interface -->
 		<activity
-			android:name="com.andrew.apollo.ui.activities.SearchActivity">
+			android:name="com.andrew.apollo.ui.activities.SearchActivity"
+			android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.SEARCH" />
 				<action android:name="android.intent.action.MEDIA_SEARCH" />

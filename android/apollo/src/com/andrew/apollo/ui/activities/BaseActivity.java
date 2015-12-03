@@ -139,10 +139,11 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
             mResources.themeActionBar(actionBar, getString(R.string.app_name), getWindow());
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setIcon(R.color.transparent);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+
 
         TextView actionBarTitleTextView = (TextView) findViewById(R.id.action_bar_title);
         if (actionBarTitleTextView != null) {
