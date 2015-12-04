@@ -152,16 +152,23 @@ public final class TorrentUtil {
     public static boolean askForPermissionToSeedAndSeedDownloads(BTDownload[] downloaders) {
         boolean allowedToResume = true;
         boolean oneIsCompleted = false;
-        for (BTDownload downloader : downloaders) {
-            if (downloader.isCompleted()) {
-                oneIsCompleted = true;
-                break;
+
+        if (downloaders != null) {
+            for (BTDownload downloader : downloaders) {
+                if (downloader.isCompleted()) {
+                    oneIsCompleted = true;
+                    break;
+                }
             }
         }
 
-        if (oneIsCompleted && !SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
+        if ((oneIsCompleted || downloaders==null) && !SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
             DialogOption answer;
-            String message1 = (downloaders.length > 1) ? I18n.tr("One of the transfers is complete and resuming will cause it to start seeding") : I18n.tr("This transfer is already complete, resuming it will cause it to start seeding");
+            String message1 = "";
+            if (downloaders != null) {
+                message1 = (downloaders.length > 1) ? I18n.tr("One of the transfers is complete and resuming will cause it to start seeding") : I18n.tr("This transfer is already complete, resuming it will cause it to start seeding");
+            }
+
             String message2 = I18n.tr("Do you want to enable torrent seeding?");
             answer = GUIMediator.showYesNoMessage(message1 + "\n\n" + message2, DialogOption.YES);
             allowedToResume = answer.equals(DialogOption.YES);
@@ -171,13 +178,12 @@ public final class TorrentUtil {
             }
         }
 
-        if (allowedToResume) {
+        if (allowedToResume && downloaders != null) {
             for (BTDownload downloader : downloaders) {
                 downloader.resume();
             }
+            UXStats.instance().log(UXAction.DOWNLOAD_RESUME);
         }
-
-        UXStats.instance().log(UXAction.DOWNLOAD_RESUME);
         return allowedToResume;
     }
 
@@ -219,9 +225,7 @@ public final class TorrentUtil {
                     if (uiTorrentMakerListener != null) {
                         uiTorrentMakerListener.beforeOpenForSeedInUIThread();
                     }
-
                     GUIMediator.instance().openTorrentForSeed(torrentFile, file.getParentFile());
-
                     if (showShareTorrentDialog) {
                         new ShareTorrentDialog(torrent).setVisible(true);
                     }

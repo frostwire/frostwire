@@ -40,6 +40,9 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
     private static final float BUTTONS_TRANSPARENCY = 0.85f;
     private static final ImageIcon play_solid;
     private static final AlphaIcon play_transparent;
+    private static final ImageIcon share_solid;
+    private static final AlphaIcon share_transparent;
+
 
     private JLabel labelPlay;
     private JLabel labelShare;
@@ -49,6 +52,8 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
     static {
         play_solid = GUIMediator.getThemeImage("search_result_play_over");
         play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
+        share_solid = GUIMediator.getThemeImage("transfers_sharing_over");
+        share_transparent = new AlphaIcon(share_solid, BUTTONS_TRANSPARENCY);
     }
 
     public TransferActionsRenderer() {
@@ -58,6 +63,21 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
     private void setupUI() {
         setLayout(new GridBagLayout());
         GridBagConstraints c;
+        c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.LINE_START;
+        c.gridx = GridBagConstraints.RELATIVE;
+        c.ipadx = 3;
+        labelShare = new JLabel(share_solid);
+        labelShare.setToolTipText(I18n.tr("Share the download url/magnet of this seeding transfer"));
+        labelShare.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    onShareTransfer();
+                }
+            }
+        });
+        add(labelShare, c);
 
         labelPlay = new JLabel(play_transparent);
         labelPlay.setToolTipText(I18n.tr("Play/Preview"));
@@ -69,24 +89,7 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
                 }
             }
         });
-
-        c = new GridBagConstraints();
-        c.gridx = GridBagConstraints.RELATIVE;
-        c.ipadx = 3;
-        add(labelPlay, c);
-
-        labelShare = new JLabel("share");
-        labelShare.setToolTipText(I18n.tr("Share the download url/magnet of this seeding transfer"));
-        labelShare.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    onShareTransfer();
-                }
-            }
-        });
-
-        add(labelShare,c);
+        add(labelPlay,c);
 
         setEnabled(true);
     }
@@ -101,7 +104,8 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
         showSolid = mouseIsOverRow(table, row);
         updatePlayButton();
         labelPlay.setVisible(dl.canPreview());
-        labelShare.setVisible(dl instanceof BittorrentDownload || dl.isCompleted());
+        boolean canShareNow = dl instanceof BittorrentDownload || dl.isCompleted();
+        labelShare.setVisible(canShareNow);
     }
 
     private void updatePlayButton() {
@@ -119,22 +123,29 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
     }
 
     private void onShareTransfer() {
+        boolean canShareNow = dl instanceof BittorrentDownload || dl.isCompleted();
+        if (!canShareNow) {
+            return;
+        }
+
         if (dl instanceof BittorrentDownload) {
-          // ask for permission to seed, start seeding, or just start seeding.
           if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(new BTDownload[] { dl })) {
               new ShareTorrentDialog(((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
           }
         } else if (dl instanceof SoundcloudDownload ||
                    dl instanceof HttpDownload) {
-          TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, true);
-          dl.setDeleteDataWhenRemove(false);
-          GUIMediator.instance().getBTDownloadMediator().remove(dl);
+            if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
+                TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, true);
+                dl.setDeleteDataWhenRemove(false);
+                GUIMediator.instance().getBTDownloadMediator().remove(dl);
+            }
         } else if (dl instanceof YouTubeDownload) {
-          // TODO: normalize file, remove transfer, get rid of unnormalized file, then make torrent.
-          // for now same as above but not useful.
-          TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, true);
-          dl.setDeleteDataWhenRemove(false);
-          GUIMediator.instance().getBTDownloadMediator().remove(dl);
+          // TODO: normalize file, remove transfer, get rid of unnormalized file, then make torrent with normalized file.
+          if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
+              TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, true);
+              dl.setDeleteDataWhenRemove(false);
+              GUIMediator.instance().getBTDownloadMediator().remove(dl);
+          }
         }
     }
 
