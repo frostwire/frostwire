@@ -45,6 +45,7 @@ public class SendFileProgressDialog extends JDialog {
 	
     private Container _container;
 	private File _preselectedFile;
+    private final TorrentMakerListener torrentMakerListener;
 
 	public SendFileProgressDialog(JFrame frame, File file) {
 		this(frame);
@@ -56,6 +57,7 @@ public class SendFileProgressDialog extends JDialog {
 
         setupUI();
         setLocationRelativeTo(frame);
+        torrentMakerListener = new TorrentMakerListener();
     }
 
     protected void setupUI() {
@@ -164,32 +166,33 @@ public class SendFileProgressDialog extends JDialog {
 	}
 
     private void onApprovedFileSelectionToSend(File absoluteFile) {
-        TorrentUtil.makeTorrentAndDownload(absoluteFile,
-            new TorrentUtil.UITorrentMakerListener() {
-                @Override
-                public void onCreateTorrentError(final error_code ec) {
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            _progressBar.setString("Error: " + ec.message());
-                        }
-                    });
-                }
+        TorrentUtil.makeTorrentAndDownload(absoluteFile, torrentMakerListener, true);
+    }
 
+    private class TorrentMakerListener implements TorrentUtil.UITorrentMakerListener {
+        @Override
+        public void onCreateTorrentError(final error_code ec) {
+            GUIMediator.safeInvokeLater(new Runnable() {
                 @Override
-                public void beforeOpenForSeedInUIThread() {
-                    dispose();
+                public void run() {
+                    _progressBar.setString("Error: " + ec.message());
                 }
+            });
+        }
 
+        @Override
+        public void beforeOpenForSeedInUIThread() {
+            dispose();
+        }
+
+        @Override
+        public void onException() {
+            GUIMediator.safeInvokeLater(new Runnable() {
                 @Override
-                public void onException() {
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            _progressBar.setString("There was an error. Make sure the file/folder is not empty.");
-                        }
-                    });
+                public void run() {
+                    _progressBar.setString("There was an error. Make sure the file/folder is not empty.");
                 }
-        },true);
+            });
+        }
     }
 }

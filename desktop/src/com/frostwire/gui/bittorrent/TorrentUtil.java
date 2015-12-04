@@ -221,6 +221,7 @@ public final class TorrentUtil {
                     }
 
                     GUIMediator.instance().openTorrentForSeed(torrentFile, file.getParentFile());
+
                     if (showShareTorrentDialog) {
                         new ShareTorrentDialog(torrent).setVisible(true);
                     }

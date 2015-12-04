@@ -124,10 +124,17 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
           if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(new BTDownload[] { dl })) {
               new ShareTorrentDialog(((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
           }
-        } else if (dl instanceof SoundcloudDownload) {
-          // TODO: make torrent and show send dialog.
+        } else if (dl instanceof SoundcloudDownload ||
+                   dl instanceof HttpDownload) {
+          TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, true);
+          dl.setDeleteDataWhenRemove(false);
+          GUIMediator.instance().getBTDownloadMediator().remove(dl);
         } else if (dl instanceof YouTubeDownload) {
-          // TODO: normalize file, make torrent and show send dialog.
+          // TODO: normalize file, remove transfer, get rid of unnormalized file, then make torrent.
+          // for now same as above but not useful.
+          TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, true);
+          dl.setDeleteDataWhenRemove(false);
+          GUIMediator.instance().getBTDownloadMediator().remove(dl);
         }
     }
 
