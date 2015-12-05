@@ -89,7 +89,7 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
         });
         add(labelShare, c);
 
-        labelSeed = new JLabel(seed_solid);
+        labelSeed = new JLabel(seed_faded);
         labelSeed.setToolTipText(I18n.tr("SEED this torrent transfer so others can download it. The more seeds, the faster the downloads."));
         labelSeed.addMouseListener(new MouseAdapter() {
             @Override
@@ -117,7 +117,6 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
             }
         });
         add(labelPlay,c);
-
         setEnabled(true);
     }
 
