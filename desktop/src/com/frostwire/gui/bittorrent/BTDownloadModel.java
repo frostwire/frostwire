@@ -114,13 +114,9 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     @Override
     public void remove(int i) {
         BTDownloadDataLine line = get(i);
-
         BTDownload downloader = line.getInitializeObject();
-
         downloader.remove();
-
         _hashDownloads.remove(downloader.getHash());
-
         super.remove(i);
     }
 
@@ -139,6 +135,7 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return columnIndex == BTDownloadDataLine.PAYMENT_OPTIONS_COLUMN.getModelIndex() ||
-                columnIndex == BTDownloadDataLine.ACTIONS_COLUMN.getModelIndex();
+                columnIndex == BTDownloadDataLine.ACTIONS_COLUMN.getModelIndex() ||
+                columnIndex == BTDownloadDataLine.SEEDING_COLUMN.getModelIndex();
     }
 }

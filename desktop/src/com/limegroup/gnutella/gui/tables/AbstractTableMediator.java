@@ -17,6 +17,7 @@ package com.limegroup.gnutella.gui.tables;
 
 import com.frostwire.gui.bittorrent.PaymentOptionsRenderer;
 import com.frostwire.gui.bittorrent.TransferActionsRenderer;
+import com.frostwire.gui.bittorrent.TransferSeedingRenderer;
 import com.limegroup.gnutella.gui.ButtonRow;
 import com.limegroup.gnutella.gui.GUIConstants;
 import com.limegroup.gnutella.gui.PaddedPanel;
@@ -157,12 +158,9 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
 
     /** Variable for the date renderer. */
     private static TableCellRenderer DATE_RENDERER;
-    
-    
     private static NameHolderRenderer NAME_HOLDER_RENDERER;
-
     private static TransferActionsRenderer TRANSFER_ACTIONS_RENDERER;
-
+    private static TransferSeedingRenderer TRANSFER_SEEDING_RENDERER;
     private static PaymentOptionsRenderer PAYMENT_OPTIONS_RENDERER;
 
     /**
@@ -1005,6 +1003,13 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
             TRANSFER_ACTIONS_RENDERER = new TransferActionsRenderer();
         }
         return TRANSFER_ACTIONS_RENDERER;
+    }
+
+    protected TransferSeedingRenderer getSeedingRenderer() {
+        if (TRANSFER_SEEDING_RENDERER == null) {
+            TRANSFER_SEEDING_RENDERER = new TransferSeedingRenderer();
+        }
+        return TRANSFER_SEEDING_RENDERER;
     }
 
     protected PaymentOptionsRenderer getPaymentOptionsRenderer() {

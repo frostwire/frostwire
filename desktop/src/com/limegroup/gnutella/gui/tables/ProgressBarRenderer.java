@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,22 +18,14 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.util.HashMap;
-import java.util.Map;
+import com.frostwire.gui.theme.SkinProgressBarUI;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JProgressBar;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.TableCellRenderer;
-
-import com.frostwire.gui.theme.SkinProgressBarUI;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class handles rendering a <tt>JProgressBar</tt> for improved

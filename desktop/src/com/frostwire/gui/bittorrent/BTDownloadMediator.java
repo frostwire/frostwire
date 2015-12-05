@@ -539,12 +539,14 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         super.setDefaultRenderers();
         TABLE.setDefaultRenderer(PaymentOptions.class, new PaymentOptionsRenderer());
         TABLE.setDefaultRenderer(TransferHolder.class, new TransferActionsRenderer());
+        TABLE.setDefaultRenderer(SeedingHolder.class, new TransferSeedingRenderer());
     }
 
     @Override
     protected void setDefaultEditors() {
         BTDownloadDataLine.PAYMENT_OPTIONS_COLUMN.setCellEditor(new GenericCellEditor(getPaymentOptionsRenderer()));
         BTDownloadDataLine.ACTIONS_COLUMN.setCellEditor(new GenericCellEditor(getTransferActionsRenderer()));
+        BTDownloadDataLine.SEEDING_COLUMN.setCellEditor(new GenericCellEditor(getSeedingRenderer()));
     }
 
     public void openTorrentFile(final File torrentFile, final boolean partialDownload, final Runnable onOpenRunnableForUIThread) {

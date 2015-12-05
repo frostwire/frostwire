@@ -34,9 +34,12 @@ import javax.swing.plaf.TableUI;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+import com.frostwire.gui.bittorrent.*;
 import com.frostwire.gui.theme.SkinTableUI;
 import com.frostwire.gui.theme.ThemeMediator;
+import com.frostwire.transfers.TransferState;
 import com.limegroup.gnutella.gui.AbstractCellEditor;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.BeveledCellPainter;
 
@@ -165,7 +168,7 @@ abstract public class FWAbstractJPanelTableCellRenderer extends JPanel implement
      */
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         // Strings get interned...
-        if (propertyName=="text"
+        if (propertyName == "text"
                 || propertyName == "labelFor"
                 || propertyName == "displayedMnemonic"
                 || ((propertyName == "font" || propertyName == "foreground")

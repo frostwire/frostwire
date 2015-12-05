@@ -447,4 +447,42 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
         return l;
     }
+
+    public static class RendererHelper {
+        public static boolean canShareNow(com.frostwire.gui.bittorrent.BTDownload dl) {
+            return (dl instanceof BittorrentDownload && dl.isCompleted()) || dl.isCompleted();
+        }
+
+        public static void onSeedTransfer(com.frostwire.gui.bittorrent.BTDownload dl, boolean showShareTorrentDialog) {
+            boolean canShareNow = canShareNow(dl);
+            if (!canShareNow) {
+                System.out.println("Not doing anything.");
+                return;
+            }
+
+            if (dl instanceof BittorrentDownload &&
+                    dl.getState().equals(TransferState.SEEDING) &&
+                    !showShareTorrentDialog) {
+                dl.pause();
+                // sorry Dijkstra.
+                return;
+            }
+
+            if (dl instanceof BittorrentDownload &&
+                    TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[] { dl }) &&
+                    showShareTorrentDialog) {
+                new ShareTorrentDialog(((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
+            } else if (dl instanceof SoundcloudDownload || dl instanceof YouTubeDownload || dl instanceof HttpDownload) {
+                if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
+                    TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, showShareTorrentDialog);
+                    dl.setDeleteDataWhenRemove(false);
+                    GUIMediator.instance().getBTDownloadMediator().remove(dl);
+                }
+            }
+            // revise this if we decide to do file normalization, meanwhile, will handle these downloads in above case.
+        /* else if (dl instanceof YouTubeDownload) {
+            // TODO: normalize file, remove transfer, get rid of unnormalized file, then make torrent with normalized file.
+        } */
+        }
+    }
 }
