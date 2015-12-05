@@ -34,7 +34,7 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
      */
     BTDownloadModel() {
         super(BTDownloadDataLine.class);
-        _hashDownloads = new HashSet<String>();
+        _hashDownloads = new HashSet<>();
     }
 
     /**
@@ -89,7 +89,7 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
 
             fireTableRowsUpdated(0, size);
         } catch (Exception e) {
-            System.out.println("ATENTION: Send the following output to the FrostWire Development team.");
+            System.out.println("ATTENTION: Send the following output to the FrostWire Development team.");
             System.out.println("===============================START COPY & PASTE=======================================");
             e.printStackTrace();
             System.out.println("===============================END COPY & PASTE=======================================");
@@ -128,9 +128,9 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
         _hashDownloads.remove(hash);
     }
 
-    public BTDownloadDataLine getDataline(int i) {
-        return get(i);
-    }
+//    public BTDownloadDataLine getDataline(int i) {
+//        return get(i);
+//    }
 
     public boolean isDownloading(String hash) {
         return _hashDownloads.contains(hash);
@@ -138,6 +138,7 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex == BTDownloadDataLine.PAYMENT_OPTIONS_INDEX || columnIndex == BTDownloadDataLine.ACTIONS_INDEX;
+        return columnIndex == BTDownloadDataLine.PAYMENT_OPTIONS_COLUMN.getModelIndex() ||
+                columnIndex == BTDownloadDataLine.ACTIONS_COLUMN.getModelIndex();
     }
 }

@@ -839,13 +839,15 @@ public final class GUIMediator {
     public static void shutdown() {
 
         // hide video player if visible
-        if (MPlayerMediator.instance() != null) {
-            try {
-                MPlayerMediator.instance().showPlayerWindow(false);
-            } catch (Throwable t) {
-                //we tried
+        try {
+            if (MPlayerMediator.instance() != null) {
+                try {
+                    MPlayerMediator.instance().showPlayerWindow(false);
+                } catch (Throwable t) {
+                    //we tried
+                }
             }
-        }
+        } catch (Throwable ignored) {}
 
         Finalizer.shutdown();
     }

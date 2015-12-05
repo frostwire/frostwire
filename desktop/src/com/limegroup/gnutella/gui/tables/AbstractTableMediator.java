@@ -15,6 +15,7 @@
 
 package com.limegroup.gnutella.gui.tables;
 
+import com.frostwire.gui.bittorrent.PaymentOptionsRenderer;
 import com.frostwire.gui.bittorrent.TransferActionsRenderer;
 import com.limegroup.gnutella.gui.ButtonRow;
 import com.limegroup.gnutella.gui.GUIConstants;
@@ -161,6 +162,8 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     private static NameHolderRenderer NAME_HOLDER_RENDERER;
 
     private static TransferActionsRenderer TRANSFER_ACTIONS_RENDERER;
+
+    private static PaymentOptionsRenderer PAYMENT_OPTIONS_RENDERER;
 
     /**
      * Resorter -- for doing real-time resorts.
@@ -555,15 +558,15 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      * @param oldLocation - table row to move
      * @param newLocation - location to insert the table row after it had been removed
      */
-    public void moveRow(int oldLocation, int newLocation) {
-        if (oldLocation < 0 || oldLocation >= DATA_MODEL.getRowCount())
-            throw new IllegalArgumentException("index " + oldLocation + " must be >= 0 and < TABLE.getRowCount()");
-        if (newLocation < 0 || newLocation >= DATA_MODEL.getRowCount())
-            throw new IllegalArgumentException("add index " + newLocation + " must be >= 0 and < TABLE.getRowCount()");
-        E e = DATA_MODEL.get(oldLocation);
-        DATA_MODEL.remove(oldLocation);
-        DATA_MODEL.add(e, newLocation);
-    }
+//    public void moveRow(int oldLocation, int newLocation) {
+//        if (oldLocation < 0 || oldLocation >= DATA_MODEL.getRowCount())
+//            throw new IllegalArgumentException("index " + oldLocation + " must be >= 0 and < TABLE.getRowCount()");
+//        if (newLocation < 0 || newLocation >= DATA_MODEL.getRowCount())
+//            throw new IllegalArgumentException("add index " + newLocation + " must be >= 0 and < TABLE.getRowCount()");
+//        E e = DATA_MODEL.get(oldLocation);
+//        DATA_MODEL.remove(oldLocation);
+//        DATA_MODEL.add(e, newLocation);
+//    }
 
     /**
      * Implements RefreshListener
@@ -630,9 +633,8 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      * Removes all selected rows from the list
      * and fires deletions through the dataModel
      * 
-     * Cancels any editing that may be occuring prior to updating the model, we
-     * must do this since editing will be occuring on the row that will be
-     * removed
+     * Cancels any editing that may be occurring prior to updating the model, we
+     * must do this since editing will be occuring on the row that will be removed.
      */
     public void removeSelection() {
         if (TABLE.isEditing()) {
@@ -695,7 +697,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
         if (menu != null) {
             try {
                 menu.show(TABLE, p.x + 1, p.y - 6);
-            } catch (IllegalComponentStateException icse) {
+            } catch (IllegalComponentStateException ignored) {
                 // happens occasionally, ignore.
             }
         }
@@ -821,7 +823,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
 
     /**
      * Abstract method for creating a right-click popup menu for the
-     * table.  If an implemention does not support a right-click
+     * table.  If an implementation does not support a right-click
      * popup menu, it should return <tt>null</tt>.
      *
      * @return a new <tt>JPopupMenu</tt> to display on right-click
@@ -865,7 +867,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
                     sortAndMaintainSelection(-1);
                     isResorting = false;
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             active = false;
             force = false;
@@ -1003,5 +1005,12 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
             TRANSFER_ACTIONS_RENDERER = new TransferActionsRenderer();
         }
         return TRANSFER_ACTIONS_RENDERER;
+    }
+
+    protected PaymentOptionsRenderer getPaymentOptionsRenderer() {
+        if (PAYMENT_OPTIONS_RENDERER == null) {
+            PAYMENT_OPTIONS_RENDERER = new PaymentOptionsRenderer();
+        }
+        return PAYMENT_OPTIONS_RENDERER;
     }
 }

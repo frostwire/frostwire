@@ -4,6 +4,8 @@ import org.limewire.util.OSUtils;
 
 import com.limegroup.gnutella.settings.UISettings;
 
+import java.io.IOException;
+
 /**
  * This class acts as a proxy for a platform-specific user notification class.
  */
@@ -73,7 +75,17 @@ public class NotifyUserProxy implements NotifyUser {
 
     public void showMessage(Notification notification) {
     	
-        if (!UISettings.SHOW_NOTIFICATIONS.getValue() || OSUtils.isMacOSX()) {
+        if (notification == null || !UISettings.SHOW_NOTIFICATIONS.getValue()) {
+            return;
+        }
+
+        if (OSUtils.isMacOSX()) {
+            ProcessBuilder pb = new ProcessBuilder("osascript","-e","'display notification \"" + notification.getMessage() + "\"");
+            try {
+                pb.start();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
             return;
         }
         

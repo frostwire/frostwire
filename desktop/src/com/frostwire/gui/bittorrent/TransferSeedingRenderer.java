@@ -36,7 +36,7 @@ import java.io.File;
  * @author gubatron
  * @author aldenml
  */
-public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRenderer {
+public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRenderer {
     private static final ImageIcon play_solid;
     private static final AlphaIcon play_transparent;
     private static final ImageIcon share_solid;
@@ -59,7 +59,7 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
         loading = GUIMediator.getThemeImage("indeterminate_small_progress");
     }
 
-    public TransferActionsRenderer() {
+    public TransferSeedingRenderer() {
         setupUI();
     }
 
@@ -153,8 +153,6 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
             } else {
                 labelSeed.setIcon(isPausing ? loading : (isSeeding ? seed_solid : seed_faded));
             }
-        } else {
-            labelSeed.setIcon(seed_faded);
         }
     }
 
