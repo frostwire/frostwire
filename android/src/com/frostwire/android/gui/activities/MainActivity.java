@@ -439,7 +439,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (!externalStoragePermissionsRequested && checker!=null && checker.noAccess()) {
             checker.requestPermissions();
             externalStoragePermissionsRequested = true;
-        } else if (mToken == null) {
+        } else if (mToken == null && checker != null && !checker.noAccess()) {
             mToken = MusicUtils.bindToService(this, this);
         }
     }
