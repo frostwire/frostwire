@@ -250,25 +250,16 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     @Override
     public File getPreviewFile() {
         BTDownloadItem item = getFirstBiggestItem();
-
         if (item != null && MediaPlayer.isPlayableFile(item.getFile())) {
             long downloaded = item.getSequentialDownloaded();
             long size = item.getSize();
-
             //LOG.debug("Downloaded: " + downloaded + ", seq: " + dl.isSequentialDownload());
-
             if (size > 0) {
-
                 long percent = (100 * downloaded) / size;
-
-                if (percent > 30 || downloaded > 10 * 1024 * 1024 || getShareRatio().equalsIgnoreCase("infinity")) {
-                    return item.getFile();
-                } else {
-                    return null;
-                }
+                return (percent > 30 || downloaded > 10 * 1024 * 1024 || getShareRatio().equalsIgnoreCase("infinity")) ?
+                    item.getFile() : null;
             }
         }
-
         return null;
     }
 
