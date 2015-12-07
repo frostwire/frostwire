@@ -37,6 +37,7 @@ import com.frostwire.util.ByteUtils;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
+import com.frostwire.uxstats.FlurryStats;
 import com.frostwire.uxstats.UXStats;
 import com.frostwire.uxstats.UXStatsConf;
 
@@ -88,7 +89,7 @@ public final class SoftwareUpdater {
     private SoftwareUpdater() {
         this.oldVersion = false;
         this.latestVersion = Constants.FROSTWIRE_VERSION_STRING;
-        this.configurationUpdateListeners = new HashSet<ConfigurationUpdateListener>();
+        this.configurationUpdateListeners = new HashSet<>();
     }
 
     public boolean isOldVersion() {
@@ -135,7 +136,7 @@ public final class SoftwareUpdater {
                             oldVersion = isFrostWireOld(mv, lv);
                         }
 
-                        updateConfiguration(update);
+                        updateConfiguration(update, context);
                     }
 
                     return handleOTAUpdate();
@@ -353,7 +354,7 @@ public final class SoftwareUpdater {
         return checkedMD5 != null && checkedMD5.trim().equalsIgnoreCase(expectedMD5.trim());
     }
 
-    private void updateConfiguration(Update update) {
+    private void updateConfiguration(Update update, Context activityContext) {
         if (update.config == null) {
             return;
         }
@@ -387,8 +388,9 @@ public final class SoftwareUpdater {
             int minEntries = update.config.uxMinEntries;
             int maxEntries = update.config.uxMaxEntries;
 
-            UXStatsConf context = new UXStatsConf(url, os, fwversion, fwbuild, period, minEntries, maxEntries);
-            UXStats.instance().setContext(context);
+            UXStatsConf uxStatsContext = new UXStatsConf(url, os, fwversion, fwbuild, period, minEntries, maxEntries);
+            UXStats.instance().setContext(uxStatsContext);
+            UXStats.instance().add3rdPartyAPI(new FlurryStats(activityContext));
         }
     }
 
@@ -397,7 +399,6 @@ public final class SoftwareUpdater {
             try {
                 listener.onConfigurationUpdate();
             } catch (Throwable t) {
-
             }
         }
     }

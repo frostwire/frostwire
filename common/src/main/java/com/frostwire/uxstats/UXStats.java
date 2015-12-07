@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 
 package com.frostwire.uxstats;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import com.frostwire.logging.Logger;
@@ -31,12 +33,11 @@ import com.frostwire.util.JsonUtils;
  */
 public final class UXStats {
     private static final boolean IS_TESTING = false;
-    
     private static final Logger LOG = Logger.getLogger(UXStats.class);
-
     private static final int HTTP_TIMEOUT = 4000;
 
     private final HttpClient httpClient;
+    private final List<UXStats3rdPartyAPI> uxStatsAPIs = new ArrayList<>();
 
     private ExecutorService executor;
     private UXStatsConf conf;
@@ -77,6 +78,12 @@ public final class UXStats {
         }
     }
 
+    public void add3rdPartyAPI(UXStats3rdPartyAPI api) {
+        if (api != null) {
+            uxStatsAPIs.add(api);
+        }
+    }
+
     /**
      * Important: This method is not thread-safe. That means it's only
      * meant to be used on the UI thread.
@@ -95,16 +102,39 @@ public final class UXStats {
                 if (isReadyToSend()) {
                     sendData();
                 }
+
+                if (!uxStatsAPIs.isEmpty()) {
+                    for (UXStats3rdPartyAPI api : uxStatsAPIs) {
+                        try {
+                            api.logAction(action);
+                        } catch (Throwable ignored) {}
+                    }
+                }
             }
         } catch (Throwable e) {
             // ignore, not important
         }
     }
 
+    /**
+     * Sends all data it has, but won't end any uxstats sessions.
+     */
     public void flush() {
+        flush(false);
+    }
+
+    public void flush(boolean endSession) {
         try {
             if (conf != null && data != null) {
                 sendData();
+            }
+
+            if (endSession && !uxStatsAPIs.isEmpty()) {
+                for (UXStats3rdPartyAPI api : uxStatsAPIs) {
+                    try {
+                        api.endSession();
+                    } catch (Throwable ignored) {}
+                }
             }
         } catch (Throwable e) {
             // ignore, not important

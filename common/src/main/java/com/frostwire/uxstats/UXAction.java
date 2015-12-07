@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,8 +126,8 @@ public final class UXAction {
         this.time = time;
     }
 
-    public final int code;
-    public final long time;
+    private final int code;
+    private final long time;
     
     public static String getActionName(int code) {
         Field[] declaredFields = UXAction.class.getDeclaredFields();
