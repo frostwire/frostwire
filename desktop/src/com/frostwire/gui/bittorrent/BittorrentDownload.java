@@ -256,10 +256,11 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
             //LOG.debug("Downloaded: " + downloaded + ", seq: " + dl.isSequentialDownload());
             if (size > 0) {
                 long percent = (100 * downloaded) / size;
+                String shareRatio = getShareRatio();
                 return (percent > 30 ||
                         downloaded > 10 * 1024 * 1024 ||
-                        getShareRatio().equalsIgnoreCase("Infinity") ||
-                        getShareRatio().equalsIgnoreCase("NaN")) ?
+                        shareRatio.equalsIgnoreCase("Infinity") ||
+                        shareRatio.equalsIgnoreCase("NaN")) ?
                     item.getFile() : null;
             }
         }
