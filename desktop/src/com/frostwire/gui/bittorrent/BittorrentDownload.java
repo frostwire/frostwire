@@ -261,7 +261,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
                 long percent = (100 * downloaded) / size;
 
-                if (percent > 30 || downloaded > 10 * 1024 * 1024) {
+                if (percent > 30 || downloaded > 10 * 1024 * 1024 || getShareRatio().equalsIgnoreCase("infinity")) {
                     return item.getFile();
                 } else {
                     return null;

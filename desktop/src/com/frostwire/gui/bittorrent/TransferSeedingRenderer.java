@@ -60,6 +60,8 @@ public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRend
         c.insets = new Insets(2,5,2,5);
 
         labelSeed = new JLabel(seed_faded);
+        labelSeed.setOpaque(false);
+        labelSeed.setDoubleBuffered(true);
         labelSeed.setToolTipText(I18n.tr("SEED this torrent transfer so others can download it. The more seeds, the faster the downloads."));
         labelSeed.addMouseListener(new MouseAdapter() {
             @Override
