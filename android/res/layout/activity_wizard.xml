@@ -46,17 +46,21 @@
 
         <Button
             android:id="@+id/activity_wizard_button_previous"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
             android:layout_weight="0.5"
-            android:text="@string/wizard_previous" />
+            android:text="@string/wizard_previous"
+            style="@style/WizardButton"
+            android:layout_margin="5dp" />
 
         <Button
             android:id="@+id/activity_wizard_button_next"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
             android:layout_weight="0.5"
-            android:text="@string/wizard_next" />
+            android:text="@string/wizard_next"
+            style="@style/WizardButton"
+            android:layout_margin="5dp" />
     </LinearLayout>
 
 </LinearLayout>
