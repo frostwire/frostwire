@@ -19,10 +19,7 @@
 package com.frostwire.gui.updates;
 
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.Session;
-import com.frostwire.jlibtorrent.TorrentAlertAdapter;
-import com.frostwire.jlibtorrent.TorrentHandle;
-import com.frostwire.jlibtorrent.TorrentStatus;
+import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.BlockFinishedAlert;
 import com.frostwire.jlibtorrent.alerts.FileErrorAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
@@ -313,8 +310,8 @@ public class InstallerUpdater implements Runnable {
         }
 
         //if (state == DownloadManager.STATE_ERROR) {
-        String error = manager.getStatus().getError();
-        if (error != null && error.length() > 0) {
+        ErrorCode error = manager.getStatus().errorCode();
+        if (error != null && error.value() != 0) {
             isDownloadingUpdate = false;
             System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             System.out.println(error);

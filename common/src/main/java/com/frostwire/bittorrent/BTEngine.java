@@ -45,17 +45,15 @@ public final class BTEngine {
     private static final int[] INNER_LISTENER_TYPES = new int[]{TORRENT_ADDED.getSwig(),
             PIECE_FINISHED.getSwig(),
             PORTMAP.getSwig(),
-            PORTMAP_ERROR.getSwig()};
+            PORTMAP_ERROR.getSwig(),
+            DHT_STATS.getSwig()};
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
-
-    private static final int SPEED_AVERAGE_CALCULATION_INTERVAL_MILLISECONDS = 2000;
 
     public static BTContext ctx;
 
     private final ReentrantLock sync;
     private final InnerListener innerListener;
-    private final DHTStatsAlertListener dhtStatsListener;
 
     private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
 
@@ -67,22 +65,9 @@ public final class BTEngine {
     private BTEngineListener listener;
     private int totalDHTNodes;
 
-    /*
-    private long bytesRecv;
-    private long bytesSent;
-    private long averageRecvSpeed;
-    private long averageSentSpeed;
-
-    // variables to keep the upload rate of this transfer
-    private long speedMarkTimestamp;
-    private long totalRecvSinceLastSpeedStamp;
-    private long totalSentSinceLastSpeedStamp;
-    */
-
     private BTEngine() {
         this.sync = new ReentrantLock();
         this.innerListener = new InnerListener();
-        this.dhtStatsListener = new DHTStatsAlertListener();
         this.restoreDownloadsQueue = new LinkedList<RestoreDownloadTask>();
     }
 
@@ -193,7 +178,6 @@ public final class BTEngine {
 
             loadSettings();
             session.addListener(innerListener);
-            session.addListener(dhtStatsListener);
 
             fireStarted();
 
@@ -214,7 +198,6 @@ public final class BTEngine {
             }
 
             session.removeListener(innerListener);
-            session.removeListener(dhtStatsListener);
             saveSettings();
 
             downloader = null;
@@ -913,37 +896,11 @@ public final class BTEngine {
                 case PORTMAP_ERROR:
                     firewalled = true;
                     break;
+                case DHT_STATS:
+                    totalDHTNodes = ((DhtStatsAlert) alert).totalNodes();
+                    break;
             }
         }
-    }
-
-    private final class DHTStatsAlertListener implements AlertListener {
-        @Override
-        public int[] types() {
-            return new int[] { AlertType.DHT_STATS.getSwig() };
-        }
-
-        public void alert(Alert<?> alert) {
-            if (alert instanceof DhtStatsAlert) {
-                DhtStatsAlert dhtAlert = (DhtStatsAlert) alert;
-                BTEngine.this.totalDHTNodes = countTotalDHTNodes(dhtAlert);
-            }
-        }
-
-        private int countTotalDHTNodes(DhtStatsAlert alert) {
-            final DHTRoutingBucket[] routingTable = alert.getRoutingTable();
-
-            int totalNodes = 0;
-            if (routingTable != null && routingTable.length > 0) {
-                for (int i=0; i < routingTable.length; i++) {
-                    DHTRoutingBucket bucket = routingTable[i];
-                    totalNodes += bucket.numNodes();
-                }
-            }
-
-            return totalNodes;
-        }
-
     }
 
     private final class RestoreDownloadTask implements Runnable {
