@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Active tab -->
+    <item android:drawable="@drawable/wizard_button_off" android:state_focused="false" android:state_pressed="false" android:state_selected="true"/>
+    <!-- Inactive tab -->
+    <item android:drawable="@drawable/wizard_button_off" android:state_focused="false" android:state_pressed="false" android:state_selected="false"/>
+    <!-- Pressed tab -->
+    <item android:drawable="@drawable/wizard_button_on" android:state_pressed="true"/>
+    <!-- Selected tab (using d-pad) -->
+    <item android:drawable="@drawable/wizard_button_on" android:state_focused="true" android:state_pressed="false" android:state_selected="true"/>
+
+</selector>
