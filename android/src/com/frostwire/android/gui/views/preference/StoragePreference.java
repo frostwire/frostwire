@@ -148,19 +148,19 @@ public class StoragePreference extends DialogPreference {
         }
     }
 
-    public static void updateStorageOptionSummary(Activity activity, String newPath) {
+    public static void updateStorageOptionSummary(Context context, String newPath) {
         // intentional repetition of preference value here
         String lollipopKey = "frostwire.prefs.storage.path_asf";
         if (SystemUtils.hasLollipopOrNewer()) {
-            Preference p = getPreference(activity, lollipopKey);
+            Preference p = getPreference(context, lollipopKey);
             if (p != null) {
                 p.setSummary(newPath);
             }
         }
     }
 
-    private static Preference getPreference(Activity activity, String prefKey) {
-        SharedPreferences preferenceManager = PreferenceManager.getDefaultSharedPreferences(activity);
+    private static Preference getPreference(Context context, String prefKey) {
+        SharedPreferences preferenceManager = PreferenceManager.getDefaultSharedPreferences(context);
         Map<String, ?> preferences = preferenceManager.getAll();
         return (Preference) preferences.get(prefKey);
     }
