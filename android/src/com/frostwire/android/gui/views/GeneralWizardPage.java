@@ -87,15 +87,14 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
 
         View.inflate(getContext(), R.layout.view_general_wizard_page, this);
         final TextView textWifiOnly = (TextView) findViewById(R.id.view_general_wizard_page_wifi_only_text);
-
+        
         checkSeedFinishedTorrents = (CheckBox) findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents);
         checkSeedFinishedTorrents.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 checkSeedFinishedTorrentsWifiOnly.setEnabled(isChecked);
                 checkSeedFinishedTorrentsWifiOnly.setTextColor((isChecked) ? Color.WHITE : getContext().getResources().getColor(R.color.frostwire_gray_explanation_text_dark));
-                textWifiOnly.setTextColor(checkSeedFinishedTorrents.isChecked() ? getContext().getResources().getColor(R.color.frostwire_gray_explanation_text) : getContext().getResources().getColor(R.color.frostwire_gray_explanation_text_dark));
+                textWifiOnly.setTextColor(getContext().getResources().getColor(checkSeedFinishedTorrents.isChecked() ? R.color.frostwire_gray_explanation_text : R.color.frostwire_gray_explanation_text_dark));
                 validate();
-
             }
         });
 
