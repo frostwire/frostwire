@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.activities.WizardActivity;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 
 /**
@@ -95,12 +96,7 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         View.inflate(getContext(), R.layout.view_general_wizard_page, this);
 
         textStoragePath = (TextView) findViewById(R.id.view_general_wizard_page_storage_path);
-        textStoragePath.setOnClickListener(new ClickAdapter<Activity>((Activity) getContext()) {
-            @Override
-            public void onClick(Activity owner, View v) {
-                StoragePreference.invokeStoragePreference(owner);
-            }
-        });
+        textStoragePath.setOnClickListener(new StoragePathTextViewAdapter((Activity) getContext()));
 
         checkSeedFinishedTorrents = (CheckBox) findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents);
         checkSeedFinishedTorrents.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -141,5 +137,16 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
      */
     private void validate() {
         onComplete(true);
+    }
+
+    private static class StoragePathTextViewAdapter extends ClickAdapter<Activity> {
+        public StoragePathTextViewAdapter(Activity owner) {
+            super(owner);
+        }
+
+        @Override
+        public void onClick(Activity owner, View v) {
+            StoragePreference.invokeStoragePreference(owner);
+        }
     }
 }
