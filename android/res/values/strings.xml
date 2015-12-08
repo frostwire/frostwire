@@ -438,7 +438,7 @@
     <string name="turn_on_wifi_sharing">Turn on Wi-fi Sharing</string>    
     <string name="are_you_sure_wifi_sharing_off">Turning off Wi-Fi sharing will make all your locally shared files unavailable to other users on the nearby Wi-Fi network.</string>
     <string name="anonymous_usage_statistics">Anonymous Usage Statistics</string>
-    <string name="anonymous_usage_statistics_summary">Send anonymous usage statistics. No information regarding content searched, shared or played nor any information that can personally identify you will be stored on disk or sent through the network.</string>
+    <string name="anonymous_usage_statistics_summary">Send anonymous usage statistics. No information that can personally identify you will be stored on disk or sent through the network.</string>
     <string name="paused_song_name">Paused %s</string>
     <string name="use_bitsnoop">Use BitSnoop</string>
     <string name="use_torlock">Use TorLock</string>
