@@ -48,7 +48,8 @@
     <!-- Other colors (old) -->
     <color name="frostwire_light_blue">#ff7adafa</color>
     <color name="frostwire_orange">#ffe9a54c</color>
-    <color name="frostwire_gray_explanation_text">#ff99aabb</color>
+    <color name="frostwire_gray_explanation_text">#abb3bc</color>
+    <color name="frostwire_gray_explanation_text_dark">#ff6f7d88</color>
 
     <!-- General application colors -->
     <color name="app_search_blue">#ff375065</color>
