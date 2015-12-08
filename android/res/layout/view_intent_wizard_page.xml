@@ -25,21 +25,20 @@
 
     <TextView
         android:id="@+id/view_intent_wizard_page_text"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:layout_marginBottom="10dp"
         android:text="@string/intent_text"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@android:color/white" />
+        style="@style/WizardSubTitle" />
 
     <CheckBox
         android:id="@+id/view_intent_wizard_page_check_accept"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="10dp"
         android:text="@string/accept_intent"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        style="@style/WizardText" />
 
 </LinearLayout>

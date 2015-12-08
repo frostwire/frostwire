@@ -419,4 +419,23 @@
         <item name="android:textColor">@color/app_text_secondary</item>
     </style>
 
+    <!-- Wizard Activity -->
+    <style name="WizardTitle">
+        <item name="android:textSize">@dimen/text_size_x_large</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="WizardText">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/frostwire_gray_explanation_text</item>
+    </style>
+    <style name="WizardSubTitle">
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:fontFamily">sans-serif-regular</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="WizardButton">
+        <item name="android:background">@drawable/wizard_button_selector</item>
+    </style>
 </resources>
