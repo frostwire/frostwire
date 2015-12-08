@@ -93,7 +93,7 @@ public class SettingsActivity extends PreferenceActivity {
         String action = getIntent().getAction();
         if (action != null && action.equals(Constants.ACTION_SETTINGS_SELECT_STORAGE)) {
             getIntent().setAction(null);
-            invokeStoragePreference();
+            StoragePreference.invokeStoragePreference(this);
         }
 
         updateConnectSwitch();
@@ -151,17 +151,6 @@ public class SettingsActivity extends PreferenceActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void invokeStoragePreference() {
-        if (SystemUtils.hasLollipop()) {
-            StoragePicker.show(this);
-        } else {
-            final StoragePreference storagePreference = (StoragePreference) findPreference(Constants.PREF_KEY_STORAGE_PATH);
-            if (storagePreference != null) {
-                storagePreference.showDialog(null);
-            }
         }
     }
 
@@ -332,6 +321,7 @@ public class SettingsActivity extends PreferenceActivity {
         PreferenceCategory category = (PreferenceCategory) findPreference("frostwire.prefs.general");
 
         if (SystemUtils.hasLollipop()) {
+            // make sure this won't be saved for kitkat
             Preference p = findPreference(kitkatKey);
             if (p != null) {
                 category.removePreference(p);
@@ -341,27 +331,16 @@ public class SettingsActivity extends PreferenceActivity {
                 p.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        updateStorageOptionSummary(newValue.toString());
+                        StoragePreference.updateStorageOptionSummary(SettingsActivity.this, newValue.toString());
                         return true;
                     }
                 });
-                updateStorageOptionSummary(ConfigurationManager.instance().getStoragePath());
+                StoragePreference.updateStorageOptionSummary(this, ConfigurationManager.instance().getStoragePath());
             }
         } else {
             Preference p = findPreference(lollipopKey);
             if (p != null) {
                 category.removePreference(p);
-            }
-        }
-    }
-
-    private void updateStorageOptionSummary(String newPath) {
-        // intentional repetition of preference value here
-        String lollipopKey = "frostwire.prefs.storage.path_asf";
-        if (SystemUtils.hasLollipop()) {
-            Preference p = findPreference(lollipopKey);
-            if (p != null) {
-                p.setSummary(newPath);
             }
         }
     }

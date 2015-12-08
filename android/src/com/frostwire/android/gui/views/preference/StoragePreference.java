@@ -21,15 +21,20 @@ package com.frostwire.android.gui.views.preference;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.DialogPreference;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +46,9 @@ import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.SystemPaths;
+import com.frostwire.android.gui.StoragePicker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.gui.views.AbstractAdapter.OnItemClickAdapter;
@@ -126,6 +133,37 @@ public class StoragePreference extends DialogPreference {
             super.onClick(dialog, which);
         }
     }
+
+    private static Preference getPreference(Activity activity, String prefKey) {
+        SharedPreferences preferenceManager = PreferenceManager.getDefaultSharedPreferences(activity);
+        Map<String, ?> preferences = preferenceManager.getAll();
+        return (Preference) preferences.get(prefKey);
+    }
+
+    public static void invokeStoragePreference(Activity activity) {
+        if (SystemUtils.hasLollipop()) {
+            StoragePicker.show(activity);
+        } else {
+
+            final StoragePreference storagePreference = (StoragePreference) getPreference(activity, Constants.PREF_KEY_STORAGE_PATH);
+            if (storagePreference != null) {
+                storagePreference.showDialog(null);
+            }
+        }
+    }
+
+    public static void updateStorageOptionSummary(Activity activity, String newPath) {
+        // intentional repetition of preference value here
+        String lollipopKey = "frostwire.prefs.storage.path_asf";
+        if (SystemUtils.hasLollipop()) {
+            Preference p = getPreference(activity, lollipopKey);
+            if (p != null) {
+                p.setSummary(newPath);
+            }
+        }
+    }
+
+
 
     private void uxLogSelection() {
         try {
