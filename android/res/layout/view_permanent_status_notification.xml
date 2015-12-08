@@ -112,8 +112,7 @@
         android:layout_height="fill_parent"
         android:gravity="center_vertical"
         android:layout_gravity="right|center_vertical|center"
-        android:layout_marginBottom="0dp"
-        android:layout_marginRight="5dp"
+        android:layout_margin="0dp"
         android:background="@color/transparent"
         android:scaleType="center"
         android:src="@drawable/notification_shutdown" />
