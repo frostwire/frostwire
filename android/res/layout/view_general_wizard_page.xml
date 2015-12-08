@@ -92,18 +92,19 @@
         style="@style/WizardSubTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="25dp"
         android:text="@string/seed_finished_torrents_wifi_only" />
 
     <TextView
         style="@style/WizardText"
+        android:id="@+id/view_general_wizard_page_wifi_only_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="30dp"
         android:text="@string/seeding_wifi_settings_explanation"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/frostwire_gray_explanation_text" />
+        android:textColor="@color/frostwire_gray_explanation_text_dark" />
 
     <TextView
         style="@style/WizardSubTitle"
