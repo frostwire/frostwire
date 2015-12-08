@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.activities.WizardActivity;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 
 /**
@@ -46,7 +45,6 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
     private CheckBox checkSeedFinishedTorrents;
     private CheckBox checkSeedFinishedTorrentsWifiOnly;
     private CheckBox checkUXStats;
-
 
     public GeneralWizardPage(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -104,9 +102,8 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 checkSeedFinishedTorrentsWifiOnly.setEnabled(isChecked);
                 checkSeedFinishedTorrentsWifiOnly.setTextColor((isChecked) ? Color.WHITE : getContext().getResources().getColor(R.color.frostwire_gray_explanation_text_dark));
-                textWifiOnly.setTextColor(checkSeedFinishedTorrents.isChecked() ? getContext().getResources().getColor(R.color.frostwire_gray_explanation_text) : getContext().getResources().getColor(R.color.frostwire_gray_explanation_text_dark));
+                textWifiOnly.setTextColor(getContext().getResources().getColor(checkSeedFinishedTorrents.isChecked() ? R.color.frostwire_gray_explanation_text : R.color.frostwire_gray_explanation_text_dark));
                 validate();
-
             }
         });
 
