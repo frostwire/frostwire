@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.views;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
@@ -26,11 +27,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
-
 import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.views.preference.StoragePreference;
 
 /**
  * @author gubatron
@@ -40,10 +41,11 @@ import com.frostwire.android.core.Constants;
 public class GeneralWizardPage extends RelativeLayout implements WizardPageView {
 
     private OnCompleteListener listener;
-
+    private TextView textStoragePath;
     private CheckBox checkSeedFinishedTorrents;
     private CheckBox checkSeedFinishedTorrentsWifiOnly;
     private CheckBox checkUXStats;
+
 
     public GeneralWizardPage(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -61,6 +63,7 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
 
     @Override
     public void load() {
+        textStoragePath.setText(ConfigurationManager.instance().getStoragePath());
         checkSeedFinishedTorrents.setChecked(ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS));
         checkSeedFinishedTorrentsWifiOnly.setChecked(ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
         checkSeedFinishedTorrentsWifiOnly.setEnabled(checkSeedFinishedTorrents.isChecked());
@@ -81,11 +84,23 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         this.listener = listener;
     }
 
+    public void updateStoragePathTextView(String newLocation) {
+        textStoragePath.setText(newLocation);
+    }
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
 
         View.inflate(getContext(), R.layout.view_general_wizard_page, this);
+
+        textStoragePath = (TextView) findViewById(R.id.view_general_wizard_page_storage_path);
+        textStoragePath.setOnClickListener(new ClickAdapter<Activity>((Activity) getContext()) {
+            @Override
+            public void onClick(Activity owner, View v) {
+                StoragePreference.invokeStoragePreference(owner);
+            }
+        });
 
         checkSeedFinishedTorrents = (CheckBox) findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents);
         checkSeedFinishedTorrents.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -125,8 +140,6 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
      * Put more complete/validation logic here.
      */
     private void validate() {
-        boolean complete = true;
-
-        onComplete(complete);
+        onComplete(true);
     }
 }

@@ -91,7 +91,6 @@ public final class SystemUtils {
      * returns true if the media is present
      * and mounted at its mount point with read/write access.
      *
-     * @return
      * @see android.os.Environment#MEDIA_MOUNTED
      */
     public static boolean isPrimaryExternalStorageMounted() {
@@ -104,8 +103,6 @@ public final class SystemUtils {
      * returns true if the media is present
      * and mounted at its mount point with read/write access.
      *
-     * @param path
-     * @return
      * @see android.os.Environment#MEDIA_MOUNTED
      */
     public static boolean isSecondaryExternalStorageMounted(File path) {
@@ -115,7 +112,7 @@ public final class SystemUtils {
 
         boolean result = false;
 
-        if (hasKitKat()) {
+        if (hasKitKatOrNewer()) {
             result = Environment.MEDIA_MOUNTED.equals(EnvironmentCompat.getStorageState(path));
         } else {
             try {
@@ -135,7 +132,7 @@ public final class SystemUtils {
     }
 
     public static long getAvailableStorageSize(File dir) {
-        long size = -1;
+        long size;
         try {
             StatFs stat = new StatFs(dir.getAbsolutePath());
             size = ((long) stat.getAvailableBlocks()) * stat.getBlockSize();
@@ -149,12 +146,10 @@ public final class SystemUtils {
     /**
      * Use this instead ContextCompat
      *
-     * @param context
-     * @return
      */
     public static File[] getExternalFilesDirs(Context context) {
-        if (hasKitKat()) {
-            List<File> dirs = new LinkedList<File>();
+        if (hasKitKatOrNewer()) {
+            List<File> dirs = new LinkedList<>();
 
             for (File f : ContextCompat.getExternalFilesDirs(context, null)) {
                 if (f != null) {
@@ -162,9 +157,9 @@ public final class SystemUtils {
                 }
             }
 
-            return dirs.toArray(new File[0]);
+            return dirs.toArray(new File[dirs.size()]);
         } else {
-            List<File> dirs = new LinkedList<File>();
+            List<File> dirs = new LinkedList<>();
 
             dirs.add(context.getExternalFilesDir(null));
 
@@ -180,11 +175,15 @@ public final class SystemUtils {
                 LOG.error("Unable to get secondary external storages", e);
             }
 
-            return dirs.toArray(new File[0]);
+            return dirs.toArray(new File[dirs.size()]);
         }
     }
 
-    public static boolean hasSdk(int versionCode) {
+    public static boolean isSdk(int versionCode) {
+        return Build.VERSION.SDK_INT == versionCode;
+    }
+
+    public static boolean hasSdkOrNewer(int versionCode) {
         return Build.VERSION.SDK_INT >= versionCode;
     }
 
@@ -195,8 +194,8 @@ public final class SystemUtils {
      * @return True if the device is running KitKat or greater,
      * false otherwise
      */
-    public static final boolean hasKitKat() {
-        return hasSdk(VERSION_CODE_KITKAT);
+    public static boolean hasKitKatOrNewer() {
+        return hasSdkOrNewer(VERSION_CODE_KITKAT);
     }
 
     /**
@@ -206,7 +205,7 @@ public final class SystemUtils {
      * @return True if the device is running KitKat or greater,
      * false otherwise
      */
-    public static final boolean hasLollipop() {
-        return hasSdk(VERSION_CODE_LOLLIPOP);
+    public static boolean hasLollipopOrNewer() {
+        return hasSdkOrNewer(VERSION_CODE_LOLLIPOP);
     }
 }

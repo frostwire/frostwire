@@ -47,11 +47,11 @@
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
-        android:text="Current Storage Location"
+        android:text="@string/storage_path"
         android:textColor="@color/white" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/view_general_wizard_page_storage_path"
         style="@style/WizardText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

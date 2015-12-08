@@ -562,6 +562,7 @@
     <string name="storage_picker_treeuri_not_directory">[MSG: storage_picker_treeuri_not_directory]</string>
     <string name="storage_picker_treeuri_cant_write">[MSG: storage_picker_treeuri_cant_write]</string>
     <string name="storage_picker_treeuri_error">[MSG: storage_picker_treeuri_error]</string>
+    <string name="storage_path">Storage Path</string>
 
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="your_privacy_is_a_fundamental_right_html">Your privacy is a fundamental human right.</string>

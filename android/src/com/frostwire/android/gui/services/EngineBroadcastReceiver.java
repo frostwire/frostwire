@@ -19,12 +19,10 @@
 package com.frostwire.android.gui.services;
 
 import java.io.File;
-import java.util.concurrent.ExecutorService;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
@@ -34,7 +32,6 @@ import android.util.Log;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.UniversalScanner;
@@ -165,7 +162,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 Intent i = new Intent(Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
                 context.sendBroadcast(i);
 
-                if (SystemUtils.hasKitKat()) {
+                if (SystemUtils.hasKitKatOrNewer()) {
                     final File privateDir = new File(path + File.separator + "Android" + File.separator + "data" + File.separator + context.getPackageName() + File.separator + "files" + File.separator + "FrostWire");
                     if (privateDir.exists() && privateDir.isDirectory()) {
                         Thread t = new Thread(new Runnable() {

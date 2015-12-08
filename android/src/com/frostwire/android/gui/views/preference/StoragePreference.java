@@ -29,6 +29,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -49,6 +50,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.StoragePicker;
+import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.gui.views.AbstractAdapter.OnItemClickAdapter;
@@ -134,14 +136,8 @@ public class StoragePreference extends DialogPreference {
         }
     }
 
-    private static Preference getPreference(Activity activity, String prefKey) {
-        SharedPreferences preferenceManager = PreferenceManager.getDefaultSharedPreferences(activity);
-        Map<String, ?> preferences = preferenceManager.getAll();
-        return (Preference) preferences.get(prefKey);
-    }
-
     public static void invokeStoragePreference(Activity activity) {
-        if (SystemUtils.hasLollipop()) {
+        if (SystemUtils.hasLollipopOrNewer()) {
             StoragePicker.show(activity);
         } else {
 
@@ -155,7 +151,7 @@ public class StoragePreference extends DialogPreference {
     public static void updateStorageOptionSummary(Activity activity, String newPath) {
         // intentional repetition of preference value here
         String lollipopKey = "frostwire.prefs.storage.path_asf";
-        if (SystemUtils.hasLollipop()) {
+        if (SystemUtils.hasLollipopOrNewer()) {
             Preference p = getPreference(activity, lollipopKey);
             if (p != null) {
                 p.setSummary(newPath);
@@ -163,7 +159,11 @@ public class StoragePreference extends DialogPreference {
         }
     }
 
-
+    private static Preference getPreference(Activity activity, String prefKey) {
+        SharedPreferences preferenceManager = PreferenceManager.getDefaultSharedPreferences(activity);
+        Map<String, ?> preferences = preferenceManager.getAll();
+        return (Preference) preferences.get(prefKey);
+    }
 
     private void uxLogSelection() {
         try {
@@ -203,6 +203,16 @@ public class StoragePreference extends DialogPreference {
         if (getDialog() != null) {
             getDialog().dismiss();
         }
+    }
+
+    public static String onDocumentTreeActivityResult(Context context, int requestCode, int resultCode, Intent data) {
+        final String selectedPath = StoragePicker.handle(context, requestCode, resultCode, data);
+        if (selectedPath != null) {
+            ConfigurationManager.instance().setStoragePath(selectedPath);
+            BTEngine.ctx.dataDir = SystemPaths.getTorrentData();
+            BTEngine.ctx.torrentsDir = SystemPaths.getTorrents();
+        }
+        return selectedPath;
     }
 
     private static final class StorageMount {
