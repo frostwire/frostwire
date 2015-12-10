@@ -132,7 +132,11 @@ public class VPNStatusDetailActivity extends AbstractActivity {
                 UIUtils.openURL(owner, Constants.VPN_LEARN_MORE_URL);
             }
             else {
-                UIUtils.openURL(owner, Constants.PIA_URL);
+                String vpnUrl = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ?
+                        Constants.EXPRESSVPN_URL_BASIC :
+                        Constants.EXPRESSVPN_URL_PLUS;
+
+                UIUtils.openURL(owner, vpnUrl);
             }
 
         }
