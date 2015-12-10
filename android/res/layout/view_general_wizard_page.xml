@@ -33,14 +33,14 @@
         android:text="@string/welcome_to_frostwire" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/view_general_wizard_page_title_horizontal_break"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@drawable/main_header_background"
         android:src="@drawable/main_header_background" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/view_general_wizard_page_storage_path_title"
         style="@style/WizardSubTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
         android:textColor="@color/white" />
 
     <TextView
-        android:id="@+id/view_general_wizard_page_storage_path"
+        android:id="@+id/view_general_wizard_page_storage_path_textview"
         style="@style/WizardText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

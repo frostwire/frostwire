@@ -23,15 +23,13 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.views.preference.StoragePreference;
+import com.frostwire.android.util.SystemUtils;
 
 /**
  * @author gubatron
@@ -94,8 +92,17 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         View.inflate(getContext(), R.layout.view_general_wizard_page, this);
         final TextView textWifiOnly = (TextView) findViewById(R.id.view_general_wizard_page_wifi_only_text);
 
-        textStoragePath = (TextView) findViewById(R.id.view_general_wizard_page_storage_path);
-        textStoragePath.setOnClickListener(new StoragePathTextViewAdapter((Activity) getContext()));
+        TextView textStoragePathTitle = (TextView) findViewById(R.id.view_general_wizard_page_storage_path_title);
+        textStoragePath = (TextView) findViewById(R.id.view_general_wizard_page_storage_path_textview);
+        ImageView titleHorizontalBreak = (ImageView) findViewById(R.id.view_general_wizard_page_title_horizontal_break);
+
+        if (SystemUtils.hasMarshmallowOrNewer() || StoragePreference.isLollipopWithNoSDCardHACK(getContext())) {
+            textStoragePath.setOnClickListener(new StoragePathTextViewAdapter((Activity) getContext()));
+        } else {
+            titleHorizontalBreak.setVisibility(View.GONE);
+            textStoragePathTitle.setVisibility(View.GONE);
+            textStoragePath.setVisibility(View.GONE);
+        }
 
         checkSeedFinishedTorrents = (CheckBox) findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents);
         checkSeedFinishedTorrents.setOnCheckedChangeListener(new OnCheckedChangeListener() {

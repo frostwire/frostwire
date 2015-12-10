@@ -43,8 +43,8 @@ public final class SystemUtils {
     private static final Logger LOG = Logger.getLogger(SystemUtils.class);
 
     private static final int VERSION_CODE_KITKAT = 19;
-
     private static final int VERSION_CODE_LOLLIPOP = 21;
+    private static final int VERSION_CODE_MARSHMALLOW = 23;
 
     private SystemUtils() {
     }
@@ -208,4 +208,13 @@ public final class SystemUtils {
     public static boolean hasLollipopOrNewer() {
         return hasSdkOrNewer(VERSION_CODE_LOLLIPOP);
     }
+
+    /**
+     * Used to determine if the device is running
+     * Marshmallow (Android 6.0) or greater
+     *
+     * @return True if the device is running Marhmallow or greater,
+     * false otherwise
+     */
+    public static boolean hasMarshmallowOrNewer() { return hasSdkOrNewer(VERSION_CODE_MARSHMALLOW); }
 }

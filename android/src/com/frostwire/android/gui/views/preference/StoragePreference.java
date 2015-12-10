@@ -21,7 +21,6 @@ package com.frostwire.android.gui.views.preference;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -30,12 +29,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.DialogPreference;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
+import android.preference.PreferenceActivity;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +48,6 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.StoragePicker;
-import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.gui.views.AbstractAdapter.OnItemClickAdapter;
@@ -136,33 +133,46 @@ public class StoragePreference extends DialogPreference {
         }
     }
 
+    /**
+     * If used on an android version that doesn't support StoragePicker.show(), the given
+     * activity HAS to be a PreferenceActivity, otherwise the StoragePreference.showDialog() method
+     * will throw NPE.
+     *
+     * For now it will only show for lollipop devices with no secondary sd cards.
+     * @param activity
+     */
     public static void invokeStoragePreference(Activity activity) {
-        if (SystemUtils.hasLollipopOrNewer()) {
+        System.out.println("StoragePreference.invokeStoragePreference: external dirs -> " + SystemUtils.getExternalFilesDirs(activity).length);
+        if (SystemUtils.hasMarshmallowOrNewer() || StoragePreference.isLollipopWithNoSDCardHACK(activity)) {
             StoragePicker.show(activity);
-        } else {
-
-            final StoragePreference storagePreference = (StoragePreference) getPreference(activity, Constants.PREF_KEY_STORAGE_PATH);
+        } else if (activity instanceof PreferenceActivity) {
+            final StoragePreference storagePreference = (StoragePreference) ((PreferenceActivity) activity).findPreference(Constants.PREF_KEY_STORAGE_PATH);
             if (storagePreference != null) {
                 storagePreference.showDialog(null);
             }
         }
     }
 
-    public static void updateStorageOptionSummary(Context context, String newPath) {
+    public static void updateStorageOptionSummary(PreferenceActivity activity, String newPath) {
         // intentional repetition of preference value here
         String lollipopKey = "frostwire.prefs.storage.path_asf";
-        if (SystemUtils.hasLollipopOrNewer()) {
-            Preference p = getPreference(context, lollipopKey);
+        if (SystemUtils.hasMarshmallowOrNewer() || StoragePreference.isLollipopWithNoSDCardHACK(activity)) {
+            final Preference p = activity.findPreference(lollipopKey);
             if (p != null) {
                 p.setSummary(newPath);
             }
         }
     }
 
-    private static Preference getPreference(Context context, String prefKey) {
-        SharedPreferences preferenceManager = PreferenceManager.getDefaultSharedPreferences(context);
-        Map<String, ?> preferences = preferenceManager.getAll();
-        return (Preference) preferences.get(prefKey);
+    /** Add this on your activity's onActivityResult() method to obtain the selected path. */
+    public static String onDocumentTreeActivityResult(Context context, int requestCode, int resultCode, Intent data) {
+        final String selectedPath = StoragePicker.handle(context, requestCode, resultCode, data);
+        if (selectedPath != null) {
+            ConfigurationManager.instance().setStoragePath(selectedPath);
+            BTEngine.ctx.dataDir = SystemPaths.getTorrentData();
+            BTEngine.ctx.torrentsDir = SystemPaths.getTorrents();
+        }
+        return selectedPath;
     }
 
     private void uxLogSelection() {
@@ -205,14 +215,9 @@ public class StoragePreference extends DialogPreference {
         }
     }
 
-    public static String onDocumentTreeActivityResult(Context context, int requestCode, int resultCode, Intent data) {
-        final String selectedPath = StoragePicker.handle(context, requestCode, resultCode, data);
-        if (selectedPath != null) {
-            ConfigurationManager.instance().setStoragePath(selectedPath);
-            BTEngine.ctx.dataDir = SystemPaths.getTorrentData();
-            BTEngine.ctx.torrentsDir = SystemPaths.getTorrents();
-        }
-        return selectedPath;
+    // TODO: Delete this ugly hack.
+    public static boolean isLollipopWithNoSDCardHACK(Context context) {
+        return SystemUtils.hasLollipopOrNewer() && SystemUtils.getExternalFilesDirs(context).length==1;
     }
 
     private static final class StorageMount {
