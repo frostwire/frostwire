@@ -72,8 +72,10 @@ public final class StoragePicker {
                 ContentResolver cr = context.getContentResolver();
 
                 Method takePersistableUriPermissionM = cr.getClass().getMethod("takePersistableUriPermission", Uri.class, int.class);
-                takePersistableUriPermissionM.invoke(cr, treeUri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                final int takeFlags = data.getFlags()
+                        & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                takePersistableUriPermissionM.invoke(cr, treeUri, takeFlags);
 
                 if (treeUri == null) {
                     UIUtils.showShortMessage(context, R.string.storage_picker_treeuri_null);
@@ -95,6 +97,7 @@ public final class StoragePicker {
             UIUtils.showShortMessage(context, R.string.storage_picker_treeuri_error);
             LOG.error("Error handling folder selection", e);
         }
+
 
         return result;
     }
