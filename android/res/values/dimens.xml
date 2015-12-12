@@ -29,4 +29,14 @@
     <dimen name="promo_download_button_width">130dp</dimen>
 
     <dimen name="view_transfer_list_item_title_left_drawable">20dp</dimen>
+
+    <!-- Text sizes -->
+    <dimen name="text_extra_micro">10.0sp</dimen>
+    <dimen name="text_micro">11.0sp</dimen>
+    <dimen name="text_x_small">12.0sp</dimen>
+    <dimen name="text_small">14.0sp</dimen>
+    <dimen name="text_medium">16.0sp</dimen>
+    <dimen name="text_large">18.0sp</dimen>
+    <dimen name="text_x_large">20.0sp</dimen>
+    <dimen name="text_xx_large">24.0sp</dimen>
 </resources>

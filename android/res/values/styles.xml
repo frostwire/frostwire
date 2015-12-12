@@ -159,7 +159,7 @@
     <style name="MainFragmentSimpleHeader" parent="@android:style/TextAppearance.Large">
         <item name="android:textSize">18sp</item>
         <item name="android:gravity">center</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <!-- Main Fragment Simple Header end -->
@@ -224,24 +224,24 @@
     <style name="TransfersList.Item"></style>
 
     <style name="TransfersList.Item.Title">
+        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:singleLine">true</item>
-        <item name="android:textSize">15sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#ff3b3b3b</item>
+        <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
     <style name="TransfersList.Item.Status">
         <item name="android:singleLine">true</item>
-        <item name="android:textSize">10sp</item>
-        <item name="android:textColor">#ff3b3b3b</item>
+        <item name="android:textSize">@dimen/text_micro</item>
+        <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
     <style name="TransfersList.SubItem"></style>
 
     <style name="TransfersList.SubItem.Title">
         <item name="android:singleLine">true</item>
-        <item name="android:textSize">13sp</item>
-        <item name="android:textColor">#ff3b3b3b</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
     <!-- Transfers list end -->
@@ -266,7 +266,7 @@
     <style name="TransfersNotificationTitle">
         <item name="android:textColor">@color/black</item>
         <item name="android:fontFamily">sans-serif-condensed</item>
-        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:textSize">@dimen/text_medium</item>
     </style>
 
     <style name="TransfersNotificationSub">
@@ -310,14 +310,14 @@
 
     <style name="TransferListItemSize">
         <item name="android:singleLine">true</item>
-        <item name="android:textSize">10dp</item>
-        <item name="android:textColor">#ff54afe4</item>
+        <item name="android:textSize">@dimen/text_micro</item>
+        <item name="android:textColor">@color/basic_blue_darker_highlight</item>
     </style>
 
     <style name="NoSearchResultsLink">
         <item name="android:singleLine">true</item>
         <item name="android:textSize">18dp</item>
-        <item name="android:textColor">#ff54afe4</item>
+        <item name="android:textColor">@color/app_highlight_text</item>
     </style>
 
     <style name="SearchResultListItemSource">
