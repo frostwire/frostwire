@@ -327,7 +327,13 @@ public final class DiskLruCache implements Closeable {
             } catch (final IOException journalIsCorrupt) {
                 // System.logW("DiskLruCache " + directory + " is corrupt: "
                 // + journalIsCorrupt.getMessage() + ", removing");
-                cache.delete();
+                // Gubatron: This thing is failing if the passed argument isn't a folder
+                // e.g. dir.listFiles() == null, throws illegal argument exception.
+                try {
+                    cache.delete();
+                } catch (IllegalArgumentException ignored) {
+
+                }
             }
         }
 
