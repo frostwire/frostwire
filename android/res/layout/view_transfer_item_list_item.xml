@@ -22,7 +22,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/transfers_listview_item_background_selector"
+    android:background="@color/basic_white"
     android:baselineAligned="false"
     android:orientation="horizontal"
     android:paddingBottom="1px"
@@ -32,7 +32,7 @@
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/browse_peer_list_item_download_button_background"
+        android:background="@color/body_background_gray_light"
         android:gravity="center|center_vertical"
         android:paddingBottom="10dp"
         android:paddingLeft="5dp"
@@ -49,11 +49,16 @@
             android:src="@drawable/browse_peer_audio_icon_selector_off" />
     </FrameLayout>
 
-    <RelativeLayout
-        android:layout_width="0dip"
-        android:layout_height="fill_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="5dp" >
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
 
         <TextView
             android:id="@+id/view_transfer_item_list_item_title"
@@ -65,14 +70,14 @@
 
         <ProgressBar
             android:id="@+id/view_transfer_item_list_item_progress"
-            android:layout_width="fill_parent"
-            android:layout_height="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/view_transfer_item_list_item_title"
             android:layout_margin="4sp"
             android:indeterminateOnly="false"
-            android:progressDrawable="@drawable/transfer_progress_horizontal" />
+            android:progressDrawable="@drawable/transfer_progress_horizontal_dark" />
 
         <TextView
             android:id="@+id/view_transfer_item_list_item_size"
@@ -84,7 +89,7 @@
             android:layout_marginBottom="3sp"
             android:layout_marginLeft="3sp"
             android:text="@string/dummy_size" />
-    </RelativeLayout>
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/view_transfer_item_list_item_button_play"
