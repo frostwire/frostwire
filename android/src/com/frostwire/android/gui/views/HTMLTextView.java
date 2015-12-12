@@ -53,6 +53,5 @@ public class HTMLTextView extends TextView {
         String suffix = (textStringLowered.endsWith("</html>")) ? "" : "</html>";
         String htmlText = prefix + textString + suffix;
         setText(Html.fromHtml(htmlText));
-
     }
 }

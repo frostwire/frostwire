@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -111,10 +112,11 @@ public class SearchProgressView extends LinearLayout {
         buttonFreeApps = (Button) findViewById(R.id.view_search_progress_button_free_apps);
         textNoResults = (TextView) findViewById(R.id.view_search_progress_text_no_results_feedback);
         textTryOtherKeywords = (TextView) findViewById(R.id.view_search_progress_try_other_keywords);
+
         textTryFrostWirePlus = (TextView) findViewById(R.id.view_search_progress_try_frostwire_plus);
+        textTryFrostWirePlus.setPaintFlags(textTryFrostWirePlus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
-            textTryFrostWirePlus.setText("<u>"+ getResources().getString(R.string.try_frostwire_plus_for_more_results) +"</u>");
             initTryFrostWirePlusListener();
         }
 
