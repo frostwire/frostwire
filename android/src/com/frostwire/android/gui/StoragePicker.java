@@ -96,8 +96,8 @@ public final class StoragePicker {
         } catch (Throwable e) {
             UIUtils.showShortMessage(context, R.string.storage_picker_treeuri_error);
             LOG.error("Error handling folder selection", e);
+            result = null;
         }
-
 
         return result;
     }
