@@ -20,6 +20,7 @@ package com.frostwire.alexandria.db;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
+import org.limewire.util.FileUtils;
 
 import java.io.File;
 import java.sql.*;
@@ -50,12 +51,16 @@ public class LibraryDatabase {
     }
 
     public LibraryDatabase(File databaseFile) {
+        if (databaseFile != null && !databaseFile.isDirectory() && !databaseFile.exists()) {
+            databaseFile.mkdirs();
+        }
+
         if (databaseFile != null && databaseFile.isDirectory() && databaseFile.canRead() && databaseFile.canWrite()) {
             _databaseFile = databaseFile;
             _name = databaseFile.getName();
             _connection = openOrCreateDatabase(databaseFile, _name);
         } else
-            throw new IllegalArgumentException("Invalid database file parameter received.");
+            throw new IllegalArgumentException("Invalid database file parameter received: " + databaseFile.getAbsolutePath());
     }
 
     public String getName() {
