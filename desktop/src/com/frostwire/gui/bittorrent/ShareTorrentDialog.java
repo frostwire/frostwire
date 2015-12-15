@@ -18,7 +18,10 @@
 package com.frostwire.gui.bittorrent;
 
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.util.ByteUtils;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.JsonUtils;
+import com.frostwire.util.UserAgentGenerator;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListenerAdapter;
 import com.limegroup.gnutella.gui.ButtonRow;
@@ -60,15 +63,16 @@ public class ShareTorrentDialog extends JDialog {
 	}
 
 	private void initURLShortenerListeners() {
-        URLShortenerHttpClientListener bitlyShortenerListener = new URLShortenerHttpClientListener(
-                "http://api.bit.ly/v3/shorten?format=txt&login=frostwire&apiKey=R_749968a37da3260493d8aa19ee021d14&longUrl="
-                        + UrlUtils.encode(getLink()));
-
-        URLShortenerHttpClientListener tinyurlShortenerListener = new URLShortenerHttpClientListener(
+        final URLShortenerHttpClientListener tinyurlShortenerListener = new URLShortenerHttpClientListener(
                 "http://tinyurl.com/api-create.php?url=" + getLink());
 
+        // this one is different because google got fancy with POST and Json.
+		final URLShortenerHttpClientListener googShortenerListener = new GoogleURLShortenerListener("https://www.googleapis.com/urlshortener/v1/url?key=AIzaSyDw6xPSKYZyOIv7rq2A0R9fDvzsrpI25I0");
+
+		// we'll use one at random to not exhaust the monthly quotas.
         shortenerListeners = new LinkedList<>(Arrays.asList(
-                bitlyShortenerListener, tinyurlShortenerListener));
+				googShortenerListener,
+				tinyurlShortenerListener));
     }
 
 	private void updateTextArea() {
@@ -81,7 +85,6 @@ public class ShareTorrentDialog extends JDialog {
 			}
 		});
 	}
-
 
 	private void setupUI() {
 		setupWindow();
@@ -144,7 +147,7 @@ public class ShareTorrentDialog extends JDialog {
 		container.add(textArea, c);
 
 		initURLShortenerListeners();
-		performAsyncURLShortening(shortenerListeners.get(0));
+		performAsyncURLShortening(shortenerListeners.get(ByteUtils.randomInt(0,shortenerListeners.size()-1)));
 
 		// BUTTON ROW
 		initActions();
@@ -256,17 +259,7 @@ public class ShareTorrentDialog extends JDialog {
     private void performAsyncURLShortening(final URLShortenerHttpClientListener listener) {
         final HttpClient browser = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
         browser.setListener(listener);
-        ThreadExecutor.startThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    link = browser.get(listener.getShortenerURL(), 2000);
-                    updateTextArea(); //happens safely on UI thread.
-                } catch (Throwable ignored) {
-                }
-            }
-
-        }, "ShareTorrentDialog-performAsyncURLShortening");
+        ThreadExecutor.startThread(listener.getHttpRequestRunnable(browser), "ShareTorrentDialog-performAsyncURLShortening");
     }
 
 	private void initActions() {
@@ -324,7 +317,7 @@ public class ShareTorrentDialog extends JDialog {
 		feedbackLabel.setText(title);
 	}
 
-    private final class URLShortenerHttpClientListener extends
+    private class URLShortenerHttpClientListener extends
             HttpClientListenerAdapter {
         private final String shortenerUri;
 
@@ -346,10 +339,52 @@ public class ShareTorrentDialog extends JDialog {
             }
         }
 
-        public String getShortenerURL() {
+        protected String getShortenerURL() {
             return shortenerUri;
         }
-    }
+
+		protected Runnable getHttpRequestRunnable(final HttpClient browser) {
+			return new Runnable() {
+				@Override
+				public void run() {
+					try {
+                        System.out.println("Shortening with " + getShortenerURL());
+						link = browser.get(getShortenerURL(), 2000);
+						updateTextArea(); //happens safely on UI thread.
+					} catch (Throwable ignored) {
+					}
+				}
+			};
+		}
+	}
+
+	private class GoogleURLShortenerResponse {
+		String id;
+	}
+
+	private class GoogleURLShortenerListener extends URLShortenerHttpClientListener {
+
+		public GoogleURLShortenerListener(String uri) {
+			super(uri);
+		}
+
+		@Override
+		protected Runnable getHttpRequestRunnable(final HttpClient browser) {
+			return new Runnable() {
+				@Override
+				public void run() {
+					try {
+						final String jsonRequest = "{\"longUrl\": \"" + getLink() + "\"}";
+						final String jsonResponse = browser.post(getShortenerURL(), 2000, UserAgentGenerator.getUserAgent(), jsonRequest, "application/json", false);
+                        GoogleURLShortenerResponse response = JsonUtils.toObject(jsonResponse, GoogleURLShortenerResponse.class);
+						link = response.id;
+						updateTextArea(); //happens safely on UI thread.
+					} catch (Throwable ignored) {
+					}
+				}
+			};
+		}
+	}
 
 	private class TwitterAction extends AbstractAction {
 
