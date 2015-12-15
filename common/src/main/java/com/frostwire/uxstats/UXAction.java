@@ -82,12 +82,13 @@ public final class UXAction {
     public static final int LIBRARY_PLAYLIST_RENAMED = LIBRARY_BASE + 8; // desktop only
     public static final int LIBRARY_VIDEO_PLAY = LIBRARY_BASE + 9; // both
     public static final int LIBRARY_VIDEO_TOGGLE_FULLSCREEN = LIBRARY_BASE + 10; // desktop only
-    public static final int LIBRARY_BROWSE_FILE_TYPE_AUDIO = LIBRARY_BASE + 11; // both (unused)
-    public static final int LIBRARY_BROWSE_FILE_TYPE_RINGTONES = LIBRARY_BASE + 12; // both (unused)
-    public static final int LIBRARY_BROWSE_FILE_TYPE_VIDEOS = LIBRARY_BASE + 13; // both (unused)
-    public static final int LIBRARY_BROWSE_FILE_TYPE_PICTURES = LIBRARY_BASE + 14; // both (unused)
-    public static final int LIBRARY_BROWSE_FILE_TYPE_APPLICATIONS = LIBRARY_BASE + 15; // both (unused)
-    public static final int LIBRARY_BROWSE_FILE_TYPE_DOCUMENTS = LIBRARY_BASE + 16; // both (unused)
+    public static final int LIBRARY_BROWSE_FILE_TYPE_AUDIO = LIBRARY_BASE + 11; // both (unused android)
+    public static final int LIBRARY_BROWSE_FILE_TYPE_RINGTONES = LIBRARY_BASE + 12; // android (unused)
+    public static final int LIBRARY_BROWSE_FILE_TYPE_VIDEOS = LIBRARY_BASE + 13; // both (unused android)
+    public static final int LIBRARY_BROWSE_FILE_TYPE_PICTURES = LIBRARY_BASE + 14; // both (unused android)
+    public static final int LIBRARY_BROWSE_FILE_TYPE_APPLICATIONS = LIBRARY_BASE + 15; // both (unused android)
+    public static final int LIBRARY_BROWSE_FILE_TYPE_DOCUMENTS = LIBRARY_BASE + 16; // both (unused android)
+    public static final int LIBRARY_BROWSE_FILE_TYPE_TORRENTS = LIBRARY_BASE + 17; // both (unused android)
 
     public static final int PLAYER_BASE = 6000;
     public static final int PLAYER_GESTURE_SWIPE_SONG = PLAYER_BASE + 1; // android only

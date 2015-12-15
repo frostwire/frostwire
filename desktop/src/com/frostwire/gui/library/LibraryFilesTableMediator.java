@@ -314,10 +314,27 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
      * view and to only display store files in the store view
      */
     void updateTableFiles(DirectoryHolder dirHolder) {
-        if (dirHolder == null)
+        if (dirHolder == null) {
             return;
+        }
+
         if (dirHolder instanceof MediaTypeSavedFilesDirectoryHolder) {
-            setMediaType(((MediaTypeSavedFilesDirectoryHolder) dirHolder).getMediaType());
+            MediaType mediaType = ((MediaTypeSavedFilesDirectoryHolder) dirHolder).getMediaType();
+            setMediaType(mediaType);
+
+            if (mediaType.equals(MediaType.getAudioMediaType())) {
+                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_AUDIO);
+            } else if (mediaType == MediaType.getImageMediaType()) {
+                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_PICTURES);
+            } else if (mediaType == MediaType.getDocumentMediaType()) {
+                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_DOCUMENTS);
+            } else if (mediaType == MediaType.getVideoMediaType()) {
+                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_VIDEOS);
+            } else if (mediaType == MediaType.getTorrentMediaType()) {
+                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_TORRENTS);
+            } else if (mediaType == MediaType.getProgramMediaType()) {
+                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_APPLICATIONS);
+            }
         } else {
             setMediaType(MediaType.getAnyTypeMediaType());
         }
