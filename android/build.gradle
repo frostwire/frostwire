@@ -32,10 +32,6 @@ buildscript {
 
 repositories {
     mavenCentral()
-
-    maven {
-        url  "https://oss.sonatype.org/content/repositories/comfrostwire-1027/"
-    }
 }
 
 def manifestVersionCode() {
