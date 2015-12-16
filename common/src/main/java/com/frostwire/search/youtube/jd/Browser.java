@@ -16,17 +16,14 @@
 
 package com.frostwire.search.youtube.jd;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-//import org.appwork.utils.logging2.LogSource;
 
 public class Browser {
     // we need this class in here due to jdownloader stable 0.9 compatibility
@@ -229,71 +226,6 @@ public class Browser {
             tmp = tmp + "/";
         }
         return ret + tmp + (end != null ? end : "");
-    }
-
-    /**
-     * Downloads url to file.
-     * 
-     * @param file
-     * @param urlString
-     * @return Erfolg true/false
-     * @throws IOException
-     */
-    public static void download(final File file, final String url) throws IOException {
-        new Browser().getDownload(file, url);
-    }
-
-    /**
-     * Lädt über eine URLConnection eine Datei herunter. Zieldatei ist file.
-     * 
-     * @param file
-     * @param con
-     * @return Erfolg true/false
-     * @throws IOException
-     */
-    public static void download(final File file, final HTTPConnectionImpl con) throws IOException {
-        if (file.isFile()) {
-            if (!file.delete()) {
-                System.out.println("Konnte Datei nicht löschen " + file);
-                throw new IOException("Could not overwrite file: " + file);
-            }
-        }
-
-        final File parentFile = file.getParentFile();
-        if (parentFile != null && !parentFile.exists()) {
-            parentFile.mkdirs();
-        }
-        file.createNewFile();
-        FileOutputStream fos = null;
-        BufferedOutputStream output = null;
-        BufferedInputStream input = null;
-        boolean okay = false;
-        try {
-            output = new BufferedOutputStream(fos = new FileOutputStream(file, false));
-            input = new BufferedInputStream(con.getInputStream());
-            final byte[] b = new byte[1024];
-            int len;
-            while ((len = input.read(b)) != -1) {
-                output.write(b, 0, len);
-            }
-            okay = true;
-        } finally {
-            try {
-                output.close();
-            } catch (final Throwable e) {
-            }
-            try {
-                input.close();
-            } catch (final Throwable e) {
-            }
-            try {
-                fos.close();
-            } catch (final Throwable e) {
-            }
-            if (okay == false) {
-                file.delete();
-            }
-        }
     }
 
     private String                   acceptLanguage      = "de, en-gb;q=0.9, en;q=0.8";
@@ -527,11 +459,6 @@ public class Browser {
 
     private HashMap<String, Cookies> getCookies() {
         return this.cookiesExclusive ? this.cookies : Browser.COOKIES;
-    }
-
-    public void getDownload(final File file, final String urlString) throws IOException {
-        final HTTPConnectionImpl con = this.openGetConnection(URLDecoder.decode(urlString, "UTF-8"));
-        Browser.download(file, con);
     }
 
     public RequestHeader getHeaders() {
