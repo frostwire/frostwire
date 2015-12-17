@@ -26,6 +26,8 @@ import com.frostwire.gui.library.LibraryPlaylistsTableTransferable.Item;
 import com.frostwire.gui.library.tags.TagsData;
 import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.gui.theme.DialogFinishedListener;
+import com.frostwire.gui.theme.FrostwireInputDialog;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.logging.Logger;
 import com.frostwire.uxstats.UXAction;
@@ -159,24 +161,38 @@ public class LibraryUtils {
     }
 
     public static void createNewPlaylist(final List<? extends AbstractLibraryTableDataLine<?>> lines) {
-        String playlistName = (String) ThemeMediator.showInputDialog(GUIMediator.getAppFrame(), I18n.tr("Playlist name"), I18n.tr("Playlist name"), JOptionPane.PLAIN_MESSAGE, null, null, suggestPlaylistName(lines));
+        DialogFinishedListener dialogListener = new DialogFinishedListener() {
+            @Override
+            public void onDialogCancelled() {
+            }
 
-        if (playlistName != null && playlistName.length() > 0) {
-            final Playlist playlist = LibraryMediator.getLibrary().newPlaylist(playlistName, playlistName);
-            playlist.save();
-            LibraryMediator.instance().getLibraryPlaylists().addPlaylist(playlist);
-            LibraryMediator.instance().getLibraryPlaylists().markBeginImport(playlist);
-            Thread t = new Thread(new Runnable() {
-                public void run() {
-                    addToPlaylist(playlist, lines);
+            @Override
+            public void onDialogOk(String playlistName) {
+                if (playlistName != null && playlistName.length() > 0) {
+                    final Playlist playlist = LibraryMediator.getLibrary().newPlaylist(playlistName, playlistName);
                     playlist.save();
-                    asyncAddToPlaylistFinalizer(playlist);
+                    LibraryMediator.instance().getLibraryPlaylists().addPlaylist(playlist);
+                    LibraryMediator.instance().getLibraryPlaylists().markBeginImport(playlist);
+                    Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            addToPlaylist(playlist, lines);
+                            playlist.save();
+                            asyncAddToPlaylistFinalizer(playlist);
+                        }
+                    }, "createNewPlaylist");
+                    t.setDaemon(true);
+                    t.start();
+                    UXStats.instance().log(UXAction.LIBRARY_PLAYLIST_CREATED);
                 }
-            }, "createNewPlaylist");
-            t.setDaemon(true);
-            t.start();
-            UXStats.instance().log(UXAction.LIBRARY_PLAYLIST_CREATED);
-        }
+            }
+        };
+
+        FrostwireInputDialog.showInputDialog(GUIMediator.getAppFrame(),
+                I18n.tr("Playlist name"),
+                I18n.tr("Playlist name"),
+                GUIMediator.getThemeImage("playlist"),
+                suggestPlaylistName(lines),
+                dialogListener);
     }
 
     public static void createNewPlaylist(File[] files) {
@@ -184,11 +200,48 @@ public class LibraryUtils {
     }
 
     public static void createNewPlaylist(final File[] files, final boolean starred) {
+        final DialogFinishedListener listener = new DialogFinishedListener() {
+            @Override
+            public void onDialogCancelled() {
+            }
 
-        final StringBuilder plBuilder = new StringBuilder();
+            @Override
+            public void onDialogOk(String playlistName) {
+                if (StringUtils.isNullOrEmpty(playlistName, true)) {
+                    return;
+                }
+                if (playlistName != null && playlistName.length() > 0) {
+                    GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
+                    final Playlist playlist = LibraryMediator.getLibrary().newPlaylist(playlistName, playlistName);
+                    playlist.save();
+
+                    GUIMediator.safeInvokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            LibraryMediator.instance().getLibraryPlaylists().addPlaylist(playlist);
+                            LibraryMediator.instance().getLibraryPlaylists().markBeginImport(playlist);
+                        }
+                    });
+
+                    Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            try {
+                                Set<File> ignore = TorrentUtil.getIgnorableFiles();
+                                addToPlaylist(playlist, files, starred, ignore);
+                                playlist.save();
+                            } finally {
+                                asyncAddToPlaylistFinalizer(playlist);
+                            }
+                        }
+                    }, "createNewPlaylist");
+                    t.setDaemon(true);
+                    t.start();
+                    UXStats.instance().log(UXAction.LIBRARY_PLAYLIST_CREATED);
+                }
+            }
+        };
 
         GUIMediator.safeInvokeAndWait(new Runnable() {
-
             @Override
             public void run() {
                 File[] mediaFiles = files;
@@ -196,49 +249,14 @@ public class LibraryUtils {
                 if (files.length == 1 && files[0].isDirectory()) {
                     mediaFiles = FileUtils.getFilesRecursive(files[0], null);
                 }
-                String input = (String) ThemeMediator.showInputDialog(GUIMediator.getAppFrame(),
+                FrostwireInputDialog.showInputDialog(GUIMediator.getAppFrame(),
                         I18n.tr("Playlist name"),
                         I18n.tr("Playlist name"),
-                        JOptionPane.PLAIN_MESSAGE, null, null,
-                        suggestPlaylistName(mediaFiles));
-                if (!StringUtils.isNullOrEmpty(input, true)) {
-                    plBuilder.append(input);
-                }
+                        GUIMediator.getThemeImage("playlist"),
+                        suggestPlaylistName(mediaFiles),
+                        listener);
             }
         });
-
-        String playlistName = plBuilder.toString();
-
-        if (playlistName != null && playlistName.length() > 0) {
-            GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
-            final Playlist playlist = LibraryMediator.getLibrary().newPlaylist(playlistName, playlistName);
-            playlist.save();
-
-            GUIMediator.safeInvokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    LibraryMediator.instance().getLibraryPlaylists().addPlaylist(playlist);
-                    LibraryMediator.instance().getLibraryPlaylists().markBeginImport(playlist);
-                }
-            });
-
-            Thread t = new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        Set<File> ignore = TorrentUtil.getIgnorableFiles();
-                        addToPlaylist(playlist, files, starred, ignore);
-                        playlist.save();
-                    } finally {
-                        asyncAddToPlaylistFinalizer(playlist);
-                    }
-                }
-            }, "createNewPlaylist");
-            t.setDaemon(true);
-            t.start();
-
-            UXStats.instance().log(UXAction.LIBRARY_PLAYLIST_CREATED);
-        }
     }
 
     public static void createNewPlaylist(final PlaylistItem[] playlistItems) {
@@ -249,32 +267,43 @@ public class LibraryUtils {
         if (starred) {
             createStarredPlaylist(playlistItems);
         } else {
-            String playlistName = (String) ThemeMediator.showInputDialog(GUIMediator.getAppFrame(), I18n.tr("Playlist name"), I18n.tr("Playlist name"), JOptionPane.PLAIN_MESSAGE, null, null, suggestPlaylistName(playlistItems));
+            DialogFinishedListener listener = new DialogFinishedListener() {
+                @Override
+                public void onDialogCancelled() {
+                }
 
-            if (playlistName != null && playlistName.length() > 0) {
-                final Playlist playlist = LibraryMediator.getLibrary().newPlaylist(playlistName, playlistName);
+                @Override
+                public void onDialogOk(String playlistName) {
+                    if (playlistName != null && playlistName.length() > 0) {
+                        final Playlist playlist = LibraryMediator.getLibrary().newPlaylist(playlistName, playlistName);
 
-                Thread t = new Thread(new Runnable() {
-                    public void run() {
-                        try {
-                            playlist.save();
-                            addToPlaylist(playlist, playlistItems);
-                            playlist.save();
-                            GUIMediator.safeInvokeLater(new Runnable() {
-                                public void run() {
-                                    LibraryMediator.instance().getLibraryPlaylists().addPlaylist(playlist);
+                        Thread t = new Thread(new Runnable() {
+                            public void run() {
+                                try {
+                                    playlist.save();
+                                    addToPlaylist(playlist, playlistItems);
+                                    playlist.save();
+                                    GUIMediator.safeInvokeLater(new Runnable() {
+                                        public void run() {
+                                            LibraryMediator.instance().getLibraryPlaylists().addPlaylist(playlist);
+                                        }
+                                    });
+                                    UXStats.instance().log(UXAction.LIBRARY_PLAYLIST_CREATED);
+                                } finally {
+                                    asyncAddToPlaylistFinalizer(playlist);
                                 }
-                            });
-                        } finally {
-                            asyncAddToPlaylistFinalizer(playlist);
-                        }
+                            }
+                        }, "createNewPlaylist");
+                        t.setDaemon(true);
+                        t.start();
                     }
-                }, "createNewPlaylist");
-                t.setDaemon(true);
-                t.start();
-            }
+
+                }
+            };
+
+            FrostwireInputDialog.showInputDialog(GUIMediator.getAppFrame(), I18n.tr("Playlist name"), I18n.tr("Playlist name"), GUIMediator.getThemeImage("playlist"), suggestPlaylistName(playlistItems), listener);
         }
-        UXStats.instance().log(UXAction.LIBRARY_PLAYLIST_CREATED);
+
     }
 
     private static void createStarredPlaylist(final PlaylistItem[] playlistItems) {

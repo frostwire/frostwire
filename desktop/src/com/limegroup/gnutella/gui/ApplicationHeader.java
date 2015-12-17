@@ -158,7 +158,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
     private void initCloudSearchField() {
         cloudSearchField.addActionListener(new SearchListener());
-        cloudSearchField.setPrompt(I18n.tr("Search or enter a YouTube/Soundcloud URL"));
+        cloudSearchField.setPrompt(I18n.tr("Search or enter a cloud sourced URL"));
         Font origFont = cloudSearchField.getFont();
         Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
         cloudSearchField.setFont(newFont);
