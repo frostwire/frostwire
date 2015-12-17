@@ -27,10 +27,6 @@ repositories {
     maven {
         url  "http://dl.bintray.com/ijabz/maven"
     }
-
-    maven {
-        url  "https://oss.sonatype.org/content/repositories/comfrostwire-1027/"
-    }
 }
 
 dependencies {
@@ -38,7 +34,7 @@ dependencies {
     compile 'com.h2database:h2:1.4.186'
     compile 'org.apache.lucene:lucene-core:3.5.0'
     compile 'net.jthink:jaudiotagger:2.2.4'
-    compile 'com.frostwire:jlibtorrent:1.1.0.12'
+    compile 'com.frostwire:jlibtorrent:1.1.0.15'
 
     compile fileTree(dir: 'desktop/lib/jars', include: ['*.jar'])
 }
