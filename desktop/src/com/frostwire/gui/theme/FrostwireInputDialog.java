@@ -133,7 +133,6 @@ public final class FrostwireInputDialog extends JDialog {
         return new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                System.out.println(e);
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     onButtonClicked(true);
                 } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {

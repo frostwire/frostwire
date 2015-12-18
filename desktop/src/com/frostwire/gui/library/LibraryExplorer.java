@@ -122,12 +122,21 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
         }
 
+        saveLastSelectedDirectoryHolder();
+
         if (searchPrompt == null) {
             searchPrompt = I18n.tr("Search your") + " " + node.getUserObject();
         }
 
         LibraryMediator.instance().getLibrarySearch().clear();
         LibraryMediator.instance().getLibrarySearch().setSearchPrompt(searchPrompt);
+    }
+
+    private void saveLastSelectedDirectoryHolder() {
+        int[] selectionRows = tree.getSelectionRows();
+        if (selectionRows != null && selectionRows.length == 1) {
+            LibrarySettings.LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET.setValue(selectionRows[0]);
+        }
     }
 
     protected void setupUI() {
@@ -407,6 +416,18 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
             }
         } finally {
             executePendingRunnables();
+        }
+    }
+
+    public void selectDirectoryHolderAt(final int index) {
+        if (index >=0 && index < tree.getRowCount()) {
+            GUIMediator.safeInvokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    tree.setSelectionRow(index);
+                    tree.scrollRowToVisible(index);
+                }
+            });
         }
     }
 

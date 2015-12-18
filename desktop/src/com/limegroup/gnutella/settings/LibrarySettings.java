@@ -21,6 +21,7 @@ package com.limegroup.gnutella.settings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.FileSetSetting;
 import org.limewire.setting.FileSetting;
+import org.limewire.setting.IntSetting;
 import org.limewire.util.CommonUtils;
 
 import java.io.File;
@@ -50,6 +51,8 @@ public class LibrarySettings extends LimeProps {
     public static final FileSetting USER_MUSIC_FOLDER = FACTORY.createFileSetting("USER_MUSIC_FOLDER", FrostWireUtils.getUserMusicFolder());
 
     public static final FileSetting USER_VIDEO_FOLDER = FACTORY.createFileSetting("USER_VIDEO_FOLDER", FrostWireUtils.getUserVideoFolder());
+
+    public static final IntSetting LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET = FACTORY.createIntSetting("LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET", -1);
 
     public static void setupInitialLibraryFolders() {
         SharingSettings.initTorrentDataDirSetting();

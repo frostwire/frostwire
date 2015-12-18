@@ -35,10 +35,10 @@ import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.bugs.FatalBugManager;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.gui.options.OptionsMediator;
-import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
 import com.limegroup.gnutella.settings.ApplicationSettings;
+import com.limegroup.gnutella.settings.LibrarySettings;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 import com.limegroup.gnutella.settings.StartupSettings;
 import com.limegroup.gnutella.util.LaunchException;
@@ -604,7 +604,13 @@ public final class GUIMediator {
     public void setWindow(GUIMediator.Tabs tabEnum) {
         getMainFrame().getApplicationHeader().showSearchField(getMainFrame().getTab(tabEnum));
         getMainFrame().setSelectedTab(tabEnum);
-        selectFinishedDownloadsOnLibraryFirstTime(tabEnum);
+
+        // If we've never selected a directory holder in the library, then we have it select "Default Save Folder"
+        if (LibrarySettings.LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET.getValue()==-1) {
+            selectDefaultSaveFolderOnLibraryFirstTime(tabEnum);
+        } else {
+            LibraryMediator.instance().getLibraryExplorer().selectDirectoryHolderAt(LibrarySettings.LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET.getValue());
+        }
     }
 
     /**
@@ -614,7 +620,7 @@ public final class GUIMediator {
      *
      * @param tab
      */
-    private void selectFinishedDownloadsOnLibraryFirstTime(GUIMediator.Tabs tab) {
+    private void selectDefaultSaveFolderOnLibraryFirstTime(GUIMediator.Tabs tab) {
         if (!tab.navigatedTo && tab.equals(GUIMediator.Tabs.LIBRARY)) {
             LibraryMediator.instance().getLibraryExplorer().selectFinishedDownloads();
             tab.navigatedTo = true;
