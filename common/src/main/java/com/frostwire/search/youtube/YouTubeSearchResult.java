@@ -43,6 +43,9 @@ public class YouTubeSearchResult extends AbstractFileSearchResult implements Cra
         this.filename = title + ".youtube";
         this.displayName = FilenameUtils.getBaseName(filename);
         this.creationTime = -1;
+        if (link.startsWith("/")) {
+            link = link.substring(1);
+        }
         this.videoUrl = "https://www.youtube.com/" + link;
         this.source = "YouTube - " + user;
         this.size = buildSize(duration);

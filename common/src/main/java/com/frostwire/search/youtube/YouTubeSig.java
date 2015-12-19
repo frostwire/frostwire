@@ -33,6 +33,16 @@ public final class YouTubeSig {
 	private final JsFunction<String> fn;
 
 	public YouTubeSig(String jscode) {
+		//The function is usually found in a block like this:
+		/**
+		 * if (e.sig || e.s) {
+		 var f = e.sig || gr(e.s);
+		 e.url = xj(e.url, {
+		 signature: f
+		 })
+		 }
+		 >> Output: gr
+		 */
 		Matcher m = Pattern.compile("\\.sig\\|\\|([$a-zA-Z0-9]+)\\(").matcher(jscode);
         m.find();
         String funcname = m.group(1);
