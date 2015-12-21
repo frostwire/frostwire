@@ -47,6 +47,8 @@ public final class JsFunction<T> {
     private final JsContext ctx;
     private final LambdaN initial_function;
 
+    private final static String WS = "[ \\t\\n\\x0B\\f\\r]"; //whitespaces, line feeds, aka \s.
+
     public JsFunction(String jscode, String funcname) {
         this.ctx = new JsContext(jscode);
         this.initial_function = extract_function(ctx, funcname);
@@ -253,14 +255,13 @@ public final class JsFunction<T> {
 
     private static JsObject extract_object(final JsContext ctx, String objname) {
         JsObject obj = new JsObject();
-        final String FF_SPACE = "[ \\t\\n\\x0B\\f\\r]"; //whitespaces, line feeds
-        String obj_mRegex = String.format("(var"+FF_SPACE+"+)?%1$s"+FF_SPACE+"*="+FF_SPACE+"*\\{",
-                escape(objname)) + FF_SPACE+"*(?<fields>([a-zA-Z$0-9]+"+FF_SPACE+"*:"+FF_SPACE+"*function\\(.*?\\)"+FF_SPACE+"*\\{.*?\\}(,"+FF_SPACE+")*)*)\\}"+FF_SPACE+"*;";
+        String obj_mRegex = String.format("(var"+ WS +"+)?%1$s"+ WS +"*="+ WS +"*\\{",
+                escape(objname)) + WS +"*(?<fields>([a-zA-Z$0-9]+"+ WS +"*:"+ WS +"*function\\(.*?\\)"+ WS +"*\\{.*?\\}(,"+ WS +")*)*)\\}"+ WS +"*;";
         final Matcher obj_m = Pattern.compile(obj_mRegex).matcher(ctx.jscode);
         obj_m.find();
         String fields = obj_m.group("fields");
         // Currently, it only supports function definitions
-        final Matcher fields_m = Pattern.compile("(?<key>[a-zA-Z$0-9]+)"+FF_SPACE+"*:"+FF_SPACE+"*function\\((?<args>[a-z,]+)\\)\\{(?<code>[^\\}]+)\\}").matcher(fields);
+        final Matcher fields_m = Pattern.compile("(?<key>[a-zA-Z$0-9]+)"+ WS +"*:"+ WS +"*function\\((?<args>[a-z,]+)\\)\\{(?<code>[^\\}]+)\\}").matcher(fields);
 
         while (fields_m.find()) {
             final String[] argnames = mscpy(fields_m.group("args").split(","));
@@ -274,7 +275,7 @@ public final class JsFunction<T> {
     }
 
     private static LambdaN extract_function(final JsContext ctx, String funcname) {
-        String func_mRegex = String.format("(%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*function|function[ \\t\\n\\x0B\\f\\r]+%1$s|[\\{;,]%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*function|var[ \\t\\n\\x0B\\f\\r]+%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*function)[ \\t\\n\\x0B\\f\\r]*",
+        String func_mRegex = String.format("(%1$s"+WS+"*="+WS+"*function|function"+WS+"+%1$s|[\\{;,]%1$s"+WS+"*="+WS+"*function|var"+WS+"+%1$s"+WS+"*="+WS+"*function)"+WS+"*",
                 escape(funcname)) + "\\((?<args>[a-z,]+)\\)\\{(?<code>[^\\}]+)\\}";
         final Matcher func_m = Pattern.compile(func_mRegex).matcher(ctx.jscode);
         if (!func_m.find()) {
