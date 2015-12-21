@@ -6,7 +6,7 @@ frostwire (6.1.9) stable; urgency=high
   * Fixes event handling bug on "Create New Playlist" dialog for MacOSX.
   * New FrostWireInputDialog.
 
- -- FrostWire Team <contact@frostwire.com>  Sat, 19 Dec 2015 16:52:50 -0500
+ -- FrostWire Team <contact@frostwire.com>  Mon, 21 Dec 2015 16:52:50 -0500
 
 frostwire (6.1.8) stable; urgency=high
   * New status/control transfer buttons to Seed and Share transfers.	

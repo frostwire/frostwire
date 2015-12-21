@@ -253,12 +253,14 @@ public final class JsFunction<T> {
 
     private static JsObject extract_object(final JsContext ctx, String objname) {
         JsObject obj = new JsObject();
-        String obj_mRegex = String.format("(var[ \\t\\n\\x0B\\f\\r]+)?%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*\\{", escape(objname)) + "[ \\t\\n\\x0B\\f\\r]*(?<fields>([a-zA-Z$0-9]+[ \\t\\n\\x0B\\f\\r]*:[ \\t\\n\\x0B\\f\\r]*function\\(.*?\\)[ \\t\\n\\x0B\\f\\r]*\\{.*?\\}(,[ \\t\\n\\x0B\\f\\r])*)*)\\}[ \\t\\n\\x0B\\f\\r]*;";
+        final String FF_SPACE = "[ \\t\\n\\x0B\\f\\r]"; //whitespaces, line feeds
+        String obj_mRegex = String.format("(var"+FF_SPACE+"+)?%1$s"+FF_SPACE+"*="+FF_SPACE+"*\\{",
+                escape(objname)) + FF_SPACE+"*(?<fields>([a-zA-Z$0-9]+"+FF_SPACE+"*:"+FF_SPACE+"*function\\(.*?\\)"+FF_SPACE+"*\\{.*?\\}(,"+FF_SPACE+")*)*)\\}"+FF_SPACE+"*;";
         final Matcher obj_m = Pattern.compile(obj_mRegex).matcher(ctx.jscode);
         obj_m.find();
         String fields = obj_m.group("fields");
         // Currently, it only supports function definitions
-        final Matcher fields_m = Pattern.compile("(?<key>[a-zA-Z$0-9]+)[ \\t\\n\\x0B\\f\\r]*:[ \\t\\n\\x0B\\f\\r]*function\\((?<args>[a-z,]+)\\)\\{(?<code>[^\\}]+)\\}").matcher(fields);
+        final Matcher fields_m = Pattern.compile("(?<key>[a-zA-Z$0-9]+)"+FF_SPACE+"*:"+FF_SPACE+"*function\\((?<args>[a-z,]+)\\)\\{(?<code>[^\\}]+)\\}").matcher(fields);
 
         while (fields_m.find()) {
             final String[] argnames = mscpy(fields_m.group("args").split(","));
