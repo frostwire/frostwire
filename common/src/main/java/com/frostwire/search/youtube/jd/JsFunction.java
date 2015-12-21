@@ -272,7 +272,7 @@ public final class JsFunction<T> {
     }
 
     private static LambdaN extract_function(final JsContext ctx, String funcname) {
-        String func_mRegex = String.format("(%1$s=function|function %1$s|[\\{;][a-zA-Z0-9]+\\.%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*function|var %1$s=function)",
+        String func_mRegex = String.format("(%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*function|function[ \\t\\n\\x0B\\f\\r]+%1$s|[\\{;,]%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*function|var[ \\t\\n\\x0B\\f\\r]+%1$s[ \\t\\n\\x0B\\f\\r]*=[ \\t\\n\\x0B\\f\\r]*function)[ \\t\\n\\x0B\\f\\r]*",
                 escape(funcname)) + "\\((?<args>[a-z,]+)\\)\\{(?<code>[^\\}]+)\\}";
         final Matcher func_m = Pattern.compile(func_mRegex).matcher(ctx.jscode);
         if (!func_m.find()) {
@@ -286,6 +286,9 @@ public final class JsFunction<T> {
 
     private static LambdaN build_function(final JsContext ctx, final String[] argnames, String code) {
         final String[] stmts = mscpy(code.split(";"));
+        for (int i = 0; i < stmts.length; i++) {
+            stmts[i] = stmts[i].replaceAll("[\n\r]", "");
+        }
 
         return new LambdaN() {
             @Override
@@ -296,7 +299,7 @@ public final class JsFunction<T> {
                 }
                 Object res = null;
                 for (String stmt : stmts) {
-                    res = interpret_statement(ctx, stmt, local_vars, 100);
+                    res = interpret_statement(ctx, stmt.trim(), local_vars, 100);
                 }
                 return res;
             }
