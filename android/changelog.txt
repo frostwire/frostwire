@@ -1,3 +1,9 @@
+FrostWire 1.6.8 - DECEMBER/21/2015
+ - Plus: Fixes YouTube search/download issues.
+ - Updates to new jlibtorrent 1.1.0.15. Better connectivity, crash fixes.
+ - Misc User Interfaces upgrades/adjustments.
+ - Fixes multiple crashes.
+
 FrostWire 1.6.7 - DECEMBER/03/2015
  - New: Select storage location. Down to the folder where you want
    your FrostWire download folders to be.

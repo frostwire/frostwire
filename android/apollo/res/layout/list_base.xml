@@ -31,7 +31,8 @@
 		android:textColor="@color/holo_blue_light"
         android:textSize="@dimen/text_size_large"
         android:textStyle="bold"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:layout_margin="40dp"/>
 
     <com.andrew.apollo.dragdrop.DragSortListView
         android:id="@+id/list_base"
