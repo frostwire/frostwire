@@ -27,16 +27,11 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.text.InputType;
-import android.text.method.KeyListener;
-import android.text.method.NumberKeyListener;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -116,12 +111,6 @@ public final class UIUtils {
         showShortMessage(context, context.getString(resId, formatArgs));
     }
 
-    /**
-     * @param context
-     * @param messageId
-     * @param titleId
-     * @param positiveListener
-     */
     public static Dialog showYesNoDialog(Context context, int messageId, int titleId, OnClickListener positiveListener) {
         return showYesNoDialog(context, messageId, titleId, positiveListener, new OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
@@ -138,13 +127,6 @@ public final class UIUtils {
         });
     }
 
-    /**
-     * @param context
-     * @param messageId
-     * @param titleId
-     * @param positiveListener
-     * @param negativeListener
-     */
     public static Dialog showYesNoDialog(Context context, int messageId, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(messageId).setTitle(titleId).setCancelable(false).setPositiveButton(android.R.string.yes, positiveListener).setNegativeButton(android.R.string.no, negativeListener);
@@ -180,20 +162,6 @@ public final class UIUtils {
         return dialog;
     }
 
-    public static void showYesNoDialog(Context context, int iconId, int messageId, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-        builder.setIcon(iconId).setMessage(messageId).setTitle(titleId).setCancelable(false).setPositiveButton(android.R.string.yes, positiveListener).setNegativeButton(android.R.string.no, negativeListener);
-
-        builder.create().show();
-    }
-
-    public static void showYesNoDialog(Context context, String message, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage(message).setTitle(titleId).setCancelable(false).setPositiveButton(android.R.string.yes, positiveListener).setNegativeButton(android.R.string.no, negativeListener);
-        builder.create().show();
-    }
-
     public static void showYesNoDialog(Context context, int iconId, String message, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setIcon(iconId).setMessage(message).setTitle(titleId).setCancelable(false).setPositiveButton(android.R.string.yes, positiveListener).setNegativeButton(android.R.string.no, negativeListener);
@@ -215,7 +183,7 @@ public final class UIUtils {
     }
 
     public static String getBytesInHuman(float size) {
-        int i = 0;
+        int i;
         for (i = 0; size > 1024; i++) {
             size /= 1024f;
         }
@@ -250,31 +218,9 @@ public final class UIUtils {
         }
     }
 
-    public static int getFileTypeIconId(byte fileType) {
-        switch (fileType) {
-            case Constants.FILE_TYPE_APPLICATIONS:
-                return R.drawable.browse_peer_application_icon_selector_off;
-            case Constants.FILE_TYPE_AUDIO:
-                return R.drawable.browse_peer_audio_icon_selector_off;
-            case Constants.FILE_TYPE_DOCUMENTS:
-                return R.drawable.browse_peer_document_icon_selector_off;
-            case Constants.FILE_TYPE_PICTURES:
-                return R.drawable.browse_peer_picture_icon_selector_off;
-            case Constants.FILE_TYPE_RINGTONES:
-                return R.drawable.browse_peer_ringtone_icon_selector_off;
-            case Constants.FILE_TYPE_VIDEOS:
-                return R.drawable.browse_peer_video_icon_selector_off;
-            default:
-                return R.drawable.question_mark;
-        }
-    }
-
     /**
      * Opens the given file with the default Android activity for that File and
      * mime type.
-     *
-     * @param filePath
-     * @param mime
      */
     public static void openFile(Context context, String filePath, String mime) {
         try {
@@ -319,8 +265,6 @@ public final class UIUtils {
 
     /**
      * Create an ephemeral playlist with the files of the same type that live on the folder of the given file descriptor and play it.
-     *
-     * @param fd
      */
     public static void playEphemeralPlaylist(FileDescriptor fd) {
         Engine.instance().getMediaPlayer().play(Librarian.instance().createEphemeralPlaylist(fd));
@@ -384,7 +328,7 @@ public final class UIUtils {
 
     /**
      *
-     * @param activity
+     * @param context -  containing Context.
      * @param showInstallationCompleteSection - true if you want to display "Your installation is now complete. Thank You" section
      * @param dismissListener - what happens when the dialog is dismissed.
      * @param referrerContextSuffix - string appended at the end of social pages click urls's ?ref=_android_ parameter.
