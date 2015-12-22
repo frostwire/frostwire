@@ -279,7 +279,7 @@
     <string name="azureus_manager_item_stopped">Stopped</string>
     <string name="azureus_manager_item_paused">Paused</string>
     <string name="azureus_manager_item_queued">Queued</string>
-    <string name="azureus_manager_item_error">Error</string>
+    <string name="azureus_manager_item_error">Errcor</string>
     <string name="azureus_manager_item_forced">Forced</string>
     <string name="azureus_general_view_yes">Yes</string>
     <string name="azureus_general_view_no">No</string>
@@ -476,7 +476,7 @@
     <string name="now_playing">Now playing</string>
     <string name="dummy_author" translatable="false">[Author]</string>
     <string name="install_bitcoin_wallet">Install Bitcoin Wallet</string>
-    <string name="cant_resume_torrent_transfers">Cannot resume torrent transfers. Check status of "Settings" > "Connectivity"</string>
+    <string name="cant_resume_torrent_transfers">Cannot resume torrent transfers. Check status of "Settings" > " BitTorrent Connection Status"</string>
     <string name="or_enter_url">or enter URL</string>
     <string name="confirm_download">Confirm Download</string>
     <string name="track">track</string>
