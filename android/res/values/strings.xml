@@ -279,7 +279,7 @@
     <string name="azureus_manager_item_stopped">Stopped</string>
     <string name="azureus_manager_item_paused">Paused</string>
     <string name="azureus_manager_item_queued">Queued</string>
-    <string name="azureus_manager_item_error">Errcor</string>
+    <string name="azureus_manager_item_error">Error</string>
     <string name="azureus_manager_item_forced">Forced</string>
     <string name="azureus_general_view_yes">Yes</string>
     <string name="azureus_general_view_no">No</string>
