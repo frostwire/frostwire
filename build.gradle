@@ -31,9 +31,9 @@ repositories {
 
 dependencies {
     compile 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
-    compile 'com.h2database:h2:1.4.186'
+    compile 'com.h2database:h2:1.4.190'
     compile 'org.apache.lucene:lucene-core:3.5.0'
-    compile 'net.jthink:jaudiotagger:2.2.4'
+    compile 'net.jthink:jaudiotagger:2.2.5'
     compile 'com.frostwire:jlibtorrent:1.1.0.15'
 
     compile fileTree(dir: 'desktop/lib/jars', include: ['*.jar'])
