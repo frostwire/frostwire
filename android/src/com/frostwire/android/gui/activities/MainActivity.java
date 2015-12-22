@@ -241,6 +241,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
         if (action != null) {
             if (action.equals(Constants.ACTION_SHOW_TRANSFERS)) {
+                intent.setAction(null);
                 controller.showTransfers(TransferStatus.ALL);
             } else if (action.equals(Constants.ACTION_OPEN_TORRENT_URL)) {
                 openTorrentUrl(intent);

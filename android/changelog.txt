@@ -3,6 +3,9 @@ FrostWire 1.6.8 - DECEMBER/22/2015
  - Updates to new jlibtorrent 1.1.0.15. Better connectivity, crash fixes.
  - Misc User Interfaces upgrades/adjustments.
  - Fixes multiple crashes.
+ - Fixes bug where after using the android notification, every time
+   the device was rotated, user would be taken to Transfer's screen
+   from Search or My Files.
  - Upgrades to okhttp, JSON parser, regex engine, rxjava.
  - Japanese translation update by @naofum.
 
