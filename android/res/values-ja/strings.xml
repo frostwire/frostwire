@@ -226,7 +226,6 @@
     <string name="media_player_failed">メディアプレイヤーに失敗しました</string>
     <string name="activity_media_player_name">メディアプレイヤー</string>
     <string name="search_settings">検索設定</string>
-    <string name="use_kat">KAT.phを使用する</string>
     <string name="use_clearbits">ClearBits.netを使用する</string>
     <string name="use_tpb">ThePirateBay.orgを使用する</string>
     <string name="use_tpb_summary">TPBはマグネットベースで、Wi-Fi上のみ動作します</string>
