@@ -476,7 +476,7 @@
     <string name="now_playing">Now playing</string>
     <string name="dummy_author" translatable="false">[Author]</string>
     <string name="install_bitcoin_wallet">Install Bitcoin Wallet</string>
-    <string name="cant_resume_torrent_transfers">Cannot resume torrent transfers. Check status of "Settings" > "Connectivity"</string>
+    <string name="cant_resume_torrent_transfers">Cannot resume torrent transfers. Check status of "Settings" > "BitTorrent Connection Status"</string>
     <string name="or_enter_url">or enter URL</string>
     <string name="confirm_download">Confirm Download</string>
     <string name="track">track</string>
