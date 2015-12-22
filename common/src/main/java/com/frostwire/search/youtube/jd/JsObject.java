@@ -29,7 +29,7 @@ import java.util.Map;
 class JsObject {
 
     public JsObject() {
-        this.functions = new HashMap<String, LambdaN>();
+        this.functions = new HashMap<>();
     }
 
     public final Map<String, LambdaN> functions;

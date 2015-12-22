@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -258,12 +258,12 @@ public final class JsFunction<T> {
     private static JsObject extract_object(final JsContext ctx, String objname) {
         JsObject obj = new JsObject();
         String obj_mRegex = String.format("(var"+ WS +"+)?%1$s"+ WS +"*="+ WS +"*\\{",
-                escape(objname)) + WS +"*(?<fields>("+VAR+""+ WS +"*:"+ WS +"*function\\(.*?\\)"+ WS +"*\\{.*?\\}(,"+ WS +")*)*)\\}"+ WS +"*;";
+                escape(objname)) + WS +"*(?<fields>("+VAR + WS +"*:"+ WS +"*function\\(.*?\\)"+ WS +"*\\{.*?\\}(,"+ WS +")*)*)\\}"+ WS +"*;";
         final Matcher obj_m = Pattern.compile(obj_mRegex).matcher(ctx.jscode);
         obj_m.find();
         String fields = obj_m.group("fields");
         // Currently, it only supports function definitions
-        final Matcher fields_m = Pattern.compile("(?<key>"+VAR+")"+ WS +"*:"+ WS +"*function\\((?<args>[a-z,]+)\\)\\"+CODE+"").matcher(fields);
+        final Matcher fields_m = Pattern.compile("(?<key>"+VAR+")"+ WS +"*:"+ WS +"*function\\((?<args>[a-z,]+)\\)\\"+CODE).matcher(fields);
 
         while (fields_m.find()) {
             final String[] argnames = mscpy(fields_m.group("args").split(","));
@@ -278,7 +278,7 @@ public final class JsFunction<T> {
 
     private static LambdaN extract_function(final JsContext ctx, String funcname) {
         String func_mRegex = String.format("(%1$s"+WS+"*="+WS+"*function|function"+WS+"+%1$s|[\\{;,]%1$s"+WS+"*="+WS+"*function|var"+WS+"+%1$s"+WS+"*="+WS+"*function)"+WS+"*",
-                escape(funcname)) + "\\((?<args>[a-z,]+)\\)\\"+CODE+"";
+                escape(funcname)) + "\\((?<args>[a-z,]+)\\)\\"+CODE;
         final Matcher func_m = Pattern.compile(func_mRegex).matcher(ctx.jscode);
         if (!func_m.find()) {
             throw new JsError("JsFunction.extract_function(): Could not find JS function " + funcname);
