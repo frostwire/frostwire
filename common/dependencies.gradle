@@ -1,6 +1,6 @@
 dependencies {
-    compile 'com.google.re2j:re2j:1.0'
-    compile 'com.google.code.gson:gson:2.4'
-    compile 'com.squareup.okhttp:okhttp:2.5.0'
-    compile 'io.reactivex:rxjava:1.0.16'
+    compile 'com.google.re2j:re2j:1.1'
+    compile 'com.google.code.gson:gson:2.5'
+    compile 'com.squareup.okhttp:okhttp:2.7.0'
+    compile 'io.reactivex:rxjava:1.1.0'
 }
