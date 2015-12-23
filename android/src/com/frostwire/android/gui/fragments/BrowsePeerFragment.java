@@ -27,8 +27,6 @@ import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import com.andrew.apollo.MusicPlaybackService;
@@ -47,6 +45,8 @@ import com.frostwire.android.gui.views.FileTypeRadioButtonSelectorFactory;
 import com.frostwire.android.gui.views.OverScrollListener;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.StringUtils;
+import com.frostwire.uxstats.UXAction;
+import com.frostwire.uxstats.UXStats;
 
 import java.util.HashSet;
 import java.util.List;
@@ -69,6 +69,18 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private long lastAdapterRefresh;
     private String previousFilter;
     private Set<FileListAdapter.FileDescriptorItem> previouslyChecked;
+
+    // given the byte:fileType as the index, this array will match the corresponding UXAction code.
+    // no if's necessary, random access -> O(1)
+    private final int[] browseUXActions = {
+            UXAction.LIBRARY_BROWSE_FILE_TYPE_AUDIO,
+            UXAction.LIBRARY_BROWSE_FILE_TYPE_PICTURES,
+            UXAction.LIBRARY_BROWSE_FILE_TYPE_VIDEOS,
+            UXAction.LIBRARY_BROWSE_FILE_TYPE_DOCUMENTS,
+            UXAction.LIBRARY_BROWSE_FILE_TYPE_APPLICATIONS,
+            UXAction.LIBRARY_BROWSE_FILE_TYPE_RINGTONES,
+            UXAction.LIBRARY_BROWSE_FILE_TYPE_TORRENTS
+    };
 
     public BrowsePeerFragment() {
         super(R.layout.fragment_browse_peer);
@@ -246,14 +258,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
             }
         });
-        button.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    browseFilesButtonClick(fileType);
-                }
-                fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
-            }
-        });
 
         button.setChecked(fileType == Constants.FILE_TYPE_AUDIO);
         return button;
@@ -268,6 +272,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         }
         filesBar.clearCheckAll();
         reloadFiles(fileType);
+        logBrowseAction(fileType);
+    }
+
+    private void logBrowseAction(byte fileType) {
+        try {
+            UXStats.instance().log(browseUXActions[fileType]);
+        } catch (Throwable ignored) {}
     }
 
     private void reloadFiles(byte fileType) {

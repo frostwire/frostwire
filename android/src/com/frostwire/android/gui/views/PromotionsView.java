@@ -50,10 +50,6 @@ public class PromotionsView extends LinearLayout {
         super(context, attrs);
     }
 
-    public OnPromotionClickListener getOnPromotionClickListener() {
-        return onPromotionClickListener;
-    }
-
     public void setOnPromotionClickListener(OnPromotionClickListener listener) {
         this.onPromotionClickListener = listener;
     }
@@ -127,7 +123,7 @@ public class PromotionsView extends LinearLayout {
         }
     }
 
-    public static interface OnPromotionClickListener {
-        public void onPromotionClick(PromotionsView v, Slide slide);
+    public interface OnPromotionClickListener {
+        void onPromotionClick(PromotionsView v, Slide slide);
     }
 }
