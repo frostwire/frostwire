@@ -230,10 +230,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         list = findView(view, R.id.fragment_search_list);
 
         showSearchView(view);
-
-        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            showRatingsReminder(view);
-        }
+        showRatingsReminder(view);
     }
 
     private void startMagnetDownload(String magnet) {
@@ -462,7 +459,9 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         }
 
         final int finishedDownloads = Engine.instance().getNotifiedDownloadsBloomFilter().count();
-        final int REMINDER_INTERVAL = CM.getInt(Constants.PREF_KEY_GUI_FINISHED_DOWNLOADS_BETWEEN_RATINGS_REMINDER);
+        final int intervalFactor = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? 4 : 1;
+        final int REMINDER_INTERVAL = intervalFactor * CM.getInt(Constants.PREF_KEY_GUI_FINISHED_DOWNLOADS_BETWEEN_RATINGS_REMINDER);
+
         //LOG.info("successful finishedDownloads: " + finishedDownloads);
 
         if (finishedDownloads < REMINDER_INTERVAL) {
