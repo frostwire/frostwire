@@ -272,12 +272,10 @@ public final class UIUtils {
 
     private static boolean openAudioInternal(String filePath) {
         try {
-            UXStats.instance().log(UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
-
             List<FileDescriptor> fds = Librarian.instance().getFiles(filePath, true);
-
             if (fds.size() == 1 && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
                 playEphemeralPlaylist(fds.get(0));
+                UXStats.instance().log(UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
                 return true;
             } else {
                 return false;
