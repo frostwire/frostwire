@@ -374,7 +374,7 @@ public final class YouTubeDownload implements DownloadTransfer {
         return sr.getDetailsUrl();
     }
 
-    private static enum DownloadType {
+    private enum DownloadType {
         VIDEO, DASH, DEMUX
     }
 

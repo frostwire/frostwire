@@ -342,10 +342,6 @@ public final class HttpDownload implements DownloadTransfer {
         }
     }
 
-    static void simpleHTTP(String url, OutputStream out) throws Throwable {
-        simpleHTTP(url, out, 1000);
-    }
-
     static void simpleHTTP(String url, OutputStream out, int timeout) throws Throwable {
         URL u = new URL(url);
         URLConnection con = u.openConnection();
