@@ -17,6 +17,9 @@ apply from: "$rootDir/common/dependencies.gradle"
 
 sourceCompatibility = 1.7
 
+// if false, you will need to have a symlink to frostwire-jlibtorrent at the root of the project.
+// this won't work for windows users, who will either have to have this in true, or just
+// copy frostwire-jlibtorrent if they need to hack frostwire-jlibtorrent while coding.
 def useJlibtorrentFromMaven = false
 
 compileJava {
@@ -52,7 +55,10 @@ sourceSets {
             srcDir 'desktop/src'
 
             if (!useJlibtorrentFromMaven) {
-                srcDir '../frostwire-jlibtorrent/src/main/java'
+                //To avoid 'Can't register given path of type 'SOURCE' ... error in intelliJ
+                //make a symlink to frostwire-jlibtorrent inside our content root folder,
+                //at the same level where desktop,common and android are.
+                srcDir 'frostwire-jlibtorrent/src/main/java'
             }
         }
 
