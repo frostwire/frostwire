@@ -86,7 +86,7 @@ public class PaymentOptions implements Mappable<String, Map<String, String>> {
     }
 
     public Map<String, Map<String, String>> asMap() {
-        Map<String, String> innerMap = new HashMap<String, String>();
+        Map<String, String> innerMap = new HashMap<>();
         if (!StringUtils.isNullOrEmpty(bitcoin)) {
             innerMap.put("bitcoin", bitcoin);
         }
@@ -94,7 +94,7 @@ public class PaymentOptions implements Mappable<String, Map<String, String>> {
             innerMap.put("paypalUrl", paypalUrl);
         }
 
-        Map<String, Map<String, String>> paymentOptions = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> paymentOptions = new HashMap<>();
 
         if (!innerMap.isEmpty()) {
             paymentOptions.put("paymentOptions", innerMap);

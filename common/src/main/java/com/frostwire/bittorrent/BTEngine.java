@@ -20,7 +20,8 @@ package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
-import com.frostwire.jlibtorrent.swig.*;
+import com.frostwire.jlibtorrent.swig.entry;
+import com.frostwire.jlibtorrent.swig.torrent_handle;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import org.apache.commons.io.FileUtils;
@@ -59,7 +60,7 @@ public final class BTEngine {
 
     private Session session;
     private Downloader downloader;
-    private SessionSettings defaultSettings;
+
 
     private boolean firewalled;
     private BTEngineListener listener;
@@ -68,7 +69,7 @@ public final class BTEngine {
     private BTEngine() {
         this.sync = new ReentrantLock();
         this.innerListener = new InnerListener();
-        this.restoreDownloadsQueue = new LinkedList<RestoreDownloadTask>();
+        this.restoreDownloadsQueue = new LinkedList<>();
     }
 
     private static class Loader {
@@ -86,12 +87,11 @@ public final class BTEngine {
         return session;
     }
 
-    private SessionSettings getSettings() {
+    private SettingsPack getSettingsPack() {
         if (session == null) {
             return null;
         }
-
-        return session.getSettings();
+        return session.getSettingsPack();
     }
 
     public BTEngineListener getListener() {
@@ -110,48 +110,42 @@ public final class BTEngine {
         if (session == null) {
             return 0;
         }
-
-        return session.getStatus().getDownloadRate();
+        return session.getStats().downloadRate();
     }
 
     public long getUploadRate() {
         if (session == null) {
             return 0;
         }
-
-        return session.getStatus().getUploadRate();
+        return session.getStats().uploadRate();
     }
 
     public long getTotalDownload() {
         if (session == null) {
             return 0;
         }
-
-        return session.getStatus().getTotalDownload();
+        return session.getStats().download();
     }
 
     public long getTotalUpload() {
         if (session == null) {
             return 0;
         }
-
-        return session.getStatus().getTotalUpload();
+        return session.getStats().upload();
     }
 
     public int getDownloadRateLimit() {
         if (session == null) {
             return 0;
         }
-
-        return session.getSettings().getDownloadRateLimit();
+        return session.getSettingsPack().downloadRateLimit();
     }
 
     public int getUploadRateLimit() {
         if (session == null) {
             return 0;
         }
-
-        return session.getSettings().getUploadRateLimit();
+        return session.getSettingsPack().uploadRateLimit();
     }
 
     public boolean isStarted() {
@@ -170,11 +164,11 @@ public final class BTEngine {
                 return;
             }
 
-            Pair<Integer, Integer> prange = new Pair<Integer, Integer>(ctx.port0, ctx.port1);
+            Pair<Integer, Integer> prange = new Pair<>(ctx.port0, ctx.port1);
             session = new Session(prange, ctx.iface);
 
             downloader = new Downloader(session);
-            defaultSettings = session.getSettings();
+            getSettingsPack();
 
             loadSettings();
             session.addListener(innerListener);
@@ -201,7 +195,6 @@ public final class BTEngine {
             saveSettings();
 
             downloader = null;
-            defaultSettings = null;
 
             session.abort();
             session = null;
@@ -272,12 +265,11 @@ public final class BTEngine {
         }
     }
 
-    private void saveSettings(SessionSettings s) {
+    private void saveSettings(SettingsPack sp) {
         if (session == null) {
             return;
         }
-
-        session.setSettings(s);
+        session.applySettings(sp);
         saveSettings();
     }
 
@@ -315,7 +307,7 @@ public final class BTEngine {
         }
 
         if (BTEngine.getInstance().getSession() != null && snapshot != null) {
-            pauseAndMoveActiveIncompleteTorrents(torrentDataDir, snapshot);
+            pauseAndMoveActiveIncompleteTorrents(torrentDataDir);
         }
 
         if (stop) {
@@ -388,10 +380,8 @@ public final class BTEngine {
     /**
      * Get the ongoing transfers and have them move to the new location.
      * Make sure the .resume files for these .torrents are also updated.
-     *
-     * @param torrentDataDir
      */
-    private void pauseAndMoveActiveIncompleteTorrents(final File torrentDataDir, Map<String, TorrentStatus.State> sessionSnapshot) {
+    private void pauseAndMoveActiveIncompleteTorrents(final File torrentDataDir) {
         final List<TorrentHandle> torrents = session.getTorrents();
         if (torrents != null) {
             PausedTorrentAlertListener torrentPausedListener = new PausedTorrentAlertListener(torrentDataDir);
@@ -420,9 +410,9 @@ public final class BTEngine {
     }
 
     private Map<String, TorrentStatus.State> sessionSnapshot(List<TorrentHandle> torrents, boolean cleanInvalid) {
-        Map<String, TorrentStatus.State> torrentHandleStatuses = new HashMap<String, TorrentStatus.State>();
+        Map<String, TorrentStatus.State> torrentHandleStatuses = new HashMap<>();
         for (final TorrentHandle th : torrents) {
-            if (th.isValid()) {
+            if (th!=null && th.isValid()) {
                 torrentHandleStatuses.put(th.getInfoHash().toString(), th.getStatus().getState());
                 System.out.println(th.getStatus().getState().toString() + " -> " + th.getInfoHash().toString() + " " + th.getTorrentInfo().getName());
             } else if (cleanInvalid) {
@@ -438,65 +428,34 @@ public final class BTEngine {
             return;
         }
 
-        /*
-        SettingsPack p = settingsToPack(defaultSettings);
-        SessionSettings s = defaultSettings;
-
-        if (ctx.optimizeMemory) {
-
-            int maxQueuedDiskBytes = s.getMaxQueuedDiskBytes();
-            p.setMaxQueuedDiskBytes(maxQueuedDiskBytes / 2);
-            int sendBufferWatermark = s.getSendBufferWatermark();
-            p.setSendBufferWatermark(sendBufferWatermark / 2);
-            p.setCacheSize(256);
-            p.setActiveDownloads(4);
-            p.setActiveSeeds(2);
-            p.setMaxPeerlistSize(200);
-            p.setUtpDynamicSockBuf(false);
-            p.setGuidedReadCache(true);
-            p.setTickInterval(1000);
-            p.setInactivityTimeout(60);
-            p.setSeedingOutgoingConnections(false);
-            p.setConnectionsLimit(200);
-        } else {
-            p.setActiveDownloads(5);
-            p.setActiveSeeds(3);
+        SettingsPack sp = getSettingsPack(); //this returns a new object copy to work with.
+        if (sp == null) {
+            return;
         }
 
-        session.applySettings(p);
-        saveSettings();
-        */
-
-        defaultSettings.broadcastLSD(true);
-
-        session.setSettings(defaultSettings);
-
-        SessionSettings s = session.getSettings(); // working with a copy?
+        sp.broadcastLSD(true);
+        session.applySettings(sp);
 
         if (ctx.optimizeMemory) {
-
-            int maxQueuedDiskBytes = s.getMaxQueuedDiskBytes();
-            s.setMaxQueuedDiskBytes(maxQueuedDiskBytes / 2);
-            int sendBufferWatermark = s.getSendBufferWatermark();
-            s.setSendBufferWatermark(sendBufferWatermark / 2);
-            s.setCacheSize(256);
-            s.setActiveDownloads(4);
-            s.setActiveSeeds(4);
-            s.setMaxPeerlistSize(200);
-            s.setGuidedReadCache(true);
-            s.setTickInterval(1000);
-            s.setInactivityTimeout(60);
-            s.setSeedingOutgoingConnections(false);
-            s.setConnectionsLimit(200);
-
+            int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
+            sp.setMaxQueuedDiskBytes(maxQueuedDiskBytes / 2);
+            int sendBufferWatermark = sp.sendBufferWatermark();
+            sp.setSendBufferWatermark(sendBufferWatermark / 2);
+            sp.setCacheSize(256);
+            sp.setActiveDownloads(4);
+            sp.setActiveSeeds(4);
+            sp.setMaxPeerlistSize(200);
+            sp.setGuidedReadCache(true);
+            sp.setTickInterval(1000);
+            sp.setInactivityTimeout(60);
+            sp.setSeedingOutgoingConnections(false);
+            sp.setConnectionsLimit(200);
         } else {
-
-            s.setActiveDownloads(10);
-            s.setActiveSeeds(10);
+            sp.setActiveDownloads(10);
+            sp.setActiveSeeds(10);
         }
 
-        session.setSettings(s);
-
+        session.applySettings(sp);
         saveSettings();
     }
 
@@ -720,7 +679,7 @@ public final class BTEngine {
     private void doResumeData(TorrentAlert<?> alert) {
         try {
             TorrentHandle th = session.findTorrent(alert.getHandle().getInfoHash());
-            if (th.isValid() && th.needSaveResumeData()) {
+            if (th!=null && th.isValid() && th.needSaveResumeData()) {
                 th.saveResumeData();
             }
         } catch (Throwable e) {
@@ -935,108 +894,101 @@ public final class BTEngine {
         if (session == null) {
             return 0;
         }
-
-        return getSettings().getDownloadRateLimit();
+        return session.getSettingsPack().downloadRateLimit();
     }
 
     public void setDownloadSpeedLimit(int limit) {
         if (session == null) {
             return;
         }
-
-        SessionSettings s = getSettings();
-        s.setDownloadRateLimit(limit);
-        saveSettings(s);
+        SettingsPack settingsPack = session.getSettingsPack();
+        settingsPack.setDownloadRateLimit(limit);
+        saveSettings(settingsPack);
     }
 
     public int getUploadSpeedLimit() {
         if (session == null) {
             return 0;
         }
-
-        return getSettings().getUploadRateLimit();
+        return session.getSettingsPack().uploadRateLimit();
     }
 
     public void setUploadSpeedLimit(int limit) {
         if (session == null) {
             return;
         }
-
-        SessionSettings s = getSettings();
-        s.setUploadRateLimit(limit);
-        saveSettings(s);
+        SettingsPack settingsPack = session.getSettingsPack();
+        settingsPack.setUploadRateLimit(limit);
+        session.applySettings(settingsPack);
+        saveSettings(settingsPack);
     }
 
     public int getMaxActiveDownloads() {
         if (session == null) {
             return 0;
         }
-
-        return getSettings().getActiveDownloads();
+        return session.getSettingsPack().activeDownloads();
     }
 
     public void setMaxActiveDownloads(int limit) {
         if (session == null) {
             return;
         }
-
-        SessionSettings s = getSettings();
-        s.setActiveDownloads(limit);
-        saveSettings(s);
+        SettingsPack settingsPack = session.getSettingsPack();
+        settingsPack.setActiveDownloads(limit);
+        session.applySettings(settingsPack);
+        saveSettings(settingsPack);
     }
 
     public int getMaxActiveSeeds() {
         if (session == null) {
             return 0;
         }
-
-        return getSettings().getActiveSeeds();
+        return session.getSettingsPack().activeSeeds();
     }
 
     public void setMaxActiveSeeds(int limit) {
         if (session == null) {
             return;
         }
-
-        SessionSettings s = getSettings();
-        s.setActiveSeeds(limit);
-        saveSettings(s);
+        SettingsPack settingsPack = session.getSettingsPack();
+        settingsPack.setActiveSeeds(limit);
+        session.applySettings(settingsPack);
+        saveSettings(settingsPack);
     }
 
     public int getMaxConnections() {
         if (session == null) {
             return 0;
         }
-
-        return getSettings().getConnectionsLimit();
+        return session.getSettingsPack().connectionsLimit();
     }
 
     public void setMaxConnections(int limit) {
         if (session == null) {
             return;
         }
-
-        SessionSettings s = getSettings();
-        s.setConnectionsLimit(limit);
-        saveSettings(s);
+        SettingsPack settingsPack = session.getSettingsPack();
+        settingsPack.setConnectionsLimit(limit);
+        session.applySettings(settingsPack);
+        saveSettings(settingsPack);
     }
 
     public int getMaxPeers() {
         if (session == null) {
             return 0;
         }
-
-        return getSettings().getMaxPeerlistSize();
+        return session.getSettingsPack().maxPeerlistSize();
     }
 
     public void setMaxPeers(int limit) {
         if (session == null) {
             return;
         }
-
-        SessionSettings s = getSettings();
-        s.setMaxPeerlistSize(limit);
-        saveSettings(s);
+        SettingsPack settingsPack = session.getSettingsPack();
+        settingsPack.setMaxPeerlistSize(limit);
+        session.applySettings(settingsPack);
+        saveSettings(settingsPack);
     }
 
     public int getTotalDHTNodes() {
