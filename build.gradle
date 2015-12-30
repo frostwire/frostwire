@@ -17,6 +17,8 @@ apply from: "$rootDir/common/dependencies.gradle"
 
 sourceCompatibility = 1.7
 
+def useJlibtorrentFromMaven = false
+
 compileJava {
     options.encoding = '8859_1'
 }
@@ -34,7 +36,10 @@ dependencies {
     compile 'com.h2database:h2:1.4.190'
     compile 'org.apache.lucene:lucene-core:3.5.0'
     compile 'net.jthink:jaudiotagger:2.2.5'
-    compile 'com.frostwire:jlibtorrent:1.1.0.15'
+
+    if (useJlibtorrentFromMaven) {
+        compile 'com.frostwire:jlibtorrent:1.1.0.15'
+    }
 
     compile fileTree(dir: 'desktop/lib/jars', include: ['*.jar'])
 }
@@ -45,6 +50,10 @@ sourceSets {
             // frostwire-common
             srcDir 'common/src/main/java'
             srcDir 'desktop/src'
+
+            if (!useJlibtorrentFromMaven) {
+                srcDir '../frostwire-jlibtorrent/src/main/java'
+            }
         }
 
         resources {
