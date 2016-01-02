@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Emil Suleymanov (sssemil)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,9 +46,11 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.preference.NumberPickerPreference;
 import com.frostwire.android.gui.views.preference.SimpleActionPreference;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
@@ -109,11 +111,29 @@ public class SettingsActivity extends PreferenceActivity {
         setupStorageOption();
         setupOtherOptions();
         setupSeedingOptions();
+        setupTorrentOptions();
         setupNickname();
         setupClearIndex();
         setupSearchEngines();
         setupUXStatsOption();
         setupAbout();
+    }
+
+    private void setupTorrentOptions() {
+        NumberPickerPreference maxDownloads = (NumberPickerPreference) findPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS);
+        if (maxDownloads != null) {
+           maxDownloads.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+               @Override
+               public boolean onPreferenceChange(Preference preference, Object newValue) {
+                   BTEngine e = BTEngine.getInstance();
+                   if (e != null) {
+                       e.setMaxActiveDownloads((int) newValue);
+                       return e.getMaxActiveDownloads() == (int) newValue;
+                   }
+                   return false;
+               }
+           });
+        }
     }
 
     private void setupOtherOptions() {
