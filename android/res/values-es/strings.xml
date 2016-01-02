@@ -505,7 +505,7 @@
     <string name="rating_reminder_description">Si te gusta FrostWire califícanos en la tienda.</string>
     <string name="love_frostwire">Te gusta FrostWire</string>
     <string name="send_feedback">Send Feedback</string>
-    <string name="choose_email_app">Elige un App de Correo Electrónico...</string>
+    <string name="choose_email_app">Elige un App de Correo Electrónico…</string>
     <string name="media_preview">%s preliminar</string>
     <string name="your_installation_is_complete">Instalación completa.</string>
     <string name="thank_you">¡Gracias!</string>
@@ -516,9 +516,9 @@
     <string name="transfers_context_menu_copy_infohash_copied">Infohash copiado al portapeles</string>
     <string name="remove_torrent_and_data">Eliminar Torrent y Archivos Descargados</string>
     <string name="frostwire_shutting_down_no_permissions">Lo siento, FrostWire no puede continuar sin tu permiso de acceder a disco.</string>
-    <string name="shutting_down">Apagando...</string>
+    <string name="shutting_down">Apagando…</string>
     <string name="why_we_need_storage_permissions">Por qué necesitamos permisos de almacenamiento.</string>
-    <string name="restarting">Reiniciando...</string>
+    <string name="restarting">Reiniciando…</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Las transferencias de torrent no empezarán hasta que te conectes a una red Wi-Fi. (Verifica tus preferencias de Redes con respecto al uso de datos 3G/4G)</string>
     <string name="transfers_context_menu_copy_magnet">Copiar Magnet</string>
     <string name="transfers_context_menu_copy_infohash">Copiar InfoHash</string>
