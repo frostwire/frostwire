@@ -23,9 +23,9 @@ sourceCompatibility = 1.7
 def useJlibtorrentFromMaven = false
 
 if (!useJlibtorrentFromMaven && !new File("frostwire-jlibtorrent").exists()) {
-    throw new Exception("You want to use jlibtorrent from source but you don't have a symlink 'frostwire-jlibtorrent' inside the frostwire/ folder with the sources.\n Try `ln -s ../frostwire-jlibtorrent`");
+    def path = new File("frostwire-jlibtorrent").getAbsolutePath()
+    throw new Exception("You want to use jlibtorrent from source but you don't have a symlink at '" + path + "' with the sources.");
 }
-
 
 compileJava {
     options.encoding = '8859_1'
