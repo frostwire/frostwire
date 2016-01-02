@@ -93,7 +93,7 @@ For `android/`, go inside the directory and do:
 
 ### License
 
-Frostwire Desktop is offered under the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html).
+Frostwire Desktop and Frostwire Android are offered under the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html).
 
 
 ### Official FrostWire sites
