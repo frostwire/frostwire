@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010-2011 Mike Novak <michael.novakjr@gmail.com>
+ * Copyright (C) 2011-2016, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +69,14 @@ public class NumberPickerPreference extends DialogPreference {
         switch (which) {
         case DialogInterface.BUTTON_POSITIVE:
             saveValue(mPicker.getValue());
+            final OnPreferenceChangeListener onPreferenceChangeListener = getOnPreferenceChangeListener();
+            if (onPreferenceChangeListener != null) {
+                try {
+                    onPreferenceChangeListener.onPreferenceChange(this, mPicker.getValue());
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
             break;
         default:
             break;
