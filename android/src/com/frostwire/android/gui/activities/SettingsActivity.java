@@ -120,12 +120,53 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void setupTorrentOptions() {
-        NumberPickerPreference maxDownloads = (NumberPickerPreference) findPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS);
-        if (maxDownloads != null) {
-           maxDownloads.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+        final BTEngine e = BTEngine.getInstance();
+        setupTorrentMaxDownloadSpeed(e);
+        setupTorrentMaxUploadSpeed(e);
+        setupTorrentMaxDownloads(e);
+        setupTorrentMaxUploads(e);
+        setupTorrentMaxTotalConnections(e);
+        setupTorrentMaxPeers(e);
+    }
+
+    private void setupTorrentMaxDownloadSpeed(final BTEngine e) {
+        NumberPickerPreference pickerPref = (NumberPickerPreference) findPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED);
+        if (pickerPref != null) {
+            pickerPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if (e != null) {
+                        e.setDownloadSpeedLimit((int) newValue);
+                        return e.getDownloadSpeedLimit() == (int) newValue;
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
+    private void setupTorrentMaxUploadSpeed(final BTEngine e) {
+        NumberPickerPreference pickerPref = (NumberPickerPreference) findPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED);
+        if (pickerPref != null) {
+            pickerPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if (e != null) {
+                        e.setUploadSpeedLimit((int) newValue);
+                        return e.getUploadSpeedLimit() == (int) newValue;
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
+    private void setupTorrentMaxDownloads(final BTEngine e) {
+        NumberPickerPreference pickerPref = (NumberPickerPreference) findPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS);
+        if (pickerPref != null) {
+           pickerPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
                @Override
                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                   BTEngine e = BTEngine.getInstance();
                    if (e != null) {
                        e.setMaxActiveDownloads((int) newValue);
                        return e.getMaxActiveDownloads() == (int) newValue;
@@ -135,6 +176,55 @@ public class SettingsActivity extends PreferenceActivity {
            });
         }
     }
+
+    private void setupTorrentMaxUploads(final BTEngine e) {
+        NumberPickerPreference pickerPref = (NumberPickerPreference) findPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOADS);
+        if (pickerPref != null) {
+            pickerPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if (e != null) {
+                        e.setMaxActiveSeeds((int) newValue);
+                        return e.getMaxActiveSeeds() == (int) newValue;
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
+    private void setupTorrentMaxTotalConnections(final BTEngine e) {
+        NumberPickerPreference pickerPreference = (NumberPickerPreference) findPreference(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS);
+        if (pickerPreference != null) {
+            pickerPreference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if (e != null) {
+                        e.setMaxConnections((int) newValue);
+                        return e.getMaxConnections() == (int) newValue;
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
+    private void setupTorrentMaxPeers(final BTEngine e) {
+        NumberPickerPreference pickerPreference = (NumberPickerPreference) findPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS);
+        if (pickerPreference != null) {
+            pickerPreference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if (e != null) {
+                        e.setMaxPeers((int) newValue);
+                        return e.getMaxPeers() == (int) newValue;
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
 
     private void setupOtherOptions() {
         setupPermanentStatusNotificationOption();
