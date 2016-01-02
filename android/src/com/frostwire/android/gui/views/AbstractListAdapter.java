@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(TM). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,14 +70,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     protected List<T> visualList;
 
     public AbstractListAdapter(Context context, int viewItemId, List<T> list, Set<T> checked) {
-        this.context = new WeakReference<Context>(context);
+        this.context = new WeakReference<>(context);
         this.viewItemId = viewItemId;
         this.viewOnClickListener = new ViewOnClickListener();
         this.viewOnLongClickListener = new ViewOnLongClickListener();
         this.viewOnKeyListener = new ViewOnKeyListener();
         this.checkboxOnCheckedChangeListener = new CheckboxOnCheckedChangeListener();
 
-        this.dialogs = new ArrayList<Dialog>();
+        this.dialogs = new ArrayList<>();
 
         this.list = list.equals(Collections.emptyList()) ? new ArrayList<T>() : list;
         this.checked = checked;
@@ -195,7 +195,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * Adds new results to the existing list.
-     * @param g
      */
     public void addList(List<T> g) {
         addList(g, false);
@@ -213,7 +212,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             }
         } else {
             if (visualList == list) {
-                visualList = new ArrayList<T>(list);
+                visualList = new ArrayList<>(list);
             }
             list.add(item);
         }
@@ -298,7 +297,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * So that results can be filtered. This discriminator should define which fields of T are the ones eligible for filtering.
-     * @param filter
      */
     public void setAdapterFilter(ListAdapterFilter<T> filter) {
         this.filter = filter;
@@ -323,21 +321,17 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * Implement this method to refresh the UI contents of the List Item with the data.
-     * @param view
-     * @param data
      */
     protected abstract void populateView(View view, T data);
 
     /**
      * Override this method if you want to do something when the overall List Item is clicked.
-     * @param v
      */
     protected void onItemClicked(View v) {
     }
 
     /**
      * Override this method if you want to do something when the overall List Item is long clicked.
-     * @param v
      */
     protected boolean onItemLongClicked(View v) {
         return false;
@@ -359,11 +353,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * Helper function.
-     *
-     * @param <TView>
-     * @param view
-     * @param id
-     * @return
      */
     @SuppressWarnings("unchecked")
     protected final <TView extends View> TView findView(View view, int id) {
@@ -374,14 +363,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         @SuppressWarnings("unchecked")
         SparseArray<View> h = (SparseArray<View>) view.getTag(R.id.abstract_list_adapter_holder_tag_id);
         if (h == null) {
-            h = new SparseArray<View>();
+            h = new SparseArray<>();
             view.setTag(R.id.abstract_list_adapter_holder_tag_id, h);
         }
         return h;
     }
 
     private View getView(View view, SparseArray<View> h, int id) {
-        View v = null;
+        View v;
 
         int index = h.indexOfKey(id);
         if (index < 0) {
@@ -415,9 +404,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * - Setting the correct checked/unchecked value without triggering the onCheckedChanged event.
      *
      * @see #getChecked()
-     *
-     * @param view
-     * @param item
      */
     private void initCheckBox(View view, T item) {
 
@@ -436,7 +422,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     private void initTouchFeedback(View v, T item) {
-        if (v instanceof CheckBox) {
+        if (v==null || v instanceof CheckBox) {
             return;
         }
 
@@ -450,7 +436,9 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             int count = vg.getChildCount();
             for (int i = 0; i < count; i++) {
                 View child = vg.getChildAt(i);
-                initTouchFeedback(child, item);
+                if (child != null) {
+                    initTouchFeedback(child, item);
+                }
             }
         }
     }
@@ -532,7 +520,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
                 result.values = list;
                 result.count = list.size();
             } else {
-                List<T> filtered = new ArrayList<T>();
+                List<T> filtered = new ArrayList<>();
                 int size = list.size();
                 for (int i = 0; i < size; i++) {
                     T obj = list.get(i);
