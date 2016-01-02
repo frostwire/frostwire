@@ -535,9 +535,15 @@
     <string name="dht_contacts">Contactos DHT</string>
     <string name="unprotected_connection">Conexión desprotegida</string>
     <string name="protect_my_privacy">Protege mi privacidad</string>
+    <string name="storage_picker_treeuri_error">Error inesperado seleccionando ruta de almacenamiento</string>
+    <string name="protected_connections_visibility_bullet">Gracias por proteger tu privacidad al usar VPN. Tu conexión es segura.</string>
+    <string name="unprotected_connections_visibility_bullet">Una conexión desprotegida hace visible todo lo que haces en línea a los ojos de tu proveedor de Internet y a todos los que se conectan a tu red, esto incluye tus búsquedas, navegación web, mensajería, correos electrónicos y descargas.</string>
+    <string name="storage_picker_treeuri_null">La ruta de almacenamiento no fué seleccionada</string>
+    <string name="storage_picker_treeuri_cant_write">FrostWire no puede escribir en la ruta de almacenamiento seleccionada</string>
+    <string name="storage_path">Storage Path</string>
 
     <!-- Important: Android tiene bugs con HTML, no dejes etiquetas HTML pegadas al texto, deja espacios. De otro modo android cuenta las etiquetas como parte de la longitud del texto y luego las lineas se cortan de forma prematura. -->
     <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Tu privacidad es un derecho humano fundamental.</b>]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p><b> *NO HACE FALTA TENER VPN para usar FrostWire </b> pero LO RECOMENDAMOS ENORMEMENTE para proteger tu privacidad.</p>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[<b> Una conexión desprotegida hace visible todo lo que haces en línea </b> a los ojos de tu proveedor de Internet y a todos los que se conectan a tu red, esto incluye tus búsquedas, navegación web, mensajería, correos electrónicos y descargas.]]></string>
+
 </resources>

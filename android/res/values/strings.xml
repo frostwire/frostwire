@@ -19,6 +19,11 @@
  */
 -->
 <resources>
+    <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
+    <string name="your_privacy_is_a_fundamental_right_html">Your privacy is a fundamental human right.</string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * Although highly recommended, <b>you do not need a VPN to use FrostWire. </b></p>]]></string>
+
+    <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Settings</string>
     <string name="activity_browse_peer_name">Browse Host</string>
@@ -563,10 +568,6 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire can\'t write on the selected storage path</string>
     <string name="storage_picker_treeuri_error">Unexpected error picking storage path</string>
     <string name="storage_path">Storage Path</string>
-
-    <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
-    <string name="your_privacy_is_a_fundamental_right_html">Your privacy is a fundamental human right.</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * Although highly recommended, <b>you do not need a VPN to use FrostWire. </b></p>]]></string>
     <string name="unprotected_connections_visibility_bullet">An unprotected connection makes everything you do online visible to your Internet provider and everyone on your network, that includes your searches, web browsing, messaging, emails and downloads. Consider a VPN.</string>
     <string name="protected_connections_visibility_bullet">Thank you for protecting your privacy by using a VPN. Your connection is secure.</string>
     <string name="learn_more">Learn more</string>
