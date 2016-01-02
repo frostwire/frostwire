@@ -16,6 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// if false, you will need to have a symlink to frostwire-jlibtorrent at the root of the project.
+// this won't work for windows users, who will either have to have this in true, or just
+// copy frostwire-jlibtorrent if they need to hack frostwire-jlibtorrent while coding.
+def useJlibtorrentFromMaven = false
+
+if (!useJlibtorrentFromMaven && !new File("frostwire-jlibtorrent").exists()) {
+    throw new Exception("You want to use jlibtorrent from source but you don't have a symlink 'frostwire-jlibtorrent' inside the frostwire/android folder with the sources.\n Try `ln -s ../../frostwire-jlibtorrent`");
+}
+
 import groovy.swing.SwingBuilder
 
 apply plugin: 'com.android.application'
@@ -100,6 +109,13 @@ android {
                 srcDir 'apollo/src'
                 srcDir 'src'
 
+                if (!useJlibtorrentFromMaven) {
+                    //To avoid 'Can't register given path of type 'SOURCE' ... error in intelliJ
+                    //make a symlink to frostwire-jlibtorrent inside our content root folder,
+                    //at the same level where desktop,common and android are.
+                    srcDir 'frostwire-jlibtorrent/src/main/java'
+                }
+
                 exclude '**/MobileCore*.java'
             }
 
@@ -156,9 +172,12 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:8.4.0'
 
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.frostwire:jlibtorrent:1.1.0.15'
-    compile 'com.frostwire:jlibtorrent-android-arm:1.1.0.15'
-    compile 'com.frostwire:jlibtorrent-android-x86:1.1.0.15'
+
+    if (useJlibtorrentFromMaven) {
+        compile 'com.frostwire:jlibtorrent:1.1.0.15'
+        compile 'com.frostwire:jlibtorrent-android-arm:1.1.0.15'
+        compile 'com.frostwire:jlibtorrent-android-x86:1.1.0.15'
+    }
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
