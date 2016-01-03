@@ -177,7 +177,7 @@ public abstract class SearchEngine {
         public SearchPerformer getPerformer(long token, String keywords) {
             TPBSearchPerformer performer = null;
             if (NetworkManager.instance().isDataWIFIUp()) {
-                performer = new TPBSearchPerformer("thepiratebay.mn", token, keywords, DEFAULT_TIMEOUT);
+                performer = new TPBSearchPerformer("thepiratebay.se", token, keywords, DEFAULT_TIMEOUT);
             } else {
                 LOG.info("No TPBSearchPerformer, WiFi not up");
             }
