@@ -20,7 +20,7 @@ sourceCompatibility = 1.7
 // if false, you will need to have a symlink to frostwire-jlibtorrent at the root of the project.
 // this won't work for windows users, who will either have to have this in true, or just
 // copy frostwire-jlibtorrent if they need to hack frostwire-jlibtorrent while coding.
-def useJlibtorrentFromMaven = false
+def useJlibtorrentFromMaven = true
 
 if (!useJlibtorrentFromMaven && !new File("frostwire-jlibtorrent").exists()) {
     def path = new File("frostwire-jlibtorrent").getAbsolutePath()
@@ -46,7 +46,7 @@ dependencies {
     compile 'net.jthink:jaudiotagger:2.2.5'
 
     if (useJlibtorrentFromMaven) {
-        compile 'com.frostwire:jlibtorrent:1.1.0.15'
+        compile 'com.frostwire:jlibtorrent:1.1.0.16'
     }
 
     compile fileTree(dir: 'desktop/lib/jars', include: ['*.jar'])
