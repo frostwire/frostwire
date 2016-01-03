@@ -87,13 +87,6 @@ public final class BTEngine {
         return session;
     }
 
-    private SettingsPack getSettingsPack() {
-        if (session == null) {
-            return null;
-        }
-        return session.getSettingsPack();
-    }
-
     public BTEngineListener getListener() {
         return listener;
     }
@@ -168,7 +161,6 @@ public final class BTEngine {
             session = new Session(prange, ctx.iface);
 
             downloader = new Downloader(session);
-            getSettingsPack();
 
             loadSettings();
             session.addListener(innerListener);
@@ -412,7 +404,7 @@ public final class BTEngine {
     private Map<String, TorrentStatus.State> sessionSnapshot(List<TorrentHandle> torrents, boolean cleanInvalid) {
         Map<String, TorrentStatus.State> torrentHandleStatuses = new HashMap<>();
         for (final TorrentHandle th : torrents) {
-            if (th!=null && th.isValid()) {
+            if (th != null && th.isValid()) {
                 torrentHandleStatuses.put(th.getInfoHash().toString(), th.getStatus().getState());
                 System.out.println(th.getStatus().getState().toString() + " -> " + th.getInfoHash().toString() + " " + th.getTorrentInfo().getName());
             } else if (cleanInvalid) {
@@ -428,13 +420,9 @@ public final class BTEngine {
             return;
         }
 
-        SettingsPack sp = getSettingsPack(); //this returns a new object copy to work with.
-        if (sp == null) {
-            return;
-        }
+        SettingsPack sp = session.getSettingsPack();
 
         sp.broadcastLSD(true);
-        session.applySettings(sp);
 
         if (ctx.optimizeMemory) {
             int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
@@ -679,7 +667,7 @@ public final class BTEngine {
     private void doResumeData(TorrentAlert<?> alert) {
         try {
             TorrentHandle th = session.findTorrent(alert.getHandle().getInfoHash());
-            if (th!=null && th.isValid() && th.needSaveResumeData()) {
+            if (th != null && th.isValid() && th.needSaveResumeData()) {
                 th.saveResumeData();
             }
         } catch (Throwable e) {
