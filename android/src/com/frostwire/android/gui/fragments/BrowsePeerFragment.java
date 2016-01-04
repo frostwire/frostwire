@@ -27,6 +27,7 @@ import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import com.andrew.apollo.MusicPlaybackService;
@@ -255,6 +256,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 if (button.isChecked()) {
                     browseFilesButtonClick(fileType);
                 }
+                fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
+            }
+        });
+
+        button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
             }
         });
