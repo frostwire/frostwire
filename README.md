@@ -8,7 +8,7 @@ Here you will find the sources necessary to build [FrostWire for Android](http:/
  * [/common](https://github.com/frostwire/frostwire/tree/master/common) Common sources for the desktop and android client
 
 In the past these sources were held at [frostwire-android](https://github.com/frostwire/frostwire-android), 
-[frostwire-desktop](https://github.com/frostwire/frostwire-desktop) and [frostwire-common](https://github.com/frostwire/frostwire-common) and [https://github.com/frostwire/frostwire-common](frostwire-common) respectively.
+[frostwire-desktop](https://github.com/frostwire/frostwire-desktop) and [frostwire-common](https://github.com/frostwire/frostwire-common) respectively.
 **These repositories will no longer be used.**
 
 # Coding Guidelines
