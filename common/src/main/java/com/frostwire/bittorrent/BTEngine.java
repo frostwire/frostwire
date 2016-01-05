@@ -808,6 +808,7 @@ public final class BTEngine {
                 // did they just add the entire torrent (therefore not selecting any priorities)
                 final Priority[] wholeTorrentPriorities = Priority.array(Priority.NORMAL, ti.getNumFiles());
                 th.prioritizeFiles(wholeTorrentPriorities);
+                fireDownloadUpdate(th);
                 th.resume();
             }
         } else { // new download

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.soundcloud.*;
+import com.frostwire.search.torrent.TorrentItemSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.transfers.TransferState;
@@ -601,7 +602,14 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     public void openTorrentSearchResult(final TorrentSearchResult sr, final boolean partialDownload) {
         GUIMediator.safeInvokeLater(new Runnable() {
             public void run() {
-                add(new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), partialDownload));
+                TorrentFetcherDownload d;
+                if (!partialDownload && sr instanceof TorrentItemSearchResult) {
+                    String relativePath = ((TorrentItemSearchResult) sr).getFilePath();
+                    d = new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), false, relativePath);
+                } else {
+                    d = new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), partialDownload);
+                }
+                add(d);
             }
         });
     }
