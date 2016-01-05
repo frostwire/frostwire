@@ -1,10 +1,11 @@
 frostwire (6.2.0) stable; urgency=high
+  * Fixes issue where partial downloads from search results would download
+    the rest of the .torrent files.
   * New jlibtorrent 1.1.0.16
   * Updated okhttp to 2.7.1
   * TPB fixed
 	
- -- FrostWire Team <contact@frostwire.com>  Sun, 03 Jan 2016 18:53:30 -0500
-
+ -- FrostWire Team <contact@frostwire.com>  Tue, 05 Jan 2016 18:06:10 -0500
 
 frostwire (6.1.9) stable; urgency=high
   * Fixes Youtube search issues.
