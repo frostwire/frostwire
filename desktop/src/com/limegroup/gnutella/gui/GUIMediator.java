@@ -1223,20 +1223,6 @@ public final class GUIMediator {
     }
 
     /**
-     * Connects the user from the network.
-     */
-    public void connect() {
-        //GuiCoreMediator.getConnectionServices().connect();
-    }
-
-    /**
-     * Disconnects the user to the network.
-     */
-    public void disconnect() {
-        //GuiCoreMediator.getConnectionServices().disconnect();
-    }
-
-    /**
      * Notifies the user that LimeWire is disconnected
      */
     public static void disconnected() {
