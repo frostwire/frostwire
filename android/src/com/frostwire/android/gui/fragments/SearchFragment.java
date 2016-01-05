@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.tasks.StartDownloadTask;
+import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
@@ -417,11 +418,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
     public static void startDownload(Context ctx, SearchResult sr, String message) {
         StartDownloadTask task = new StartDownloadTask(ctx, sr, message);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        } else {
-            task.execute();
-        }
+        Tasks.executeParallel(task);
         UIUtils.showTransfersOnDownloadStart(ctx);
 
         if (ctx instanceof Activity) {
