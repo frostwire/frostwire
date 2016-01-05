@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -482,7 +482,7 @@ public final class BTEngine {
             }
         }
 
-        downloader.download(ti, saveDir, priorities, null);
+        download(ti, saveDir, priorities, null);
 
         if (!exists) {
             saveResumeTorrent(torrent);
@@ -518,7 +518,7 @@ public final class BTEngine {
             }
         }
 
-        downloader.download(ti, saveDir, priorities, null);
+        download(ti, saveDir, priorities, null);
 
         if (!torrentHandleExists) {
             File torrent = saveTorrent(ti);
@@ -546,12 +546,12 @@ public final class BTEngine {
             Priority[] priorities = th.getFilePriorities();
             if (priorities[fileIndex] == Priority.IGNORE) {
                 priorities[fileIndex] = Priority.NORMAL;
-                downloader.download(ti, saveDir, priorities, null);
+                download(ti, saveDir, priorities, null);
             }
         } else {
             Priority[] priorities = Priority.array(Priority.IGNORE, ti.getNumFiles());
             priorities[fileIndex] = Priority.NORMAL;
-            downloader.download(ti, saveDir, priorities, null);
+            download(ti, saveDir, priorities, null);
         }
 
         if (!exists) {
@@ -699,6 +699,17 @@ public final class BTEngine {
         }
     }
 
+    private void fireDownloadUpdate(TorrentHandle th) {
+        try {
+            BTDownload dl = new BTDownload(this, th);
+            if (listener != null) {
+                listener.downloadUpdate(this, dl);
+            }
+        } catch (Throwable e) {
+            LOG.error("Unable to notify update the a download", e);
+        }
+    }
+
     private void migrateVuzeDownloads() {
         try {
             File dir = new File(ctx.homeDir.getParent(), "azureus");
@@ -776,6 +787,31 @@ public final class BTEngine {
         }
         if (task != null) {
             task.run();
+        }
+    }
+
+    public void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile) {
+
+        TorrentHandle th = session.findTorrent(ti.getInfoHash());
+
+        if (th != null) {
+            // found a download with the same hash, just adjust the priorities if needed
+            if (priorities != null) {
+                if (ti.getNumFiles() != priorities.length) {
+                    throw new IllegalArgumentException("The priorities length should be equals to the number of files");
+                }
+
+                th.prioritizeFiles(priorities);
+                fireDownloadUpdate(th);
+                th.resume();
+            } else {
+                // did they just add the entire torrent (therefore not selecting any priorities)
+                final Priority[] wholeTorrentPriorities = Priority.array(Priority.NORMAL, ti.getNumFiles());
+                th.prioritizeFiles(wholeTorrentPriorities);
+                th.resume();
+            }
+        } else { // new download
+            session.asyncAddTorrent(ti, saveDir, priorities, resumeFile);
         }
     }
 

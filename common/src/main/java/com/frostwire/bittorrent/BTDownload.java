@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -378,18 +378,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     @Override
     public int[] types() {
         return ALERT_TYPES;
-    }
-
-    @Override
-    public void torrentPrioritize(TorrentPrioritizeAlert alert) {
-        if (listener != null) {
-            try {
-                listener.update(this);
-            } catch (Throwable e) {
-                LOG.error("Error calling listener", e);
-            }
-        }
-        resume();
     }
 
     @Override

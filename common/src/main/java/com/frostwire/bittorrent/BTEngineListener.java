@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,11 @@ package com.frostwire.bittorrent;
  */
 public interface BTEngineListener {
 
-    public void started(BTEngine engine);
+    void started(BTEngine engine);
 
-    public void stopped(BTEngine engine);
+    void stopped(BTEngine engine);
 
-    public void downloadAdded(BTEngine engine, BTDownload dl);
+    void downloadAdded(BTEngine engine, BTDownload dl);
+
+    void downloadUpdate(BTEngine engine, BTDownload dl);
 }
