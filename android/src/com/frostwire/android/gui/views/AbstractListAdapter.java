@@ -37,14 +37,12 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 
 /**
- *
  * We extend from ListAdapter to populate our ListViews.
  * This one allows us to click and long click on the elements of our ListViews.
  *
+ * @param <T>
  * @author gubatron
  * @author aldenml
- *
- * @param <T>
  */
 public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filterable {
 
@@ -148,12 +146,16 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         return context.get();
     }
 
-    /** This will return the count for the current file type */
+    /**
+     * This will return the count for the current file type
+     */
     public int getCount() {
         return visualList == null ? 0 : visualList.size();
     }
 
-    /** Should return the total count for all file types. */
+    /**
+     * Should return the total count for all file types.
+     */
     public int getTotalCount() {
         return list == null ? 0 : list.size();
     }
@@ -256,14 +258,13 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * Inflates the view out of the XML.
-     *
+     * <p>
      * Sets click and long click listeners in case you need them. (Override onItemClicked and onItemLongClicked)
-     *
+     * <p>
      * Let's the adapter know that the view has been created, in case you need to go deeper and create
      * more advanced click behavior or even add new Views during runtime.
-     *
+     * <p>
      * It will also bind the data to the view, you can refer to it if you need it by doing a .getTag()
-     *
      */
     public View getView(int position, View view, ViewGroup parent) {
 
@@ -398,7 +399,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * Sets up the behavior of a possible checkbox to check this item.
-     *
+     * <p>
      * Takes in consideration:
      * - Only so many views are created and reused by the ListView
      * - Setting the correct checked/unchecked value without triggering the onCheckedChanged event.
@@ -422,7 +423,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     private void initTouchFeedback(View v, T item) {
-        if (v==null || v instanceof CheckBox) {
+        if (v == null || v instanceof CheckBox) {
             return;
         }
 
@@ -472,11 +473,11 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             boolean handled = false;
 
             switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_ENTER:
-                if (event.getAction() == KeyEvent.ACTION_UP) {
-                    handled = onItemKeyMaster(v);
-                }
+                case KeyEvent.KEYCODE_DPAD_CENTER:
+                case KeyEvent.KEYCODE_ENTER:
+                    if (event.getAction() == KeyEvent.ACTION_UP) {
+                        handled = onItemKeyMaster(v);
+                    }
             }
 
             return handled;
