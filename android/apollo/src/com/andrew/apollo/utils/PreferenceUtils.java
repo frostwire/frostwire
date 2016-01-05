@@ -34,7 +34,7 @@ import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
 public final class PreferenceUtils {
 
     /* Default start page (Artist page) */
-    public static final int DEFFAULT_PAGE = 2;
+    public static final int DEFFAULT_PAGE = 0;
 
     /* Saves the last page the pager was on in {@link MusicBrowserPhoneFragment} */
     public static final String START_PAGE = "start_page";
