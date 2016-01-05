@@ -201,7 +201,7 @@ public final class TorrentUtil {
             torrentCreator.add_tracker("udp://tracker.pomf.se");
 
             torrentCreator.set_priv(false);
-            torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireJarPath() + " build " + FrostWireUtils.getBuildNumber());
+            torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
             final File torrentFile = new File(SharingSettings.TORRENTS_DIR_SETTING.getValue(), file.getName() + ".torrent");
             final error_code ec = new error_code();
             libtorrent.set_piece_hashes(torrentCreator,file.getParentFile().getAbsolutePath(), ec);

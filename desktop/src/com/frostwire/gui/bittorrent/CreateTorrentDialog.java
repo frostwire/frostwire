@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,14 +63,12 @@ import java.util.regex.Pattern;
 @SuppressWarnings("serial")
 public class CreateTorrentDialog extends JDialog {
 
-    private static final String TT_EXTERNAL_DEFAULT = "http://";
     private final static String COMMENT = I18n.tr("Torrent File Created with FrostWire http://www.frostwire.com");
     private boolean create_from_dir;
     private String singlePath = null;
     private String directoryPath = null;
     private String dotTorrentSavePath = null;
 
-    private String trackerURL = TT_EXTERNAL_DEFAULT;
     private final List<String> trackers;
 
     private boolean autoOpen = true;
@@ -550,7 +548,6 @@ public class CreateTorrentDialog extends JDialog {
         //update the trackers list of lists
         trackers.clear();
         trackers.addAll(valid_tracker_urls);
-        trackerURL = valid_tracker_urls.get(0);
         _invalidTrackerURL = null;
         return true;
     }
