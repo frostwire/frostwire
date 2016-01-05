@@ -38,7 +38,7 @@ class TorrentSearchResultInfo implements TorrentDownloadInfo {
     }
 
     public TorrentSearchResultInfo(TorrentSearchResult sr) {
-        this(sr, sr.getDetailsUrl());
+        this(sr, sr.getReferrerUrl());
     }
 
     @Override
