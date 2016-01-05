@@ -263,8 +263,8 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             double httpBandwidth = 0;
             for (BTDownload btDownload : this.getDownloads()) {
                 if (btDownload instanceof HttpDownload ||
-                    btDownload instanceof SoundcloudDownload ||
-                    btDownload instanceof YouTubeDownload) {
+                        btDownload instanceof SoundcloudDownload ||
+                        btDownload instanceof YouTubeDownload) {
                     httpBandwidth += btDownload.getDownloadSpeed();
                 }
             }
@@ -684,6 +684,23 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             add(new BittorrentDownload(dl));
         } catch (Throwable e) {
             LOG.error("Error adding bittorrent download", e);
+        }
+    }
+
+    public void updateDownload(com.frostwire.bittorrent.BTDownload dl) {
+        try {
+            int count = TABLE.getRowCount();
+            for (int i = 0; i < count; i++) {
+                if (i < DATA_MODEL.getRowCount()) {
+                    BTDownloadDataLine line = DATA_MODEL.get(i);
+                    BTDownload downloader = line.getInitializeObject();
+                    if (downloader instanceof BittorrentDownload) {
+                        ((BittorrentDownload) downloader).updateUI(dl);
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            LOG.error("Error updating bittorrent download", e);
         }
     }
 

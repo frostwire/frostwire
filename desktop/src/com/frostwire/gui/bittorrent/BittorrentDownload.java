@@ -261,10 +261,17 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                         downloaded > 10 * 1024 * 1024 ||
                         shareRatio.equalsIgnoreCase("Infinity") ||
                         shareRatio.equalsIgnoreCase("NaN")) ?
-                    item.getFile() : null;
+                        item.getFile() : null;
             }
         }
         return null;
+    }
+
+    void updateUI(BTDownload dl) {
+        displayName = dl.getDisplayName();
+        size = calculateSize(dl);
+        items = calculateItems(dl);
+        partial = dl.isPartial();
     }
 
     private void checkSequentialDownload() {
@@ -317,14 +324,6 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     }
 
     private class StatusListener implements BTDownloadListener {
-
-        @Override
-        public void update(BTDownload dl) {
-            displayName = dl.getDisplayName();
-            size = calculateSize(dl);
-            items = calculateItems(dl);
-            partial = dl.isPartial();
-        }
 
         @Override
         public void finished(BTDownload dl) {
@@ -464,7 +463,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
             }
 
             if (dl instanceof BittorrentDownload &&
-                    TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[] { dl }) &&
+                    TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[]{dl}) &&
                     showShareTorrentDialog) {
                 new ShareTorrentDialog(((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
             } else if (dl instanceof SoundcloudDownload || dl instanceof YouTubeDownload || dl instanceof HttpDownload) {

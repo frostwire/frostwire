@@ -24,7 +24,9 @@ public interface ActivityCallback {
     /**
      * Add a file to the download window
      */
-    public void addDownload(BTDownload dl);
+    void addDownload(BTDownload dl);
+
+    void updateDownload(BTDownload dl);
 
     /**
      * Show active downloads

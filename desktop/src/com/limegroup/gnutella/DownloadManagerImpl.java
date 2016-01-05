@@ -39,6 +39,12 @@ public final class DownloadManagerImpl implements DownloadManager {
         }
     }
 
+    private void updateDownload(BTDownload dl) {
+        synchronized (this) {
+            activityCallback.updateDownload(dl);
+        }
+    }
+
     public void loadSavedDownloadsAndScheduleWriting() {
         try {
             BTEngine engine = BTEngine.getInstance();
@@ -78,6 +84,11 @@ public final class DownloadManagerImpl implements DownloadManager {
 //                }
 
                     addDownload(dl);
+                }
+
+                @Override
+                public void downloadUpdate(BTEngine engine, BTDownload dl) {
+                    updateDownload(dl);
                 }
             });
 

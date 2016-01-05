@@ -110,6 +110,12 @@ public final class VisualConnectionCallback implements ActivityCallback {
         GUIMediator.safeInvokeAndWait(doWorkRunnable);
     }
 
+    @Override
+    public void updateDownload(BTDownload dl) {
+        // no need of running this in the UI thread
+        mf().getBTDownloadMediator().updateDownload(dl);
+    }
+
     public boolean isRemoteDownloadsAllowed() {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
