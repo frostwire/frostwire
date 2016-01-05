@@ -16,7 +16,7 @@ In the past these sources were held at [frostwire-android](https://github.com/fr
 [5 Object Oriented Programming Principles learned during the last 15 years][3]
 [3]: <http://bit.ly/y0hdR4>
 
-* Keep it simple. ([KISS](https://en.wikipedia.org/wiki/KISS_principle))
+* Keep it simple, stupid. ([KISS](https://en.wikipedia.org/wiki/KISS_principle))
 * Do not repeat yourself. ([DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)) Re-use your own code and our code. It'll be faster to code, and easier to maintain.
 * If you want to help, the [Issue tracker](https://github.com/frostwire/frostwire/issues) is a good place to take a look at.
 * Try to follow our coding style and formatting before submitting a patch.
