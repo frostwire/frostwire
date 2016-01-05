@@ -14,6 +14,7 @@ package com.andrew.apollo.ui.activities;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -286,6 +287,11 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         } else if (isAlbum()) {
             getMenuInflater().inflate(R.menu.album_song_sort_by, menu);
         }
+        // Add to playlist
+        if (isArtist() || isAlbum()) {
+            getMenuInflater().inflate(R.menu.add_to_playlist, menu);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -299,6 +305,19 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
                 CreateNewPlaylistMenuAction createPlaylistAction = new CreateNewPlaylistMenuAction(this, null);
                 createPlaylistAction.onClick();
                 return true;
+            case R.id.menu_add_to_playlist: {
+                // Add to existing playlist or to new playlist
+                if (isAlbum()) {
+                    //I have experimented here with many things all failed - I was able to show dialog with the playlists but nothing actually happened when a playlist was selected, below is just my last try
+//                    AddToThisPlaylistMenuAction addToPlaylistAction = new AddToThisPlaylistMenuAction(this, (long[]) null);
+//                    addToPlaylistAction.onClick();
+//                    return true;
+
+                } else if (isArtist()){
+
+                }
+                return true;
+            }
             case android.R.id.home:
                 // If an album profile, go up to the artist profile
                 if (isAlbum()) {
