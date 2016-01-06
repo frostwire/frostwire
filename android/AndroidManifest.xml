@@ -48,7 +48,7 @@
 	<uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
 	<application android:name="com.frostwire.android.gui.MainApplication"
-		android:allowBackup="true" android:icon="@drawable/app_icon"
+		android:allowBackup="true" android:icon="@mipmap/ic_launcher"
 		android:label="@string/application_label" android:theme="@style/Theme.FrostWire">
 
         <meta-data android:name="com.google.android.gms.version"
