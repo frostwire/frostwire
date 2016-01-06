@@ -52,7 +52,7 @@ public final class TransferManager {
 
     private static final Logger LOG = Logger.getLogger(TransferManager.class);
 
-    private final List<DownloadTransfer> downloads;
+    private final List<DownloadTransfer> httpDownloads;
     private final List<BittorrentDownload> bittorrentDownloads;
 
     private int downloadsToReview;
@@ -71,7 +71,7 @@ public final class TransferManager {
     private TransferManager() {
         registerPreferencesChangeListener();
 
-        this.downloads = new CopyOnWriteArrayList<DownloadTransfer>();
+        this.httpDownloads = new CopyOnWriteArrayList<DownloadTransfer>();
         this.bittorrentDownloads = new CopyOnWriteArrayList<BittorrentDownload>();
 
         this.downloadsToReview = 0;
@@ -82,8 +82,8 @@ public final class TransferManager {
     public List<Transfer> getTransfers() {
         List<Transfer> transfers = new ArrayList<Transfer>();
 
-        if (downloads != null) {
-            transfers.addAll(downloads);
+        if (httpDownloads != null) {
+            transfers.addAll(httpDownloads);
         }
 
         if (bittorrentDownloads != null) {
@@ -95,7 +95,7 @@ public final class TransferManager {
 
     private boolean alreadyDownloading(String detailsUrl) {
         synchronized (alreadyDownloadingMonitor) {
-            for (DownloadTransfer dt : downloads) {
+            for (DownloadTransfer dt : httpDownloads) {
                 if (dt.isDownloading()) {
                     if (dt.getDetailsUrl() != null && dt.getDetailsUrl().equals(detailsUrl)) {
                         return true;
@@ -108,7 +108,7 @@ public final class TransferManager {
 
     private boolean isDownloadingTorrentByUri(String uri) {
         synchronized (alreadyDownloadingMonitor) {
-            for (DownloadTransfer dt : downloads) {
+            for (DownloadTransfer dt : httpDownloads) {
                 if (dt instanceof TorrentFetcherDownload) {
                     String torrentUri = ((TorrentFetcherDownload) dt).getTorrentUri();
                     if (torrentUri != null && torrentUri.equals(uri)) {
@@ -169,7 +169,7 @@ public final class TransferManager {
                 count++;
             }
         }
-        for (DownloadTransfer d : downloads) {
+        for (DownloadTransfer d : httpDownloads) {
             if (!d.isComplete() && d.isDownloading()) {
                 count++;
             }
@@ -190,7 +190,7 @@ public final class TransferManager {
     public long getDownloadsBandwidth() {
         long torrentDownloadsBandwidth = BTEngine.getInstance().getDownloadRate();
         long peerDownloadsBandwidth = 0;
-        for (DownloadTransfer d : downloads) {
+        for (DownloadTransfer d : httpDownloads) {
             peerDownloadsBandwidth += d.getDownloadSpeed();
         }
         return torrentDownloadsBandwidth + peerDownloadsBandwidth;
@@ -265,7 +265,7 @@ public final class TransferManager {
         if (transfer instanceof BittorrentDownload) {
             return bittorrentDownloads.remove(transfer);
         } else if (transfer instanceof DownloadTransfer) {
-            return downloads.remove(transfer);
+            return httpDownloads.remove(transfer);
         }
         return false;
     }
@@ -334,7 +334,7 @@ public final class TransferManager {
     private HttpDownload newHttpDownload(HttpSlideSearchResult sr) {
         HttpDownload download = new HttpDownload(this, sr.getDownloadLink());
 
-        downloads.add(download);
+        httpDownloads.add(download);
         download.start();
 
         return download;
@@ -343,7 +343,7 @@ public final class TransferManager {
     private DownloadTransfer newYouTubeDownload(YouTubeCrawledSearchResult sr) {
         YouTubeDownload download = new YouTubeDownload(this, sr);
 
-        downloads.add(download);
+        httpDownloads.add(download);
         download.start();
 
         return download;
@@ -352,7 +352,7 @@ public final class TransferManager {
     private DownloadTransfer newSoundcloudDownload(SoundcloudSearchResult sr) {
         SoundcloudDownload download = new SoundcloudDownload(this, sr);
 
-        downloads.add(download);
+        httpDownloads.add(download);
         download.start();
 
         return download;
@@ -361,7 +361,7 @@ public final class TransferManager {
     private DownloadTransfer newHttpDownload(HttpSearchResult sr) {
         HttpDownload download = new HttpDownload(this, new HttpSearchResultDownloadLink(sr));
 
-        downloads.add(download);
+        httpDownloads.add(download);
         download.start();
 
         return download;
@@ -418,7 +418,7 @@ public final class TransferManager {
      */
     public void stopHttpTransfers() {
         List<Transfer> transfers = new ArrayList<Transfer>();
-        transfers.addAll(downloads);
+        transfers.addAll(httpDownloads);
         for (Transfer t : transfers) {
             if (t instanceof DownloadTransfer && !t.isComplete() && ((DownloadTransfer)t).isDownloading()) {
                 t.cancel();
