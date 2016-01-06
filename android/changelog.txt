@@ -1,6 +1,7 @@
 FrostWire 1.6.9 - JANUARY/05/2016
  - Crash fix.
  - Updated to new jlibtorrent 1.1.0.15.
+ - Updated to new okhttp 2.7.1.
  - Fixes on torrenting settings that were not being correctly applied.
  - TPB fixed.
  - YT search fixed.

@@ -66,6 +66,8 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
     private static final String LIBRARY_SEARCH_FIELD = "library_search_field";
 
+    private static final String CLOUD_SEARCH_FIELD_HINT_TEXT = I18n.tr("Search or enter a cloud sourced URL");
+
     /**
      * The clicker forwarder.
      */
@@ -158,7 +160,10 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
     private void initCloudSearchField() {
         cloudSearchField.addActionListener(new SearchListener());
-        cloudSearchField.setPrompt(I18n.tr("Search or enter a cloud sourced URL"));
+        cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
+        cloudSearchField.setText(CLOUD_SEARCH_FIELD_HINT_TEXT);
+        cloudSearchField.selectAll();
+        cloudSearchField.requestFocus();
         Font origFont = cloudSearchField.getFont();
         Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
         cloudSearchField.setFont(newFont);
@@ -424,6 +429,9 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
     public void requestSearchFocusImmediately() {
         if (cloudSearchField != null) {
+            cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
+            cloudSearchField.setText(CLOUD_SEARCH_FIELD_HINT_TEXT);
+            cloudSearchField.selectAll();
             cloudSearchField.requestFocus();
         }
     }

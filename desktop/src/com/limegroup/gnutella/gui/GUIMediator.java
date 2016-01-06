@@ -35,6 +35,7 @@ import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.bugs.FatalBugManager;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.gui.options.OptionsMediator;
+import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
 import com.limegroup.gnutella.settings.ApplicationSettings;
@@ -338,7 +339,7 @@ public final class GUIMediator {
                         ErrorService.error(t);
                 }
                 if (visible) {
-                    //SearchMediator.requestSearchFocus();
+                    SearchMediator.requestSearchFocus();
                     // forcibly revalidate the FRAME
                     // after making it visible.
                     // on Java 1.5, it does not validate correctly.
