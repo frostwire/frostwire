@@ -320,8 +320,10 @@ public final class TransferManager {
 
     private BittorrentDownload newBittorrentDownload(TorrentSearchResult sr) {
         try {
-            createBittorrentDownload(this, sr);
-
+            BittorrentDownload bittorrentDownload = createBittorrentDownload(this, sr);
+            if (bittorrentDownload != null) {
+                bittorrentDownloads.add(bittorrentDownload);
+            }
             return null;
         } catch (Throwable e) {
             LOG.warn("Error creating download from search result: " + sr);
