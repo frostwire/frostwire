@@ -296,7 +296,6 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     private class StatusListener implements BTDownloadListener {
 
-        @Override
         public void update(BTDownload dl) {
             displayName = dl.getDisplayName();
             size = calculateSize(dl);
