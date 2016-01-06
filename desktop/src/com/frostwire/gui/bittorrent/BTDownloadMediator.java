@@ -706,6 +706,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                         BittorrentDownload bt = (BittorrentDownload) downloader;
                         if (bt.getHash().equals(dl.getInfoHash())) {
                             ((BittorrentDownload) downloader).updateUI(dl);
+                            break;
                         }
                     }
                 }
