@@ -294,13 +294,13 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         return null;
     }
 
-    private class StatusListener implements BTDownloadListener {
+    void updateUI(BTDownload dl) {
+        displayName = dl.getDisplayName();
+        size = calculateSize(dl);
+        items = calculateItems(dl);
+    }
 
-        public void update(BTDownload dl) {
-            displayName = dl.getDisplayName();
-            size = calculateSize(dl);
-            items = calculateItems(dl);
-        }
+    private class StatusListener implements BTDownloadListener {
 
         @Override
         public void finished(BTDownload dl) {

@@ -235,6 +235,27 @@ public final class TransferManager {
 
                 bittorrentDownloads.add(new UIBittorrentDownload(TransferManager.this, dl));
             }
+
+            @Override
+            public void downloadUpdate(BTEngine engine, BTDownload dl) {
+                try {
+                    int count = bittorrentDownloads.size();
+                    for (int i = 0; i < count; i++) {
+                        if (i < bittorrentDownloads.size()) {
+                            BittorrentDownload download = bittorrentDownloads.get(i);
+                            if (download instanceof UIBittorrentDownload) {
+                                UIBittorrentDownload bt = (UIBittorrentDownload) download;
+                                if (bt.getHash().equals(dl.getInfoHash())) {
+                                    bt.updateUI(dl);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (Throwable e) {
+                    LOG.error("Error updating bittorrent download", e);
+                }
+            }
         });
 
         engine.restoreDownloads();
