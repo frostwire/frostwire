@@ -103,13 +103,21 @@ public final class UXStats {
                     sendData();
                 }
 
+                // IMPORTANT: gubatron: Don't uncomment this
+                // until we research if indeed the providers
+                // are truly asynchronous and don't use the main
+                // looper to send the data to the servers.
+                // We also never set the internal executor and
+                // that could be another potential problem
+                // see the configuration for uxMinEntries
+                /*
                 if (!uxStatsAPIs.isEmpty()) {
                     for (UXStats3rdPartyAPI api : uxStatsAPIs) {
                         try {
                             api.logAction(action);
                         } catch (Throwable ignored) {}
                     }
-                }
+                }*/
             }
         } catch (Throwable e) {
             // ignore, not important

@@ -46,10 +46,9 @@ import java.util.*;
  */
 public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filterable {
 
-    private static String TAG = "FW.AbstractListAdapter";
     private static Logger LOG = Logger.getLogger(AbstractListAdapter.class);
 
-    private final WeakReference<Context> context;
+    private final Context context;
     private final int viewItemId;
 
     private final OnClickListener viewOnClickListener;
@@ -68,7 +67,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     protected List<T> visualList;
 
     public AbstractListAdapter(Context context, int viewItemId, List<T> list, Set<T> checked) {
-        this.context = new WeakReference<>(context);
+        this.context = context;
         this.viewItemId = viewItemId;
         this.viewOnClickListener = new ViewOnClickListener();
         this.viewOnLongClickListener = new ViewOnLongClickListener();
@@ -143,7 +142,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     public Context getContext() {
-        return context.get();
+        return context;
     }
 
     /**
@@ -286,7 +285,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             populateView(view, item);
 
         } catch (Throwable e) {
-            Log.e(TAG, "Fatal error getting view: " + e.getMessage(), e);
+            LOG.error("Fatal error getting view: " + e.getMessage(), e);
         }
 
         return view;
