@@ -77,7 +77,7 @@ be part of the development team._
 
 # Tip 4 commit
 
-Every countribution merged to the master branch will automatically receive a tip of 1% of whatever funds are available on the [tip4commit fund](https://tip4commit.com/github/frostwire/frostwire).
+Every contribution merged to the master branch will automatically receive a tip of 1% of whatever funds are available on the [tip4commit fund](https://tip4commit.com/github/frostwire/frostwire).
 
 Tip for next commit: [![tip for next commit](https://tip4commit.com/projects/43144.svg)](https://tip4commit.com/github/frostwire/frostwire)
 
