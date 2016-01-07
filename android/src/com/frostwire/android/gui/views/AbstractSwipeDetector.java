@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import com.frostwire.logging.Logger;
 
 /**
  * 
@@ -32,8 +31,7 @@ import com.frostwire.logging.Logger;
  * 
  */
 public abstract class AbstractSwipeDetector extends SimpleOnGestureListener implements OnTouchListener {
-    private static Logger logger = Logger.getLogger(AbstractSwipeDetector.class);
-    
+
     @SuppressWarnings("unused")
     private static final String TAG = "FW.AbstractSwipeDetector";
     
