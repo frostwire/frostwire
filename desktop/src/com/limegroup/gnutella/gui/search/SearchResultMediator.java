@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public final class SearchResultMediator extends AbstractTableMediator<TableRowFilteredModel, SearchResultDataLine, UISearchResult> {
 
@@ -105,8 +104,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     ActionListener STOP_SEARCH_LISTENER;
 
     protected Box SOUTH_PANEL;
-
-    public AtomicInteger searchCount = new AtomicInteger(0);
 
     private SchemaBox schemaBox;
     private SearchOptionsPanel searchOptionsPanel;
@@ -324,8 +321,8 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
         if (lines.length > 0) {
             boolean allWithHash = true;
-            for (int i = 0; i < lines.length; i++) {
-                if (lines[i].getHash() == null) {
+            for (SearchResultDataLine line : lines) {
+                if (line.getHash() == null) {
                     allWithHash = false;
                     break;
                 }
@@ -376,7 +373,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
     /**
      * Clears the table and converts the download button into a
-     * wishlist button.
+     * wish list button.
      */
     public void clearTable() {
         super.clearTable();
@@ -423,13 +420,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     /**
-     * Gets the SearchInformation of this search.
-     */
-    SearchInformation getSearchInformation() {
-        return SEARCH_INFO;
-    }
-
-    /**
      * Gets the query of the search.
      */
     String getQuery() {
@@ -438,32 +428,9 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
     /**
      * Returns the title of the search.
-     * @return
      */
     String getTitle() {
         return SEARCH_INFO.getTitle();
-    }
-
-    /**
-     * Gets the rich query of the search.
-     */
-    String getRichQuery() {
-        return SEARCH_INFO.getXML();
-    }
-
-    /**
-     * Shows a LicenseWindow for the selected line.
-     */
-    void showLicense() {
-        //        TableLine line = getSelectedLine();
-        //        if(line == null)
-        //            return;
-        //            
-        //        URN urn = line.getSHA1Urn();
-        //        LimeXMLDocument doc = line.getXMLDocument();
-        //        LicenseWindow window = LicenseWindow.create(line.getLicense(), urn, doc, this);
-        //        GUIUtils.centerOnScreen(window);
-        //        window.setVisible(true);
     }
 
     /**
@@ -507,7 +474,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         // store the selection & visible rows
         int[] rows = TABLE.getSelectedRows();
         SearchResultDataLine[] lines = new SearchResultDataLine[rows.length];
-        List<SearchResultDataLine> inView = new LinkedList<SearchResultDataLine>();
+        List<SearchResultDataLine> inView = new LinkedList<>();
         for (int i = 0; i < rows.length; i++) {
             int row = rows[i];
             SearchResultDataLine line = DATA_MODEL.get(row);
@@ -538,11 +505,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     int totalResults() {
-        return ((ResultPanelModel) DATA_MODEL).getTotalResults();
-    }
-
-    int filteredResults() {
-        return DATA_MODEL.getFilteredResults();
+        return DATA_MODEL.getTotalResults();
     }
 
     /**
@@ -640,7 +603,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * - Adds listeners, so the filters can be displayed when necessary.
      */
     private void setupRealTable() {
-        SearchTableColumns columns = ((ResultPanelModel) DATA_MODEL).getColumns();
+        SearchTableColumns columns = DATA_MODEL.getColumns();
         LimeTableColumn countColumn = columns.getColumn(SearchTableColumns.COUNT_IDX);
         if (SETTINGS.REAL_TIME_SORT.getValue() && TABLE.isColumnVisible(countColumn.getId())) {
             DATA_MODEL.sort(SearchTableColumns.COUNT_IDX); // ascending

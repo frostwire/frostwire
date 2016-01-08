@@ -127,10 +127,10 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     private void updateUIData(SearchResultActionsHolder actionsHolder, JTable table, int row, int column) {
         searchResult = actionsHolder.getSearchResult();
+
         if (searchResult==null) {
             return;
         }
-
         showSolid = mouseIsOverRow(table, row);
         labelPlay.setVisible(isSearchResultPlayable());
         if (labelPlay.isVisible()) {
@@ -163,9 +163,8 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (searchResult.getSearchResult() instanceof StreamableSearchResult && !isStreamableSourceBeingPlayed(searchResult)) {
                 searchResult.play();
-                updatePlayButton();
             }
-
+            updatePlayButton();
             uxLogMediaPreview();
         }
     }
@@ -196,7 +195,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private boolean isStreamableSourceBeingPlayed(UISearchResult sr) {
-        System.out.println(sr.getClass() + " - " + sr.getDisplayName());
         if (!(sr instanceof StreamableSearchResult)) {
             return false;
         }
