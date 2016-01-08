@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,10 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JPopupMenu;
 
+import com.frostwire.licences.License;
+import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
+import com.frostwire.search.archiveorg.ArchiveorgCrawledStreamableSearchResult;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -34,7 +37,7 @@ import com.limegroup.gnutella.gui.util.PopupUtils;
  * @author aldenml
  *
  */
-public final class ArchiveorgUISearchResult extends AbstractUISearchResult {
+public final class ArchiveorgUISearchResult extends AbstractUISearchResult implements StreamableSearchResult {
 
     private final ArchiveorgCrawledSearchResult sr;
 
@@ -74,5 +77,29 @@ public final class ArchiveorgUISearchResult extends AbstractUISearchResult {
     @Override
     public int getSeeds() {
         return 200;
+    }
+
+    @Override
+    public String getStreamUrl() {
+        String result = null;
+        if (sr instanceof ArchiveorgCrawledStreamableSearchResult) {
+            result = ((ArchiveorgCrawledStreamableSearchResult)sr).getStreamUrl();
+        }
+        return result;
+    }
+
+    @Override
+    public License getLicense() {
+        return sr.getLicense();
+    }
+
+    @Override
+    public String getThumbnailUrl() {
+        return sr.getThumbnailUrl();
+    }
+
+    @Override
+    public int uid() {
+        return sr.uid();
     }
 }

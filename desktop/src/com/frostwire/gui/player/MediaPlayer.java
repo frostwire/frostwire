@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import com.frostwire.mplayer.IcyInfoListener;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.frostwire.mplayer.PositionListener;
 import com.frostwire.mplayer.StateListener;
+import com.frostwire.util.StringUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.MPlayerMediator;
@@ -639,17 +640,14 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     }
 
     public boolean isThisBeingPlayed(String file) {
-        if (isPlayerStoppedClosedFailed()) {
+        if (StringUtils.isNullOrEmpty(file) || isPlayerStoppedClosedFailed()) {
             return false;
         }
-        
         MediaSource currentMedia = getCurrentMedia();
         if (currentMedia == null) {
             return false;
         }
-
         String currentMediaUrl = currentMedia.getURL();
-
         return (currentMediaUrl != null) && file.toLowerCase().equals(currentMediaUrl.toLowerCase());
     }
 

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,16 +18,6 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JTable;
-
 import com.frostwire.gui.AlphaIcon;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.search.CrawlableSearchResult;
@@ -39,6 +29,11 @@ import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * 
@@ -54,6 +49,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     private final static AlphaIcon download_transparent;
     private final static ImageIcon details_solid;
     private final static AlphaIcon details_transparent;
+    private final static ImageIcon speaker_icon;
 
     private JLabel labelPlay;
     private JLabel labelPartialDownload;
@@ -70,6 +66,8 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
         details_solid = GUIMediator.getThemeImage("search_result_details_over");
         details_transparent = new AlphaIcon(details_solid, BUTTONS_TRANSPARENCY);
+
+        speaker_icon = GUIMediator.getThemeImage("speaker");
     }
 
     public SearchResultActionsRenderer() {
@@ -134,8 +132,10 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         }
 
         showSolid = mouseIsOverRow(table, row);
-        updatePlayButton();
         labelPlay.setVisible(isSearchResultPlayable());
+        if (labelPlay.isVisible()) {
+            updatePlayButton();
+        }
         labelDownload.setIcon(showSolid ? download_solid : download_transparent);
         labelDownload.setVisible(true);
         labelPartialDownload.setIcon(showSolid ? details_solid : details_transparent);
@@ -156,7 +156,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private void updatePlayButton() {
-        labelPlay.setIcon((isStreamableSourceBeingPlayed(searchResult)) ? GUIMediator.getThemeImage("speaker") : (showSolid) ? play_solid : play_transparent);
+        labelPlay.setIcon((isStreamableSourceBeingPlayed(searchResult)) ? speaker_icon : (showSolid) ? play_solid : play_transparent);
     }
 
     private void labelPlay_mouseReleased(MouseEvent e) {
@@ -196,12 +196,11 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private boolean isStreamableSourceBeingPlayed(UISearchResult sr) {
+        System.out.println(sr.getClass() + " - " + sr.getDisplayName());
         if (!(sr instanceof StreamableSearchResult)) {
             return false;
         }
-
-        StreamableSearchResult ssr = (StreamableSearchResult) sr;
-        return MediaPlayer.instance().isThisBeingPlayed(ssr.getStreamUrl());
+        return MediaPlayer.instance().isThisBeingPlayed(((StreamableSearchResult)sr).getStreamUrl());
     }
 
     @Override

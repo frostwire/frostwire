@@ -1,8 +1,9 @@
-FrostWire 1.7.0 - JANUARY/06/2016
+FrostWire 1.7.0 - JANUARY/07/2016
  - Torrent transfers are now shown immediatly after they start.
  - "Stop and Delete Data" now also deletes corresponding .torrent.
  - Downloading two partial files from the same .torrent no longer
    downloads the entire torrent.
+ - Lots of icons updated, unused ones pruned.
 
 FrostWire 1.6.9 - JANUARY/05/2016
  - Crash fix.

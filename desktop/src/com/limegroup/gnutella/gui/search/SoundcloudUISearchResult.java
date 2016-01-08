@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JPopupMenu;
 
+import com.frostwire.licences.License;
+import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -34,7 +36,7 @@ import com.limegroup.gnutella.gui.util.PopupUtils;
  * @author aldenml
  *
  */
-public final class SoundcloudUISearchResult extends AbstractUISearchResult {
+public final class SoundcloudUISearchResult extends AbstractUISearchResult implements StreamableSearchResult {
 
     private final SoundcloudSearchResult sr;
 
@@ -76,8 +78,18 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
         return 200;
     }
 
+    @Override
+    public License getLicense() {
+        return sr.getLicense();
+    }
+
     public String getThumbnailUrl() {
         return sr.getThumbnailUrl();
+    }
+
+    @Override
+    public int uid() {
+        return sr.uid();
     }
 
     public String getUsername() {
@@ -86,5 +98,10 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
 
     public String getDownloadUrl() {
         return sr.getDownloadUrl();
+    }
+
+    @Override
+    public String getStreamUrl() {
+        return sr.getStreamUrl();
     }
 }
