@@ -168,6 +168,15 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
         cloudSearchField.setFont(newFont);
         cloudSearchField.setMargin(new Insets(0, 2, 0, 0));
+
+        cloudSearchField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (cloudSearchField.getText().equals(CLOUD_SEARCH_FIELD_HINT_TEXT)) {
+                    cloudSearchField.setText("");
+                }
+            }
+        });
     }
 
     private void createUpdateButton() {
