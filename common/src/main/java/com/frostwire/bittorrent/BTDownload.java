@@ -602,7 +602,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         try {
             BTInfoAdditionalMetadataHolder holder = new BTInfoAdditionalMetadataHolder(ti, getDisplayName());
             return holder.getPaymentOptions();
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             return null;
         }
     }
