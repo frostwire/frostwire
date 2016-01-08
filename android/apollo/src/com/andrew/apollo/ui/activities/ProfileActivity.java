@@ -27,7 +27,9 @@ import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.PagerAdapter;
@@ -40,6 +42,8 @@ import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.ProfileTabCarousel.Listener;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
+import com.frostwire.android.gui.views.menu.MenuBuilder;
+import com.frostwire.android.gui.views.menu.SubMenuBuilder;
 
 /**
  * The {@link Activity} is used to display the data for specific
@@ -275,6 +279,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      */
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
+
         // Pin to Home screen
         getMenuInflater().inflate(R.menu.add_to_homescreen, menu);
         // Shuffle
@@ -308,10 +313,11 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
             case R.id.menu_add_to_playlist: {
                 // Add to existing playlist or to new playlist
                 if (isAlbum()) {
-                    //I have experimented here with many things all failed - I was able to show dialog with the playlists but nothing actually happened when a playlist was selected, below is just my last try
-//                    AddToThisPlaylistMenuAction addToPlaylistAction = new AddToThisPlaylistMenuAction(this, (long[]) null);
-//                    addToPlaylistAction.onClick();
-//                    return true;
+                    MusicUtils.makePlaylistMenu(this, AlbumSongFragment.GROUP_ID, item.getSubMenu(), true);
+//                    MenuBuilder menuBuilder = new MenuBuilder(this);
+//                    getMenuInflater().inflate(R.menu.add_to_playlist, menuBuilder);
+//                    MusicUtils.makePlaylistMenu(this, AlbumSongFragment.GROUP_ID, item.getSubMenu(), true);
+                    return true;
 
                 } else if (isArtist()){
 
