@@ -44,7 +44,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private static final long SAVE_RESUME_RESOLUTION_MILLIS = 10000;
 
     private static final int[] ALERT_TYPES = {
-            AlertType.TORRENT_PRIORITIZE.getSwig(),
             AlertType.TORRENT_FINISHED.getSwig(),
             AlertType.TORRENT_REMOVED.getSwig(),
             AlertType.TORRENT_CHECKED.getSwig(),
