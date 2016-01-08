@@ -147,8 +147,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         boolean playable = false;
         if (searchResult.getSearchResult() instanceof StreamableSearchResult) {
             playable = ((StreamableSearchResult) searchResult.getSearchResult()).getStreamUrl() != null;
-        } else {
-
         }
 
         if (playable && searchResult.getExtension() != null) {

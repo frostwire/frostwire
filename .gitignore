@@ -52,3 +52,5 @@ GRTAGS
 *.iml
 *.ipr
 local.properties
+*/.idea
+.idea
