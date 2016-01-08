@@ -55,7 +55,7 @@ public class AlbumSongFragment extends Fragment implements LoaderCallbacks<List<
     /**
      * Used to keep context menu items from bleeding into other fragments
      */
-    private static final int GROUP_ID = 11;
+    public static final int GROUP_ID = 11;
 
     /**
      * LoaderCallbacks identifier
