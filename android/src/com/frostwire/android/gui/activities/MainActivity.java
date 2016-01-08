@@ -100,6 +100,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private MainController controller;
     private DrawerLayout drawerLayout;
     @SuppressWarnings("deprecation")
+
     private ActionBarDrawerToggle drawerToggle;
     private View leftDrawer;
     private ListView listMenu;
@@ -382,7 +383,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                externalStorageChecker.restartFrostWire(1000);
+                                externalStorageChecker.restartFrostWire(2000);
                             }
                         });
             }
