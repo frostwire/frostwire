@@ -69,6 +69,6 @@ public interface UISearchResult {
     String getDisplayName();
     
     String getQuery();
-    
+
     void play();
 }

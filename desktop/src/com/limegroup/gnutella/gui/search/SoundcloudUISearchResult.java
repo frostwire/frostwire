@@ -18,25 +18,22 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JPopupMenu;
-
-import com.frostwire.licences.License;
-import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * @author gubatron
  * @author aldenml
  *
  */
-public final class SoundcloudUISearchResult extends AbstractUISearchResult implements StreamableSearchResult {
+public final class SoundcloudUISearchResult extends AbstractUISearchResult {
 
     private final SoundcloudSearchResult sr;
 
@@ -78,18 +75,8 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult imple
         return 200;
     }
 
-    @Override
-    public License getLicense() {
-        return sr.getLicense();
-    }
-
     public String getThumbnailUrl() {
         return sr.getThumbnailUrl();
-    }
-
-    @Override
-    public int uid() {
-        return sr.uid();
     }
 
     public String getUsername() {
@@ -98,10 +85,5 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult imple
 
     public String getDownloadUrl() {
         return sr.getDownloadUrl();
-    }
-
-    @Override
-    public String getStreamUrl() {
-        return sr.getStreamUrl();
     }
 }

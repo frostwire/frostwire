@@ -147,11 +147,15 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         boolean playable = false;
         if (searchResult.getSearchResult() instanceof StreamableSearchResult) {
             playable = ((StreamableSearchResult) searchResult.getSearchResult()).getStreamUrl() != null;
-            if (playable && searchResult.getExtension() != null) {
-                MediaType mediaType = MediaType.getMediaTypeForExtension(searchResult.getExtension());
-                playable = mediaType != null && (mediaType.equals(MediaType.getAudioMediaType())) || mediaType.equals(MediaType.getVideoMediaType());
-            }
+        } else {
+
         }
+
+        if (playable && searchResult.getExtension() != null) {
+            MediaType mediaType = MediaType.getMediaTypeForExtension(searchResult.getExtension());
+            playable = mediaType != null && (mediaType.equals(MediaType.getAudioMediaType())) || mediaType.equals(MediaType.getVideoMediaType());
+        }
+
         return playable;
     }
 
@@ -195,10 +199,11 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private boolean isStreamableSourceBeingPlayed(UISearchResult sr) {
-        if (!(sr instanceof StreamableSearchResult)) {
+        SearchResult delegateSearchResult = sr.getSearchResult();
+        if (!(delegateSearchResult instanceof StreamableSearchResult)) {
             return false;
         }
-        return MediaPlayer.instance().isThisBeingPlayed(((StreamableSearchResult)sr).getStreamUrl());
+        return MediaPlayer.instance().isThisBeingPlayed(((StreamableSearchResult)delegateSearchResult).getStreamUrl());
     }
 
     @Override

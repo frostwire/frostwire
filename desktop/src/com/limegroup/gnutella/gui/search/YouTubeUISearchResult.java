@@ -18,10 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.frostwire.licences.License;
-import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
-import com.frostwire.search.youtube.YouTubeCrawledStreamableSearchResult;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -37,7 +34,7 @@ import java.awt.event.ActionListener;
  * @author aldenml
  *
  */
-public final class YouTubeUISearchResult extends AbstractUISearchResult implements StreamableSearchResult {
+public final class YouTubeUISearchResult extends AbstractUISearchResult {
 
     private final YouTubeCrawledSearchResult sr;
     private final int seeds;
@@ -84,29 +81,5 @@ public final class YouTubeUISearchResult extends AbstractUISearchResult implemen
     @Override
     public int getSeeds() {
         return seeds;
-    }
-
-    @Override
-    public String getStreamUrl() {
-        String result = null;
-        if (sr instanceof YouTubeCrawledStreamableSearchResult) {
-            result = ((YouTubeCrawledStreamableSearchResult) sr).getStreamUrl();
-        }
-        return result;
-    }
-
-    @Override
-    public License getLicense() {
-        return sr.getLicense();
-    }
-
-    @Override
-    public String getThumbnailUrl() {
-        return sr.getThumbnailUrl();
-    }
-
-    @Override
-    public int uid() {
-        return sr.uid();
     }
 }

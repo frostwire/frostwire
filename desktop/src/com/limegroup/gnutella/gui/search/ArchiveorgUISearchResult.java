@@ -18,13 +18,6 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JPopupMenu;
-
-import com.frostwire.licences.License;
-import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
 import com.frostwire.search.archiveorg.ArchiveorgCrawledStreamableSearchResult;
 import com.frostwire.uxstats.UXAction;
@@ -32,12 +25,16 @@ import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * @author gubatron
  * @author aldenml
  *
  */
-public final class ArchiveorgUISearchResult extends AbstractUISearchResult implements StreamableSearchResult {
+public final class ArchiveorgUISearchResult extends AbstractUISearchResult {
 
     private final ArchiveorgCrawledSearchResult sr;
 
@@ -77,29 +74,5 @@ public final class ArchiveorgUISearchResult extends AbstractUISearchResult imple
     @Override
     public int getSeeds() {
         return 200;
-    }
-
-    @Override
-    public String getStreamUrl() {
-        String result = null;
-        if (sr instanceof ArchiveorgCrawledStreamableSearchResult) {
-            result = ((ArchiveorgCrawledStreamableSearchResult)sr).getStreamUrl();
-        }
-        return result;
-    }
-
-    @Override
-    public License getLicense() {
-        return sr.getLicense();
-    }
-
-    @Override
-    public String getThumbnailUrl() {
-        return sr.getThumbnailUrl();
-    }
-
-    @Override
-    public int uid() {
-        return sr.uid();
     }
 }
