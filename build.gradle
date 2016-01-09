@@ -46,7 +46,7 @@ dependencies {
     compile 'net.jthink:jaudiotagger:2.2.5'
 
     if (useJlibtorrentFromMaven) {
-        compile 'com.frostwire:jlibtorrent:1.1.0.18'
+        compile 'com.frostwire:jlibtorrent:1.1.0.19'
     }
 
     compile fileTree(dir: 'desktop/lib/jars', include: ['*.jar'])
