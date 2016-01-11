@@ -83,7 +83,7 @@ Tip for next commit: [![tip for next commit](https://tip4commit.com/projects/431
 
 # How to build
 
-Instructions on how to build are included inside each project, we're still making the migration into this monorepo structure, so we'll accept gladly any commits refering to the README.md files found here.
+Instructions on how to build are included inside each project, we're still making the migration into this monorepo structure, so we'll accept gladly any commits referring to the README.md files found here.
 
 For now, `desktop/` has to be built from the root of the monorepo as simple as doing:
 `gradle build`
