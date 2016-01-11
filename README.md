@@ -75,7 +75,7 @@ _Repeat and rinse, if you send enough patches to demonstrate you have a good
 coding skills, we'll just give you commit access on the real repo and you will
 be part of the development team._
 
-# Tip 4 commit
+# Tip4Commit
 
 Every countribution merged to the master branch will automatically receive a tip of 1% of whatever funds are available on the [tip4commit fund](https://tip4commit.com/github/frostwire/frostwire).
 
