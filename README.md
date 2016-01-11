@@ -69,7 +69,7 @@ and then rebase your branch to bring it up to speed so it can be merged properly
 
 As you do this you may have to fix any possible conflicts, just follow the instruction git gives you if this is your first time.
 
-Make sure to squash any cosmetic commits into the body of your work so that we don't pollude the history and you don't get more bitcoins than you should from the rest of the collaborators for things like fixing a typo you just introduced on your branch.
+Make sure to squash any cosmetic commits into the body of your work so that we don't pollute the history and you don't get more bitcoins than you should from the rest of the collaborators for things like fixing a typo you just introduced on your branch.
 
 _Repeat and rinse, if you send enough patches to demonstrate you have a good
 coding skills, we'll just give you commit access on the real repo and you will
