@@ -158,6 +158,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private void updatePlayButton() {
+        cancelEdit();
         labelPlay.setIcon((isStreamableSourceBeingPlayed(searchResult)) ? speaker_icon : (showSolid) ? play_solid : play_transparent);
     }
 
@@ -202,11 +203,5 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             return false;
         }
         return MediaPlayer.instance().isThisBeingPlayed(((StreamableSearchResult)delegateSearchResult).getStreamUrl());
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        updatePlayButton();
     }
 }

@@ -52,6 +52,8 @@ import com.limegroup.gnutella.gui.tables.BeveledCellPainter;
  * 2. Make sure to add the proper default cell editors on your mediator's setDefaultEditors class (on that particular column).
  * 3. Make sure to add the proper default cell renderer on {@link AbstractTableMediator} <code>setDefaultRenderers()</code> 
  * 4. Avoid using FlowLayout as it will wrap if your component won't fit into the column.
+ * 5. If your renderer is an editor, make sure to invoke `cancelEdit()` before performing any updates on your inner components,
+ *    otherwise you may get blank cells.
  * @author gubatron
  *
  */
