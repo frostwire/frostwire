@@ -27,14 +27,13 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.*;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -43,6 +42,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.views.ListView;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -166,6 +166,46 @@ public final class UIUtils {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setIcon(iconId).setMessage(message).setTitle(titleId).setCancelable(false).setPositiveButton(android.R.string.yes, positiveListener).setNegativeButton(android.R.string.no, negativeListener);
         builder.create().show();
+    }
+
+    public static void showYesNoDialog(Context context,
+                                       int iconId,
+                                       String message,
+                                       int titleId,
+                                       List<String> bullets,
+                                       OnClickListener positiveListener,
+                                       OnClickListener negativeListener,
+                                       AdapterView.OnItemClickListener bulletsClickListener) {
+        if (bullets == null || bullets.isEmpty()) {
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        // show all bullets pre-checked, prepend
+        for (int i=0; i < bullets.size(); i++) {
+            bullets.set(i, String.valueOf(Html.fromHtml("&#8226; " + bullets.get(i))));
+        }
+
+        ArrayAdapter bulletsAdapter;
+        bulletsAdapter = new ArrayAdapter(context,
+                R.layout.dialog_update_bullet,
+                R.id.dialog_update_bullets_checked_text_view,
+                bullets);
+
+        ListView bulletsListView = new ListView(context);
+        bulletsListView.setAdapter(bulletsAdapter);
+        bulletsListView.setOnItemClickListener(bulletsClickListener);
+
+        builder.setIcon(iconId).
+                setTitle(titleId).
+                setMessage(message).
+                setView(bulletsListView).
+                setCancelable(false).
+                setPositiveButton(android.R.string.yes, positiveListener).
+                setNegativeButton(android.R.string.no, negativeListener).
+                create().
+                show();
     }
 
     public static void showOkCancelDialog(Context context, View view, int titleId, OnClickListener okListener, OnClickListener cancelListener) {

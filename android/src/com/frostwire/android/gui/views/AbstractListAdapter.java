@@ -20,7 +20,6 @@ package com.frostwire.android.gui.views;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
@@ -33,7 +32,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import com.frostwire.android.R;
 import com.frostwire.logging.Logger;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 /**

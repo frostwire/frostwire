@@ -45,6 +45,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -137,6 +138,8 @@ public final class SoftwareUpdater {
                         }
 
                         updateConfiguration(update, context);
+                    } else {
+                        LOG.warn("Could not fetch update information from " + Constants.SERVER_UPDATE_URL);
                     }
 
                     return handleOTAUpdate();
@@ -163,7 +166,7 @@ public final class SoftwareUpdater {
                     notifyUpdate(context);
                 }
 
-                // even if we're offline, we need to disable this for the Google Play Distro.
+                // Even if we're offline, we need to disable these for the Google Play Distro.
                 if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
                     SearchEngine ytSE = SearchEngine.forName("YouTube");
                     ytSE.setActive(false);
@@ -177,6 +180,7 @@ public final class SoftwareUpdater {
             }
         };
 
+        // TODO: Use our executors and a runnable instead.
         updateTask.execute();
     }
 
@@ -198,6 +202,7 @@ public final class SoftwareUpdater {
             if (update.a.equals(UPDATE_ACTION_OTA)) {
                 // did we download the newest already?
                 if (downloadedLatestFrostWire(update.md5)) {
+                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire("+update.md5+") -> true");
                     return true;
                 }
                 // didn't download it? go get it now
@@ -207,11 +212,14 @@ public final class SoftwareUpdater {
                         apkDirectory.mkdirs();
                     }
 
+                    LOG.info("handleOTAUpdate(): Downloading update... ("+update.md5+")");
                     HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).save(update.u, SystemPaths.getUpdateApk());
-
+                    LOG.info("handleOTAUpdate(): Finished downloading update... ("+update.md5+")");
                     if (downloadedLatestFrostWire(update.md5)) {
+                        LOG.info("handleOTAUpdate(): downloadedLatestFrostWire("+update.md5+") -> true");
                         return true;
                     }
+                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire("+update.md5+") -> false");
                 }
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
                 return update.m != null;
@@ -241,12 +249,20 @@ public final class SoftwareUpdater {
 
                 String message = StringUtils.getLocaleString(update.updateMessages, context.getString(R.string.update_message));
 
-                UIUtils.showYesNoDialog(context, R.drawable.app_icon, message, R.string.update_title, new OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Engine.instance().stopServices(false);
-                        UIUtils.openFile(context, SystemPaths.getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE);
-                    }
-                });
+                UIUtils.showYesNoDialog(context,
+                        R.drawable.app_icon,
+                        message,
+                        R.string.update_title,
+                        update.changelog,
+                        new OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Engine.instance().stopServices(false);
+                                UIUtils.openFile(context, SystemPaths.getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE);
+                            }
+                        },
+                        null, // negative listener
+                        null  // bullet's listener
+                );
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
 
                 String message = StringUtils.getLocaleString(update.marketMessages, context.getString(R.string.update_message));
@@ -288,21 +304,16 @@ public final class SoftwareUpdater {
     }
 
     private boolean isFrostWireOld(int myBuild, String latestBuild) {
-        // IntelliJ will default its build flavor to basic. However, we don't consider DEBUG builds
-        // to be part of Google Play distros, which is the discriminatory flag we use to ask for the update message.
-        // If the following happens it means we're running from IntelliJ, but since the flavor is "basic" the
-        // myBuild number received here will be in the lower range (8000xxx's) that we use for Google Play (basic) builds.
-        final boolean IS_IDEA_BUILD = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
-        if (IS_IDEA_BUILD) {
-            myBuild += 1000000;
+        if (Constants.IS_BASIC_DEBUG) {
+            myBuild += 900000;
         }
-
+        LOG.info("isFrostWireOld(myBuild="+myBuild+", latestBuild="+latestBuild+")");
         boolean result;
         try {
-
             int latestBuildNum = Integer.parseInt(latestBuild);
             result = myBuild < latestBuildNum;
         } catch(Throwable ignored) {
+            LOG.error("isFrostWireOld() can't parse latestBuild number.", ignored);
             result = false;
         }
         return result;
@@ -351,6 +362,7 @@ public final class SoftwareUpdater {
         }
 
         String checkedMD5 = getMD5(f);
+        LOG.info("checkMD5(expected="+expectedMD5+", checked="+checkedMD5+")");
         return checkedMD5 != null && checkedMD5.trim().equalsIgnoreCase(expectedMD5.trim());
     }
 
@@ -425,6 +437,8 @@ public final class SoftwareUpdater {
          * - "market" go to market page 
          */
         public String a;
+
+        public List<String> changelog;
 
         public Map<String, String> updateMessages;
         public Map<String, String> marketMessages;
