@@ -17,6 +17,8 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.util.StringUtils;
+
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -56,15 +58,21 @@ public final class MediaButton extends JButton implements LongPressable {
         setContentAreaFilled(false);
         setBorderPainted(false);
         setRolloverEnabled(true);
-        if (upName != null) {
+        if (!StringUtils.isNullOrEmpty(upName)) {
             ImageIcon upIcon = GUIMediator.getThemeImage(upName);
             setIcon(upIcon);
+        } else {
+            setIcon(null);
         }
+
         setHorizontalAlignment(SwingConstants.CENTER);
-        if (downName != null) {
+        if (!StringUtils.isNullOrEmpty(downName)) {
             ImageIcon downIcon = GUIMediator.getThemeImage(downName);
             setPressedIcon(downIcon);
             setRolloverIcon(downIcon);
+        } else {
+            setPressedIcon(null);
+            setRolloverIcon(null);
         }
         //        setPreferredSize(new Dimension(
         //            getIcon().getIconWidth(), getIcon().getIconHeight()));

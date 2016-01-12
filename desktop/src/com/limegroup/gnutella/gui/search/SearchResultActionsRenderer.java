@@ -126,6 +126,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private void updateUIData(SearchResultActionsHolder actionsHolder, JTable table, int row, int column) {
+        cancelEdit();
         searchResult = actionsHolder.getSearchResult();
 
         if (searchResult==null) {
@@ -158,7 +159,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private void updatePlayButton() {
-        cancelEdit();
         labelPlay.setIcon((isStreamableSourceBeingPlayed(searchResult)) ? speaker_icon : (showSolid) ? play_solid : play_transparent);
     }
 

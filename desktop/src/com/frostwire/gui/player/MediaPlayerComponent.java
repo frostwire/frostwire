@@ -1014,11 +1014,15 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                     iconDownName = "archive_on";
                 }
 
-                mediaSourceButton.init(tooltipText, iconUpName, iconDownName);
+
 
                 //TODO: Add "isLocalFile || isPlaylistItem ||" on FrostWire 6.x when we have room for 3 buttons.
                 boolean mediaSourceButtonVisible = (currentMedia != null) && (isYT || isSC || isAR);
                 //System.out.println("mediaSourceButton should be visible? " + mediaSourceButtonVisible);
+                if (mediaSourceButtonVisible) {
+                    mediaSourceButton.init(tooltipText, iconUpName, iconDownName);
+                }
+
                 mediaSourceButton.setVisible(mediaSourceButtonVisible);
             }
 
