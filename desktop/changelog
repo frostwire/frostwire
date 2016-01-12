@@ -1,4 +1,6 @@
 frostwire (6.2.1) stable; urgency=high
+  * Fixes issue where a corrupted .torrent inside the libtorrent folder
+    would make FrostWire crash on startup.
   * Fixes issue where partial downloads from search results would download.
     the rest of the .torrent files.
   * Fixes bug on search results display where action cell would dissapear
