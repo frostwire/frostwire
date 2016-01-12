@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,30 +18,19 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import com.frostwire.gui.theme.SkinTableUI;
+import com.frostwire.gui.theme.ThemeMediator;
+import com.limegroup.gnutella.gui.AbstractCellEditor;
+import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
+import com.limegroup.gnutella.gui.tables.BeveledCellPainter;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.plaf.TableUI;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-
-import com.frostwire.gui.bittorrent.*;
-import com.frostwire.gui.theme.SkinTableUI;
-import com.frostwire.gui.theme.ThemeMediator;
-import com.frostwire.transfers.TransferState;
-import com.limegroup.gnutella.gui.AbstractCellEditor;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
-import com.limegroup.gnutella.gui.tables.BeveledCellPainter;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 
 /**
