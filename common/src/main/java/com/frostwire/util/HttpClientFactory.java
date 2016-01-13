@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ package com.frostwire.util;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.JdkHttpClient;
 import com.frostwire.util.http.OKHTTPClient;
-import org.limewire.util.OSUtils;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -49,7 +49,7 @@ public class HttpClientFactory {
     }
 
     public static HttpClient getInstance(HttpContext context) {
-        if (OSUtils.isWindowsXP()) {
+        if (isWindowsXP()) {
             return new JdkHttpClient();
         }
 
@@ -60,10 +60,16 @@ public class HttpClientFactory {
     }
 
     private static Map<HttpContext, ThreadPool> buildThreadPools() {
-        final HashMap<HttpContext, ThreadPool> map = new HashMap<HttpContext, ThreadPool>();
+        final HashMap<HttpContext, ThreadPool> map = new HashMap<>();
         map.put(HttpContext.SEARCH, new ThreadPool("OkHttpClient-searches", 1, 5, 60, new LinkedBlockingQueue<Runnable>(), true));
         map.put(HttpContext.DOWNLOAD, new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true));
         map.put(HttpContext.MISC, new ThreadPool("OkHttpClient-misc", 2, 10, 30, new LinkedBlockingQueue<Runnable>(), true));
         return map;
+    }
+
+    private static boolean isWindowsXP() {
+        String os = System.getProperty("os.name");
+        os = os.toLowerCase(Locale.US);
+        return os.indexOf("windows xp") > -1;
     }
 }
