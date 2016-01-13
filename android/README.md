@@ -20,7 +20,7 @@ All the BitTorrent functionality is done using FrostWire's [jlibtorrent](https:/
  
 - All pull requests should come from a feature branch created on your git fork. We'll review your code and will only merge it to the `master` branch if it doesn't break the build. If you can include tests for your pull request you get extra bonus points ;)
 
-- When you submit a pull request, try to explain what issue you're fixing in detail and how you're fixing in detail it so it's easier for us to read your patches.
+- When you submit a pull request, try to explain what issue you're fixing in detail and how you're fixing it in detail, so it's easier for us to read your patches.
   If it's too hard to explain what you're doing, you're probably making things more complex than they already are.
   Look and test your code well before submitting patches.
 
