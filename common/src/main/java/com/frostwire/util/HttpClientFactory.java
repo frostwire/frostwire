@@ -20,6 +20,7 @@ package com.frostwire.util;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.JdkHttpClient;
 import com.frostwire.util.http.OKHTTPClient;
+import org.limewire.util.OSUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +49,10 @@ public class HttpClientFactory {
     }
 
     public static HttpClient getInstance(HttpContext context) {
+        if (OSUtils.isWindowsXP()) {
+            return new JdkHttpClient();
+        }
+
         if (okHttpClientPools == null) {
             okHttpClientPools = buildThreadPools();
         }
