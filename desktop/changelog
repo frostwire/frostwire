@@ -6,8 +6,9 @@ frostwire (6.2.1) stable; urgency=high
   * Fixes bug on search results display where action cell would dissapear
     when clicking on the play preview button.
   * New jlibtorrent 1.1.0.19.
+  * New playlists now sort songs by track number if track number available.
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 19 Jan 2016 15:33:26 -0500
+ -- FrostWire Team <contact@frostwire.com>  Wed, 13 Jan 2016 16:12:48 -0500
 
 frostwire (6.2.0) stable; urgency=high
   * New jlibtorrent 1.1.0.16.

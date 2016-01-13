@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.theme.DialogFinishedListener;
 import com.frostwire.gui.theme.FrostwireInputDialog;
-import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.logging.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -91,14 +90,14 @@ public class LibraryUtils {
 
                 // update all sort indexes from insertion point onwards
                 for (int i = index; i < items.size(); i++) {
-                    PlaylistItem cur_item = items.get(i);
-                    cur_item.setSortIndex(i + 1); //set index 1-based
-                    cur_item.save();
+                    PlaylistItem curItem = items.get(i);
+                    curItem.setSortIndexByTrackNumber(i+1);
+                    curItem.save();
                 }
 
             } else {
                 items.add(item);
-                item.setSortIndex(items.size()); // set sort index to 1-based size
+                item.setSortIndexByTrackNumber(items.size()); // fall back index would be it being the last track.
                 item.save();
             }
 
@@ -421,7 +420,7 @@ public class LibraryUtils {
     }
 
     public static List<LibraryPlaylistsTableTransferable.Item> convertToItems(List<PlaylistItem> playlistItems) {
-        List<LibraryPlaylistsTableTransferable.Item> items = new ArrayList<LibraryPlaylistsTableTransferable.Item>(playlistItems.size());
+        List<LibraryPlaylistsTableTransferable.Item> items = new ArrayList<>(playlistItems.size());
         for (PlaylistItem playlistItem : playlistItems) {
             Item item = new LibraryPlaylistsTableTransferable.Item();
             item.id = playlistItem.getId();
@@ -456,21 +455,13 @@ public class LibraryUtils {
     }
 
     public static PlaylistItem[] convertToPlaylistItems(LibraryPlaylistsTableTransferable.PlaylistItemContainer itemContainer) {
-        List<PlaylistItem> playlistItems = new ArrayList<PlaylistItem>(itemContainer.items.size());
+        List<PlaylistItem> playlistItems = new ArrayList<>(itemContainer.items.size());
         for (LibraryPlaylistsTableTransferable.Item item : itemContainer.items) {
             PlaylistItem playlistItem = new PlaylistItem(null, item.id, item.filePath, item.fileName, item.fileSize, item.fileExtension, item.trackTitle, item.trackDurationInSecs, item.trackArtist, item.trackAlbum, item.coverArtPath, item.trackBitrate, item.trackComment, item.trackGenre,
                     item.trackNumber, item.trackYear, item.starred);
             playlistItems.add(playlistItem);
         }
         return playlistItems.toArray(new PlaylistItem[0]);
-    }
-
-    public static File[] convertToFiles(PlaylistItem[] items) {
-        List<File> files = new ArrayList<File>(items.length);
-        for (PlaylistItem item : items) {
-            files.add(new File(item.getFilePath()));
-        }
-        return files.toArray(new File[0]);
     }
 
     private static void addToPlaylist(Playlist playlist, List<? extends AbstractLibraryTableDataLine<?>> lines) {
@@ -511,14 +502,14 @@ public class LibraryUtils {
     private static void addToPlaylist(Playlist playlist, PlaylistItem[] playlistItems, boolean starred, int index) {
         List<PlaylistItem> items = playlist.getItems();
         if (index != -1 && index <= items.size()) {
-            List<Integer> toRemove = new ArrayList<Integer>(playlistItems.length);
+            List<Integer> toRemove = new ArrayList<>(playlistItems.length);
             for (int i = 0; i < playlistItems.length && !playlist.isDeleted(); i++) {
                 toRemove.add(playlistItems[i].getId());
                 playlistItems[i].setId(LibraryDatabase.OBJECT_NOT_SAVED_ID);
                 playlistItems[i].setPlaylist(playlist);
                 items.add(index + i, playlistItems[i]);
                 if (starred) {
-                    playlistItems[i].setStarred(starred);
+                    playlistItems[i].setStarred(true);
                     playlistItems[i].save();
                 }
             }
@@ -532,11 +523,11 @@ public class LibraryUtils {
                 }
             }
 
-            // reupdate sort indexes now that the ordering in the list is correct
+            // update sort indexes now that the ordering in the list is correct
             items = playlist.getItems();
             for (int i = 0; i < items.size(); i++) {
                 PlaylistItem item = items.get(i);
-                item.setSortIndex(i + 1); // set index 1-based
+                item.setSortIndexByTrackNumber(i + 1); // set index 1-based
                 item.save();
             }
 
@@ -545,10 +536,10 @@ public class LibraryUtils {
 
                 playlistItems[i].setPlaylist(playlist);
                 items.add(playlistItems[i]);
-                playlistItems[i].setSortIndex(items.size()); // set sort index to be at the end (1-based)
+                playlistItems[i].setSortIndexByTrackNumber(items.size()); // set sort index to be at the end (1-based)
 
                 if (starred) {
-                    playlistItems[i].setStarred(starred);
+                    playlistItems[i].setStarred(true);
                 }
 
                 playlistItems[i].save();
@@ -572,7 +563,7 @@ public class LibraryUtils {
     }
 
     public static boolean directoryContainsASinglePlayableFile(File directory, int depth) {
-        return directoryContainsPlayableExtensions(directory, depth) && directory.listFiles().length == 1;
+        return directoryContainsPlayableExtensions(directory, depth) && (directory.listFiles().length == 1);
     }
 
     public static boolean directoryContainsAudio(File directory) {
@@ -583,11 +574,6 @@ public class LibraryUtils {
     public static boolean directoryContainsExtension(File directory, int depth, String extensionWithoutDot) {
         Set<File> ignore = TorrentUtil.getIgnorableFiles();
         return directoryContainsExtension(directory, depth, ignore, extensionWithoutDot);
-    }
-
-    public static boolean directoryContainsExtension(File directory, String... extensionWithoutDot) {
-        Set<File> ignore = TorrentUtil.getIgnorableFiles();
-        return directoryContainsExtension(directory, 4, ignore, extensionWithoutDot);
     }
 
     private static boolean directoryContainsExtension(File directory, int depth, Set<File> ignore, String... extensionWithoutDot) {
@@ -617,10 +603,10 @@ public class LibraryUtils {
     }
 
     private static String suggestPlaylistName(File[] mediaFiles) {
-        HistoHashMap<String> artistNames = new HistoHashMap<String>();
-        HistoHashMap<String> artistsAlbums = new HistoHashMap<String>();
-        HistoHashMap<String> albumNames = new HistoHashMap<String>();
-        HistoHashMap<String> genres = new HistoHashMap<String>();
+        HistoHashMap<String> artistNames = new HistoHashMap<>();
+        HistoHashMap<String> artistsAlbums = new HistoHashMap<>();
+        HistoHashMap<String> albumNames = new HistoHashMap<>();
+        HistoHashMap<String> genres = new HistoHashMap<>();
 
         for (File mf : mediaFiles) {
             if (MediaPlayer.isPlayableFile(mf)) {
@@ -779,7 +765,7 @@ public class LibraryUtils {
         // second, generate new indexes based list order
         for (int i = 0; i < items.size(); i++) {
             PlaylistItem item = items.get(i);
-            item.setSortIndex(i + 1); // set index (1-based)
+            item.setSortIndexByTrackNumber(i + 1); // set index (1-based)
             item.save();
         }
 

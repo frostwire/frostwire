@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package com.frostwire.alexandria.db;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
-import org.limewire.util.FileUtils;
 
 import java.io.File;
 import java.sql.*;
@@ -59,8 +58,13 @@ public class LibraryDatabase {
             _databaseFile = databaseFile;
             _name = databaseFile.getName();
             _connection = openOrCreateDatabase(databaseFile, _name);
-        } else
-            throw new IllegalArgumentException("Invalid database file parameter received: " + databaseFile.getAbsolutePath());
+        } else {
+            if (databaseFile != null) {
+                throw new IllegalArgumentException("Invalid library database file parameter received: " + databaseFile.getAbsolutePath());
+            } else {
+                throw new IllegalArgumentException("Null library database file parameter received.");
+            }
+        }
     }
 
     public String getName() {
@@ -346,7 +350,7 @@ public class LibraryDatabase {
             
             for(int i=0; i < items.size(); i++) {
                 PlaylistItem item = items.get(i);
-                item.setSortIndex(i+1); // set initial sort index (1-based)
+                item.setSortIndexByTrackNumber(i+1); // set initial sort index (1-based)
                 item.save();
             }
         }

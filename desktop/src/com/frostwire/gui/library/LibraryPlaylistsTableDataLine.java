@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,18 @@
  */
 package com.frostwire.gui.library;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.FilenameUtils;
-import org.limewire.util.StringUtils;
-
 import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.gui.player.MediaPlayer;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.NameHolder;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
+import org.apache.commons.io.FilenameUtils;
+import org.limewire.util.StringUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class LibraryPlaylistsTableDataLine extends AbstractLibraryTableDataLine<PlaylistItem> {
 
@@ -128,7 +127,7 @@ public final class LibraryPlaylistsTableDataLine extends AbstractLibraryTableDat
     }
 
     /**
-     *  Coverts the size of the PlayListItem into readable form postfixed with
+     *  Coverts the size of the PlayListItem into readable form post-fixed with
      *  Kb or Mb
      */
     private SizeHolder sizeHolder;
@@ -267,7 +266,7 @@ public final class LibraryPlaylistsTableDataLine extends AbstractLibraryTableDat
      * a property map
      */
     public String[] getToolTipArray(int col) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         if (!StringUtils.isNullOrEmpty(initializer.getTrackTitle(), true)) {
             list.add(I18n.tr("Title") + ": " + initializer.getTrackTitle());
         }

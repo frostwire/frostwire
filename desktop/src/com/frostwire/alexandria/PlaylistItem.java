@@ -1,8 +1,28 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.frostwire.alexandria;
 
 import com.frostwire.alexandria.db.LibraryDatabase;
 import com.frostwire.alexandria.db.LibraryDatabaseEntity;
 import com.frostwire.alexandria.db.PlaylistItemDB;
+
+import static com.frostwire.util.StringUtils.isNullOrEmpty;
 
 public class PlaylistItem extends LibraryDatabaseEntity {
 
@@ -224,5 +244,24 @@ public class PlaylistItem extends LibraryDatabaseEntity {
 
     public void setSortIndex(int sortIndex) {
         this.sortIndex = sortIndex;
+    }
+
+    /**
+     * Attempts to look for the track number to set this number as the sorting index.
+     * In case it cannot find a track number it will use the fallback value.
+     *
+     * Indexes start at 1. (not 0)
+     * @param fallBackIndexValue the sorting index to use if a track number isn't found.
+     */
+    public void setSortIndexByTrackNumber(int fallBackIndexValue) {
+        int sortIndex = fallBackIndexValue;
+        try {
+            if (!isNullOrEmpty(getTrackNumber())) {
+                sortIndex = Integer.parseInt(getTrackNumber().trim());
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        setSortIndex(sortIndex);
     }
 }
