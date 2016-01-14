@@ -191,6 +191,7 @@ public final class SoftwareUpdater {
      */
     private boolean handleOTAUpdate() throws IOException {
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            LOG.info("handleOTAUpdate(): it's Google Play, aborting -> false");
             return false;
         }
 
@@ -244,9 +245,11 @@ public final class SoftwareUpdater {
 
             if (update.a.equals(UPDATE_ACTION_OTA)) {
                 if (!SystemPaths.getUpdateApk().exists()) {
+                    LOG.info("notifyUpdate(): " + SystemPaths.getUpdateApk().getAbsolutePath() + " not found. Aborting.");
                     return;
                 }
 
+                LOG.info("notifyUpdate(): showing update dialog.");
                 String message = StringUtils.getLocaleString(update.updateMessages, context.getString(R.string.update_message));
 
                 UIUtils.showYesNoDialog(context,

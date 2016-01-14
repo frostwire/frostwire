@@ -28,7 +28,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.text.Html;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -43,6 +42,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.ListView;
+import com.frostwire.logging.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -59,7 +59,7 @@ import java.util.Locale;
  */
 public final class UIUtils {
 
-    private static final String TAG = "FW.UIUtils";
+    private static final Logger LOG = Logger.getLogger(UIUtils.class);
 
     /**
      * Localizable Number Format constant for the current default locale.
@@ -177,6 +177,7 @@ public final class UIUtils {
                                        OnClickListener negativeListener,
                                        AdapterView.OnItemClickListener bulletsClickListener) {
         if (bullets == null || bullets.isEmpty()) {
+            LOG.warn("showYesNoDialog() - aborting bullet dialog, no bullets to show.");
             return;
         }
 
@@ -280,7 +281,7 @@ public final class UIUtils {
             }
         } catch (Throwable e) {
             UIUtils.showShortMessage(context, R.string.cant_open_file);
-            Log.e(TAG, "Failed to open file: " + filePath, e);
+            LOG.error("Failed to open file: " + filePath, e);
         }
     }
 
@@ -298,7 +299,7 @@ public final class UIUtils {
         try {
             return MimeDetector.getMimeType(FilenameUtils.getExtension(filePath));
         } catch (Throwable e) {
-            Log.e(TAG, "Failed to read mime type for: " + filePath);
+            LOG.error("Failed to read mime type for: " + filePath);
             return MimeDetector.UNKNOWN;
         }
     }
