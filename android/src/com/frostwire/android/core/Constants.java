@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,9 @@ public final class Constants {
 
     public static final String BUILD_PREFIX = !IS_GOOGLE_PLAY_DISTRIBUTION ? "1000" : "";
 
-    /** This occurs when developing on IDEA, but we want to treat it as a plus build. */
+    /**
+     * This occurs when developing on IDEA, but we want to treat it as a plus build.
+     */
     public static final boolean IS_BASIC_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
 
     /**
@@ -115,6 +117,7 @@ public final class Constants {
     public static final String PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY = "frostwire.prefs.torrent.seed_finished_torrents_wifi_only";
 
     public static final String PREF_KEY_STORAGE_PATH = "frostwire.prefs.storage.path";
+    public static final String PREF_KEY_STORAGE_TEMP_PATH = "frostwire.prefs.storage.temp_path";
 
     public static final String PREF_KEY_UXSTATS_ENABLED = "frostwire.prefs.uxstats.enabled";
 
@@ -173,7 +176,9 @@ public final class Constants {
     public static final int NOTIFIED_BLOOM_FILTER_BITSET_SIZE = 320000; //40 kilobytes
     public static final int NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS = 10000;
 
-    /** Social Media official URLS */
+    /**
+     * Social Media official URLS
+     */
     public static final String SOCIAL_URL_FACEBOOK_PAGE = "https://www.facebook.com/FrostwireOfficial";
     public static final String SOCIAL_URL_TWITTER_PAGE = "https://twitter.com/frostwire";
     public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
@@ -181,5 +186,5 @@ public final class Constants {
     public static final String VPN_LEARN_MORE_URL = "http://www.frostwire.com/vpn";
     public static final String PIA_URL = "https://www.privateinternetaccess.com/pages/android-vpn-app/FROSTWIRE";
     public static final String EXPRESSVPN_URL_BASIC = "https://www.linkev.com/?a_aid=frostwire&data1=AndBTSB";
-    public static final String EXPRESSVPN_URL_PLUS  = "https://www.linkev.com/?a_aid=frostwire&data1=AndPTSB";
+    public static final String EXPRESSVPN_URL_PLUS = "https://www.linkev.com/?a_aid=frostwire&data1=AndPTSB";
 }

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ public final class SystemPaths {
     private static final String APP_STORAGE_PATH = "FrostWire";
     private static final String TORRENTS_PATH = "Torrents";
     private static final String TORRENT_DATA_PATH = "TorrentsData";
-    private static final String TEMP_PATH = "Temp";
 
     private static final String AUDIO_PATH = "Music";
     private static final String PICTURES_PATH = "Pictures";
@@ -64,7 +63,8 @@ public final class SystemPaths {
     }
 
     public static File getTemp() {
-        return new File(getAppStorage(), TEMP_PATH);
+        String path = ConfigurationManager.instance().getString(Constants.PREF_KEY_STORAGE_TEMP_PATH);
+        return new File(path);
     }
 
     public static File getSaveDirectory(byte fileType) {

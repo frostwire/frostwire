@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
 
 package com.frostwire.android.core;
 
+import android.content.Context;
 import android.os.Environment;
 import com.frostwire.util.ByteUtils;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,10 +37,10 @@ final class ConfigurationDefaults {
     private final Map<String, Object> defaultValues;
     private final Map<String, Object> resetValues;
 
-    public ConfigurationDefaults() {
+    public ConfigurationDefaults(Context context) {
         defaultValues = new HashMap<String, Object>();
         resetValues = new HashMap<String, Object>();
-        load();
+        load(context);
     }
 
     public Map<String, Object> getDefaultValues() {
@@ -49,7 +51,7 @@ final class ConfigurationDefaults {
         return Collections.unmodifiableMap(resetValues);
     }
 
-    private void load() {
+    private void load(Context context) {
         defaultValues.put(Constants.PREF_KEY_CORE_UUID, ByteUtils.uuidToByteArray(UUID.randomUUID()));
         defaultValues.put(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION, "");//won't know until I see it.
 
@@ -113,6 +115,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_PEERS, Long.valueOf(200));
 
         defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath()); // /mnt/sdcard
+        defaultValues.put(Constants.PREF_KEY_STORAGE_TEMP_PATH, new File(context.getExternalFilesDir(null), "temp").getAbsolutePath());
 
         defaultValues.put(Constants.PREF_KEY_UXSTATS_ENABLED, true);
 

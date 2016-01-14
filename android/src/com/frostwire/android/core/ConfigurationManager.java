@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,26 +18,23 @@
 
 package com.frostwire.android.core;
 
-import java.io.File;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
-
-import com.frostwire.util.StringUtils;
 import com.frostwire.util.ByteUtils;
+import com.frostwire.util.StringUtils;
+
+import java.io.File;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
- * 
  * Looking for default config values? look at {@link ConfigurationDefaults}
- * 
+ *
  * @author gubatron
  * @author aldenml
- *
  */
 public class ConfigurationManager {
 
@@ -66,7 +63,7 @@ public class ConfigurationManager {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = preferences.edit();
 
-        defaults = new ConfigurationDefaults();
+        defaults = new ConfigurationDefaults(context);
 
         initPreferences();
     }
