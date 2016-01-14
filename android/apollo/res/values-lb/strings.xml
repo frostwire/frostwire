@@ -37,7 +37,7 @@
   <string name="playlist_favorite">Favorit</string>
   <string name="playlist_favorites">Favoritten</string>
   <string name="playlist_last_added">Fir d\'lescht dobäigesat</string>
-  <string name="new_playlist">Nei Ofspilllëscht</string>
+  <string name="new_empty_playlist">Nei Ofspilllëscht</string>
   <string name="save">Späicheren</string>
   <string name="cancel">Ofbriechen</string>
   <string name="overwrite">Iwwerschreiwen</string>

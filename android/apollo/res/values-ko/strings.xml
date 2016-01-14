@@ -57,7 +57,7 @@
   <string name="playlist_favorite">즐겨찾기</string>
   <string name="playlist_favorites">즐겨찾기</string>
   <string name="playlist_last_added">최근에 추가한 곡</string>
-  <string name="new_playlist">새 재생목록</string>
+  <string name="new_empty_playlist">새 재생목록</string>
   <string name="save">저장</string>
   <string name="cancel">취소</string>
   <string name="overwrite">덮어쓰기</string>

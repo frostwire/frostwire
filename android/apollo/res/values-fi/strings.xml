@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Suosikki</string>
   <string name="playlist_favorites">Suosikit</string>
   <string name="playlist_last_added">Viimeksi lisätyt</string>
-  <string name="new_playlist">Uusi soittolista</string>
+  <string name="new_empty_playlist">Uusi soittolista</string>
   <string name="save">Tallenna</string>
   <string name="cancel">Peruuta</string>
   <string name="overwrite">Korvaa</string>

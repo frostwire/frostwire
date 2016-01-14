@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Αγαπημένο</string>
   <string name="playlist_favorites">Αγαπημένα</string>
   <string name="playlist_last_added">Προστέθηκαν πρόσφατα</string>
-  <string name="new_playlist">Νέα λίστα αναπαραγωγής</string>
+  <string name="new_empty_playlist">Νέα λίστα αναπαραγωγής</string>
   <string name="save">Αποθήκευση</string>
   <string name="cancel">Ακύρωση</string>
   <string name="overwrite">Αντικατάσταση</string>

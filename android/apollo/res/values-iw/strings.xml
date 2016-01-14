@@ -57,7 +57,7 @@
   <string name="playlist_favorite">מועדף</string>
   <string name="playlist_favorites">מועדפים</string>
   <string name="playlist_last_added">הוספו לאחרונה</string>
-  <string name="new_playlist">רשימת השמעה חדשה</string>
+  <string name="new_empty_playlist">רשימת השמעה חדשה</string>
   <string name="save">שמור</string>
   <string name="cancel">בטל</string>
   <string name="overwrite">לדרוס</string>

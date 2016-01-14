@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Favorit</string>
   <string name="playlist_favorites">Favorit</string>
   <string name="playlist_last_added">Terakhir ditambahkan</string>
-  <string name="new_playlist">Daftar putar baru</string>
+  <string name="new_empty_playlist">Daftar putar baru</string>
   <string name="save">Simpan</string>
   <string name="cancel">Batal</string>
   <string name="overwrite">Timpa</string>

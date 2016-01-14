@@ -72,7 +72,7 @@
     <string name="playlist_last_added">Last added</string>
 
     <!-- AlertDialog items -->
-    <string name="new_playlist">New playlist</string>
+    <string name="new_empty_playlist">New empty playlist</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="overwrite">Overwrite</string>

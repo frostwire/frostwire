@@ -58,7 +58,7 @@
   <string name="playlist_favorite">Favorito</string>
   <string name="playlist_favorites">Favoritos</string>
   <string name="playlist_last_added">Recientes</string>
-  <string name="new_playlist">Nueva lista</string>
+  <string name="new_empty_playlist">Nueva lista</string>
   <string name="save">Guardar</string>
   <string name="cancel">Cancelar</string>
   <string name="overwrite">Reemplazar</string>

@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Gogokoa</string>
   <string name="playlist_favorites">Gogokoak</string>
   <string name="playlist_last_added">Berriki gehituak</string>
-  <string name="new_playlist">Zerrenda berria</string>
+  <string name="new_empty_playlist">Zerrenda berria</string>
   <string name="save">Gorde</string>
   <string name="cancel">Ezeztatu</string>
   <string name="overwrite">Gainidatzi</string>

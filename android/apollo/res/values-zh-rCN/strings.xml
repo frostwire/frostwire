@@ -57,7 +57,7 @@
   <string name="playlist_favorite">收藏夹</string>
   <string name="playlist_favorites">收藏夹</string>
   <string name="playlist_last_added">最后添加</string>
-  <string name="new_playlist">新的播放列表</string>
+  <string name="new_empty_playlist">新的播放列表</string>
   <string name="save">保存</string>
   <string name="cancel">取消</string>
   <string name="overwrite">覆盖</string>

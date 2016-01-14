@@ -57,7 +57,7 @@
   <string name="playlist_favorite">په‌سه‌ندکراو</string>
   <string name="playlist_favorites">په‌سه‌ندکراوه‌کان</string>
   <string name="playlist_last_added">دوایین زیادکردن</string>
-  <string name="new_playlist">لیستی لێدانی تازه‌</string>
+  <string name="new_empty_playlist">لیستی لێدانی تازه‌</string>
   <string name="save">پاشەکەوتکردن</string>
   <string name="cancel">لابردن</string>
   <string name="overwrite">له‌جیاتیدانان</string>
