@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Favorit</string>
   <string name="playlist_favorites">Favoriti</string>
   <string name="playlist_last_added">Aktualna</string>
-  <string name="new_playlist">Nova playlista</string>
+  <string name="new_empty_playlist">Nova playlista</string>
   <string name="save">Spremi</string>
   <string name="cancel">Odbaci</string>
   <string name="overwrite">Prepiši</string>

@@ -57,7 +57,7 @@
   <string name="playlist_favorite">お気に入り</string>
   <string name="playlist_favorites">お気に入り</string>
   <string name="playlist_last_added">最近追加した曲</string>
-  <string name="new_playlist">新しいプレイリスト</string>
+  <string name="new_empty_playlist">新しいプレイリスト</string>
   <string name="save">保存</string>
   <string name="cancel">キャンセル</string>
   <string name="overwrite">上書き</string>

@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Izlase</string>
   <string name="playlist_favorites">Izlase</string>
   <string name="playlist_last_added">Pēdējie pievienotie</string>
-  <string name="new_playlist">Jauns atskaņošanas saraksts</string>
+  <string name="new_empty_playlist">Jauns atskaņošanas saraksts</string>
   <string name="save">Saglabāt</string>
   <string name="cancel">Atcelt</string>
   <string name="overwrite">Pārrakstīt</string>

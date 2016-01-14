@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Омиљена</string>
   <string name="playlist_favorites">Омиљене</string>
   <string name="playlist_last_added">Последње додате</string>
-  <string name="new_playlist">Нова плејлиста</string>
+  <string name="new_empty_playlist">Нова плејлиста</string>
   <string name="save">Сачувај</string>
   <string name="cancel">Поништи</string>
   <string name="overwrite">Пресними</string>

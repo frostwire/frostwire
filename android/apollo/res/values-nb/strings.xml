@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Favoritt</string>
   <string name="playlist_favorites">Favoritter</string>
   <string name="playlist_last_added">Nylige</string>
-  <string name="new_playlist">Ny spilleliste</string>
+  <string name="new_empty_playlist">Ny spilleliste</string>
   <string name="save">Lagre</string>
   <string name="cancel">Avbryt</string>
   <string name="overwrite">Overskriv</string>

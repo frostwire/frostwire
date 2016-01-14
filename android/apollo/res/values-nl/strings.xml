@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Favoriet</string>
   <string name="playlist_favorites">Favorieten</string>
   <string name="playlist_last_added">Laatst toegevoegd</string>
-  <string name="new_playlist">Nieuwe afspeellijst</string>
+  <string name="new_empty_playlist">Nieuwe afspeellijst</string>
   <string name="save">Opslaan</string>
   <string name="cancel">Annuleren</string>
   <string name="overwrite">Overschrijven</string>

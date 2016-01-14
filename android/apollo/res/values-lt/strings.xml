@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Mėgstamas</string>
   <string name="playlist_favorites">Mėgstami</string>
   <string name="playlist_last_added">Neseniai pridėta</string>
-  <string name="new_playlist">Naujas grojaraštis</string>
+  <string name="new_empty_playlist">Naujas grojaraštis</string>
   <string name="save">Išsaugoti</string>
   <string name="cancel">Atšaukti</string>
   <string name="overwrite">Perrašyti</string>

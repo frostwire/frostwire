@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Kedvenc</string>
   <string name="playlist_favorites">Kedvencek</string>
   <string name="playlist_last_added">Legutóbb hozzáadott</string>
-  <string name="new_playlist">Új lejátszási lista</string>
+  <string name="new_empty_playlist">Új lejátszási lista</string>
   <string name="save">Mentés</string>
   <string name="cancel">Mégsem</string>
   <string name="overwrite">Felülír</string>

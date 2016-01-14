@@ -59,7 +59,7 @@
   <string name="playlist_favorite">Избранное</string>
   <string name="playlist_favorites">Избранное</string>
   <string name="playlist_last_added">Недавно добавленные</string>
-  <string name="new_playlist">Новый плейлист</string>
+  <string name="new_empty_playlist">Новый плейлист</string>
   <string name="save">Сохранить</string>
   <string name="cancel">Отмена</string>
   <string name="overwrite">Заменить</string>
