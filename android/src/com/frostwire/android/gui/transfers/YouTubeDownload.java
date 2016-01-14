@@ -43,7 +43,6 @@ import java.util.Map;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class YouTubeDownload implements DownloadTransfer {
 
@@ -117,13 +116,13 @@ public final class YouTubeDownload implements DownloadTransfer {
         }
     }
 
-    private static File buildFile(File savePath, String name) {
+    static File buildFile(File savePath, String name) {
         String baseName = FilenameUtils.getBaseName(name);
         String ext = FilenameUtils.getExtension(name);
 
         File f = new File(savePath, name);
         int i = 1;
-        while (f.exists() && i < Integer.MAX_VALUE) {
+        while (f.exists() && i < 30) {
             f = new File(savePath, baseName + " (" + i + ")." + ext);
             i++;
         }
@@ -352,7 +351,7 @@ public final class YouTubeDownload implements DownloadTransfer {
 
             status = STATUS_ERROR;
 
-            if (e.getMessage() !=null && e.getMessage().contains("No space left on device")) {
+            if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
                 status = STATUS_ERROR_DISK_FULL;
             }
 
@@ -379,7 +378,7 @@ public final class YouTubeDownload implements DownloadTransfer {
     }
 
     private final class HttpDownloadListenerImpl implements HttpClientListener {
-        @Override   
+        @Override
         public void onError(HttpClient client, Throwable e) {
             error(e);
         }
@@ -451,7 +450,7 @@ public final class YouTubeDownload implements DownloadTransfer {
 
         @Override
         public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
-            
+
         }
     }
 
@@ -478,7 +477,7 @@ public final class YouTubeDownload implements DownloadTransfer {
         if (!(obj instanceof YouTubeDownload)) {
             return false;
         }
-        
+
         return sr.getFilename().equals(((YouTubeDownload) obj).sr.getFilename());
     }
 
@@ -486,7 +485,7 @@ public final class YouTubeDownload implements DownloadTransfer {
         String title = sr.getDisplayName();
         String author = sr.getSource();
         String source = "YouTube.com";
-        
+
         if (author != null && author.startsWith("YouTube - ")) {
             author = author.replace("YouTube - ", "") + " (YouTube)";
         } else {
