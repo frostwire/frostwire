@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,16 +18,15 @@
 
 package com.frostwire.android.gui.transfers;
 
-import java.io.File;
-
 import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.search.SearchResult;
 
+import java.io.File;
+
 /**
  * @author gubatron
  * @author aldenml
- * 
  */
 public abstract class TemporaryDownloadTransfer<T extends SearchResult> implements DownloadTransfer {
 
@@ -45,27 +44,18 @@ public abstract class TemporaryDownloadTransfer<T extends SearchResult> implemen
 
         return path;
     }
-    
+
     @Override
     public String getDetailsUrl() {
         return sr.getDetailsUrl();
     }
-    
-    protected void moveFile(File savePath, byte fileType) {
-        File finalFile = getFinalFile(savePath, fileType);
-        if (savePath.renameTo(finalFile)) {
-            this.savePath = finalFile;
-        } else {
-            this.savePath = savePath;
-        }
-    }
-    
+
     protected void scanFinalFile() {
-        if (getSavePath() != null &&  getSavePath().exists()) {
+        if (getSavePath() != null && getSavePath().exists()) {
             Librarian.instance().scan(getSavePath().getAbsoluteFile());
         }
     }
-    
+
     protected File getFinalFile(File savePath, byte fileType) {
         File path = SystemPaths.getSaveDirectory(fileType);
 
@@ -76,7 +66,7 @@ public abstract class TemporaryDownloadTransfer<T extends SearchResult> implemen
         File finalFile = new File(path, savePath.getName());
         return finalFile;
     }
-    
+
     public T getTag() {
         return sr;
     }

@@ -23,14 +23,14 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
+import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.transfers.TransferItem;
-import com.frostwire.util.http.HttpClient;
-import com.frostwire.util.http.HttpClient.HttpClientListener;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.MP4Muxer;
 import com.frostwire.util.MP4Muxer.MP4Metadata;
+import com.frostwire.util.http.HttpClient;
+import com.frostwire.util.http.HttpClient.HttpClientListener;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -90,8 +90,12 @@ public final class YouTubeDownload implements DownloadTransfer {
 
         File savePath = SystemPaths.getTorrentData();
 
-        ensureDirectoryExits(savePath);
-        ensureDirectoryExits(SystemPaths.getTemp());
+        if (!ensureDirectoryExits(savePath)) {
+            this.status = STATUS_SAVE_DIR_ERROR;
+        }
+        if (!ensureDirectoryExits(SystemPaths.getTemp())) {
+            this.status = STATUS_SAVE_DIR_ERROR;
+        }
 
         completeFile = buildFile(savePath, filename);
         tempVideo = buildTempFile(FilenameUtils.getBaseName(filename), "m4v");
@@ -110,9 +114,11 @@ public final class YouTubeDownload implements DownloadTransfer {
         }
     }
 
-    private void ensureDirectoryExits(File dir) {
+    static boolean ensureDirectoryExits(File dir) {
         if (dir == null || !dir.isDirectory() && !dir.mkdirs()) {
-            this.status = STATUS_SAVE_DIR_ERROR;
+            return false;
+        } else {
+            return true;
         }
     }
 

@@ -39,7 +39,6 @@ import com.frostwire.transfers.TransferItem;
 /**
  * @author gubatron
  * @author aldenml
- * 
  */
 public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSearchResult> {
 
@@ -158,7 +157,7 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
                     @Override
                     public void onComplete(HttpDownload download) {
                         downloadAndUpdateCoverArt(download.getSavePath());
-                        moveFile(download.getSavePath(), Constants.FILE_TYPE_AUDIO);
+                        moveFile(download.getSavePath());
                         scanFinalFile();
                         File savedFile = getSavePath(); //the update path after the file was moved.
                         String sha1 = Digests.sha1(savedFile);
@@ -178,6 +177,19 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
             return getSavePath();
         } else {
             return delegate != null ? delegate.getSavePath() : null;
+        }
+    }
+
+    private void moveFile(File savePath) {
+        if (!YouTubeDownload.ensureDirectoryExits(SystemPaths.getTorrentData())) {
+            // error
+            return;
+        }
+        File finalFile = YouTubeDownload.buildFile(SystemPaths.getTorrentData(), savePath.getName());
+        if (savePath.renameTo(finalFile)) {
+            this.savePath = finalFile;
+        } else {
+            this.savePath = savePath;
         }
     }
 
