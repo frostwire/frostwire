@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.transfers;
 
-import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.search.SearchResult;
 
@@ -56,19 +55,7 @@ public abstract class TemporaryDownloadTransfer<T extends SearchResult> implemen
         }
     }
 
-    protected File getFinalFile(File savePath, byte fileType) {
-        File path = SystemPaths.getSaveDirectory(fileType);
-
-        if (!path.exists()) {
-            path.mkdirs();
-        }
-
-        File finalFile = new File(path, savePath.getName());
-        return finalFile;
-    }
-
     public T getTag() {
         return sr;
     }
-
 }

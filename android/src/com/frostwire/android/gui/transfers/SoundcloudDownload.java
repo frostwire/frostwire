@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,7 @@
 
 package com.frostwire.android.gui.transfers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 import android.util.Log;
-
-import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.mp3.ID3Wrapper;
@@ -35,6 +27,12 @@ import com.frostwire.mp3.ID3v23Tag;
 import com.frostwire.mp3.Mp3File;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.TransferItem;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author gubatron
