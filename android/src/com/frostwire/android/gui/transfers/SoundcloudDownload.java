@@ -18,13 +18,18 @@
 
 package com.frostwire.android.gui.transfers;
 
+import android.net.Uri;
 import android.util.Log;
+import com.frostwire.android.LollipopFileSystem;
 import com.frostwire.android.core.SystemPaths;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.mp3.ID3Wrapper;
 import com.frostwire.mp3.ID3v1Tag;
 import com.frostwire.mp3.ID3v23Tag;
 import com.frostwire.mp3.Mp3File;
+import com.frostwire.platform.FileSystem;
+import com.frostwire.platform.Platforms;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.TransferItem;
 
@@ -155,16 +160,42 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
                     @Override
                     public void onComplete(HttpDownload download) {
                         downloadAndUpdateCoverArt(download.getSavePath());
-                        moveFile(download.getSavePath());
-                        scanFinalFile();
-                        File savedFile = getSavePath(); //the update path after the file was moved.
-                        Engine.instance().notifyDownloadFinished(getDisplayName(), savedFile, null);
+
+                        FileSystem fs = Platforms.get().fileSystem();
+                        if (fs instanceof LollipopFileSystem) {
+                            Uri uri = ((LollipopFileSystem) fs).getDocumentUri(SystemPaths.getTorrentData());
+                            if (uri != null) {
+                                safComplete(fs, download.getSavePath());
+                            } else {
+                                classicComplete(download);
+                            }
+                        } else {
+                            classicComplete(download);
+                        }
                     }
                 });
                 delegate.start();
             }
         } catch (Exception e) {
             Log.e(TAG, "Error starting youtube download", e);
+        }
+    }
+
+    private void classicComplete(HttpDownload download) {
+        moveFile(download.getSavePath());
+        Librarian.instance().scan(getSavePath().getAbsoluteFile());
+        File savedFile = getSavePath(); //the update path after the file was moved.
+        Engine.instance().notifyDownloadFinished(getDisplayName(), savedFile, null);
+    }
+
+    private void safComplete(FileSystem fs, File file) {
+        File finalFile = new File(SystemPaths.getTorrentData(), file.getName());
+        if (fs.rename(file, finalFile)) {
+            this.savePath = finalFile;
+        } else {
+            // TODO: do something here
+            // error
+            return;
         }
     }
 

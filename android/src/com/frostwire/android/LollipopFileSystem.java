@@ -71,6 +71,14 @@ public final class LollipopFileSystem implements FileSystem {
         return copy(app, srcF, destF);
     }
 
+    public Uri getDocumentUri(File file) {
+        return getDocumentUri(app, file);
+    }
+
+    public String getPath(Uri treeUri) {
+        return getPath(app, treeUri);
+    }
+
     private static DocumentFile getDirectory(Context context, File dir, boolean create) {
         String baseFolder = getExtSdCardFolder(context, dir);
         if (baseFolder == null) {
@@ -136,7 +144,7 @@ public final class LollipopFileSystem implements FileSystem {
         return f;
     }
 
-    public static Uri getDocumentUri(Context context, File file) {
+    private static Uri getDocumentUri(Context context, File file) {
         String baseFolder = getExtSdCardFolder(context, file);
         if (baseFolder == null) {
             return null;
@@ -156,7 +164,7 @@ public final class LollipopFileSystem implements FileSystem {
         return Uri.parse(uri);
     }
 
-    public static String getPath(Context context, Uri treeUri) {
+    private static String getPath(Context context, Uri treeUri) {
         if (treeUri == null) {
             return null;
         }

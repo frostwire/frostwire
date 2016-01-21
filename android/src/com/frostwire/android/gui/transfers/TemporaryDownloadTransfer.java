@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.transfers;
 
-import com.frostwire.android.gui.Librarian;
 import com.frostwire.search.SearchResult;
 
 import java.io.File;
@@ -47,12 +46,6 @@ public abstract class TemporaryDownloadTransfer<T extends SearchResult> implemen
     @Override
     public String getDetailsUrl() {
         return sr.getDetailsUrl();
-    }
-
-    protected void scanFinalFile() {
-        if (getSavePath() != null && getSavePath().exists()) {
-            Librarian.instance().scan(getSavePath().getAbsoluteFile());
-        }
     }
 
     public T getTag() {
