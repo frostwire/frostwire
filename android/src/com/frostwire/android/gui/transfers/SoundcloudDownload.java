@@ -158,8 +158,7 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
                         moveFile(download.getSavePath());
                         scanFinalFile();
                         File savedFile = getSavePath(); //the update path after the file was moved.
-                        String sha1 = Digests.sha1(savedFile);
-                        Engine.instance().notifyDownloadFinished(getDisplayName(), savedFile, sha1);
+                        Engine.instance().notifyDownloadFinished(getDisplayName(), savedFile, null);
                     }
                 });
                 delegate.start();

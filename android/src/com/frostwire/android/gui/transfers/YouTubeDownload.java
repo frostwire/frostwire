@@ -338,8 +338,7 @@ public final class YouTubeDownload implements DownloadTransfer {
 
         if (completeFile.getAbsoluteFile().exists()) {
             Librarian.instance().scan(getSavePath().getAbsoluteFile());
-            String sha1 = Digests.sha1(completeFile);
-            Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, sha1);
+            Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, null);
         } else {
             Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
         }
