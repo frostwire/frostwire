@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ import java.util.List;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class HttpDownload implements DownloadTransfer {
 
@@ -61,6 +60,7 @@ public final class HttpDownload implements DownloadTransfer {
     private final TransferManager manager;
     private final HttpDownloadLink link;
     private final Date dateCreated;
+    private final File tempPath;
     private final File savePath;
 
     private int status;
@@ -78,6 +78,7 @@ public final class HttpDownload implements DownloadTransfer {
         this.link = link;
         this.dateCreated = new Date();
 
+        this.tempPath = new File(SystemPaths.getTemp(), link.getFileName());
         this.savePath = new File(savePath, link.getFileName());
         this.status = STATUS_DOWNLOADING;
 
@@ -210,8 +211,7 @@ public final class HttpDownload implements DownloadTransfer {
                     String uri = link.getUrl();
                     HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
                     client.setListener(new DownloadListener());
-                    client.save(uri, savePath, resume);
-                    Librarian.instance().scan(savePath);
+                    client.save(uri, tempPath, resume);
                 } catch (Throwable e) {
                     error(e);
                 }
@@ -271,9 +271,16 @@ public final class HttpDownload implements DownloadTransfer {
         boolean success = true;
         String location = null;
         if (link.isCompressed()) {
-            status = STATUS_UNCOMPRESSING;
-            location = FilenameUtils.removeExtension(savePath.getAbsolutePath());
-            success = ZipUtils.unzip(savePath, new File(location));
+            // TODO: Unsupported
+//            status = STATUS_UNCOMPRESSING;
+//            location = FilenameUtils.removeExtension(tempPath.getAbsolutePath());
+//            success = ZipUtils.unzip(tempPath, new File(location));
+        }
+
+        if (tempPath.exists() && tempPath.renameTo(savePath)) {
+            success = true;
+        } else {
+            success = false;
         }
 
         if (success) {
@@ -299,7 +306,7 @@ public final class HttpDownload implements DownloadTransfer {
             Log.e(TAG, String.format("Error downloading url: %s", link.getUrl()), e);
             status = STATUS_ERROR;
 
-            if (e.getMessage() !=null && e.getMessage().contains("No space left on device")) {
+            if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
                 status = STATUS_ERROR_DISK_FULL;
             }
 
