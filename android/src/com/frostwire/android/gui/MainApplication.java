@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package com.frostwire.android.gui;
 import android.app.Application;
 import android.view.ViewConfiguration;
 import com.andrew.apollo.cache.ImageCache;
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.SystemPaths;
@@ -31,6 +32,7 @@ import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.DHT;
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.Platforms;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.util.DirectoryUtils;
 
@@ -51,6 +53,8 @@ public class MainApplication extends Application {
         super.onCreate();
 
         try {
+
+            Platforms.set(new AndroidPlatform(this));
 
             ignoreHardwareMenu();
             installHttpCache();
@@ -110,7 +114,7 @@ public class MainApplication extends Application {
         BTEngine.getInstance().reloadBTContext(SystemPaths.getTorrents(),
                 SystemPaths.getTorrentData(),
                 SystemPaths.getLibTorrent(this),
-                0,0,"0.0.0.0",false,false);
+                0, 0, "0.0.0.0", false, false);
         BTEngine.ctx.optimizeMemory = true;
         BTEngine.getInstance().start();
 
