@@ -26,9 +26,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.FileSystem;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -50,7 +53,22 @@ public final class LollipopFileSystem implements FileSystem {
 
     @Override
     public boolean rename(File src, File dest) {
-        return src.renameTo(dest);
+        if (src.renameTo(dest)) { // old way
+            return true;
+        }
+
+        DocumentFile srcF = getFile(app, src, false);
+        DocumentFile destF = getFile(app, dest, true);
+
+        if (srcF == null) {
+            LOG.error("Unable to obtain document for file: " + src);
+        }
+
+        if (destF == null) {
+            LOG.error("Unable to obtain or create document for file: " + dest);
+        }
+
+        return copy(app, srcF, destF);
     }
 
     private static DocumentFile getDirectory(Context context, File dir, boolean create) {
@@ -300,5 +318,30 @@ public final class LollipopFileSystem implements FileSystem {
             return paths.get(1);
         }
         throw new IllegalArgumentException("Invalid URI: " + documentUri);
+    }
+
+    //------------ more tools methods
+
+    private static boolean copy(Context context, DocumentFile source, DocumentFile target) {
+        InputStream inStream = null;
+        OutputStream outStream = null;
+        try {
+            inStream = context.getContentResolver().openInputStream(source.getUri());
+            outStream = context.getContentResolver().openOutputStream(target.getUri());
+
+            byte[] buffer = new byte[16384]; // MAGIC_NUMBER
+            int bytesRead;
+            while ((bytesRead = inStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+        } catch (Throwable e) {
+            LOG.error("Error when copying file from " + source.getUri() + " to " + target.getUri(), e);
+            return false;
+        } finally {
+            IOUtils.closeQuietly(inStream);
+            IOUtils.closeQuietly(outStream);
+        }
+
+        return true;
     }
 }
