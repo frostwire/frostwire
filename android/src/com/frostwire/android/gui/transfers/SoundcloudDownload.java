@@ -197,6 +197,8 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
             // error
             return;
         }
+
+        Engine.instance().notifyDownloadFinished(getDisplayName(), finalFile, null);
     }
 
     @Override
