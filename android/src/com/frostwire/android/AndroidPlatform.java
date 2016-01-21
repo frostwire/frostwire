@@ -27,11 +27,7 @@ import com.frostwire.platform.GenericPlatform;
  */
 public final class AndroidPlatform extends GenericPlatform {
 
-    private final Application app;
-
     public AndroidPlatform(Application app) {
         super(new LollipopFileSystem(app));
-
-        this.app = app;
     }
 }
