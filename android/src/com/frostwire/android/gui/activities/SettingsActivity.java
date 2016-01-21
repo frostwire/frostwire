@@ -427,8 +427,7 @@ public class SettingsActivity extends PreferenceActivity {
         PreferenceCategory category = (PreferenceCategory) findPreference("frostwire.prefs.general");
 
         // temporary hack. full blown for marshmallow or for lollipops with no secondary sd card.
-        if (SystemUtils.hasMarshmallowOrNewer() ||
-            StoragePreference.isLollipopWithNoSDCardHACK(this)) {
+        if (SystemUtils.hasLollipopOrNewer()) {
             // make sure this won't be saved for kitkat
             Preference p = findPreference(kitkatKey);
             if (p != null) {

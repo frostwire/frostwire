@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,6 @@
 
 package com.frostwire.android.gui.views.preference;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -37,12 +33,7 @@ import android.preference.PreferenceActivity;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RadioButton;
-import android.widget.TextView;
-
+import android.widget.*;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -56,10 +47,13 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class StoragePreference extends DialogPreference {
 
@@ -106,7 +100,7 @@ public class StoragePreference extends DialogPreference {
                 }
             }
         });
-        
+
 
         TextView warningText = (TextView) view.findViewById(R.id.dialog_preference_storage_warning);
         warningText.setVisibility(list.getCount() == 1 ? View.GONE : View.VISIBLE);
@@ -137,13 +131,14 @@ public class StoragePreference extends DialogPreference {
      * If used on an android version that doesn't support StoragePicker.show(), the given
      * activity HAS to be a PreferenceActivity, otherwise the StoragePreference.showDialog() method
      * will throw NPE.
-     *
+     * <p/>
      * For now it will only show for lollipop devices with no secondary sd cards.
+     *
      * @param activity
      */
     public static void invokeStoragePreference(Activity activity) {
         System.out.println("StoragePreference.invokeStoragePreference: external dirs -> " + SystemUtils.getExternalFilesDirs(activity).length);
-        if (SystemUtils.hasMarshmallowOrNewer() || StoragePreference.isLollipopWithNoSDCardHACK(activity)) {
+        if (SystemUtils.hasLollipopOrNewer()) {
             StoragePicker.show(activity);
         } else if (activity instanceof PreferenceActivity) {
             final StoragePreference storagePreference = (StoragePreference) ((PreferenceActivity) activity).findPreference(Constants.PREF_KEY_STORAGE_PATH);
@@ -156,7 +151,7 @@ public class StoragePreference extends DialogPreference {
     public static void updateStorageOptionSummary(PreferenceActivity activity, String newPath) {
         // intentional repetition of preference value here
         String lollipopKey = "frostwire.prefs.storage.path_asf";
-        if (SystemUtils.hasMarshmallowOrNewer() || StoragePreference.isLollipopWithNoSDCardHACK(activity)) {
+        if (SystemUtils.hasLollipopOrNewer()) {
             final Preference p = activity.findPreference(lollipopKey);
             if (p != null) {
                 p.setSummary(newPath);
@@ -164,7 +159,9 @@ public class StoragePreference extends DialogPreference {
         }
     }
 
-    /** Add this on your activity's onActivityResult() method to obtain the selected path. */
+    /**
+     * Add this on your activity's onActivityResult() method to obtain the selected path.
+     */
     public static String onDocumentTreeActivityResult(Context context, int requestCode, int resultCode, Intent data) {
         final String selectedPath = StoragePicker.handle(context, requestCode, resultCode, data);
         if (selectedPath != null) {
@@ -196,7 +193,7 @@ public class StoragePreference extends DialogPreference {
             }
         };
         return new AlertDialog.Builder(context).
-                setMultiChoiceItems(new String[] { context.getString(R.string.storage_setting_confirm_dialog_text) }, new boolean[] { false }, checkListener).
+                setMultiChoiceItems(new String[]{context.getString(R.string.storage_setting_confirm_dialog_text)}, new boolean[]{false}, checkListener).
                 setTitle(R.string.storage_setting_confirm_dialog_title).
                 setPositiveButton(android.R.string.ok, this).
                 setNegativeButton(android.R.string.cancel, this).
@@ -213,11 +210,6 @@ public class StoragePreference extends DialogPreference {
         if (getDialog() != null) {
             getDialog().dismiss();
         }
-    }
-
-    // TODO: Delete this ugly hack.
-    public static boolean isLollipopWithNoSDCardHACK(Context context) {
-        return SystemUtils.hasLollipopOrNewer() && SystemUtils.getExternalFilesDirs(context).length==1;
     }
 
     private static final class StorageMount {
