@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,26 +18,33 @@
 
 package com.frostwire.platform;
 
-import java.io.File;
-
 /**
  * @author gubatron
  * @author aldenml
  */
-public class GenericPlatform implements Platform {
+public abstract class AbstractPlatform implements Platform {
 
     private final FileSystem fileSystem;
+    private final SystemPaths systemPaths;
 
-    public GenericPlatform(FileSystem fileSystem) {
+    public AbstractPlatform(FileSystem fileSystem, SystemPaths systemPaths) {
         this.fileSystem = fileSystem;
-    }
-
-    public GenericPlatform() {
-        this(new GenericFileSystem());
+        this.systemPaths = systemPaths;
     }
 
     public FileSystem fileSystem() {
+        if (fileSystem == null) {
+            throw new IllegalStateException("FileSystem can't be null");
+        }
         return fileSystem;
+    }
+
+    @Override
+    public SystemPaths systemPaths() {
+        if (systemPaths == null) {
+            throw new IllegalStateException("FileSystem can't be null");
+        }
+        return systemPaths;
     }
 
     @Override

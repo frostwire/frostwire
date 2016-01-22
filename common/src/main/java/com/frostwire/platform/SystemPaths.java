@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,16 +18,25 @@
 
 package com.frostwire.platform;
 
+import android.content.Context;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
+
 import java.io.File;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class GenericFileSystem implements FileSystem {
+public interface SystemPaths {
 
-    @Override
-    public boolean rename(File src, File dest) {
-        return src.renameTo(dest);
-    }
+    File data();
+
+    File torrents();
+
+    File temp();
+
+    File libTorrent();
+
+    File update();
 }

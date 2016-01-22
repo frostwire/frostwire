@@ -18,29 +18,16 @@
 
 package com.frostwire.platform;
 
+import java.io.File;
+
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface Platform {
+public class DefaultFileSystem implements FileSystem {
 
-    FileSystem fileSystem();
-
-    SystemPaths systemPaths();
-
-    /**
-     * Returns true if we are under a platform that
-     * it is(or can mimic) and Android OS.
-     *
-     * @return
-     */
-    boolean android();
-
-    /**
-     * Returns the number of the SDK version if the
-     * platform is android, -1 otherwise.
-     *
-     * @return
-     */
-    int androidVersion();
+    @Override
+    public boolean rename(File src, File dest) {
+        return src.renameTo(dest);
+    }
 }
