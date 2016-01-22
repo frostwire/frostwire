@@ -99,8 +99,8 @@ public final class YouTubeDownload implements DownloadTransfer {
         }
 
         completeFile = buildFile(savePath, filename);
-        tempVideo = buildTempFile(FilenameUtils.getBaseName(filename), "m4v");
-        tempAudio = buildTempFile(FilenameUtils.getBaseName(filename), "m4a");
+        tempVideo = buildTempFile(FilenameUtils.getBaseName(filename), ".temp.m4v");
+        tempAudio = buildTempFile(FilenameUtils.getBaseName(filename), ".temp.m4a");
 
         bytesReceived = 0;
         dateCreated = new Date();

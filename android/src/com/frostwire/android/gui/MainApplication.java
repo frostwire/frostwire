@@ -133,10 +133,6 @@ public class MainApplication extends Application {
         try {
             File tmp = SystemPaths.getTemp();
             DirectoryUtils.deleteFolderRecursively(tmp);
-
-            if (tmp.mkdirs()) {
-                new File(tmp, ".nomedia").createNewFile();
-            }
         } catch (Throwable e) {
             LOG.error("Error during setup of temp directory", e);
         }
