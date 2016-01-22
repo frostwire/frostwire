@@ -54,12 +54,12 @@ public class MainApplication extends Application {
 
         try {
 
-            Platforms.set(new AndroidPlatform(this));
-
             ignoreHardwareMenu();
             installHttpCache();
 
             ConfigurationManager.create(this);
+
+            Platforms.set(new AndroidPlatform(this));
 
             setupBTEngine();
 

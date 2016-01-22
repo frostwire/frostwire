@@ -41,7 +41,7 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-final class LollipopFileSystem implements FileSystem {
+public final class LollipopFileSystem implements FileSystem {
 
     private static final Logger LOG = Logger.getLogger(LollipopFileSystem.class);
 

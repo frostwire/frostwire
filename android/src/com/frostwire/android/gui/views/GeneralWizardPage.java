@@ -30,6 +30,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.views.preference.StoragePreference;
+import com.frostwire.platform.Platforms;
 
 /**
  * @author gubatron
@@ -95,7 +96,7 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         textStoragePath = (TextView) findViewById(R.id.view_general_wizard_page_storage_path_textview);
         ImageView titleHorizontalBreak = (ImageView) findViewById(R.id.view_general_wizard_page_title_horizontal_break);
 
-        if (AndroidPlatform.saf()) {
+        if (Platforms.get().experimental()) {
             textStoragePath.setOnClickListener(new StoragePathTextViewAdapter((Activity) getContext()));
         } else {
             titleHorizontalBreak.setVisibility(View.GONE);

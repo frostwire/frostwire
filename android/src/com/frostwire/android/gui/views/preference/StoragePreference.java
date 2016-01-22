@@ -45,6 +45,7 @@ import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.gui.views.AbstractAdapter.OnItemClickAdapter;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.platform.Platforms;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
@@ -139,7 +140,7 @@ public class StoragePreference extends DialogPreference {
      */
     public static void invokeStoragePreference(Activity activity) {
         System.out.println("StoragePreference.invokeStoragePreference: external dirs -> " + SystemUtils.getExternalFilesDirs(activity).length);
-        if (AndroidPlatform.saf()) {
+        if (Platforms.get().experimental()) {
             StoragePicker.show(activity);
         } else if (activity instanceof PreferenceActivity) {
             final StoragePreference storagePreference = (StoragePreference) ((PreferenceActivity) activity).findPreference(Constants.PREF_KEY_STORAGE_PATH);
@@ -152,7 +153,7 @@ public class StoragePreference extends DialogPreference {
     public static void updateStorageOptionSummary(PreferenceActivity activity, String newPath) {
         // intentional repetition of preference value here
         String lollipopKey = "frostwire.prefs.storage.path_asf";
-        if (AndroidPlatform.saf()) {
+        if (Platforms.get().experimental()) {
             final Preference p = activity.findPreference(lollipopKey);
             if (p != null) {
                 p.setSummary(newPath);

@@ -20,9 +20,11 @@ package com.frostwire.android;
 
 import android.app.Application;
 import android.os.Build;
-import com.frostwire.platform.FileSystem;
-import com.frostwire.platform.DefaultFileSystem;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.platform.AbstractPlatform;
+import com.frostwire.platform.DefaultFileSystem;
+import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 
 /**
@@ -51,8 +53,9 @@ public final class AndroidPlatform extends AbstractPlatform {
         return sdk;
     }
 
-    public static boolean saf() {
-        return Platforms.get().fileSystem() instanceof LollipopFileSystem;
+    @Override
+    public boolean experimental() {
+        return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_CORE_EXPERIMENTAL);
     }
 
     private static FileSystem buildFileSystem(Application app) {

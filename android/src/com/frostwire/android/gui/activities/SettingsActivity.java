@@ -52,6 +52,7 @@ import com.frostwire.android.gui.views.preference.SimpleActionPreference;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.Platforms;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -426,7 +427,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         PreferenceCategory category = (PreferenceCategory) findPreference("frostwire.prefs.general");
 
-        if (AndroidPlatform.saf()) {
+        if (Platforms.get().experimental()) {
             // make sure this won't be saved for kitkat
             Preference p = findPreference(kitkatKey);
             if (p != null) {
