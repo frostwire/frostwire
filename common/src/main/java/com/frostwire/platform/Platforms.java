@@ -24,7 +24,7 @@ package com.frostwire.platform;
  */
 public final class Platforms {
 
-    private static Platform platform = new GenericPlatform();
+    private static Platform platform;
 
     private Platforms() {
     }

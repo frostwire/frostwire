@@ -20,6 +20,8 @@ package com.frostwire.android;
 
 import android.app.Application;
 import android.os.Build;
+import com.frostwire.platform.FileSystem;
+import com.frostwire.platform.GenericFileSystem;
 import com.frostwire.platform.GenericPlatform;
 import com.frostwire.platform.Platforms;
 
@@ -31,8 +33,12 @@ public final class AndroidPlatform extends GenericPlatform {
 
     private static final int VERSION_CODE_LOLLIPOP = 21;
 
+    private final int sdk;
+
     public AndroidPlatform(Application app) {
-        super(new LollipopFileSystem(app));
+        super(buildFileSystem(app));
+
+        this.sdk = Build.VERSION.SDK_INT;
     }
 
     @Override
@@ -42,10 +48,22 @@ public final class AndroidPlatform extends GenericPlatform {
 
     @Override
     public int androidVersion() {
-        return Build.VERSION.SDK_INT;
+        return sdk;
     }
 
     public static boolean saf() {
-        return Platforms.get().androidVersion() >= VERSION_CODE_LOLLIPOP;
+        return Platforms.get().fileSystem() instanceof LollipopFileSystem;
+    }
+
+    private static FileSystem buildFileSystem(Application app) {
+        FileSystem fs;
+
+        if (Build.VERSION.SDK_INT >= VERSION_CODE_LOLLIPOP) {
+            fs = new LollipopFileSystem(app);
+        } else {
+            fs = new GenericFileSystem();
+        }
+
+        return fs;
     }
 }
