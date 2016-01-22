@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,16 +25,15 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.views.preference.StoragePreference;
-import com.frostwire.android.util.SystemUtils;
 
 /**
  * @author gubatron
  * @author aldenml
- * 
  */
 public class GeneralWizardPage extends RelativeLayout implements WizardPageView {
 
@@ -96,7 +95,7 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         textStoragePath = (TextView) findViewById(R.id.view_general_wizard_page_storage_path_textview);
         ImageView titleHorizontalBreak = (ImageView) findViewById(R.id.view_general_wizard_page_title_horizontal_break);
 
-        if (SystemUtils.hasLollipopOrNewer()) {
+        if (AndroidPlatform.saf()) {
             textStoragePath.setOnClickListener(new StoragePathTextViewAdapter((Activity) getContext()));
         } else {
             titleHorizontalBreak.setVisibility(View.GONE);

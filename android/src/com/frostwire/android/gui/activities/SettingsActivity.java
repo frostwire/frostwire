@@ -35,6 +35,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -49,7 +50,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference;
 import com.frostwire.android.gui.views.preference.SimpleActionPreference;
 import com.frostwire.android.gui.views.preference.StoragePreference;
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.StringUtils;
@@ -164,16 +164,16 @@ public class SettingsActivity extends PreferenceActivity {
     private void setupTorrentMaxDownloads(final BTEngine e) {
         NumberPickerPreference pickerPref = (NumberPickerPreference) findPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS);
         if (pickerPref != null) {
-           pickerPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-               @Override
-               public boolean onPreferenceChange(Preference preference, Object newValue) {
-                   if (e != null) {
-                       e.setMaxActiveDownloads((int) newValue);
-                       return e.getMaxActiveDownloads() == (int) newValue;
-                   }
-                   return false;
-               }
-           });
+            pickerPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if (e != null) {
+                        e.setMaxActiveDownloads((int) newValue);
+                        return e.getMaxActiveDownloads() == (int) newValue;
+                    }
+                    return false;
+                }
+            });
         }
     }
 
@@ -426,8 +426,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         PreferenceCategory category = (PreferenceCategory) findPreference("frostwire.prefs.general");
 
-        // temporary hack. full blown for marshmallow or for lollipops with no secondary sd card.
-        if (SystemUtils.hasLollipopOrNewer()) {
+        if (AndroidPlatform.saf()) {
             // make sure this won't be saved for kitkat
             Preference p = findPreference(kitkatKey);
             if (p != null) {

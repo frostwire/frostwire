@@ -19,7 +19,9 @@
 package com.frostwire.android;
 
 import android.app.Application;
+import android.os.Build;
 import com.frostwire.platform.GenericPlatform;
+import com.frostwire.platform.Platforms;
 
 /**
  * @author gubatron
@@ -27,7 +29,23 @@ import com.frostwire.platform.GenericPlatform;
  */
 public final class AndroidPlatform extends GenericPlatform {
 
+    private static final int VERSION_CODE_LOLLIPOP = 21;
+
     public AndroidPlatform(Application app) {
         super(new LollipopFileSystem(app));
+    }
+
+    @Override
+    public boolean android() {
+        return true;
+    }
+
+    @Override
+    public int androidVersion() {
+        return Build.VERSION.SDK_INT;
+    }
+
+    public static boolean saf() {
+        return Platforms.get().androidVersion() >= VERSION_CODE_LOLLIPOP;
     }
 }
