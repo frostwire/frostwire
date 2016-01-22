@@ -39,4 +39,14 @@ public class GenericPlatform implements Platform {
     public FileSystem fileSystem() {
         return fileSystem;
     }
+
+    @Override
+    public boolean android() {
+        return false;
+    }
+
+    @Override
+    public int androidVersion() {
+        return -1;
+    }
 }

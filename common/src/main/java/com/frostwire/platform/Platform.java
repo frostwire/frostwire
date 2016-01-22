@@ -25,4 +25,20 @@ package com.frostwire.platform;
 public interface Platform {
 
     FileSystem fileSystem();
+
+    /**
+     * Returns true if we are under a platform that
+     * it is(or can mimic) and Android OS.
+     *
+     * @return
+     */
+    boolean android();
+
+    /**
+     * Returns the number of the SDK version if the
+     * platform is android, -1 otherwise.
+     *
+     * @return
+     */
+    int androidVersion();
 }
