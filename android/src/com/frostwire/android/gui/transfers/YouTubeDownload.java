@@ -390,11 +390,12 @@ public final class YouTubeDownload implements DownloadTransfer {
             public void run() {
                 try {
                     if (fs.rename(completeFile, finalFile)) {
+                        completeFile.delete();
                         completeFile = finalFile;
                         Librarian.instance().scan(getSavePath().getAbsoluteFile());
                         Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, null);
                     } else {
-                        Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
+                        YouTubeDownload.this.status = STATUS_ERROR;
                     }
 
                     cleanupIncomplete();

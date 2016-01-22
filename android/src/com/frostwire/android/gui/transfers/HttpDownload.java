@@ -344,6 +344,8 @@ public final class HttpDownload implements DownloadTransfer {
                     } else {
                         error(new Exception("Error"));
                     }
+
+                    tempPath.delete();
                 } catch (Throwable e) {
                     e.printStackTrace();
                     error(new Exception("Error"));

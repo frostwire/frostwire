@@ -204,6 +204,8 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
 
                     Librarian.instance().scan(finalFile.getAbsoluteFile());
                     Engine.instance().notifyDownloadFinished(getDisplayName(), finalFile, null);
+
+                    file.delete();
                 } catch (Throwable e) {
                     e.printStackTrace();
                     // TODO: do something here
