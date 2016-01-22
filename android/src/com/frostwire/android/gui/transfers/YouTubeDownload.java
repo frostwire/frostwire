@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,15 @@
 
 package com.frostwire.android.gui.transfers;
 
+import android.net.Uri;
 import android.util.Log;
+import com.frostwire.android.LollipopFileSystem;
 import com.frostwire.android.R;
 import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.platform.FileSystem;
+import com.frostwire.platform.Platforms;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.transfers.TransferItem;
@@ -63,7 +67,7 @@ public final class YouTubeDownload implements DownloadTransfer {
     private final YouTubeCrawledSearchResult sr;
     private final DownloadType downloadType;
 
-    private final File completeFile;
+    private File completeFile;
     private final File tempVideo;
     private final File tempAudio;
 
@@ -88,11 +92,8 @@ public final class YouTubeDownload implements DownloadTransfer {
 
         String filename = sr.getFilename();
 
-        File savePath = SystemPaths.getTorrentData();
+        File savePath = SystemPaths.getTemp();
 
-        if (!ensureDirectoryExits(savePath)) {
-            this.status = STATUS_SAVE_DIR_ERROR;
-        }
         if (!ensureDirectoryExits(SystemPaths.getTemp())) {
             this.status = STATUS_SAVE_DIR_ERROR;
         }
@@ -336,7 +337,36 @@ public final class YouTubeDownload implements DownloadTransfer {
         status = STATUS_COMPLETE;
         manager.incrementDownloadsToReview();
 
-        if (completeFile.getAbsoluteFile().exists()) {
+        FileSystem fs = Platforms.get().fileSystem();
+        if (fs instanceof LollipopFileSystem) {
+            Uri uri = ((LollipopFileSystem) fs).getDocumentUri(SystemPaths.getTorrentData());
+            if (uri != null) {
+                safComplete(fs);
+            } else {
+                classicComplete();
+            }
+        } else {
+            classicComplete();
+        }
+    }
+
+    private void classicComplete() {
+        if (!completeFile.getAbsoluteFile().exists()) {
+            this.status = STATUS_ERROR;
+            cleanupIncomplete();
+            return;
+        }
+
+        if (!ensureDirectoryExits(SystemPaths.getTorrentData())) {
+            this.status = STATUS_SAVE_DIR_ERROR;
+            cleanup();
+            return;
+        }
+
+        File finalFile = buildFile(SystemPaths.getTorrentData(), completeFile.getName());
+
+        if (completeFile.renameTo(finalFile)) {
+            completeFile = finalFile;
             Librarian.instance().scan(getSavePath().getAbsoluteFile());
             Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, null);
         } else {
@@ -344,6 +374,36 @@ public final class YouTubeDownload implements DownloadTransfer {
         }
 
         cleanupIncomplete();
+    }
+
+    private void safComplete(final FileSystem fs) {
+        if (!completeFile.getAbsoluteFile().exists()) {
+            this.status = STATUS_ERROR;
+            cleanupIncomplete();
+            return;
+        }
+
+        final File finalFile = new File(SystemPaths.getTorrentData(), completeFile.getName());
+
+        Engine.instance().getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (fs.rename(completeFile, finalFile)) {
+                        completeFile = finalFile;
+                        Librarian.instance().scan(getSavePath().getAbsoluteFile());
+                        Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, null);
+                    } else {
+                        Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
+                    }
+
+                    cleanupIncomplete();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    YouTubeDownload.this.status = STATUS_ERROR;
+                }
+            }
+        });
     }
 
     private void error(Throwable e) {

@@ -188,17 +188,29 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
         Engine.instance().notifyDownloadFinished(getDisplayName(), savedFile, null);
     }
 
-    private void safComplete(FileSystem fs, File file) {
-        File finalFile = new File(SystemPaths.getTorrentData(), file.getName());
-        if (fs.rename(file, finalFile)) {
-            this.savePath = finalFile;
-        } else {
-            // TODO: do something here
-            // error
-            return;
-        }
+    private void safComplete(final FileSystem fs, final File file) {
+        Engine.instance().getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    File finalFile = new File(SystemPaths.getTorrentData(), file.getName());
+                    if (fs.rename(file, finalFile)) {
+                        SoundcloudDownload.this.savePath = finalFile;
+                    } else {
+                        // TODO: do something here
+                        // error
+                        return;
+                    }
 
-        Engine.instance().notifyDownloadFinished(getDisplayName(), finalFile, null);
+                    Librarian.instance().scan(finalFile.getAbsoluteFile());
+                    Engine.instance().notifyDownloadFinished(getDisplayName(), finalFile, null);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    // TODO: do something here
+                    // error
+                }
+            }
+        });
     }
 
     @Override

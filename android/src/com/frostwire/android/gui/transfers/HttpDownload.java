@@ -18,16 +18,18 @@
 
 package com.frostwire.android.gui.transfers;
 
+import android.net.Uri;
 import android.util.Log;
+import com.frostwire.android.LollipopFileSystem;
 import com.frostwire.android.R;
 import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.platform.FileSystem;
+import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.ZipUtils;
 import com.frostwire.util.http.HttpClient;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -268,8 +270,6 @@ public final class HttpDownload implements DownloadTransfer {
     }
 
     private void complete() {
-        boolean success = true;
-        String location = null;
         if (link.isCompressed()) {
             // TODO: Unsupported
 //            status = STATUS_UNCOMPRESSING;
@@ -277,6 +277,21 @@ public final class HttpDownload implements DownloadTransfer {
 //            success = ZipUtils.unzip(tempPath, new File(location));
         }
 
+        FileSystem fs = Platforms.get().fileSystem();
+        if (fs instanceof LollipopFileSystem) {
+            Uri uri = ((LollipopFileSystem) fs).getDocumentUri(savePath);
+            if (uri != null) {
+                safComplete(fs);
+            } else {
+                classicComplete();
+            }
+        } else {
+            classicComplete();
+        }
+    }
+
+    private void classicComplete() {
+        boolean success = true;
         if (tempPath.exists() && tempPath.renameTo(savePath)) {
             success = true;
         } else {
@@ -294,11 +309,47 @@ public final class HttpDownload implements DownloadTransfer {
             Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
 
             if (savePath.getAbsoluteFile().exists()) {
-                Librarian.instance().scan(link.isCompressed() ? new File(location) : getSavePath().getAbsoluteFile());
+                Librarian.instance().scan(getSavePath().getAbsoluteFile());
             }
         } else {
             error(new Exception("Error"));
         }
+    }
+
+    private void safComplete(final FileSystem fs) {
+        Engine.instance().getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    boolean success = true;
+                    if (tempPath.exists() && fs.rename(tempPath, savePath)) {
+                        success = true;
+                    } else {
+                        success = false;
+                    }
+
+                    if (success) {
+                        if (listener != null) {
+                            listener.onComplete(HttpDownload.this);
+                        }
+
+                        status = STATUS_COMPLETE;
+
+                        manager.incrementDownloadsToReview();
+                        Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
+
+                        if (savePath.getAbsoluteFile().exists()) {
+                            Librarian.instance().scan(getSavePath().getAbsoluteFile());
+                        }
+                    } else {
+                        error(new Exception("Error"));
+                    }
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    error(new Exception("Error"));
+                }
+            }
+        });
     }
 
     private void error(Throwable e) {
