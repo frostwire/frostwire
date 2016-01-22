@@ -43,4 +43,11 @@ public interface Platform {
      * @return
      */
     int androidVersion();
+
+    /**
+     * Returns true if we are supporting experimental features.
+     *
+     * @return
+     */
+    boolean experimental();
 }
