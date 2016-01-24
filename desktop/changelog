@@ -1,3 +1,8 @@
+frostwire (6.2.2) stable; urgency=high
+  * Portuguese translation update. Thanks Alejandro.
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, 24 Jan 2016 18:35:30 -0500
+ 
 frostwire (6.2.1) stable; urgency=high
   * Fixes issue where a corrupted .torrent inside the libtorrent folder
     would make FrostWire crash on startup.
