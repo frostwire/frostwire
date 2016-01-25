@@ -28,7 +28,15 @@ public interface FileSystem {
 
     boolean isDirectory(File file);
 
+    boolean isFile(File file);
+
+    boolean canRead(File file);
+
     boolean canWrite(File file);
+
+    long length(File file);
+
+    long lastModified(File file);
 
     boolean mkdirs(File file);
 

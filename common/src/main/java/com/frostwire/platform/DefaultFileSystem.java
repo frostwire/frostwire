@@ -37,8 +37,28 @@ public class DefaultFileSystem implements FileSystem {
     }
 
     @Override
+    public boolean isFile(File file) {
+        return file.isFile();
+    }
+
+    @Override
+    public boolean canRead(File file) {
+        return file.canRead();
+    }
+
+    @Override
     public boolean canWrite(File file) {
         return file.canWrite();
+    }
+
+    @Override
+    public long length(File file) {
+        return file.length();
+    }
+
+    @Override
+    public long lastModified(File file) {
+        return file.lastModified();
     }
 
     @Override
