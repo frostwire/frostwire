@@ -124,6 +124,17 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     @Override
+    public boolean exists(File file) {
+        if (file.exists()) {
+            return true;
+        }
+
+        DocumentFile f = getDocument(app, file);
+
+        return f != null && f.exists();
+    }
+
+    @Override
     public boolean mkdirs(File file) {
         if (file.mkdirs()) {
             return true;
@@ -137,6 +148,17 @@ public final class LollipopFileSystem implements FileSystem {
         f = getDirectory(app, file, true);
 
         return f != null;
+    }
+
+    @Override
+    public boolean delete(File file) {
+        if (file.delete()) {
+            return true;
+        }
+
+        DocumentFile f = getDocument(app, file);
+
+        return f != null && f.delete();
     }
 
     @Override
@@ -189,6 +211,10 @@ public final class LollipopFileSystem implements FileSystem {
 
     public String getPath(Uri treeUri) {
         return getPath(app, treeUri);
+    }
+
+    public DocumentFile getDocument(File file) {
+        return getDocument(app, file);
     }
 
     public int openFD(File file, String mode) {

@@ -20,6 +20,7 @@ package com.frostwire.android;
 
 import android.app.Application;
 import android.os.Build;
+import android.support.v4.provider.DocumentFile;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.jlibtorrent.LibTorrent;
@@ -97,6 +98,9 @@ public final class AndroidPlatform extends AbstractPlatform {
             }
 
             r = fs.openFD(new File(path), "rw");
+            if (r < 0) {
+                LOG.info("posix wrapper failed to create native fd for: " + path);
+            }
 
             return r;
         }
@@ -110,14 +114,18 @@ public final class AndroidPlatform extends AbstractPlatform {
                 return r;
             }
 
-            File f = new File(path);
+            DocumentFile f = fs.getDocument(new File(path));
+            if (f == null) {
+                LOG.info("posix wrapper failed to stat file for: " + path);
+                return -1;
+            }
 
-            int S_ISDIR = fs.isDirectory(f) ? 0040000 : 0;
+            int S_ISDIR = f.isDirectory() ? 0040000 : 0;
             int S_IFREG = 0100000;
 
             buf.setMode(S_ISDIR | S_IFREG);
-            buf.setSize(fs.length(f));
-            int t = (int) (fs.lastModified(f) / 1000);
+            buf.setSize(f.length());
+            int t = (int) (f.lastModified() / 1000);
             buf.setAtime(t);
             buf.setMtime(t);
             buf.setCtime(t);
@@ -133,7 +141,12 @@ public final class AndroidPlatform extends AbstractPlatform {
                 return r;
             }
 
-            return fs.mkdirs(new File(path)) ? 0 : -1;
+            r = fs.mkdirs(new File(path)) ? 0 : -1;
+            if (r < 0) {
+                LOG.info("posix wrapper failed to create dir: " + path);
+            }
+
+            return r;
         }
 
         @Override
@@ -151,6 +164,7 @@ public final class AndroidPlatform extends AbstractPlatform {
                 fs.delete(src);
                 return 0;
             } else {
+                LOG.info("posix wrapper failed to copy file: " + oldpath + " -> " + newpath);
                 return -1;
             }
         }
@@ -163,7 +177,12 @@ public final class AndroidPlatform extends AbstractPlatform {
                 return r;
             }
 
-            return fs.delete(new File(path)) ? 0 : -1;
+            r = fs.delete(new File(path)) ? 0 : -1;
+            if (r < 0) {
+                LOG.info("posix wrapper failed to delete file: " + path);
+            }
+
+            return r;
         }
     }
 }
