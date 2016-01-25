@@ -29,12 +29,10 @@ import android.support.v4.provider.DocumentFile;
 import android.util.LruCache;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.FileSystem;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -104,9 +102,12 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     @Override
-    public boolean rename(File src, File dest) {
-        if (src.renameTo(dest)) {
+    public boolean copy(File src, File dest) {
+        try {
+            FileUtils.copyFile(src, dest);
             return true;
+        } catch (Throwable e) {
+            // ignore
         }
 
         DocumentFile srcF = getFile(app, src, false);
@@ -123,6 +124,25 @@ public final class LollipopFileSystem implements FileSystem {
         }
 
         return copy(app, srcF, destF);
+    }
+
+    @Override
+    public boolean write(File file, byte[] data) {
+        try {
+            FileUtils.writeByteArrayToFile(file, data);
+            return true;
+        } catch (IOException e) {
+            // ignore
+        }
+
+        DocumentFile f = getFile(app, file, true);
+
+        if (f == null) {
+            LOG.error("Unable to obtain document for file: " + file);
+            return false;
+        }
+
+        return write(app, f, data);
     }
 
     public Uri getDocumentUri(File file) {
@@ -442,6 +462,29 @@ public final class LollipopFileSystem implements FileSystem {
             }
         } catch (Throwable e) {
             LOG.error("Error when copying file from " + source.getUri() + " to " + target.getUri(), e);
+            return false;
+        } finally {
+            IOUtils.closeQuietly(inStream);
+            IOUtils.closeQuietly(outStream);
+        }
+
+        return true;
+    }
+
+    private static boolean write(Context context, DocumentFile f, byte[] data) {
+        InputStream inStream = null;
+        OutputStream outStream = null;
+        try {
+            inStream = new ByteArrayInputStream(data);
+            outStream = context.getContentResolver().openOutputStream(f.getUri());
+
+            byte[] buffer = new byte[16384]; // MAGIC_NUMBER
+            int bytesRead;
+            while ((bytesRead = inStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+        } catch (Throwable e) {
+            LOG.error("Error when writing bytes to " + f.getUri(), e);
             return false;
         } finally {
             IOUtils.closeQuietly(inStream);

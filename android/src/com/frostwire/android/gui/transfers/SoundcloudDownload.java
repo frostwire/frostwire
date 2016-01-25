@@ -194,7 +194,7 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
             public void run() {
                 try {
                     File finalFile = new File(SystemPaths.getTorrentData(), file.getName());
-                    if (fs.rename(file, finalFile)) {
+                    if (fs.copy(file, finalFile)) {
                         SoundcloudDownload.this.savePath = finalFile;
                     } else {
                         // TODO: do something here

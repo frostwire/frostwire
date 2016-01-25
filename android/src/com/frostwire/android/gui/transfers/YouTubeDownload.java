@@ -389,7 +389,7 @@ public final class YouTubeDownload implements DownloadTransfer {
             @Override
             public void run() {
                 try {
-                    if (fs.rename(completeFile, finalFile)) {
+                    if (fs.copy(completeFile, finalFile)) {
                         completeFile.delete();
                         completeFile = finalFile;
                         Librarian.instance().scan(getSavePath().getAbsoluteFile());
