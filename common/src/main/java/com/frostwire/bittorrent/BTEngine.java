@@ -666,6 +666,10 @@ public final class BTEngine {
 
     private void doResumeData(TorrentAlert<?> alert) {
         try {
+            // TODO: I need to restore this later
+            if (ctx.optimizeMemory) {
+                return;
+            }
             TorrentHandle th = session.findTorrent(alert.getHandle().getInfoHash());
             if (th != null && th.isValid() && th.needSaveResumeData()) {
                 th.saveResumeData();
