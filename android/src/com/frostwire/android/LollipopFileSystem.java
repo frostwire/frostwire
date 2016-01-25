@@ -19,8 +19,10 @@
 package com.frostwire.android;
 
 import android.app.Application;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
@@ -62,10 +64,12 @@ public final class LollipopFileSystem implements FileSystem {
 
         if (srcF == null) {
             LOG.error("Unable to obtain document for file: " + src);
+            return false;
         }
 
         if (destF == null) {
             LOG.error("Unable to obtain or create document for file: " + dest);
+            return false;
         }
 
         return copy(app, srcF, destF);
@@ -77,6 +81,34 @@ public final class LollipopFileSystem implements FileSystem {
 
     public String getPath(Uri treeUri) {
         return getPath(app, treeUri);
+    }
+
+    public int openFD(File file, String mode) {
+        if (!("r".equals(mode) || "w".equals(mode) || "rw".equals(mode))) {
+            LOG.error("Only r, w or rw modes supported");
+            return -1;
+        }
+
+        File parent = file.getParentFile();
+        if (parent == null) {
+            LOG.error("Can't create file: " + file);
+            return -1;
+        }
+
+        DocumentFile f = getFile(app, file, true);
+        if (f == null) {
+            LOG.error("Unable to obtain or create document for file: " + file);
+            return -1;
+        }
+
+        try {
+            ContentResolver cr = app.getContentResolver();
+            ParcelFileDescriptor fd = cr.openFileDescriptor(f.getUri(), mode);
+            return fd.detachFd();
+        } catch (Throwable e) {
+            LOG.error("Unable to get native fd", e);
+            return -1;
+        }
     }
 
     private static DocumentFile getDirectory(Context context, File dir, boolean create) {
