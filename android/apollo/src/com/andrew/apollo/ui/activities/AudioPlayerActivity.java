@@ -868,17 +868,21 @@ public class AudioPlayerActivity extends FragmentActivity implements
      * /** Used to shared what the user is currently listening to
      */
     private void shareCurrentTrack() {
-        if (MusicUtils.getTrackName() == null || MusicUtils.getArtistName() == null) {
+        final long currentAudioId = MusicUtils.getCurrentAudioId();
+        final String trackName = MusicUtils.getTrackName();
+        if (currentAudioId != -1 && trackName == null) {
             return;
         }
         final Intent shareIntent = new Intent();
-        final String shareMessage = getString(R.string.now_listening_to,
-                MusicUtils.getTrackName(), MusicUtils.getArtistName());
+        final String artistName = MusicUtils.getArtistName();
+
+        final String shareMessage = (artistName != null) ? getString(R.string.now_listening_to, trackName, artistName) :
+                getString(R.string.now_listening_to_no_artist_available, trackName);
 
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
-        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + MusicUtils.getCurrentAudioId()));
+        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + currentAudioId));
         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_track_using)));
     }
 
