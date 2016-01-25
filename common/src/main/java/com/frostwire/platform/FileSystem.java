@@ -26,5 +26,11 @@ import java.io.File;
  */
 public interface FileSystem {
 
+    boolean isDirectory(File file);
+
+    boolean canWrite(File file);
+
+    boolean mkdirs(File file);
+
     boolean rename(File src, File dest);
 }

@@ -27,6 +27,21 @@ import java.io.File;
 public class DefaultFileSystem implements FileSystem {
 
     @Override
+    public boolean isDirectory(File file) {
+        return file.isDirectory();
+    }
+
+    @Override
+    public boolean canWrite(File file) {
+        return file.canWrite();
+    }
+
+    @Override
+    public boolean mkdirs(File file) {
+        return file.mkdirs();
+    }
+
+    @Override
     public boolean rename(File src, File dest) {
         return src.renameTo(dest);
     }

@@ -23,6 +23,8 @@ import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.torrent_handle;
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.FileSystem;
+import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -768,12 +770,14 @@ public final class BTEngine {
             result = saveDir;
         }
 
-        if (result != null && !result.isDirectory() && !result.mkdirs()) {
+        FileSystem fs = Platforms.get().fileSystem();
+
+        if (result != null && !fs.isDirectory(result) && !fs.mkdirs(result)) {
             result = null;
             LOG.warn("Failed to create save dir to download");
         }
 
-        if (result != null && !result.canWrite()) {
+        if (result != null && !fs.canWrite(result)) {
             result = null;
             LOG.warn("Failed to setup save dir with write access");
         }
