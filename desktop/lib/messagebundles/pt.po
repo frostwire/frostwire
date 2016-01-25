@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 18:18+0300\n"
-"PO-Revision-Date: 2016-01-24 20:24-0300\n"
+"PO-Revision-Date: 2016-01-25 17:42-0300\n"
 "Last-Translator: Alejandro Martinez <bloghogwarts@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt\n"
@@ -33,6 +33,7 @@ msgstr ""
 #: /frostwire/desktop/src/com/frostwire/gui/HideExitDialog.java:72
 msgid "This way file transfers may continue in the background."
 msgstr ""
+"Desta forma, as transferências de arquivos podem continuar em segundo plano."
 
 #: /frostwire/desktop/src/com/frostwire/gui/HideExitDialog.java:79
 msgid "Don't show this again"
@@ -91,7 +92,7 @@ msgstr "Explorar"
 #: /frostwire/desktop/src/com/frostwire/gui/library/LibraryFilesTableMediator.java:791
 #: /frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableMediator.java:683
 msgid "Open Folder Containing the File"
-msgstr "Abrir Arquivo que Contém o Arquivo"
+msgstr "Abrir pasta que contém o arquivo"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:172
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:173
@@ -266,11 +267,11 @@ msgstr "Criar e adicionar uma Nova Lista de Reprodução"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:496
 msgid "Play file"
-msgstr "Tocar arquivo"
+msgstr "Reproduzir arquivo"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:497
 msgid "Play media file"
-msgstr "Tocar arquivo de mídia"
+msgstr "Reproduzir arquivo de mídia"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:529
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:165
@@ -448,14 +449,12 @@ msgid "Stopped"
 msgstr "Parou"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:199
-#, fuzzy
 msgid "Pausing"
-msgstr "Pausando..."
+msgstr "Pausando"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:200
-#, fuzzy
 msgid "Canceling"
-msgstr "Cancelar"
+msgstr "Cancelando"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:201
 msgid "Canceled"
@@ -638,15 +637,14 @@ msgid "Scrape Tracker"
 msgstr "Raspar Tracker"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:517
-#, fuzzy
 msgid "Edit trackers"
-msgstr "faixas"
+msgstr "Editar trackers"
 
 #. columns
 #. rows
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:534
 msgid "Edit trackers, one by line"
-msgstr "Editar crackers, um por linha"
+msgstr "Editar trackers, um por linha"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:543
 msgid "Accept"
@@ -664,7 +662,7 @@ msgstr "URL da Música inválida\n"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:41
 msgid "Creative Commons"
-msgstr "'Criativa comum'"
+msgstr "Creative Commons"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:42
 msgid "Open Source"
@@ -693,7 +691,7 @@ msgstr "Autor"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:94
 msgid "The name of the creator or creators of this work."
-msgstr ""
+msgstr "O nome do criador ou criadores deste trabalho."
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:96
 msgid "Work's Title"
@@ -751,12 +749,16 @@ msgid ""
 "You allow others to distribute derivative works only under a license "
 "identical to the license that governs your work."
 msgstr ""
+"Você permitir que outros distribuam obras derivadas somente sob uma licença "
+"idêntica à licença que rege o seu trabalho."
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:138
 msgid ""
 "This work has been identified as being free of known restrictions under "
 "copyright law, including all related and neighboring rights."
 msgstr ""
+"Este trabalho tem sido considerado livre de restrições conhecidas devidas a "
+"direitos de autor, incluindo todos os direitos conexos."
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:139
 msgid ""
@@ -765,20 +767,26 @@ msgid ""
 "under copyright law, including all related and neighboring rights, to the "
 "extent allowed by law."
 msgstr ""
+"A pessoa que associou uma obra a este documento dedicou a obra ao domínio "
+"público, renunciando a todos os seus direitos sobre a obra em todo o mundo "
+"sob a lei de direitos de autor, incluindo todos os direitos conexos, na "
+"medida permitida por lei."
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:226
 msgid "You have selected the following License"
-msgstr ""
+msgstr "Você selecionou a seguinte Licença"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:385
 msgid "Select what people can and can't do with this work"
-msgstr ""
+msgstr "Selecione o que as pessoas podem e não podem fazer com este trabalho"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:416
 msgid ""
 "You can copy, modify, distribute and perform the work, even for commercial "
 "purposes, all without asking permission."
 msgstr ""
+"Você pode copiar, modificar, distribuir e executar a obra, até com fins "
+"comerciais, sem pedir permissão."
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:458
 #, fuzzy
@@ -857,9 +865,8 @@ msgstr ""
 "seu novo .torrent"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:190
-#, fuzzy
 msgid "Tracking"
-msgstr "Faixa"
+msgstr "Tracking"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:192
 msgid "Trackerless Torrent (DHT)"
@@ -914,6 +921,8 @@ msgid ""
 "If these files can be downloaded from the web, enter the URLs of each "
 "possible mirror, one per line (GetRight style)."
 msgstr ""
+"Se esses arquivos podem ser baixados da web, digite os URLs de cada espelho "
+"possível, uma linha por (estilo GetRight)."
 
 #. first button will dock all the way east,
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:231
@@ -934,18 +943,17 @@ msgstr "Fechar"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:318
 msgid "Select a single file or one directory"
-msgstr ""
+msgstr "Selecione um único arquivo ou um diretório"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:320
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:333
-#, fuzzy
 msgid "Select a single file"
-msgstr "Marcar/Desmarcar todos os arquivos."
+msgstr "Selecione um único arquivo"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:322
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:338
 msgid "Select a single directory"
-msgstr ""
+msgstr "Selecione um único diretório"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:339
 #, fuzzy
@@ -1006,8 +1014,9 @@ msgid "Adding trackers..."
 msgstr "faixas"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:592
+#, fuzzy
 msgid "Calculating piece hashes..."
-msgstr ""
+msgstr "Calculando peça hastes …"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:596
 #, fuzzy
@@ -1070,9 +1079,8 @@ msgid "Select/Unselect all files"
 msgstr "Marcar/Desmarcar todos os arquivos."
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/PartialFilesDialog.java:504
-#, fuzzy
 msgid "Unknown"
-msgstr "aslunknown"
+msgstr "Desconhecido"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsPanel.java:43
 msgid ""
@@ -1097,12 +1105,12 @@ msgstr ""
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsPanel.java:118
 msgid "\"Name your price\", \"Tips\", \"Donations\" payment options"
-msgstr ""
+msgstr "\"Dê o seu preço\", \"Dicas\", \"doações\" opções de pagamento"
 
 #. We use "Bitcoin" for the protocol (upper case B), and "bitcoins" for the units of currency (lower case b)
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsRenderer.java:77
 msgid "Name your price, Send a Tip or Donation in"
-msgstr ""
+msgstr "Dê o seu preço, enviar uma dica ou doação em"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsRenderer.java:77
 msgid "bitcoins"
@@ -1110,7 +1118,7 @@ msgstr ""
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsRenderer.java:78
 msgid "Name your price, Send a Tip or Donation via Paypal"
-msgstr ""
+msgstr "Dê o seu preço, enviar uma dica ou doação via Paypal"
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/SendFileProgressDialog.java:75
 msgid "Preparing selection"
@@ -1173,6 +1181,8 @@ msgid ""
 "<strong>Keep FrostWire Open</strong> until the file has been downloaded by "
 "at least one other friend."
 msgstr ""
+"<strong>Mantenha FrostWire aberto</strong> até que o arquivo foi baixado por "
+"pelo menos um outro amigo."
 
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:199
 msgid ""
@@ -1314,9 +1324,8 @@ msgstr ""
 #: /frostwire/desktop/src/com/frostwire/gui/bittorrent/TransferActionsRenderer.java:62
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultActionsRenderer.java:84
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/tables/AbstractActionsRenderer.java:85
-#, fuzzy
 msgid "Play/Preview"
-msgstr "Pré-visualizar"
+msgstr "Reproduzir/Pré-visualizar"
 
 #: /frostwire/desktop/src/com/frostwire/gui/components/slides/SlideControlsOverlay.java:133
 msgid "Leave a tip"
@@ -4330,7 +4339,7 @@ msgstr ""
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:178
 msgid "You must enter a valid port range."
-msgstr ""
+msgstr "Você deve digitar um intervalo de portas válido."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/IgnoreResultsPaneItem.java:22
 msgid "Filter Results"
@@ -4501,9 +4510,8 @@ msgid "Configure username and password to be used for the proxy."
 msgstr "Configurar nome do usuário e senha para serem utilizados para o proxy."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ProxyLoginPaneItem.java:48
-#, fuzzy
 msgid "Enable Authentication:"
-msgstr "Ativar Índice de Filtragem"
+msgstr "Ativar autenticação:"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ProxyLoginPaneItem.java:55
 msgid "Username:"
@@ -4543,27 +4551,28 @@ msgstr "Sem proxy"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SearchEnginesPaneItem.java:37
 msgid "Search Engines"
-msgstr "Mecanismos de pesquisa"
+msgstr "Motores de pesquisa"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SearchEnginesPaneItem.java:38
-#, fuzzy
 msgid "Select which search engines you want FrostWire to use."
-msgstr "Selecione o idioma que pretende que o FrostWire utilize."
+msgstr "Selecione os motores de pesquisa que pretende que o FrostWire utilize."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SearchEnginesPaneItem.java:79
 msgid "Check/Uncheck all"
-msgstr ""
+msgstr "Marcar / desmarcar todos"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ShowFrostWireRecommendationsPaneItem.java:34
-#, fuzzy
 msgid "FrostWire Recommendations"
-msgstr "FrostWire para Andriod"
+msgstr "FrostWire Recomendações"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ShowFrostWireRecommendationsPaneItem.java:36
 msgid ""
 "By enabling this feature you become eligible to receive FrostWire sponsored "
 "offers and software recommendations to complement your experience."
 msgstr ""
+"Ao habilitar este recurso você se tornar elegível para receber ofertas "
+"FrostWire patrocinados e recomendações de software para complementar sua "
+"experiência."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ShowFrostWireRecommendationsPaneItem.java:43
 #, fuzzy
@@ -4621,23 +4630,21 @@ msgid ""
 "The Smart Search database is used to speed up individual file searches, it's "
 "how FrostWire remembers information about .torrent contents."
 msgstr ""
-"O banco de dados de Busca Inteligente é usado para acelerar buscas de "
+"O banco de dados de Pesquisa Inteligente é usado para acelerar buscas de "
 "arquivos individuais, é como FrostWire lembra das informações sobre "
 "conteúdos .torrent."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:48
-#, fuzzy
 msgid "Enable Smart Search"
-msgstr "Pesquisa Inteligente"
+msgstr "Habilitar Pesquisa Inteligente"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:50
 msgid "Total torrents indexed"
 msgstr "Total de torrents indexados"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:54
-#, fuzzy
 msgid "Reset Smart Search Database"
-msgstr "Pesquisa Inteligente"
+msgstr "Reset Pesquisa Inteligente"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:82
 #, java-format
@@ -4646,6 +4653,10 @@ msgid ""
 "{0} torrents that FrostWire has learned to speed up your search results.\n"
 "Do you wish to continue?"
 msgstr ""
+"Se você continuar, você irá apagar todas as informações relacionadas a \n"
+"{0} torrents que FrostWire aprendeu a acelerar seus resultados de "
+"pesquisa. \n"
+"Você deseja continuar?"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StartupPaneItem.java:23
 msgid ""
@@ -4729,7 +4740,7 @@ msgstr "Máximo de downloads ativos"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java:40
 msgid "Enable Distributed Hash Table (DHT)"
-msgstr ""
+msgstr "Habilitar Distributed Hash Table (DHT)"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:34
 msgid "BitTorrent Global Tranfer Speeds"
@@ -4749,7 +4760,7 @@ msgstr "Velocidade de download:"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:50
 msgid "Set the Maximum BitTorrent upload speed in KB/s."
-msgstr ""
+msgstr "Defina o BitTorrent máxima velocidade de upload em kbps."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:50
 #, fuzzy
@@ -4793,7 +4804,7 @@ msgstr ""
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/UXStatsPaneItem.java:34
 msgid "Anonymous Usage Statistics"
-msgstr ""
+msgstr "Estatísticas anônimas de uso"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/UXStatsPaneItem.java:36
 msgid ""
@@ -4802,10 +4813,14 @@ msgid ""
 "any information that can personally identify you will be stored on disk or "
 "sent through the network."
 msgstr ""
+"Enviar estatísticas de uso anônimas para que FrostWire pode ser melhorado de "
+"forma mais eficaz. Nenhuma informação sobre o conteúdo pesquisado, "
+"compartilhado ou jogado nem qualquer informação que possa identificá-lo "
+"pessoalmente será armazenado em disco ou enviados através da rede."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/UXStatsPaneItem.java:38
 msgid "Send anonymous usage statistics"
-msgstr ""
+msgstr "Enviar estatísticas de uso anônimas"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/VideoPlayerPaneItem.java:26
 msgid "Video Options"
@@ -4842,38 +4857,36 @@ msgstr "Máximo"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SchemaBox.java:116
 msgid "No results so far..."
-msgstr ""
+msgstr "Nenhum resultado até agora..."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SchemaBox.java:150
-#, fuzzy
 msgid "%s Audio files found (including .mp3, .wav, .ogg, and more)"
-msgstr "Pesquisar arquivos de Áudio, incluindo mp3, wav, ogg e outros."
+msgstr "%s Pesquisar arquivos de Áudio, incluindo mp3, wav, ogg e outros."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SchemaBox.java:155
-#, fuzzy
 msgid "%s Video files found (including .avi, .mpg, .wmv, and more)"
-msgstr "Pesquisar arquivos de Vídeo, incluindo avi, mpg, wmv e outros."
+msgstr "%s Pesquisar arquivos de Vídeo, incluindo avi, mpg, wmv e outros."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SchemaBox.java:160
-#, fuzzy
 msgid "%s Image files found (including .jpg, .gif, .png and more)"
-msgstr "Pesquisar arquivos de Imagem, incluindo jpg, gif, png e outros."
+msgstr "%s Pesquisar arquivos de Imagem, incluindo jpg, gif, png e outros."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SchemaBox.java:166
-#, fuzzy
 msgid "%s Document files found (including .html, .txt, .pdf, and more)"
-msgstr "Pesquisar arquivos de documentos, incluindo html, txt, pdf e outros."
+msgstr ""
+"%s Pesquisar arquivos de documentos, incluindo html, txt, pdf e outros."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SchemaBox.java:171
-#, fuzzy
 msgid "%s Program files found (including .exe, .zip, .gz, and more)"
-msgstr "Pesquisar arquivos de Programas, incluindo exe, zip, gz e outros."
+msgstr "%s Pesquisar arquivos de Programas, incluindo exe, zip, gz e outros."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SchemaBox.java:176
 msgid ""
 "%s Torrent files found (includes only .torrent files. Torrent files point to "
 "collections of files shared on the BitTorrent network.)"
 msgstr ""
+"%s Pesquisar arquivos de Torrent, incluindo arquivos .torrent. Arquivos "
+"torrent apontar para coleções de arquivos compartilhados na rede BitTorrent"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchButtons.java:44
 msgid "Stop"
@@ -4962,16 +4975,16 @@ msgid ""
 "has been disabled on your FrostWire Search Options. (Go to Tools > Options > "
 "Search to enable)"
 msgstr ""
+"foi desativado em suas opções de pesquisa de FrostWire. (Vá em Ferramentas> "
+"Opções> Procurar para ativar)"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultActionsRenderer.java:110
-#, fuzzy
 msgid "Select content to download from this torrent."
-msgstr "Selecione o conteúdo que você deseja enviar"
+msgstr "Selecione o conteúdo que você deseja baixar de este torrent."
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultDisplayer.java:578
-#, fuzzy
 msgid "results"
-msgstr "Resultados"
+msgstr "resultados"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultMediator.java:333
 msgid "Copy Hash"
@@ -5021,6 +5034,7 @@ msgid "More Options"
 msgstr "Mais opções"
 
 #: /frostwire/desktop/src/com/limegroup/gnutella/gui/tables/ColumnSelectionMenu.java:62
+#, fuzzy
 msgid "Stripe Rows"
 msgstr "Linhas"
 
