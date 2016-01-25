@@ -645,7 +645,8 @@ public final class BTEngine {
             torrentFile = new File(ctx.torrentsDir, name + ".torrent");
             byte[] arr = ti.toEntry().bencode();
 
-            FileUtils.writeByteArrayToFile(torrentFile, arr);
+            FileSystem fs = Platforms.get().fileSystem();
+            fs.write(torrentFile, arr);
         } catch (Throwable e) {
             torrentFile = null;
             LOG.warn("Error saving torrent info to file", e);

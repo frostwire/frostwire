@@ -18,6 +18,9 @@
 
 package com.frostwire.platform;
 
+import com.frostwire.logging.Logger;
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 
 /**
@@ -25,6 +28,8 @@ import java.io.File;
  * @author aldenml
  */
 public class DefaultFileSystem implements FileSystem {
+
+    private static final Logger LOG = Logger.getLogger(DefaultFileSystem.class);
 
     @Override
     public boolean isDirectory(File file) {
@@ -42,7 +47,26 @@ public class DefaultFileSystem implements FileSystem {
     }
 
     @Override
-    public boolean rename(File src, File dest) {
-        return src.renameTo(dest);
+    public boolean copy(File src, File dest) {
+        try {
+            FileUtils.copyFile(src, dest);
+            return true;
+        } catch (Throwable e) {
+            LOG.error("Error in copy file: " + src + " -> " + dest, e);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean write(File file, byte[] data) {
+        try {
+            FileUtils.writeByteArrayToFile(file, data);
+            return true;
+        } catch (Throwable e) {
+            LOG.error("Error in writing to file: " + file, e);
+        }
+
+        return false;
     }
 }

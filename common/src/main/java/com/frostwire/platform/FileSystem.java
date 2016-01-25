@@ -32,5 +32,7 @@ public interface FileSystem {
 
     boolean mkdirs(File file);
 
-    boolean rename(File src, File dest);
+    boolean copy(File src, File dest);
+
+    boolean write(File file, byte[] data);
 }

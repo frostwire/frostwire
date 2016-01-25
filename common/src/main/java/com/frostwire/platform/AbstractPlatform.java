@@ -42,7 +42,7 @@ public abstract class AbstractPlatform implements Platform {
     @Override
     public SystemPaths systemPaths() {
         if (systemPaths == null) {
-            throw new IllegalStateException("FileSystem can't be null");
+            throw new IllegalStateException("System paths can't be null");
         }
         return systemPaths;
     }
