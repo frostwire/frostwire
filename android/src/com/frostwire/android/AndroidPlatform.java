@@ -139,13 +139,31 @@ public final class AndroidPlatform extends AbstractPlatform {
         @Override
         public int rename(String oldpath, String newpath) {
             LOG.info("posix - rename:" + oldpath + " -> " + newpath);
-            return super.rename(oldpath, newpath);
+            int r = super.rename(oldpath, newpath);
+            if (r >= 0) {
+                return r;
+            }
+
+            File src = new File(oldpath);
+            File dest = new File(newpath);
+
+            if (fs.copy(src, dest)) {
+                fs.delete(src);
+                return 0;
+            } else {
+                return -1;
+            }
         }
 
         @Override
         public int remove(String path) {
             LOG.info("posix - remove:" + path);
-            return super.remove(path);
+            int r = super.remove(path);
+            if (r >= 0) {
+                return r;
+            }
+
+            return fs.delete(new File(path)) ? 0 : -1;
         }
     }
 }
