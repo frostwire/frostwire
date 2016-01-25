@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 import com.frostwire.android.R;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.*;
 import com.frostwire.android.gui.transfers.BittorrentDownload;
 import com.frostwire.android.gui.transfers.DownloadTransfer;
@@ -39,7 +40,6 @@ import java.io.File;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class CancelMenuAction extends MenuAction {
 
@@ -70,14 +70,20 @@ public class CancelMenuAction extends MenuAction {
 
         UIUtils.showYesNoDialog(context, (deleteData) ? R.string.yes_no_cancel_delete_transfer_question : yes_no_cancel_transfer_id, R.string.cancel_transfer, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                if (transfer instanceof UIBittorrentDownload) {
-                    ((UIBittorrentDownload) transfer).cancel(Ref.weak(context), deleteTorrent, deleteData);
-                } else if (transfer instanceof DownloadTransfer) {
-                    ((DownloadTransfer) transfer).cancel(deleteData);
-                } else {
-                    transfer.cancel();
-                }
-                UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);
+                Thread t = new Thread("Delete files - " + transfer.getDisplayName()) {
+                    @Override
+                    public void run() {
+                        if (transfer instanceof UIBittorrentDownload) {
+                            ((UIBittorrentDownload) transfer).cancel(Ref.weak(context), deleteTorrent, deleteData);
+                        } else if (transfer instanceof DownloadTransfer) {
+                            ((DownloadTransfer) transfer).cancel(deleteData);
+                        } else {
+                            transfer.cancel();
+                        }
+                        UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);
+                    }
+                };
+                Engine.instance().getThreadPool().execute(t);
             }
         });
     }
