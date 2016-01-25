@@ -89,12 +89,6 @@ public final class LollipopFileSystem implements FileSystem {
             return -1;
         }
 
-        File parent = file.getParentFile();
-        if (parent == null) {
-            LOG.error("Can't create file: " + file);
-            return -1;
-        }
-
         DocumentFile f = getFile(app, file, true);
         if (f == null) {
             LOG.error("Unable to obtain or create document for file: " + file);
