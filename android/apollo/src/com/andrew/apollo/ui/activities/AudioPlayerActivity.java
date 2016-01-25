@@ -870,7 +870,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     private void shareCurrentTrack() {
         final long currentAudioId = MusicUtils.getCurrentAudioId();
         final String trackName = MusicUtils.getTrackName();
-        if (currentAudioId == -1 && trackName == null) {
+        if (currentAudioId == -1 || trackName == null) {
             return;
         }
         final Intent shareIntent = new Intent();
