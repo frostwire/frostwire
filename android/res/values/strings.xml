@@ -571,4 +571,5 @@
     <string name="unprotected_connections_visibility_bullet">An unprotected connection makes everything you do online visible to your Internet provider and everyone on your network, that includes your searches, web browsing, messaging, emails and downloads. Consider a VPN.</string>
     <string name="protected_connections_visibility_bullet">Thank you for protecting your privacy by using a VPN. Your connection is secure.</string>
     <string name="learn_more">Learn more</string>
+    <string name="enable_experimental">Experimental Features</string>
 </resources>

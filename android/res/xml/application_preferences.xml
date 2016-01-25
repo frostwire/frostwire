@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -189,6 +189,9 @@
         <CheckBoxPreference
             android:key="frostwire.prefs.gui.show_share_indication"
             android:title="@string/show_share_indication" />
+        <CheckBoxPreference
+                android:key="frostwire.prefs.core.enable_experimental"
+                android:title="@string/enable_experimental" />
         <CheckBoxPreference
                 android:key="frostwire.prefs.uxstats.enabled"
                 android:summary="@string/anonymous_usage_statistics_summary"
