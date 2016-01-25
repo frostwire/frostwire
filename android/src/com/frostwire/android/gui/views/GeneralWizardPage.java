@@ -96,7 +96,7 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         textStoragePath = (TextView) findViewById(R.id.view_general_wizard_page_storage_path_textview);
         ImageView titleHorizontalBreak = (ImageView) findViewById(R.id.view_general_wizard_page_title_horizontal_break);
 
-        if (Platforms.get().experimental()) {
+        if (AndroidPlatform.saf()) {
             textStoragePath.setOnClickListener(new StoragePathTextViewAdapter((Activity) getContext()));
         } else {
             titleHorizontalBreak.setVisibility(View.GONE);

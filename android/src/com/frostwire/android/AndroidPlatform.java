@@ -27,9 +27,7 @@ import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.jlibtorrent.swig.posix_stat;
 import com.frostwire.jlibtorrent.swig.posix_wrapper;
 import com.frostwire.logging.Logger;
-import com.frostwire.platform.AbstractPlatform;
-import com.frostwire.platform.DefaultFileSystem;
-import com.frostwire.platform.FileSystem;
+import com.frostwire.platform.*;
 
 import java.io.File;
 
@@ -64,6 +62,11 @@ public final class AndroidPlatform extends AbstractPlatform {
     @Override
     public boolean experimental() {
         return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_CORE_EXPERIMENTAL);
+    }
+
+    public static boolean saf() {
+        Platform p = Platforms.get();
+        return p.experimental() && p.fileSystem() instanceof LollipopFileSystem;
     }
 
     private static FileSystem buildFileSystem(Application app) {
