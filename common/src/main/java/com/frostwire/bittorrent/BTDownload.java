@@ -24,6 +24,7 @@ import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
 import com.frostwire.jlibtorrent.swig.string_vector;
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
@@ -357,8 +358,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         if (deleteTorrent) {
             File torrent = engine.readTorrentPath(infoHash);
-            if (torrent != null && torrent.exists()) {
-                torrent.delete();
+            if (torrent != null) {
+                Platforms.get().fileSystem().delete(torrent);
             }
         }
 
