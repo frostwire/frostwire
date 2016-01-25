@@ -30,6 +30,8 @@ import com.frostwire.platform.AbstractPlatform;
 import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.FileSystem;
 
+import java.io.File;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -88,19 +90,50 @@ public final class AndroidPlatform extends AbstractPlatform {
         @Override
         public int open(String path, int flags, int mode) {
             LOG.info("posix - open:" + path);
-            return super.open(path, flags, mode);
+
+            int r = super.open(path, flags, mode);
+            if (r >= 0) {
+                return r;
+            }
+
+            r = fs.openFD(new File(path), "rw");
+
+            return r;
         }
 
         @Override
         public int stat(String path, posix_stat buf) {
             LOG.info("posix - stat:" + path);
-            return super.stat(path, buf);
+
+            int r = super.stat(path, buf);
+            if (r >= 0) {
+                return r;
+            }
+
+            File f = new File(path);
+
+            int S_ISDIR = fs.isDirectory(f) ? 0040000 : 0;
+            int S_IFREG = 0100000;
+
+            buf.setMode(S_ISDIR | S_IFREG);
+            buf.setSize(fs.length(f));
+            int t = (int) (fs.lastModified(f) / 1000);
+            buf.setAtime(t);
+            buf.setMtime(t);
+            buf.setCtime(t);
+
+            return 0;
         }
 
         @Override
         public int mkdir(String path, int mode) {
             LOG.info("posix - mkdir:" + path);
-            return super.mkdir(path, mode);
+            int r = super.mkdir(path, mode);
+            if (r >= 0) {
+                return r;
+            }
+
+            return fs.mkdirs(new File(path)) ? 0 : -1;
         }
 
         @Override

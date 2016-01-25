@@ -61,9 +61,31 @@ public final class LollipopFileSystem implements FileSystem {
             return true;
         }
 
-        DocumentFile f = getDirectory(app, file, false);
+        DocumentFile f = getDocument(app, file);
 
-        return f != null;
+        return f != null && f.isDirectory();
+    }
+
+    @Override
+    public boolean isFile(File file) {
+        if (file.isFile()) {
+            return true;
+        }
+
+        DocumentFile f = getDocument(app, file);
+
+        return f != null && f.isFile();
+    }
+
+    @Override
+    public boolean canRead(File file) {
+        if (file.canRead()) {
+            return true;
+        }
+
+        DocumentFile f = getDocument(app, file);
+
+        return f != null && f.canRead();
     }
 
     @Override
@@ -72,17 +94,33 @@ public final class LollipopFileSystem implements FileSystem {
             return true;
         }
 
-        DocumentFile d = getDirectory(app, file, false);
-        if (d != null) {
-            return d.canWrite();
+        DocumentFile f = getDocument(app, file);
+
+        return f != null && f.canWrite();
+    }
+
+    @Override
+    public long length(File file) {
+        long r = file.length();
+        if (r > 0) {
+            return r;
         }
 
-        DocumentFile f = getFile(app, file, false);
-        if (f != null) {
-            return f.canWrite();
+        DocumentFile f = getDocument(app, file);
+
+        return f != null ? f.length() : 0;
+    }
+
+    @Override
+    public long lastModified(File file) {
+        long r = file.lastModified();
+        if (r > 0) {
+            return r;
         }
 
-        return false;
+        DocumentFile f = getDocument(app, file);
+
+        return f != null ? f.lastModified() : 0;
     }
 
     @Override
@@ -252,6 +290,43 @@ public final class LollipopFileSystem implements FileSystem {
                 } else {
                     f = null;
                 }
+            }
+        }
+
+        if (f != null) {
+            CACHE.put(path, f);
+        }
+
+        return f;
+    }
+
+    private static DocumentFile getDocument(Context context, File file) {
+        String path = file.getAbsolutePath();
+        DocumentFile cached = CACHE.get(path);
+        if (cached != null) {
+            return cached;
+        }
+
+        String baseFolder = getExtSdCardFolder(context, file);
+        if (baseFolder == null) {
+            return file.exists() ? DocumentFile.fromFile(file) : null;
+        }
+
+        String fullPath = file.getAbsolutePath();
+        String relativePath = baseFolder.length() < fullPath.length() ? fullPath.substring(baseFolder.length() + 1) : "";
+
+        String[] segments = relativePath.split("/");
+
+        Uri rootUri = getDocumentUri(context, new File(baseFolder));
+        DocumentFile f = DocumentFile.fromTreeUri(context, rootUri);
+
+        for (int i = 0; i < segments.length; i++) {
+            String segment = segments[i];
+            DocumentFile child = f.findFile(segment);
+            if (child != null) {
+                f = child;
+            } else {
+                return null;
             }
         }
 
