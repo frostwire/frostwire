@@ -22,16 +22,21 @@ import android.app.Application;
 import android.os.Build;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.jlibtorrent.LibTorrent;
+import com.frostwire.jlibtorrent.swig.posix_stat;
+import com.frostwire.jlibtorrent.swig.posix_wrapper;
+import com.frostwire.logging.Logger;
 import com.frostwire.platform.AbstractPlatform;
 import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.FileSystem;
-import com.frostwire.platform.Platforms;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class AndroidPlatform extends AbstractPlatform {
+
+    private static final Logger LOG = Logger.getLogger(AndroidPlatform.class);
 
     private static final int VERSION_CODE_LOLLIPOP = 21;
 
@@ -62,11 +67,52 @@ public final class AndroidPlatform extends AbstractPlatform {
         FileSystem fs;
 
         if (Build.VERSION.SDK_INT >= VERSION_CODE_LOLLIPOP) {
-            fs = new LollipopFileSystem(app);
+            LollipopFileSystem lfs = new LollipopFileSystem(app);
+            LibTorrent.setPosixWrapper(new PosixCalls(lfs));
+            fs = lfs;
         } else {
             fs = new DefaultFileSystem();
         }
 
         return fs;
+    }
+
+    private static final class PosixCalls extends posix_wrapper {
+
+        private final LollipopFileSystem fs;
+
+        public PosixCalls(LollipopFileSystem fs) {
+            this.fs = fs;
+        }
+
+        @Override
+        public int open(String path, int flags, int mode) {
+            LOG.info("posix - open:" + path);
+            return super.open(path, flags, mode);
+        }
+
+        @Override
+        public int stat(String path, posix_stat buf) {
+            LOG.info("posix - stat:" + path);
+            return super.stat(path, buf);
+        }
+
+        @Override
+        public int mkdir(String path, int mode) {
+            LOG.info("posix - mkdir:" + path);
+            return super.mkdir(path, mode);
+        }
+
+        @Override
+        public int rename(String oldpath, String newpath) {
+            LOG.info("posix - rename:" + oldpath + " -> " + newpath);
+            return super.rename(oldpath, newpath);
+        }
+
+        @Override
+        public int remove(String path) {
+            LOG.info("posix - remove:" + path);
+            return super.remove(path);
+        }
     }
 }

@@ -322,7 +322,7 @@ public final class HttpDownload implements DownloadTransfer {
             public void run() {
                 try {
                     boolean success = true;
-                    if (tempPath.exists() && fs.rename(tempPath, savePath)) {
+                    if (tempPath.exists() && fs.copy(tempPath, savePath)) {
                         success = true;
                     } else {
                         success = false;
