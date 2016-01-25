@@ -58,8 +58,54 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     @Override
+    public boolean isDirectory(File file) {
+        if (file.isDirectory()) {
+            return true;
+        }
+
+        DocumentFile f = getDirectory(app, file, false);
+
+        return f != null;
+    }
+
+    @Override
+    public boolean canWrite(File file) {
+        if (file.canWrite()) {
+            return true;
+        }
+
+        DocumentFile d = getDirectory(app, file, false);
+        if (d != null) {
+            return d.canWrite();
+        }
+
+        DocumentFile f = getFile(app, file, false);
+        if (f != null) {
+            return f.canWrite();
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean mkdirs(File file) {
+        if (file.mkdirs()) {
+            return true;
+        }
+
+        DocumentFile f = getDirectory(app, file, false);
+        if (f != null) {
+            return false; // already exists
+        }
+
+        f = getDirectory(app, file, true);
+
+        return f != null;
+    }
+
+    @Override
     public boolean rename(File src, File dest) {
-        if (src.renameTo(dest)) { // old way
+        if (src.renameTo(dest)) {
             return true;
         }
 
