@@ -38,6 +38,8 @@ public interface FileSystem {
 
     long lastModified(File file);
 
+    boolean exists(File file);
+
     boolean mkdirs(File file);
 
     boolean delete(File file);

@@ -62,6 +62,11 @@ public class DefaultFileSystem implements FileSystem {
     }
 
     @Override
+    public boolean exists(File file) {
+        return file.exists();
+    }
+
+    @Override
     public boolean mkdirs(File file) {
         return file.mkdirs();
     }
