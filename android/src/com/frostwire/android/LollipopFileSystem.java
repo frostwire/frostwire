@@ -26,6 +26,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
+import android.util.LruCache;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.FileSystem;
 import org.apache.commons.io.IOUtils;
@@ -46,6 +47,9 @@ import java.util.List;
 public final class LollipopFileSystem implements FileSystem {
 
     private static final Logger LOG = Logger.getLogger(LollipopFileSystem.class);
+
+    private static final int CACHE_MAX_SIZE = 1000;
+    private static final LruCache<String, DocumentFile> CACHE = new LruCache<>(CACHE_MAX_SIZE);
 
     private final Application app;
 
@@ -106,6 +110,12 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     private static DocumentFile getDirectory(Context context, File dir, boolean create) {
+        String path = dir.getAbsolutePath();
+        DocumentFile cached = CACHE.get(path);
+        if (cached != null && cached.isDirectory()) {
+            return cached;
+        }
+
         String baseFolder = getExtSdCardFolder(context, dir);
         if (baseFolder == null) {
             if (create) {
@@ -140,10 +150,22 @@ public final class LollipopFileSystem implements FileSystem {
             }
         }
 
-        return f.isDirectory() ? f : null;
+        f = f.isDirectory() ? f : null;
+
+        if (f != null) {
+            CACHE.put(path, f);
+        }
+
+        return f;
     }
 
     private static DocumentFile getFile(Context context, File file, boolean create) {
+        String path = file.getAbsolutePath();
+        DocumentFile cached = CACHE.get(path);
+        if (cached != null && cached.isFile()) {
+            return cached;
+        }
+
         File parent = file.getParentFile();
         if (parent == null) {
             return DocumentFile.fromFile(file);
@@ -165,6 +187,10 @@ public final class LollipopFileSystem implements FileSystem {
                     f = null;
                 }
             }
+        }
+
+        if (f != null) {
+            CACHE.put(path, f);
         }
 
         return f;
