@@ -40,6 +40,8 @@ public interface FileSystem {
 
     boolean mkdirs(File file);
 
+    boolean delete(File file);
+
     boolean copy(File src, File dest);
 
     boolean write(File file, byte[] data);

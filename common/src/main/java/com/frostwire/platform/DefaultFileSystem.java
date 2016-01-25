@@ -67,6 +67,11 @@ public class DefaultFileSystem implements FileSystem {
     }
 
     @Override
+    public boolean delete(File file) {
+        return file.delete();
+    }
+
+    @Override
     public boolean copy(File src, File dest) {
         try {
             FileUtils.copyFile(src, dest);
