@@ -49,7 +49,10 @@ public final class BTEngine {
             PORTMAP.getSwig(),
             PORTMAP_ERROR.getSwig(),
             DHT_STATS.getSwig(),
-            STORAGE_MOVED.getSwig()};
+            STORAGE_MOVED.getSwig(),
+            LISTEN_SUCCEEDED.getSwig(),
+            LISTEN_FAILED.getSwig()
+    };
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
 
@@ -744,6 +747,16 @@ public final class BTEngine {
         }
     }
 
+    private void logListenSucceeded(ListenSucceededAlert alert) {
+        String s = "endpoint: " + alert.getEndpoint().toString() + " type:" + alert.getSwig().getSock_type();
+        LOG.info("Listen succeeded on " + s);
+    }
+
+    private void logListenFailed(ListenFailedAlert alert) {
+        String s = "endpoint: " + alert.listenInterface() + " type:" + alert.getSwig().getSock_type();
+        LOG.info("Listen failed on " + s);
+    }
+
     private void migrateVuzeDownloads() {
         try {
             File dir = new File(ctx.homeDir.getParent(), "azureus");
@@ -921,6 +934,12 @@ public final class BTEngine {
                     break;
                 case STORAGE_MOVED:
                     doResumeData((TorrentAlert<?>) alert, true);
+                    break;
+                case LISTEN_SUCCEEDED:
+                    logListenSucceeded((ListenSucceededAlert) alert);
+                    break;
+                case LISTEN_FAILED:
+                    logListenFailed((ListenFailedAlert) alert);
                     break;
             }
         }
