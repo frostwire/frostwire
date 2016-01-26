@@ -90,6 +90,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
 
                 Enumeration<InetAddress> addresses = ni.getInetAddresses();
                 gbc.insets = new Insets(0, 6, 0, 0);
+
                 while (addresses.hasMoreElements()) {
                     InetAddress address = addresses.nextElement();
                     JRadioButton button = new JRadioButton(address.getHostAddress());
@@ -185,30 +186,21 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
         if (ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue()) {
             iface = ConnectionSettings.CUSTOM_INETADRESS.getValue();
         }
-
-        BTEngine.getInstance().reloadBTContext(BTEngine.ctx.torrentsDir,
-                BTEngine.ctx.dataDir,
-                BTEngine.ctx.homeDir,
-                BTEngine.ctx.port0,
-                BTEngine.ctx.port1,
-                iface,
-                false,
-                false);
-
-        final List<TorrentHandle> torrents = BTEngine.getInstance().getSession().getTorrents();
-        if (torrents != null) {
-            for (TorrentHandle th : torrents) {
-                // TODO: review this deprecated API
-                //th.useInterface(iface);
-            }
+        if (!ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue()) {
+            iface = "0.0.0.0";
+            ConnectionSettings.CUSTOM_INETADRESS.setValue(iface);
         }
+
+        String if_string = String.format("%s:%d", iface, BTEngine.ctx.port0);
+        BTEngine.getInstance().setListenInterfaces(if_string);
 
         return isDirty;
     }
 
     public boolean isDirty() {
-        if (!ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue())
-            return CUSTOM.isSelected();
+        if (ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue() != CUSTOM.isSelected()) {
+            return true;
+        }
 
         String expect = ConnectionSettings.CUSTOM_INETADRESS.getValue();
         Enumeration<AbstractButton> buttons = GROUP.getElements();
