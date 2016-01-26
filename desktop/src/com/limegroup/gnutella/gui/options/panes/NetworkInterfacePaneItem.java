@@ -15,9 +15,13 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import com.frostwire.bittorrent.BTEngine;
+import com.limegroup.gnutella.gui.BoxPanel;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.ConnectionSettings;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
@@ -27,22 +31,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-
-import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.TorrentHandle;
-import com.limegroup.gnutella.gui.BoxPanel;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.settings.ConnectionSettings;
 
 /**
  * Allows the user to pick a custom interface/address to bind to.
