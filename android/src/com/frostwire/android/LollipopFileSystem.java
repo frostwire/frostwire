@@ -29,6 +29,8 @@ import android.support.v4.provider.DocumentFile;
 import android.util.LruCache;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.FileSystem;
+import com.frostwire.platform.Platforms;
+import com.frostwire.platform.SystemPaths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -255,6 +257,8 @@ public final class LollipopFileSystem implements FileSystem {
             }
         }
 
+        baseFolder = combineRoot(baseFolder);
+
         String fullPath = dir.getAbsolutePath();
         String relativePath = baseFolder.length() < fullPath.length() ? fullPath.substring(baseFolder.length() + 1) : "";
 
@@ -338,6 +342,8 @@ public final class LollipopFileSystem implements FileSystem {
             return file.exists() ? DocumentFile.fromFile(file) : null;
         }
 
+        baseFolder = combineRoot(baseFolder);
+
         String fullPath = file.getAbsolutePath();
         String relativePath = baseFolder.length() < fullPath.length() ? fullPath.substring(baseFolder.length() + 1) : "";
 
@@ -420,8 +426,9 @@ public final class LollipopFileSystem implements FileSystem {
         String[] extSdPaths = getExtSdCardPaths(context);
         try {
             for (int i = 0; i < extSdPaths.length; i++) {
-                if (file.getCanonicalPath().startsWith(extSdPaths[i])) {
-                    return extSdPaths[i];
+                String extSdPath = extSdPaths[i];
+                if (file.getCanonicalPath().startsWith(extSdPath)) {
+                    return extSdPath;
                 }
             }
         } catch (IOException e) {
@@ -545,6 +552,17 @@ public final class LollipopFileSystem implements FileSystem {
             return paths.get(1);
         }
         throw new IllegalArgumentException("Invalid URI: " + documentUri);
+    }
+
+    private static String combineRoot(String baseFolder) {
+        SystemPaths paths = Platforms.get().systemPaths();
+        File data = paths.data();
+        String root = null;
+        if (data.getParentFile() != null) {
+            root = data.getParentFile().getAbsolutePath();
+        }
+
+        return root != null && root.startsWith(baseFolder) ? root : baseFolder;
     }
 
     //------------ more tools methods
