@@ -24,7 +24,6 @@ import com.andrew.apollo.cache.ImageCache;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.HttpResponseCache;
 import com.frostwire.android.util.ImageLoader;
@@ -33,6 +32,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.DHT;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
+import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.util.DirectoryUtils;
 
@@ -110,12 +110,18 @@ public class MainApplication extends Application {
     }
 
     private void setupBTEngine() {
-        BTEngine.ctx = new BTContext();
-        BTEngine.getInstance().reloadBTContext(SystemPaths.getTorrents(),
-                SystemPaths.getTorrentData(),
-                SystemPaths.getLibTorrent(this),
-                0, 0, "0.0.0.0", false, false);
-        BTEngine.ctx.optimizeMemory = true;
+        SystemPaths paths = Platforms.get().systemPaths();
+
+        BTContext ctx = new BTContext();
+        ctx.homeDir = paths.libtorrent();
+        ctx.torrentsDir = paths.torrents();
+        ctx.dataDir = paths.data();
+        ctx.port0 = 0;
+        ctx.port1 = 0;
+        ctx.iface = "0.0.0.0";
+        ctx.optimizeMemory = true;
+
+        BTEngine.ctx = ctx;
         BTEngine.getInstance().start();
 
         boolean enable_dht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
@@ -131,7 +137,7 @@ public class MainApplication extends Application {
 
     private void cleanTemp() {
         try {
-            File tmp = SystemPaths.getTemp();
+            File tmp = Platforms.get().systemPaths().temp();
             DirectoryUtils.deleteFolderRecursively(tmp);
         } catch (Throwable e) {
             LOG.error("Error during setup of temp directory", e);
