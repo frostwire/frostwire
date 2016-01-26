@@ -470,6 +470,13 @@ public final class BTEngine {
                     String infoHash = FilenameUtils.getBaseName(t.getName());
                     if (infoHash != null) {
                         File resumeFile = resumeDataFile(infoHash);
+
+                        File savePath = readSavePath(infoHash);
+                        if (setupSaveDir(savePath) == null) {
+                            LOG.warn("Can't create data dir or mount point is not accessible");
+                            return;
+                        }
+
                         restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
                     }
                 } catch (Throwable e) {
@@ -507,6 +514,20 @@ public final class BTEngine {
         }
 
         return torrent;
+    }
+
+    File readSavePath(String infoHash) {
+        File savePath = null;
+
+        try {
+            byte[] arr = FileUtils.readFileToByteArray(resumeDataFile(infoHash));
+            entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
+            savePath = new File(e.dict().get("save_path").string());
+        } catch (Throwable e) {
+            // can't recover original torrent path
+        }
+
+        return savePath;
     }
 
     private File saveTorrent(TorrentInfo ti) {
