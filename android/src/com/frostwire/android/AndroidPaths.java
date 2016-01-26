@@ -34,6 +34,7 @@ final class AndroidPaths implements SystemPaths {
     private static final String STORAGE_PATH = "FrostWire";
     private static final String TORRENT_DATA_PATH = "TorrentsData";
     private static final String TORRENTS_PATH = "Torrents";
+    private static final String TEMP_PATH = "temp";
     private static final String LIBTORRENT_PATH = "libtorrent";
 
 
@@ -55,7 +56,7 @@ final class AndroidPaths implements SystemPaths {
 
     @Override
     public File temp() {
-        return null;
+        return new File(app.getExternalFilesDir(null), TEMP_PATH);
     }
 
     @Override
