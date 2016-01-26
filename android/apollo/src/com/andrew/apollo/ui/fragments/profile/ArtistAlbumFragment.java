@@ -233,7 +233,7 @@ public class ArtistAlbumFragment extends Fragment implements LoaderCallbacks<Lis
                     final long id = item.getIntent().getLongExtra("playlist", 0);
                     MusicUtils.addToPlaylist(getActivity(), mAlbumList, id);
                     return true;
-                case FragmentMenuItems.DELETE:
+                    case FragmentMenuItems.DELETE:
                     DeleteDialog.newInstance(mAlbum.mAlbumName, mAlbumList, null).
                             setOnDeleteCallback(new DeleteDialog.DeleteDialogCallback() {
                                 @Override

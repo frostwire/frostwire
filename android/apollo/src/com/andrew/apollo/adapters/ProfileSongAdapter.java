@@ -41,7 +41,7 @@ import java.util.List;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class ProfileSongAdapter extends ArrayAdapter<Song> {
+public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
 
     /**
      * Default display setting: title/album
@@ -101,7 +101,7 @@ public class ProfileSongAdapter extends ArrayAdapter<Song> {
     /**
      * Used to set the size of the data in the adapter
      */
-    private List<Song> mCount = Lists.newArrayList();
+    //private List<Song> mCount = Lists.newArrayList();
 
     /**
      * Constructor of <code>ProfileSongAdapter</code>
@@ -242,20 +242,5 @@ public class ProfileSongAdapter extends ArrayAdapter<Song> {
             return ITEM_VIEW_TYPE_HEADER;
         }
         return ITEM_VIEW_TYPE_MUSIC;
-    }
-
-    /**
-     * Method that unloads and clears the items in the adapter
-     */
-    public void unload() {
-        mCount.clear();
-        clear();
-    }
-
-    /**
-     * @param data The {@link List} used to return the count for the adapter.
-     */
-    public void setCount(final List<Song> data) {
-        mCount = data;
     }
 }

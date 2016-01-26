@@ -1,113 +1,98 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.andrew.apollo.ui.fragments.profile;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.SubMenu;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-
-import com.andrew.apollo.Config;
-import com.frostwire.android.R;
-import com.andrew.apollo.adapters.ProfileSongAdapter;
-import com.andrew.apollo.loaders.ArtistSongLoader;
+import com.andrew.apollo.adapters.ApolloFragmentAdapter;
 import com.andrew.apollo.menu.CreateNewPlaylist;
 import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.menu.FragmentMenuItems;
+import com.andrew.apollo.model.Album;
+import com.andrew.apollo.model.Artist;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
+import com.frostwire.android.R;
 
 import java.util.List;
 
 /**
- * This class is used to display all of the songs from a particular artist.
+ * Created by gubatron on 1/26/16 on a plane.
  *
- * @author Andrew Neal (andrewdneal@gmail.com)
- * @author Angel Leon (gubatron@gmail.com)
+ * @author gubatron
+ * @author aldenml
  */
-public class ArtistSongFragment extends Fragment implements LoaderCallbacks<List<Song>>,
-        OnItemClickListener {
+public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I> extends Fragment implements
+        LoaderManager.LoaderCallbacks<List<I>>,
+        AdapterView.OnItemClickListener {
 
-    /**
-     * Used to keep context menu items from bleeding into other fragments
-     */
-    private static final int GROUP_ID = 9;
-
+    private final int GROUP_ID;
     /**
      * LoaderCallbacks identifier
      */
-    private static final int LOADER = 0;
-
-    /**
-     * The adapter for the list
-     */
-    private ProfileSongAdapter mAdapter;
-
+    protected final int LOADER;
     /**
      * The list view
      */
-    private ListView mListView;
-
+    protected ListView mListView;
     /**
-     * Represents a song
+     * The adapter for the list
      */
-    private Song mSong;
-
+    protected T mAdapter;
     /**
-     * Position of a context menu item
+     * Represents a song/album/
      */
-    private int mSelectedPosition;
-
+    protected I mItem;
     /**
      * Id of a context menu item
      */
-    private long mSelectedId;
-
+    protected long mSelectedId;
     /**
      * Song, album, and artist name used in the context menu
      */
-    private String mSongName, mAlbumName, mArtistName;
-
+    protected String mSongName, mAlbumName, mArtistName;
     /**
      * Profile header
      */
     private ProfileTabCarousel mProfileTabCarousel;
 
-    /**
-     * Empty constructor as per the {@link Fragment} documentation
-     */
-    public ArtistSongFragment() {
+    abstract T createAdapter();
+
+    public abstract void onItemClick(final AdapterView<?> parent, final View view, final int position,
+                                     final long id);
+
+    protected ProfileFragment(int groupId, int loaderId) {
+        this.GROUP_ID = groupId;
+        this.LOADER = loaderId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @SuppressWarnings("deprecation")
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
@@ -115,22 +100,9 @@ public class ArtistSongFragment extends Fragment implements LoaderCallbacks<List
                 .findViewById(R.id.activity_profile_base_tab_carousel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // Create the adpater
-        mAdapter = new ProfileSongAdapter(getActivity(), R.layout.list_item_simple);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         // The View for the fragment's UI
         final ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.list_base, null);
         // Initialize the list
@@ -152,28 +124,15 @@ public class ArtistSongFragment extends Fragment implements LoaderCallbacks<List
         return rootView;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        // Enable the options menu
-        setHasOptionsMenu(true);
-        // Start the loader
-        final Bundle arguments = getArguments();
-        if (arguments != null) {
-            getLoaderManager().initLoader(LOADER, arguments, this);
-        }
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Create the adapter
+        mAdapter = createAdapter();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putAll(getArguments() != null ? getArguments() : new Bundle());
+    public T getAdapter() {
+        return mAdapter;
     }
 
     /**
@@ -181,23 +140,29 @@ public class ArtistSongFragment extends Fragment implements LoaderCallbacks<List
      */
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v,
-            final ContextMenuInfo menuInfo) {
+                                    final ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+
         // Get the position of the selected item
-        final AdapterContextMenuInfo info = (AdapterContextMenuInfo)menuInfo;
-        mSelectedPosition = info.position - 1;
-        // Creat a new song
-        mSong = mAdapter.getItem(mSelectedPosition);
-        mSelectedId = mSong.mSongId;
-        mSongName = mSong.mSongName;
-        mAlbumName = mSong.mAlbumName;
-        mArtistName = mSong.mArtistName;
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        int mSelectedPosition = info.position - 1;
+
+        // Create a new song
+        mItem = mAdapter.getItem(mSelectedPosition);
+
+        if (mItem instanceof Song) {
+            Song mSong = (Song) mItem;
+            mSelectedId = mSong.mSongId;
+            mSongName = mSong.mSongName;
+            mAlbumName = mSong.mAlbumName;
+            mArtistName = mSong.mArtistName;
+        }
 
         // Play the song
         menu.add(GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE,
                 getString(R.string.context_menu_play_selection));
 
-        // Play next
+        // Play the song
         menu.add(GROUP_ID, FragmentMenuItems.PLAY_NEXT, Menu.NONE,
                 getString(R.string.context_menu_play_next));
 
@@ -225,17 +190,17 @@ public class ArtistSongFragment extends Fragment implements LoaderCallbacks<List
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
                     MusicUtils.playAll(getActivity(), new long[] {
-                        mSelectedId
+                            mSelectedId
                     }, 0, false);
                     return true;
                 case FragmentMenuItems.PLAY_NEXT:
                     MusicUtils.playNext(new long[] {
-                        mSelectedId
+                            mSelectedId
                     });
                     return true;
                 case FragmentMenuItems.ADD_TO_QUEUE:
                     MusicUtils.addToQueue(getActivity(), new long[] {
-                        mSelectedId
+                            mSelectedId
                     });
                     return true;
                 case FragmentMenuItems.ADD_TO_FAVORITES:
@@ -244,28 +209,37 @@ public class ArtistSongFragment extends Fragment implements LoaderCallbacks<List
                     return true;
                 case FragmentMenuItems.NEW_PLAYLIST:
                     CreateNewPlaylist.getInstance(new long[] {
-                        mSelectedId
+                            mSelectedId
                     }).show(getFragmentManager(), "CreatePlaylist");
                     return true;
                 case FragmentMenuItems.PLAYLIST_SELECTED:
                     final long mPlaylistId = item.getIntent().getLongExtra("playlist", 0);
                     MusicUtils.addToPlaylist(getActivity(), new long[] {
-                        mSelectedId
+                            mSelectedId
                     }, mPlaylistId);
                     return true;
                 case FragmentMenuItems.USE_AS_RINGTONE:
                     MusicUtils.setRingtone(getActivity(), mSelectedId);
                     return true;
                 case FragmentMenuItems.DELETE:
-                    DeleteDialog.newInstance(mSong.mSongName, new long[]{
+                    String title = null;
+
+                    if (mItem instanceof Song) {
+                        title = ((Song) mItem).mSongName;
+                    } else if (mItem instanceof Album) {
+                        title = ((Album) mItem).mAlbumName;
+                    } else if (mItem instanceof Artist) {
+                        title = ((Artist) mItem).mArtistName;
+                    }
+
+                    DeleteDialog.newInstance(title, new long[] {
                             mSelectedId
                     }, null).setOnDeleteCallback(new DeleteDialog.DeleteDialogCallback() {
                         @Override
                         public void onDelete(long[] id) {
                             refresh();
                         }
-                    }).
-                    show(getFragmentManager(), "DeleteDialog");
+                    }).show(getFragmentManager(), "DeleteDialog");
                     return true;
                 default:
                     break;
@@ -278,24 +252,28 @@ public class ArtistSongFragment extends Fragment implements LoaderCallbacks<List
      * {@inheritDoc}
      */
     @Override
-    public void onItemClick(final AdapterView<?> parent, final View view, final int position,
-            final long id) {
-        MusicUtils.playAllFromUserItemClick(getActivity(), mAdapter, position);
+    public void onActivityCreated(final Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // Enable the options menu
+        setHasOptionsMenu(true);
+        // Start the loader
+        final Bundle arguments = getArguments();
+        if (arguments != null) {
+            getLoaderManager().initLoader(LOADER, arguments, this);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putAll(getArguments() != null ? getArguments() : new Bundle());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
-        return new ArtistSongLoader(getActivity(), args.getLong(Config.ID));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onLoadFinished(final Loader<List<Song>> loader, final List<Song> data) {
+    public void onLoadFinished(final Loader<List<I>> loader, final List<I> data) {
         // Check for any errors
         if (data.isEmpty()) {
             mAdapter.unload();
@@ -307,9 +285,9 @@ public class ArtistSongFragment extends Fragment implements LoaderCallbacks<List
         mAdapter.unload();
         // Return the correct count
         mAdapter.setCount(data);
-        // Add the data to the adpater
-        for (final Song song : data) {
-            mAdapter.add(song);
+        // Add the data to the adapter
+        for (final I item : data) {
+            mAdapter.add(item);
         }
         mAdapter.notifyDataSetChanged();
     }
@@ -318,7 +296,7 @@ public class ArtistSongFragment extends Fragment implements LoaderCallbacks<List
      * {@inheritDoc}
      */
     @Override
-    public void onLoaderReset(final Loader<List<Song>> loader) {
+    public void onLoaderReset(final Loader<List<I>> loader) {
         // Clear the data in the adapter
         mAdapter.unload();
     }
@@ -331,8 +309,6 @@ public class ArtistSongFragment extends Fragment implements LoaderCallbacks<List
         // Otherwise, if the user has scrolled enough to move the header, it
         // becomes misplaced and needs to be reset.
         mListView.setSelection(0);
-        // Wait a moment for the preference to change.
-        SystemClock.sleep(10);
         mAdapter.notifyDataSetChanged();
         getLoaderManager().restartLoader(LOADER, getArguments(), this);
     }

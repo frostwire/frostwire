@@ -770,6 +770,6 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     }
 
     private AlbumSongFragment getAlbumSongFragment() {
-        return (AlbumSongFragment)mPagerAdapter.getFragment(0);
+        return (AlbumSongFragment) mPagerAdapter.getFragment(0);
     }
 }
