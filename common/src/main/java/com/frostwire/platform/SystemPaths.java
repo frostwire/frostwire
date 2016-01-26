@@ -18,10 +18,6 @@
 
 package com.frostwire.platform;
 
-import android.content.Context;
-import com.frostwire.android.core.ConfigurationManager;
-import com.frostwire.android.core.Constants;
-
 import java.io.File;
 
 /**
@@ -36,7 +32,7 @@ public interface SystemPaths {
 
     File temp();
 
-    File libTorrent();
+    File libtorrent();
 
     File update();
 }
