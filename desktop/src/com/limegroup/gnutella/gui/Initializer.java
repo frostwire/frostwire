@@ -458,17 +458,16 @@ public final class Initializer {
             iface = ConnectionSettings.CUSTOM_INETADRESS.getValue();
         }
 
-        BTEngine.ctx = new BTContext();
+        BTContext ctx = new BTContext();
+        ctx.homeDir = homeDir;
+        ctx.torrentsDir = SharingSettings.TORRENTS_DIR_SETTING.getValue();
+        ctx.dataDir = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
+        ctx.port0 = port0;
+        ctx.port1 = port1;
+        ctx.iface = iface;
 
-        // Sets the BTContext on the BTEngine and starts it.
-        BTEngine.getInstance().reloadBTContext(SharingSettings.TORRENTS_DIR_SETTING.getValue(),
-                SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(),
-                homeDir,
-                port0,
-                port1,
-                iface,
-                false,// Don't stop, as it's not even started yet :)
-                true);// Start
+        BTEngine.ctx = ctx;
+        BTEngine.getInstance().start();
 
         if (!SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue()) {
             DHT dht = new DHT(BTEngine.getInstance().getSession());
