@@ -15,34 +15,18 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Properties;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-
-import org.limewire.util.VersionUtils;
-
+import com.frostwire.desktop.DesktopPlatform;
+import com.frostwire.platform.Platforms;
 import com.limegroup.gnutella.gui.bugs.FatalBugManager;
 import com.limegroup.gnutella.util.FrostWireUtils;
+import org.limewire.util.VersionUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.util.Properties;
 
 
 /**
@@ -62,6 +46,8 @@ public class GUILoader {
      */
     public static void load(String args[], Frame frame) {
         try {
+            Platforms.set(new DesktopPlatform());
+
             if (JavaVersionNotice.upgradeRequired(VersionUtils.getJavaVersion())) {
                 hideSplash(frame);
                 JavaVersionNotice.showUpgradeRequiredDialog();
