@@ -44,33 +44,35 @@ import com.limegroup.gnutella.gui.BoxPanel;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.ConnectionSettings;
 
-/** Allows the user to pick a custom interface/address to bind to. */
+/**
+ * Allows the user to pick a custom interface/address to bind to.
+ */
 public class NetworkInterfacePaneItem extends AbstractPaneItem {
-    
+
     public final static String TITLE = I18n.tr("Network Interface");
-    
+
     public final static String LABEL = I18n.tr("You can tell FrostWire to bind outgoing connections to an IP address from a specific network interface. Listening sockets will still listen on all available interfaces. This is useful on multi-homed hosts. If you later disable this interface, FrostWire will revert to binding to an arbitrary address.");
 
     private static final String ADDRESS = "frostwire.networkinterfacepane.address";
-    
+
     private final ButtonGroup GROUP = new ButtonGroup();
-    
+
     private final JCheckBox CUSTOM;
 
-	private List<JRadioButton> activeButtons = new ArrayList<JRadioButton>();
-    
+    private List<JRadioButton> activeButtons = new ArrayList<JRadioButton>();
+
     public NetworkInterfacePaneItem() {
         super(TITLE, LABEL);
-        
+
         CUSTOM = new JCheckBox(I18n.tr("Use a specific network interface."));
         CUSTOM.setSelected(ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue());
         CUSTOM.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				updateButtons(CUSTOM.isSelected());
-			}        	
+            public void itemStateChanged(ItemEvent e) {
+                updateButtons(CUSTOM.isSelected());
+            }
         });
         add(CUSTOM);
-        
+
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             JPanel panel = new JPanel(new GridBagLayout());
@@ -78,26 +80,26 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
             gbc.anchor = GridBagConstraints.NORTHWEST;
             gbc.fill = GridBagConstraints.NONE;
             gbc.gridwidth = GridBagConstraints.REMAINDER;
-            
+
             // Add the available interfaces / addresses
-            while(interfaces.hasMoreElements()) {
+            while (interfaces.hasMoreElements()) {
                 NetworkInterface ni = interfaces.nextElement();
                 JLabel label = new JLabel(ni.getDisplayName());
                 gbc.insets = new Insets(5, 0, 2, 0);
                 panel.add(label, gbc);
-                
+
                 Enumeration<InetAddress> addresses = ni.getInetAddresses();
                 gbc.insets = new Insets(0, 6, 0, 0);
-                while(addresses.hasMoreElements()) {
+                while (addresses.hasMoreElements()) {
                     InetAddress address = addresses.nextElement();
                     JRadioButton button = new JRadioButton(address.getHostAddress());
                     GROUP.add(button);
-                    if(address.isAnyLocalAddress() || address.isLinkLocalAddress() || address.isLoopbackAddress()) {
+                    if (address.isAnyLocalAddress() || address.isLinkLocalAddress() || address.isLoopbackAddress()) {
                         button.setEnabled(false);
                     } else {
                         activeButtons.add(button);
                     }
-                    if(ConnectionSettings.CUSTOM_INETADRESS.getValue().equals(address.getHostAddress()))
+                    if (ConnectionSettings.CUSTOM_INETADRESS.getValue().equals(address.getHostAddress()))
                         button.setSelected(true);
                     button.putClientProperty(ADDRESS, address);
                     panel.add(button, gbc);
@@ -105,7 +107,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
             }
 
             initializeSelection();
-            
+
             gbc.weightx = 1;
             gbc.weighty = 1;
             gbc.fill = GridBagConstraints.BOTH;
@@ -116,10 +118,10 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
             JScrollPane pane = new JScrollPane(panel);
             pane.setBorder(BorderFactory.createEmptyBorder());
             add(pane);
-            
+
             // initialize
             updateButtons(CUSTOM.isSelected());
-        } catch(SocketException se) {
+        } catch (SocketException se) {
             CUSTOM.setSelected(false);
             JPanel labelPanel = new BoxPanel(BoxPanel.X_AXIS);
             labelPanel.add(new JLabel(I18n.tr("FrostWire was unable to determine which network interfaces are available on this machine. Outgoing connections will bind to any arbitrary interface.")));
@@ -130,33 +132,33 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
             add(outerPanel);
         }
     }
-    
+
     protected void updateButtons(boolean enable) {
-    	for (JRadioButton button : activeButtons) {
-    		button.setEnabled(enable);
-		}
+        for (JRadioButton button : activeButtons) {
+            button.setEnabled(enable);
+        }
     }
 
-	private void initializeSelection() {
+    private void initializeSelection() {
         // Make sure one item is selected always.
-        Enumeration<AbstractButton> buttons = GROUP.getElements();   
-        while(buttons.hasMoreElements()) {
-        	AbstractButton bt = buttons.nextElement();
-        	if(bt.isSelected())
-        		return;
+        Enumeration<AbstractButton> buttons = GROUP.getElements();
+        while (buttons.hasMoreElements()) {
+            AbstractButton bt = buttons.nextElement();
+            if (bt.isSelected())
+                return;
         }
         // Select the first one if nothing's selected.
         buttons = GROUP.getElements();
-        while(buttons.hasMoreElements()) {
-        	AbstractButton bt = buttons.nextElement();
-        	if(bt.isEnabled()) {
-        		bt.setSelected(true);
-        		return;
-        	}
+        while (buttons.hasMoreElements()) {
+            AbstractButton bt = buttons.nextElement();
+            if (bt.isEnabled()) {
+                bt.setSelected(true);
+                return;
+            }
         }
-	}
+    }
 
-	/**
+    /**
      * Applies the options currently set in this <tt>PaneItem</tt>.
      *
      * @throws IOException if the options could not be fully applied
@@ -170,10 +172,10 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
 
         ConnectionSettings.CUSTOM_NETWORK_INTERFACE.setValue(CUSTOM.isSelected());
         Enumeration<AbstractButton> buttons = GROUP.getElements();
-        while(buttons.hasMoreElements()) {
+        while (buttons.hasMoreElements()) {
             AbstractButton bt = buttons.nextElement();
-            if(bt.isSelected()) {
-                InetAddress addr = (InetAddress)bt.getClientProperty(ADDRESS);
+            if (bt.isSelected()) {
+                InetAddress addr = (InetAddress) bt.getClientProperty(ADDRESS);
                 ConnectionSettings.CUSTOM_INETADRESS.setValue(addr.getHostAddress());
             }
         }
@@ -203,22 +205,22 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
 
         return isDirty;
     }
-    
+
     public boolean isDirty() {
-        if(!ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue())
+        if (!ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue())
             return CUSTOM.isSelected();
-        
+
         String expect = ConnectionSettings.CUSTOM_INETADRESS.getValue();
         Enumeration<AbstractButton> buttons = GROUP.getElements();
-        while(buttons.hasMoreElements()) {
+        while (buttons.hasMoreElements()) {
             AbstractButton bt = buttons.nextElement();
-            if(bt.isSelected()) {
-                InetAddress addr = (InetAddress)bt.getClientProperty(ADDRESS);
-                if(addr.getHostAddress().equals(expect))
+            if (bt.isSelected()) {
+                InetAddress addr = (InetAddress) bt.getClientProperty(ADDRESS);
+                if (addr.getHostAddress().equals(expect))
                     return false;
             }
         }
-        
+
         return true;
     }
 
