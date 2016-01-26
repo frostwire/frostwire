@@ -18,6 +18,8 @@
 
 package com.frostwire.platform;
 
+import java.io.File;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -41,5 +43,32 @@ public final class Platforms {
             throw new IllegalArgumentException("Platform can't be set to null");
         }
         platform = p;
+    }
+
+    /**
+     * Shortcut to current platform file system data method.
+     *
+     * @return
+     */
+    public static File data() {
+        return get().systemPaths().data();
+    }
+
+    /**
+     * Shortcut to current platform file system torrents method.
+     *
+     * @return
+     */
+    public static File torrents() {
+        return get().systemPaths().torrents();
+    }
+
+    /**
+     * Shortcut to current platform file system temp method.
+     *
+     * @return
+     */
+    public static File temp() {
+        return get().systemPaths().temp();
     }
 }
