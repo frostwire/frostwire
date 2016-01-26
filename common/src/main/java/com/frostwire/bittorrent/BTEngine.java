@@ -22,6 +22,8 @@ import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.torrent_handle;
+import com.frostwire.jlibtorrent.swig.torrent_handle_vector;
+import com.frostwire.jlibtorrent.swig.torrent_status;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
@@ -49,7 +51,8 @@ public final class BTEngine {
             PIECE_FINISHED.getSwig(),
             PORTMAP.getSwig(),
             PORTMAP_ERROR.getSwig(),
-            DHT_STATS.getSwig()};
+            DHT_STATS.getSwig(),
+            STORAGE_MOVED.getSwig()};
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
 
@@ -225,6 +228,31 @@ public final class BTEngine {
     public void resume() {
         if (session != null) {
             session.resume();
+        }
+    }
+
+    public void updateSavePath(File dataDir) {
+        if (session == null) {
+            return;
+        }
+
+        ctx.dataDir = dataDir; // this will be removed when we start using platform
+
+        try {
+            torrent_handle_vector v = session.getSwig().get_torrents();
+            long size = v.size();
+
+            String path = dataDir.getAbsolutePath();
+            for (int i = 0; i < size; i++) {
+                torrent_handle th = v.get(i);
+                torrent_status ts = th.status();
+                boolean incomplete = !ts.getIs_seeding() && !ts.getIs_finished();
+                if (th.is_valid() && incomplete) {
+                    th.move_storage(path);
+                }
+            }
+        } catch (Throwable e) {
+            LOG.error("Error changing save path for session", e);
         }
     }
 
@@ -667,14 +695,16 @@ public final class BTEngine {
         }
     }
 
-    private void doResumeData(TorrentAlert<?> alert) {
+    private void doResumeData(TorrentAlert<?> alert, boolean force) {
         try {
-            // TODO: I need to restore this later
-            if (ctx.optimizeMemory) {
-                return;
+            if (!force) {
+                // TODO: I need to restore this later
+                if (ctx.optimizeMemory) {
+                    return;
+                }
             }
             TorrentHandle th = session.findTorrent(alert.getHandle().getInfoHash());
-            if (th != null && th.isValid() && th.needSaveResumeData()) {
+            if (th != null && th.isValid()) {
                 th.saveResumeData();
             }
         } catch (Throwable e) {
@@ -877,11 +907,11 @@ public final class BTEngine {
                 case TORRENT_ADDED:
                     TorrentAlert<?> torrentAlert = (TorrentAlert<?>) alert;
                     fireDownloadAdded(torrentAlert);
-                    doResumeData(torrentAlert);
+                    doResumeData(torrentAlert, false);
                     runNextRestoreDownloadTask();
                     break;
                 case PIECE_FINISHED:
-                    doResumeData((TorrentAlert<?>) alert);
+                    doResumeData((TorrentAlert<?>) alert, false);
                     break;
                 case PORTMAP:
                     firewalled = false;
@@ -891,6 +921,9 @@ public final class BTEngine {
                     break;
                 case DHT_STATS:
                     totalDHTNodes = ((DhtStatsAlert) alert).totalNodes();
+                    break;
+                case STORAGE_MOVED:
+                    doResumeData((TorrentAlert<?>) alert, true);
                     break;
             }
         }

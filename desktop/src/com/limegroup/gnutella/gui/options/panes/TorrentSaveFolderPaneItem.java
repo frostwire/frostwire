@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,35 +30,33 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
 
-	public final static String TITLE = I18n.tr("Default Save Folder");
-	
-	private TorrentSaveFolderComponent COMPONENT;
+    public final static String TITLE = I18n.tr("Default Save Folder");
 
-	public TorrentSaveFolderPaneItem() {
+    private TorrentSaveFolderComponent COMPONENT;
+
+    public TorrentSaveFolderPaneItem() {
         super(TITLE, I18n.tr("Choose the folder where downloads will be saved to"));
-        
+
         COMPONENT = new TorrentSaveFolderComponent(false);
         add(COMPONENT);
-	}
+    }
 
-	@Override
-	public void initOptions() {
-		// nothing the component does it.
-	}
+    @Override
+    public void initOptions() {
+        // nothing the component does it.
+    }
 
-	@Override
-	public boolean applyOptions() throws IOException {
-		if (!COMPONENT.isTorrentSaveFolderPathValid(true)) {
-			GUIMediator.showError(TorrentSaveFolderComponent.getError());
-			throw new IOException();
-		}
+    @Override
+    public boolean applyOptions() throws IOException {
+        if (!COMPONENT.isTorrentSaveFolderPathValid(true)) {
+            GUIMediator.showError(TorrentSaveFolderComponent.getError());
+            throw new IOException();
+        }
 
         boolean dirty = isDirty();
         if (dirty) {
@@ -66,18 +64,19 @@ public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
             updateLibraryFolders(newSaveFolder);
             updateDefaultSaveFolders(newSaveFolder);
         }
-		
-		return dirty;
-	}
 
-	/**
-	 * Adds this save folder to the Library so the user can find the files he's going to save in the different sections of the Library.
-	 * If the user wants the previous save folder out of the library she'll have to remove it by hand.
-	 * @param newSaveFolder
-	 */
+        return dirty;
+    }
+
+    /**
+     * Adds this save folder to the Library so the user can find the files he's going to save in the different sections of the Library.
+     * If the user wants the previous save folder out of the library she'll have to remove it by hand.
+     *
+     * @param newSaveFolder
+     */
     private void updateLibraryFolders(final File newSaveFolder) {
         LibrarySettings.DIRECTORIES_TO_INCLUDE.add(newSaveFolder);
-        
+
         //if we don't re-init the Library Folders Pane, it will exclude this folder when options are applied.
         //so we reload it with our new folder from here.
         OptionsMediator.instance().reinitPane(OptionsConstructor.LIBRARY_KEY);
@@ -86,23 +85,11 @@ public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
     private void updateDefaultSaveFolders(File newSaveFolder) {
         SharingSettings.TORRENT_DATA_DIR_SETTING.setValue(newSaveFolder);
 
-        new Thread() {
-            @Override
-            public void run() {
-                BTEngine.getInstance().reloadBTContext(SharingSettings.TORRENTS_DIR_SETTING.getValue(),
-                        SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(),
-                        BTEngine.ctx.homeDir,
-                        BTEngine.ctx.port0,
-                        BTEngine.ctx.port1,
-                        BTEngine.ctx.iface,
-                        false, //stop
-                        false);//start
-            }
-        }.start();
+        BTEngine.getInstance().updateSavePath(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue());
     }
 
     @Override
-	public boolean isDirty() {
-		return !SharingSettings.TORRENT_DATA_DIR_SETTING.getValueAsString().equals(COMPONENT.getTorrentSaveFolderPath());
-	}
+    public boolean isDirty() {
+        return !SharingSettings.TORRENT_DATA_DIR_SETTING.getValueAsString().equals(COMPONENT.getTorrentSaveFolderPath());
+    }
 }
