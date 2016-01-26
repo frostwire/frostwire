@@ -28,7 +28,6 @@ import java.io.File;
  */
 public final class SystemPaths {
 
-    private static final String LIBTORRENT_PATH = "libtorrent";
     private static final String APP_STORAGE_PATH = "FrostWire";
     private static final String TORRENTS_PATH = "Torrents";
     private static final String TORRENT_DATA_PATH = "TorrentsData";
@@ -43,10 +42,6 @@ public final class SystemPaths {
     private static final String APPLICATION_APK_NAME = "frostwire.apk";
 
     private SystemPaths() {
-    }
-
-    public static File getLibTorrent(Context context) {
-        return new File(context.getExternalFilesDir(null), LIBTORRENT_PATH);
     }
 
     public static File getAppStorage() {
