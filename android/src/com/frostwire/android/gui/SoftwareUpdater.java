@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,10 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.Platforms;
 import com.frostwire.util.ByteUtils;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
@@ -50,10 +50,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public final class SoftwareUpdater {
 
@@ -114,8 +112,8 @@ public final class SoftwareUpdater {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
-                    final String basicOrPlus = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic":"plus";
-                    final String userAgent = "FrostWire/android-"+ basicOrPlus+"/"+Constants.FROSTWIRE_VERSION_STRING;
+                    final String basicOrPlus = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic" : "plus";
+                    final String userAgent = "FrostWire/android-" + basicOrPlus + "/" + Constants.FROSTWIRE_VERSION_STRING;
                     byte[] jsonBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).
                             getBytes(Constants.SERVER_UPDATE_URL, 5000, userAgent, null);
 
@@ -185,7 +183,6 @@ public final class SoftwareUpdater {
     }
 
     /**
-     *
      * @return true if there's an update available.
      * @throws IOException
      */
@@ -202,24 +199,24 @@ public final class SoftwareUpdater {
             if (update.a.equals(UPDATE_ACTION_OTA)) {
                 // did we download the newest already?
                 if (downloadedLatestFrostWire(update.md5)) {
-                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire("+update.md5+") -> true");
+                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> true");
                     return true;
                 }
                 // didn't download it? go get it now
                 else {
-                    File apkDirectory = SystemPaths.getSaveDirectory(Constants.FILE_TYPE_APPLICATIONS);
+                    File apkDirectory = getUpdateApk().getParentFile();
                     if (!apkDirectory.exists()) {
                         apkDirectory.mkdirs();
                     }
 
-                    LOG.info("handleOTAUpdate(): Downloading update... ("+update.md5+")");
-                    HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).save(update.u, SystemPaths.getUpdateApk());
-                    LOG.info("handleOTAUpdate(): Finished downloading update... ("+update.md5+")");
+                    LOG.info("handleOTAUpdate(): Downloading update... (" + update.md5 + ")");
+                    HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).save(update.u, getUpdateApk());
+                    LOG.info("handleOTAUpdate(): Finished downloading update... (" + update.md5 + ")");
                     if (downloadedLatestFrostWire(update.md5)) {
-                        LOG.info("handleOTAUpdate(): downloadedLatestFrostWire("+update.md5+") -> true");
+                        LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> true");
                         return true;
                     }
-                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire("+update.md5+") -> false");
+                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> false");
                 }
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
                 return update.m != null;
@@ -236,6 +233,10 @@ public final class SoftwareUpdater {
         }
     }
 
+    private File getUpdateApk() {
+        return Platforms.get().systemPaths().update();
+    }
+
     private void notifyUpdate(final Context context) {
         try {
             if (update.a == null) {
@@ -243,7 +244,7 @@ public final class SoftwareUpdater {
             }
 
             if (update.a.equals(UPDATE_ACTION_OTA)) {
-                if (!SystemPaths.getUpdateApk().exists()) {
+                if (!getUpdateApk().exists()) {
                     return;
                 }
 
@@ -257,7 +258,7 @@ public final class SoftwareUpdater {
                         new OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Engine.instance().stopServices(false);
-                                UIUtils.openFile(context, SystemPaths.getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE);
+                                UIUtils.openFile(context, getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE);
                             }
                         },
                         null, // negative listener
@@ -281,19 +282,17 @@ public final class SoftwareUpdater {
     }
 
     /**
-     * 
-     * @param md5
-     *            - Expected MD5 hash as a string.
+     * @param md5 - Expected MD5 hash as a string.
      * @return true if the latest apk was downloaded and md5 verified.
      */
     private boolean downloadedLatestFrostWire(String md5) {
-        return SystemPaths.getUpdateApk().exists() && checkMD5(SystemPaths.getUpdateApk(), md5);
+        return getUpdateApk().exists() && checkMD5(getUpdateApk(), md5);
     }
 
     /**
      * mv = my version
      * lv = latest version
-     * 
+     * <p/>
      * returns true if mv is older.
      */
     private boolean isFrostWireOld(byte[] mv, byte[] lv) {
@@ -307,12 +306,12 @@ public final class SoftwareUpdater {
         if (Constants.IS_BASIC_DEBUG) {
             myBuild += 900000;
         }
-        LOG.info("isFrostWireOld(myBuild="+myBuild+", latestBuild="+latestBuild+")");
+        LOG.info("isFrostWireOld(myBuild=" + myBuild + ", latestBuild=" + latestBuild + ")");
         boolean result;
         try {
             int latestBuildNum = Integer.parseInt(latestBuild);
             result = myBuild < latestBuildNum;
-        } catch(Throwable ignored) {
+        } catch (Throwable ignored) {
             LOG.error("isFrostWireOld() can't parse latestBuild number.", ignored);
             result = false;
         }
@@ -362,7 +361,7 @@ public final class SoftwareUpdater {
         }
 
         String checkedMD5 = getMD5(f);
-        LOG.info("checkMD5(expected="+expectedMD5+", checked="+checkedMD5+")");
+        LOG.info("checkMD5(expected=" + expectedMD5 + ", checked=" + checkedMD5 + ")");
         return checkedMD5 != null && checkedMD5.trim().equalsIgnoreCase(expectedMD5.trim());
     }
 
@@ -416,25 +415,35 @@ public final class SoftwareUpdater {
     }
 
     private static class Update {
-        /** version X.Y.Z */
+        /**
+         * version X.Y.Z
+         */
         public String v;
 
-        /** version code: Plus = 9000000 + manifest:versionCode; Basic = 8000000 + manifest:versionCode */
+        /**
+         * version code: Plus = 9000000 + manifest:versionCode; Basic = 8000000 + manifest:versionCode
+         */
         public String vc;
 
-        /** .apk download URL */
+        /**
+         * .apk download URL
+         */
         public String u;
 
-        /** .apk md5 */
+        /**
+         * .apk md5
+         */
         public String md5;
 
-        /** Address from the market */
+        /**
+         * Address from the market
+         */
         public String m;
 
         /**
          * Action for the update message
          * - "ota" is download from 'u' (a regular http)
-         * - "market" go to market page 
+         * - "market" go to market page
          */
         public String a;
 

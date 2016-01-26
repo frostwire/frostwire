@@ -37,6 +37,7 @@ final class AndroidPaths implements SystemPaths {
     private static final String TEMP_PATH = "temp";
     private static final String LIBTORRENT_PATH = "libtorrent";
 
+    private static final String UPDATE_APK_NAME = "frostwire.apk";
 
     private final Application app;
 
@@ -66,7 +67,7 @@ final class AndroidPaths implements SystemPaths {
 
     @Override
     public File update() {
-        return null;
+        return new File(app.getExternalFilesDir(null), UPDATE_APK_NAME);
     }
 
     private static File storage() {
