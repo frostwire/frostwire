@@ -20,10 +20,7 @@ package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
-import com.frostwire.jlibtorrent.swig.entry;
-import com.frostwire.jlibtorrent.swig.torrent_handle;
-import com.frostwire.jlibtorrent.swig.torrent_handle_vector;
-import com.frostwire.jlibtorrent.swig.torrent_status;
+import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
@@ -1056,6 +1053,22 @@ public final class BTEngine {
         settingsPack.setMaxPeerlistSize(limit);
         session.applySettings(settingsPack);
         saveSettings(settingsPack);
+    }
+
+    public String getListenInterfaces() {
+        if (session == null) {
+            return null;
+        }
+        return session.getSettingsPack().getString(settings_pack.string_types.listen_interfaces.swigValue());
+    }
+
+    public void setListenInterfaces(String value) {
+        if (session == null) {
+            return;
+        }
+        SettingsPack sp = new SettingsPack();
+        sp.setString(settings_pack.string_types.listen_interfaces.swigValue(), value);
+        saveSettings(sp);
     }
 
     public int getTotalDHTNodes() {
