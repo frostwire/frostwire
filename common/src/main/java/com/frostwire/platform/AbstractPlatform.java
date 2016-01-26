@@ -28,22 +28,23 @@ public abstract class AbstractPlatform implements Platform {
     private final SystemPaths systemPaths;
 
     public AbstractPlatform(FileSystem fileSystem, SystemPaths systemPaths) {
+        if (fileSystem == null) {
+            throw new IllegalArgumentException("FileSystem can't be null");
+        }
+        if (systemPaths == null) {
+            throw new IllegalArgumentException("SystemPaths can't be null");
+        }
+
         this.fileSystem = fileSystem;
         this.systemPaths = systemPaths;
     }
 
     public FileSystem fileSystem() {
-        if (fileSystem == null) {
-            throw new IllegalStateException("FileSystem can't be null");
-        }
         return fileSystem;
     }
 
     @Override
     public SystemPaths systemPaths() {
-        if (systemPaths == null) {
-            throw new IllegalStateException("System paths can't be null");
-        }
         return systemPaths;
     }
 
