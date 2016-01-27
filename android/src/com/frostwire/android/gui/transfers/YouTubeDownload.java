@@ -369,7 +369,8 @@ public final class YouTubeDownload implements DownloadTransfer {
         if (completeFile.renameTo(finalFile)) {
             completeFile = finalFile;
             Librarian.instance().scan(getSavePath().getAbsoluteFile());
-            Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, null);
+            String hash = String.valueOf(getDisplayName().hashCode());
+            Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, hash);
         } else {
             Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
         }
@@ -394,7 +395,8 @@ public final class YouTubeDownload implements DownloadTransfer {
                         completeFile.delete();
                         completeFile = finalFile;
                         Librarian.instance().scan(getSavePath().getAbsoluteFile());
-                        Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, null);
+                        String hash = String.valueOf(getDisplayName().hashCode());
+                        Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, hash);
                     } else {
                         YouTubeDownload.this.status = STATUS_ERROR;
                     }

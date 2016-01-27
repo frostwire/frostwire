@@ -184,7 +184,8 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
         moveFile(download.getSavePath());
         Librarian.instance().scan(getSavePath().getAbsoluteFile());
         File savedFile = getSavePath(); //the update path after the file was moved.
-        Engine.instance().notifyDownloadFinished(getDisplayName(), savedFile, null);
+        String hash = String.valueOf(getDisplayName().hashCode());
+        Engine.instance().notifyDownloadFinished(getDisplayName(), savedFile, hash);
     }
 
     private void safComplete(final FileSystem fs, final File file) {
@@ -202,7 +203,8 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
                     }
 
                     Librarian.instance().scan(finalFile.getAbsoluteFile());
-                    Engine.instance().notifyDownloadFinished(getDisplayName(), finalFile, null);
+                    String hash = String.valueOf(getDisplayName().hashCode());
+                    Engine.instance().notifyDownloadFinished(getDisplayName(), finalFile, hash);
 
                     file.delete();
                 } catch (Throwable e) {
