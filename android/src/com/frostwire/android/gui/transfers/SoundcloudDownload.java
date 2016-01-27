@@ -155,7 +155,7 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
         try {
             final HttpDownloadLink link = buildDownloadLink();
             if (link != null) {
-                delegate = new HttpDownload(manager, SystemPaths.getTemp(), link);
+                delegate = new HttpDownload(manager, Platforms.temp(), link);
                 delegate.setListener(new HttpDownloadListener() {
                     @Override
                     public void onComplete(HttpDownload download) {
@@ -163,7 +163,7 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
 
                         FileSystem fs = Platforms.get().fileSystem();
                         if (fs instanceof LollipopFileSystem) {
-                            Uri uri = ((LollipopFileSystem) fs).getDocumentUri(SystemPaths.getTorrentData());
+                            Uri uri = ((LollipopFileSystem) fs).getDocumentUri(Platforms.data());
                             if (uri != null) {
                                 safComplete(fs, download.getSavePath());
                             } else {
@@ -193,7 +193,7 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
             @Override
             public void run() {
                 try {
-                    File finalFile = new File(SystemPaths.getTorrentData(), file.getName());
+                    File finalFile = new File(Platforms.data(), file.getName());
                     if (fs.copy(file, finalFile)) {
                         SoundcloudDownload.this.savePath = finalFile;
                     } else {
@@ -225,11 +225,12 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
     }
 
     private void moveFile(File savePath) {
-        if (!YouTubeDownload.ensureDirectoryExits(SystemPaths.getTorrentData())) {
+        File dataDir = Platforms.data();
+        if (!YouTubeDownload.ensureDirectoryExits(dataDir)) {
             // error
             return;
         }
-        File finalFile = YouTubeDownload.buildFile(SystemPaths.getTorrentData(), savePath.getName());
+        File finalFile = YouTubeDownload.buildFile(dataDir, savePath.getName());
         if (savePath.renameTo(finalFile)) {
             this.savePath = finalFile;
         } else {

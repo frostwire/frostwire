@@ -36,6 +36,7 @@ import com.frostwire.android.core.providers.TableFetcher;
 import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.transfers.Transfers;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.platform.Platforms;
 import com.frostwire.util.DirectoryUtils;
 import com.frostwire.util.StringUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -251,7 +252,7 @@ public final class Librarian {
         syncMediaStore(Constants.FILE_TYPE_RINGTONES, ignorableFiles);
         syncMediaStore(Constants.FILE_TYPE_DOCUMENTS, ignorableFiles);
 
-        scan(SystemPaths.getTorrents());
+        scan(Platforms.torrents());
     }
 
     private void syncMediaStore(byte fileType, Set<File> ignorableFiles) {
@@ -263,7 +264,7 @@ public final class Librarian {
             ContentResolver cr = context.getContentResolver();
 
             String where = MediaColumns.DATA + " LIKE ?";
-            String[] whereArgs = new String[]{SystemPaths.getAppStorage().getAbsolutePath() + "%"};
+            String[] whereArgs = new String[]{Platforms.data() + "%"};
 
             c = cr.query(fetcher.getContentUri(), new String[]{MediaColumns._ID, MediaColumns.DATA}, where, whereArgs, null);
             if (c == null) {

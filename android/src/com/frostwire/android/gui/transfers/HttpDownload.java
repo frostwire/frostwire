@@ -80,7 +80,7 @@ public final class HttpDownload implements DownloadTransfer {
         this.link = link;
         this.dateCreated = new Date();
 
-        this.tempPath = new File(SystemPaths.getTemp(), link.getFileName());
+        this.tempPath = new File(Platforms.temp(), link.getFileName());
         this.savePath = new File(savePath, link.getFileName());
         this.status = STATUS_DOWNLOADING;
 
@@ -94,7 +94,7 @@ public final class HttpDownload implements DownloadTransfer {
     }
 
     HttpDownload(TransferManager manager, HttpDownloadLink link) {
-        this(manager, SystemPaths.getTorrentData(), link);
+        this(manager, Platforms.data(), link);
     }
 
     public HttpDownloadListener getListener() {

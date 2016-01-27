@@ -119,8 +119,8 @@ public class StoragePreference extends DialogPreference {
         if (dialog != null && dialog.equals(confirmDlg)) {
             if (which == Dialog.BUTTON_POSITIVE && selectedPath != null) {
                 ConfigurationManager.instance().setStoragePath(selectedPath);
-                BTEngine.ctx.dataDir = SystemPaths.getTorrentData();
-                BTEngine.ctx.torrentsDir = SystemPaths.getTorrents();
+                BTEngine.ctx.dataDir = Platforms.data();
+                BTEngine.ctx.torrentsDir = Platforms.torrents();
                 dismissPreferenceDialog();
                 uxLogSelection();
             }
@@ -168,8 +168,8 @@ public class StoragePreference extends DialogPreference {
         final String selectedPath = StoragePicker.handle(context, requestCode, resultCode, data);
         if (selectedPath != null) {
             ConfigurationManager.instance().setStoragePath(selectedPath);
-            BTEngine.ctx.dataDir = SystemPaths.getTorrentData();
-            BTEngine.ctx.torrentsDir = SystemPaths.getTorrents();
+            BTEngine.ctx.dataDir = Platforms.data();
+            BTEngine.ctx.torrentsDir = Platforms.torrents();
         }
         return selectedPath;
     }

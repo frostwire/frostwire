@@ -92,9 +92,10 @@ public final class YouTubeDownload implements DownloadTransfer {
 
         String filename = sr.getFilename();
 
-        File savePath = SystemPaths.getTemp();
+        File tempDir = Platforms.temp();
+        File savePath = tempDir;
 
-        if (!ensureDirectoryExits(SystemPaths.getTemp())) {
+        if (!ensureDirectoryExits(tempDir)) {
             this.status = STATUS_SAVE_DIR_ERROR;
         }
 
@@ -137,7 +138,7 @@ public final class YouTubeDownload implements DownloadTransfer {
     }
 
     private static File buildTempFile(String name, String ext) {
-        return new File(SystemPaths.getTemp(), name + "." + ext);
+        return new File(Platforms.temp(), name + "." + ext);
     }
 
     private DownloadType buildDownloadType(YouTubeCrawledSearchResult sr) {
@@ -339,7 +340,7 @@ public final class YouTubeDownload implements DownloadTransfer {
 
         FileSystem fs = Platforms.get().fileSystem();
         if (fs instanceof LollipopFileSystem) {
-            Uri uri = ((LollipopFileSystem) fs).getDocumentUri(SystemPaths.getTorrentData());
+            Uri uri = ((LollipopFileSystem) fs).getDocumentUri(Platforms.data());
             if (uri != null) {
                 safComplete(fs);
             } else {
@@ -357,13 +358,14 @@ public final class YouTubeDownload implements DownloadTransfer {
             return;
         }
 
-        if (!ensureDirectoryExits(SystemPaths.getTorrentData())) {
+        File dataDir = Platforms.data();
+        if (!ensureDirectoryExits(dataDir)) {
             this.status = STATUS_SAVE_DIR_ERROR;
             cleanup();
             return;
         }
 
-        File finalFile = buildFile(SystemPaths.getTorrentData(), completeFile.getName());
+        File finalFile = buildFile(dataDir, completeFile.getName());
 
         if (completeFile.renameTo(finalFile)) {
             completeFile = finalFile;
@@ -383,7 +385,7 @@ public final class YouTubeDownload implements DownloadTransfer {
             return;
         }
 
-        final File finalFile = new File(SystemPaths.getTorrentData(), completeFile.getName());
+        final File finalFile = new File(Platforms.data(), completeFile.getName());
 
         Engine.instance().getThreadPool().execute(new Runnable() {
             @Override
