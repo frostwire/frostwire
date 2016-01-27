@@ -21,7 +21,6 @@ package com.frostwire.android.gui.transfers;
 import android.net.Uri;
 import android.util.Log;
 import com.frostwire.android.LollipopFileSystem;
-import com.frostwire.android.core.SystemPaths;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.mp3.ID3Wrapper;
