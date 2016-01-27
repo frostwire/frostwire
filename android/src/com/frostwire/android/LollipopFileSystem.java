@@ -565,14 +565,16 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     private static String combineRoot(String baseFolder) {
-        SystemPaths paths = Platforms.get().systemPaths();
-        File data = paths.data();
-        String root = null;
-        if (data.getParentFile() != null) {
-            root = data.getParentFile().getAbsolutePath();
-        }
-
-        return root != null && root.startsWith(baseFolder) ? root : baseFolder;
+        return baseFolder;
+        // TODO: review this logic for configurable root
+//        SystemPaths paths = Platforms.get().systemPaths();
+//        File data = paths.data();
+//        String root = null;
+//        if (data.getParentFile() != null) {
+//            root = data.getParentFile().getAbsolutePath();
+//        }
+//
+//        return root != null && root.startsWith(baseFolder) ? root : baseFolder;
     }
 
     //------------ more tools methods
