@@ -394,6 +394,7 @@ public final class LollipopFileSystem implements FileSystem {
         String relativePath = baseFolder.length() < fullPath.length() ? fullPath.substring(baseFolder.length() + 1) : "";
 
         relativePath = relativePath.replace("/", "%2F");
+        relativePath = relativePath.replace(" ", "%20");
         String uri = "content://com.android.externalstorage.documents/tree/" + volumeId + "%3A" + relativePath;
 
         return Uri.parse(uri);
@@ -565,16 +566,14 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     private static String combineRoot(String baseFolder) {
-        return baseFolder;
-        // TODO: review this logic for configurable root
-//        SystemPaths paths = Platforms.get().systemPaths();
-//        File data = paths.data();
-//        String root = null;
-//        if (data.getParentFile() != null) {
-//            root = data.getParentFile().getAbsolutePath();
-//        }
-//
-//        return root != null && root.startsWith(baseFolder) ? root : baseFolder;
+        SystemPaths paths = Platforms.get().systemPaths();
+        File data = paths.data();
+        String root = null;
+        if (data.getParentFile() != null) {
+            root = data.getParentFile().getAbsolutePath();
+        }
+
+        return root != null && root.startsWith(baseFolder) ? root : baseFolder;
     }
 
     //------------ more tools methods

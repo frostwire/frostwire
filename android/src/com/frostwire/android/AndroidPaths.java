@@ -72,11 +72,10 @@ final class AndroidPaths implements SystemPaths {
 
     private static File storage() {
         String path = ConfigurationManager.instance().getString(Constants.PREF_KEY_STORAGE_PATH);
-        // TODO: review this logic for configurable root
-//        if (path.endsWith("/" + STORAGE_PATH)) {
-//            return new File(path);
-//        } else {
-        return new File(path, STORAGE_PATH);
-//        }
+        if (path.toLowerCase().endsWith("/" + STORAGE_PATH.toLowerCase())) {
+            return new File(path);
+        } else {
+            return new File(path, STORAGE_PATH);
+        }
     }
 }
