@@ -242,92 +242,102 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     private static DocumentFile getDirectory(Context context, File dir, boolean create) {
-        String path = dir.getAbsolutePath();
-        DocumentFile cached = CACHE.get(path);
-        if (cached != null && cached.isDirectory()) {
-            return cached;
-        }
-
-        String baseFolder = getExtSdCardFolder(context, dir);
-        if (baseFolder == null) {
-            if (create) {
-                return dir.mkdirs() ? DocumentFile.fromFile(dir) : null;
-            } else {
-                return dir.isDirectory() ? DocumentFile.fromFile(dir) : null;
+        try {
+            String path = dir.getAbsolutePath();
+            DocumentFile cached = CACHE.get(path);
+            if (cached != null && cached.isDirectory()) {
+                return cached;
             }
-        }
 
-        baseFolder = combineRoot(baseFolder);
-
-        String fullPath = dir.getAbsolutePath();
-        String relativePath = baseFolder.length() < fullPath.length() ? fullPath.substring(baseFolder.length() + 1) : "";
-
-        String[] segments = relativePath.split("/");
-
-        Uri rootUri = getDocumentUri(context, new File(baseFolder));
-        DocumentFile f = DocumentFile.fromTreeUri(context, rootUri);
-
-        for (int i = 0; i < segments.length; i++) {
-            String segment = segments[i];
-            DocumentFile child = f.findFile(segment);
-            if (child != null) {
-                f = child;
-            } else {
+            String baseFolder = getExtSdCardFolder(context, dir);
+            if (baseFolder == null) {
                 if (create) {
-                    f = f.createDirectory(segment);
-                    if (f == null) {
-                        return null;
-                    }
+                    return dir.mkdirs() ? DocumentFile.fromFile(dir) : null;
                 } else {
-                    return null;
+                    return dir.isDirectory() ? DocumentFile.fromFile(dir) : null;
                 }
             }
+
+            baseFolder = combineRoot(baseFolder);
+
+            String fullPath = dir.getAbsolutePath();
+            String relativePath = baseFolder.length() < fullPath.length() ? fullPath.substring(baseFolder.length() + 1) : "";
+
+            String[] segments = relativePath.split("/");
+
+            Uri rootUri = getDocumentUri(context, new File(baseFolder));
+            DocumentFile f = DocumentFile.fromTreeUri(context, rootUri);
+
+            for (int i = 0; i < segments.length; i++) {
+                String segment = segments[i];
+                DocumentFile child = f.findFile(segment);
+                if (child != null) {
+                    f = child;
+                } else {
+                    if (create) {
+                        f = f.createDirectory(segment);
+                        if (f == null) {
+                            return null;
+                        }
+                    } else {
+                        return null;
+                    }
+                }
+            }
+
+            f = f.isDirectory() ? f : null;
+
+            if (f != null) {
+                CACHE.put(path, f);
+            }
+
+            return f;
+        } catch (Throwable e) {
+            LOG.error("Error getting directory: " + dir, e);
+            return null;
         }
-
-        f = f.isDirectory() ? f : null;
-
-        if (f != null) {
-            CACHE.put(path, f);
-        }
-
-        return f;
     }
 
     private static DocumentFile getFile(Context context, File file, boolean create) {
-        String path = file.getAbsolutePath();
-        DocumentFile cached = CACHE.get(path);
-        if (cached != null && cached.isFile()) {
-            return cached;
-        }
+        try {
+            String path = file.getAbsolutePath();
+            DocumentFile cached = CACHE.get(path);
+            if (cached != null && cached.isFile()) {
+                return cached;
+            }
 
-        File parent = file.getParentFile();
-        if (parent == null) {
-            return DocumentFile.fromFile(file);
-        }
-        DocumentFile f = getDirectory(context, parent, create);
-        if (f != null) {
-            String name = file.getName();
-            DocumentFile child = f.findFile(name);
-            if (child != null) {
-                if (child.isFile()) {
-                    f = child;
+            File parent = file.getParentFile();
+            if (parent == null) {
+                return DocumentFile.fromFile(file);
+            }
+            DocumentFile f = getDirectory(context, parent, create);
+            if (f != null) {
+                String name = file.getName();
+                DocumentFile child = f.findFile(name);
+                if (child != null) {
+                    if (child.isFile()) {
+                        f = child;
+                    } else {
+                        f = null;
+                    }
                 } else {
-                    f = null;
-                }
-            } else {
-                if (create) {
-                    f = f.createFile("application/octet-stream", name);
-                } else {
-                    f = null;
+                    if (create) {
+                        f = f.createFile("application/octet-stream", name);
+                    } else {
+                        f = null;
+                    }
                 }
             }
-        }
 
-        if (f != null) {
-            CACHE.put(path, f);
-        }
+            if (f != null) {
+                CACHE.put(path, f);
+            }
 
-        return f;
+            return f;
+        } catch (Throwable e) {
+            LOG.error("Error getting file: " + file, e);
+            return null;
+        }
     }
 
     private static DocumentFile getDocument(Context context, File file) {
