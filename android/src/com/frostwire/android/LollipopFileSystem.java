@@ -452,6 +452,10 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     private static String getExtSdCardFolder(Context context, File file) {
+        if (file.getAbsolutePath().contains("/Android/data/")) {
+            return null;
+        }
+
         String[] extSdPaths = getExtSdCardPaths(context);
         try {
             for (int i = 0; i < extSdPaths.length; i++) {
