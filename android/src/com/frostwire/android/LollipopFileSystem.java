@@ -268,6 +268,19 @@ public final class LollipopFileSystem implements FileSystem {
             Uri rootUri = getDocumentUri(context, new File(baseFolder));
             DocumentFile f = DocumentFile.fromTreeUri(context, rootUri);
 
+            // special FrostWire case
+            if (create) {
+                if (baseFolder.endsWith("/FrostWire") && !f.exists()) {
+                    baseFolder = baseFolder.substring(0, baseFolder.length() - 10);
+                    rootUri = getDocumentUri(context, new File(baseFolder));
+                    f = DocumentFile.fromTreeUri(context, rootUri);
+                    f = f.createDirectory("FrostWire");
+                    if (f == null) {
+                        return null;
+                    }
+                }
+            }
+
             for (int i = 0; i < segments.length; i++) {
                 String segment = segments[i];
                 DocumentFile child = f.findFile(segment);
@@ -341,42 +354,47 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     private static DocumentFile getDocument(Context context, File file) {
-        String path = file.getAbsolutePath();
-        DocumentFile cached = CACHE.get(path);
-        if (cached != null) {
-            return cached;
-        }
-
-        String baseFolder = getExtSdCardFolder(context, file);
-        if (baseFolder == null) {
-            return file.exists() ? DocumentFile.fromFile(file) : null;
-        }
-
-        baseFolder = combineRoot(baseFolder);
-
-        String fullPath = file.getAbsolutePath();
-        String relativePath = baseFolder.length() < fullPath.length() ? fullPath.substring(baseFolder.length() + 1) : "";
-
-        String[] segments = relativePath.split("/");
-
-        Uri rootUri = getDocumentUri(context, new File(baseFolder));
-        DocumentFile f = DocumentFile.fromTreeUri(context, rootUri);
-
-        for (int i = 0; i < segments.length; i++) {
-            String segment = segments[i];
-            DocumentFile child = f.findFile(segment);
-            if (child != null) {
-                f = child;
-            } else {
-                return null;
+        try {
+            String path = file.getAbsolutePath();
+            DocumentFile cached = CACHE.get(path);
+            if (cached != null) {
+                return cached;
             }
-        }
 
-        if (f != null) {
-            CACHE.put(path, f);
-        }
+            String baseFolder = getExtSdCardFolder(context, file);
+            if (baseFolder == null) {
+                return file.exists() ? DocumentFile.fromFile(file) : null;
+            }
 
-        return f;
+            baseFolder = combineRoot(baseFolder);
+
+            String fullPath = file.getAbsolutePath();
+            String relativePath = baseFolder.length() < fullPath.length() ? fullPath.substring(baseFolder.length() + 1) : "";
+
+            String[] segments = relativePath.split("/");
+
+            Uri rootUri = getDocumentUri(context, new File(baseFolder));
+            DocumentFile f = DocumentFile.fromTreeUri(context, rootUri);
+
+            for (int i = 0; i < segments.length; i++) {
+                String segment = segments[i];
+                DocumentFile child = f.findFile(segment);
+                if (child != null) {
+                    f = child;
+                } else {
+                    return null;
+                }
+            }
+
+            if (f != null) {
+                CACHE.put(path, f);
+            }
+
+            return f;
+        } catch (Throwable e) {
+            LOG.error("Error getting document: " + file, e);
+            return null;
+        }
     }
 
     private static Uri getDocumentUri(Context context, File file) {
