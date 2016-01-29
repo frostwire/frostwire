@@ -120,7 +120,8 @@ public final class AndroidPlatform extends AbstractPlatform {
             DocumentFile f = fs.getDocument(new File(path));
             if (f == null) {
                 LOG.info("posix wrapper failed to stat file for: " + path);
-                return -1;
+                // this trick the posix layer to set the correct errno
+                return super.stat("/data/data/com.frostwire.android/noexists.txt", buf);
             }
 
             int S_ISDIR = f.isDirectory() ? 0040000 : 0;
