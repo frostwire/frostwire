@@ -46,6 +46,11 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> {
         super(context, layoutId);
     }
 
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).mPlaylistId;
+    }
+
     /**
      * {@inheritDoc}
      */

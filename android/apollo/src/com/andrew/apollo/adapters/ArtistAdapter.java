@@ -200,6 +200,11 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> {
         mImageFetcher.flush();
     }
 
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).mArtistId;
+    }
+
     /**
      * @param extra True to load line three and the background image, false
      *            otherwise.
