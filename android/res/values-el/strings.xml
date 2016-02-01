@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">Παρακαλώ κάνε ενημέρωση στην έκδοση v. %s</string>
     <string name="cant_open_file">Συγγνώμη, δεν ξέρω πώς να ανοίξω αυτό το αρχείο.</string>
     <string name="downloading_from_desktop">Κατεβάζω τα αρχεία από τον υπολογιστή</string>
-    <string name="share_indication_dialog_title">Πώς να ενεργοποιείς/απενεργοποιείς το μοίρασμα αρχείων</string>
-    <string name="dialog_share_indicator_text_text">Περιηγήσου στον εαυτό σου, ενεργοποίησε και απενεργοποίησε το μοίρασμα πολλαπλών αρχείων χρησιμοποιώντας τα check boxes και μετά αγγίζοντας οποιοδήποτε επιλεγμένο αρχείο.\n\nΧρησιμοποίησε το εικονίδιο του λουκέτου για να ενεργοποιήσεις ή να απενεργοποιήσεις το μοίρασμα συγκεκριμένων αρχείων.</string>
-    <string name="dialog_share_indicator_check_text">Δείξε αυτή τη βοήθεια την επόμενη φορά</string>
-    <string name="show_share_indication">Δείξε Βοήθεια Μοιράσματος</string>
     <string name="download_added_to_queue">1 αρχείο θα ξεκινήσει να κατεβαίνει</string>
     <string name="downloads_added_to_queue">%s αρχεία θα ξεκινήσουν να κατεβαίνουν</string>
     <string name="activity_downloads_title_text">Downloads</string>

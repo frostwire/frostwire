@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">Lütfen şuna güncelleyin: %s</string>
     <string name="cant_open_file">Üzgünüm, bu dosyayı nasıl açacağımı bilmiyorum.</string>
     <string name="downloading_from_desktop">Masaüstünden dosya(lar) indiriliyor</string>
-    <string name="share_indication_dialog_title">Dosyalar nasıl paylaşılır/paylaşımdan kaldırılır</string>
-    <string name="dialog_share_indicator_text_text">Kendiniz gözatın, kontrol edilen herhangi bir dosyaya kontrol kutularını kullanarak dokunun, ve çok sayıda dosyayı paylaşın veya paylaşımdan kaldırın.\n\nTekli dosyaları paylaşmak veya paylaşımdan kaldırmak için AsmaKilidi ikonlarını kullanın.</string>
-    <string name="dialog_share_indicator_check_text">Bu yardımı gelecek sefer de göster</string>
-    <string name="show_share_indication">Paylaşma Yardımını Göster</string>
     <string name="download_added_to_queue">1 dosya indirilmeye başlanacak</string>
     <string name="downloads_added_to_queue">%s dosya indirilmeye başlanacak</string>
     <string name="activity_downloads_title_text">İndirmeler</string>

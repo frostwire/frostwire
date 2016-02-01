@@ -173,10 +173,6 @@ public class ConfigurationManager {
         return getBoolean(Constants.PREF_KEY_GUI_SHOW_TRANSFERS_ON_DOWNLOAD_START);
     }
 
-    public boolean showShareIndication() {
-        return getBoolean(Constants.PREF_KEY_GUI_SHOW_SHARE_INDICATION);
-    }
-
     public void registerOnPreferenceChange(OnSharedPreferenceChangeListener listener) {
         preferences.registerOnSharedPreferenceChangeListener(listener);
     }

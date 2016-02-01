@@ -2,7 +2,7 @@
 <!--
 /*
  * Criado por Angel Leon (@gubatron), Alden Torres (aldenml)
- * Direitos Autorais (c) 2011, 2013, FrostWire(R). Todos os direitos reservados.
+ * Direitos Autorais (c) 2011-2016, FrostWire(R). Todos os direitos reservados.
  *
  * Este programa é um software gratuito: você pode redistribui-lo e/ou modifica-lo
  * sob os termos de GNU General Public License como publicado por 
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">Por favor atualize para v. %s</string>
     <string name="cant_open_file">Desculpe, não sei como abrir esse arquivo.</string>
     <string name="downloading_from_desktop">Baixando o(s) arquivo(s) da área de trabalho</string>
-    <string name="dialog_share_indicator_text_text">Procure você mesmo, Compartilhe ou Descompartilhe vários arquivos usando as caixas de seleção tocando em qualquer arquivo checado.\n\ nUse os ícones de cadeado para compartilhar ou descompartilhar arquivos individuais.</string>
-    <string name="dialog_share_indicator_check_text">Mostre essa ajuda na próxima vez</string>
-    <string name="show_share_indication">Mostre Ajuda de Compartilhar</string>
-    <string name="share_indication_dialog_title">Como compartilhar/descompartilhar arquivos</string>
     <string name="download_added_to_queue">1 arquivo irá começar a baixar</string>
     <string name="downloads_added_to_queue">%s arquivos irão começar a baixar</string>
     <string name="activity_downloads_title_text">Downloads</string>

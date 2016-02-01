@@ -91,7 +91,6 @@ public final class Constants {
 
     public static final String PREF_KEY_GUI_NICKNAME = "frostwire.prefs.gui.nickname";
     public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD = "frostwire.prefs.gui.vibrate_on_finished_download";
-    public static final String PREF_KEY_GUI_SHOW_SHARE_INDICATION = "frostwire.prefs.gui.show_share_indication";
     public static final String PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER = "frostwire.prefs.gui.last_media_type_filter";
     public static final String PREF_KEY_GUI_TOS_ACCEPTED = "frostwire.prefs.gui.tos_accepted";
     public static final String PREF_KEY_GUI_ALREADY_RATED_US_IN_MARKET = "frostwire.prefs.gui.already_rated_in_market";

@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">Opdater venligst til v. %s</string>
     <string name="cant_open_file">Desværre, ved ikke hvordan man åbner denne fil.</string>
     <string name="downloading_from_desktop">Hentning fil (er) fra desktop</string>
-    <string name="share_indication_dialog_title">Hvordan Del/ophæve delingen filer</string>
-    <string name="dialog_share_indicator_text_text">Gennemse dig selv, Del eller Ophæv deling af flere filer ved hjælp af afkrydsningsfelterne, derefter trykke nogen kontrolleret fil. \n\nBrug hængelås ikoner til dele eller ophæve delingen individuelle filer.</string>
-    <string name="dialog_share_indicator_check_text">Vis denne hjælpetekst næste gang</string>
-    <string name="show_share_indication">Vis deling hjælp</string>
     <string name="download_added_to_queue">1 fil vil begynde at downloade</string>
     <string name="downloads_added_to_queue">s filer vi begynde at downloade</string>
     <string name="activity_downloads_title_text">Downloads</string>

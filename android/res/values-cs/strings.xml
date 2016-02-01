@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">Prosím aktualizujte do v. %s</string>
     <string name="cant_open_file">Omlouváme se, ale nevím, jak tento soubor otevřít.</string>
     <string name="downloading_from_desktop">Stažení souboru(y) z desktopu</string>
-    <string name="share_indication_dialog_title">Jak Sdílet/Nesdílení souborů</string>
-    <string name="dialog_share_indicator_text_text">Prohlížet, Sdílet nebo Zrušit Sdílení více souborů pomocí zaškrtávacích políček, poté se dotknete zkontrolovane soubory. Použijte ikonu zámku pro sdílení nebo nesdílení jednotlivých souboru.</string>
-    <string name="dialog_share_indicator_check_text">Zobrazit tuto nápovědu příště</string>
-    <string name="show_share_indication">Zobrazit Nápovědu Sdílení</string>
     <string name="download_added_to_queue">1 Soubor se začne stahovat</string>
     <string name="downloads_added_to_queue">%s soubory se začnou stahovat</string>
     <string name="activity_downloads_title_text">Stažení</string>
