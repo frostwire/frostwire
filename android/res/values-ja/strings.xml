@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">v. %sにアップデートしてください</string>
     <string name="cant_open_file">申し訳ございませんが、このファイルの開き方が分かりません。</string>
     <string name="downloading_from_desktop">デスクトップからファイルをダウンロードしています</string>
-    <string name="share_indication_dialog_title">ファイルの共有/非共有の方法</string>
-    <string name="dialog_share_indicator_text_text">自分をブラウズして、チェックボックスを使用して複数ファイルを共有もしくは非共有してから、チェック済みのファイルにタッチしてください。\n\n南京錠アイコンを使用して、個人のファイルを共有もしくは非共有してください。</string>
-    <string name="dialog_share_indicator_check_text">次回このヘルプを表示する</string>
-    <string name="show_share_indication">共有ヘルプを表示する</string>
     <string name="download_added_to_queue">1つのファイルのダウンロードが始まります</string>
     <string name="downloads_added_to_queue">%sつのファイルのダウンロードが始まります</string>
     <string name="activity_downloads_title_text">ダウンロード</string>

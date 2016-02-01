@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">Bitte aktualisiere jetzt auf v. %s</string>
     <string name="cant_open_file">Sorry. Ich kann die Datei nicht öffnen.</string>
     <string name="downloading_from_desktop">Datei(n) vom Desktop herunterladen.</string>
-    <string name="share_indication_dialog_title">Anweisung zum Freigeben bzw. Sperren von Dateien</string>
-    <string name="dialog_share_indicator_text_text">Durchsuche die Dateien. Mit Hilfe der Kontrollkästchen kannst du mehrere Dateien freigeben bzw. sperren. Danach auf die abgehakten Dateien tippen.\n\nVerwende dabei das Vorhängeschloss-Symbol zur Freigabe oder zum Sperren von einzelnen Dateien.</string>
-    <string name="dialog_share_indicator_check_text">Diese Hilfe beim nächsten Mal anzeigen</string>
-    <string name="show_share_indication">Freigeben-Hilfe anzeigen</string>
     <string name="download_added_to_queue">1 Datei wird heruntergeladen</string>
     <string name="downloads_added_to_queue">%s Dateien werden heruntergeladen</string>
     <string name="activity_downloads_title_text">Downloads</string>

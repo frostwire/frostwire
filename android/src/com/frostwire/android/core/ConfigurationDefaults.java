@@ -58,7 +58,6 @@ final class ConfigurationDefaults {
 
         defaultValues.put(Constants.PREF_KEY_GUI_NICKNAME, "FrostNewbie");
         defaultValues.put(Constants.PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD, true);
-        defaultValues.put(Constants.PREF_KEY_GUI_SHOW_SHARE_INDICATION, true);
         defaultValues.put(Constants.PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER, Constants.FILE_TYPE_AUDIO);
         defaultValues.put(Constants.PREF_KEY_GUI_TOS_ACCEPTED, false);
         defaultValues.put(Constants.PREF_KEY_GUI_ALREADY_RATED_US_IN_MARKET, false);

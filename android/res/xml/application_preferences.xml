@@ -187,9 +187,6 @@
             android:key="frostwire.prefs.gui.vibrate_on_finished_download"
             android:title="@string/vibrate_on_finished_download" />
         <CheckBoxPreference
-            android:key="frostwire.prefs.gui.show_share_indication"
-            android:title="@string/show_share_indication" />
-        <CheckBoxPreference
                 android:key="frostwire.prefs.core.enable_experimental"
                 android:title="@string/enable_experimental" />
         <CheckBoxPreference

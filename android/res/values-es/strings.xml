@@ -2,7 +2,7 @@
 <!--
 /* 
  * Creado por Angel Leon (@gubatron), Alden Torres (aldenml) 
- * Derechos de Autor (c) 2011, 2013, FrostWire(R). Todos los derechos reservados. 
+ * Derechos de Autor (c) 2011-2016, FrostWire(R). Todos los derechos reservados.
  * 
  * Este programa es gratuito: puedes distribuirlo y/o modificarlo 
  * bajo los términos de la Licencia General Pública de GNU tal y como lo publica 
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">Por favor, actualizalo a v. %s</string>
     <string name="cant_open_file">Lo siento, no sé como abrir este archivo.</string>
     <string name="downloading_from_desktop">Descargando archivo(s) del escritorio</string>
-    <string name="share_indication_dialog_title">Como Compartir/Dejar de Compartir Archivos</string>
-    <string name="dialog_share_indicator_text_text">Explóralo tú mismo, Compartir o Dejar de Compartir múltiples archivos usando las casillas y tocando un archivo marcado.\n\nUsa los iconos de cerradura para compartir o dejar de compartir los archivos individuales.</string>
-    <string name="dialog_share_indicator_check_text">Mostrar esta ayuda la próxima vez</string>
-    <string name="show_share_indication">Mostrar la Ayuda de Compartir</string>
     <string name="download_added_to_queue">1 archivo comenzará a descargarse</string>
     <string name="downloads_added_to_queue">%s archivos comenzarán a descargarse</string>
     <string name="activity_downloads_title_text">Descargas</string>

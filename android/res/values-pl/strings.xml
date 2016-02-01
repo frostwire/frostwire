@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">Proszę zaktualizować do w %s</string>
     <string name="cant_open_file">Przepraszam, nie wiem jak otworzyć ten plik.</string>
     <string name="downloading_from_desktop">Pobieranie pliku(ów) z pulpitu</string>
-    <string name="share_indication_dialog_title">Jak Udostępniać/Nie Udostępniać pliki</string>
-    <string name="dialog_share_indicator_text_text">Przejrzyj, Udostępniaj lub Nie Udostępniaj wiele plików, za pomocą pól wyboru, następnie dotknij zaznaczone pliki. \n\nUżyj ikony kłódki, aby udostępniać lub nie udostępniać indywidualne pliki.</string>
-    <string name="dialog_share_indicator_check_text">Pokaż tę pomoc następnym razem</string>
-    <string name="show_share_indication">Pokaż Pomoc Udostępniania</string>
     <string name="download_added_to_queue">1 plik - pobieranie rozpoczęte</string>
     <string name="downloads_added_to_queue">%s pliki - pobieranie rozpoczęte</string>
     <string name="activity_downloads_title_text">Pobierane</string>
