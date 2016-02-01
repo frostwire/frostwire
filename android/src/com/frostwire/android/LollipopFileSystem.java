@@ -488,7 +488,10 @@ public final class LollipopFileSystem implements FileSystem {
                 }
             }
         }
-        if (paths.isEmpty()) paths.add("/storage/sdcard1");
+        // special hard coded paths
+        paths.add("/storage/sdcard1");
+        paths.add("/storage/ext_sd");
+
         return paths.toArray(new String[0]);
     }
 
