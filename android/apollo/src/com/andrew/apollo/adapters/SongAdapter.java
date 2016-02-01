@@ -23,6 +23,7 @@ import com.andrew.apollo.ui.MusicHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.QueueFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.util.Ref;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the songs on a user's
@@ -31,33 +32,15 @@ import com.andrew.apollo.utils.MusicUtils;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class SongAdapter extends ArrayAdapter<Song> {
+public class SongAdapter extends ApolloFragmentAdapter<Song> {
 
     /**
      * Number of views (TextView)
      */
     private static final int VIEW_TYPE_COUNT = 1;
 
-    /**
-     * The resource Id of the layout to inflate
-     */
-    private final int mLayoutId;
-
-    /**
-     * Used to cache the song info
-     */
-    private DataHolder[] mData;
-
-    /**
-     * Constructor of <code>SongAdapter</code>
-     * 
-     * @param context The {@link Context} to use.
-     * @param layoutId The resource Id of the view to inflate.
-     */
-    public SongAdapter(final Context context, final int layoutId) {
-        super(context, 0);
-        // Get the layout Id
-        mLayoutId = layoutId;
+    public SongAdapter(Context context, int mLayoutId) {
+        super(context, mLayoutId);
     }
 
     /**
@@ -66,15 +49,9 @@ public class SongAdapter extends ArrayAdapter<Song> {
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
-            // Hide the third line of text
+        MusicHolder holder = prepareMusicHolder(mLayoutId, getContext(), convertView, parent);
+        if (holder != null && Ref.alive(holder.mLineThree)) {
             holder.mLineThree.get().setVisibility(View.GONE);
-            convertView.setTag(holder);
-        } else {
-            holder = (MusicHolder)convertView.getTag();
         }
 
         // Retrieve the data holder
@@ -146,6 +123,11 @@ public class SongAdapter extends ArrayAdapter<Song> {
     public void unload() {
         clear();
         mData = null;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).mSongId;
     }
 
 }

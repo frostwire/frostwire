@@ -14,6 +14,7 @@ package com.andrew.apollo.ui.fragments.profile;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
+import android.view.ContextMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import com.andrew.apollo.adapters.ProfileSongAdapter;
@@ -35,34 +36,10 @@ import java.util.List;
 public class FavoriteFragment extends ProfileFragment<ProfileSongAdapter, Song> {
 
     /**
-     * Used to keep context menu items from bleeding into other fragments
-     */
-    private static final int GROUP_ID = 6;
-
-    /**
-     * LoaderCallbacks identifier
-     */
-    private static final int LOADER = 0;
-
-    /**
      * Empty constructor as per the {@link Fragment} documentation
      */
     public FavoriteFragment() {
-        super(6, 0);
-    }
-
-    @Override
-    public boolean onContextItemSelected(final android.view.MenuItem item) {
-        if (!super.onContextItemSelected(item) && item.getGroupId() == GROUP_ID) {
-            switch (item.getItemId()) {
-                case FragmentMenuItems.REMOVE_FROM_FAVORITES:
-                    onRemoveFromFavorites();
-                    return true;
-                default:
-                    break;
-            }
-        }
-        return super.onContextItemSelected(item);
+        super(FAVORITE_FRAGMENT_GROUP_ID, FAVORITE_FRAGMENT_LOADER_ID);
     }
 
     @Override
@@ -91,10 +68,9 @@ public class FavoriteFragment extends ProfileFragment<ProfileSongAdapter, Song> 
         return new FavoritesLoader(getActivity());
     }
 
-    private void onRemoveFromFavorites() {
-        mAdapter.remove(mItem);
-        mAdapter.notifyDataSetChanged();
-        FavoritesStore.getInstance(getActivity()).removeItem(mSelectedId);
-        getLoaderManager().restartLoader(LOADER, null, this);
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.removeItem(FragmentMenuItems.ADD_TO_FAVORITES);
     }
 }

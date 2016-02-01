@@ -18,9 +18,19 @@
 
 package com.andrew.apollo.adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import com.andrew.apollo.cache.ImageFetcher;
+import com.andrew.apollo.model.Album;
+import com.andrew.apollo.ui.MusicHolder;
+import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.Lists;
+import com.andrew.apollo.utils.MusicUtils;
 
 import java.util.List;
 
@@ -33,20 +43,48 @@ import java.util.List;
 public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
 
     /**
+     * The resource Id of the layout to inflate
+     */
+    protected final int mLayoutId;
+
+    /**
      * Used to set the size of the data in the adapter
      */
     protected List<I> mCount = Lists.newArrayList();
 
-    public ApolloFragmentAdapter(Context context, int i) {
-        super(context, i);
+    /**
+     * Image cache and image fetcher
+     */
+    protected final ImageFetcher mImageFetcher;
+
+    /**
+     * Used to cache the album info
+     */
+    protected MusicHolder.DataHolder[] mData;
+
+    public ApolloFragmentAdapter(Context context, int mLayoutId) {
+        super(context, 0);
+        this.mLayoutId = mLayoutId;
+        if (context instanceof Activity) {
+            mImageFetcher = ApolloUtils.getImageFetcher((Activity) context);
+        } else {
+            mImageFetcher = null;
+        }
     }
 
     /**
      * Method that unloads and clears the items in the adapter
      */
     public void unload() {
+        mData = null;
         mCount.clear();
         clear();
+    }
+
+    public void flush() {
+        if (mImageFetcher != null) {
+            mImageFetcher.flush();
+        }
     }
 
     /**
@@ -54,5 +92,74 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      */
     public void setCount(final List<I> data) {
         mCount = data;
+    }
+
+    public abstract long getItemId(int position);
+
+    /**
+     * Starts playing an album if the user touches the artwork in the list.
+     *
+     * @param album The {@link ImageView} holding the album
+     * @param position The position of the album to play.
+     */
+    protected void playAlbum(final ImageView album, final int position) {
+        if (album != null) {
+            album.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    final long id = getItemId(position);
+                    final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
+                    MusicUtils.playAll(getContext(), list, 0, false);
+                }
+            });
+        }
+    }
+
+    public static MusicHolder prepareMusicHolder(int mLayoutId, Context context, View convertView, final ViewGroup parent) {
+        MusicHolder holder;
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(mLayoutId, parent, false);
+            holder = new MusicHolder(convertView);
+            convertView.setTag(holder);
+        } else {
+            holder = (MusicHolder)convertView.getTag();
+        }
+        return holder;
+    }
+
+    /**
+     * @param pause True to temporarily pause the disk cache, false otherwise.
+     */
+    public void setPauseDiskCache(final boolean pause) {
+        if (mImageFetcher != null) {
+            mImageFetcher.setPauseDiskCache(pause);
+        }
+    }
+
+    /**
+     * @param album The key used to find the cached album to remove
+     */
+    public void removeFromCache(final Album album) {
+        if (mImageFetcher != null) {
+            mImageFetcher.removeFromCache(
+                    ImageFetcher.generateAlbumCacheKey(album.mAlbumName, album.mArtistName));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasStableIds() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getCount() {
+        final int size = mCount.size();
+        return size == 0 ? 0 : size + 1;
     }
 }

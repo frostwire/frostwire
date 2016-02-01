@@ -23,6 +23,7 @@ import com.andrew.apollo.model.Genre;
 import com.andrew.apollo.ui.MusicHolder;
 import com.andrew.apollo.ui.MusicHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.GenreFragment;
+import com.frostwire.util.Ref;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the genres on a user's
@@ -30,33 +31,20 @@ import com.andrew.apollo.ui.fragments.GenreFragment;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class GenreAdapter extends ArrayAdapter<Genre> {
+public class GenreAdapter extends ApolloFragmentAdapter<Genre> {
 
     /**
      * Number of views (TextView)
      */
     private static final int VIEW_TYPE_COUNT = 1;
 
-    /**
-     * The resource Id of the layout to inflate
-     */
-    private final int mLayoutId;
-
-    /**
-     * Used to cache the genre info
-     */
-    private DataHolder[] mData;
-
-    /**
-     * Constructor of <code>GenreAdapter</code>
-     * 
-     * @param context The {@link Context} to use.
-     * @param layoutId The resource Id of the view to inflate.
-     */
     public GenreAdapter(final Context context, final int layoutId) {
-        super(context, 0);
-        // Get the layout Id
-        mLayoutId = layoutId;
+        super(context, layoutId);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).mGenreId;
     }
 
     /**
@@ -65,26 +53,28 @@ public class GenreAdapter extends ArrayAdapter<Genre> {
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
-            // Hide the second and third lines of text
-            holder.mLineTwo.get().setVisibility(View.GONE);
-            holder.mLineThree.get().setVisibility(View.GONE);
-            // Make line one slightly larger
-            holder.mLineOne.get().setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    getContext().getResources().getDimension(R.dimen.text_size_large));
-            convertView.setTag(holder);
-        } else {
-            holder = (MusicHolder)convertView.getTag();
+        MusicHolder holder = prepareMusicHolder(mLayoutId, getContext(), convertView, parent);
+        if (holder != null) {
+            if (Ref.alive(holder.mLineTwo)) {
+                holder.mLineTwo.get().setVisibility(View.GONE);
+            }
+            if (Ref.alive(holder.mLineThree)) {
+                holder.mLineThree.get().setVisibility(View.GONE);
+            }
+            if (Ref.alive(holder.mLineOne)) {
+                // Make line one slightly larger
+                holder.mLineOne.get().setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        getContext().getResources().getDimension(R.dimen.text_size_large));
+            }
         }
 
         // Retrieve the data holder
         final DataHolder dataHolder = mData[position];
 
         // Set each genre name (line one)
-        holder.mLineOne.get().setText(dataHolder.mLineOne);
+        if (holder != null && Ref.alive(holder.mLineOne)) {
+            holder.mLineOne.get().setText(dataHolder.mLineOne);
+        }
         return convertView;
     }
 
@@ -123,13 +113,4 @@ public class GenreAdapter extends ArrayAdapter<Genre> {
             mData[i].mLineOne = genre.mGenreName;
         }
     }
-
-    /**
-     * Method that unloads and clears the items in the adapter
-     */
-    public void unload() {
-        clear();
-        mData = null;
-    }
-
 }

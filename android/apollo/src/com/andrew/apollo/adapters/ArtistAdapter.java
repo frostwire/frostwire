@@ -13,20 +13,17 @@ package com.andrew.apollo.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.Artist;
 import com.andrew.apollo.ui.MusicHolder;
 import com.andrew.apollo.ui.MusicHolder.DataHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.R;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the artists on a user's
@@ -37,17 +34,12 @@ import com.andrew.apollo.utils.MusicUtils;
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class ArtistAdapter extends ArrayAdapter<Artist> {
+public class ArtistAdapter extends ApolloFragmentAdapter<Artist> {
 
     /**
      * Number of views (ImageView and TextView)
      */
     private static final int VIEW_TYPE_COUNT = 2;
-
-    /**
-     * The resource Id of the layout to inflate
-     */
-    private final int mLayoutId;
 
     /**
      * Image cache and image fetcher
@@ -76,9 +68,7 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
      * @param layoutId The resource Id of the view to inflate.
      */
     public ArtistAdapter(final Activity context, final int layoutId) {
-        super(context, 0);
-        // Get the layout Id
-        mLayoutId = layoutId;
+        super(context, layoutId);
         // Initialize the cache & image fetcher
         mImageFetcher = ApolloUtils.getImageFetcher(context);
         // Cache the transparent overlay
@@ -91,14 +81,7 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
-            convertView.setTag(holder);
-        } else {
-            holder = (MusicHolder)convertView.getTag();
-        }
+        MusicHolder holder = prepareMusicHolder(mLayoutId, getContext(), convertView, parent);
 
         // Retrieve the data holder
         final DataHolder dataHolder = mData[position];
@@ -187,6 +170,7 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
      * Method that unloads and clears the items in the adapter
      */
     public void unload() {
+        super.unload();
         clear();
         mData = null;
     }

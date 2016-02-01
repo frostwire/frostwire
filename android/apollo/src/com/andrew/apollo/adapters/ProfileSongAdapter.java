@@ -40,6 +40,7 @@ import java.util.List;
  * {@link GenreSongFragment},{@link FavoriteFragment},{@link LastAddedFragment}.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
 public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
 
@@ -139,7 +140,6 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
      */
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
-
         // Return a faux header at position 0
         if (position == 0) {
             return mHeader;

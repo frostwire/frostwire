@@ -12,40 +12,30 @@
 package com.andrew.apollo.adapters;
 
 import android.app.Activity;
-import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-
-import com.andrew.apollo.Config;
-import com.frostwire.android.R;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.ui.MusicHolder;
 import com.andrew.apollo.ui.MusicHolder.DataHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.R;
+import com.frostwire.util.Ref;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the albums on a user's
- * device for {@link RecentsFragment} and {@link AlbumsFragment}.
+ * device for RecentsFragment and AlbumsFragment.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class AlbumAdapter extends ArrayAdapter<Album> {
+public class AlbumAdapter extends ApolloFragmentAdapter<Album> {
 
     /**
      * Number of views (ImageView and TextView)
      */
     private static final int VIEW_TYPE_COUNT = 2;
-
-    /**
-     * The resource Id of the layout to inflate
-     */
-    private final int mLayoutId;
 
     /**
      * Image cache and image fetcher
@@ -69,22 +59,10 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
     private boolean mTouchPlay = false;
 
     /**
-     * Used to cache the album info
-     */
-    private DataHolder[] mData;
-
-    /**
      * Constructor of <code>AlbumAdapter</code>
-     * 
-     * @param context The {@link Context} to use.
-     * @param layoutId The resource Id of the view to inflate.
-     * @param style Determines which layout to use and therefore which items to
-     *            load.
      */
     public AlbumAdapter(final Activity context, final int layoutId) {
-        super(context, 0);
-        // Get the layout Id
-        mLayoutId = layoutId;
+        super(context, layoutId);
         // Initialize the cache & image fetcher
         mImageFetcher = ApolloUtils.getImageFetcher(context);
         // Cache the transparent overlay
@@ -97,22 +75,20 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
-            convertView.setTag(holder);
-        } else {
-            holder = (MusicHolder)convertView.getTag();
-        }
-
+        MusicHolder holder = prepareMusicHolder(mLayoutId, getContext(), convertView, parent);
         // Retrieve the data holder
         final DataHolder dataHolder = mData[position];
 
-        // Set each album name (line one)
-        holder.mLineOne.get().setText(dataHolder.mLineOne);
-        // Set the artist name (line two)
-        holder.mLineTwo.get().setText(dataHolder.mLineTwo);
+        if (holder != null) {
+            // Set each album name (line one)
+            if (Ref.alive(holder.mLineOne)) {
+                holder.mLineOne.get().setText(dataHolder.mLineOne);
+            }
+            // Set the artist name (line two)
+            if (Ref.alive(holder.mLineTwo)) {
+                holder.mLineTwo.get().setText(dataHolder.mLineTwo);
+            }
+        }
         // Asynchronously load the album images into the adapter
         mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mItemId,
                 holder.mImage.get());
@@ -174,32 +150,6 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
     }
 
     /**
-     * Starts playing an album if the user touches the artwork in the list.
-     * 
-     * @param album The {@link ImageView} holding the album
-     * @param position The position of the album to play.
-     */
-    private void playAlbum(final ImageView album, final int position) {
-        album.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(final View v) {
-                final long id = getItem(position).mAlbumId;
-                final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
-                MusicUtils.playAll(getContext(), list, 0, false);
-            }
-        });
-    }
-
-    /**
-     * Method that unloads and clears the items in the adapter
-     */
-    public void unload() {
-        clear();
-        mData = null;
-    }
-
-    /**
      * @param pause True to temporarily pause the disk cache, false otherwise.
      */
     public void setPauseDiskCache(final boolean pause) {
@@ -240,5 +190,10 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
      */
     public void setTouchPlay(final boolean play) {
         mTouchPlay = play;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).mAlbumId;
     }
 }

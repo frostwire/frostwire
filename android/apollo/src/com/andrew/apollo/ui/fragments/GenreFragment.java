@@ -17,20 +17,14 @@ import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.view.ContextMenu;
+import android.view.*;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.andrew.apollo.Config;
-import com.frostwire.android.R;
 import com.andrew.apollo.adapters.GenreAdapter;
 import com.andrew.apollo.loaders.GenreLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
@@ -38,6 +32,7 @@ import com.andrew.apollo.model.Genre;
 import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.ui.activities.ProfileActivity;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.R;
 
 import java.util.List;
 
@@ -217,7 +212,7 @@ public class GenreFragment extends Fragment implements LoaderCallbacks<List<Genr
 
         // Start fresh
         mAdapter.unload();
-        // Add the data to the adpater
+        // Add the data to the adapter
         for (final Genre genre : data) {
             mAdapter.add(genre);
         }

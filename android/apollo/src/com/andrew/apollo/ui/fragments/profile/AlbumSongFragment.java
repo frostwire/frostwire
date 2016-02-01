@@ -36,7 +36,7 @@ public class AlbumSongFragment extends ProfileFragment<ProfileSongAdapter, Song>
      * Empty constructor as per the {@link Fragment} documentation
      */
     public AlbumSongFragment() {
-        super(11,0);
+        super(ALBUM_SONG_FRAGMENT_GROUP_ID, ALBUM_SONG_FRAGMENT_LOADER_ID);
     }
 
     @Override

@@ -12,7 +12,6 @@
 package com.andrew.apollo.ui.fragments.profile;
 
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.view.View;
@@ -37,7 +36,7 @@ public class GenreSongFragment extends ProfileFragment<ProfileSongAdapter, Song>
      * Empty constructor as per the {@link Fragment} documentation
      */
     public GenreSongFragment() {
-        super(12,0);
+        super(GENRE_SONG_FRAGMENT_GROUP_ID, GENRE_SONG_FRAGMENT_LOADER_ID);
     }
 
     @Override
@@ -60,18 +59,5 @@ public class GenreSongFragment extends ProfileFragment<ProfileSongAdapter, Song>
     @Override
     public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
         return new GenreSongLoader(getActivity(), args.getLong(Config.ID));
-    }
-
-    /**
-     * Restarts the loader.
-     */
-    public void refresh() {
-        // Scroll to the stop of the list before restarting the loader.
-        // Otherwise, if the user has scrolled enough to move the header, it
-        // becomes misplaced and needs to be reset.
-        mListView.setSelection(0);
-        // Wait a moment for the preference to change.
-        SystemClock.sleep(10);
-        getLoaderManager().restartLoader(LOADER, getArguments(), this);
     }
 }

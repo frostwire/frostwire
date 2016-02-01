@@ -24,6 +24,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.*;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.andrew.apollo.adapters.ApolloFragmentAdapter;
@@ -36,6 +37,7 @@ import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.frostwire.android.R;
@@ -48,15 +50,37 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I> extends Fragment implements
+public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
+        extends Fragment implements
         LoaderManager.LoaderCallbacks<List<I>>,
         AdapterView.OnItemClickListener {
+
+    protected static int ALBUM_SONG_FRAGMENT_GROUP_ID = 0;
+    protected static int ALBUM_SONG_FRAGMENT_LOADER_ID = 0;
+
+    protected static int FAVORITE_FRAGMENT_GROUP_ID = 1;
+    protected static int FAVORITE_FRAGMENT_LOADER_ID = 1;
+
+    protected static int GENRE_SONG_FRAGMENT_GROUP_ID = 2;
+    protected static int GENRE_SONG_FRAGMENT_LOADER_ID = 2;
+
+    protected static int ARTIST_ALBUM_FRAGMENT_GROUP_ID = 3;
+    protected static int ARTIST_ALBUM_FRAGMENT_LOADER_ID = 3;
+
+    protected static int ARTIST_SONG_FRAGMENT_GROUP_ID = 4;
+    protected static int ARTIST_SONG_FRAGMENT_LOADER_ID = 4;
+
+    protected static int LAST_ADDED_FRAGMENT_GROUP_ID = 5;
+    protected static int LAST_ADDED_FRAGMENT_LOADER_ID = 5;
+
+    protected static int PLAYLIST_SONG_FRAGMENT_GROUP_ID = 6;
+    protected static int PLAYLIST_SONG_FRAGMENT_LOADER_ID = 6;
 
     private final int GROUP_ID;
     /**
      * LoaderCallbacks identifier
      */
-    protected final int LOADER;
+    protected final int LOADER_ID;
     /**
      * The list view
      */
@@ -69,18 +93,52 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I> ext
      * Represents a song/album/
      */
     protected I mItem;
+
+    /**
+     * Album song list
+     */
+    protected long[] mAlbumSongIds;
+
     /**
      * Id of a context menu item
      */
     protected long mSelectedId;
+
+    /**
+     * The Id of the playlist the song belongs to
+     */
+    protected long mPlaylistId;
+
     /**
      * Song, album, and artist name used in the context menu
      */
     protected String mSongName, mAlbumName, mArtistName;
+
     /**
      * Profile header
      */
-    private ProfileTabCarousel mProfileTabCarousel;
+    protected ProfileTabCarousel mProfileTabCarousel;
+
+    protected ViewGroup mRootView;
+
+    /**
+     * Pause disk cache access to ensure smoother scrolling
+     */
+     protected final VerticalScrollListener.ScrollableHeader mScrollableHeader = new VerticalScrollListener.ScrollableHeader() {
+        @Override
+        public void onScrollStateChanged(final AbsListView view, final int scrollState) {
+            if (mAdapter == null) {
+                return;
+            }
+            if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING
+                    || scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                mAdapter.setPauseDiskCache(true);
+            } else {
+                mAdapter.setPauseDiskCache(false);
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    };
 
     abstract T createAdapter();
 
@@ -89,7 +147,7 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I> ext
 
     protected ProfileFragment(int groupId, int loaderId) {
         this.GROUP_ID = groupId;
-        this.LOADER = loaderId;
+        this.LOADER_ID = loaderId;
     }
 
     @SuppressWarnings("deprecation")
@@ -104,9 +162,9 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I> ext
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
         // The View for the fragment's UI
-        final ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.list_base, null);
+        mRootView = (ViewGroup)inflater.inflate(R.layout.list_base, null);
         // Initialize the list
-        mListView = (ListView)rootView.findViewById(R.id.list_base);
+        mListView = (ListView) mRootView.findViewById(R.id.list_base);
         // Set the data behind the list
         mListView.setAdapter(mAdapter);
         // Release any references to the recycled Views
@@ -121,7 +179,7 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I> ext
         mListView.setVerticalScrollBarEnabled(false);
         mListView.setFastScrollEnabled(false);
         mListView.setPadding(0, 0, 0, 0);
-        return rootView;
+        return mRootView;
     }
 
     @Override
@@ -150,36 +208,48 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I> ext
         // Create a new song
         mItem = mAdapter.getItem(mSelectedPosition);
 
+        // TODO: Remove these mutable properties, parametrize the onMenuEvent handlers.
         if (mItem instanceof Song) {
             Song mSong = (Song) mItem;
             mSelectedId = mSong.mSongId;
             mSongName = mSong.mSongName;
             mAlbumName = mSong.mAlbumName;
             mArtistName = mSong.mArtistName;
+        } else if (mItem instanceof Album) {
+            Album mAlbum = (Album) mItem;
+            mSelectedId = -1;
+            mSongName = null;
+            mAlbumName = mAlbum.mAlbumName;
+            mArtistName = mAlbum.mArtistName;
+            final long[] songListForAlbum = MusicUtils.getSongListForAlbum(getActivity(), mAlbum.mAlbumId);
+            mAlbumSongIds = songListForAlbum;
         }
 
-        // Play the song
-        menu.add(GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE,
-                getString(R.string.context_menu_play_selection));
+        // Play the selected songs
+        menu.add(GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE, getString(R.string.context_menu_play_selection));
 
-        // Play the song
-        menu.add(GROUP_ID, FragmentMenuItems.PLAY_NEXT, Menu.NONE,
-                getString(R.string.context_menu_play_next));
+        // Play the next song
+        menu.add(GROUP_ID, FragmentMenuItems.PLAY_NEXT, Menu.NONE, getString(R.string.context_menu_play_next));
 
-        // Add the song to the queue
-        menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_QUEUE, Menu.NONE,
-                getString(R.string.add_to_queue));
+        // Add the song/album to the queue
+        menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_QUEUE, Menu.NONE, getString(R.string.add_to_queue));
 
-        // Add the song to a playlist
-        final SubMenu subMenu = menu.addSubMenu(GROUP_ID, FragmentMenuItems.ADD_TO_PLAYLIST,
-                Menu.NONE, R.string.add_to_playlist);
+        // Add the song to favorite's playlist
+        menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_FAVORITES, Menu.NONE, R.string.add_to_favorites);
+
+        // Add the song/album to a playlist
+        final SubMenu subMenu =
+                menu.addSubMenu(GROUP_ID, FragmentMenuItems.ADD_TO_PLAYLIST, Menu.NONE, R.string.add_to_playlist);
         MusicUtils.makePlaylistMenu(getActivity(), GROUP_ID, subMenu, true);
 
-        // Make the song a ringtone
-        menu.add(GROUP_ID, FragmentMenuItems.USE_AS_RINGTONE, Menu.NONE,
-                getString(R.string.context_menu_use_as_ringtone));
+        if (mItem instanceof Song) {
+            menu.add(GROUP_ID, FragmentMenuItems.USE_AS_RINGTONE, Menu.NONE, getString(R.string.context_menu_use_as_ringtone));
+        }
 
-        // Delete the song
+        // More by artist
+        menu.add(GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE, getString(R.string.context_menu_more_by_artist));
+
+        // Delete the album
         menu.add(GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE,
                 getString(R.string.context_menu_delete));
     }
@@ -187,65 +257,109 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I> ext
     @Override
     public boolean onContextItemSelected(final android.view.MenuItem item) {
         if (item.getGroupId() == GROUP_ID) {
+            final long[] songList = mAlbumSongIds != null ?
+                    mAlbumSongIds :
+                    new long[] { mSelectedId };
+
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
-                    MusicUtils.playAll(getActivity(), new long[] {
-                            mSelectedId
-                    }, 0, false);
+                    MusicUtils.playAll(getActivity(), songList, 0, false);
                     return true;
                 case FragmentMenuItems.PLAY_NEXT:
-                    MusicUtils.playNext(new long[] {
-                            mSelectedId
-                    });
+                    MusicUtils.playNext(songList);
                     return true;
                 case FragmentMenuItems.ADD_TO_QUEUE:
-                    MusicUtils.addToQueue(getActivity(), new long[] {
-                            mSelectedId
-                    });
+                    MusicUtils.addToQueue(getActivity(), songList);
                     return true;
                 case FragmentMenuItems.ADD_TO_FAVORITES:
-                    FavoritesStore.getInstance(getActivity()).addSongId(
-                            mSelectedId, mSongName, mAlbumName, mArtistName);
+                    onAddToFavorites();
+                    return true;
+                case FragmentMenuItems.REMOVE_FROM_FAVORITES:
+                    onRemoveFromFavorites();
                     return true;
                 case FragmentMenuItems.NEW_PLAYLIST:
-                    CreateNewPlaylist.getInstance(new long[] {
-                            mSelectedId
-                    }).show(getFragmentManager(), "CreatePlaylist");
+                    CreateNewPlaylist.getInstance(songList).show(getFragmentManager(), "CreatePlaylist");
                     return true;
                 case FragmentMenuItems.PLAYLIST_SELECTED:
-                    final long mPlaylistId = item.getIntent().getLongExtra("playlist", 0);
-                    MusicUtils.addToPlaylist(getActivity(), new long[] {
-                            mSelectedId
-                    }, mPlaylistId);
+                    final long playlistId = item.getIntent().getLongExtra("playlist", 0);
+                    MusicUtils.addToPlaylist(getActivity(), songList, playlistId);
                     return true;
                 case FragmentMenuItems.USE_AS_RINGTONE:
                     MusicUtils.setRingtone(getActivity(), mSelectedId);
                     return true;
                 case FragmentMenuItems.DELETE:
-                    String title = null;
-
-                    if (mItem instanceof Song) {
-                        title = ((Song) mItem).mSongName;
-                    } else if (mItem instanceof Album) {
-                        title = ((Album) mItem).mAlbumName;
-                    } else if (mItem instanceof Artist) {
-                        title = ((Artist) mItem).mArtistName;
-                    }
-
-                    DeleteDialog.newInstance(title, new long[] {
-                            mSelectedId
-                    }, null).setOnDeleteCallback(new DeleteDialog.DeleteDialogCallback() {
-                        @Override
-                        public void onDelete(long[] id) {
-                            refresh();
-                        }
-                    }).show(getFragmentManager(), "DeleteDialog");
+                    return onDelete(songList);
+                case FragmentMenuItems.MORE_BY_ARTIST:
+                    NavUtils.openArtistProfile(getActivity(), mArtistName);
                     return true;
+                case FragmentMenuItems.REMOVE_FROM_PLAYLIST:
+                    return onRemoveFromPlaylist();
                 default:
                     break;
             }
         }
         return super.onContextItemSelected(item);
+    }
+
+    private boolean onDelete(long[] songList) {
+        if (songList == null || songList.length == 0) {
+            return false;
+        }
+
+        String title = getResources().getString(R.string.unknown);
+
+        if (mItem instanceof Song) {
+            title = ((Song) mItem).mSongName;
+        } else if (mItem instanceof Album) {
+            title = ((Album) mItem).mAlbumName;
+        } else if (mItem instanceof Artist) {
+            title = ((Artist) mItem).mArtistName;
+        }
+
+        DeleteDialog.newInstance(title, songList, null).setOnDeleteCallback(new DeleteDialog.DeleteDialogCallback() {
+            @Override
+            public void onDelete(long[] id) {
+                refresh();
+            }
+        }).show(getFragmentManager(), "DeleteDialog");
+        return true;
+    }
+
+    private boolean onRemoveFromPlaylist() {
+        mAdapter.remove(mItem);
+        mAdapter.notifyDataSetChanged();
+        if (mItem instanceof Song) {
+            Song song = (Song) mItem;
+            MusicUtils.removeFromPlaylist(getActivity(), song.mSongId, mPlaylistId);
+            getLoaderManager().restartLoader(LOADER_ID, null, this);
+            return true;
+        }
+        return false;
+    }
+
+    private void onAddToFavorites() {
+        if (mAlbumSongIds != null) {
+            for (Long songId : mAlbumSongIds) {
+                try {
+                    final Song song = MusicUtils.getSong(getActivity(), songId);
+                    if (song != null) {
+                        FavoritesStore.getInstance(getActivity()).addSongId(songId, song.mSongName, song.mAlbumName, song.mArtistName);
+                    }
+                } catch (Throwable ignored) {
+                    ignored.printStackTrace();
+                }
+            }
+        } else if (mSelectedId != -1){
+            FavoritesStore.getInstance(getActivity()).addSongId(
+                    mSelectedId, mSongName, mAlbumName, mArtistName);
+        }
+    }
+
+    private void onRemoveFromFavorites() {
+        mAdapter.remove(mItem);
+        mAdapter.notifyDataSetChanged();
+        FavoritesStore.getInstance(getActivity()).removeItem(mSelectedId);
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     /**
@@ -259,7 +373,7 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I> ext
         // Start the loader
         final Bundle arguments = getArguments();
         if (arguments != null) {
-            getLoaderManager().initLoader(LOADER, arguments, this);
+            getLoaderManager().initLoader(LOADER_ID, arguments, this);
         }
     }
 
@@ -310,6 +424,15 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I> ext
         // becomes misplaced and needs to be reset.
         mListView.setSelection(0);
         mAdapter.notifyDataSetChanged();
-        getLoaderManager().restartLoader(LOADER, getArguments(), this);
+        getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        mAdapter.flush();
     }
 }

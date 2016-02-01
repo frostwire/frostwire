@@ -33,7 +33,7 @@ import java.util.Locale;
  */
 public class PagerAdapter extends FragmentPagerAdapter {
 
-    private final SparseArray<WeakReference<Fragment>> mFragmentArray = new SparseArray<WeakReference<Fragment>>();
+    private final SparseArray<WeakReference<Fragment>> mFragmentArray = new SparseArray<>();
 
     private final List<Holder> mHolderList = Lists.newArrayList();
 
@@ -42,7 +42,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
     private int mCurrentPage;
 
     /**
-     * Constructor of <code>PagerAdatper<code>
+     * Constructor of <code>PagerAdapter<code>
      * 
      * @param fragmentActivity The {@link Activity} of the
      *            {@link Fragment}.
@@ -95,7 +95,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
         if (mWeakFragment != null) {
             mWeakFragment.clear();
         }
-        mFragmentArray.put(position, new WeakReference<Fragment>(mFragment));
+        mFragmentArray.put(position, new WeakReference<>(mFragment));
         return mFragment;
     }
 
@@ -105,9 +105,8 @@ public class PagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(final int position) {
         final Holder mCurrentHolder = mHolderList.get(position);
-        final Fragment mFragment = Fragment.instantiate(mFragmentActivity,
+        return Fragment.instantiate(mFragmentActivity,
                 mCurrentHolder.mClassName, mCurrentHolder.mParams);
-        return mFragment;
     }
 
     /**

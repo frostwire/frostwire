@@ -17,12 +17,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.ui.MusicHolder;
 import com.andrew.apollo.ui.MusicHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
+import com.frostwire.android.R;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the playlists on a user's
@@ -30,22 +29,12 @@ import com.andrew.apollo.ui.fragments.PlaylistFragment;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class PlaylistAdapter extends ArrayAdapter<Playlist> {
+public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> {
 
     /**
      * Number of views (TextView)
      */
     private static final int VIEW_TYPE_COUNT = 1;
-
-    /**
-     * The resource Id of the layout to inflate
-     */
-    private final int mLayoutId;
-
-    /**
-     * Used to cache the playlist info
-     */
-    private DataHolder[] mData;
 
     /**
      * Constructor of <code>PlaylistAdapter</code>
@@ -54,9 +43,7 @@ public class PlaylistAdapter extends ArrayAdapter<Playlist> {
      * @param layoutId The resource Id of the view to inflate.
      */
     public PlaylistAdapter(final Context context, final int layoutId) {
-        super(context, 0);
-        // Get the layout Id
-        mLayoutId = layoutId;
+        super(context, layoutId);
     }
 
     /**
@@ -123,13 +110,4 @@ public class PlaylistAdapter extends ArrayAdapter<Playlist> {
             mData[i].mLineOne = playlist.mPlaylistName;
         }
     }
-
-    /**
-     * Method that unloads and clears the items in the adapter
-     */
-    public void unload() {
-        clear();
-        mData = null;
-    }
-
 }
