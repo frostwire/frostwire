@@ -16,32 +16,16 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
-
-import com.frostwire.android.R;
-import com.andrew.apollo.model.Album;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Used to query {@link MediaStore.Audio.Artists.Albums} and return the albums
  * for a particular artist.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
-public class ArtistAlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
-
-    /**
-     * The result
-     */
-    private final ArrayList<Album> mAlbumsList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
+public class ArtistAlbumLoader extends AlbumLoader {
 
     /**
      * The Id of the artist the albums belong to.
@@ -59,51 +43,16 @@ public class ArtistAlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
         mArtistID = artistId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Album> loadInBackground() {
-        // Create the Cursor
-        mCursor = makeArtistAlbumCursor(getContext(), mArtistID);
-        // Gather the dataS
-        if (mCursor != null && mCursor.moveToFirst()) {
-            do {
-                // Copy the album id
-                final long id = mCursor.getLong(0);
-
-                // Copy the album name
-                final String albumName = mCursor.getString(1);
-
-                // Copy the artist name
-                final String artist = mCursor.getString(2);
-
-                // Copy the number of songs
-                final int songCount = mCursor.getInt(3);
-
-                // Copy the release year
-                final String year = mCursor.getString(4);
-
-                // Create a new album
-                final Album album = new Album(id, albumName, artist, songCount, year);
-
-                // Add everything up
-                mAlbumsList.add(album);
-            } while (mCursor.moveToNext());
-        }
-        // Close the cursor
-        if (mCursor != null) {
-            mCursor.close();
-            mCursor = null;
-        }
-        return mAlbumsList;
+    public Cursor makeCursor(Context context) {
+        return makeArtistAlbumCursor(context, mArtistID);
     }
 
     /**
      * @param context The {@link Context} to use.
      * @param artistId The Id of the artist the albums belong to.
      */
-    private static final Cursor makeArtistAlbumCursor(final Context context, final Long artistId) {
+    private static Cursor makeArtistAlbumCursor(final Context context, final Long artistId) {
         if (artistId == -1) {
             // fix an error reported in Play console
             return null;

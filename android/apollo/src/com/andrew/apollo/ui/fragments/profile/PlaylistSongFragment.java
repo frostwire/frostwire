@@ -87,7 +87,7 @@ public class PlaylistSongFragment extends ProfileFragment<ProfileSongAdapter, So
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
             final long id) {
-        MusicUtils.playAllFromUserItemClick(getActivity(), mAdapter, position);
+        MusicUtils.playAllFromUserItemClick(mAdapter, position);
     }
 
     /**

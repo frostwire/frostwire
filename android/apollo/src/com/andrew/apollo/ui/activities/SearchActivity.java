@@ -36,7 +36,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -377,7 +376,7 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
             final long[] list = new long[] {
                 id
             };
-            MusicUtils.playAll(this, list, 0, false);
+            MusicUtils.playAll(list, 0, false);
         }
 
         // Close it up

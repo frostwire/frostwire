@@ -627,7 +627,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         boolean handled = false;
 
         if (uri != null && uri.toString().length() > 0) {
-            MusicUtils.playFile(this, uri);
+            MusicUtils.playFile(uri);
             handled = true;
         } else if (Playlists.CONTENT_TYPE.equals(mimeType)) {
             long id = parseIdFromIntent(intent, "playlistId", "playlist", -1);

@@ -94,13 +94,17 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
         return mSongList;
     }
 
+    public static Cursor makeCursor(final Context context) {
+        return makeSongCursor(context);
+    }
+
     /**
      * Creates the {@link Cursor} used to run the query.
      * 
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the song query.
      */
-    public static final Cursor makeSongCursor(final Context context) {
+    private static Cursor makeSongCursor(final Context context) {
         final StringBuilder mSelection = new StringBuilder();
         mSelection.append(AudioColumns.IS_MUSIC + "=1");
         mSelection.append(" AND " + AudioColumns.TITLE + " != ''"); //$NON-NLS-2$

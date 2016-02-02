@@ -22,12 +22,9 @@ import android.widget.ImageView;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.ui.MusicHolder;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.util.Ref;
-
-import java.util.List;
 
 /**
  * This {@link ArrayAdapter} is used to display the albums for a particular
@@ -63,11 +60,6 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
     private final View mHeader;
 
     /**
-     * Used to set the size of the data in the adapter
-     */
-    private List<Album> mCount = Lists.newArrayList();
-
-    /**
      * Constructor of <code>ArtistAlbumAdapter</code>
      * 
      * @param context The {@link Context} to use
@@ -77,6 +69,7 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
         super(context, layoutId);
         // Used to create the custom layout
         mInflater = LayoutInflater.from(context);
+
         // Cache the header
         mHeader = mInflater.inflate(R.layout.faux_carousel, null);
     }
@@ -153,7 +146,15 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
         if (position == 0) {
             return -1;
         }
-        return position - 1;
+
+        int realPosition = position-1;
+        if (mData != null && realPosition < mData.length) {
+            return mData[realPosition].mItemId;
+        } else if (!mDataList.isEmpty() && position < mDataList.size()) {
+            return mDataList.get(realPosition).mAlbumId;
+        }
+
+        return - 1;
     }
 
     /**
@@ -170,7 +171,7 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
                 public void onClick(final View v) {
                     final long id = getItem(position - 1).mAlbumId;
                     final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
-                    MusicUtils.playAll(getContext(), list, 0, false);
+                    MusicUtils.playAll(list, 0, false);
                 }
             });
         }

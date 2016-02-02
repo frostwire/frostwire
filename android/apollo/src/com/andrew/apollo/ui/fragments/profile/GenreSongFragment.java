@@ -50,7 +50,7 @@ public class GenreSongFragment extends ProfileFragment<ProfileSongAdapter, Song>
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
             final long id) {
-        MusicUtils.playAllFromUserItemClick(getActivity(), getAdapter(), position);
+        MusicUtils.playAllFromUserItemClick(getAdapter(), position);
     }
 
     /**

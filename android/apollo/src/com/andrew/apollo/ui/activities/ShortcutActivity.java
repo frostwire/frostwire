@@ -329,7 +329,7 @@ public class ShortcutActivity extends FragmentActivity implements ServiceConnect
         final boolean shouldOpenAudioPlayer = mIntent.getBooleanExtra(OPEN_AUDIO_PLAYER, true);
         // Play the list
         if (mList != null && mList.length > 0) {
-            MusicUtils.playAll(this, mList, 0, mShouldShuffle);
+            MusicUtils.playAll(mList, 0, mShouldShuffle);
         }
 
         // Open the now playing screen

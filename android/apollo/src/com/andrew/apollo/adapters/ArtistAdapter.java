@@ -161,7 +161,7 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> {
             public void onClick(final View v) {
                 final long id = getItem(position).mArtistId;
                 final long[] list = MusicUtils.getSongListForArtist(getContext(), id);
-                MusicUtils.playAll(getContext(), list, 0, false);
+                MusicUtils.playAll(list, 0, false);
             }
         });
     }

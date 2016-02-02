@@ -213,7 +213,7 @@ public class AlbumFragment extends Fragment implements LoaderCallbacks<List<Albu
         if (item.getGroupId() == GROUP_ID) {
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
-                    MusicUtils.playAll(getActivity(), mAlbumList, 0, false);
+                    MusicUtils.playAll(mAlbumList, 0, false);
                     return true;
                 case FragmentMenuItems.ADD_TO_QUEUE:
                     MusicUtils.addToQueue(getActivity(), mAlbumList);

@@ -50,7 +50,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     /**
      * Used to set the size of the data in the adapter
      */
-    protected List<I> mCount = Lists.newArrayList();
+    protected List<I> mDataList = Lists.newArrayList();
 
     /**
      * Image cache and image fetcher
@@ -77,7 +77,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      */
     public void unload() {
         mData = null;
-        mCount.clear();
+        mDataList.clear();
         clear();
     }
 
@@ -90,8 +90,8 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     /**
      * @param data The {@link List} used to return the count for the adapter.
      */
-    public void setCount(final List<I> data) {
-        mCount = data;
+    public void setDataList(final List<I> data) {
+        mDataList = data;
     }
 
     public abstract long getItemId(int position);
@@ -109,7 +109,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
                 public void onClick(final View v) {
                     final long id = getItemId(position);
                     final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
-                    MusicUtils.playAll(getContext(), list, 0, false);
+                    MusicUtils.playAll(list, 0, false);
                 }
             });
         }
@@ -159,7 +159,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      */
     @Override
     public int getCount() {
-        final int size = mCount.size();
+        final int size = mDataList.size();
         return size == 0 ? 0 : size + 1;
     }
 }

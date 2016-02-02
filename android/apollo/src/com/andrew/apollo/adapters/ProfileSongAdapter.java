@@ -30,6 +30,7 @@ import com.andrew.apollo.ui.fragments.profile.LastAddedFragment;
 import com.andrew.apollo.ui.fragments.profile.PlaylistSongFragment;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.logging.Logger;
 
 import java.util.List;
 
@@ -43,6 +44,8 @@ import java.util.List;
  * @author Angel Leon (gubatron@gmail.com)
  */
 public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
+
+    public static final Logger LOGGER = Logger.getLogger(ProfileSongAdapter.class);
 
     /**
      * Default display setting: title/album
@@ -160,6 +163,12 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
         // Retrieve the album
         final Song song = getItem(position - 1);
 
+        if (song == null) {
+            LOGGER.info("getItem("+position+" - 1) == null");
+        } else {
+            LOGGER.info("getItem("+position+" - 1) == " + song.mSongId);
+        }
+
         // Set each track name (line one)
         holder.mLineOne.get().setText(song.mSongName);
         // Set the line two
@@ -203,15 +212,6 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
     @Override
     public boolean hasStableIds() {
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getCount() {
-        final int size = mCount.size();
-        return size == 0 ? 0 : size + 1;
     }
 
     /**

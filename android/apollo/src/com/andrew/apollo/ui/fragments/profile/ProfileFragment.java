@@ -263,7 +263,7 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
 
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
-                    MusicUtils.playAll(getActivity(), songList, 0, false);
+                    MusicUtils.playAll(songList, 0, false);
                     return true;
                 case FragmentMenuItems.PLAY_NEXT:
                     MusicUtils.playNext(songList);
@@ -389,7 +389,7 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
     @Override
     public void onLoadFinished(final Loader<List<I>> loader, final List<I> data) {
         // Check for any errors
-        if (data.isEmpty()) {
+        if (data == null || data.isEmpty()) {
             mAdapter.unload();
             mAdapter.notifyDataSetChanged();
             return;
@@ -397,8 +397,10 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
 
         // Start fresh
         mAdapter.unload();
+
         // Return the correct count
-        mAdapter.setCount(data);
+        mAdapter.setDataList(data);
+
         // Add the data to the adapter
         for (final I item : data) {
             mAdapter.add(item);

@@ -35,7 +35,6 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.andrew.apollo.Config;
 import com.andrew.apollo.MusicStateListener;
 import com.frostwire.android.R;
 import com.andrew.apollo.adapters.AlbumAdapter;
@@ -230,7 +229,7 @@ public class RecentFragment extends Fragment implements LoaderCallbacks<List<Alb
         if (item.getGroupId() == GROUP_ID) {
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
-                    MusicUtils.playAll(getActivity(), mAlbumList, 0, false);
+                    MusicUtils.playAll(mAlbumList, 0, false);
                     return true;
                 case FragmentMenuItems.ADD_TO_QUEUE:
                     MusicUtils.addToQueue(getActivity(), mAlbumList);

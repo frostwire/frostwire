@@ -25,10 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Used to query {@link MediaStore.Audio.Media.EXTERNAL_CONTENT_URI} and return
+ * Used to query {MediaStore.Audio.Media.EXTERNAL_CONTENT_URI} and return
  * the songs for a particular artist.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
 public class ArtistSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
 

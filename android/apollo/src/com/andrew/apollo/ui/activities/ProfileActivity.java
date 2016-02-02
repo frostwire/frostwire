@@ -29,7 +29,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.widget.AdapterView;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.adapters.ProfileSongAdapter;
@@ -378,7 +377,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
                     MusicUtils.playLastAdded(this);
                 } else {
                     if (list != null && list.length > 0) {
-                        MusicUtils.playAll(this, list, 0, true);
+                        MusicUtils.playAll(list, 0, true);
                     }
                 }
                 return true;

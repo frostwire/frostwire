@@ -216,7 +216,7 @@ public class SongFragment extends Fragment implements LoaderCallbacks<List<Song>
         if (item.getGroupId() == GROUP_ID) {
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
-                    MusicUtils.playAll(getActivity(), new long[] {
+                    MusicUtils.playAll(new long[] {
                         mSelectedId
                     }, 0, false);
                     return true;
@@ -271,7 +271,7 @@ public class SongFragment extends Fragment implements LoaderCallbacks<List<Song>
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
             final long id) {
         if (mAdapter != null) {
-            MusicUtils.playAllFromUserItemClick(getActivity(), mAdapter, position);
+            MusicUtils.playAllFromUserItemClick(mAdapter, position);
         }
         notifyAdapterDataSetChanged();
     }

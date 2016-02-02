@@ -22,7 +22,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.andrew.apollo.Config;
 import com.frostwire.android.R;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.utils.ApolloUtils;
@@ -184,7 +183,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
                 public void onClick(final View v) {
                     final long[] albumList = MusicUtils.getSongListForAlbum(getContext(),
                             MusicUtils.getIdForAlbum(context, lastAlbum, artist));
-                    MusicUtils.playAll(getContext(), albumList, 0, false);
+                    MusicUtils.playAll(albumList, 0, false);
                 }
             });
         } else {
