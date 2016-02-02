@@ -704,7 +704,7 @@ public final class MusicUtils {
     public static void shuffleAll(final Context context) {
         // TODO: Check for PHONE_STATE Permissions here.
 
-        Cursor cursor = SongLoader.makeCursor(context);
+        Cursor cursor = new SongLoader(context).makeCursor(context);
         final long[] mTrackList = getSongListForCursor(cursor);
         final int position = 0;
         if (mTrackList.length == 0 || mService == null) {

@@ -57,7 +57,7 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
     @Override
     public List<Song> loadInBackground() {
         // Create the Cursor
-        mCursor = makeSongCursor(getContext());
+        mCursor = makeCursor(getContext());
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
@@ -94,7 +94,7 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
         return mSongList;
     }
 
-    public static Cursor makeCursor(final Context context) {
+    public Cursor makeCursor(final Context context) {
         return makeSongCursor(context);
     }
 

@@ -23,6 +23,7 @@ import com.andrew.apollo.loaders.ArtistAlbumLoader;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.NavUtils;
+import com.andrew.apollo.utils.PreferenceUtils;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.frostwire.android.R;
 
@@ -34,7 +35,7 @@ import java.util.List;
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (gubatron@gmail.com)
  */
-public class ArtistAlbumFragment extends ProfileFragment<ArtistAlbumAdapter, Album> {
+public class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Album> {
 
     public ArtistAlbumFragment() {
         super(Fragments.ARTIST_ALBUM_FRAGMENT_GROUP_ID,Fragments.ARTIST_ALBUM_FRAGMENT_LOADER_ID);
@@ -55,8 +56,13 @@ public class ArtistAlbumFragment extends ProfileFragment<ArtistAlbumAdapter, Alb
     }
 
     @Override
-    ArtistAlbumAdapter createAdapter() {
+    protected ArtistAlbumAdapter createAdapter() {
         return new ArtistAlbumAdapter(getActivity(), R.layout.list_item_detailed_no_background);
+    }
+
+    @Override
+    protected String getLayoutTypeName() {
+        return PreferenceUtils.SIMPLE_LAYOUT;
     }
 
     @Override

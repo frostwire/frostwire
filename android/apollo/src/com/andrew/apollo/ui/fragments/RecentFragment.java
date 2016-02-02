@@ -130,7 +130,7 @@ public class RecentFragment extends Fragment implements LoaderCallbacks<List<Alb
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int layout = R.layout.list_item_normal;
+        int layout;
         if (isSimpleLayout()) {
             layout = R.layout.list_item_normal;
         } else if (isDetailedLayout()) {

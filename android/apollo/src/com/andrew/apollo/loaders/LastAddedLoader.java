@@ -24,22 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Used to query {@link MediaStore.Audio.Media.EXTERNAL_CONTENT_URI} and return
+ * Used to query {MediaStore.Audio.Media.EXTERNAL_CONTENT_URI} and return
  * the Song the user added over the past four of weeks.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
-public class LastAddedLoader extends WrappedAsyncTaskLoader<List<Song>> {
-
-    /**
-     * The result
-     */
-    private final ArrayList<Song> mSongList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
+public class LastAddedLoader extends SongLoader {
 
     /**
      * Constructor of <code>LastAddedHandler</code>
@@ -50,54 +41,16 @@ public class LastAddedLoader extends WrappedAsyncTaskLoader<List<Song>> {
         super(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Song> loadInBackground() {
-        // Create the Cursor
-        mCursor = makeLastAddedCursor(getContext());
-        // Gather the data
-        if (mCursor != null && mCursor.moveToFirst()) {
-            do {
-                // Copy the song Id
-                final long id = mCursor.getLong(0);
-
-                // Copy the song name
-                final String songName = mCursor.getString(1);
-
-                // Copy the artist name
-                final String artist = mCursor.getString(2);
-
-                // Copy the album name
-                final String album = mCursor.getString(3);
-
-                // Copy the duration
-                final long duration = mCursor.getLong(4);
-
-                // Convert the duration into seconds
-                final int durationInSecs = (int) duration / 1000;
-
-                // Create a new song
-                final Song song = new Song(id, songName, artist, album, durationInSecs);
-
-                // Add everything up
-                mSongList.add(song);
-            } while (mCursor.moveToNext());
-        }
-        // Close the cursor
-        if (mCursor != null) {
-            mCursor.close();
-            mCursor = null;
-        }
-        return mSongList;
+    public Cursor makeCursor(Context context) {
+        return makeLastAddedCursor(getContext());
     }
 
     /**
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the song query.
      */
-    public static final Cursor makeLastAddedCursor(final Context context) {
+    public static Cursor makeLastAddedCursor(final Context context) {
         final int fourWeeks = 4 * 3600 * 24 * 7;
         final StringBuilder selection = new StringBuilder();
         selection.append(AudioColumns.IS_MUSIC + "=1");

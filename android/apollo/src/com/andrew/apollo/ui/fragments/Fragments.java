@@ -23,6 +23,9 @@ package com.andrew.apollo.ui.fragments;
  * @author aldenml
  */
 public class Fragments {
+
+    // com.andrew.apollo.ui.fragments.profile.*
+
     public static int ALBUM_SONG_FRAGMENT_GROUP_ID = 0;
     public static int ALBUM_SONG_FRAGMENT_LOADER_ID = 0;
 
@@ -43,4 +46,12 @@ public class Fragments {
 
     public static int PLAYLIST_SONG_FRAGMENT_GROUP_ID = 6;
     public static int PLAYLIST_SONG_FRAGMENT_LOADER_ID = 6;
+
+    // com.andrew.apollo.ui.fragments
+
+    public static final int ALBUM_FRAGMENT_GROUP_ID = TabFragmentOrder.ALBUMS_POSITION;
+    public static final int ALBUM_FRAGMENT_LOADER_ID = 0;
+
+    public static final int ARTIST_FRAGMENT_GROUP_ID = 2;
+    public static final int ARTIST_FRAGMENT_LOADER_ID = 0;
 }

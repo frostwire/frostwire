@@ -66,6 +66,12 @@ public final class PreferenceUtils {
     // Sets the type of layout to use for the recent list
     public static final String RECENT_LAYOUT = "recent_layout";
 
+    public static final String SIMPLE_LAYOUT = "simple";
+
+    public static final String DETAILED_LAYOUT = "detailed";
+
+    public static final String GRID_LAYOUT = "grid";
+
     // Key used to download images only on Wi-Fi
     public static final String ONLY_ON_WIFI = "only_on_wifi";
 

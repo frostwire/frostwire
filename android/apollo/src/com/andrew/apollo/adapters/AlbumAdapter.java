@@ -22,6 +22,7 @@ import com.andrew.apollo.ui.MusicHolder.DataHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 
 /**
@@ -30,7 +31,9 @@ import com.frostwire.util.Ref;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class AlbumAdapter extends ApolloFragmentAdapter<Album> {
+public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements ApolloFragmentAdapter.Cacheable {
+
+    static Logger LOGGER = Logger.getLogger(AlbumAdapter.class);
 
     /**
      * Number of views (ImageView and TextView)
@@ -194,6 +197,10 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> {
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).mAlbumId;
+        try {
+            return getItem(position).mAlbumId;
+        } catch (Throwable t) {
+            return -1;
+        }
     }
 }

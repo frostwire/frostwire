@@ -26,6 +26,7 @@ import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 
 import java.util.List;
@@ -37,7 +38,7 @@ import java.util.List;
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (gubatron@gmail.com)
  */
-public class LastAddedFragment extends ProfileFragment<ProfileSongAdapter, Song> {
+public class LastAddedFragment extends ApolloFragment<ProfileSongAdapter, Song> {
 
     /**
      * Empty constructor as per the {@link Fragment} documentation
@@ -46,7 +47,7 @@ public class LastAddedFragment extends ProfileFragment<ProfileSongAdapter, Song>
         super(Fragments.LAST_ADDED_FRAGMENT_GROUP_ID, Fragments.LAST_ADDED_FRAGMENT_LOADER_ID);
     }
 
-    ProfileSongAdapter createAdapter() {
+    protected ProfileSongAdapter createAdapter() {
         return new ProfileSongAdapter(
                 getActivity(),
                 R.layout.list_item_simple,
@@ -99,5 +100,10 @@ public class LastAddedFragment extends ProfileFragment<ProfileSongAdapter, Song>
                 mListView.setEmptyView(empty);
             }
         }
+    }
+
+    @Override
+    protected String getLayoutTypeName() {
+        return PreferenceUtils.SIMPLE_LAYOUT;
     }
 }

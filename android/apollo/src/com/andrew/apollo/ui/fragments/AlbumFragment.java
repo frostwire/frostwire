@@ -13,27 +13,14 @@ package com.andrew.apollo.ui.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.view.*;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.*;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemClickListener;
-import com.andrew.apollo.MusicStateListener;
+import android.view.View;
+import android.widget.AdapterView;
 import com.andrew.apollo.adapters.AlbumAdapter;
-import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.loaders.AlbumLoader;
-import com.andrew.apollo.menu.CreateNewPlaylist;
-import com.andrew.apollo.menu.DeleteDialog;
-import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Album;
-import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.ui.activities.BaseActivity;
-import com.andrew.apollo.utils.ApolloUtils;
+import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
@@ -42,65 +29,16 @@ import com.viewpagerindicator.TitlePageIndicator;
 
 import java.util.List;
 
-import static com.andrew.apollo.utils.PreferenceUtils.ALBUM_LAYOUT;
-
 /**
  * This class is used to display all of the albums on a user's device.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class AlbumFragment extends Fragment implements LoaderCallbacks<List<Album>>,
-        OnScrollListener, OnItemClickListener, MusicStateListener {
+public class AlbumFragment extends ApolloFragment<AlbumAdapter, Album> {
 
-    /**
-     * Used to keep context menu items from bleeding into other fragments
-     */
-    private static final int GROUP_ID = TabFragmentOrder.ALBUMS_POSITION;
-
-    /**
-     * Grid view column count. ONE - list, TWO - normal grid, FOUR - landscape
-     */
-    private static final int ONE = 1, TWO = 2, FOUR = 4;
-
-    /**
-     * LoaderCallbacks identifier
-     */
-    private static final int LOADER = 0;
-
-    /**
-     * Fragment UI
-     */
-    private ViewGroup mRootView;
-
-    /**
-     * The adapter for the grid
-     */
-    private AlbumAdapter mAdapter;
-
-    /**
-     * The grid view
-     */
-    private GridView mGridView;
-
-    /**
-     * The list view
-     */
-    private ListView mListView;
-
-    /**
-     * Album song list
-     */
-    private long[] mAlbumList;
-
-    /**
-     * Represents an album
-     */
-    private Album mAlbum;
-
-    /**
-     * True if the list should execute {@code #restartLoader()}.
-     */
-    private boolean mShouldRefresh = false;
+    public AlbumFragment() {
+        super(Fragments.ALBUM_FRAGMENT_GROUP_ID, Fragments.ALBUM_FRAGMENT_LOADER_ID);
+    }
 
     /**
      * {@inheritDoc}
@@ -112,12 +50,8 @@ public class AlbumFragment extends Fragment implements LoaderCallbacks<List<Albu
         ((BaseActivity)activity).setMusicStateListenerListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected AlbumAdapter createAdapter() {
         int layout;
         if (isSimpleLayout()) {
             layout = R.layout.list_item_normal;
@@ -126,136 +60,12 @@ public class AlbumFragment extends Fragment implements LoaderCallbacks<List<Albu
         } else {
             layout = R.layout.grid_items_normal;
         }
-        mAdapter = new AlbumAdapter(getActivity(), layout);
+        return new AlbumAdapter(getActivity(), layout);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
-        // The View for the fragment's UI
-        if (isSimpleLayout()) {
-            mRootView = (ViewGroup)inflater.inflate(R.layout.list_base, null);
-            initListView();
-        } else {
-            mRootView = (ViewGroup)inflater.inflate(R.layout.grid_base, null);
-            initGridView();
-        }
-        return mRootView;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        // Enable the options menu
-        setHasOptionsMenu(true);
-        // Start the loader
-        getLoaderManager().initLoader(LOADER, null, this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onPause() {
-        super.onPause();
-        mAdapter.flush();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onCreateContextMenu(final ContextMenu menu, final View v,
-            final ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        // Get the position of the selected item
-        final AdapterContextMenuInfo info = (AdapterContextMenuInfo)menuInfo;
-        // Create a new album
-        mAlbum = mAdapter.getItem(info.position);
-        // Create a list of the album's songs
-        mAlbumList = MusicUtils.getSongListForAlbum(getActivity(), mAlbum.mAlbumId);
-
-        // Play the album
-        menu.add(GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE,
-                getString(R.string.context_menu_play_selection));
-
-        // Add the album to the queue
-        menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_QUEUE, Menu.NONE,
-                getString(R.string.add_to_queue));
-
-        // Add the album to a playlist
-        final SubMenu subMenu = menu.addSubMenu(GROUP_ID, FragmentMenuItems.ADD_TO_PLAYLIST,
-                Menu.NONE, R.string.add_to_playlist);
-        MusicUtils.makePlaylistMenu(getActivity(), GROUP_ID, subMenu, false);
-
-        // View more content by the album artist
-        menu.add(GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE,
-                getString(R.string.context_menu_more_by_artist));
-
-        // Remove the album from the list
-        menu.add(GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE,
-                getString(R.string.context_menu_delete));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean onContextItemSelected(final MenuItem item) {
-        // Avoid leaking context menu selections
-        if (item.getGroupId() == GROUP_ID) {
-            switch (item.getItemId()) {
-                case FragmentMenuItems.PLAY_SELECTION:
-                    MusicUtils.playAll(mAlbumList, 0, false);
-                    return true;
-                case FragmentMenuItems.ADD_TO_QUEUE:
-                    MusicUtils.addToQueue(getActivity(), mAlbumList);
-                    return true;
-                case FragmentMenuItems.NEW_PLAYLIST:
-                    CreateNewPlaylist.getInstance(mAlbumList).show(getFragmentManager(),
-                            "CreatePlaylist");
-                    return true;
-                case FragmentMenuItems.MORE_BY_ARTIST:
-                    NavUtils.openArtistProfile(getActivity(), mAlbum.mArtistName);
-                    return true;
-                case FragmentMenuItems.PLAYLIST_SELECTED:
-                    final long id = item.getIntent().getLongExtra("playlist", 0);
-                    MusicUtils.addToPlaylist(getActivity(), mAlbumList, id);
-                    return true;
-                case FragmentMenuItems.DELETE:
-                    mShouldRefresh = true;
-                    final String album = mAlbum.mAlbumName;
-                    DeleteDialog.newInstance(album, mAlbumList,
-                            ImageFetcher.generateAlbumCacheKey(album,mAlbum.mArtistName))
-                            .show(getFragmentManager(), "DeleteDialog");
-                    return true;
-                default:
-                    break;
-            }
-        }
-        return super.onContextItemSelected(item);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onScrollStateChanged(final AbsListView view, final int scrollState) {
-        // Pause disk cache access to ensure smoother scrolling
-        if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING
-                || scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-            mAdapter.setPauseDiskCache(true);
-        } else {
-            mAdapter.setPauseDiskCache(false);
-            mAdapter.notifyDataSetChanged();
-        }
+    protected String getLayoutTypeName() {
+        return PreferenceUtils.ALBUM_LAYOUT;
     }
 
     /**
@@ -264,8 +74,8 @@ public class AlbumFragment extends Fragment implements LoaderCallbacks<List<Albu
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
             final long id) {
-        mAlbum = mAdapter.getItem(position);
-        NavUtils.openAlbumProfile(getActivity(), mAlbum.mAlbumName, mAlbum.mArtistName, mAlbum.mAlbumId);
+        mItem = mAdapter.getItem(position);
+        NavUtils.openAlbumProfile(getActivity(), mItem.mAlbumName, mItem.mArtistName, mItem.mAlbumId);
     }
 
     /**
@@ -274,44 +84,6 @@ public class AlbumFragment extends Fragment implements LoaderCallbacks<List<Albu
     @Override
     public Loader<List<Album>> onCreateLoader(final int id, final Bundle args) {
         return new AlbumLoader(getActivity());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onLoadFinished(final Loader<List<Album>> loader, final List<Album> data) {
-        // Check for any errors
-        if (data.isEmpty()) {
-            // Set the empty text
-            final TextView empty = (TextView)mRootView.findViewById(R.id.empty);
-            empty.setText(getString(R.string.empty_music));
-            if (isSimpleLayout()) {
-                mListView.setEmptyView(empty);
-            } else {
-                mGridView.setEmptyView(empty);
-            }
-            return;
-        }
-
-        // Start fresh
-        mAdapter.unload();
-        // Add the data to the adpater
-        for (final Album album : data) {
-            mAdapter.add(album);
-        }
-        // Build the cache
-        mAdapter.buildCache();
-        mAdapter.notifyDataSetChanged();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onLoaderReset(final Loader<List<Album>> loader) {
-        // Clear the data in the adapter
-        mAdapter.unload();
     }
 
     /**
@@ -345,109 +117,5 @@ public class AlbumFragment extends Fragment implements LoaderCallbacks<List<Albu
             }
         }
         return 0;
-    }
-
-    /**
-     * Restarts the loader.
-     */
-    public void refresh() {
-        // Wait a moment for the preference to change.
-        SystemClock.sleep(10);
-        getLoaderManager().restartLoader(LOADER, null, this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onScroll(final AbsListView view, final int firstVisibleItem,
-            final int visibleItemCount, final int totalItemCount) {
-        // Nothing to do
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void restartLoader() {
-        // Update the list when the user deletes any items
-        if (mShouldRefresh) {
-            getLoaderManager().restartLoader(LOADER, null, this);
-        }
-        mShouldRefresh = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onMetaChanged() {
-        // Nothing to do
-    }
-
-    /**
-     * Sets up various helpers for both the list and grid
-     * 
-     * @param list The list or grid
-     */
-    private void initAbsListView(final AbsListView list) {
-        // Release any references to the recycled Views
-        list.setRecyclerListener(new RecycleHolder());
-        // Listen for ContextMenus to be created
-        list.setOnCreateContextMenuListener(this);
-        // Show the albums and songs from the selected artist
-        list.setOnItemClickListener(this);
-        // To help make scrolling smooth
-        list.setOnScrollListener(this);
-    }
-
-    /**
-     * Sets up the list view
-     */
-    private void initListView() {
-        // Initialize the grid
-        mListView = (ListView)mRootView.findViewById(R.id.list_base);
-        // Set the data behind the list
-        mListView.setAdapter(mAdapter);
-        // Set up the helpers
-        initAbsListView(mListView);
-        mAdapter.setTouchPlay(true);
-    }
-
-    /**
-     * Sets up the grid view
-     */
-    private void initGridView() {
-        // Initialize the grid
-        mGridView = (GridView)mRootView.findViewById(R.id.grid_base);
-        // Set the data behind the grid
-        mGridView.setAdapter(mAdapter);
-        // Set up the helpers
-        initAbsListView(mGridView);
-        if (ApolloUtils.isLandscape(getActivity())) {
-            if (isDetailedLayout()) {
-                mAdapter.setLoadExtraData(true);
-                mGridView.setNumColumns(TWO);
-            } else {
-                mGridView.setNumColumns(FOUR);
-            }
-        } else {
-            if (isDetailedLayout()) {
-                mAdapter.setLoadExtraData(true);
-                mGridView.setNumColumns(ONE);
-            } else {
-                mGridView.setNumColumns(TWO);
-            }
-        }
-    }
-
-    private boolean isSimpleLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(ALBUM_LAYOUT,
-                getActivity());
-    }
-
-    private boolean isDetailedLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isDetailedLayout(ALBUM_LAYOUT,
-                getActivity());
     }
 }

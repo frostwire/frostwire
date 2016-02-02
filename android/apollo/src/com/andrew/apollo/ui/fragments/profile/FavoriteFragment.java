@@ -24,6 +24,7 @@ import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 
 import java.util.List;
@@ -34,7 +35,7 @@ import java.util.List;
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (gubatron@gmail.com)
  */
-public class FavoriteFragment extends ProfileFragment<ProfileSongAdapter, Song> {
+public class FavoriteFragment extends ApolloFragment<ProfileSongAdapter, Song> {
 
     /**
      * Empty constructor as per the {@link Fragment} documentation
@@ -44,7 +45,7 @@ public class FavoriteFragment extends ProfileFragment<ProfileSongAdapter, Song> 
     }
 
     @Override
-    ProfileSongAdapter createAdapter() {
+    protected ProfileSongAdapter createAdapter() {
         return new ProfileSongAdapter(
                 getActivity(),
                 R.layout.list_item_simple,
@@ -73,5 +74,10 @@ public class FavoriteFragment extends ProfileFragment<ProfileSongAdapter, Song> 
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.removeItem(FragmentMenuItems.ADD_TO_FAVORITES);
+    }
+
+    @Override
+    protected String getLayoutTypeName() {
+        return PreferenceUtils.SIMPLE_LAYOUT;
     }
 }

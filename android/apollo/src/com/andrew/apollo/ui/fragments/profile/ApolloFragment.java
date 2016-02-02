@@ -24,20 +24,23 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.*;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.*;
+import com.andrew.apollo.MusicStateListener;
 import com.andrew.apollo.adapters.ApolloFragmentAdapter;
 import com.andrew.apollo.menu.CreateNewPlaylist;
 import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.model.Artist;
+import com.andrew.apollo.model.Genre;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.recycler.RecycleHolder;
+import com.andrew.apollo.ui.activities.BaseActivity;
+import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
+import com.andrew.apollo.utils.PreferenceUtils;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.frostwire.android.R;
@@ -50,10 +53,12 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
+public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         extends Fragment implements
         LoaderManager.LoaderCallbacks<List<I>>,
-        AdapterView.OnItemClickListener {
+        AdapterView.OnItemClickListener,
+        AbsListView.OnScrollListener,
+        MusicStateListener {
 
     private final int GROUP_ID;
     /**
@@ -64,6 +69,12 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
      * The list view
      */
     protected ListView mListView;
+
+    /**
+     * The grid view
+     */
+    protected GridView mGridView;
+
     /**
      * The adapter for the list
      */
@@ -74,9 +85,9 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
     protected I mItem;
 
     /**
-     * Album song list
+     * Song list. The playlist's, the album's, the artist's discography available.
      */
-    protected long[] mAlbumSongIds;
+    protected long[] mSongList;
 
     /**
      * Id of a context menu item
@@ -119,12 +130,14 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
         }
     };
 
-    abstract T createAdapter();
+    protected abstract T createAdapter();
+
+    protected abstract String getLayoutTypeName();
 
     public abstract void onItemClick(final AdapterView<?> parent, final View view, final int position,
                                      final long id);
 
-    protected ProfileFragment(int groupId, int loaderId) {
+    protected ApolloFragment(int groupId, int loaderId) {
         this.GROUP_ID = groupId;
         this.LOADER_ID = loaderId;
     }
@@ -142,22 +155,16 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
                              final Bundle savedInstanceState) {
         // The View for the fragment's UI
         mRootView = (ViewGroup)inflater.inflate(R.layout.list_base, null);
-        // Initialize the list
-        mListView = (ListView) mRootView.findViewById(R.id.list_base);
-        // Set the data behind the list
-        mListView.setAdapter(mAdapter);
-        // Release any references to the recycled Views
-        mListView.setRecyclerListener(new RecycleHolder());
-        // Listen for ContextMenus to be created
-        mListView.setOnCreateContextMenuListener(this);
-        // Play the selected song
-        mListView.setOnItemClickListener(this);
-        // To help make scrolling smooth
-        mListView.setOnScrollListener(new VerticalScrollListener(null, mProfileTabCarousel, 0));
-        // Remove the scrollbars and padding for the fast scroll
-        mListView.setVerticalScrollBarEnabled(false);
-        mListView.setFastScrollEnabled(false);
-        mListView.setPadding(0, 0, 0, 0);
+
+        // The View for the fragment's UI
+        if (isSimpleLayout()) {
+            mRootView = (ViewGroup)inflater.inflate(R.layout.list_base, null);
+            initListView();
+        } else {
+            mRootView = (ViewGroup)inflater.inflate(R.layout.grid_base, null);
+            initGridView();
+        }
+
         return mRootView;
     }
 
@@ -194,14 +201,24 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
             mSongName = mSong.mSongName;
             mAlbumName = mSong.mAlbumName;
             mArtistName = mSong.mArtistName;
+            mSongList = null;
         } else if (mItem instanceof Album) {
             Album mAlbum = (Album) mItem;
-            mSelectedId = -1;
+            mSelectedId = mAlbum.mAlbumId;
             mSongName = null;
             mAlbumName = mAlbum.mAlbumName;
             mArtistName = mAlbum.mArtistName;
-            final long[] songListForAlbum = MusicUtils.getSongListForAlbum(getActivity(), mAlbum.mAlbumId);
-            mAlbumSongIds = songListForAlbum;
+            mSongList = MusicUtils.getSongListForAlbum(getActivity(), mAlbum.mAlbumId);
+        } else if (mItem instanceof Artist) {
+            Artist mArtist = (Artist) mItem;
+            mSelectedId = mArtist.mArtistId;
+            mSongName = null;
+            mArtistName = mArtist.mArtistName;
+            mSongList = MusicUtils.getSongListForArtist(getActivity(), mArtist.mArtistId);
+        } else if (mItem instanceof Genre) {
+            Genre mGenre = (Genre) mItem;
+            mSelectedId = mGenre.mGenreId;
+
         }
 
         // Play the selected songs
@@ -236,8 +253,8 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
     @Override
     public boolean onContextItemSelected(final android.view.MenuItem item) {
         if (item.getGroupId() == GROUP_ID) {
-            final long[] songList = mAlbumSongIds != null ?
-                    mAlbumSongIds :
+            final long[] songList = mSongList != null ?
+                    mSongList :
                     new long[] { mSelectedId };
 
             switch (item.getItemId()) {
@@ -317,8 +334,8 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     private void onAddToFavorites() {
-        if (mAlbumSongIds != null) {
-            for (Long songId : mAlbumSongIds) {
+        if (mSongList != null) {
+            for (Long songId : mSongList) {
                 try {
                     final Song song = MusicUtils.getSong(getActivity(), songId);
                     if (song != null) {
@@ -349,10 +366,12 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
         super.onActivityCreated(savedInstanceState);
         // Enable the options menu
         setHasOptionsMenu(true);
+
         // Start the loader
         final Bundle arguments = getArguments();
-        if (arguments != null) {
+        try {
             getLoaderManager().initLoader(LOADER_ID, arguments, this);
+        } catch (Throwable ignored) {
         }
     }
 
@@ -371,6 +390,16 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
         if (data == null || data.isEmpty()) {
             mAdapter.unload();
             mAdapter.notifyDataSetChanged();
+
+            // Set the empty text
+            final TextView empty = (TextView) mRootView.findViewById(R.id.empty);
+            empty.setText(getString(R.string.empty_music));
+
+            if (isSimpleLayout()) {
+                mListView.setEmptyView(empty);
+            } else {
+                mGridView.setEmptyView(empty);
+            }
             return;
         }
 
@@ -384,6 +413,11 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
         for (final I item : data) {
             mAdapter.add(item);
         }
+
+        if (mAdapter instanceof ApolloFragmentAdapter.Cacheable) {
+            ((ApolloFragmentAdapter.Cacheable) mAdapter).buildCache();
+        }
+
         mAdapter.notifyDataSetChanged();
     }
 
@@ -404,16 +438,117 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
         // Otherwise, if the user has scrolled enough to move the header, it
         // becomes misplaced and needs to be reset.
         mListView.setSelection(0);
-        mAdapter.notifyDataSetChanged();
         getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mAdapter.flush();
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+    }
+
+    public void onMetaChanged() {
+
+    }
+
+    public void restartLoader() {
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
+    }
+
+    protected boolean isSimpleLayout() {
+        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName(),
+                getActivity());
+    }
+
+    protected boolean isDetailedLayout() {
+        return PreferenceUtils.getInstance(getActivity()).isDetailedLayout(getLayoutTypeName(),
+                getActivity());
+    }
+
+    /**
+     * Sets up the grid view
+     */
+    protected void initGridView() {
+        // Initialize the grid
+        mGridView = (GridView)mRootView.findViewById(R.id.grid_base);
+        // Set the data behind the grid
+        mGridView.setAdapter(mAdapter);
+        // Set up the helpers
+        initAbsListView(mGridView);
+        if (ApolloUtils.isLandscape(getActivity())) {
+            if (isDetailedLayout()) {
+                mAdapter.setLoadExtraData(true);
+                mGridView.setNumColumns(2);
+            } else {
+                mGridView.setNumColumns(4);
+            }
+        } else {
+            if (isDetailedLayout()) {
+                mAdapter.setLoadExtraData(true);
+                mGridView.setNumColumns(1);
+            } else {
+                mGridView.setNumColumns(2);
+            }
+        }
+    }
+
+    /**
+     * Sets up various helpers for both the list and grid
+     *
+     * @param list The list or grid
+     */
+    private void initAbsListView(final AbsListView list) {
+        // Release any references to the recycled Views
+        list.setRecyclerListener(new RecycleHolder());
+        // Listen for ContextMenus to be created
+        list.setOnCreateContextMenuListener(this);
+        // Show the albums and songs from the selected artist
+        list.setOnItemClickListener(this);
+
+        // To help make scrolling smooth
+        // from initAbsListView original code.
+        list.setOnScrollListener(this);
+
+        // To help make scrolling smooth
+        if (mProfileTabCarousel != null) {
+            list.setOnScrollListener(new VerticalScrollListener(null, mProfileTabCarousel, 0));
+            // Remove the scrollbars and padding for the fast scroll
+            list.setVerticalScrollBarEnabled(false);
+            list.setFastScrollEnabled(false);
+            list.setPadding(0, 0, 0, 0);
+        }
+    }
+
+    /**
+     * Sets up the list view
+     */
+    private void initListView() {
+        // Initialize the grid
+        mListView = (ListView) mRootView.findViewById(R.id.list_base);
+        // Set the data behind the list
+        mListView.setAdapter(mAdapter);
+        // Set up the helpers
+        initAbsListView(mListView);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onPause() {
-        super.onPause();
-        mAdapter.flush();
+    public void onScrollStateChanged(final AbsListView view, final int scrollState) {
+        // Pause disk cache access to ensure smoother scrolling
+        if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING
+                || scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+            mAdapter.setPauseDiskCache(true);
+        } else {
+            mAdapter.setPauseDiskCache(false);
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

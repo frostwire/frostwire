@@ -17,11 +17,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.Artist;
 import com.andrew.apollo.ui.MusicHolder;
 import com.andrew.apollo.ui.MusicHolder.DataHolder;
-import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 
@@ -34,7 +32,7 @@ import com.frostwire.android.R;
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class ArtistAdapter extends ApolloFragmentAdapter<Artist> {
+public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements ApolloFragmentAdapter.Cacheable {
 
     /**
      * Number of views (ImageView and TextView)
@@ -42,24 +40,9 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> {
     private static final int VIEW_TYPE_COUNT = 2;
 
     /**
-     * Image cache and image fetcher
-     */
-    private final ImageFetcher mImageFetcher;
-
-    /**
      * Semi-transparent overlay
      */
-    private final int mOverlay;
-
-    /**
-     * Used to cache the artist info
-     */
-    private DataHolder[] mData;
-
-    /**
-     * Loads line three and the background image if the user decides to.
-     */
-    private boolean mLoadExtraData = false;
+    private final int mOverlayColor;
 
     /**
      * Constructor of <code>ArtistAdapter</code>
@@ -69,10 +52,8 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> {
      */
     public ArtistAdapter(final Activity context, final int layoutId) {
         super(context, layoutId);
-        // Initialize the cache & image fetcher
-        mImageFetcher = ApolloUtils.getImageFetcher(context);
         // Cache the transparent overlay
-        mOverlay = context.getResources().getColor(R.color.list_item_background);
+        mOverlayColor = context.getResources().getColor(R.color.list_item_background);
     }
 
     /**
@@ -92,9 +73,10 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> {
         holder.mLineTwo.get().setText(dataHolder.mLineTwo);
         // Asynchronously load the artist image into the adapter
         mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mImage.get());
+
         if (mLoadExtraData) {
             // Make sure the background layer gets set
-            holder.mOverlay.get().setBackgroundColor(mOverlay);
+            holder.mOverlay.get().setBackgroundColor(mOverlayColor);
             // Set the number of songs (line three)
             holder.mLineThree.get().setText(dataHolder.mLineThree);
             // Set the background image
@@ -166,50 +148,12 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> {
         });
     }
 
-    /**
-     * Method that unloads and clears the items in the adapter
-     */
-    public void unload() {
-        super.unload();
-        clear();
-        mData = null;
-    }
-
-    /**
-     * @param pause True to temporarily pause the disk cache, false otherwise.
-     */
-    public void setPauseDiskCache(final boolean pause) {
-        if (mImageFetcher != null) {
-            mImageFetcher.setPauseDiskCache(pause);
-        }
-    }
-
-    /**
-     * @param artist The key used to find the cached artist to remove
-     */
-    public void removeFromCache(final Artist artist) {
-        if (mImageFetcher != null) {
-            mImageFetcher.removeFromCache(artist.mArtistName);
-        }
-    }
-
-    /**
-     * Flushes the disk cache.
-     */
-    public void flush() {
-        mImageFetcher.flush();
-    }
-
     @Override
     public long getItemId(int position) {
-        return getItem(position).mArtistId;
-    }
-
-    /**
-     * @param extra True to load line three and the background image, false
-     *            otherwise.
-     */
-    public void setLoadExtraData(final boolean extra) {
-        mLoadExtraData = extra;
+        try {
+            return getItem(position).mArtistId;
+        } catch (Throwable t) {
+            return -1;
+        }
     }
 }

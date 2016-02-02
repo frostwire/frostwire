@@ -22,6 +22,7 @@ import com.andrew.apollo.loaders.AlbumSongLoader;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.List;
  * @author Angel Leon (gubatron@gmail.com)
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class AlbumSongFragment extends ProfileFragment<ProfileSongAdapter, Song> {
+public class AlbumSongFragment extends ApolloFragment<ProfileSongAdapter, Song> {
     /**
      * Empty constructor as per the {@link Fragment} documentation
      */
@@ -41,12 +42,17 @@ public class AlbumSongFragment extends ProfileFragment<ProfileSongAdapter, Song>
     }
 
     @Override
-    ProfileSongAdapter createAdapter() {
+    protected ProfileSongAdapter createAdapter() {
         return new ProfileSongAdapter(
                 getActivity(),
                 R.layout.list_item_simple,
                 ProfileSongAdapter.DISPLAY_ALBUM_SETTING
         );
+    }
+
+    @Override
+    protected String getLayoutTypeName() {
+        return PreferenceUtils.SIMPLE_LAYOUT;
     }
 
     /**

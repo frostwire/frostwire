@@ -26,12 +26,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import com.andrew.apollo.cache.ImageFetcher;
-import com.andrew.apollo.model.Album;
-import com.andrew.apollo.model.Song;
+import com.andrew.apollo.model.*;
 import com.andrew.apollo.ui.MusicHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.logging.Logger;
 
 import java.util.List;
 
@@ -42,6 +42,12 @@ import java.util.List;
  * @author aldenml
  */
 public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
+
+    public interface Cacheable {
+        void buildCache();
+    }
+
+    static Logger LOGGER = Logger.getLogger(ApolloFragmentAdapter.class);
 
     /**
      * The resource Id of the layout to inflate
@@ -62,6 +68,11 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      * Used to cache the album info
      */
     protected MusicHolder.DataHolder[] mData;
+
+    /**
+     * Loads line three and the background image if the user decides to.
+     */
+    protected boolean mLoadExtraData = false;
 
     public ApolloFragmentAdapter(Context context, int mLayoutId) {
         super(context, mLayoutId);
@@ -92,6 +103,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      * @param data The {@link List} used to return the count for the adapter.
      */
     public void setDataList(final List<I> data) {
+        mDataList.clear();
         mDataList = data;
     }
 
@@ -162,26 +174,63 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         return size == 0 ? 0 : size + 1;
     }
 
+    public I getItem(int position) {
+        if (position == 0) {
+            LOGGER.info("getItem(0) -> null.");
+            return null;
+        }
+
+        I result;
+
+        if (mDataList != null && !mDataList.isEmpty()) {
+            int realPosition = position - 1;
+            result = mDataList.get(realPosition);
+            LOGGER.info("getItem(" + position + " -> " + realPosition + ") => " + result);
+        } else {
+            result = super.getItem(position);
+        }
+
+        return result;
+    }
+
     @Override
     public long getItemId(int position) {
         if (position == 0) {
+            LOGGER.info("position == 0 -> -1");
             return -1;
         }
 
         int realPosition = position-1;
         if (mData != null && realPosition < mData.length) {
+            LOGGER.info("using mData[]. "+realPosition+" -> " + mData[realPosition].mItemId);
             return mData[realPosition].mItemId;
-        } else if (!mDataList.isEmpty() && position < mDataList.size()) {
+        } else if (!mDataList.isEmpty() && realPosition < mDataList.size()) {
             I item = mDataList.get(realPosition);
             long id=-1;
             if (item instanceof Song) {
                 id = ((Song) item).mSongId;
             } else if (item instanceof Album) {
                 id = ((Album) item).mAlbumId;
+            } else if (item instanceof Playlist) {
+                id = ((Playlist) item).mPlaylistId;
+            } else if (item instanceof Genre) {
+                id = ((Genre) item).mGenreId;
+            } else if (item instanceof Artist) {
+                id = ((Artist) item).mArtistId;
             }
+
+            LOGGER.info("using mDataList. "+realPosition+" -> " + id);
             return id;
         }
 
         return - 1;
+    }
+
+    /**
+     * @param extra True to load line three and the background image, false
+     *            otherwise.
+     */
+    public void setLoadExtraData(final boolean extra) {
+        mLoadExtraData = extra;
     }
 }
