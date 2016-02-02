@@ -91,7 +91,10 @@ public final class StoragePicker {
                     } else {
                         result = getFullPathFromTreeUri(context, treeUri);
                         if (result != null && !result.endsWith("/FrostWire")) {
-                            file.createDirectory("FrostWire");
+                            DocumentFile f = file.findFile("FrostWire");
+                            if (f == null) {
+                                file.createDirectory("FrostWire");
+                            }
                         }
                     }
                 }
