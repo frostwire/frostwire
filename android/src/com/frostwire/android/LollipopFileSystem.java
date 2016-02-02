@@ -475,11 +475,15 @@ public final class LollipopFileSystem implements FileSystem {
 
     private static String[] getExtSdCardPaths(Context context) {
         List<String> paths = new ArrayList<>();
-        for (File file : ContextCompat.getExternalFilesDirs(context, "external")) {
-            if (file != null && !file.equals(context.getExternalFilesDir("external"))) {
-                int index = file.getAbsolutePath().lastIndexOf("/Android/data");
+        File[] externals = ContextCompat.getExternalFilesDirs(context, "external");
+        File external = context.getExternalFilesDir("external");
+        for (int i = 0; i < externals.length; i++) {
+            File file = externals[i];
+            if (file != null && !file.equals(external)) {
+                String absolutePath = file.getAbsolutePath();
+                int index = absolutePath.lastIndexOf("/Android/data");
                 if (index >= 0) {
-                    String path = file.getAbsolutePath().substring(0, index);
+                    String path = absolutePath.substring(0, index);
                     try {
                         path = new File(path).getCanonicalPath();
                     } catch (IOException e) {
@@ -487,13 +491,17 @@ public final class LollipopFileSystem implements FileSystem {
                     }
                     paths.add(path);
                 } else {
-                    LOG.warn("ext sd card path wrong: " + file.getAbsolutePath());
+                    LOG.warn("ext sd card path wrong: " + absolutePath);
                 }
             }
         }
-        // special hard coded paths
-        paths.add("/storage/sdcard1");
-        paths.add("/storage/ext_sd");
+        // special hard coded paths for more security
+        if (!paths.contains("/storage/sdcard1")) {
+            paths.add("/storage/sdcard1");
+        }
+        if (!paths.contains("/storage/ext_sd")) {
+            paths.add("/storage/ext_sd");
+        }
 
         return paths.toArray(new String[0]);
     }
