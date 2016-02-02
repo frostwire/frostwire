@@ -274,9 +274,12 @@ public final class LollipopFileSystem implements FileSystem {
                     baseFolder = baseFolder.substring(0, baseFolder.length() - 10);
                     rootUri = getDocumentUri(context, new File(baseFolder));
                     f = DocumentFile.fromTreeUri(context, rootUri);
-                    f = f.createDirectory("FrostWire");
+                    f = f.findFile("FrostWire");
                     if (f == null) {
-                        return null;
+                        f = f.createDirectory("FrostWire");
+                        if (f == null) {
+                            return null;
+                        }
                     }
                 }
             }

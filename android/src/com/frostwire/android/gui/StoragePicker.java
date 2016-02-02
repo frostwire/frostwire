@@ -90,6 +90,9 @@ public final class StoragePicker {
                         result = null;
                     } else {
                         result = getFullPathFromTreeUri(context, treeUri);
+                        if (result != null && !result.endsWith("/FrostWire")) {
+                            file.createDirectory("FrostWire");
+                        }
                     }
                 }
             }
