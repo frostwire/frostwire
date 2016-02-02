@@ -22,6 +22,7 @@ import com.andrew.apollo.loaders.FavoritesLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
+import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 
@@ -39,7 +40,7 @@ public class FavoriteFragment extends ProfileFragment<ProfileSongAdapter, Song> 
      * Empty constructor as per the {@link Fragment} documentation
      */
     public FavoriteFragment() {
-        super(FAVORITE_FRAGMENT_GROUP_ID, FAVORITE_FRAGMENT_LOADER_ID);
+        super(Fragments.FAVORITE_FRAGMENT_GROUP_ID, Fragments.FAVORITE_FRAGMENT_LOADER_ID);
     }
 
     @Override

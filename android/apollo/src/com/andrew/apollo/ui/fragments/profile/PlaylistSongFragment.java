@@ -30,6 +30,7 @@ import com.andrew.apollo.dragdrop.DragSortListView.RemoveListener;
 import com.andrew.apollo.loaders.PlaylistSongLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Song;
+import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 
@@ -47,7 +48,7 @@ public class PlaylistSongFragment extends ProfileFragment<ProfileSongAdapter, So
      * Empty constructor as per the {@link Fragment} documentation
      */
     public PlaylistSongFragment() {
-        super(PLAYLIST_SONG_FRAGMENT_GROUP_ID, PLAYLIST_SONG_FRAGMENT_LOADER_ID);
+        super(Fragments.PLAYLIST_SONG_FRAGMENT_GROUP_ID, Fragments.PLAYLIST_SONG_FRAGMENT_LOADER_ID);
     }
 
     @Override
@@ -68,11 +69,11 @@ public class PlaylistSongFragment extends ProfileFragment<ProfileSongAdapter, So
         super.onCreateContextMenu(menu, v, menuInfo);
 
         // View more content by the song artist
-        menu.add(PLAYLIST_SONG_FRAGMENT_GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE,
+        menu.add(Fragments.PLAYLIST_SONG_FRAGMENT_GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE,
                 getString(R.string.context_menu_more_by_artist));
 
         // Remove the song from playlist
-        menu.add(PLAYLIST_SONG_FRAGMENT_GROUP_ID, FragmentMenuItems.REMOVE_FROM_PLAYLIST, Menu.NONE,
+        menu.add(Fragments.PLAYLIST_SONG_FRAGMENT_GROUP_ID, FragmentMenuItems.REMOVE_FROM_PLAYLIST, Menu.NONE,
                 getString(R.string.context_menu_remove_from_playlist));
     }
 

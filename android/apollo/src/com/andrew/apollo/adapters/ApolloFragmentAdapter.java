@@ -27,6 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.Album;
+import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.MusicHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.Lists;
@@ -63,7 +64,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     protected MusicHolder.DataHolder[] mData;
 
     public ApolloFragmentAdapter(Context context, int mLayoutId) {
-        super(context, 0);
+        super(context, mLayoutId);
         this.mLayoutId = mLayoutId;
         if (context instanceof Activity) {
             mImageFetcher = ApolloUtils.getImageFetcher((Activity) context);
@@ -93,8 +94,6 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     public void setDataList(final List<I> data) {
         mDataList = data;
     }
-
-    public abstract long getItemId(int position);
 
     /**
      * Starts playing an album if the user touches the artwork in the list.
@@ -161,5 +160,28 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     public int getCount() {
         final int size = mDataList.size();
         return size == 0 ? 0 : size + 1;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        if (position == 0) {
+            return -1;
+        }
+
+        int realPosition = position-1;
+        if (mData != null && realPosition < mData.length) {
+            return mData[realPosition].mItemId;
+        } else if (!mDataList.isEmpty() && position < mDataList.size()) {
+            I item = mDataList.get(realPosition);
+            long id=-1;
+            if (item instanceof Song) {
+                id = ((Song) item).mSongId;
+            } else if (item instanceof Album) {
+                id = ((Album) item).mAlbumId;
+            }
+            return id;
+        }
+
+        return - 1;
     }
 }

@@ -139,25 +139,6 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getItemId(final int position) {
-        if (position == 0) {
-            return -1;
-        }
-
-        int realPosition = position-1;
-        if (mData != null && realPosition < mData.length) {
-            return mData[realPosition].mItemId;
-        } else if (!mDataList.isEmpty() && position < mDataList.size()) {
-            return mDataList.get(realPosition).mAlbumId;
-        }
-
-        return - 1;
-    }
-
-    /**
      * Starts playing an album if the user touches the artwork in the list.
      * 
      * @param album The {@link ImageView} holding the album

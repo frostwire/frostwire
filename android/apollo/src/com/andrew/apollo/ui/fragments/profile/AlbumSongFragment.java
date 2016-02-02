@@ -20,6 +20,7 @@ import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.ProfileSongAdapter;
 import com.andrew.apollo.loaders.AlbumSongLoader;
 import com.andrew.apollo.model.Song;
+import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 
@@ -36,7 +37,7 @@ public class AlbumSongFragment extends ProfileFragment<ProfileSongAdapter, Song>
      * Empty constructor as per the {@link Fragment} documentation
      */
     public AlbumSongFragment() {
-        super(ALBUM_SONG_FRAGMENT_GROUP_ID, ALBUM_SONG_FRAGMENT_LOADER_ID);
+        super(Fragments.ALBUM_SONG_FRAGMENT_GROUP_ID, Fragments.ALBUM_SONG_FRAGMENT_LOADER_ID);
     }
 
     @Override

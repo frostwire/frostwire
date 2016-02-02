@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.GenresColumns;
 import com.andrew.apollo.model.Genre;
 import com.andrew.apollo.utils.Lists;
+import com.frostwire.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.List;
  * @author Angel Leon (gubatron@gmail.com)
  */
 public class GenreLoader extends WrappedAsyncTaskLoader<List<Genre>> {
+    static Logger LOGGER = Logger.getLogger(GenreLoader.class);
 
     /**
      * Constructor of <code>GenreLoader</code>
@@ -69,6 +71,7 @@ public class GenreLoader extends WrappedAsyncTaskLoader<List<Genre>> {
         if (mCursor != null) {
             mCursor.close();
         }
+        LOGGER.info("Loaded genre list ("+mGenreList.size()+" genres)");
         return mGenreList;
     }
 

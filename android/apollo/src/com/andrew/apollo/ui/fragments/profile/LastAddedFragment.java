@@ -24,6 +24,7 @@ import com.andrew.apollo.adapters.ProfileSongAdapter;
 import com.andrew.apollo.loaders.LastAddedLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Song;
+import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 
@@ -42,7 +43,7 @@ public class LastAddedFragment extends ProfileFragment<ProfileSongAdapter, Song>
      * Empty constructor as per the {@link Fragment} documentation
      */
     public LastAddedFragment() {
-        super(LAST_ADDED_FRAGMENT_GROUP_ID, LAST_ADDED_FRAGMENT_LOADER_ID);
+        super(Fragments.LAST_ADDED_FRAGMENT_GROUP_ID, Fragments.LAST_ADDED_FRAGMENT_LOADER_ID);
     }
 
     ProfileSongAdapter createAdapter() {
@@ -70,7 +71,7 @@ public class LastAddedFragment extends ProfileFragment<ProfileSongAdapter, Song>
         super.onCreateContextMenu(menu, v, menuInfo);
 
         // View more content by the song artist
-        menu.add(LAST_ADDED_FRAGMENT_GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE,
+        menu.add(Fragments.LAST_ADDED_FRAGMENT_GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE,
                 getString(R.string.context_menu_more_by_artist));
     }
 

@@ -13,15 +13,15 @@ package com.andrew.apollo.ui.fragments.profile;
 
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.view.*;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.ArtistAlbumAdapter;
 import com.andrew.apollo.loaders.ArtistAlbumLoader;
-import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Album;
-import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.frostwire.android.R;
@@ -37,7 +37,7 @@ import java.util.List;
 public class ArtistAlbumFragment extends ProfileFragment<ArtistAlbumAdapter, Album> {
 
     public ArtistAlbumFragment() {
-        super(ARTIST_ALBUM_FRAGMENT_GROUP_ID,ARTIST_ALBUM_FRAGMENT_LOADER_ID);
+        super(Fragments.ARTIST_ALBUM_FRAGMENT_GROUP_ID,Fragments.ARTIST_ALBUM_FRAGMENT_LOADER_ID);
     }
 
     /**

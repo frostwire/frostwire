@@ -55,27 +55,6 @@ public abstract class ProfileFragment<T extends ApolloFragmentAdapter<I>, I>
         LoaderManager.LoaderCallbacks<List<I>>,
         AdapterView.OnItemClickListener {
 
-    protected static int ALBUM_SONG_FRAGMENT_GROUP_ID = 0;
-    protected static int ALBUM_SONG_FRAGMENT_LOADER_ID = 0;
-
-    protected static int FAVORITE_FRAGMENT_GROUP_ID = 1;
-    protected static int FAVORITE_FRAGMENT_LOADER_ID = 1;
-
-    protected static int GENRE_SONG_FRAGMENT_GROUP_ID = 2;
-    protected static int GENRE_SONG_FRAGMENT_LOADER_ID = 2;
-
-    protected static int ARTIST_ALBUM_FRAGMENT_GROUP_ID = 3;
-    protected static int ARTIST_ALBUM_FRAGMENT_LOADER_ID = 3;
-
-    protected static int ARTIST_SONG_FRAGMENT_GROUP_ID = 4;
-    protected static int ARTIST_SONG_FRAGMENT_LOADER_ID = 4;
-
-    protected static int LAST_ADDED_FRAGMENT_GROUP_ID = 5;
-    protected static int LAST_ADDED_FRAGMENT_LOADER_ID = 5;
-
-    protected static int PLAYLIST_SONG_FRAGMENT_GROUP_ID = 6;
-    protected static int PLAYLIST_SONG_FRAGMENT_LOADER_ID = 6;
-
     private final int GROUP_ID;
     /**
      * LoaderCallbacks identifier
