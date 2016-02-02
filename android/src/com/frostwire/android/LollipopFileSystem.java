@@ -326,7 +326,12 @@ public final class LollipopFileSystem implements FileSystem {
             if (parent == null) {
                 return DocumentFile.fromFile(file);
             }
-            DocumentFile f = getDirectory(context, parent, create);
+
+            DocumentFile f = getDirectory(context, parent, false);
+            if (f == null && create) {
+                f = getDirectory(context, parent, create);
+            }
+
             if (f != null) {
                 String name = file.getName();
                 DocumentFile child = f.findFile(name);
