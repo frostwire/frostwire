@@ -37,11 +37,6 @@ public class GenreLoader extends WrappedAsyncTaskLoader<List<Genre>> {
     private final ArrayList<Genre> mGenreList = Lists.newArrayList();
 
     /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
-
-    /**
      * Constructor of <code>GenreLoader</code>
      * 
      * @param context The {@link Context} to use
@@ -55,8 +50,13 @@ public class GenreLoader extends WrappedAsyncTaskLoader<List<Genre>> {
      */
     @Override
     public List<Genre> loadInBackground() {
+
+        if (!mGenreList.isEmpty()) {
+            mGenreList.clear();
+        }
+
         // Create the Cursor
-        mCursor = makeGenreCursor(getContext());
+        Cursor mCursor = makeGenreCursor(getContext());
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
@@ -76,7 +76,6 @@ public class GenreLoader extends WrappedAsyncTaskLoader<List<Genre>> {
         // Close the cursor
         if (mCursor != null) {
             mCursor.close();
-            mCursor = null;
         }
         return mGenreList;
     }

@@ -197,8 +197,9 @@ public class ArtistFragment extends Fragment implements LoaderCallbacks<List<Art
 
         // Get the position of the selected item
         final AdapterContextMenuInfo info = (AdapterContextMenuInfo)menuInfo;
-        // Creat a new model
+        // Create a new model
         mArtist = mAdapter.getItem(info.position);
+
         // Create a list of the artist's songs
         mArtistList = MusicUtils.getSongListForArtist(getActivity(), mArtist.mArtistId);
 

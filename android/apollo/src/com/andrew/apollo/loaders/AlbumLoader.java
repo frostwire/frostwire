@@ -38,11 +38,6 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
     private final ArrayList<Album> mAlbumsList = Lists.newArrayList();
 
     /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
-
-    /**
      * Constructor of <code>AlbumLoader</code>
      * 
      * @param context The {@link Context} to use
@@ -57,6 +52,7 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
     @Override
     public List<Album> loadInBackground() {
         // Create the Cursor
+        Cursor mCursor;
         try {
             mCursor = makeAlbumCursor(getContext());
         } catch (Throwable e) {
@@ -91,7 +87,6 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
         // Close the cursor
         if (mCursor != null) {
             mCursor.close();
-            mCursor = null;
         }
         return mAlbumsList;
     }
