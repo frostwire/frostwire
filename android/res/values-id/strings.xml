@@ -1,7 +1,7 @@
 ﻿<!--
  /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -182,10 +182,6 @@
     <string name="please_update_to_v">Silahkan Perbarui untuk V. %s</string>
     <string name="cant_open_file">Maaf, tidak tahu cara membuka arsip ini</string>
     <string name="downloading_from_desktop">Mengunduh arsip dari Desktop</string>
-    <string name="share_indication_dialog_title">Cara Berbagi/Tidak Berbagi Arsip</string>
-    <string name="dialog_share_indicator_text_text">Jelajahi sendiri, Berbagi atau Tidak Berbagi berbagai arsip dengan menggunakan kotak-kotak centang kemudian sentuh arsip yang dicentang. \n\n gunakan ikon gembok kunci untuk berbagi atau tidak berbagi arsip-arsip individu</string>
-    <string name="dialog_share_indicator_check_text">Tampilkan bantuan ini lain kali</string>
-    <string name="show_share_indication">Tampilkan Bantuan Berbagi</string>
     <string name="download_added_to_queue">1 arsip akan mulai diunduh</string>
     <string name="downloads_added_to_queue">%s arsip akan mulai diunduh</string>
     <string name="activity_downloads_title_text">Unduhan-unduhan</string>

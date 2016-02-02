@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -182,10 +182,6 @@
     <string name="please_update_to_v">请更新至 %</string>
     <string name="cant_open_file">很抱歉，不知道如何打开此文件.</string>
     <string name="downloading_from_desktop">从桌面下载文件</string>
-    <string name="share_indication_dialog_title">如何共享/不共享文件</string>
-    <string name="dialog_share_indicator_text_text">浏览自己文件，使用复选框，点击任何选中文件，共享或不共享大量文件。 使用挂锁图标共享或不共享个人文件。</string>
-    <string name="dialog_share_indicator_check_text">下一次显示帮助</string>
-    <string name="show_share_indication">显示共享帮助</string>
     <string name="download_added_to_queue">1个文件开始下载</string>
     <string name="downloads_added_to_queue">%文件开始下载</string>
     <string name="activity_downloads_title_text">下载文件</string>

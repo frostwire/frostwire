@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">Update alsjeblieft naar v. %s</string>
     <string name="cant_open_file">Sorry, weet niet hoe dit file geopend moet worden.</string>
     <string name="downloading_from_desktop">Downloaden van file(s) vanaf desktop</string>
-    <string name="share_indication_dialog_title">Hoe te Delen/Delen op te heffen van files</string>
-    <string name="dialog_share_indicator_text_text">Browse jezelf, Deel of Stop met delen van meerdere files door gebruik van de aangevinkte vierkantjes, waarna je elk aangevinkt vierkantje aanraakt.\n\nGebruik het sloticoontje om te delen of stop met delen van individuele files.</string>
-    <string name="dialog_share_indicator_check_text">Toon deze hulp volgende keer</string>
-    <string name="show_share_indication">Toon Delen Hulp</string>
     <string name="download_added_to_queue">1 file zal gaan beginnen met downloaden</string>
     <string name="downloads_added_to_queue">%s files zullen gaan beginnen met downloaden</string>
     <string name="activity_downloads_title_text">Downloads</string>

@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,10 +181,6 @@
     <string name="please_update_to_v">Aggiornare alla versione %s</string>
     <string name="cant_open_file">Siamo spiacenti ma il file non può essere aperto</string>
     <string name="downloading_from_desktop">Scaricamento file dal computer</string>
-    <string name="share_indication_dialog_title">Come condividere/smettere di condividere file</string>
-    <string name="dialog_share_indicator_text_text">Condividi, o interrompi la condivisione di file spuntando le caselle vicino ai file \n\nUsa l\'icona con il lucchetto per condividere, o smettere di condividere, file singoli</string>
-    <string name="dialog_share_indicator_check_text">Mostra la prossima volta</string>
-    <string name="show_share_indication">Mostra l\'Aiuto Sharing</string>
     <string name="download_added_to_queue">1 file sta per essere scaricato</string>
     <string name="downloads_added_to_queue">%s file stanno per essere scaricati</string>
     <string name="activity_downloads_title_text">Download</string>

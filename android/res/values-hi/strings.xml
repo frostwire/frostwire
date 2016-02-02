@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -182,10 +182,6 @@
     <string name="please_update_to_v">कृपया वी अद्यतन करें  %s</string>
     <string name="cant_open_file">खेद है, पता नहीं कैसे यह  फाईल खुलता  है .</string>
     <string name="downloading_from_desktop">डेस्कटॉप से फ़ाइल (ओं) डाउनलोड हो रहा है </string>
-    <string name="share_indication_dialog_title">कैसे फ़ाइलों को साझा करें / साझा न करें</string>
-    <string name="dialog_share_indicator_text_text">अपने आप को ब्राउज़ करें, चेक बक्से  का उपयोग करके कई फ़ाइल को  शेयर या साझा  करें  न करें  फिर  किसी चेक्ड फ़ाइल को  छू कर.\n\nकिसी  व्यक्तिगत फ़ाइलों को  पॅडलॉक आइकॉन्स का उपयोग करके साझा  करें  न करें.</string>
-    <string name="dialog_share_indicator_check_text">इस को मदद अगली बार दिखाएँ</string>
-    <string name="show_share_indication"> साझा सहायता दिखाएँ</string>
     <string name="download_added_to_queue">1 फ़ाइल डाउनलोड करना शुरू होगा </string>
     <string name="downloads_added_to_queue">%s फ़ाइलों को डाउनलोड शुरू होगा</string>
     <string name="activity_downloads_title_text">डाउनलोड</string>

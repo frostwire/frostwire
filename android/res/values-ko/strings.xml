@@ -2,7 +2,7 @@
 <!--
 /*
   * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
-  * Copyright (c) 2011, 2013, FrostWire(R). All rights reserved.
+  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
   *
   * This program is free software: you can redistribute it and/or modify
   * it under the terms of the GNU General Public License as published by
@@ -184,12 +184,6 @@
     <string name="please_update_to_v">v로 업데이트 해주세요 %s</string>
     <string name="cant_open_file">파일을 열 수 없습니다.</string>
     <string name="downloading_from_desktop">데스크탑으로부터 파일을 다운로드 하는 중</string>
-    <string name="share_indication_dialog_title">파일 공유 설정 바꾸는 법</string>
-    <string name="dialog_share_indicator_text_text">자신을 검색하기. 체크버튼을 사용하여 여러 파일을 공유 혹은 비공유하기.\n\n 자물쇠 버튼을 이용하여 각 파일들을 공유
-        혹은 비공유하기.
-    </string>
-    <string name="dialog_share_indicator_check_text">다음에도 도움말 기능 사용</string>
-    <string name="show_share_indication">공유 도움말 나타내기</string>
     <string name="download_added_to_queue">1개의 파일 다운로드를 시작합니다</string>
     <string name="downloads_added_to_queue">%s 개의 파일 다운로드를 시작합니다</string>
     <string name="activity_downloads_title_text">다운로드 목록</string>

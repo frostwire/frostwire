@@ -78,8 +78,6 @@ public final class FrostWireUtils {
     /**
      * Returns the path of the FrostWire.jar executable.
      * For a windows binary distribution this is the same path as FrostWire.exe since those files live together.
-     *
-     * @return
      */
     public static String getFrostWireJarPath() {
         return new File(FrostWireUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
@@ -104,16 +102,13 @@ public final class FrostWireUtils {
         return new File(root, "FrostWire");
     }
 
-    public static interface IndexedMapFunction<T> {
-        public void map(int i, T obj);
+    public interface IndexedMapFunction<T> {
+        void map(int i, T obj);
     }
 
     /**
      * Make sure your List implements RandomAccess.
      *
-     * @param <T>
-     * @param list
-     * @param mapFunction
      */
     public static <T> void map(List<T> list, IndexedMapFunction<T> mapFunction) {
         int size = list.size();
@@ -123,7 +118,7 @@ public final class FrostWireUtils {
     }
 
     public static Set<File> getFrostWire4SaveDirectories() {
-        Set<File> result = new HashSet<File>();
+        Set<File> result = new HashSet<>();
 
         try {
             File settingFile = new File(CommonUtils.getFrostWire4UserSettingsDir(), "frostwire.props");

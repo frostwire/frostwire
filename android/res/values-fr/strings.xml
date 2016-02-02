@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -182,10 +182,6 @@
     <string name="please_update_to_v">Veuillez actualiser à v. %s</string>
     <string name="cant_open_file">Désolé, impossible d\'ouvrir ce fichier.</string>
     <string name="downloading_from_desktop">Télécharge le(s) fichier(s) à partir d\'un ordinateur de bureau</string>
-    <string name="share_indication_dialog_title">Comment partager/départager les fichiers </string>
-    <string name="dialog_share_indicator_text_text">Parcourez votre profil, partagez ou départagez plusieurs fichiers en utilisant les cases à cocher et en touchant le fichier sélectionné.\n\n Utilisez l\'icône en forme de cadenas pour partager ou départager les fichiers individuels.</string>
-    <string name="dialog_share_indicator_check_text">Afficher cette aide la prochaine fois</string>
-    <string name="show_share_indication">Afficher la rubrique d\'aide sur le partage </string>
     <string name="download_added_to_queue">Fichier ajouté à la file d\'attente de téléchargement </string>
     <string name="downloads_added_to_queue">%s Fichiers ajoutés à la file d\'attente de téléchargement </string>
     <string name="activity_downloads_title_text">Téléchargements </string>

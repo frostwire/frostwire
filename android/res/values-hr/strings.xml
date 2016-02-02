@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -162,7 +162,6 @@
     <string name="use_mobile_data">Koristi 3G/4G za BitTorrent</string>
     <string name="send_to_chat">Pošalji u chat</string>
     <string name="sent_files_to_chat">Poslano %d datoteka u chat</string>
-    <string name="show_share_indication">Pokaži pomoć dijeljenja</string>
     <string name="activity_downloads_title_text">Preuzimanja</string>
     <string name="updating">Nadograđujem</string>
     <string name="search_hint">Traži sadržaj</string>
