@@ -50,11 +50,6 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     static Logger LOGGER = Logger.getLogger(ApolloFragmentAdapter.class);
 
     /**
-     * The resource Id of the layout to inflate
-     */
-    protected final int mLayoutId;
-
-    /**
      * Used to set the size of the data in the adapter
      */
     protected List<I> mDataList = Lists.newArrayList();
@@ -73,6 +68,8 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      * Loads line three and the background image if the user decides to.
      */
     protected boolean mLoadExtraData = false;
+
+    protected final int mLayoutId;
 
     public ApolloFragmentAdapter(Context context, int mLayoutId) {
         super(context, mLayoutId);
@@ -147,15 +144,15 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         }
     }
 
-    /**
-     * @param album The key used to find the cached album to remove
-     */
-    public void removeFromCache(final Album album) {
-        if (mImageFetcher != null) {
-            mImageFetcher.removeFromCache(
-                    ImageFetcher.generateAlbumCacheKey(album.mAlbumName, album.mArtistName));
-        }
-    }
+//    /**
+//     * @param album The key used to find the cached album to remove
+//     */
+//    public void removeFromCache(final Album album) {
+//        if (mImageFetcher != null) {
+//            mImageFetcher.removeFromCache(
+//                    ImageFetcher.generateAlbumCacheKey(album.mAlbumName, album.mArtistName));
+//        }
+//    }
 
     /**
      * {@inheritDoc}

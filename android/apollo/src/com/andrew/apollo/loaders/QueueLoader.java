@@ -36,6 +36,8 @@ public class QueueLoader extends SongLoader {
      * @return The {@link Cursor} used to run the song query.
      */
     public Cursor makeCursor(final Context context) {
-        return new NowPlayingCursor(context);
+        return makeQueueCursor(context);
     }
+
+    public static Cursor makeQueueCursor(final Context context) { return new NowPlayingCursor(context); }
 }
