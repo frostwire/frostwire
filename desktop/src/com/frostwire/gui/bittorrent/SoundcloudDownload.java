@@ -173,12 +173,12 @@ public class SoundcloudDownload implements BTDownload {
 
     @Override
     public int getProgress() {
-        if (size <= 0) {
-            return -1;
-        }
-
         if (isComplete()) {
             return 100;
+        }
+
+        if (size <= 0) {
+            return -1;
         }
 
         int progress = (int) ((bytesReceived * 100) / size);
