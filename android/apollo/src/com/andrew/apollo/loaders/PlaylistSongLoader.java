@@ -16,30 +16,14 @@ import android.database.Cursor;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
 
-import com.andrew.apollo.model.Song;
-import com.andrew.apollo.utils.Lists;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Used to query {@link MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI} and
+ * Used to query MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI and
  * return the songs for a particular playlist.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
-public class PlaylistSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
-
-    /**
-     * The result
-     */
-    private final ArrayList<Song> mSongList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
-
+public class PlaylistSongLoader extends SongLoader {
     /**
      * The Id of the playlist the songs belong to.
      */
@@ -49,59 +33,16 @@ public class PlaylistSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
      * Constructor of <code>SongLoader</code>
      * 
      * @param context The {@link Context} to use
-     * @param playlistID The Id of the playlist the songs belong to.
+     * @param playlistId The Id of the playlist the songs belong to.
      */
     public PlaylistSongLoader(final Context context, final Long playlistId) {
         super(context);
         mPlaylistID = playlistId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Song> loadInBackground() {
-        // Create the Cursor
-        mCursor = makePlaylistSongCursor(getContext(), mPlaylistID);
-        // Gather the data
-        if (mCursor != null && mCursor.moveToFirst()) {
-            do {
-                // Copy the song Id
-                final long id = mCursor.getLong(mCursor
-                        .getColumnIndexOrThrow(MediaStore.Audio.Playlists.Members.AUDIO_ID));
-
-                // Copy the song name
-                final String songName = mCursor.getString(mCursor
-                        .getColumnIndexOrThrow(AudioColumns.TITLE));
-
-                // Copy the artist name
-                final String artist = mCursor.getString(mCursor
-                        .getColumnIndexOrThrow(AudioColumns.ARTIST));
-
-                // Copy the album name
-                final String album = mCursor.getString(mCursor
-                        .getColumnIndexOrThrow(AudioColumns.ALBUM));
-
-                // Copy the duration
-                final long duration = mCursor.getLong(mCursor
-                        .getColumnIndexOrThrow(AudioColumns.DURATION));
-
-                // Convert the duration into seconds
-                final int durationInSecs = (int) duration / 1000;
-
-                // Create a new song
-                final Song song = new Song(id, songName, artist, album, durationInSecs);
-
-                // Add everything up
-                mSongList.add(song);
-            } while (mCursor.moveToNext());
-        }
-        // Close the cursor
-        if (mCursor != null) {
-            mCursor.close();
-            mCursor = null;
-        }
-        return mSongList;
+    public Cursor makeCursor(Context context) {
+        return makePlaylistSongCursor(getContext(), mPlaylistID);
     }
 
     /**
@@ -111,7 +52,7 @@ public class PlaylistSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
      * @param playlistID The playlist the songs belong to.
      * @return The {@link Cursor} used to run the song query.
      */
-    public static final Cursor makePlaylistSongCursor(final Context context, final Long playlistID) {
+    public static Cursor makePlaylistSongCursor(final Context context, final Long playlistID) {
         final StringBuilder mSelection = new StringBuilder();
         mSelection.append(AudioColumns.IS_MUSIC + "=1");
         mSelection.append(" AND " + AudioColumns.TITLE + " != ''"); //$NON-NLS-2$

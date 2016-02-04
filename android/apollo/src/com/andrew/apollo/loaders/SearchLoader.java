@@ -22,23 +22,15 @@ import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.Lists;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
-public class SearchLoader extends WrappedAsyncTaskLoader<List<Song>> {
-
-    /**
-     * The result
-     */
-    private final ArrayList<Song> mSongList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
-
+public class SearchLoader extends SongLoader {
+    private String mQuery;
     /**
      * Constructor of <code>SongLoader</code>
      * 
@@ -47,8 +39,12 @@ public class SearchLoader extends WrappedAsyncTaskLoader<List<Song>> {
      */
     public SearchLoader(final Context context, final String query) {
         super(context);
-        // Create the Cursor
-        mCursor = makeSearchCursor(context, query);
+        mQuery = query;
+    }
+
+    @Override
+    public Cursor makeCursor(Context context) {
+        return makeSearchCursor(context, mQuery);
     }
 
     /**
@@ -56,6 +52,14 @@ public class SearchLoader extends WrappedAsyncTaskLoader<List<Song>> {
      */
     @Override
     public List<Song> loadInBackground() {
+        ArrayList<Song> mSongList = Lists.newArrayList();
+        Cursor mCursor;
+        try {
+            mCursor = makeCursor(getContext());
+        } catch (Throwable ignored) {
+            return Collections.EMPTY_LIST;
+        }
+
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
@@ -102,7 +106,6 @@ public class SearchLoader extends WrappedAsyncTaskLoader<List<Song>> {
         // Close the cursor
         if (mCursor != null) {
             mCursor.close();
-            mCursor = null;
         }
         return mSongList;
     }
@@ -113,7 +116,7 @@ public class SearchLoader extends WrappedAsyncTaskLoader<List<Song>> {
      * @param query The user's query.
      * @return The {@link Cursor} used to perform the search.
      */
-    public static final Cursor makeSearchCursor(final Context context, final String query) {
+    public static Cursor makeSearchCursor(final Context context, final String query) {
         return context.getContentResolver().query(
                 Uri.parse("content://media/external/audio/search/fancy/" + Uri.encode(query)),
                 new String[] {
@@ -122,5 +125,4 @@ public class SearchLoader extends WrappedAsyncTaskLoader<List<Song>> {
                         MediaStore.Audio.Media.TITLE, "data1", "data2" //$NON-NLS-2$ 
                 }, null, null, null);
     }
-
 }

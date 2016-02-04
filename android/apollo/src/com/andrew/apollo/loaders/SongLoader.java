@@ -16,31 +16,21 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
-
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * Used to query {@link MediaStore.Audio.Media.EXTERNAL_CONTENT_URI} and return
+ * Used to query MediaStore.Audio.Media.EXTERNAL_CONTENT_URI and return
  * the songs on a user's device.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
-
-    /**
-     * The result
-     */
-    private final ArrayList<Song> mSongList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
 
     /**
      * Constructor of <code>SongLoader</code>
@@ -56,8 +46,19 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
      */
     @Override
     public List<Song> loadInBackground() {
+        ArrayList<Song> mSongList = Lists.newArrayList();
         // Create the Cursor
-        mCursor = makeCursor(getContext());
+        Cursor mCursor = null;
+        try {
+            mCursor = makeCursor(getContext());
+        } catch (Throwable ignored) {
+            return Collections.EMPTY_LIST;
+        }
+
+        if (mCursor == null) {
+            return Collections.EMPTY_LIST;
+        }
+
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
@@ -73,11 +74,14 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
                 // Copy the album name
                 final String album = mCursor.getString(3);
 
-                // Copy the duration
-                final long duration = mCursor.getLong(4);
-
-                // Convert the duration into seconds
-                final int durationInSecs = (int) duration / 1000;
+                // Copy the duration (Not available for all song Cursors, like on FavoritesLoader's)
+                long duration = -1;
+                int durationInSecs = -1;
+                try {
+                    duration = mCursor.getLong(4);
+                    durationInSecs = (int) duration / 1000;
+                } catch (Throwable ignored) {
+                }
 
                 // Create a new song
                 final Song song = new Song(id, songName, artist, album, durationInSecs);
@@ -89,7 +93,6 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
         // Close the cursor
         if (mCursor != null) {
             mCursor.close();
-            mCursor = null;
         }
         return mSongList;
     }

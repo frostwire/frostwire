@@ -16,8 +16,6 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.ArtistColumns;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.model.Artist;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
@@ -26,23 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Used to query {@link MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI} and
+ * Used to query MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI and
  * return the artists on a user's device.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
 public class ArtistLoader extends WrappedAsyncTaskLoader<List<Artist>> {
-
-    /**
-     * The result
-     */
-    private final ArrayList<Artist> mArtistsList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
-
     /**
      * Constructor of <code>ArtistLoader</code>
      * 
@@ -52,13 +40,18 @@ public class ArtistLoader extends WrappedAsyncTaskLoader<List<Artist>> {
         super(context);
     }
 
+    public Cursor makeCursor(Context context) {
+        return makeArtistCursor(context);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public List<Artist> loadInBackground() {
+        ArrayList<Artist> mArtistsList = Lists.newArrayList();
         // Create the Cursor
-        mCursor = makeArtistCursor(getContext());
+        Cursor mCursor = makeCursor(getContext());
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
@@ -84,7 +77,6 @@ public class ArtistLoader extends WrappedAsyncTaskLoader<List<Artist>> {
         // Close the cursor
         if (mCursor != null) {
             mCursor.close();
-            mCursor = null;
         }
         return mArtistsList;
     }
@@ -95,7 +87,7 @@ public class ArtistLoader extends WrappedAsyncTaskLoader<List<Artist>> {
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the artist query.
      */
-    public static final Cursor makeArtistCursor(final Context context) {
+    public static Cursor makeArtistCursor(final Context context) {
         return context.getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
                 new String[] {
                         /* 0 */
