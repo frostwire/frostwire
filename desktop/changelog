@@ -1,7 +1,8 @@
 frostwire (6.2.2) stable; urgency=high
+  * Player playback loop modes working as expected again.
   * Portuguese translation update. Thanks Alejandro.
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 24 Jan 2016 18:35:30 -0500
+ -- FrostWire Team <contact@frostwire.com>  Wed, 03 Feb 2016 07:56:40 -0500
  
 frostwire (6.2.1) stable; urgency=high
   * Fixes issue where a corrupted .torrent inside the libtorrent folder

@@ -67,7 +67,7 @@ public class SoundcloudDownload implements BTDownload {
     private final HttpClientListener httpClientListener;
     private final Date dateCreated;
 
-    private final long size;
+    private long size;
     private long bytesReceived;
     private TransferState state;
     private long averageSpeed; // in bytes
@@ -173,12 +173,12 @@ public class SoundcloudDownload implements BTDownload {
 
     @Override
     public int getProgress() {
-        if (size <= 0) {
-            return -1;
-        }
-
         if (isComplete()) {
             return 100;
+        }
+
+        if (size <= 0) {
+            return -1;
         }
 
         int progress = (int) ((bytesReceived * 100) / size);
@@ -446,6 +446,10 @@ public class SoundcloudDownload implements BTDownload {
 
         @Override
         public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
+            if (headerFields != null && headerFields.containsKey("Content-Length")) {
+                String lengthStr = headerFields.get("Content-Length").get(0);
+                SoundcloudDownload.this.size = Long.valueOf(lengthStr);
+            }
         }
     }
 
