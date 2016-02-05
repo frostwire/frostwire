@@ -44,6 +44,9 @@ public final class NavUtils {
      */
     public static void openArtistProfile(final Activity context,
             final String artistName) {
+        if (artistName == null || artistName.isEmpty()) {
+            return;
+        }
 
         // Create a new bundle to transfer the artist info
         final Bundle bundle = new Bundle();
@@ -115,9 +118,6 @@ public final class NavUtils {
      */
     public static void openAudioPlayer(final Activity activity) {
         final Intent intent = new Intent(activity, AudioPlayerActivity.class);
-        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivity(intent);
         activity.finish();
