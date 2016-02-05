@@ -63,16 +63,6 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
     public static final int DISPLAY_ALBUM_SETTING = 2;
 
     /**
-     * The header view
-     */
-    private static final int ITEM_VIEW_TYPE_HEADER = 0;
-
-    /**
-     * * The data in the list.
-     */
-    private static final int ITEM_VIEW_TYPE_MUSIC = 1;
-
-    /**
      * Number of views (ImageView, TextView, header)
      */
     private static final int VIEW_TYPE_COUNT = 3;
@@ -204,25 +194,6 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
                 break;
         }
         return convertView;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getItemId(final int position) {
-        if (position == 0) {
-            return -1;
-        }
-        return position - 1;
     }
 
     /**

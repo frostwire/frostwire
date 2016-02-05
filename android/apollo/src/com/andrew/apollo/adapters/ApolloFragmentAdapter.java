@@ -50,6 +50,17 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     static Logger LOGGER = Logger.getLogger(ApolloFragmentAdapter.class);
 
     /**
+     * The header view
+     */
+    protected static final int ITEM_VIEW_TYPE_HEADER = -1;
+
+    /**
+     * * The data in the list.
+     */
+    protected static final int ITEM_VIEW_TYPE_MUSIC = 0;
+
+
+    /**
      * Used to set the size of the data in the adapter
      */
     protected List<I> mDataList = Lists.newArrayList();
@@ -85,7 +96,9 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      * Method that unloads and clears the items in the adapter
      */
     public void unload() {
-        mData = null;
+        if (this instanceof Cacheable) {
+            mData = null;
+        }
         mDataList.clear();
         clear();
     }
@@ -107,10 +120,10 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     /**
      * Starts playing an album if the user touches the artwork in the list.
      *
-     * @param album The {@link ImageView} holding the album
+     * @param album    The {@link ImageView} holding the album
      * @param position The position of the album to play.
      */
-    protected void playAlbum(final ImageView album, final int position) {
+    protected void initAlbumPlayOnClick(final ImageView album, final int position) {
         if (album != null) {
             album.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -130,7 +143,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
             holder = new MusicHolder(convertView);
             convertView.setTag(holder);
         } else {
-            holder = (MusicHolder)convertView.getTag();
+            holder = (MusicHolder) convertView.getTag();
         }
         return holder;
     }
@@ -163,47 +176,74 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     }
 
     /**
-     * {@inheritDoc}
+     * Some views have multiple view types.
+     * If the View type for the adapter is a ITEM_VIEW_TYPE_HEADER
+     * Our elements are actually displayed starting with an offset of 1 on the listView, gridView.
+     *
+     * @return
+     */
+    public int getOffset() {
+        int offset = 0;
+        if (getItemViewType(0) == ITEM_VIEW_TYPE_HEADER) {
+            offset = 1;
+        }
+        return offset;
+    }
+
+    /**
+     * The adapter's element count
      */
     @Override
     public int getCount() {
-        final int size = mDataList.size();
-        return size == 0 ? 0 : size + 1;
+        if (mDataList != null) {
+            return mDataList.size();
+        }
+        return super.getCount();
     }
 
+    /**
+     * The view count, including a header element if present for this adapter.
+     *
+     * @return
+     */
+    public int getViewCount() {
+        return getCount() + getOffset();
+    }
+
+    /**
+     * @param position - The ACTUAL position in the model container. If you're using an offset based on a list view that has a header element at 0, you must substract to the position you might have.
+     * @return The element at the indexed position in the model container (not the view). null if position is out of bounds.
+     */
     public I getItem(int position) {
-        if (position == 0) {
-            LOGGER.info("getItem(0) -> null.");
+        if (position < 0 || (mDataList != null && position >= mDataList.size())) {
             return null;
         }
-
-        I result;
-
-        if (mDataList != null && !mDataList.isEmpty()) {
-            int realPosition = position - 1;
-            result = mDataList.get(realPosition);
-            LOGGER.info("getItem(" + position + " -> " + realPosition + ") => " + result);
-        } else {
-            result = super.getItem(position);
-        }
-
-        return result;
+        return (mDataList != null && !mDataList.isEmpty()) ? mDataList.get(position) : super.getItem(position);
     }
 
+    /**
+     *
+     * @param position The ACTUAL position in the model container.
+     *                 If you have an extra header element, substract the offset before invoking this method.
+     * @return the object id. if out of bound, returns -1.
+     */
     @Override
     public long getItemId(int position) {
-        if (position == 0) {
-            LOGGER.info("position == 0 -> -1");
+        if (position < 0) {
             return -1;
         }
 
-        int realPosition = position-1;
-        if (mData != null && realPosition < mData.length) {
-            LOGGER.info("using mData[]. "+realPosition+" -> " + mData[realPosition].mItemId);
-            return mData[realPosition].mItemId;
-        } else if (!mDataList.isEmpty() && realPosition < mDataList.size()) {
-            I item = mDataList.get(realPosition);
-            long id=-1;
+        if (this instanceof Cacheable && mData != null) {
+            if (position < mData.length) {
+                return mData[position].mItemId;
+            } else {
+                return -1;
+            }
+        }
+
+        if (mDataList != null && !mDataList.isEmpty() && position < mDataList.size()) {
+            I item = mDataList.get(position);
+            long id = -1;
             if (item instanceof Song) {
                 id = ((Song) item).mSongId;
             } else if (item instanceof Album) {
@@ -215,17 +255,15 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
             } else if (item instanceof Artist) {
                 id = ((Artist) item).mArtistId;
             }
-
-            LOGGER.info("using mDataList. "+realPosition+" -> " + id);
             return id;
         }
 
-        return - 1;
+        return -1;
     }
 
     /**
      * @param extra True to load line three and the background image, false
-     *            otherwise.
+     *              otherwise.
      */
     public void setLoadExtraData(final boolean extra) {
         mLoadExtraData = extra;

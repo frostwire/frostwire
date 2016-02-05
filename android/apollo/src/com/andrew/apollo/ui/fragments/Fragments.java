@@ -54,4 +54,8 @@ public class Fragments {
 
     public static final int ARTIST_FRAGMENT_GROUP_ID = 2;
     public static final int ARTIST_FRAGMENT_LOADER_ID = 0;
+
+    public static final int RECENT_FRAGMENT_GROUP_ID = 3;
+    public static final int RECENT_FRAGMENT_LOADER_ID = 0;
+
 }

@@ -36,6 +36,10 @@ import java.util.List;
  */
 public class AlbumFragment extends ApolloFragment<AlbumAdapter, Album> {
 
+    public AlbumFragment(int groupId, int loaderId) {
+        super(groupId, loaderId);
+    }
+
     public AlbumFragment() {
         super(Fragments.ALBUM_FRAGMENT_GROUP_ID, Fragments.ALBUM_FRAGMENT_LOADER_ID);
     }
@@ -84,38 +88,5 @@ public class AlbumFragment extends ApolloFragment<AlbumAdapter, Album> {
     @Override
     public Loader<List<Album>> onCreateLoader(final int id, final Bundle args) {
         return new AlbumLoader(getActivity());
-    }
-
-    /**
-     * Scrolls the list to the currently playing album when the user touches the
-     * header in the {@link TitlePageIndicator}.
-     */
-    public void scrollToCurrentAlbum() {
-        final int currentAlbumPosition = getItemPositionByAlbum();
-
-        if (currentAlbumPosition != 0) {
-            if (isSimpleLayout()) {
-                mListView.setSelection(currentAlbumPosition);
-            } else {
-                mGridView.setSelection(currentAlbumPosition);
-            }
-        }
-    }
-
-    /**
-     * @return The position of an item in the list or grid based on the id of
-     *         the currently playing album.
-     */
-    private int getItemPositionByAlbum() {
-        final long albumId = MusicUtils.getCurrentAlbumId();
-        if (mAdapter == null) {
-            return 0;
-        }
-        for (int i = 0; i < mAdapter.getCount(); i++) {
-            if (mAdapter.getItem(i).mAlbumId == albumId) {
-                return i;
-            }
-        }
-        return 0;
     }
 }

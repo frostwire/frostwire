@@ -71,10 +71,17 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
         holder.mLineOne.get().setText(dataHolder.mLineOne);
         // Set the number of albums (line two)
         holder.mLineTwo.get().setText(dataHolder.mLineTwo);
-        // Asynchronously load the artist image into the adapter
-        mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mImage.get());
 
-        if (mLoadExtraData) {
+        if (mImageFetcher == null) {
+            LOGGER.warn("ArtistAdapter has null image fetcher");
+        }
+
+        if (mImageFetcher != null) {
+            // Asynchronously load the artist image into the adapter
+            mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mImage.get());
+        }
+
+        if (mLoadExtraData && mImageFetcher != null) {
             // Make sure the background layer gets set
             holder.mOverlay.get().setBackgroundColor(mOverlayColor);
             // Set the number of songs (line three)
@@ -114,18 +121,20 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
             // Build the artist
             final Artist artist = getItem(i);
 
-            // Build the data holder
-            mData[i] = new DataHolder();
-            // Artist Id
-            mData[i].mItemId = artist.mArtistId;
-            // Artist names (line one)
-            mData[i].mLineOne = artist.mArtistName;
-            // Number of albums (line two)
-            mData[i].mLineTwo = MusicUtils.makeLabel(getContext(),
-                    R.plurals.Nalbums, artist.mAlbumNumber);
-            // Number of songs (line three)
-            mData[i].mLineThree = MusicUtils.makeLabel(getContext(),
-                    R.plurals.Nsongs, artist.mSongNumber);
+            if (artist != null) {
+                // Build the data holder
+                mData[i] = new DataHolder();
+                // Artist Id
+                mData[i].mItemId = artist.mArtistId;
+                // Artist names (line one)
+                mData[i].mLineOne = artist.mArtistName;
+                // Number of albums (line two)
+                mData[i].mLineTwo = MusicUtils.makeLabel(getContext(),
+                        R.plurals.Nalbums, artist.mAlbumNumber);
+                // Number of songs (line three)
+                mData[i].mLineThree = MusicUtils.makeLabel(getContext(),
+                        R.plurals.Nsongs, artist.mSongNumber);
+            }
         }
     }
 

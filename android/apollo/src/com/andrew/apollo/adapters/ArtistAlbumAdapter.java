@@ -35,16 +35,6 @@ import com.frostwire.util.Ref;
 public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
 
     /**
-     * The header view
-     */
-    private static final int ITEM_VIEW_TYPE_HEADER = 0;
-
-    /**
-     * * The data in the list.
-     */
-    private static final int ITEM_VIEW_TYPE_MUSIC = 1;
-
-    /**
      * Number of views (ImageView, TextView, header)
      */
     private static final int VIEW_TYPE_COUNT = 3;
@@ -114,8 +104,9 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
         mImageFetcher.loadAlbumImage(album.mArtistName,
                 albumName, album.mAlbumId,
                 holder.mImage.get());
+
         // Play the album when the artwork is touched
-        playAlbum(holder.mImage.get(), position);
+        initAlbumPlayOnClick(holder.mImage.get(), position);
         return convertView;
     }
 
@@ -144,7 +135,7 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
      * @param album The {@link ImageView} holding the album
      * @param position The position of the album to play.
      */
-    protected void playAlbum(final ImageView album, final int position) {
+    protected void initAlbumPlayOnClick(final ImageView album, final int position) {
         if (album != null) {
             album.setOnClickListener(new OnClickListener() {
 

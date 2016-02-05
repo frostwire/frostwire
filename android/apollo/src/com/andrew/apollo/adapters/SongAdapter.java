@@ -32,7 +32,7 @@ import com.frostwire.util.Ref;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class SongAdapter extends ApolloFragmentAdapter<Song> {
+public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFragmentAdapter.Cacheable {
 
     /**
      * Number of views (TextView)
@@ -81,14 +81,6 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> {
      * {@inheritDoc}
      */
     @Override
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public int getViewTypeCount() {
         return VIEW_TYPE_COUNT;
     }
@@ -115,14 +107,6 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> {
             // Artist name (line two)
             mData[i].mLineTwo = song.mArtistName;
         }
-    }
-
-    /**
-     * Method that unloads and clears the items in the adapter
-     */
-    public void unload() {
-        clear();
-        mData = null;
     }
 
     @Override

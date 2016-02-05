@@ -92,21 +92,32 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
                 holder.mLineTwo.get().setText(dataHolder.mLineTwo);
             }
         }
-        // Asynchronously load the album images into the adapter
-        mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mItemId,
-                holder.mImage.get());
+
+        if (mImageFetcher == null) {
+            LOGGER.warn("ArtistAdapter has null image fetcher");
+        }
+
+        if (mImageFetcher != null) {
+            // Asynchronously load the album images into the adapter
+            mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mItemId,
+                    holder.mImage.get());
+        }
+
         // List view only items
         if (mLoadExtraData) {
             // Make sure the background layer gets set
             holder.mOverlay.get().setBackgroundColor(mOverlay);
             // Set the number of songs (line three)
             holder.mLineThree.get().setText(dataHolder.mLineThree);
-            // Asynchronously load the artist image on the background view
-            mImageFetcher.loadArtistImage(dataHolder.mLineTwo, holder.mBackground.get());
+
+            if (mImageFetcher != null) {
+                // Asynchronously load the artist image on the background view
+                mImageFetcher.loadArtistImage(dataHolder.mLineTwo, holder.mBackground.get());
+            }
         }
         if (mTouchPlay) {
             // Play the album when the artwork is touched
-            playAlbum(holder.mImage.get(), position);
+            initAlbumPlayOnClick(holder.mImage.get(), position);
         }
         return convertView;
     }
@@ -169,13 +180,6 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
             mImageFetcher.removeFromCache(
                     ImageFetcher.generateAlbumCacheKey(album.mAlbumName, album.mArtistName));
         }
-    }
-
-    /**
-     * Flushes the disk cache.
-     */
-    public void flush() {
-        mImageFetcher.flush();
     }
 
     /**

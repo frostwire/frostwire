@@ -66,7 +66,7 @@ public class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> {
         // Enable the options menu
         setHasOptionsMenu(true);
         // Start the loader
-        getLoaderManager().initLoader(Fragments.ARTIST_FRAGMENT_LOADER_ID, null, this);
+        getLoaderManager().initLoader(Fragments.ARTIST_FRAGMENT_LOADER_ID, savedInstanceState, this);
     }
 
     @Override

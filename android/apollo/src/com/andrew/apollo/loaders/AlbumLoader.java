@@ -19,6 +19,7 @@ import android.provider.MediaStore.Audio.AlbumColumns;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
+import com.frostwire.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +33,9 @@ import java.util.List;
  * @author Angel Leon (gubatron@gmail.com)
  */
 public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
+
+    private static Logger LOGGER = Logger.getLogger(AlbumLoader.class);
+
     /**
      * Constructor of <code>AlbumLoader</code>
      * 
@@ -58,6 +62,10 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
 
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
+            String an = mCursor.getString(1) != null ? mCursor.getString(1) : "n/a";
+            String art = mCursor.getString(2) != null ? mCursor.getString(2) : "n/a";
+            LOGGER.info("first album loaded? id: " + mCursor.getLong(0) + " - albumName: " + an + " - artist: " + art);
+
             do {
                 // Copy the album id
                 final long id = mCursor.getLong(0);
