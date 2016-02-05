@@ -1,3 +1,16 @@
+FrostWire 1.7.1 - FEBRUARY/04/2016
+ - New "Experimental Features" option available. In order to move at a
+   faster pace and keep up with Android's endless architectural changes
+   and fragmentation issues, we're rolling out experimental features
+   with a switch you can turn on to help us test and fix faster.
+ - [Experimental] Integration of Android's new Storage Access Framework.
+   Android 5.x and up users are now able to save files on your SD Card
+   and not use up your internal memory once again.
+ - Upgraded to new jlibtorrent 1.1.0.20.
+ - Greatly improved Spanish translation.
+ - Improved track sharing on social networks.
+ - Crash fixes.
+
 FrostWire 1.7.0 - JANUARY/12/2016
  - Updated to new jlibtorrent 1.1.0.19.
  - Torrent transfers are now shown immediatly after they start.
