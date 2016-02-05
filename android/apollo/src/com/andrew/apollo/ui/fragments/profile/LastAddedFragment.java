@@ -36,7 +36,8 @@ import java.util.List;
  * within the last four weeks.
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
- * @author Angel Leon (gubatron@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
  */
 public class LastAddedFragment extends ApolloFragment<ProfileSongAdapter, Song> {
 
@@ -44,7 +45,7 @@ public class LastAddedFragment extends ApolloFragment<ProfileSongAdapter, Song> 
      * Empty constructor as per the {@link Fragment} documentation
      */
     public LastAddedFragment() {
-        super(Fragments.LAST_ADDED_FRAGMENT_GROUP_ID, Fragments.LAST_ADDED_FRAGMENT_LOADER_ID);
+        super(Fragments.LAST_ADDED_PROFILE_FRAGMENT_GROUP_ID, Fragments.LAST_ADDED_PROFILE_FRAGMENT_LOADER_ID);
     }
 
     protected ProfileSongAdapter createAdapter() {
@@ -72,7 +73,7 @@ public class LastAddedFragment extends ApolloFragment<ProfileSongAdapter, Song> 
         super.onCreateContextMenu(menu, v, menuInfo);
 
         // View more content by the song artist
-        menu.add(Fragments.LAST_ADDED_FRAGMENT_GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE,
+        menu.add(Fragments.LAST_ADDED_PROFILE_FRAGMENT_GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE,
                 getString(R.string.context_menu_more_by_artist));
     }
 

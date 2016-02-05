@@ -33,7 +33,8 @@ import java.util.List;
  * This class is used to display all of the songs in {@link FavoritesStore}.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
- * @author Angel Leon (gubatron@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
  */
 public class FavoriteFragment extends ApolloFragment<ProfileSongAdapter, Song> {
 
@@ -41,7 +42,7 @@ public class FavoriteFragment extends ApolloFragment<ProfileSongAdapter, Song> {
      * Empty constructor as per the {@link Fragment} documentation
      */
     public FavoriteFragment() {
-        super(Fragments.FAVORITE_FRAGMENT_GROUP_ID, Fragments.FAVORITE_FRAGMENT_LOADER_ID);
+        super(Fragments.FAVORITE_PROFILE_FRAGMENT_GROUP_ID, Fragments.FAVORITE_PROFILE_FRAGMENT_LOADER_ID);
     }
 
     @Override

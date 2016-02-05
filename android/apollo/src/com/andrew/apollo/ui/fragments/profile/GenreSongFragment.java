@@ -31,14 +31,15 @@ import java.util.List;
  * This class is used to display all of the songs from a particular playlist.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
- * @author Angel Leon (gubatron@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
  */
 public class GenreSongFragment extends ApolloFragment<ProfileSongAdapter, Song> {
     /**
      * Empty constructor as per the {@link Fragment} documentation
      */
     public GenreSongFragment() {
-        super(Fragments.GENRE_SONG_FRAGMENT_GROUP_ID, Fragments.GENRE_SONG_FRAGMENT_LOADER_ID);
+        super(Fragments.GENRE_SONG_PROFILE_FRAGMENT_GROUP_ID, Fragments.GENRE_SONG_PROFILE_FRAGMENT_LOADER_ID);
     }
 
     @Override

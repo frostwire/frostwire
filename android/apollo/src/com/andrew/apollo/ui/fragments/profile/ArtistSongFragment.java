@@ -31,7 +31,8 @@ import java.util.List;
  * This class is used to display all of the songs from a particular artist.
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
- * @author Angel Leon (gubatron@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
  */
 public class ArtistSongFragment extends ApolloFragment<ProfileSongAdapter, Song> {
 
@@ -39,7 +40,7 @@ public class ArtistSongFragment extends ApolloFragment<ProfileSongAdapter, Song>
      * Empty constructor as per the {@link Fragment} documentation
      */
     public ArtistSongFragment() {
-        super(Fragments.ARTIST_SONG_FRAGMENT_GROUP_ID, Fragments.ARTIST_SONG_FRAGMENT_LOADER_ID);
+        super(Fragments.ARTIST_SONG_PROFILE_FRAGMENT_GROUP_ID, Fragments.ARTIST_SONG_PROFILE_FRAGMENT_LOADER_ID);
     }
 
     /**

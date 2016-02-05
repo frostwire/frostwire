@@ -30,13 +30,11 @@ import com.andrew.apollo.adapters.ApolloFragmentAdapter;
 import com.andrew.apollo.menu.CreateNewPlaylist;
 import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.menu.FragmentMenuItems;
-import com.andrew.apollo.model.Album;
-import com.andrew.apollo.model.Artist;
-import com.andrew.apollo.model.Genre;
-import com.andrew.apollo.model.Song;
+import com.andrew.apollo.model.*;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.recycler.RecycleHolder;
+import com.andrew.apollo.ui.activities.BaseActivity;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
@@ -133,6 +131,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         super.onAttach(activity);
         mProfileTabCarousel = (ProfileTabCarousel)activity
                 .findViewById(R.id.activity_profile_base_tab_carousel);
+
+        // Register the music status listener
+        ((BaseActivity)activity).setMusicStateListenerListener(this);
     }
 
     @Override
@@ -205,7 +206,11 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         } else if (mItem instanceof Genre) {
             Genre mGenre = (Genre) mItem;
             mSelectedId = mGenre.mGenreId;
-
+            mSongList = MusicUtils.getSongListForGenre(getActivity(), mGenre.mGenreId);
+        } else if (mItem instanceof Playlist) {
+            Playlist mPlaylist = (Playlist) mItem;
+            mSelectedId = mPlaylist.mPlaylistId;
+            mSongList = MusicUtils.getSongListForPlaylist(getActivity(), mPlaylist.mPlaylistId);
         }
 
         // Play the selected songs
@@ -431,6 +436,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * Restarts the loader.
      */
     public void refresh() {
+        //SystemClock.sleep(2);
+
         // Scroll to the stop of the list before restarting the loader.
         // Otherwise, if the user has scrolled enough to move the header, it
         // becomes misplaced and needs to be reset.
@@ -459,12 +466,12 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     }
 
-    public void onMetaChanged() {
+    public void restartLoader() {
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
-    public void restartLoader() {
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
+    public void onMetaChanged() {
+        restartLoader();
     }
 
     protected boolean isSimpleLayout() {
@@ -621,5 +628,34 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 mGridView.setSelection(currentAlbumPosition);
             }
         }
+    }
+
+    /**
+     * Scrolls the list to the currently playing song when the user touches the
+     * header in the {@link TitlePageIndicator}.
+     */
+    public void scrollToCurrentSong() {
+        final int currentSongPosition = getItemPositionBySong();
+
+        if (currentSongPosition != 0) {
+            mListView.setSelection(currentSongPosition);
+        }
+    }
+
+    /**
+     * @return The position of an item in the list based on the name of the
+     *         currently playing song.
+     */
+    protected int getItemPositionBySong() {
+        final long trackId = MusicUtils.getCurrentAudioId();
+        if (mAdapter == null) {
+            return 0;
+        }
+        for (int i = 0; i < mAdapter.getCount(); i++) {
+            if (((Song) mAdapter.getItem(i)).mSongId == trackId) {
+                return i;
+            }
+        }
+        return 0;
     }
 }

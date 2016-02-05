@@ -35,6 +35,8 @@ import static com.andrew.apollo.utils.PreferenceUtils.ARTIST_LAYOUT;
  * This class is used to display all of the artists on a user's device.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
  */
 public class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> {
 
@@ -47,9 +49,6 @@ public class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> {
         super(Fragments.ARTIST_FRAGMENT_GROUP_ID, Fragments.ARTIST_FRAGMENT_LOADER_ID);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
@@ -57,9 +56,6 @@ public class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> {
         ((BaseActivity)activity).setMusicStateListenerListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -87,9 +83,6 @@ public class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> {
         return ARTIST_LAYOUT;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
             final long id) {
@@ -97,9 +90,6 @@ public class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> {
         NavUtils.openArtistProfile(getActivity(), mItem.mArtistName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Loader<List<Artist>> onCreateLoader(final int id, final Bundle args) {
         return new ArtistLoader(getActivity());

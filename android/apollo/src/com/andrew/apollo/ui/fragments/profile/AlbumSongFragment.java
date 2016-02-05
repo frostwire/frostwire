@@ -30,7 +30,8 @@ import java.util.List;
 /**
  * This class is used to display all of the songs from a particular album.
  *
- * @author Angel Leon (gubatron@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class AlbumSongFragment extends ApolloFragment<ProfileSongAdapter, Song> {
@@ -38,7 +39,7 @@ public class AlbumSongFragment extends ApolloFragment<ProfileSongAdapter, Song> 
      * Empty constructor as per the {@link Fragment} documentation
      */
     public AlbumSongFragment() {
-        super(Fragments.ALBUM_SONG_FRAGMENT_GROUP_ID, Fragments.ALBUM_SONG_FRAGMENT_LOADER_ID);
+        super(Fragments.ALBUM_SONG_PROFILE_FRAGMENT_GROUP_ID, Fragments.ALBUM_SONG_PROFILE_FRAGMENT_LOADER_ID);
     }
 
     @Override

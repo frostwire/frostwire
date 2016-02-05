@@ -24,7 +24,6 @@ import com.andrew.apollo.loaders.RecentLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.ui.activities.BaseActivity;
-import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
@@ -82,7 +81,7 @@ public class RecentFragment extends AlbumFragment {
 
     @Override
     protected String getLayoutTypeName() {
-        return PreferenceUtils.SIMPLE_LAYOUT;
+        return PreferenceUtils.RECENT_LAYOUT;
     }
 
     /**

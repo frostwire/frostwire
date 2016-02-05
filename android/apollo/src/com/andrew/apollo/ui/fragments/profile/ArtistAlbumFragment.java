@@ -33,12 +33,13 @@ import java.util.List;
  * This class is used to display all of the albums from a particular artist.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
- * @author Angel Leon (gubatron@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
  */
 public class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Album> {
 
     public ArtistAlbumFragment() {
-        super(Fragments.ARTIST_ALBUM_FRAGMENT_GROUP_ID,Fragments.ARTIST_ALBUM_FRAGMENT_LOADER_ID);
+        super(Fragments.ARTIST_ALBUM_PROFILE_FRAGMENT_GROUP_ID,Fragments.ARTIST_ALBUM_PROFILE_FRAGMENT_LOADER_ID);
     }
 
     /**
@@ -78,10 +79,6 @@ public class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Albu
                             final View view,
                             final int position,
                             final long id) {
-//        if (position == 0) {
-//            return;
-//        }
-//        mItem = mAdapter.getItem(position - 1);
         mItem = mAdapter.getItem(position);
         NavUtils.openAlbumProfile(getActivity(), mItem.mAlbumName, mItem.mArtistName, mItem.mAlbumId);
         getActivity().finish();

@@ -41,7 +41,8 @@ import java.util.List;
  * This class is used to display all of the songs from a particular playlist.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
- * @author Angel Leon (gubatron@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
  */
 public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Song> implements DropListener, RemoveListener, DragScrollProfile {
 
@@ -49,7 +50,7 @@ public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Son
      * Empty constructor as per the {@link Fragment} documentation
      */
     public PlaylistSongFragment() {
-        super(Fragments.PLAYLIST_SONG_FRAGMENT_GROUP_ID, Fragments.PLAYLIST_SONG_FRAGMENT_LOADER_ID);
+        super(Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_GROUP_ID, Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_LOADER_ID);
     }
 
     @Override
@@ -70,11 +71,11 @@ public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Son
         super.onCreateContextMenu(menu, v, menuInfo);
 
         // View more content by the song artist
-        menu.add(Fragments.PLAYLIST_SONG_FRAGMENT_GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE,
+        menu.add(Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE,
                 getString(R.string.context_menu_more_by_artist));
 
         // Remove the song from playlist
-        menu.add(Fragments.PLAYLIST_SONG_FRAGMENT_GROUP_ID, FragmentMenuItems.REMOVE_FROM_PLAYLIST, Menu.NONE,
+        menu.add(Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_GROUP_ID, FragmentMenuItems.REMOVE_FROM_PLAYLIST, Menu.NONE,
                 getString(R.string.context_menu_remove_from_playlist));
     }
 
