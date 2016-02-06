@@ -12,18 +12,16 @@
 package com.andrew.apollo.adapters;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-
 import com.andrew.apollo.model.Song;
-import com.andrew.apollo.ui.MusicHolder;
-import com.andrew.apollo.ui.MusicHolder.DataHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
+import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.QueueFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.util.Ref;
+import com.andrew.apollo.utils.Ref;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the songs on a user's
@@ -49,7 +47,7 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicHolder holder = prepareMusicHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
         if (holder != null && Ref.alive(holder.mLineThree)) {
             holder.mLineThree.get().setVisibility(View.GONE);
         }

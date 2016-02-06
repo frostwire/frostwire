@@ -20,11 +20,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import com.andrew.apollo.model.Album;
-import com.andrew.apollo.ui.MusicHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
-import com.frostwire.util.Ref;
+
 
 /**
  * This {@link ArrayAdapter} is used to display the albums for a particular
@@ -75,13 +76,13 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
         }
 
         // Recycle MusicHolder's items
-        MusicHolder holder = prepareMusicHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
         if (holder != null && Ref.alive(holder.mOverlay)) {
             holder.mOverlay.get().setBackgroundColor(0);
         }
 
         // Retrieve the album
-        final Album album = getItem(position - 1);
+        final Album album = getItem(position - getOffset());
         final String albumName = album.mAlbumName;
 
         if (holder != null) {
@@ -100,13 +101,18 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
             }
         }
 
-        // Asynchronously load the album images into the adapter
-        mImageFetcher.loadAlbumImage(album.mArtistName,
-                albumName, album.mAlbumId,
-                holder.mImage.get());
+        if (mImageFetcher != null && Ref.alive(holder.mImage)) {
+            // Asynchronously load the album images into the adapter
+            mImageFetcher.loadAlbumImage(album.mArtistName,
+                    albumName, album.mAlbumId,
+                    holder.mImage.get());
+        }
 
         // Play the album when the artwork is touched
-        initAlbumPlayOnClick(holder.mImage.get(), position);
+        if (holder != null && Ref.alive(holder.mImage)) {
+            initAlbumPlayOnClick(holder.mImage.get(), position - getOffset());
+        }
+
         return convertView;
     }
 
@@ -133,15 +139,15 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
      * Starts playing an album if the user touches the artwork in the list.
      * 
      * @param album The {@link ImageView} holding the album
-     * @param position The position of the album to play.
+     * @param pos The position of the album to play.
      */
-    protected void initAlbumPlayOnClick(final ImageView album, final int position) {
+    protected void initAlbumPlayOnClick(final ImageView album, final int pos) {
         if (album != null) {
             album.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(final View v) {
-                    final long id = getItem(position - 1).mAlbumId;
+                    final long id = getItem(pos).mAlbumId;
                     final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
                     MusicUtils.playAll(list, 0, false);
                 }

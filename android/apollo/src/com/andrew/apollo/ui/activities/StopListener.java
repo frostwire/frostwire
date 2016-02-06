@@ -22,8 +22,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.core.Constants;
-import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 

@@ -50,9 +50,13 @@ public class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Albu
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
-        // To help make scrolling smooth
-        mListView.setOnScrollListener(new VerticalScrollListener(mScrollableHeader,
-                mProfileTabCarousel, 1));
+
+        if (mListView != null && mProfileTabCarousel != null) {
+            // To help make scrolling smooth
+            mListView.setOnScrollListener(new VerticalScrollListener(mScrollableHeader,
+                    mProfileTabCarousel, 1));
+        }
+
         return rootView;
     }
 

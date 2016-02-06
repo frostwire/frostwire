@@ -27,7 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.*;
-import com.andrew.apollo.ui.MusicHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
@@ -73,7 +73,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     /**
      * Used to cache the album info
      */
-    protected MusicHolder.DataHolder[] mData;
+    protected MusicViewHolder.DataHolder[] mData;
 
     /**
      * Loads line three and the background image if the user decides to.
@@ -136,14 +136,24 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         }
     }
 
-    public static MusicHolder prepareMusicHolder(int mLayoutId, Context context, View convertView, final ViewGroup parent) {
-        MusicHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
-            convertView.setTag(holder);
+    public static MusicViewHolder prepareMusicViewHolder(int mLayoutId, Context context, View convertView, final ViewGroup parent) {
+        MusicViewHolder holder = null;
+        if (convertView != null) {
+            holder = (MusicViewHolder) convertView.getTag();
         } else {
-            holder = (MusicHolder) convertView.getTag();
+            try {
+                convertView = LayoutInflater.from(context).inflate(mLayoutId, parent, false);
+            } catch (Throwable t) {
+                holder = null;
+            }
+        }
+
+        if (holder == null && convertView != null) {
+            holder = new MusicViewHolder(convertView);
+        }
+
+        if (convertView != null && holder != null) {
+            convertView.setTag(holder);
         }
         return holder;
     }
@@ -156,16 +166,6 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
             mImageFetcher.setPauseDiskCache(pause);
         }
     }
-
-//    /**
-//     * @param album The key used to find the cached album to remove
-//     */
-//    public void removeFromCache(final Album album) {
-//        if (mImageFetcher != null) {
-//            mImageFetcher.removeFromCache(
-//                    ImageFetcher.generateAlbumCacheKey(album.mAlbumName, album.mArtistName));
-//        }
-//    }
 
     /**
      * {@inheritDoc}

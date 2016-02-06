@@ -54,7 +54,7 @@ import com.frostwire.android.R;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.format.PrefixHighlighter;
 import com.andrew.apollo.recycler.RecycleHolder;
-import com.andrew.apollo.ui.MusicHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
@@ -446,9 +446,9 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
         @Override
         public void bindView(final View convertView, final Context context, final Cursor cursor) {
             /* Recycle ViewHolder's items */
-            MusicHolder holder = (MusicHolder)convertView.getTag();
+            MusicViewHolder holder = (MusicViewHolder)convertView.getTag();
             if (holder == null) {
-                holder = new MusicHolder(convertView);
+                holder = new MusicViewHolder(convertView);
                 convertView.setTag(holder);
             }
 

@@ -13,17 +13,15 @@ package com.andrew.apollo.adapters;
 
 import android.content.Context;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.model.Genre;
-import com.andrew.apollo.ui.MusicHolder;
-import com.andrew.apollo.ui.MusicHolder.DataHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
+import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.GenreFragment;
-import com.frostwire.util.Ref;
+import com.andrew.apollo.utils.Ref;
+import com.frostwire.android.R;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the genres on a user's
@@ -31,7 +29,7 @@ import com.frostwire.util.Ref;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class GenreAdapter extends ApolloFragmentAdapter<Genre> {
+public class GenreAdapter extends ApolloFragmentAdapter<Genre> implements ApolloFragmentAdapter.Cacheable {
 
     /**
      * Number of views (TextView)
@@ -47,13 +45,10 @@ public class GenreAdapter extends ApolloFragmentAdapter<Genre> {
         return getItem(position).mGenreId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicHolder holder = prepareMusicHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
         if (holder != null) {
             if (Ref.alive(holder.mLineTwo)) {
                 holder.mLineTwo.get().setVisibility(View.GONE);
@@ -78,17 +73,11 @@ public class GenreAdapter extends ApolloFragmentAdapter<Genre> {
         return convertView;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasStableIds() {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getViewTypeCount() {
         return VIEW_TYPE_COUNT;

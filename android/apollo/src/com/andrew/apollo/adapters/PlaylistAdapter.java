@@ -18,8 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import com.andrew.apollo.model.Playlist;
-import com.andrew.apollo.ui.MusicHolder;
-import com.andrew.apollo.ui.MusicHolder.DataHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
+import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.frostwire.android.R;
 
@@ -29,7 +29,7 @@ import com.frostwire.android.R;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> {
+public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements ApolloFragmentAdapter.Cacheable {
 
     /**
      * Number of views (TextView)
@@ -57,10 +57,10 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> {
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicHolder holder;
+        MusicViewHolder holder;
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
+            holder = new MusicViewHolder(convertView);
             // Hide the second and third lines of text
             holder.mLineTwo.get().setVisibility(View.GONE);
             holder.mLineThree.get().setVisibility(View.GONE);
@@ -69,7 +69,7 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> {
                     getContext().getResources().getDimension(R.dimen.text_size_large));
             convertView.setTag(holder);
         } else {
-            holder = (MusicHolder)convertView.getTag();
+            holder = (MusicViewHolder)convertView.getTag();
         }
 
         // Retrieve the data holder

@@ -113,12 +113,10 @@ public class RecentFragment extends AlbumFragment {
     }
 
     protected boolean isSimpleLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(RECENT_LAYOUT,
-                getActivity());
+        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(RECENT_LAYOUT);
     }
 
     protected boolean isDetailedLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isDetailedLayout(RECENT_LAYOUT,
-                getActivity());
+        return PreferenceUtils.getInstance(getActivity()).isDetailedLayout(RECENT_LAYOUT);
     }
 }

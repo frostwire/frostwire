@@ -47,7 +47,7 @@ import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.util.Ref;
+import com.andrew.apollo.utils.Ref;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;

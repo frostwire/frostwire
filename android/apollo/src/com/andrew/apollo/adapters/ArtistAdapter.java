@@ -18,9 +18,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.andrew.apollo.model.Artist;
-import com.andrew.apollo.ui.MusicHolder;
-import com.andrew.apollo.ui.MusicHolder.DataHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
+import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
 
 /**
@@ -62,34 +63,53 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicHolder holder = prepareMusicHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
 
         // Retrieve the data holder
         final DataHolder dataHolder = mData[position];
 
-        // Set each artist name (line one)
-        holder.mLineOne.get().setText(dataHolder.mLineOne);
-        // Set the number of albums (line two)
-        holder.mLineTwo.get().setText(dataHolder.mLineTwo);
+        if (holder != null && dataHolder != null) {
+            // Set each artist name (line one)
+            if (Ref.alive(holder.mLineOne)) {
+                holder.mLineOne.get().setText(dataHolder.mLineOne);
+            }
+
+            // Set the number of albums (line two)
+            if (Ref.alive(holder.mLineTwo)) {
+                holder.mLineTwo.get().setText(dataHolder.mLineTwo);
+            }
+        }
 
         if (mImageFetcher == null) {
             LOGGER.warn("ArtistAdapter has null image fetcher");
         }
 
-        if (mImageFetcher != null) {
+        if (mImageFetcher != null && dataHolder != null && Ref.alive(holder.mImage)) {
             // Asynchronously load the artist image into the adapter
             mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mImage.get());
         }
 
-        if (mLoadExtraData && mImageFetcher != null) {
-            // Make sure the background layer gets set
-            holder.mOverlay.get().setBackgroundColor(mOverlayColor);
-            // Set the number of songs (line three)
-            holder.mLineThree.get().setText(dataHolder.mLineThree);
-            // Set the background image
-            mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mBackground.get());
-            // Play the artist when the artwork is touched
-            playArtist(holder.mImage.get(), position);
+        if (mLoadExtraData && mImageFetcher != null && holder != null) {
+            if (Ref.alive(holder.mOverlay)) {
+                // Make sure the background layer gets set
+                holder.mOverlay.get().setBackgroundColor(mOverlayColor);
+            }
+
+            if (Ref.alive(holder.mLineThree)) {
+                // Set the number of songs (line three)
+                holder.mLineThree.get().setText(dataHolder.mLineThree);
+            }
+
+
+            if (Ref.alive(holder.mBackground)) {
+                // Set the background image
+                mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mBackground.get());
+            }
+
+            if (Ref.alive(holder.mImage)) {
+                // Play the artist when the artwork is touched
+                initArtistPlayOnClick(holder.mImage.get(), position);
+            }
         }
         return convertView;
     }
@@ -145,7 +165,7 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
      * @param artist The {@link ImageView} holding the aritst image
      * @param position The position of the artist to play.
      */
-    private void playArtist(final ImageView artist, final int position) {
+    private void initArtistPlayOnClick(final ImageView artist, final int position) {
         artist.setOnClickListener(new OnClickListener() {
 
             @Override

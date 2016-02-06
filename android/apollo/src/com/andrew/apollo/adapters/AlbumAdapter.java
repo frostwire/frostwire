@@ -17,13 +17,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.Album;
-import com.andrew.apollo.ui.MusicHolder;
-import com.andrew.apollo.ui.MusicHolder.DataHolder;
-import com.andrew.apollo.utils.ApolloUtils;
+import com.andrew.apollo.ui.MusicViewHolder;
+import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
 import com.frostwire.logging.Logger;
-import com.frostwire.util.Ref;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the albums on a user's
@@ -41,19 +40,9 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
     private static final int VIEW_TYPE_COUNT = 2;
 
     /**
-     * Image cache and image fetcher
-     */
-    private final ImageFetcher mImageFetcher;
-
-    /**
      * Semi-transparent overlay
      */
     private final int mOverlay;
-
-    /**
-     * Determines if the grid or list should be the default style
-     */
-    private boolean mLoadExtraData = false;
 
     /**
      * Sets the album art on click listener to start playing them album when
@@ -66,8 +55,6 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
      */
     public AlbumAdapter(final Activity context, final int layoutId) {
         super(context, layoutId);
-        // Initialize the cache & image fetcher
-        mImageFetcher = ApolloUtils.getImageFetcher(context);
         // Cache the transparent overlay
         mOverlay = context.getResources().getColor(R.color.list_item_background);
     }
@@ -78,11 +65,11 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicHolder holder = prepareMusicHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
         // Retrieve the data holder
         final DataHolder dataHolder = mData[position];
 
-        if (holder != null) {
+        if (holder != null && dataHolder != null) {
             // Set each album name (line one)
             if (Ref.alive(holder.mLineOne)) {
                 holder.mLineOne.get().setText(dataHolder.mLineOne);
@@ -97,28 +84,34 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
             LOGGER.warn("ArtistAdapter has null image fetcher");
         }
 
-        if (mImageFetcher != null) {
+        if (mImageFetcher != null && dataHolder != null && Ref.alive(holder.mImage)) {
             // Asynchronously load the album images into the adapter
-            mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mItemId,
-                    holder.mImage.get());
+            mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mItemId, holder.mImage.get());
         }
 
         // List view only items
-        if (mLoadExtraData) {
-            // Make sure the background layer gets set
-            holder.mOverlay.get().setBackgroundColor(mOverlay);
-            // Set the number of songs (line three)
-            holder.mLineThree.get().setText(dataHolder.mLineThree);
+        if (mLoadExtraData && holder != null && dataHolder != null) {
+            if (Ref.alive(holder.mOverlay)) {
+                // Make sure the background layer gets set
+                holder.mOverlay.get().setBackgroundColor(mOverlay);
+            }
 
-            if (mImageFetcher != null) {
+            if (Ref.alive(holder.mLineThree)) {
+                // Set the number of songs (line three)
+                holder.mLineThree.get().setText(dataHolder.mLineThree);
+            }
+
+            if (mImageFetcher != null && Ref.alive(holder.mBackground)) {
                 // Asynchronously load the artist image on the background view
                 mImageFetcher.loadArtistImage(dataHolder.mLineTwo, holder.mBackground.get());
             }
         }
-        if (mTouchPlay) {
+
+        if (mTouchPlay && holder != null && Ref.alive(holder.mImage)) {
             // Play the album when the artwork is touched
             initAlbumPlayOnClick(holder.mImage.get(), position);
         }
+
         return convertView;
     }
 

@@ -12,8 +12,6 @@
 package com.andrew.apollo.adapters;
 
 import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,18 +19,15 @@ import android.widget.ArrayAdapter;
 
 import com.frostwire.android.R;
 import com.andrew.apollo.model.Song;
-import com.andrew.apollo.ui.MusicHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
 import com.andrew.apollo.ui.fragments.profile.FavoriteFragment;
 import com.andrew.apollo.ui.fragments.profile.GenreSongFragment;
 import com.andrew.apollo.ui.fragments.profile.LastAddedFragment;
 import com.andrew.apollo.ui.fragments.profile.PlaylistSongFragment;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.logging.Logger;
-
-import java.util.List;
 
 /**
  * This {@link ArrayAdapter} is used to display the songs for a particular
@@ -139,25 +134,19 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
         }
 
         // Recycle MusicHolder's items
-        MusicHolder holder;
+        MusicViewHolder holder;
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
+            holder = new MusicViewHolder(convertView);
             // Hide the third line of text
             holder.mLineThree.get().setVisibility(View.GONE);
             convertView.setTag(holder);
         } else {
-            holder = (MusicHolder)convertView.getTag();
+            holder = (MusicViewHolder)convertView.getTag();
         }
 
         // Retrieve the album
-        final Song song = getItem(position - 1);
-
-        if (song == null) {
-            LOGGER.info("getItem("+position+" - 1) == null");
-        } else {
-            LOGGER.info("getItem("+position+" - 1) == " + song.mSongId);
-        }
+        final Song song = getItem(position - getOffset());
 
         // Set each track name (line one)
         holder.mLineOne.get().setText(song.mSongName);

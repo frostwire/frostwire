@@ -60,6 +60,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         AbsListView.OnScrollListener,
         MusicStateListener {
 
+    public volatile static long LAST_REFRESH_TIMESTAMP;
+
     private static Logger LOGGER = Logger.getLogger(ApolloFragment.class);
 
     private final int GROUP_ID;
@@ -121,6 +123,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                                      final long id);
 
     protected ApolloFragment(int groupId, int loaderId) {
+        LOGGER.info(getClass().getName() + ": Constructor("+groupId+","+" "+loaderId+")");
         this.GROUP_ID = groupId;
         this.LOADER_ID = loaderId;
     }
@@ -128,9 +131,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     @SuppressWarnings("deprecation")
     @Override
     public void onAttach(final Activity activity) {
+        LOGGER.info(getClass().getName() + ": onAttach()");
         super.onAttach(activity);
-        mProfileTabCarousel = (ProfileTabCarousel)activity
-                .findViewById(R.id.activity_profile_base_tab_carousel);
+        mProfileTabCarousel = (ProfileTabCarousel) activity.findViewById(R.id.activity_profile_base_tab_carousel);
 
         // Register the music status listener
         ((BaseActivity)activity).setMusicStateListenerListener(this);
@@ -139,40 +142,41 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        // The View for the fragment's UI
-        mRootView = (ViewGroup)inflater.inflate(R.layout.list_base, null);
-        initListView();
-        /**
+        LOGGER.info(getClass().getName() + ": onCreateView()");
         // The View for the fragment's UI
         if (isSimpleLayout()) {
             mRootView = (ViewGroup)inflater.inflate(R.layout.list_base, null);
             initListView();
         } else {
-            mRootView = (ViewGroup)inflater.inflate(R.layout.grid_base, null);
-            initGridView();
-        }
-         */
+            // this inflate here is crashing.
+            LOGGER.info(getClass().getName() + ": About to inflate grid_base.");
+            mRootView = (ViewGroup) inflater.inflate(R.layout.grid_base, null);
+            LOGGER.info(getClass().getName() + ": Inflated it, got it in mRootView.");
 
+            LOGGER.info(getClass().getName() + ": About to initGridView().");
+            initGridView();
+            LOGGER.info(getClass().getName() + ": Done with initGridView().");
+        }
         return mRootView;
     }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
+        LOGGER.info(getClass().getName() + ": onCreate()");
         super.onCreate(savedInstanceState);
         // Create the adapter
         mAdapter = createAdapter();
     }
 
     public T getAdapter() {
+        LOGGER.info(getClass().getName() + ": getAdapter()");
         return mAdapter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v,
                                     final ContextMenu.ContextMenuInfo menuInfo) {
+        LOGGER.info(getClass().getName() + ": onCreateContextMenu()");
         super.onCreateContextMenu(menu, v, menuInfo);
 
         // Get the position of the selected item
@@ -244,6 +248,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     @Override
     public boolean onContextItemSelected(final android.view.MenuItem item) {
+        LOGGER.info(getClass().getName() + ": onContextItemSelected()");
         if (item.getGroupId() == GROUP_ID) {
             final long[] songList = mSongList != null ?
                     mSongList :
@@ -292,6 +297,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     private boolean onRemoveFromRecent()  {
+        LOGGER.info(getClass().getName() + ": onRemoveFromRecent()");
         RecentStore.getInstance(getActivity()).removeItem(mSelectedId);
         MusicUtils.refresh();
         refresh();
@@ -299,6 +305,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     private boolean onDelete(long[] songList) {
+        LOGGER.info(getClass().getName() + ": onDelete()");
         if (songList == null || songList.length == 0) {
             return false;
         }
@@ -323,6 +330,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     private boolean onRemoveFromPlaylist() {
+        LOGGER.info(getClass().getName() + ": onRemoveFromPlaylist()");
         mAdapter.remove(mItem);
         mAdapter.notifyDataSetChanged();
         if (mItem instanceof Song) {
@@ -364,6 +372,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      */
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
+        LOGGER.info(getClass().getName() + ": onActivityCreated()");
         super.onActivityCreated(savedInstanceState);
         // Enable the options menu
         setHasOptionsMenu(true);
@@ -378,6 +387,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
+        LOGGER.info(getClass().getName() + ": onSaveInstanceState()");
         super.onSaveInstanceState(outState);
         outState.putAll(getArguments() != null ? getArguments() : new Bundle());
     }
@@ -387,6 +397,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      */
     @Override
     public void onLoadFinished(final Loader<List<I>> loader, final List<I> data) {
+        LOGGER.info(getClass().getName() + ": onLoadFinished()");
         // Check for any errors
         if (data == null || data.isEmpty()) {
             mAdapter.unload();
@@ -406,26 +417,35 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             return;
         }
 
+        if (mAdapter == null) {
+            mAdapter = createAdapter();
+            if (isSimpleLayout()) {
+                mListView.setAdapter(mAdapter);
+            } else {
+                mGridView.setAdapter(mAdapter);
+            }
+        }
+
         // Start fresh
-        mAdapter.unload();
-        mAdapter.setDataList(data);
+        if (mAdapter != null) {
+            mAdapter.unload();
+            mAdapter.setDataList(data);
 
-        for (final I item : data) {
-            mAdapter.add(item);
+            for (final I item : data) {
+                mAdapter.add(item);
+            }
+
+            if (mAdapter instanceof ApolloFragmentAdapter.Cacheable) {
+                ((ApolloFragmentAdapter.Cacheable) mAdapter).buildCache();
+            }
+
+            mAdapter.notifyDataSetChanged();
         }
-
-        if (mAdapter instanceof ApolloFragmentAdapter.Cacheable) {
-            ((ApolloFragmentAdapter.Cacheable) mAdapter).buildCache();
-        }
-
-        mAdapter.notifyDataSetChanged();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onLoaderReset(final Loader<List<I>> loader) {
+        LOGGER.info(getClass().getName() + ": onLoaderReset()");
         // Clear the data in the adapter
         if (mAdapter != null) {
             mAdapter.unload();
@@ -434,8 +454,18 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     /**
      * Restarts the loader.
+     * (Don't do so until 10 seconds later if you refreshed already)
      */
     public void refresh() {
+        long start = System.currentTimeMillis();
+
+        if (start - LAST_REFRESH_TIMESTAMP < 10000) {
+            LOGGER.info(getClass().getName() + " - too early to refresh() aborting.");
+            return;
+        }
+        LAST_REFRESH_TIMESTAMP = start;
+
+        LOGGER.info(getClass().getName() + " - refresh() started.");
         //SystemClock.sleep(2);
 
         // Scroll to the stop of the list before restarting the loader.
@@ -451,10 +481,13 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
+        long total = System.currentTimeMillis() - start;
+        LOGGER.info(getClass().getName() + " - refresh() finished. ("+total+" ms)");
     }
 
     @Override
     public void onPause() {
+        LOGGER.info(getClass().getName() + ": onPause()");
         super.onPause();
         if (mAdapter != null) {
             mAdapter.flush();
@@ -467,6 +500,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     public void restartLoader() {
+        LOGGER.info(getClass().getName() + ": restartLoader()");
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
@@ -475,25 +509,27 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     protected boolean isSimpleLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName(),
-                getActivity());
+        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName());
     }
 
     protected boolean isDetailedLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isDetailedLayout(getLayoutTypeName(),
-                getActivity());
+        return PreferenceUtils.getInstance(getActivity()).isDetailedLayout(getLayoutTypeName());
     }
 
     /**
      * Sets up the grid view
      */
     protected void initGridView() {
+        LOGGER.info(getClass().getName() + ": initGridView()");
         // Initialize the grid
         mGridView = (GridView) mRootView.findViewById(R.id.grid_base);
-        // Set the data behind the grid
-        mGridView.setAdapter(mAdapter);
-        // Set up the helpers
-        initAbsListView(mGridView);
+
+        if (mGridView != null && mAdapter != null) {
+            // Set the data behind the grid
+            mGridView.setAdapter(mAdapter);
+            // Set up the helpers
+            initAbsListView(mGridView);
+        }
         if (ApolloUtils.isLandscape(getActivity())) {
             if (isDetailedLayout()) {
                 if (mAdapter != null) {
@@ -521,6 +557,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * @param list The list or grid
      */
     private void initAbsListView(final AbsListView list) {
+        LOGGER.info(getClass().getName() + ": initAbsListView()");
         // Release any references to the recycled Views
         list.setRecyclerListener(new RecycleHolder());
         // Listen for ContextMenus to be created
@@ -546,6 +583,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * Sets up the list view
      */
     protected void initListView() {
+        LOGGER.info(getClass().getName() + ": initListView()");
         // Initialize the grid
         mListView = (ListView) mRootView.findViewById(R.id.list_base);
 

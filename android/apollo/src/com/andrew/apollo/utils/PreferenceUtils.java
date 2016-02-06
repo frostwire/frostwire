@@ -363,33 +363,30 @@ public final class PreferenceUtils {
     }
 
     /**
-     * @param context The {@link Context} to use.
      * @param which Which list to check.
      * @return True if the layout type is the simple layout, false otherwise.
      */
-    public boolean isSimpleLayout(final String which, final Context context) {
+    public boolean isSimpleLayout(final String which) {
         final String simple = "simple";
         final String defaultValue = "grid";
         return mPreferences.getString(which, defaultValue).equals(simple);
     }
 
     /**
-     * @param context The {@link Context} to use.
      * @param which Which list to check.
      * @return True if the layout type is the simple layout, false otherwise.
      */
-    public boolean isDetailedLayout(final String which, final Context context) {
+    public boolean isDetailedLayout(final String which) {
         final String detailed = "detailed";
         final String defaultValue = "grid";
         return mPreferences.getString(which, defaultValue).equals(detailed);
     }
 
     /**
-     * @param context The {@link Context} to use.
      * @param which Which list to check.
      * @return True if the layout type is the simple layout, false otherwise.
      */
-    public boolean isGridLayout(final String which, final Context context) {
+    public boolean isGridLayout(final String which) {
         final String grid = "grid";
         final String defaultValue = "simple";
         return mPreferences.getString(which, defaultValue).equals(grid);
