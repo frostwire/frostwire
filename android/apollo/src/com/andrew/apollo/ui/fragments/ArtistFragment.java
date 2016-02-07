@@ -24,6 +24,7 @@ import com.andrew.apollo.ui.activities.BaseActivity;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
+import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 import com.viewpagerindicator.TitlePageIndicator;
 
@@ -126,5 +127,10 @@ public class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> {
             }
         }
         return 0;
+    }
+
+    @Override
+    protected boolean isSimpleLayout() {
+        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName());
     }
 }

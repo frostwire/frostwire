@@ -23,6 +23,8 @@ import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.Ref;
 
+import java.lang.ref.Reference;
+
 /**
  * This {@link ArrayAdapter} is used to display all of the songs on a user's
  * device for {@link SongFragment}. It is also used to show the queue in
@@ -46,22 +48,18 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
      */
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
-        // Recycle ViewHolder's items
-        MusicViewHolder holder = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
+        convertView = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = (MusicViewHolder) convertView.getTag();
         if (holder != null && Ref.alive(holder.mLineThree)) {
             holder.mLineThree.get().setVisibility(View.GONE);
         }
-
-        // Retrieve the data holder
         final DataHolder dataHolder = mData[position];
-
         // Set each song name (line one)
         holder.mLineOne.get().setText(dataHolder.mLineOne);
         // Set the song duration (line one, right)
         holder.mLineOneRight.get().setText(dataHolder.mLineOneRight);
         // Set the artist name (line two)
         holder.mLineTwo.get().setText(dataHolder.mLineTwo);
-
         if (MusicUtils.getCurrentAudioId() == dataHolder.mItemId) {
             holder.mLineOne.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
             holder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
@@ -71,11 +69,6 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
             holder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
             holder.mLineTwo.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
         }
-        //LOGGER.info(".getView() - returning a convertView != null ? " + (convertView != null));
-        if (convertView == null && Ref.alive(holder.mConvertView)) {
-            convertView = holder.mConvertView.get();
-        }
-
         return convertView;
     }
 

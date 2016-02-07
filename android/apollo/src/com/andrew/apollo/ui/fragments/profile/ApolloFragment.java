@@ -529,9 +529,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     protected boolean isSimpleLayout() {
-        boolean r = PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName());
-        LOGGER.info(getClass().getSimpleName() + ": isSimpleLayout("+getLayoutTypeName()+") -> " + r);
-        return r;
+        //boolean r = PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName());
+        return true;
     }
 
     protected boolean isDetailedLayout() {

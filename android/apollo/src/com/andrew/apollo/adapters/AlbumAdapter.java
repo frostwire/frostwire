@@ -65,20 +65,13 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicViewHolder holder = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
+        convertView = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = (MusicViewHolder) convertView.getTag();
+
         // Retrieve the data holder
         final DataHolder dataHolder = mData[position];
 
-        if (holder != null && dataHolder != null) {
-            // Set each album name (line one)
-            if (Ref.alive(holder.mLineOne)) {
-                holder.mLineOne.get().setText(dataHolder.mLineOne);
-            }
-            // Set the artist name (line two)
-            if (Ref.alive(holder.mLineTwo)) {
-                holder.mLineTwo.get().setText(dataHolder.mLineTwo);
-            }
-        }
+        updateFirstTwoArtistLines(holder, dataHolder);
 
         if (mImageFetcher == null) {
             LOGGER.warn("ArtistAdapter has null image fetcher");

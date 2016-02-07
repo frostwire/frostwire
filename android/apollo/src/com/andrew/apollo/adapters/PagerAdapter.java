@@ -163,19 +163,19 @@ public class PagerAdapter extends FragmentPagerAdapter {
         /**
          * The Last Songs added Fragment
          */
-        LAST(LastAddedFragment.class);
+        LAST(LastAddedFragment.class),
         /**
          * The playlist fragment
          */
-        //PLAYLIST(PlaylistFragment.class),
+        PLAYLIST(PlaylistFragment.class),
         /**
          * The recent fragment
          */
-        //RECENT(RecentFragment.class),
+        RECENT(RecentFragment.class),
         /**
          * The artist fragment
          */
-        //ARTIST(ArtistFragment.class),
+        ARTIST(ArtistFragment.class);
         /**
          * The song fragment
          */

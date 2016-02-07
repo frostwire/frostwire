@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.MusicViewHolder;
@@ -142,7 +143,7 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
             holder.mLineThree.get().setVisibility(View.GONE);
             convertView.setTag(holder);
         } else {
-            holder = (MusicViewHolder)convertView.getTag();
+            holder = (MusicViewHolder) convertView.getTag();
         }
 
         // Retrieve the album
@@ -182,6 +183,11 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
                 holder.mLineTwo.get().setText(song.mAlbumName);
                 break;
         }
+
+        if (convertView == null && Ref.alive(holder.mConvertView)) {
+            convertView = holder.mConvertView.get();
+        }
+
         return convertView;
     }
 

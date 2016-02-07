@@ -21,6 +21,7 @@ import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
+import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
 
 /**
@@ -95,6 +96,7 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
     public int getViewTypeCount() {
         return VIEW_TYPE_COUNT;
     }
+
 
     /**
      * Method used to cache the data used to populate the list or grid. The idea

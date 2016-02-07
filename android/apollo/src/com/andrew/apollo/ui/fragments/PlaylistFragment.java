@@ -162,6 +162,11 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         return new PlaylistLoader(getActivity());
     }
 
+    @Override
+    protected boolean isSimpleLayout() {
+        return true;
+    }
+
     private AlertDialog buildDeleteDialog() {
         return new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.delete_dialog_title, mItem.mPlaylistName))

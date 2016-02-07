@@ -76,7 +76,9 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
         }
 
         // Recycle MusicHolder's items
-        MusicViewHolder holder = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
+        convertView = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = (MusicViewHolder) convertView.getTag();
+
         if (holder != null && Ref.alive(holder.mOverlay)) {
             holder.mOverlay.get().setBackgroundColor(0);
         }

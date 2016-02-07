@@ -47,8 +47,8 @@ public class GenreAdapter extends ApolloFragmentAdapter<Genre> implements Apollo
 
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
-        // Recycle ViewHolder's items
-        MusicViewHolder holder = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
+        convertView = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = (MusicViewHolder) convertView.getTag();
         if (holder != null) {
             if (Ref.alive(holder.mLineTwo)) {
                 holder.mLineTwo.get().setVisibility(View.GONE);
@@ -62,10 +62,7 @@ public class GenreAdapter extends ApolloFragmentAdapter<Genre> implements Apollo
                         getContext().getResources().getDimension(R.dimen.text_size_large));
             }
         }
-
-        // Retrieve the data holder
         final DataHolder dataHolder = mData[position];
-
         // Set each genre name (line one)
         if (holder != null && Ref.alive(holder.mLineOne)) {
             holder.mLineOne.get().setText(dataHolder.mLineOne);

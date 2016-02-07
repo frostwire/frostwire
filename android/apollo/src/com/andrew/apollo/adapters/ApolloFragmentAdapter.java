@@ -31,6 +31,7 @@ import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.Ref;
 import com.frostwire.logging.Logger;
 
 import java.util.List;
@@ -136,7 +137,21 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         }
     }
 
-    public static MusicViewHolder prepareMusicViewHolder(int mLayoutId, Context context, View convertView, final ViewGroup parent) {
+    protected void updateFirstTwoArtistLines(MusicViewHolder holder, MusicViewHolder.DataHolder dataHolder) {
+        if (holder != null && dataHolder != null) {
+            // Set each artist name (line one)
+            if (Ref.alive(holder.mLineOne)) {
+                holder.mLineOne.get().setText(dataHolder.mLineOne);
+            }
+
+            // Set the number of albums (line two)
+            if (Ref.alive(holder.mLineTwo)) {
+                holder.mLineTwo.get().setText(dataHolder.mLineTwo);
+            }
+        }
+    }
+
+    public static View prepareMusicViewHolder(int mLayoutId, Context context, View convertView, final ViewGroup parent) {
         MusicViewHolder holder = null;
         if (convertView != null) {
             holder = (MusicViewHolder) convertView.getTag();
@@ -147,15 +162,13 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
                 holder = null;
             }
         }
-
         if (holder == null && convertView != null) {
             holder = new MusicViewHolder(convertView);
         }
-
-        if (convertView != null && holder != null) {
+        if (convertView != null) {
             convertView.setTag(holder);
         }
-        return holder;
+        return convertView;
     }
 
     /**
