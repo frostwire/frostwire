@@ -57,7 +57,7 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
      * @param layoutId The resource Id of the view to inflate.
      */
     public ArtistAlbumAdapter(final Activity context, final int layoutId) {
-        super(context, layoutId);
+        super(context, layoutId, 0);
         // Used to create the custom layout
         mInflater = LayoutInflater.from(context);
 

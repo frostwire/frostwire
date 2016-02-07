@@ -37,7 +37,7 @@ public class GenreAdapter extends ApolloFragmentAdapter<Genre> implements Apollo
     private static final int VIEW_TYPE_COUNT = 1;
 
     public GenreAdapter(final Context context, final int layoutId) {
-        super(context, layoutId);
+        super(context, layoutId, 0);
     }
 
     @Override

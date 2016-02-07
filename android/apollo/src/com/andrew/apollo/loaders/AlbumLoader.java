@@ -62,10 +62,6 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
 
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
-            String an = mCursor.getString(1) != null ? mCursor.getString(1) : "n/a";
-            String art = mCursor.getString(2) != null ? mCursor.getString(2) : "n/a";
-            LOGGER.info("first album loaded? id: " + mCursor.getLong(0) + " - albumName: " + an + " - artist: " + art);
-
             do {
                 // Copy the album id
                 final long id = mCursor.getLong(0);
@@ -87,6 +83,9 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
 
                 // Add everything up
                 mAlbumsList.add(album);
+                //String an = mCursor.getString(1) != null ? mCursor.getString(1) : "n/a";
+                //String art = mCursor.getString(2) != null ? mCursor.getString(2) : "n/a";
+                //LOGGER.info("Adding id: " + mCursor.getLong(0) + " - albumName: " + an + " - artist: " + art);
             } while (mCursor.moveToNext());
         }
         // Close the cursor

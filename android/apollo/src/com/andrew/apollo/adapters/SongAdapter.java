@@ -38,7 +38,7 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
     private static final int VIEW_TYPE_COUNT = 1;
 
     public SongAdapter(Context context, int mLayoutId) {
-        super(context, mLayoutId);
+        super(context, mLayoutId, 0);
     }
 
     /**
@@ -70,6 +70,10 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
             holder.mLineOne.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
             holder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
             holder.mLineTwo.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
+        }
+        //LOGGER.info(".getView() - returning a convertView != null ? " + (convertView != null));
+        if (convertView == null && Ref.alive(holder.mConvertView)) {
+            convertView = holder.mConvertView.get();
         }
 
         return convertView;

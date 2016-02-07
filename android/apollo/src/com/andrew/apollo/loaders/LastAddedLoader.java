@@ -19,6 +19,7 @@ import android.provider.MediaStore.Audio.AudioColumns;
 
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.Lists;
+import com.frostwire.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.List;
  * @author Angel Leon (gubatron@gmail.com)
  */
 public class LastAddedLoader extends SongLoader {
-
+    private static Logger LOGGER = Logger.getLogger(LastAddedLoader.class);
     /**
      * Constructor of <code>LastAddedHandler</code>
      * 
@@ -43,7 +44,10 @@ public class LastAddedLoader extends SongLoader {
 
     @Override
     public Cursor makeCursor(Context context) {
-        return makeLastAddedCursor(getContext());
+        LOGGER.info("makeCursor() start. (Overrides SongLoader's makeCursor())");
+        Cursor c = makeLastAddedCursor(getContext());
+        LOGGER.info("makCursor() finished.");
+        return c;
     }
 
     /**
@@ -51,13 +55,14 @@ public class LastAddedLoader extends SongLoader {
      * @return The {@link Cursor} used to run the song query.
      */
     public static Cursor makeLastAddedCursor(final Context context) {
+        LOGGER.info("makeLastAddedCursor() start.");
         final int fourWeeks = 4 * 3600 * 24 * 7;
         final StringBuilder selection = new StringBuilder();
         selection.append(AudioColumns.IS_MUSIC + "=1");
         selection.append(" AND " + AudioColumns.TITLE + " != ''"); //$NON-NLS-2$
         selection.append(" AND " + MediaStore.Audio.Media.DATE_ADDED + ">"); //$NON-NLS-2$
         selection.append(System.currentTimeMillis() / 1000 - fourWeeks);
-        return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+        Cursor c = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 new String[] {
                         /* 0 */
                         BaseColumns._ID,
@@ -70,5 +75,7 @@ public class LastAddedLoader extends SongLoader {
                         /* 4 */
                         AudioColumns.DURATION
                 }, selection.toString(), null, MediaStore.Audio.Media.DATE_ADDED + " DESC");
+        LOGGER.info("makeLastAddedCursor() finished with " + c.getCount() + " elements.");
+        return c;
     }
 }

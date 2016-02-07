@@ -54,7 +54,7 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
      * Constructor of <code>AlbumAdapter</code>
      */
     public AlbumAdapter(final Activity context, final int layoutId) {
-        super(context, layoutId);
+        super(context, layoutId, 0);
         // Cache the transparent overlay
         mOverlay = context.getResources().getColor(R.color.list_item_background);
     }

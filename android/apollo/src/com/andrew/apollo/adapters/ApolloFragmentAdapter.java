@@ -82,8 +82,8 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
 
     protected final int mLayoutId;
 
-    public ApolloFragmentAdapter(Context context, int mLayoutId) {
-        super(context, mLayoutId);
+    public ApolloFragmentAdapter(Context context, int mLayoutId, int textViewResourceId) {
+        super(context, textViewResourceId);
         this.mLayoutId = mLayoutId;
         if (context instanceof Activity) {
             mImageFetcher = ApolloUtils.getImageFetcher((Activity) context);
@@ -187,6 +187,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         if (getItemViewType(0) == ITEM_VIEW_TYPE_HEADER) {
             offset = 1;
         }
+        LOGGER.info(getClass().getCanonicalName() + ".getOffset() -> " + offset);
         return offset;
     }
 

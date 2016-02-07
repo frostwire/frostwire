@@ -24,6 +24,7 @@ import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
+import com.frostwire.logging.Logger;
 
 /**
  * A collection of helpers designed to get and set various preferences across
@@ -32,6 +33,8 @@ import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class PreferenceUtils {
+
+    public static final Logger LOGGER = Logger.getLogger(PreferenceUtils.class);
 
     /* Default start page (Artist page) */
     public static final int DEFFAULT_PAGE = 0;
@@ -369,6 +372,8 @@ public final class PreferenceUtils {
     public boolean isSimpleLayout(final String which) {
         final String simple = "simple";
         final String defaultValue = "grid";
+        final String savedPreference = mPreferences.getString(which, defaultValue);
+        LOGGER.info("isSimpleLayout(which="+which+", defaultValue=grid) -> ["+savedPreference+"] -> " + mPreferences.getString(which, defaultValue).equals(simple));
         return mPreferences.getString(which, defaultValue).equals(simple);
     }
 

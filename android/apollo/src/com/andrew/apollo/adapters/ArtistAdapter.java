@@ -52,7 +52,7 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
      * @param layoutId The resource Id of the view to inflate.
      */
     public ArtistAdapter(final Activity context, final int layoutId) {
-        super(context, layoutId);
+        super(context, layoutId, 0);
         // Cache the transparent overlay
         mOverlayColor = context.getResources().getColor(R.color.list_item_background);
     }

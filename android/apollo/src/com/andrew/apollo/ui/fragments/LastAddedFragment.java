@@ -11,35 +11,18 @@
 
 package com.andrew.apollo.ui.fragments;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.view.*;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
-import android.widget.TextView;
-import com.andrew.apollo.MusicStateListener;
 import com.andrew.apollo.adapters.SongAdapter;
 import com.andrew.apollo.loaders.LastAddedLoader;
-import com.andrew.apollo.menu.CreateNewPlaylist;
-import com.andrew.apollo.menu.DeleteDialog;
-import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Song;
-import com.andrew.apollo.provider.FavoritesStore;
-import com.andrew.apollo.recycler.RecycleHolder;
-import com.andrew.apollo.ui.activities.BaseActivity;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
-import com.viewpagerindicator.TitlePageIndicator;
 
 import java.util.List;
 
@@ -80,5 +63,17 @@ public class LastAddedFragment extends ApolloFragment<SongAdapter, Song> {
     @Override
     public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
         return new LastAddedLoader(getActivity());
+    }
+
+    @Override
+    protected boolean isSimpleLayout() {
+        return true;
+    }
+
+    @Override
+    public void onMetaChanged() {
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

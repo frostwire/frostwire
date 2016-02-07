@@ -100,7 +100,7 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
      * @param setting defines the content of the second line
      */
     public ProfileSongAdapter(final Context context, final int layoutId, final int setting) {
-        super(context, layoutId);
+        super(context, layoutId, 0);
         // Used to create the custom layout
         mInflater = LayoutInflater.from(context);
         // Cache the header

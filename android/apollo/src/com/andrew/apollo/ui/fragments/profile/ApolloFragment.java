@@ -60,7 +60,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         AbsListView.OnScrollListener,
         MusicStateListener {
 
-    public volatile static long LAST_REFRESH_TIMESTAMP;
+    public volatile long LAST_REFRESH_TIMESTAMP;
 
     private static Logger LOGGER = Logger.getLogger(ApolloFragment.class);
 
@@ -114,6 +114,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     protected ProfileTabCarousel mProfileTabCarousel;
 
     protected ViewGroup mRootView;
+    private long lastRestartLoader;
 
     protected abstract T createAdapter();
 
@@ -123,7 +124,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                                      final long id);
 
     protected ApolloFragment(int groupId, int loaderId) {
-        LOGGER.info(getClass().getName() + ": Constructor("+groupId+","+" "+loaderId+")");
+        LOGGER.info(getClass().getSimpleName() + ": Constructor("+groupId+","+" "+loaderId+")");
         this.GROUP_ID = groupId;
         this.LOADER_ID = loaderId;
     }
@@ -131,52 +132,55 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     @SuppressWarnings("deprecation")
     @Override
     public void onAttach(final Activity activity) {
-        LOGGER.info(getClass().getName() + ": onAttach()");
+        LOGGER.info(getClass().getSimpleName() + ": onAttach() start.");
         super.onAttach(activity);
         mProfileTabCarousel = (ProfileTabCarousel) activity.findViewById(R.id.activity_profile_base_tab_carousel);
 
         // Register the music status listener
         ((BaseActivity)activity).setMusicStateListenerListener(this);
+        LOGGER.info(getClass().getSimpleName() + ": onAttach() mProfileTabCarousel == null ? " + (mProfileTabCarousel == null));
+        LOGGER.info(getClass().getSimpleName() + ": onAttach() done.");
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        LOGGER.info(getClass().getName() + ": onCreateView()");
+        LOGGER.info(getClass().getSimpleName() + ": onCreateView()");
         // The View for the fragment's UI
         if (isSimpleLayout()) {
-            mRootView = (ViewGroup)inflater.inflate(R.layout.list_base, null);
+            mRootView = (ViewGroup) inflater.inflate(R.layout.list_base, null);
             initListView();
         } else {
             // this inflate here is crashing.
-            LOGGER.info(getClass().getName() + ": About to inflate grid_base.");
+            LOGGER.info(getClass().getSimpleName() + ": About to inflate grid_base.");
             mRootView = (ViewGroup) inflater.inflate(R.layout.grid_base, null);
-            LOGGER.info(getClass().getName() + ": Inflated it, got it in mRootView.");
+            LOGGER.info(getClass().getSimpleName() + ": Inflated it, got it in mRootView.");
 
-            LOGGER.info(getClass().getName() + ": About to initGridView().");
             initGridView();
-            LOGGER.info(getClass().getName() + ": Done with initGridView().");
         }
+        LOGGER.info(getClass().getSimpleName() + ": mRootView == null : " + (mRootView == null));
+        LOGGER.info(getClass().getSimpleName() + ": Done with onCreateView().");
         return mRootView;
     }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        LOGGER.info(getClass().getName() + ": onCreate()");
+        LOGGER.info(getClass().getSimpleName() + ": onCreate() start.");
         super.onCreate(savedInstanceState);
         // Create the adapter
         mAdapter = createAdapter();
+        LOGGER.info(getClass().getSimpleName() + ": onCreate() finished.");
     }
 
     public T getAdapter() {
-        LOGGER.info(getClass().getName() + ": getAdapter()");
+        LOGGER.info(getClass().getSimpleName() + ": getAdapter()");
         return mAdapter;
     }
 
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v,
                                     final ContextMenu.ContextMenuInfo menuInfo) {
-        LOGGER.info(getClass().getName() + ": onCreateContextMenu()");
+        LOGGER.info(getClass().getSimpleName() + ": onCreateContextMenu() start.");
         super.onCreateContextMenu(menu, v, menuInfo);
 
         // Get the position of the selected item
@@ -244,11 +248,12 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         // Delete the album
         menu.add(GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE,
                 getString(R.string.context_menu_delete));
+        LOGGER.info(getClass().getSimpleName() + ": onCreateContextMenu() stop.");
     }
 
     @Override
     public boolean onContextItemSelected(final android.view.MenuItem item) {
-        LOGGER.info(getClass().getName() + ": onContextItemSelected()");
+        LOGGER.info(getClass().getSimpleName() + ": onContextItemSelected() start.");
         if (item.getGroupId() == GROUP_ID) {
             final long[] songList = mSongList != null ?
                     mSongList :
@@ -293,11 +298,12 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     break;
             }
         }
+        LOGGER.info(getClass().getSimpleName() + ": onContextItemSelected() stop.");
         return super.onContextItemSelected(item);
     }
 
     private boolean onRemoveFromRecent()  {
-        LOGGER.info(getClass().getName() + ": onRemoveFromRecent()");
+        LOGGER.info(getClass().getSimpleName() + ": onRemoveFromRecent()");
         RecentStore.getInstance(getActivity()).removeItem(mSelectedId);
         MusicUtils.refresh();
         refresh();
@@ -305,7 +311,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     private boolean onDelete(long[] songList) {
-        LOGGER.info(getClass().getName() + ": onDelete()");
+        LOGGER.info(getClass().getSimpleName() + ": onDelete()");
         if (songList == null || songList.length == 0) {
             return false;
         }
@@ -330,7 +336,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     private boolean onRemoveFromPlaylist() {
-        LOGGER.info(getClass().getName() + ": onRemoveFromPlaylist()");
+        LOGGER.info(getClass().getSimpleName() + ": onRemoveFromPlaylist()");
         mAdapter.remove(mItem);
         mAdapter.notifyDataSetChanged();
         if (mItem instanceof Song) {
@@ -364,7 +370,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         mAdapter.remove(mItem);
         mAdapter.notifyDataSetChanged();
         FavoritesStore.getInstance(getActivity()).removeItem(mSelectedId);
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
+        restartLoader(true);
     }
 
     /**
@@ -372,22 +378,17 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      */
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
-        LOGGER.info(getClass().getName() + ": onActivityCreated()");
+        LOGGER.info(getClass().getSimpleName() + ": onActivityCreated() started.");
         super.onActivityCreated(savedInstanceState);
         // Enable the options menu
         setHasOptionsMenu(true);
-
-        // Start the loader
-        final Bundle arguments = getArguments();
-        try {
-            getLoaderManager().initLoader(LOADER_ID, arguments, this);
-        } catch (Throwable ignored) {
-        }
+        restartLoader(true);
+        LOGGER.info(getClass().getSimpleName() + ": onActivityCreated() stopped.");
     }
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
-        LOGGER.info(getClass().getName() + ": onSaveInstanceState()");
+        LOGGER.info(getClass().getSimpleName() + ": onSaveInstanceState()");
         super.onSaveInstanceState(outState);
         outState.putAll(getArguments() != null ? getArguments() : new Bundle());
     }
@@ -397,9 +398,10 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      */
     @Override
     public void onLoadFinished(final Loader<List<I>> loader, final List<I> data) {
-        LOGGER.info(getClass().getName() + ": onLoadFinished()");
+        LOGGER.info(getClass().getSimpleName() + ": onLoadFinished() start.");
         // Check for any errors
         if (data == null || data.isEmpty()) {
+            LOGGER.info(getClass().getSimpleName() + ": onLoadFinished() data null/empty, unloading adapter.");
             mAdapter.unload();
             mAdapter.notifyDataSetChanged();
 
@@ -407,13 +409,13 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             final TextView empty = (TextView) mRootView.findViewById(R.id.empty);
             if (empty != null) {
                 empty.setText(getString(R.string.empty_music));
-
                 if (isSimpleLayout()) {
                     mListView.setEmptyView(empty);
                 } else {
                     mGridView.setEmptyView(empty);
                 }
             }
+            LOGGER.info(getClass().getSimpleName() + ": onLoadFinished() finished early (no data).");
             return;
         }
 
@@ -424,11 +426,12 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             } else {
                 mGridView.setAdapter(mAdapter);
             }
+        }  else {
+            mAdapter.unload();
         }
 
         // Start fresh
         if (mAdapter != null) {
-            mAdapter.unload();
             mAdapter.setDataList(data);
 
             for (final I item : data) {
@@ -441,15 +444,17 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
             mAdapter.notifyDataSetChanged();
         }
+        LOGGER.info(getClass().getSimpleName() + ": onLoadFinished() finished.");
     }
 
     @Override
     public void onLoaderReset(final Loader<List<I>> loader) {
-        LOGGER.info(getClass().getName() + ": onLoaderReset()");
+        LOGGER.info(getClass().getSimpleName() + ": onLoaderReset() start.");
         // Clear the data in the adapter
         if (mAdapter != null) {
             mAdapter.unload();
         }
+        LOGGER.info(getClass().getSimpleName() + ": onLoaderReset() finished.");
     }
 
     /**
@@ -460,12 +465,13 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         long start = System.currentTimeMillis();
 
         if (start - LAST_REFRESH_TIMESTAMP < 10000) {
-            LOGGER.info(getClass().getName() + " - too early to refresh() aborting.");
+            LOGGER.info(getClass().getSimpleName() + " - too early to refresh() aborting.");
             return;
         }
+
         LAST_REFRESH_TIMESTAMP = start;
 
-        LOGGER.info(getClass().getName() + " - refresh() started.");
+        LOGGER.info(getClass().getSimpleName() + " - refresh() started.");
         //SystemClock.sleep(2);
 
         // Scroll to the stop of the list before restarting the loader.
@@ -476,18 +482,20 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         } else if (mGridView != null) {
             mGridView.setSelection(0);
         }
-        getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
+
+        restartLoader(true);
+
 
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
         long total = System.currentTimeMillis() - start;
-        LOGGER.info(getClass().getName() + " - refresh() finished. ("+total+" ms)");
+        LOGGER.info(getClass().getSimpleName() + " - refresh() finished. ("+total+" ms)");
     }
 
     @Override
     public void onPause() {
-        LOGGER.info(getClass().getName() + ": onPause()");
+        LOGGER.info(getClass().getSimpleName() + ": onPause()");
         super.onPause();
         if (mAdapter != null) {
             mAdapter.flush();
@@ -500,8 +508,20 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     public void restartLoader() {
-        LOGGER.info(getClass().getName() + ": restartLoader()");
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
+        restartLoader(false);
+    }
+
+    public void restartLoader(boolean force) {
+        if (force || (System.currentTimeMillis() - lastRestartLoader) >= 5000) {
+            lastRestartLoader = System.currentTimeMillis();
+            LOGGER.info(getClass().getSimpleName() + ": restartLoader("+force+") start.");
+            LOGGER.info(getClass().getSimpleName() + ": getArguments() -> " + getArguments());
+            getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
+        } else {
+            LOGGER.info(getClass().getSimpleName() + ": Not ready yet to restartLoader(false)");
+        }
+
+        LOGGER.info(getClass().getSimpleName() + ": restartLoader("+force+") finished.");
     }
 
     public void onMetaChanged() {
@@ -509,18 +529,26 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     protected boolean isSimpleLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName());
+        boolean r = PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName());
+        LOGGER.info(getClass().getSimpleName() + ": isSimpleLayout("+getLayoutTypeName()+") -> " + r);
+        return r;
     }
 
     protected boolean isDetailedLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isDetailedLayout(getLayoutTypeName());
+        boolean r = PreferenceUtils.getInstance(getActivity()).isDetailedLayout(getLayoutTypeName());
+        LOGGER.info(getClass().getSimpleName() + ": isDetailedLayout("+getLayoutTypeName()+") -> " + r);
+        return r;
     }
 
     /**
      * Sets up the grid view
      */
     protected void initGridView() {
-        LOGGER.info(getClass().getName() + ": initGridView()");
+        if (mRootView == null) {
+            throw new RuntimeException("initGridView(): mRootView == null");
+        }
+
+        LOGGER.info(getClass().getSimpleName() + ": initGridView() start.");
         // Initialize the grid
         mGridView = (GridView) mRootView.findViewById(R.id.grid_base);
 
@@ -530,6 +558,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             // Set up the helpers
             initAbsListView(mGridView);
         }
+
         if (ApolloUtils.isLandscape(getActivity())) {
             if (isDetailedLayout()) {
                 if (mAdapter != null) {
@@ -549,6 +578,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 mGridView.setNumColumns(2);
             }
         }
+        LOGGER.info(getClass().getSimpleName() + ": initGridView() done.");
     }
 
     /**
@@ -557,7 +587,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * @param list The list or grid
      */
     private void initAbsListView(final AbsListView list) {
-        LOGGER.info(getClass().getName() + ": initAbsListView()");
+        LOGGER.info(getClass().getSimpleName() + ": initAbsListView() start.");
         // Release any references to the recycled Views
         list.setRecyclerListener(new RecycleHolder());
         // Listen for ContextMenus to be created
@@ -577,19 +607,24 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             list.setFastScrollEnabled(false);
             list.setPadding(0, 0, 0, 0);
         }
+
+        LOGGER.info(getClass().getSimpleName() + ": initAbsListView() finished.");
     }
 
     /**
      * Sets up the list view
      */
     protected void initListView() {
-        LOGGER.info(getClass().getName() + ": initListView()");
+        if (mRootView == null) {
+            throw new RuntimeException("initListView(): mRootView == null");
+        }
+        LOGGER.info(getClass().getSimpleName() + ": initListView() start.");
         // Initialize the grid
         mListView = (ListView) mRootView.findViewById(R.id.list_base);
 
         // Set the data behind the list
         if (mAdapter == null) {
-            LOGGER.warn(this.getClass().getName() + " doesn't have an adapter ready and the listView will be empty.");
+            LOGGER.warn(getClass().getSimpleName() + " doesn't have an adapter ready and the listView will be empty.");
         }
 
 
@@ -599,6 +634,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
         // Set up the helpers
         initAbsListView(mListView);
+        LOGGER.info(getClass().getSimpleName() + ": initListView() finished.");
     }
 
     /**

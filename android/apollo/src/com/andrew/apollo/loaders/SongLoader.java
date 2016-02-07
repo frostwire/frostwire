@@ -19,6 +19,7 @@ import android.provider.MediaStore.Audio.AudioColumns;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
+import com.frostwire.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +32,7 @@ import java.util.List;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
-
+    private static Logger LOGGER = Logger.getLogger(SongLoader.class);
     /**
      * Constructor of <code>SongLoader</code>
      * 
@@ -48,14 +49,16 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
     public List<Song> loadInBackground() {
         ArrayList<Song> mSongList = Lists.newArrayList();
         // Create the Cursor
-        Cursor mCursor = null;
+        Cursor mCursor;
         try {
             mCursor = makeCursor(getContext());
         } catch (Throwable ignored) {
+            LOGGER.error("SongLoader.loadInBackground(): " + ignored.getMessage(), ignored);
             return Collections.EMPTY_LIST;
         }
 
         if (mCursor == null) {
+            LOGGER.warn("loadInBackground() - cursor == null, returning empty list.");
             return Collections.EMPTY_LIST;
         }
 
@@ -81,6 +84,7 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
                     duration = mCursor.getLong(4);
                     durationInSecs = (int) duration / 1000;
                 } catch (Throwable ignored) {
+                    LOGGER.error("SongLoader.loadInBackground(): " +ignored.getMessage(), ignored);
                 }
 
                 // Create a new song
@@ -94,6 +98,7 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
         if (mCursor != null) {
             mCursor.close();
         }
+        LOGGER.info("loadInBackground() done (" + mSongList.size() + " songs)");
         return mSongList;
     }
 

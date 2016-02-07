@@ -43,7 +43,7 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
      * @param layoutId The resource Id of the view to inflate.
      */
     public PlaylistAdapter(final Context context, final int layoutId) {
-        super(context, layoutId);
+        super(context, layoutId, 0);
     }
 
     @Override

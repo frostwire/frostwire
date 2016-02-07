@@ -30,6 +30,7 @@ import java.lang.ref.WeakReference;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class MusicViewHolder {
+    public WeakReference<View> mConvertView;
 
     /**
      * This is the overlay ontop of the background artist, playlist, or genre
@@ -80,6 +81,8 @@ public class MusicViewHolder {
      */
     public MusicViewHolder(final View view) {
         super();
+        mConvertView = new WeakReference<>(view);
+
         // Initialize mOverlay
         mOverlay = new WeakReference<>((RelativeLayout)view.findViewById(R.id.image_background));
 
