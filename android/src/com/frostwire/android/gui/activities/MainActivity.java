@@ -374,6 +374,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         externalStorageChecker.setPermissionsGrantedCallback(new DangerousPermissionsChecker.OnPermissionsGrantedCallback() {
             @Override
             public void onPermissionsGranted() {
+                // TODO: is the restart necessary?
+                /*
                 UIUtils.showInformationDialog(MainActivity.this,
                         R.string.restarting_summary,
                         R.string.restarting,
@@ -384,6 +386,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                                 externalStorageChecker.restartFrostWire(2000);
                             }
                         });
+                        */
             }
         });
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
