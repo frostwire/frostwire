@@ -42,7 +42,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SearchEngine;
-import com.frostwire.android.gui.StoragePicker;
+import com.frostwire.android.StoragePicker;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;

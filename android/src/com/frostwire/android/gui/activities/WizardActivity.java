@@ -18,10 +18,8 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -30,16 +28,12 @@ import android.widget.ViewFlipper;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.StoragePicker;
-import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.StoragePicker;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.GeneralWizardPage;
 import com.frostwire.android.gui.views.WizardPageView;
 import com.frostwire.android.gui.views.WizardPageView.OnCompleteListener;
 import com.frostwire.android.gui.views.preference.StoragePreference;
-import com.inmobi.commons.metric.Storage;
-
-import static android.content.DialogInterface.OnDismissListener;
 
 /**
  * @author gubatron

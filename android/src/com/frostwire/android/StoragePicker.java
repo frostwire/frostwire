@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.android.gui;
+package com.frostwire.android;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.storage.StorageManager;
 import android.support.v4.provider.DocumentFile;
-import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
 
