@@ -224,7 +224,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     }
 
     /**
-     * @param position - The ACTUAL position in the model container. If you're using an offset based on a list view that has a header element at 0, you must substract to the position you might have.
+     * @param position - The ACTUAL position in the model container. If you're using an offset based on a list view that has a header element at 0, you must subtract to the position you might have.
      * @return The element at the indexed position in the model container (not the view). null if position is out of bounds.
      */
     public I getItem(int position) {
@@ -237,7 +237,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     /**
      *
      * @param position The ACTUAL position in the model container.
-     *                 If you have an extra header element, substract the offset before invoking this method.
+     *                 If you have an extra header element, subtract the offset before invoking this method.
      * @return the object id. if out of bound, returns -1.
      */
     @Override

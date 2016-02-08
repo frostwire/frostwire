@@ -63,26 +63,7 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
-                // Copy the album id
-                final long id = mCursor.getLong(0);
-
-                // Copy the album name
-                final String albumName = mCursor.getString(1);
-
-                // Copy the artist name
-                final String artist = mCursor.getString(2);
-
-                // Copy the number of songs
-                final int songCount = mCursor.getInt(3);
-
-                // Copy the release year
-                final String year = mCursor.getString(4);
-
-                // Create a new album
-                final Album album = new Album(id, albumName, artist, songCount, year);
-
-                // Add everything up
-                mAlbumsList.add(album);
+                mAlbumsList.add(getAlbumEntryFromCursor(mCursor));
                 //String an = mCursor.getString(1) != null ? mCursor.getString(1) : "n/a";
                 //String art = mCursor.getString(2) != null ? mCursor.getString(2) : "n/a";
                 //LOGGER.info("Adding id: " + mCursor.getLong(0) + " - albumName: " + an + " - artist: " + art);
@@ -93,6 +74,21 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
             mCursor.close();
         }
         return mAlbumsList;
+    }
+
+    protected Album getAlbumEntryFromCursor(Cursor cursor) {
+        // Copy the album id
+        final long id = cursor.getLong(0);
+        // Copy the album name
+        final String albumName = cursor.getString(1);
+        // Copy the artist name
+        final String artist = cursor.getString(2);
+        // Copy the number of songs
+        final int songCount = cursor.getInt(3);
+        // Copy the release year
+        final String year = cursor.getString(4);
+        // Create a new album
+        return new Album(id, albumName, artist, songCount, year);
     }
 
     /**

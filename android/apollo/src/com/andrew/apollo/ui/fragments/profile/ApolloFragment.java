@@ -36,6 +36,7 @@ import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.ui.activities.BaseActivity;
+import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
@@ -274,6 +275,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 case FragmentMenuItems.PLAYLIST_SELECTED:
                     final long playlistId = item.getIntent().getLongExtra("playlist", 0);
                     MusicUtils.addToPlaylist(getActivity(), songList, playlistId);
+                    refresh();
                     return true;
                 case FragmentMenuItems.USE_AS_RINGTONE:
                     MusicUtils.setRingtone(getActivity(), mSelectedId);

@@ -13,6 +13,7 @@ package com.andrew.apollo.loaders;
 
 import android.content.Context;
 import android.database.Cursor;
+import com.andrew.apollo.model.Album;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.provider.RecentStore.RecentStoreColumns;
 
@@ -50,10 +51,28 @@ public class RecentLoader extends AlbumLoader {
                 .getReadableDatabase()
                 .query(RecentStoreColumns.NAME,
                         new String[] {
-                                RecentStoreColumns.ID + " as id", RecentStoreColumns.ID,
-                                RecentStoreColumns.ALBUMNAME, RecentStoreColumns.ARTISTNAME,
-                                RecentStoreColumns.ALBUMSONGCOUNT, RecentStoreColumns.ALBUMYEAR,
-                                RecentStoreColumns.TIMEPLAYED
+                                RecentStoreColumns.ID + " as id",  /** 0 - id */
+                                RecentStoreColumns.ID,             /** 1 - albumid */
+                                RecentStoreColumns.ALBUMNAME,      /** 2 - itemname */
+                                RecentStoreColumns.ARTISTNAME,     /** 3 - artistname */
+                                RecentStoreColumns.ALBUMSONGCOUNT, /** 4 - albumsongcount */
+                                RecentStoreColumns.ALBUMYEAR,      /** 5 - albumyear */
+                                RecentStoreColumns.TIMEPLAYED      /** 6 - timeplayed */
                         }, null, null, null, null, RecentStoreColumns.TIMEPLAYED + " DESC");
+    }
+
+    protected Album getAlbumEntryFromCursor(Cursor cursor) {
+        // Copy the album id
+        final long id = cursor.getLong(0);
+        // Copy the album name
+        final String albumName = cursor.getString(2);
+        // Copy the artist name
+        final String artist = cursor.getString(3);
+        // Copy the number of songs
+        final int songCount = cursor.getInt(4);
+        // Copy the release year
+        final String year = cursor.getString(5);
+        // Create a new album
+        return new Album(id, albumName, artist, songCount, year);
     }
 }

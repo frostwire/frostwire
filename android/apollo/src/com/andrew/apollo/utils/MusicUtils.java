@@ -945,6 +945,7 @@ public final class MusicUtils {
             final String message = context.getResources().getQuantityString(
                     R.plurals.NNNtrackstoplaylist, numinserted, numinserted);
             AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
+            refresh();
         } else {
             LOG.warn("Unable to complete addToPlaylist, review the logic");
         }
