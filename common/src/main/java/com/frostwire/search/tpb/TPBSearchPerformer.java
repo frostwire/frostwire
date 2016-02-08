@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,10 +27,8 @@ import com.frostwire.regex.Pattern;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResult> {
 
@@ -51,7 +49,8 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
     @Override
     public TPBSearchResult fromMatcher(SearchMatcher matcher) {
         TPBSearchResult candidate = new TPBSearchResult(getDomainName(), matcher);
-        if (candidate.getSeeds() < 40 || candidate.getDaysOld() > 200) {
+        int daysOld = PerformersHelper.daysOld(candidate);
+        if (candidate.getSeeds() < 40 || daysOld > 200) {
             candidate = null;
         }
         return candidate;
@@ -59,7 +58,7 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "https://"+getDomainName()+"/search/" + encodedKeywords + "/0/7/0";
+        return "https://" + getDomainName() + "/search/" + encodedKeywords + "/0/7/0";
     }
 
     @Override

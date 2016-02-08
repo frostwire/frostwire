@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,5 +129,18 @@ public final class PerformersHelper {
             html = new String(html.substring(preOffset, sufOffset).toCharArray());
         }
         return html;
+    }
+
+    public static int daysOld(SearchResult sr) {
+        if (sr.getCreationTime() == -1) {
+            return 1;
+        }
+
+        int daysOld = (int) ((System.currentTimeMillis() - sr.getCreationTime()) / 86400000);
+        if (daysOld < 0) {
+            daysOld = 1;
+        }
+
+        return daysOld;
     }
 }

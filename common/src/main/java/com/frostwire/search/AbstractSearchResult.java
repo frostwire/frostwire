@@ -42,14 +42,6 @@ public abstract class AbstractSearchResult implements SearchResult {
         return getDetailsUrl();
     }
 
-    public int getDaysOld() {
-        int daysOld = (int) ((System.currentTimeMillis() - getCreationTime()) / 86400000);
-        if (daysOld < 0) {
-            daysOld = 1;
-        }
-        return daysOld;
-    }
-
     @Override
     public String getThumbnailUrl() {
         return null;
