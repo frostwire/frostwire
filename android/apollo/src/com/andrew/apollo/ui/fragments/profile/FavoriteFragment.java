@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import com.andrew.apollo.adapters.ProfileSongAdapter;
@@ -69,6 +70,7 @@ public class FavoriteFragment extends ApolloFragment<ProfileSongAdapter, Song> {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.removeItem(FragmentMenuItems.ADD_TO_FAVORITES);
+        menu.add(Fragments.FAVORITE_PROFILE_FRAGMENT_GROUP_ID, FragmentMenuItems.REMOVE_FROM_FAVORITES, Menu.NONE, getString(R.string.remove_from_favorites));
     }
 
     @Override

@@ -17,6 +17,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
+import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.utils.MusicUtils;
@@ -64,8 +65,8 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
             getDialog().dismiss();
             return;
         }
-        final String prromptformat = getString(R.string.create_playlist_prompt);
-        mPrompt = String.format(prromptformat, mDefaultname);
+        final String promptformat = getString(R.string.create_playlist_prompt);
+        mPrompt = String.format(promptformat, mDefaultname);
     }
 
     @Override
@@ -82,6 +83,13 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
                         Capitalize.capitalize(playlistName));
                 MusicUtils.addToPlaylist(getActivity(), mPlaylistList, newId);
             }
+
+            int added;
+            if (mPlaylistList != null && (added=mPlaylistList.length) > 0) {
+                final String message = getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, added, added);
+                AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
+            }
+
             closeKeyboard();
             getDialog().dismiss();
         }
