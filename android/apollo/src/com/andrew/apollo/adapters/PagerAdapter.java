@@ -175,19 +175,19 @@ public class PagerAdapter extends FragmentPagerAdapter {
         /**
          * The artist fragment
          */
-        ARTIST(ArtistFragment.class);
+        ARTIST(ArtistFragment.class),
         /**
          * The song fragment
          */
-        //SONG(SongFragment.class),
+        SONG(SongFragment.class),
         /**
          * The album fragment
          */
-        //ALBUM(AlbumFragment.class),
+        ALBUM(AlbumFragment.class),
         /**
          * The genre fragment
          */
-        //GENRE(GenreFragment.class);
+        GENRE(GenreFragment.class);
 
         private Class<? extends Fragment> mFragmentClass;
 

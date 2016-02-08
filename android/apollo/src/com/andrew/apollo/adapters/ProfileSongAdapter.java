@@ -109,7 +109,7 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
         // Get the layout Id
         mLayoutId = layoutId;
         // Know what to put in line two
-        mDisplaySetting = setting;
+         mDisplaySetting = setting;
 
         setNotifyOnChange(true);
     }
@@ -182,10 +182,6 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
                         MusicUtils.makeTimeString(getContext(), song.mDuration));
                 holder.mLineTwo.get().setText(song.mAlbumName);
                 break;
-        }
-
-        if (convertView == null && Ref.alive(holder.mConvertView)) {
-            convertView = holder.mConvertView.get();
         }
 
         return convertView;

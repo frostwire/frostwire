@@ -23,8 +23,6 @@ import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.Ref;
 
-import java.lang.ref.Reference;
-
 /**
  * This {@link ArrayAdapter} is used to display all of the songs on a user's
  * device for {@link SongFragment}. It is also used to show the queue in

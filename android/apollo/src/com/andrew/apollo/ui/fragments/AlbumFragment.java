@@ -83,4 +83,8 @@ public class AlbumFragment extends ApolloFragment<AlbumAdapter, Album> {
     public Loader<List<Album>> onCreateLoader(final int id, final Bundle args) {
         return new AlbumLoader(getActivity());
     }
+
+    protected boolean isSimpleLayout() {
+        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName());
+    }
 }

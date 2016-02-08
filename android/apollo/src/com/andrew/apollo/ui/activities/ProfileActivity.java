@@ -66,7 +66,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     private ViewPager mViewPager;
 
     /**
-     * Pager adpater
+     * Pager adapter
      */
     private PagerAdapter mPagerAdapter;
 

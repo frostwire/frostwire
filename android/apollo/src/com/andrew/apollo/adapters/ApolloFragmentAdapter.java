@@ -200,7 +200,6 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         if (getItemViewType(0) == ITEM_VIEW_TYPE_HEADER) {
             offset = 1;
         }
-        LOGGER.info(getClass().getCanonicalName() + ".getOffset() -> " + offset);
         return offset;
     }
 

@@ -179,6 +179,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
                                 mItem.mPlaylistId);
                         getActivity().getContentResolver().delete(mUri, null, null);
                         MusicUtils.refresh();
+                        refresh();
                     }
                 }).setNegativeButton(R.string.cancel, new OnClickListener() {
 
