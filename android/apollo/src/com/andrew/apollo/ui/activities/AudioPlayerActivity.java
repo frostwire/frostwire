@@ -940,8 +940,16 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         @Override
         public void onClick(final View v) {
-            NavUtils.openAlbumProfile(AudioPlayerActivity.this, MusicUtils.getAlbumName(),
-                    MusicUtils.getArtistName(), MusicUtils.getCurrentAlbumId());
+            long albumId = MusicUtils.getCurrentAlbumId();
+            try {
+                NavUtils.openAlbumProfile(AudioPlayerActivity.this,
+                        MusicUtils.getAlbumName(),
+                        MusicUtils.getArtistName(),
+                        albumId,
+                        MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
+            } catch (Throwable ignored) {
+                ignored.printStackTrace();
+            }
         }
     };
 

@@ -54,6 +54,9 @@ public final class Config {
      */
     public static final String MIME_TYPE = "mime_type";
 
+    /** a long[] with the ids of the tracks involved. */
+    public static final String TRACKS = "tracks";
+
     /**
      * Play from search intent
      */

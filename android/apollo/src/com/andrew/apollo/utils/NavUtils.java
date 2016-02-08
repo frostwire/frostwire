@@ -69,7 +69,7 @@ public final class NavUtils {
      * @param albumId The id of the album
      */
     public static void openAlbumProfile(final Activity context,
-            final String albumName, final String artistName, final long albumId) {
+            final String albumName, final String artistName, final long albumId, final long[] songs) {
 
         // Create a new bundle to transfer the album info
         final Bundle bundle = new Bundle();
@@ -78,6 +78,10 @@ public final class NavUtils {
         bundle.putString(Config.MIME_TYPE, MediaStore.Audio.Albums.CONTENT_TYPE);
         bundle.putLong(Config.ID, albumId);
         bundle.putString(Config.NAME, albumName);
+
+        if (songs != null && songs.length > 0) {
+            bundle.putLongArray(Config.TRACKS, songs);
+        }
 
         // Create the intent to launch the profile activity
         final Intent intent = new Intent(context, ProfileActivity.class);

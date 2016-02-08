@@ -71,8 +71,6 @@ public class RecentFragment extends AlbumFragment {
         int layout;
         if (isSimpleLayout()) {
             layout = R.layout.list_item_normal;
-        } else if (isDetailedLayout()) {
-            layout = R.layout.list_item_detailed;
         } else {
             layout = R.layout.grid_items_normal;
         }
@@ -84,19 +82,6 @@ public class RecentFragment extends AlbumFragment {
         return PreferenceUtils.RECENT_LAYOUT;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onItemClick(final AdapterView<?> parent, final View view, final int position,
-            final long id) {
-        mItem = mAdapter.getItem(position);
-        NavUtils.openAlbumProfile(getActivity(), mItem.mAlbumName, mItem.mArtistName, mItem.mAlbumId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Loader<List<Album>> onCreateLoader(final int id, final Bundle args) {
         return new RecentLoader(getActivity());

@@ -303,9 +303,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
             // Add to playlist
             case FragmentMenuItems.NEW_PLAYLIST:
             case R.id.menu_new_playlist:
-                CreateNewPlaylistMenuAction createPlaylistAction = new CreateNewPlaylistMenuAction(this, null);
-                createPlaylistAction.onClick();
-                MusicUtils.refresh();
+                onOptionsItemNewPlaylistSelected();
                 return true;
 
             case FragmentMenuItems.PLAYLIST_SELECTED: {

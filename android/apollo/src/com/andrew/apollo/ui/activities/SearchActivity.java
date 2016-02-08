@@ -367,10 +367,12 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
                     cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST)));
         } else if ("album".equals(mimeType)) {
             // If it's an album, open the album profile
+            int albumId = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID);
             NavUtils.openAlbumProfile(this,
                     cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM)),
                     cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST)),
-                    cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID)));
+                    cursor.getLong(albumId),
+                    MusicUtils.getSongListForAlbum(this, albumId));
         } else if (position >= 0 && id >= 0) {
             // If it's a song, play it and leave
             final long[] list = new long[] {
@@ -381,7 +383,6 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
 
         // Close it up
         cursor.close();
-        cursor = null;
         // All done
         finish();
     }

@@ -22,6 +22,7 @@ import com.andrew.apollo.adapters.ArtistAlbumAdapter;
 import com.andrew.apollo.loaders.ArtistAlbumLoader;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.ui.fragments.Fragments;
+import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.andrew.apollo.widgets.VerticalScrollListener;
@@ -84,7 +85,11 @@ public class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Albu
                             final int position,
                             final long id) {
         mItem = mAdapter.getItem(position);
-        NavUtils.openAlbumProfile(getActivity(), mItem.mAlbumName, mItem.mArtistName, mItem.mAlbumId);
+        NavUtils.openAlbumProfile(getActivity(),
+                mItem.mAlbumName,
+                mItem.mArtistName,
+                mItem.mAlbumId,
+                MusicUtils.getSongListForAlbum(getActivity(), mItem.mAlbumId));
         getActivity().finish();
     }
 }

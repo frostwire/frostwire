@@ -28,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
+import com.andrew.apollo.Config;
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.MusicStateListener;
@@ -185,7 +186,7 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
         // Theme the search icon
         mResources.setSearchIcon(menu);
 
-        getMenuInflater().inflate(R.menu.new_playlist, menu);
+        //getMenuInflater().inflate(R.menu.new_playlist, menu);
 
         final SearchView searchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
         // Add voice search
@@ -221,13 +222,22 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
                 getBackHome(this);
                 return true;
             case R.id.menu_new_playlist:
-                CreateNewPlaylistMenuAction createPlaylistAction = new CreateNewPlaylistMenuAction(this, null);
-                createPlaylistAction.onClick();
+                onOptionsItemNewPlaylistSelected();
                 return true;
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void onOptionsItemNewPlaylistSelected() {
+        long[] tracks = null;
+        if (getIntent() != null && getIntent().hasExtra(Config.TRACKS)) {
+            tracks = getIntent().getLongArrayExtra(Config.TRACKS);
+        }
+        CreateNewPlaylistMenuAction createPlaylistAction = new CreateNewPlaylistMenuAction(this, tracks);
+        createPlaylistAction.onClick();
+        MusicUtils.refresh();
     }
 
     /**
@@ -388,9 +398,13 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
          */
         @Override
         public void onClick(final View v) {
-            if (MusicUtils.getCurrentAudioId() != -1) {
-                NavUtils.openAlbumProfile(BaseActivity.this, MusicUtils.getAlbumName(),
-                        MusicUtils.getArtistName(), MusicUtils.getCurrentAlbumId());
+            long currentAlbumId = MusicUtils.getCurrentAudioId();
+            if (currentAlbumId != -1) {
+                NavUtils.openAlbumProfile(BaseActivity.this,
+                        MusicUtils.getAlbumName(),
+                        MusicUtils.getArtistName(),
+                        MusicUtils.getCurrentAlbumId(),
+                        MusicUtils.getSongListForAlbum(BaseActivity.this,currentAlbumId));
             } else {
                 MusicUtils.shuffleAll(BaseActivity.this);
             }
