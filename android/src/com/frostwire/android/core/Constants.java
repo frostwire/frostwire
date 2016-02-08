@@ -117,7 +117,6 @@ public final class Constants {
     public static final String PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY = "frostwire.prefs.torrent.seed_finished_torrents_wifi_only";
 
     public static final String PREF_KEY_STORAGE_PATH = "frostwire.prefs.storage.path";
-    public static final String PREF_KEY_STORAGE_TEMP_PATH = "frostwire.prefs.storage.temp_path";
 
     public static final String PREF_KEY_UXSTATS_ENABLED = "frostwire.prefs.uxstats.enabled";
 

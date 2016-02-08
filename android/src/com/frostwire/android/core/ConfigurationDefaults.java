@@ -115,7 +115,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_PEERS, Long.valueOf(200));
 
         defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath()); // /mnt/sdcard
-        defaultValues.put(Constants.PREF_KEY_STORAGE_TEMP_PATH, new File(context.getExternalFilesDir(null), "temp").getAbsolutePath());
 
         defaultValues.put(Constants.PREF_KEY_UXSTATS_ENABLED, true);
 
