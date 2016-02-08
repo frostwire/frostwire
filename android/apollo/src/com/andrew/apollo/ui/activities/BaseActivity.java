@@ -186,8 +186,6 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
         // Theme the search icon
         mResources.setSearchIcon(menu);
 
-        //getMenuInflater().inflate(R.menu.new_playlist, menu);
-
         final SearchView searchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
         // Add voice search
         final SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
@@ -443,7 +441,7 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
          * Constructor of <code>PlaybackStatus</code>
          */
         public PlaybackStatus(final BaseActivity activity) {
-            mReference = new WeakReference<BaseActivity>(activity);
+            mReference = new WeakReference<>(activity);
         }
 
         /**

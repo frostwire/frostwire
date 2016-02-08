@@ -43,7 +43,6 @@ import com.andrew.apollo.utils.*;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.ProfileTabCarousel.Listener;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 
 /**
  * The {@link Activity} is used to display the data for specific
@@ -145,7 +144,9 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         });
         // Set up the action bar
         final ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         /* Set up the artist profile */
         if (isArtist()) {
@@ -307,6 +308,10 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
                 return true;
 
             case FragmentMenuItems.PLAYLIST_SELECTED: {
+                // TODO: Possibly refactor this entire block to just use
+                //       getIntent().getLongArrayExtra(Config.TRACKS)
+                //       Not sure yet if it'll work for all cases.
+
                 // Add to existing playlist or to new playlist
                 if (isAlbum()) {
                     long playlistId = -1;
@@ -315,6 +320,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
                         playlistId = item.getIntent().getLongExtra("playlist", -1);
                     }
 
+                    // TODO: ReDo this by passing list of tracks to Activity on intent.
                     System.out.println("It is an album! Add it to playlist id.");
                     if (playlistId != -1) {
                         System.out.println("playlist we're adding to: " + playlistId);
@@ -335,7 +341,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
                     return true;
 
                 } else if (isArtist()){
-
+                      // TODO:
                 }
                 return true;
             }
