@@ -42,7 +42,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SearchEngine;
-import com.frostwire.android.gui.StoragePicker;
+import com.frostwire.android.StoragePicker;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -112,7 +112,6 @@ public class SettingsActivity extends PreferenceActivity {
         setupOtherOptions();
         setupSeedingOptions();
         setupTorrentOptions();
-        setupNickname();
         setupClearIndex();
         setupSearchEngines();
         setupUXStatsOption();
@@ -303,18 +302,6 @@ public class SettingsActivity extends PreferenceActivity {
 
         if (preferenceSeeding != null && preferenceSeedingWifiOnly != null) {
             preferenceSeedingWifiOnly.setEnabled(preferenceSeeding.isChecked());
-        }
-    }
-
-    private void setupNickname() {
-        EditTextPreference preference = (EditTextPreference) findPreference(Constants.PREF_KEY_GUI_NICKNAME);
-        if (preference != null) {
-            preference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    String newText = ((String) newValue).trim();
-                    return !StringUtils.isNullOrEmpty(newText, true);
-                }
-            });
         }
     }
 

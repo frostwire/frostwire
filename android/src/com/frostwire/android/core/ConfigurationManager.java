@@ -141,14 +141,6 @@ public class ConfigurationManager {
         }
     }
 
-    public String getNickname() {
-        return getString(Constants.PREF_KEY_GUI_NICKNAME);
-    }
-
-    public void setNickname(String nickname) {
-        setString(Constants.PREF_KEY_GUI_NICKNAME, nickname);
-    }
-
     public String getUUIDString() {
         return getString(Constants.PREF_KEY_CORE_UUID);
     }

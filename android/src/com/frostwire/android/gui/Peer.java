@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,6 @@ public final class Peer {
     /**
      * 16 bytes (128bit - UUID identifier letting us know who is the sender)
      */
-    private String nickname;
     private String clientVersion;
 
     private int hashCode = -1;
@@ -45,13 +44,11 @@ public final class Peer {
     public Peer() {
         String address = "0.0.0.0";
         int port = 0;
-        String nickname = ConfigurationManager.instance().getNickname();
         String clientVersion = Constants.FROSTWIRE_VERSION_STRING;
 
         this.key = address + ":" + port;
         this.address = address;
 
-        this.nickname = nickname;
         this.clientVersion = clientVersion;
 
         this.hashCode = key.hashCode();
@@ -59,14 +56,6 @@ public final class Peer {
 
     public String getAddress() {
         return address;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
     }
 
     public Finger finger() {
@@ -79,7 +68,7 @@ public final class Peer {
 
     @Override
     public String toString() {
-        return "Peer(" + nickname + "@" + (address != null ? address : "unknown") + ", v:" + clientVersion + ")";
+        return "Peer(" + (address != null ? address : "unknown") + ", v:" + clientVersion + ")";
     }
 
     @Override

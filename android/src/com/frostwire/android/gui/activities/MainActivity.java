@@ -87,8 +87,7 @@ import static com.andrew.apollo.utils.MusicUtils.mService;
 public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
         OnDialogClickListener,
         ServiceConnection,
-        ActivityCompat.OnRequestPermissionsResultCallback,
-        DangerousPermissionsChecker.PermissionsCheckerHolder {
+        ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final Logger LOG = Logger.getLogger(MainActivity.class);
     private static final String FRAGMENTS_STACK_KEY = "fragments_stack";
@@ -99,7 +98,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private final Map<Integer, DangerousPermissionsChecker> permissionsCheckers;
     private MainController controller;
     private DrawerLayout drawerLayout;
-    @SuppressWarnings("deprecation")
 
     private ActionBarDrawerToggle drawerToggle;
     private View leftDrawer;
@@ -376,6 +374,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         externalStorageChecker.setPermissionsGrantedCallback(new DangerousPermissionsChecker.OnPermissionsGrantedCallback() {
             @Override
             public void onPermissionsGranted() {
+                // TODO: is the restart necessary?
+                /*
                 UIUtils.showInformationDialog(MainActivity.this,
                         R.string.restarting_summary,
                         R.string.restarting,
@@ -386,6 +386,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                                 externalStorageChecker.restartFrostWire(2000);
                             }
                         });
+                        */
             }
         });
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
@@ -771,10 +772,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
      */
     public void onServiceDisconnected(final ComponentName name) {
         mService = null;
-    }
-
-    public DangerousPermissionsChecker getPermissionsChecker(int requestCode) {
-        return permissionsCheckers.get(requestCode);
     }
 
     @Override

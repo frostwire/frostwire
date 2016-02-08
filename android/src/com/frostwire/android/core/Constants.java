@@ -89,7 +89,6 @@ public final class Constants {
 
     public static final String PREF_KEY_SEARCH_PREFERENCE_CATEGORY = "frostwire.prefs.search.preference_category";
 
-    public static final String PREF_KEY_GUI_NICKNAME = "frostwire.prefs.gui.nickname";
     public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD = "frostwire.prefs.gui.vibrate_on_finished_download";
     public static final String PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER = "frostwire.prefs.gui.last_media_type_filter";
     public static final String PREF_KEY_GUI_TOS_ACCEPTED = "frostwire.prefs.gui.tos_accepted";
@@ -117,7 +116,6 @@ public final class Constants {
     public static final String PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY = "frostwire.prefs.torrent.seed_finished_torrents_wifi_only";
 
     public static final String PREF_KEY_STORAGE_PATH = "frostwire.prefs.storage.path";
-    public static final String PREF_KEY_STORAGE_TEMP_PATH = "frostwire.prefs.storage.temp_path";
 
     public static final String PREF_KEY_UXSTATS_ENABLED = "frostwire.prefs.uxstats.enabled";
 

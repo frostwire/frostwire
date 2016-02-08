@@ -46,6 +46,15 @@ public final class Platforms {
     }
 
     /**
+     * Shortcut to current platform file system.
+     *
+     * @return
+     */
+    public static FileSystem fileSystem() {
+        return get().fileSystem();
+    }
+
+    /**
      * Shortcut to current platform file system data method.
      *
      * @return
