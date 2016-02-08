@@ -99,7 +99,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private final Map<Integer, DangerousPermissionsChecker> permissionsCheckers;
     private MainController controller;
     private DrawerLayout drawerLayout;
-    @SuppressWarnings("deprecation")
 
     private ActionBarDrawerToggle drawerToggle;
     private View leftDrawer;
