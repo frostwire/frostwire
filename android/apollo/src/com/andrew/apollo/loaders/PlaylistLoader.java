@@ -40,14 +40,10 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
         super(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<Playlist> loadInBackground() {
         // Add the default playlists to the adapter
         List<Playlist> mPlaylistList = makeDefaultPlaylists();
-
         // Create the Cursor
         Cursor mCursor = makeCursor(getContext());
         // Gather the data
@@ -55,13 +51,10 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
             do {
                 // Copy the playlist id
                 final long id = mCursor.getLong(0);
-
                 // Copy the playlist name
                 final String name = mCursor.getString(1);
-
                 // Create a new playlist
                 final Playlist playlist = new Playlist(id, name);
-
                 // Add everything up
                 mPlaylistList.add(playlist);
             } while (mCursor.moveToNext());

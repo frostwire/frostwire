@@ -524,6 +524,7 @@ public final class MusicUtils {
                 PreferenceUtils.getInstance(context).getSongSortOrder());
 
         if (cursor != null && cursor.getCount() == 1) {
+            cursor.moveToFirst();
             return new Song(songId, cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4));
         } else {
             return null;
@@ -1286,6 +1287,7 @@ public final class MusicUtils {
             while (!cursor.isAfterLast()) {
                 final Intent intent = new Intent();
                 String name = cursor.getString(1);
+                LOG.info("makePlaylistMenu - add ["+name+"]");
                 if (name != null) {
                     intent.putExtra("playlist", getIdForPlaylist(context, name));
                     subMenu.add(groupId, FragmentMenuItems.PLAYLIST_SELECTED, Menu.NONE,

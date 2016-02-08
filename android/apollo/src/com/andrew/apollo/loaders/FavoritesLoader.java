@@ -13,14 +13,20 @@ package com.andrew.apollo.loaders;
 
 import android.content.Context;
 import android.database.Cursor;
+import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.FavoritesStore.FavoriteColumns;
+import com.andrew.apollo.utils.Lists;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Used to query the {@link FavoritesStore} for the tracks marked as favorites.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
- * @author Angel Leon (gubatron@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
  */
 public class FavoritesLoader extends SongLoader {
     /**
@@ -51,5 +57,32 @@ public class FavoritesLoader extends SongLoader {
                                 FavoriteColumns.SONGNAME, FavoriteColumns.ALBUMNAME,
                                 FavoriteColumns.ARTISTNAME, FavoriteColumns.PLAYCOUNT
                         }, null, null, null, null, FavoriteColumns.PLAYCOUNT + " DESC");
+    }
+
+    @Override
+    public List<Song> loadInBackground() {
+        Cursor mCursor = makeFavoritesCursor(getContext());
+        ArrayList<Song> mSongList = Lists.newArrayList();
+        if (mCursor != null && mCursor.moveToFirst()) {
+            do {
+                // Copy the song Id
+                final long id = mCursor.getLong(mCursor.getColumnIndexOrThrow(FavoriteColumns.ID));
+                // Copy the song name
+                final String songName = mCursor.getString(mCursor.getColumnIndexOrThrow(FavoriteColumns.SONGNAME));
+                // Copy the artist name
+                final String artist = mCursor.getString(mCursor.getColumnIndexOrThrow(FavoriteColumns.ARTISTNAME));
+                // Copy the album name
+                final String album = mCursor.getString(mCursor.getColumnIndexOrThrow(FavoriteColumns.ALBUMNAME));
+                // Create a new song
+                final Song song = new Song(id, songName, artist, album, -1);
+                // Add everything up
+                mSongList.add(song);
+            } while (mCursor.moveToNext());
+        }
+        // Close the cursor
+        if (mCursor != null) {
+            mCursor.close();
+        }
+        return mSongList;
     }
 }

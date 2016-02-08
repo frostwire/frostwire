@@ -37,7 +37,7 @@ public final class PreferenceUtils {
     public static final Logger LOGGER = Logger.getLogger(PreferenceUtils.class);
 
     /* Default start page (Artist page) */
-    public static final int DEFFAULT_PAGE = 0;
+    public static final int DEFAULT_PAGE = 0;
 
     /* Saves the last page the pager was on in {@link MusicBrowserPhoneFragment} */
     public static final String START_PAGE = "start_page";
@@ -136,7 +136,7 @@ public final class PreferenceUtils {
      * @return The page to start on when the app is opened.
      */
     public final int getStartPage() {
-        return mPreferences.getInt(START_PAGE, DEFFAULT_PAGE);
+        return mPreferences.getInt(START_PAGE, DEFAULT_PAGE);
     }
 
     /**
@@ -372,8 +372,6 @@ public final class PreferenceUtils {
     public boolean isSimpleLayout(final String which) {
         final String simple = "simple";
         final String defaultValue = "grid";
-        final String savedPreference = mPreferences.getString(which, defaultValue);
-        LOGGER.info("isSimpleLayout(which="+which+", defaultValue=grid) -> ["+savedPreference+"] -> " + mPreferences.getString(which, defaultValue).equals(simple));
         return mPreferences.getString(which, defaultValue).equals(simple);
     }
 

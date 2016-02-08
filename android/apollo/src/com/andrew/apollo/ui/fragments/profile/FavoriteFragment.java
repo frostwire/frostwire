@@ -54,18 +54,12 @@ public class FavoriteFragment extends ApolloFragment<ProfileSongAdapter, Song> {
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
             final long id) {
         MusicUtils.playAllFromUserItemClick(mAdapter, position);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
         return new FavoritesLoader(getActivity());

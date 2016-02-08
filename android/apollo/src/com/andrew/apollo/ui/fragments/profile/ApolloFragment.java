@@ -41,6 +41,7 @@ import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
+import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.viewpagerindicator.TitlePageIndicator;
 
@@ -330,15 +331,22 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     private void onAddToFavorites() {
         if (mSongList != null) {
+            int added = 0;
             for (Long songId : mSongList) {
                 try {
                     final Song song = MusicUtils.getSong(getActivity(), songId);
                     if (song != null) {
                         FavoritesStore.getInstance(getActivity()).addSongId(songId, song.mSongName, song.mAlbumName, song.mArtistName);
+                        added++;
                     }
                 } catch (Throwable ignored) {
                     ignored.printStackTrace();
                 }
+            }
+            if (added > 0) {
+                final String message = getResources().getQuantityString(
+                        R.plurals.NNNtrackstoplaylist, added, added);
+                AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
             }
         } else if (mSelectedId != -1){
             FavoritesStore.getInstance(getActivity()).addSongId(
