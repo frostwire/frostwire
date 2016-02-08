@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,16 +22,11 @@ import android.content.Context;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.provider.MediaStore.Audio;
-import android.provider.Settings;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
-import com.frostwire.android.gui.util.DangerousPermissionsChecker;
-import com.frostwire.android.gui.util.DangerousPermissionsChecker.PermissionsCheckerHolder;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
-
-import java.util.concurrent.CountDownLatch;
 
 /**
  * @author gubatron

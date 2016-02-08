@@ -87,8 +87,7 @@ import static com.andrew.apollo.utils.MusicUtils.mService;
 public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
         OnDialogClickListener,
         ServiceConnection,
-        ActivityCompat.OnRequestPermissionsResultCallback,
-        DangerousPermissionsChecker.PermissionsCheckerHolder {
+        ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final Logger LOG = Logger.getLogger(MainActivity.class);
     private static final String FRAGMENTS_STACK_KEY = "fragments_stack";
@@ -770,10 +769,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
      */
     public void onServiceDisconnected(final ComponentName name) {
         mService = null;
-    }
-
-    public DangerousPermissionsChecker getPermissionsChecker(int requestCode) {
-        return permissionsCheckers.get(requestCode);
     }
 
     @Override
