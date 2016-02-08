@@ -31,6 +31,9 @@ import java.util.List;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
+    public static final int FAVORITE_PLAYLIST_ID = -1;
+    public static final int LAST_ADDED_PLAYLIST_ID = -2;
+
     /**
      * Constructor of <code>PlaylistLoader</code>
      * 
@@ -72,12 +75,12 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
         ArrayList<Playlist> mPlaylistList = Lists.newArrayList();
 
         /* Favorites list */
-        final Playlist favorites = new Playlist(-1,
+        final Playlist favorites = new Playlist(FAVORITE_PLAYLIST_ID,
                 resources.getString(R.string.playlist_favorites));
         mPlaylistList.add(favorites);
 
         /* Last added list */
-        final Playlist lastAdded = new Playlist(-2,
+        final Playlist lastAdded = new Playlist(LAST_ADDED_PLAYLIST_ID,
                 resources.getString(R.string.playlist_last_added));
         mPlaylistList.add(lastAdded);
         return mPlaylistList;

@@ -27,6 +27,7 @@ import android.view.*;
 import android.widget.*;
 import com.andrew.apollo.MusicStateListener;
 import com.andrew.apollo.adapters.ApolloFragmentAdapter;
+import com.andrew.apollo.loaders.PlaylistLoader;
 import com.andrew.apollo.menu.CreateNewPlaylist;
 import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.menu.FragmentMenuItems;
@@ -205,7 +206,14 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         } else if (mItem instanceof Playlist) {
             Playlist mPlaylist = (Playlist) mItem;
             mSelectedId = mPlaylist.mPlaylistId;
-            mSongList = MusicUtils.getSongListForPlaylist(getActivity(), mPlaylist.mPlaylistId);
+            if (mSelectedId == PlaylistLoader.FAVORITE_PLAYLIST_ID) {
+                mSongList = MusicUtils.getSongListForFavorites(getActivity());
+            } else if (mSelectedId == PlaylistLoader.LAST_ADDED_PLAYLIST_ID) {
+                mSongList = MusicUtils.getSongListForLastAdded(getActivity());
+            } else {
+                mSongList = MusicUtils.getSongListForPlaylist(getActivity(), mPlaylist.mPlaylistId);
+            }
+
         }
 
         // Play the selected songs
