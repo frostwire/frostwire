@@ -286,15 +286,11 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         }
         // Add to playlist
         if (isArtist() || isAlbum()) {
-            // Add the album to a playlist
-            // If it's an artist, we should add all the songs for that artist.
-            //if (isAlbum()) {
-                final SubMenu subMenu = menu.addSubMenu(
-                        TabFragmentOrder.ALBUMS_POSITION,
-                        FragmentMenuItems.ADD_TO_PLAYLIST,
-                        Menu.NONE, R.string.add_to_playlist);
-                MusicUtils.makePlaylistMenu(this, TabFragmentOrder.ALBUMS_POSITION, subMenu, false);
-            //}
+            final SubMenu subMenu = menu.addSubMenu(
+                    TabFragmentOrder.ALBUMS_POSITION,
+                    FragmentMenuItems.ADD_TO_PLAYLIST,
+                    Menu.NONE, R.string.add_to_playlist);
+            MusicUtils.makePlaylistMenu(this, TabFragmentOrder.ALBUMS_POSITION, subMenu, false);
         }
 
         return super.onCreateOptionsMenu(menu);

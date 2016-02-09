@@ -74,11 +74,6 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
     private final View mHeader;
 
     /**
-     * The resource Id of the layout to inflate
-     */
-    private final int mLayoutId;
-
-    /**
      * Display setting for the second line in a song fragment
      */
     private final int mDisplaySetting;
@@ -87,11 +82,6 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
      * Separator used for separating album/artist strings
      */
     private final String SEPARATOR_STRING = " - ";
-
-    /**
-     * Used to set the size of the data in the adapter
-     */
-    //private List<Song> mCount = Lists.newArrayList();
 
     /**
      * Constructor of <code>ProfileSongAdapter</code>
@@ -106,8 +96,6 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
         mInflater = LayoutInflater.from(context);
         // Cache the header
         mHeader = mInflater.inflate(R.layout.faux_carousel, null);
-        // Get the layout Id
-        mLayoutId = layoutId;
         // Know what to put in line two
          mDisplaySetting = setting;
 
