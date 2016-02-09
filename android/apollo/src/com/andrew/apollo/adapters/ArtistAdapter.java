@@ -80,9 +80,15 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
                 holder.mLineThree.get().setText(dataHolder.mLineThree);
             }
             if (Ref.alive(holder.mBackground)) {
-                // Set the background image
-                mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mBackground.get());
+                if (mLayoutId == R.layout.list_item_detailed_no_background) {
+                   holder.mBackground.get().setBackground(null);
+                   holder.mBackground.get().setBackgroundColor(convertView.getResources().getColor(R.color.app_light_background));
+                }  else {
+                    // Set the background image
+                    mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mBackground.get());
+                }
             }
+
             if (Ref.alive(holder.mImage)) {
                 // Play the artist when the artwork is touched
                 initArtistPlayOnClick(holder.mImage.get(), position);

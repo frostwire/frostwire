@@ -61,7 +61,7 @@ public class AlbumFragment extends ApolloFragment<AlbumAdapter, Album> {
         if (isSimpleLayout()) {
             layout = R.layout.list_item_normal;
         } else if (isDetailedLayout()) {
-            layout = R.layout.list_item_detailed;
+            layout = R.layout.list_item_detailed_no_background;
         } else {
             layout = R.layout.grid_items_normal;
         }

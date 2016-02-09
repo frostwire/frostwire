@@ -95,8 +95,13 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
             }
 
             if (mImageFetcher != null && Ref.alive(holder.mBackground)) {
-                // Asynchronously load the artist image on the background view
-                mImageFetcher.loadArtistImage(dataHolder.mLineTwo, holder.mBackground.get());
+                if (mLayoutId == R.layout.list_item_detailed_no_background) {
+                    holder.mBackground.get().setBackground(null);
+                    holder.mBackground.get().setBackgroundColor(convertView.getResources().getColor(R.color.app_light_background));
+                }  else {
+                    // Asynchronously load the artist image on the background view
+                    mImageFetcher.loadArtistImage(dataHolder.mLineTwo, holder.mBackground.get());
+                }
             }
         }
 

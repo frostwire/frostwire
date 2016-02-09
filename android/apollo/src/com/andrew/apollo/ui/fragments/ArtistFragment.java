@@ -70,9 +70,9 @@ public class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> {
     protected ArtistAdapter createAdapter() {
         int layout;
         if (isSimpleLayout()) {
-            layout = R.layout.list_item_simple;
+            layout = R.layout.list_item_normal;
         } else if (isDetailedLayout()) {
-            layout = R.layout.list_item_detailed;
+            layout = R.layout.list_item_detailed_no_background;
         } else {
             layout = R.layout.grid_items_normal;
         }
