@@ -364,7 +364,7 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
         // If it's an artist, open the artist profile
         if ("artist".equals(mimeType)) {
             NavUtils.openArtistProfile(this,
-                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST)));
+                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST)),null);
         } else if ("album".equals(mimeType)) {
             // If it's an album, open the album profile
             int albumId = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID);

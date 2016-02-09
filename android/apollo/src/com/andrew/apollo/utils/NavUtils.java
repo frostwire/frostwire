@@ -42,8 +42,7 @@ public final class NavUtils {
      * @param context The {@link Activity} to use.
      * @param artistName The name of the artist
      */
-    public static void openArtistProfile(final Activity context,
-            final String artistName) {
+    public static void openArtistProfile(final Activity context, final String artistName, final long[] songs) {
         if (artistName == null || artistName.isEmpty()) {
             return;
         }
@@ -53,6 +52,10 @@ public final class NavUtils {
         bundle.putLong(Config.ID, MusicUtils.getIdForArtist(context, artistName));
         bundle.putString(Config.MIME_TYPE, MediaStore.Audio.Artists.CONTENT_TYPE);
         bundle.putString(Config.ARTIST_NAME, artistName);
+
+        if (songs != null && songs.length > 0) {
+            bundle.putLongArray(Config.TRACKS, songs);
+        }
 
         // Create the intent to launch the profile activity
         final Intent intent = new Intent(context, ProfileActivity.class);

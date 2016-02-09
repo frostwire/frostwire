@@ -144,6 +144,10 @@ public class MusicBrowserPhoneFragment extends Fragment implements
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        if (isPlaylistPage()) {
+            inflater.inflate(R.menu.new_playlist, menu);
+        }
+
         // Favorite action
         inflater.inflate(R.menu.favorite, menu);
         // Shuffle all
@@ -336,6 +340,10 @@ public class MusicBrowserPhoneFragment extends Fragment implements
 
     private boolean isRecentPage() {
         return mViewPager.getCurrentItem() == TabFragmentOrder.RECENT_POSITION;
+    }
+
+    private boolean isPlaylistPage() {
+        return mViewPager.getCurrentItem() == TabFragmentOrder.PLAYLISTS_POSITION;
     }
 
     private RecentFragment getRecentFragment() {

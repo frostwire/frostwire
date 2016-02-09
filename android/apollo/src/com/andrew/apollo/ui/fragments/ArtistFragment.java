@@ -88,7 +88,8 @@ public class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> {
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
             final long id) {
         mItem = mAdapter.getItem(position);
-        NavUtils.openArtistProfile(getActivity(), mItem.mArtistName);
+        long[] tracks = MusicUtils.getSongListForArtist(getActivity(), mItem.mArtistId);
+        NavUtils.openArtistProfile(getActivity(), mItem.mArtistName, tracks);
     }
 
     @Override

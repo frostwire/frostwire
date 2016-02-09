@@ -84,6 +84,8 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      */
     private String mArtistName;
 
+    private long mArtistId;
+
     /**
      * The main profile title
      */
@@ -120,6 +122,9 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         // Get the artist name
         if (isArtist() || isAlbum()) {
             mArtistName = mArguments.getString(Config.ARTIST_NAME);
+            if (isArtist()) {
+                mArtistId = mArguments.getLong(Config.ID);
+            }
         }
         // Initialize the pager adapter
         mPagerAdapter = new PagerAdapter(this);
@@ -262,7 +267,8 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     }
 
     /**
-     * {@inheritDoc}
+     * This is the options menu that gets created when inside an artist/album
+     * on the action bar "..." button.
      */
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -282,13 +288,13 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         if (isArtist() || isAlbum()) {
             // Add the album to a playlist
             // If it's an artist, we should add all the songs for that artist.
-            if (isAlbum()) {
+            //if (isAlbum()) {
                 final SubMenu subMenu = menu.addSubMenu(
                         TabFragmentOrder.ALBUMS_POSITION,
                         FragmentMenuItems.ADD_TO_PLAYLIST,
                         Menu.NONE, R.string.add_to_playlist);
                 MusicUtils.makePlaylistMenu(this, TabFragmentOrder.ALBUMS_POSITION, subMenu, false);
-            }
+            //}
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -308,47 +314,29 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
                 return true;
 
             case FragmentMenuItems.PLAYLIST_SELECTED: {
-                // TODO: Possibly refactor this entire block to just use
-                //       getIntent().getLongArrayExtra(Config.TRACKS)
-                //       Not sure yet if it'll work for all cases.
-
                 // Add to existing playlist or to new playlist
-                if (isAlbum()) {
+                if (isAlbum() || isArtist()) {
                     long playlistId = -1;
                     // playlist id has been bundled with an intent extra along with the menu item.
                     if (item.getIntent()!=null && item.getIntent().hasExtra("playlist")) {
                         playlistId = item.getIntent().getLongExtra("playlist", -1);
                     }
 
-                    // TODO: ReDo this by passing list of tracks to Activity on intent.
-                    System.out.println("It is an album! Add it to playlist id.");
                     if (playlistId != -1) {
-                        System.out.println("playlist we're adding to: " + playlistId);
-                        System.out.println("item.getItemId() -> " + item.getItemId() + " == FragmentMenuItems.ADD_TO_PLAYLIST ("+FragmentMenuItems.ADD_TO_PLAYLIST+")");
-                        final ProfileSongAdapter adapter = getAlbumSongFragment().getAdapter();
-                        if (adapter != null && adapter.getCount() > 0) {
-                            // for some reason they changed .getCount() to return n+1 if size > 0.
-                            long songIds[] = new long[adapter.getCount()-1];
-                            for (int i=0; i < adapter.getCount()-1; i++) {
-                                final Song song = adapter.getItem(i);
-                                System.out.println("Will add this song: (" + song.mSongId + ") " + song.mSongName);
-                                songIds[i] = song.mSongId;
-                            }
-
-                            MusicUtils.addToPlaylist(this, songIds, playlistId);
+                        long[] tracks = mArguments.getLongArray(Config.TRACKS);
+                        if (playlistId != -1 && tracks != null && tracks.length > 0) {
+                            MusicUtils.addToPlaylist(this, tracks, playlistId);
                         }
                     }
-                    return true;
-
-                } else if (isArtist()){
-                      // TODO:
                 }
                 return true;
             }
             case android.R.id.home:
                 // If an album profile, go up to the artist profile
                 if (isAlbum()) {
-                    NavUtils.openArtistProfile(this, mArtistName);
+                    final Long artistId = mArguments.getLong(Config.ID);
+                    long[] tracks = MusicUtils.getSongListForArtist(this, artistId);
+                    NavUtils.openArtistProfile(this, mArtistName, tracks);
                     finish();
                 } else {
                     // Otherwise just go back
@@ -628,7 +616,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     }
 
     /**
-     * Fetchs for the artist or album art, other wise sets the default header
+     * Fetches for the artist or album art, other wise sets the default header
      * image.
      */
     public void selectOldPhoto() {
@@ -697,7 +685,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * @return True if the MIME type is vnd.android.cursor.dir/artists, false
      *         otherwise.
      */
-    private final boolean isArtist() {
+    private boolean isArtist() {
         return mType.equals(MediaStore.Audio.Artists.CONTENT_TYPE);
     }
 
@@ -705,7 +693,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * @return True if the MIME type is vnd.android.cursor.dir/albums, false
      *         otherwise.
      */
-    private final boolean isAlbum() {
+    private boolean isAlbum() {
         return mType.equals(MediaStore.Audio.Albums.CONTENT_TYPE);
     }
 
@@ -713,7 +701,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * @return True if the MIME type is vnd.android.cursor.dir/gere, false
      *         otherwise.
      */
-    private final boolean isGenre() {
+    private boolean isGenre() {
         return mType.equals(MediaStore.Audio.Genres.CONTENT_TYPE);
     }
 
@@ -721,7 +709,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * @return True if the MIME type is vnd.android.cursor.dir/playlist, false
      *         otherwise.
      */
-    private final boolean isPlaylist() {
+    private boolean isPlaylist() {
         return mType.equals(MediaStore.Audio.Playlists.CONTENT_TYPE);
     }
 
@@ -729,7 +717,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * @return True if the MIME type is one of the playlist types and the playlist is empty, false
      *         otherwise.
      */
-    private final boolean isEmptyPlaylist() {
+    private boolean isEmptyPlaylist() {
         long[] list = null;
         if (isPlaylist()) {
             final long id = mArguments.getLong(Config.ID);
@@ -745,14 +733,14 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     /**
      * @return True if the MIME type is "Favorites", false otherwise.
      */
-    private final boolean isFavorites() {
+    private boolean isFavorites() {
         return mType.equals(getString(R.string.playlist_favorites));
     }
 
     /**
      * @return True if the MIME type is "LastAdded", false otherwise.
      */
-    private final boolean isLastAdded() {
+    private boolean isLastAdded() {
         return mType.equals(getString(R.string.playlist_last_added));
     }
 

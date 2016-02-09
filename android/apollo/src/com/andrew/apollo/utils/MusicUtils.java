@@ -560,6 +560,28 @@ public final class MusicUtils {
         return sEmptyList;
     }
 
+    public static String getAlbumName(final Context context, final long id) {
+        String albumName = null;
+        final String[] projection = new String[] {
+                AudioColumns.ALBUM
+        };
+        final String selection = AudioColumns.ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC + "=1";
+        Cursor cursor = context.getContentResolver().query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                null,
+                null,
+                null
+        );
+        if (cursor != null) {
+            cursor.moveToFirst();
+            albumName = cursor.getString(0);
+            cursor.close();
+        }
+        return albumName;
+    }
+
     /**
      * @param context The {@link Context} to use.
      * @param id The ID of the album.

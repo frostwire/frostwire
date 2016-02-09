@@ -186,7 +186,7 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
         // Theme the search icon
         mResources.setSearchIcon(menu);
 
-        final SearchView searchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
+        final SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
         // Add voice search
         final SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
         final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
@@ -238,9 +238,6 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
         MusicUtils.refresh();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -251,9 +248,6 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
         updateBottomActionBarInfo();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onStart() {
         super.onStart();
