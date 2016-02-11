@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 
 package com.frostwire.search.youtube;
 
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlRegexSearchPerformer;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.util.HtmlManipulator;
-import com.frostwire.regex.Pattern;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -104,7 +104,7 @@ public class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSea
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return String.format(Locale.US, "https://"+getDomainName()+"/results?search_query=%s", encodedKeywords);
+        return String.format(Locale.US, "https://" + getDomainName() + "/results?search_query=%s", encodedKeywords);
     }
 
     @Override

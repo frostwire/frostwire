@@ -75,6 +75,10 @@ public final class YouTubeExtractor {
                 formatter = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
                 dateStr = br.getRegex("class=\"watch-video-date\" >([ ]+)?(\\d{1,2} [A-Za-z]{3} \\d{4})</span>").getMatch(1);
             }
+            if (dateStr == null) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                dateStr = br.getRegex("<meta itemprop=\"datePublished\" content=\"(\\d{4}-\\d{2}-\\d{2})\">").getMatch(0);
+            }
             Date date = dateStr != null ? formatter.parse(dateStr) : new Date();
 
             String videoId = getVideoID(videoUrl);
@@ -86,22 +90,37 @@ public final class YouTubeExtractor {
             List<LinkInfo> infos = new LinkedList<LinkInfo>();
 
             //if (!testConnection || testConnection(br, getFirstLink(LinksFound))) {
-                for (int fmt : LinksFound.keySet()) {
-                    Format format = FORMATS.get(fmt);
-                    if (format == null) {
-                        continue;
-                    }
-                    String link = LinksFound.get(fmt);
-                    LinkInfo info = new LinkInfo(link, fmt, filename, FileSearchResult.UNKNOWN_SIZE, date, videoId, userName, channelName, thumbnailLinks, format);
-                    infos.add(info);
+            for (int fmt : LinksFound.keySet()) {
+                Format format = FORMATS.get(fmt);
+                if (format == null) {
+                    continue;
                 }
+                String link = LinksFound.get(fmt);
+                LinkInfo info = new LinkInfo(link, fmt, filename, FileSearchResult.UNKNOWN_SIZE, date, videoId, userName, channelName, thumbnailLinks, format);
+                infos.add(info);
+            }
             //}
 
-            // work with the DASH manifest
-            String dashmpd = br.getRegex("\"dashmpd\":\"([^\"]+)\"").getMatch(0);
-            if (dashmpd != null && currentYTSig != null) {
-                List<LinkInfo> dashInfos = extractLinksFromDashManifest(dashmpd, currentYTSig, filename, date, videoId, userName, channelName, thumbnailLinks);
-                infos.addAll(dashInfos);
+            // work with the DASH formats
+            if (currentYTSig != null) {
+                String adaptive_fmts = br.getRegex("\"adaptive_fmts\":\"([^\"]+)\"").getMatch(0);
+
+                if (adaptive_fmts != null) {
+                    try {
+                        List<LinkInfo> dashInfos = extractLinksFromAdaptiveFmts(adaptive_fmts, currentYTSig, filename, date, videoId, userName, channelName, thumbnailLinks);
+                        infos.addAll(dashInfos);
+                    } catch (Throwable e) {
+                        // ignore
+                        e.printStackTrace();
+                    }
+                } else {
+                    // NOTE: Don't remove yet
+//                    String dashmpd = br.getRegex("\"dashmpd\":\"([^\"]+)\"").getMatch(0);
+//                    if (dashmpd != null) {
+//                        List<LinkInfo> dashInfos = extractLinksFromDashManifest(dashmpd, currentYTSig, filename, date, videoId, userName, channelName, thumbnailLinks);
+//                        infos.addAll(dashInfos);
+//                    }
+                }
             }
 
             return infos;
@@ -109,6 +128,46 @@ public final class YouTubeExtractor {
         } catch (Throwable e) {
             throw new RuntimeException("General extractor error", e);
         }
+    }
+
+    private List<LinkInfo> extractLinksFromAdaptiveFmts(String adaptive_fmts, YouTubeSig ytSig, String filename,
+                                                        Date date, String videoId, String userName, String channelName, ThumbnailLinks thumbnailLinks) {
+        String[] arr = adaptive_fmts.split(",");
+
+        List<LinkInfo> infos = new ArrayList<>();
+        for (int i = 0; i < arr.length; i++) {
+            String[] t0 = arr[i].split("\\\\u0026");
+            HashMap<String, String> m2 = new HashMap<>();
+            for (int j = 0; j < t0.length; j++) {
+                String[] t1 = t0[j].split("=");
+                m2.put(t1[0], t1[1]);
+            }
+            int fmt = Integer.parseInt(m2.get("itag"));
+            Format format = FORMATS.get(fmt);
+            if (format == null) {
+                continue;
+            }
+            String url = m2.get("url");
+            url = Encoding.urlDecode(url, false);
+            url = url.replaceAll("%252C", "%2C");
+
+            if (m2.containsKey("s")) {
+                String s = m2.get("s");
+                String sig = ytSig.calc(s);
+                url = url + "&signature=" + sig;
+            }
+
+            if (!url.contains("&ratebypass")) {
+                url = url + "&ratebypass=yes";
+            }
+
+            long size = Long.parseLong(m2.get("clen"));
+
+            LinkInfo info = new LinkInfo(url, fmt, filename, size, date, videoId, userName, channelName, thumbnailLinks, format);
+            infos.add(info);
+        }
+
+        return infos;
     }
 
     private List<LinkInfo> extractLinksFromDashManifest(String dashManifestUrl, YouTubeSig ytSig, String filename,
@@ -203,12 +262,7 @@ public final class YouTubeExtractor {
             fileNameFound = true;
         }
 
-        final String page = br.toString();
-        final String prefix = "<script src=\"//s.ytimg.com/yts/jsbin/player-";
-        final int startIndex = page.indexOf(prefix) + prefix.length();
-        final int endIndex = page.indexOf("/base.js\" name=\"player/base\"></script>", startIndex); //don't search from the start
-        final String playerId = page.substring(startIndex,
-                                               endIndex);
+        String playerId = br.getRegex("<script src=\"//s.ytimg.com/yts/jsbin/player-([\\w_\\-]+)/base.js\" name=\"player/base\"></script>").getMatch(0);
         YouTubeSig ytSig = getYouTubeSig("http://s.ytimg.com/yts/jsbin/player-" + playerId + "/base.js");
         currentYTSig = ytSig;
 
