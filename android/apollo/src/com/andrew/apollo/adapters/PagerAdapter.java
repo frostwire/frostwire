@@ -183,11 +183,11 @@ public class PagerAdapter extends FragmentPagerAdapter {
         /**
          * The album fragment
          */
-        ALBUM(AlbumFragment.class),
+        ALBUM(AlbumFragment.class);
         /**
-         * The genre fragment
+         * The genre fragment: On its way out if nobody complains. This isn't working properly. Let's empower playlists instead.
          */
-        GENRE(GenreFragment.class);
+        //GENRE(GenreFragment.class);
 
         private Class<? extends Fragment> mFragmentClass;
 
