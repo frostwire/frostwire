@@ -75,6 +75,10 @@ public final class YouTubeExtractor {
                 formatter = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
                 dateStr = br.getRegex("class=\"watch-video-date\" >([ ]+)?(\\d{1,2} [A-Za-z]{3} \\d{4})</span>").getMatch(1);
             }
+            if (dateStr == null) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                dateStr = br.getRegex("<meta itemprop=\"datePublished\" content=\"(\\d{4}-\\d{2}-\\d{2})\">").getMatch(0);
+            }
             Date date = dateStr != null ? formatter.parse(dateStr) : new Date();
 
             String videoId = getVideoID(videoUrl);
@@ -107,6 +111,7 @@ public final class YouTubeExtractor {
             return infos;
 
         } catch (Throwable e) {
+            e.printStackTrace();
             throw new RuntimeException("General extractor error", e);
         }
     }
@@ -203,12 +208,7 @@ public final class YouTubeExtractor {
             fileNameFound = true;
         }
 
-        final String page = br.toString();
-        final String prefix = "<script src=\"//s.ytimg.com/yts/jsbin/player-";
-        final int startIndex = page.indexOf(prefix) + prefix.length();
-        final int endIndex = page.indexOf("/base.js\" name=\"player/base\"></script>", startIndex); //don't search from the start
-        final String playerId = page.substring(startIndex,
-                                               endIndex);
+        String playerId = br.getRegex("<script src=\"//s.ytimg.com/yts/jsbin/player-([\\w_\\-]+)/base.js\" name=\"player/base\"></script>").getMatch(0);
         YouTubeSig ytSig = getYouTubeSig("http://s.ytimg.com/yts/jsbin/player-" + playerId + "/base.js");
         currentYTSig = ytSig;
 
