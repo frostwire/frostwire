@@ -1,8 +1,11 @@
-FrostWire 1.7.1 - FEBRUARY/04/2016
+FrostWire 1.7.1 - FEBRUARY/11/2016
  - New "Experimental Features" option available. In order to move at a
    faster pace and keep up with Android's endless architectural changes
    and fragmentation issues, we're rolling out experimental features
    with a switch you can turn on to help us test and fix faster.
+ - On Android 6.0 it's no longer needed to restart the app after
+   special permissions have been granted.
+ - YT audio search fixes.
  - [Experimental] Integration of Android's new Storage Access Framework.
    Android 5.x and up users are now able to save files on your SD Card
    and not use up your internal memory once again.
