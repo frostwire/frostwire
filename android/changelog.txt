@@ -12,6 +12,7 @@ FrostWire 1.7.1 - FEBRUARY/11/2016
  - Upgraded to new jlibtorrent 1.1.0.20.
  - Greatly improved Spanish translation.
  - Improved track sharing on social networks.
+ - Fixes broken transfer progress bar for SoundCloud downloads.
  - Crash fixes.
 
 FrostWire 1.7.0 - JANUARY/12/2016
