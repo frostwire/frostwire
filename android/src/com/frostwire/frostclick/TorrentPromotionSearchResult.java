@@ -50,7 +50,7 @@ public class TorrentPromotionSearchResult implements TorrentSearchResult {
 
     @Override
     public String getFilename() {
-        return FilenameUtils.getName(slide.url);
+        return FilenameUtils.getName(slide.torrent);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class TorrentPromotionSearchResult implements TorrentSearchResult {
 
     @Override
     public String getDetailsUrl() {
-        return slide.url;
+        return slide.clickURL;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class TorrentPromotionSearchResult implements TorrentSearchResult {
 
     @Override
     public String getReferrerUrl() {
-        return slide.url;
+        return slide.clickURL;
     }
 
     @Override

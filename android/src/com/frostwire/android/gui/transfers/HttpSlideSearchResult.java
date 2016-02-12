@@ -45,7 +45,7 @@ public class HttpSlideSearchResult extends AbstractFileSearchResult {
     }
 
     public String getHttpUrl() {
-        return slide.httpUrl;
+        return slide.httpDownloadURL;
     }
 
     public boolean isCompressed() {

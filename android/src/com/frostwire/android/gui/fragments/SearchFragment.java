@@ -508,10 +508,9 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                 break;
         }
         if (sr == null) {
-
             //check if there is a URL available to open a web browser.
-            if (slide.url != null) {
-                Intent i = new Intent("android.intent.action.VIEW", Uri.parse(slide.url));
+            if (slide.clickURL != null) {
+                Intent i = new Intent("android.intent.action.VIEW", Uri.parse(slide.clickURL));
                 try {
                     getActivity().startActivity(i);
                 } catch (Throwable t) {

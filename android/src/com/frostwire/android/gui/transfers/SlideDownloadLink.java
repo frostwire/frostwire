@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.transfers;
 
+import com.frostwire.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
 
 import com.frostwire.frostclick.Slide;
@@ -32,11 +33,18 @@ public final class SlideDownloadLink extends HttpDownloadLink {
     private final Slide slide;
 
     public SlideDownloadLink(Slide slide) {
-        super(slide.httpUrl, FilenameUtils.getName(slide.httpUrl), slide.title, slide.size, slide.uncompress);
+        super(slide.httpDownloadURL == null ? slide.torrent : slide.httpDownloadURL,
+              FilenameUtils.getName(slide.httpDownloadURL == null ? slide.torrent : slide.httpDownloadURL),
+              slide.title,
+              slide.size,
+              slide.uncompress);
         this.slide = slide;
     }
 
     public Slide getSlide() {
         return slide;
     }
+
+    @Override
+    public String getUrl() { return slide.torrent; }
 }
