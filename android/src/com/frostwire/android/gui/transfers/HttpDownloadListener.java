@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(TM). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,11 @@
 
 package com.frostwire.android.gui.transfers;
 
+import com.frostwire.util.http.HttpClient;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -25,5 +30,7 @@ package com.frostwire.android.gui.transfers;
  */
 public interface HttpDownloadListener {
 
-    public void onComplete(HttpDownload download);
+    void onComplete(HttpDownload download);
+
+    void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields);
 }

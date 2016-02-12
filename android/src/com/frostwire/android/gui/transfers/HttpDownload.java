@@ -38,12 +38,13 @@ import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class HttpDownload implements DownloadTransfer {
+public class HttpDownload implements DownloadTransfer {
 
     private static final String TAG = "FW.HttpDownload";
 
@@ -117,8 +118,9 @@ public final class HttpDownload implements DownloadTransfer {
     }
 
     public int getProgress() {
-        if (link.getSize() > 0) {
-            return isComplete() ? 100 : (int) ((bytesReceived * 100) / link.getSize());
+        if (getSize() > 0) {
+            //LOG.info("getProgress() - size:"+getSize()+" bytes");
+            return isComplete() ? 100 : (int) ((bytesReceived * 100) / getSize());
         } else {
             return 0;
         }
@@ -127,6 +129,14 @@ public final class HttpDownload implements DownloadTransfer {
     public long getSize() {
         return link.getSize();
     }
+
+    protected void setSize(long s) {
+        // it's like an abstract method that's not meant to be implemented by everyone. If you call it for some reason
+        // then you must implement it, as most HTTP downloads don't change in size. We use this only for now
+        // on SoundCloud downloads, which aren't instantiated with an expected file size number.
+        throw new RuntimeException(this.getClass().getSimpleName() + ".setSize(long s) Not implemented!");
+    }
+
 
     public Date getDateCreated() {
         return dateCreated;
@@ -293,6 +303,12 @@ public final class HttpDownload implements DownloadTransfer {
         }
     }
 
+    private void headers(HttpClient httpClient, Map<String, List<String>> headerFields) {
+        if (listener != null) {
+            listener.onHeaders(httpClient, headerFields);
+        }
+    }
+
     private void classicComplete() {
         boolean success = true;
         if (tempPath.exists() && tempPath.renameTo(savePath)) {
@@ -301,9 +317,33 @@ public final class HttpDownload implements DownloadTransfer {
             success = false;
         }
 
+        performCompletionTasks(success);
+    }
+
+    private void safComplete(final FileSystem fs) {
+        Engine.instance().getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    boolean success = false;
+                    if (tempPath.exists() && fs.copy(tempPath, savePath)) {
+                        success = true;
+                    }
+                    performCompletionTasks(success);
+
+                    tempPath.delete();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    error(new Exception("Error"));
+                }
+            }
+        });
+    }
+
+    private void performCompletionTasks(boolean success) {
         if (success) {
             if (listener != null) {
-                listener.onComplete(this);
+                listener.onComplete(HttpDownload.this);
             }
 
             status = STATUS_COMPLETE;
@@ -317,44 +357,6 @@ public final class HttpDownload implements DownloadTransfer {
         } else {
             error(new Exception("Error"));
         }
-    }
-
-    private void safComplete(final FileSystem fs) {
-        Engine.instance().getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    boolean success = true;
-                    if (tempPath.exists() && fs.copy(tempPath, savePath)) {
-                        success = true;
-                    } else {
-                        success = false;
-                    }
-
-                    if (success) {
-                        if (listener != null) {
-                            listener.onComplete(HttpDownload.this);
-                        }
-
-                        status = STATUS_COMPLETE;
-
-                        manager.incrementDownloadsToReview();
-                        Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
-
-                        if (savePath.getAbsoluteFile().exists()) {
-                            Librarian.instance().scan(getSavePath().getAbsoluteFile());
-                        }
-                    } else {
-                        error(new Exception("Error"));
-                    }
-
-                    tempPath.delete();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    error(new Exception("Error"));
-                }
-            }
-        });
     }
 
     private void error(Throwable e) {
@@ -380,6 +382,11 @@ public final class HttpDownload implements DownloadTransfer {
 
     private final class DownloadListener extends HttpClient.HttpClientListenerAdapter {
         public DownloadListener() {
+        }
+
+        @Override
+        public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
+            headers(httpClient, headerFields);
         }
 
         @Override
