@@ -133,7 +133,7 @@ public final class TorrentUtil {
         sb.append("dn=");
         sb.append(UrlUtils.encode(torrent.getName()));
 
-        final List<AnnounceEntry> trackers = torrent.getTrackers();
+        final List<AnnounceEntry> trackers = torrent.trackers();
         for (AnnounceEntry tracker : trackers) {
             final String url = tracker.getUrl();
             sb.append("&tr=");
@@ -211,7 +211,7 @@ public final class TorrentUtil {
             }
 
             final entry torrentEntry = torrentCreator.generate();
-            byte[] bencoded_torrent_bytes = Vectors.char_vector2bytes(torrentEntry.bencode());
+            byte[] bencoded_torrent_bytes = Vectors.byte_vector2bytes(torrentEntry.bencode());
             FileOutputStream fos = new FileOutputStream(torrentFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             bos.write(bencoded_torrent_bytes);

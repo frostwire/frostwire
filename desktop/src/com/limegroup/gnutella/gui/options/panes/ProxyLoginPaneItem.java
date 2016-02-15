@@ -18,6 +18,8 @@ package com.limegroup.gnutella.gui.options.panes;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.ProxySettings;
 import com.frostwire.jlibtorrent.Session;
+import com.frostwire.jlibtorrent.SettingsPack;
+import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
@@ -82,7 +84,6 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
     /**
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
-     *
      */
     public ProxyLoginPaneItem() {
         super(TITLE, LABEL);
@@ -143,15 +144,12 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
         ConnectionSettings.PROXY_PASS.setValue(password);
         ConnectionSettings.PROXY_AUTHENTICATE.setValue(authenticate);
 
-        // aldenml: OK, I will shortcut directly to the jlibtorrent session
         Session session = BTEngine.getInstance().getSession();
-        // NOTE: don't delete, this is for the new API
-        /*
         SettingsPack settings = new SettingsPack();
         if (authenticate) {
             int connectionMethod = ConnectionSettings.CONNECTION_METHOD.getValue();
 
-            //settings.setInteger(settings_pack.int_types.proxy_type.swigValue(), settings_pack.proxy_type_t.http_pw.swigValue());
+            settings.setInteger(settings_pack.int_types.proxy_type.swigValue(), settings_pack.proxy_type_t.http_pw.swigValue());
             if (connectionMethod == ConnectionSettings.C_HTTP_PROXY) {
                 settings.setInteger(settings_pack.int_types.proxy_type.swigValue(), settings_pack.proxy_type_t.http_pw.swigValue());
             } else if (connectionMethod == ConnectionSettings.C_SOCKS5_PROXY) {
@@ -161,18 +159,6 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
         settings.setString(settings_pack.string_types.proxy_username.swigValue(), username);
         settings.setString(settings_pack.string_types.proxy_password.swigValue(), password);
         session.applySettings(settings);
-        */
-        ProxySettings proxy = session.getProxy();
-        if (authenticate) {
-            if (ProxySettings.ProxyType.HTTP.equals(proxy.getType())) {
-                proxy.setType(ProxySettings.ProxyType.HTTP_PW);
-            } else if (ProxySettings.ProxyType.SOCKS5.equals(proxy.getType())) {
-                proxy.setType(ProxySettings.ProxyType.SOCKS5_PW);
-            }
-        }
-        proxy.setUsername(username);
-        proxy.setPassword(password);
-        session.setProxy(proxy);
         BTEngine.getInstance().saveSettings();
 
         return false;

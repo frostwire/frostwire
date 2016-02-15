@@ -308,7 +308,7 @@ public class TorrentFetcherDownload implements BTDownload {
                 if (uri.startsWith("http")) {
                     data = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(uri, 15000, UserAgentGenerator.getUserAgent(), referer, cookie);
                 } else {
-                    data = BTEngine.getInstance().fetchMagnet(uri, 90000);
+                    data = BTEngine.getInstance().fetchMagnet(uri, 90);
                 }
 
                 if (state == TransferState.CANCELED) {

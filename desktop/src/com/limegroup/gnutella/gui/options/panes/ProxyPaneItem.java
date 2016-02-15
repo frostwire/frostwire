@@ -18,6 +18,8 @@ package com.limegroup.gnutella.gui.options.panes;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.ProxySettings;
 import com.frostwire.jlibtorrent.Session;
+import com.frostwire.jlibtorrent.SettingsPack;
+import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 import com.limegroup.gnutella.settings.ConnectionSettings;
@@ -53,10 +55,10 @@ public final class ProxyPaneItem extends AbstractPaneItem {
      * Constant handle to the check box that enables or disables this feature.
      */
     private final ButtonGroup BUTTONS = new ButtonGroup();
-    private final JRadioButton NO_PROXY_BUTTON     = new JRadioButton(I18n.tr("No Proxy"));
+    private final JRadioButton NO_PROXY_BUTTON = new JRadioButton(I18n.tr("No Proxy"));
     private final JRadioButton SOCKS4_PROXY_BUTTON = new JRadioButton("Socks v4");
     private final JRadioButton SOCKS5_PROXY_BUTTON = new JRadioButton("Socks v5");
-    private final JRadioButton HTTP_PROXY_BUTTON   = new JRadioButton("HTTP");
+    private final JRadioButton HTTP_PROXY_BUTTON = new JRadioButton("HTTP");
 
     /**
      * Constant <tt>JTextField</tt> instance that holds the ip address to use
@@ -75,7 +77,6 @@ public final class ProxyPaneItem extends AbstractPaneItem {
     /**
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
-     *
      */
     public ProxyPaneItem() {
         super(TITLE, LABEL);
@@ -157,10 +158,7 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         ConnectionSettings.CONNECTION_METHOD.setValue(connectionMethod);
         ConnectionSettings.PROXY_HOST.setValue(proxyHost);
 
-        // aldenml: OK, I will shortcut directly to the jlibtorrent session
         Session session = BTEngine.getInstance().getSession();
-        // NOTE: don't delete, this is for the new API
-        /*
         SettingsPack settings = new SettingsPack();
         if (connectionMethod == ConnectionSettings.C_NO_PROXY) {
             settings.setInteger(settings_pack.int_types.proxy_type.swigValue(), settings_pack.proxy_type_t.none.swigValue());
@@ -174,20 +172,6 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         settings.setString(settings_pack.string_types.proxy_hostname.swigValue(), proxyHost);
         settings.setInteger(settings_pack.int_types.proxy_port.swigValue(), proxyPort);
         session.applySettings(settings);
-        */
-        ProxySettings proxy = session.getProxy();
-        if (connectionMethod == ConnectionSettings.C_NO_PROXY) {
-            proxy.setType(ProxySettings.ProxyType.NONE);
-        } else if (connectionMethod == ConnectionSettings.C_HTTP_PROXY) {
-            proxy.setType(ProxySettings.ProxyType.HTTP);
-        } else if (connectionMethod == ConnectionSettings.C_SOCKS4_PROXY) {
-            proxy.setType(ProxySettings.ProxyType.SOCKS4);
-        } else if (connectionMethod == ConnectionSettings.C_SOCKS5_PROXY) {
-            proxy.setType(ProxySettings.ProxyType.SOCKS5);
-        }
-        proxy.setHostname(proxyHost);
-        proxy.setPort(proxyPort);
-        session.setProxy(proxy);
         BTEngine.getInstance().saveSettings();
 
         return false;
