@@ -54,56 +54,18 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
     public final String attributionAuthor;
     public final String attributionUrl;
 
-    public static final String CC_VERSION = "4.0";
-
-    /**
-     * attribution
-     */
-    public static final String CC_BY_URL = "http://creativecommons.org/licenses/by/" + CC_VERSION + "/";
-
-    /**
-     * attribution - share alike
-     */
-    public static final String CC_BY_SA_URL = "http://creativecommons.org/licenses/by-sa/" + CC_VERSION + "/";
-
-    /**
-     * attribution - no derivatives
-     */
-    public static final String CC_BY_ND_URL = "http://creativecommons.org/licenses/by-nd/" + CC_VERSION + "/";
-
-    /**
-     * attribution - non commercial
-     */
-    public static final String CC_BY_NC_URL = "http://creativecommons.org/licenses/by-nc/" + CC_VERSION + "/";
-
-    /**
-     * attribution - non commercial - share alike
-     */
-    public static final String CC_BY_NC_SA_URL = "http://creativecommons.org/licenses/by-nc-sa/" + CC_VERSION + "/";
-
-    /**
-     * attribution - non commercial - no derivatives
-     */
-    public static final String CC_BY_NC_ND_URL = "http://creativecommons.org/licenses/by-nc-nd/" + CC_VERSION + "/";
-
     public static final List<String> validLicenseUrls;
 
     public static final Map<String, License> urlToLicense;
 
-    public final String BY_WORD = "Attribution";
-    public final String SA_WORD = "Share-Alike";
-    public final String ND_WORD = "NoDerivatives";
-    public final String NC_WORD = "NonCommercial";
-    public final String INTERNATIONAL_LICENSE = "International License";
-
     static {
         validLicenseUrls = new ArrayList<String>();
-        validLicenseUrls.add(CC_BY_URL);
-        validLicenseUrls.add(CC_BY_SA_URL);
-        validLicenseUrls.add(CC_BY_ND_URL);
-        validLicenseUrls.add(CC_BY_NC_URL);
-        validLicenseUrls.add(CC_BY_NC_SA_URL);
-        validLicenseUrls.add(CC_BY_NC_ND_URL);
+        validLicenseUrls.add(Licenses.CC_BY_4.getUrl());
+        validLicenseUrls.add(Licenses.CC_BY_SA_4.getUrl());
+        validLicenseUrls.add(Licenses.CC_BY_ND_4.getUrl());
+        validLicenseUrls.add(Licenses.CC_BY_NC_4.getUrl());
+        validLicenseUrls.add(Licenses.CC_BY_NC_SA_4.getUrl());
+        validLicenseUrls.add(Licenses.CC_BY_NC_ND_4.getUrl());
 
         urlToLicense = new HashMap<String, License>();
         urlToLicense.put(Licenses.CC_BY_4.getUrl(), Licenses.CC_BY_4);
@@ -216,6 +178,6 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         if (licenseShortCode.endsWith("-")) {
             licenseShortCode = licenseShortCode.substring(0, licenseShortCode.length() - 1);
         }
-        return "http://creativecommons.org/licenses/" + licenseShortCode + "/" + CC_VERSION + "/";
+        return "http://creativecommons.org/licenses/" + licenseShortCode + "/" + "4.0" + "/";
     }
 }
