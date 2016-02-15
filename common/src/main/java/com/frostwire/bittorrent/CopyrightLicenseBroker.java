@@ -86,20 +86,6 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
      */
     public static final String CC_BY_NC_ND_URL = "http://creativecommons.org/licenses/by-nc-nd/" + CC_VERSION + "/";
 
-    //creative-commons licenses
-    public static final License CC_BY_LICENSE = new CreativeCommonsLicense("CC-BY", "Creative Commons Attribution " + CC_VERSION, CC_BY_URL);
-    public static final License CC_BY_SA_LICENSE = new CreativeCommonsLicense("CC-BY-SA", "Creative Commons Attribution-ShareAlike " + CC_VERSION, CC_BY_SA_URL);
-    public static final License CC_BY_ND_LICENSE = new CreativeCommonsLicense("CC-BY-ND", "Creative Commons Attribution-NoDerivs " + CC_VERSION, CC_BY_ND_URL);
-    public static final License CC_BY_NC_LICENSE = new CreativeCommonsLicense("CC-BY-NC", "Creative Commons Attribution-NonCommercial " + CC_VERSION, CC_BY_NC_URL);
-    public static final License CC_BY_NC_SA_LICENSE = new CreativeCommonsLicense("CC-BY-NC-SA", "Creative Commons Attribution-NonCommercial-ShareAlike " + CC_VERSION, CC_BY_NC_SA_URL);
-    public static final License CC_BY_NC_ND_LICENSE = new CreativeCommonsLicense("CC-BY-NC-ND", "Creative Commons Attribution-NonCommercial-NoDerivs " + CC_VERSION, CC_BY_NC_ND_URL);
-
-    //open-source licenses
-
-    //public-domain licenses
-    public static final License PUBLIC_DOMAIN_MARK_LICENSE = new PublicDomainMarkLicense();
-    public static final License PUBLIC_DOMAIN_CC0_LICENSE = new PublicDomainDedicationLicense();
-
     public static final List<String> validLicenseUrls;
 
     public static final Map<String, License> urlToLicense;
@@ -120,25 +106,25 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         validLicenseUrls.add(CC_BY_NC_ND_URL);
 
         urlToLicense = new HashMap<String, License>();
-        urlToLicense.put(CC_BY_URL, CC_BY_LICENSE);
-        urlToLicense.put(CC_BY_SA_URL, CC_BY_SA_LICENSE);
-        urlToLicense.put(CC_BY_ND_URL, CC_BY_ND_LICENSE);
-        urlToLicense.put(CC_BY_NC_URL, CC_BY_NC_LICENSE);
-        urlToLicense.put(CC_BY_NC_SA_URL, CC_BY_NC_SA_LICENSE);
-        urlToLicense.put(CC_BY_NC_ND_URL, CC_BY_NC_ND_LICENSE);
+        urlToLicense.put(Licenses.CC_BY_4.getUrl(), Licenses.CC_BY_4);
+        urlToLicense.put(Licenses.CC_BY_SA_4.getUrl(), Licenses.CC_BY_SA_4);
+        urlToLicense.put(Licenses.CC_BY_ND_4.getUrl(), Licenses.CC_BY_ND_4);
+        urlToLicense.put(Licenses.CC_BY_NC_4.getUrl(), Licenses.CC_BY_NC_4);
+        urlToLicense.put(Licenses.CC_BY_NC_SA_4.getUrl(), Licenses.CC_BY_NC_SA_4);
+        urlToLicense.put(Licenses.CC_BY_NC_ND_4.getUrl(), Licenses.CC_BY_NC_ND_4);
 
-        urlToLicense.put(Licenses.APACHE_LICENSE.getUrl(), Licenses.APACHE_LICENSE);
-        urlToLicense.put(Licenses.BSD_2_CLAUSE_LICENSE.getUrl(), Licenses.BSD_2_CLAUSE_LICENSE);
-        urlToLicense.put(Licenses.BSD_3_CLAUSE_LICENSE.getUrl(), Licenses.BSD_3_CLAUSE_LICENSE);
-        urlToLicense.put(Licenses.GPL3_LICENSE.getUrl(), Licenses.GPL3_LICENSE);
-        urlToLicense.put(Licenses.LGPL_LICENSE.getUrl(), Licenses.LGPL_LICENSE);
-        urlToLicense.put(Licenses.MIT_LICENSE.getUrl(), Licenses.MIT_LICENSE);
-        urlToLicense.put(Licenses.MOZILLA_LICENSE.getUrl(), Licenses.MOZILLA_LICENSE);
-        urlToLicense.put(Licenses.CDDL_LICENSE.getUrl(), Licenses.CDDL_LICENSE);
-        urlToLicense.put(Licenses.ECLIPSE_LICENSE.getUrl(), Licenses.ECLIPSE_LICENSE);
+        urlToLicense.put(Licenses.APACHE.getUrl(), Licenses.APACHE);
+        urlToLicense.put(Licenses.BSD_2_CLAUSE.getUrl(), Licenses.BSD_2_CLAUSE);
+        urlToLicense.put(Licenses.BSD_3_CLAUSE.getUrl(), Licenses.BSD_3_CLAUSE);
+        urlToLicense.put(Licenses.GPL3.getUrl(), Licenses.GPL3);
+        urlToLicense.put(Licenses.LGPL.getUrl(), Licenses.LGPL);
+        urlToLicense.put(Licenses.MIT.getUrl(), Licenses.MIT);
+        urlToLicense.put(Licenses.MOZILLA.getUrl(), Licenses.MOZILLA);
+        urlToLicense.put(Licenses.CDDL.getUrl(), Licenses.CDDL);
+        urlToLicense.put(Licenses.ECLIPSE.getUrl(), Licenses.ECLIPSE);
 
-        urlToLicense.put(PUBLIC_DOMAIN_MARK_LICENSE.getUrl(), PUBLIC_DOMAIN_MARK_LICENSE);
-        urlToLicense.put(PUBLIC_DOMAIN_CC0_LICENSE.getUrl(), PUBLIC_DOMAIN_CC0_LICENSE);
+        urlToLicense.put(Licenses.PUBLIC_DOMAIN_MARK.getUrl(), Licenses.PUBLIC_DOMAIN_MARK);
+        urlToLicense.put(Licenses.PUBLIC_DOMAIN_CC0.getUrl(), Licenses.PUBLIC_DOMAIN_CC0);
     }
 
     public CopyrightLicenseBroker(boolean shareAlike, boolean nonCommercial, boolean noDerivatives, String attributionTitle, String attributionAuthor, String attributionURL) {
@@ -205,16 +191,8 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         return container;
     }
 
-    public String getLicenseShortCode() {
-        return license.getName();
-    }
-
     public String getLicenseName() {
-        if (license instanceof CreativeCommonsLicense) {
-            return ((CreativeCommonsLicense) license).getLongName();
-        } else {
-            return license.getName();
-        }
+        return license.getName();
     }
 
     private static boolean isInvalidLicense(String licenseStr) {
@@ -239,35 +217,5 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
             licenseShortCode = licenseShortCode.substring(0, licenseShortCode.length() - 1);
         }
         return "http://creativecommons.org/licenses/" + licenseShortCode + "/" + CC_VERSION + "/";
-    }
-
-    private static void testValidLicenseStringGeneration() {
-        String licenseUrl = getCreativeCommonsLicenseUrl(false, false, false);
-        System.out.println(licenseUrl + " is valid license? " + !isInvalidLicense(licenseUrl));
-
-        licenseUrl = getCreativeCommonsLicenseUrl(false, false, true);
-        System.out.println(licenseUrl + " is valid license? " + !isInvalidLicense(licenseUrl));
-
-        licenseUrl = getCreativeCommonsLicenseUrl(false, true, false);
-        System.out.println(licenseUrl + " is valid license? " + !isInvalidLicense(licenseUrl));
-
-        licenseUrl = getCreativeCommonsLicenseUrl(false, true, true);
-        System.out.println(licenseUrl + " is valid license? " + !isInvalidLicense(licenseUrl));
-
-        licenseUrl = getCreativeCommonsLicenseUrl(true, false, false);
-        System.out.println(licenseUrl + " is valid license? " + !isInvalidLicense(licenseUrl));
-
-        licenseUrl = getCreativeCommonsLicenseUrl(true, false, true);
-        System.out.println(licenseUrl + " is valid license? " + !isInvalidLicense(licenseUrl));
-
-        licenseUrl = getCreativeCommonsLicenseUrl(true, true, false);
-        System.out.println(licenseUrl + " is valid license? " + !isInvalidLicense(licenseUrl));
-
-        licenseUrl = getCreativeCommonsLicenseUrl(true, true, true);
-        System.out.println(licenseUrl + " is valid license? " + !isInvalidLicense(licenseUrl));
-    }
-
-    public static void main(String[] arg) {
-        testValidLicenseStringGeneration();
     }
 }

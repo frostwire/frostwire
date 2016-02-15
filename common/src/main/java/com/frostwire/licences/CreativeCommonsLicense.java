@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,41 @@
  */
 
 
-
 package com.frostwire.licences;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public class CreativeCommonsLicense extends License {
+public final class CreativeCommonsLicense extends License {
 
-    private final String longName;
+    private final String acronym;
 
-    public CreativeCommonsLicense(String name, String longName, String url) {
+    /**
+     * To use with raw input
+     *
+     * @param name
+     * @param url
+     * @param acronym
+     */
+    CreativeCommonsLicense(String name, String url, String acronym) {
         super(name, url);
-        this.longName = longName;
+        this.acronym = acronym;
     }
 
-    public String getLongName() {
-        return longName;
+    public String acronym() {
+        return acronym;
+    }
+
+    static CreativeCommonsLicense standard(String name, String acronym, String version) {
+        String fullName = "Creative Commons " + name + " " + version;
+        String url = "http://creativecommons.org/licenses/" + acronym.toLowerCase(Locale.US) + "/" + version + "/";
+        String fullAcronym = "CC " + acronym.toUpperCase(Locale.US) + " " + version;
+
+        return new CreativeCommonsLicense(fullName, url, fullAcronym);
     }
 }

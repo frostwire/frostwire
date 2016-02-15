@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package com.frostwire.search.archiveorg;
 
 import com.frostwire.licences.License;
+import com.frostwire.licences.Licenses;
 import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
 
@@ -43,7 +44,7 @@ public class ArchiveorgSearchResult extends AbstractSearchResult implements Craw
         this.domainName = domainName;
         this.detailsUrl = "http://" + domainName + "/details/" + item.identifier;
         this.title = item.title;
-        this.licence = License.creativeCommonsByUrl(item.licenseurl);
+        this.licence = Licenses.creativeCommonsByUrl(item.licenseurl);
         this.creationTime = parsePublicDate(item.publicdate);
     }
 
