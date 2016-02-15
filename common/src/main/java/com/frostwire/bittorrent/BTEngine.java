@@ -161,8 +161,7 @@ public final class BTEngine {
                 return;
             }
 
-            Pair<Integer, Integer> prange = new Pair<>(ctx.port0, ctx.port1);
-            session = new Session(prange, ctx.iface);
+            session = new Session(ctx.iface, ctx.port0, ctx.port1 - ctx.port0, false, null);
 
             downloader = new Downloader(session);
 
@@ -439,7 +438,12 @@ public final class BTEngine {
         }
     }
 
-    public byte[] fetchMagnet(String uri, long timeout) {
+    /**
+     * @param uri
+     * @param timeout in seconds
+     * @return
+     */
+    public byte[] fetchMagnet(String uri, int timeout) {
         if (session == null) {
             return null;
         }
@@ -507,7 +511,7 @@ public final class BTEngine {
 
         try {
             byte[] arr = FileUtils.readFileToByteArray(resumeTorrentFile(infoHash));
-            entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
+            entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
             torrent = new File(e.dict().get(TORRENT_ORIG_PATH_KEY).string());
         } catch (Throwable e) {
             // can't recover original torrent path
@@ -521,7 +525,7 @@ public final class BTEngine {
 
         try {
             byte[] arr = FileUtils.readFileToByteArray(resumeDataFile(infoHash));
-            entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
+            entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
             savePath = new File(e.dict().get("save_path").string());
         } catch (Throwable e) {
             // can't recover original torrent path
@@ -558,7 +562,7 @@ public final class BTEngine {
             TorrentInfo ti = new TorrentInfo(torrent);
             entry e = ti.toEntry().getSwig();
             e.dict().set(TORRENT_ORIG_PATH_KEY, new entry(torrent.getAbsolutePath()));
-            byte[] arr = Vectors.char_vector2bytes(e.bencode());
+            byte[] arr = Vectors.byte_vector2bytes(e.bencode());
             FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.getInfoHash().toString()), arr);
         } catch (Throwable e) {
             LOG.warn("Error saving resume torrent", e);
