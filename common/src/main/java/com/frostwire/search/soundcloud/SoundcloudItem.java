@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,8 @@ package com.frostwire.search.soundcloud;
 /**
  * @author gubatron
  * @author aldenml
- * (gubatron:just saying... In XML they actually call this a <track>, should probably rename to SoundcloudTrack instead)
- *
  */
-public class SoundcloudItem {
+final class SoundcloudItem {
 
     public int id;
     public SoundcloundUser user;

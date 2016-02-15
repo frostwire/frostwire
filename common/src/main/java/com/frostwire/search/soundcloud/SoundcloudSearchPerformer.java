@@ -29,7 +29,7 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
+public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
     public static final String SOUNDCLOUD_CLIENTID = "02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea";
     public static final String SOUNDCLOUD_APP_VERSION = "3833d63";

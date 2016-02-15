@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import java.util.Locale;
  * @author gubatron
  * @author aldenml
  */
-public class SoundcloudSearchResult extends AbstractFileSearchResult implements HttpSearchResult, StreamableSearchResult {
+public final class SoundcloudSearchResult extends AbstractFileSearchResult implements HttpSearchResult, StreamableSearchResult {
 
     private static final String DATE_FORMAT = "yyyy/mm/dd HH:mm:ss Z";
 
@@ -43,10 +43,8 @@ public class SoundcloudSearchResult extends AbstractFileSearchResult implements 
     private final long date;
     private final String downloadUrl;
     private final long size;
-    private final SoundcloudItem item;
 
-    public SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
-        this.item = item;
+    SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
         this.displayName = item.title;
         this.username = buildUsername(item);
         this.trackUrl = item.permalink_url;
@@ -109,10 +107,6 @@ public class SoundcloudSearchResult extends AbstractFileSearchResult implements 
     @Override
     public String getDownloadUrl() {
         return downloadUrl;
-    }
-
-    public SoundcloudItem getSoundcloudItem() {
-        return item;
     }
 
     private String buildUsername(SoundcloudItem item) {

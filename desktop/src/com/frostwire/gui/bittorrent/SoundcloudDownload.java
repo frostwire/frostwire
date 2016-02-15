@@ -18,26 +18,18 @@
 
 package com.frostwire.gui.bittorrent;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
+import com.frostwire.bittorrent.CopyrightLicenseBroker;
+import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.search.soundcloud.SoundCloudRedirectResponse;
-import com.frostwire.transfers.TransferState;
 import com.frostwire.mp3.ID3Wrapper;
 import com.frostwire.mp3.ID3v1Tag;
 import com.frostwire.mp3.ID3v23Tag;
 import com.frostwire.mp3.Mp3File;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
-import com.frostwire.bittorrent.CopyrightLicenseBroker;
-import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.transfers.TransferState;
+import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListener;
-import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.JsonUtils;
 import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.iTunesSettings;
@@ -46,6 +38,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.OSUtils;
 
 import java.io.File;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * @author gubatron
