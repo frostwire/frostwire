@@ -1,3 +1,8 @@
+frostwire (6.2.3) stable; urgency=high
+  * New jlibtorrent 1.1.0.21.
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 15 Feb 2016 15:14:00 -0500
+
 frostwire (6.2.2) stable; urgency=high
   * YT search fixes.
   * New jlibtorrent 1.1.0.20.
