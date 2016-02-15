@@ -36,7 +36,7 @@ import static com.frostwire.search.youtube.YouTubeUtils.isDash;
  * @author gubatron
  * @author aldenml
  */
-public class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSearchResult> {
+public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSearchResult> {
 
     private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title[ ]*\"><a href=\"(?<link>.*?)\".*? title=\"(?<title>.*?)\".*? Duration: (?<duration>.*?)\\.</span>.*?(by |byline\">)<a href=\"/user/(?<user>.*?)\"";
     private static final Pattern PATTERN = Pattern.compile(REGEX);

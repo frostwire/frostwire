@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,38 +18,37 @@
 
 package com.frostwire.search.youtube;
 
+import com.frostwire.search.youtube.jd.JsFunction;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.frostwire.search.youtube.jd.JsFunction;
 
 /**
  * @author gubatron
  * @author aldenml
- *
  */
-public final class YouTubeSig {
+final class YouTubeSig {
 
-	private final JsFunction<String> fn;
+    private final JsFunction<String> fn;
 
-	public YouTubeSig(String jscode) {
-		//The function is usually found in a block like this:
-		/**
-		 * if (e.sig || e.s) {
-		 var f = e.sig || gr(e.s);
-		 e.url = xj(e.url, {
-		 signature: f
-		 })
-		 }
-		 >> Output: gr
-		 */
-		Matcher m = Pattern.compile("\\.sig\\|\\|([$a-zA-Z0-9]+)\\(").matcher(jscode);
+    public YouTubeSig(String jscode) {
+        //The function is usually found in a block like this:
+        /**
+         * if (e.sig || e.s) {
+         var f = e.sig || gr(e.s);
+         e.url = xj(e.url, {
+         signature: f
+         })
+         }
+         >> Output: gr
+         */
+        Matcher m = Pattern.compile("\\.sig\\|\\|([$a-zA-Z0-9]+)\\(").matcher(jscode);
         m.find();
         String funcname = m.group(1);
         this.fn = new JsFunction<String>(jscode, funcname);
     }
 
-	public String calc(String sig) {
-		return fn.eval(sig);
-	}
+    public String calc(String sig) {
+        return fn.eval(sig);
+    }
 }

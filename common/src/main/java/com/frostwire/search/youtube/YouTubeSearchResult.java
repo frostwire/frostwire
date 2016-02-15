@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,11 @@ import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
 import org.apache.commons.io.FilenameUtils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
 /**
  * @author gubatron
  * @author aldenml
  */
-public class YouTubeSearchResult extends AbstractFileSearchResult implements CrawlableSearchResult {
+public final class YouTubeSearchResult extends AbstractFileSearchResult implements CrawlableSearchResult {
 
     private final String filename;
     private final String displayName;
@@ -84,38 +80,6 @@ public class YouTubeSearchResult extends AbstractFileSearchResult implements Cra
     @Override
     public boolean isComplete() {
         return true;
-    }
-
-    private long readCreationTime(YouTubeEntry entry) {
-        try {
-            //2010-07-15T16:02:42
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
-            return dateFormat.parse(entry.published.title.replace("000Z", "")).getTime();
-        } catch (ParseException e) {
-            return System.currentTimeMillis();
-        }
-    }
-
-    private String readVideoUrl(YouTubeEntry entry) {
-        String url = null;
-
-        for (YouTubeEntryLink link : entry.link) {
-            if (link.rel.equals("alternate")) {
-                url = link.href;
-            }
-        }
-
-        url = url.replace("https://", "http://").replace("&feature=youtube_gdata", "");
-
-        return url;
-    }
-
-    private String buildSource(YouTubeEntry entry) {
-        if (entry.author != null && entry.author.size() > 0 && entry.author.get(0).name != null && entry.author.get(0).name.title != null) {
-            return "YouTube - " + entry.author.get(0).name.title;
-        } else {
-            return "YouTube";
-        }
     }
 
     private long buildSize(String duration) {

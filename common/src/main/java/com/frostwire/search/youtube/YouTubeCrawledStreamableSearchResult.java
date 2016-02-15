@@ -32,7 +32,7 @@ public final class YouTubeCrawledStreamableSearchResult extends YouTubeCrawledSe
 
     private final String streamUrl;
 
-    public YouTubeCrawledStreamableSearchResult(YouTubeSearchResult sr, LinkInfo video, LinkInfo audio, LinkInfo minQuality) {
+    YouTubeCrawledStreamableSearchResult(YouTubeSearchResult sr, LinkInfo video, LinkInfo audio, LinkInfo minQuality) {
         super(sr, video, audio);
         if (audio != null && isDash(audio)) {
             streamUrl = buildDownloadUrl(null, minQuality);

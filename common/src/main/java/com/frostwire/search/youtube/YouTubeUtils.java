@@ -22,7 +22,7 @@ package com.frostwire.search.youtube;
  * @author gubatron
  * @author aldenml
  */
-class YouTubeUtils {
+final class YouTubeUtils {
 
     private YouTubeUtils() {
     }

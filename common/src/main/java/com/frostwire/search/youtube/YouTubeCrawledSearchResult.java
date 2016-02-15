@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ public class YouTubeCrawledSearchResult extends AbstractCrawledSearchResult impl
     private final long size;
     private final String downloadUrl;
 
-    public YouTubeCrawledSearchResult(YouTubeSearchResult sr, LinkInfo video, LinkInfo audio) {
+    YouTubeCrawledSearchResult(YouTubeSearchResult sr, LinkInfo video, LinkInfo audio) {
         super(sr);
 
         this.video = video;
