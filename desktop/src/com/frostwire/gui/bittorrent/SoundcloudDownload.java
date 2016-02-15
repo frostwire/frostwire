@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,6 @@ import java.io.File;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class SoundcloudDownload implements BTDownload {
 
@@ -296,7 +295,9 @@ public class SoundcloudDownload implements BTDownload {
         cleanupFile(completeFile);
     }
 
-    /** files are saved with (1), (2),... if there's one with the same name already. */
+    /**
+     * files are saved with (1), (2),... if there's one with the same name already.
+     */
     private static File buildFile(File savePath, String name) {
         String baseName = FilenameUtils.getBaseName(name);
         String ext = FilenameUtils.getExtension(name);
@@ -358,42 +359,6 @@ public class SoundcloudDownload implements BTDownload {
                 updateAverageDownloadSpeed();
                 state = TransferState.DOWNLOADING;
             }
-
-            //if we get a redirect result.
-            if (buffer!=null && length > 0 && length < 4096) {
-                handlePossibleRedirect(buffer, length);
-            }
-        }
-
-        private void handlePossibleRedirect(byte[] buffer, int length) {
-            String possibleJsonOutput = "n/a";
-
-            try {
-                possibleJsonOutput = new String(buffer,0, "{\"status\"".length());
-                if (!possibleJsonOutput.startsWith("{\"status")) {
-                    return;
-                }
-                possibleJsonOutput = new String(buffer,0,length);
-                final SoundCloudRedirectResponse redirectResponse = JsonUtils.toObject(possibleJsonOutput, SoundCloudRedirectResponse.class);
-                if (redirectResponse.status.startsWith("302") && redirectResponse.location != null && !redirectResponse.location.isEmpty()) {
-                    redirect(redirectResponse);
-                }
-            } catch (Throwable e) {
-                System.out.println("SoundCloudDownload.handlePossibleRedirect() error: " + e.getMessage());
-               //e.printStackTrace();
-            }
-
-        }
-
-        private void redirect(SoundCloudRedirectResponse redirectResponse) {
-            cleanup();
-            state = TransferState.REDIRECTING;
-            BTDownloadMediator.instance().remove(SoundcloudDownload.this);
-            sr.getSoundcloudItem().download_url = redirectResponse.location;
-            sr.getSoundcloudItem().downloadable = true;
-            state = TransferState.DOWNLOADING;
-            SoundcloudSearchResult scSearchResult = new SoundcloudSearchResult(sr.getSoundcloudItem(), null, null);
-            BTDownloadMediator.instance().downloadSoundcloudFromTrackUrlOrSearchResult(scSearchResult.getDownloadUrl(), scSearchResult);
         }
 
         @Override

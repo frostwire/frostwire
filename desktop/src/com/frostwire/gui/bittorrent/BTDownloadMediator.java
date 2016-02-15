@@ -766,19 +766,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 final String json = client.get(resolveURL, 10000);
                 //System.out.println(json);
 
-                if (json.contains("\"status\":\"30")) {
-                    try {
-                        System.out.println("Soundcloud Redirection! >> " + json);
-                        final SoundCloudRedirectResponse redirectResponse = JsonUtils.toObject(json, SoundCloudRedirectResponse.class);
-                        final String redirectedJson = client.get(redirectResponse.location, 10000);
-                        //System.out.println(redirectedJson);
-                        downloadSoundcloudSetOrTrack(clientId, appVersion, url, redirectedJson);
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
-                } else {
-                    downloadSoundcloudSetOrTrack(clientId, appVersion, url, json);
-                }
+                downloadSoundcloudSetOrTrack(clientId, appVersion, url, json);
 
             } catch (Throwable e) {
                 e.printStackTrace();
