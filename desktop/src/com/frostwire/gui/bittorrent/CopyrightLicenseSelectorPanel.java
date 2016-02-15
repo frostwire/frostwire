@@ -247,23 +247,23 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         licenseBroker = null;
         License license = null;
         if (apacheButton.isSelected()) {
-            license = Licenses.APACHE_LICENSE;
+            license = Licenses.APACHE;
         } else if (bsd2ClauseButton.isSelected()) {
-            license = Licenses.BSD_2_CLAUSE_LICENSE;
+            license = Licenses.BSD_2_CLAUSE;
         } else if (bsd3ClauseButton.isSelected()) {
-            license = Licenses.BSD_3_CLAUSE_LICENSE;
+            license = Licenses.BSD_3_CLAUSE;
         } else if (gpl3Button.isSelected()) {
-            license = Licenses.GPL3_LICENSE;
+            license = Licenses.GPL3;
         } else if (lgplButton.isSelected()) {
-            license = Licenses.LGPL_LICENSE;
+            license = Licenses.LGPL;
         } else if (mitButton.isSelected()) {
-            license = Licenses.MIT_LICENSE;
+            license = Licenses.MIT;
         } else if (mozillaButton.isSelected()) {
-            license = Licenses.MOZILLA_LICENSE;
+            license = Licenses.MOZILLA;
         } else if (cddlButton.isSelected()) {
-            license = Licenses.CDDL_LICENSE;
+            license = Licenses.CDDL;
         } else if (eclipseButton.isSelected()) {
-            license = Licenses.ECLIPSE_LICENSE;
+            license = Licenses.ECLIPSE;
         }
         
         updateLicenseBroker(license, LicenseCategory.OpenSource);
@@ -272,11 +272,11 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
 
     private void updatePublicDomainPickedLicenseLabel() {
         licenseBroker = null;
-        License license = CopyrightLicenseBroker.PUBLIC_DOMAIN_MARK_LICENSE; 
+        License license = Licenses.PUBLIC_DOMAIN_MARK;
         if (publicDomainButton.isSelected()) {
-            license = CopyrightLicenseBroker.PUBLIC_DOMAIN_MARK_LICENSE;
+            license = Licenses.PUBLIC_DOMAIN_MARK;
         } else if (cc0Button.isSelected()) {
-            license = CopyrightLicenseBroker.PUBLIC_DOMAIN_CC0_LICENSE;
+            license = Licenses.PUBLIC_DOMAIN_CC0;
         }
         
         updateLicenseBroker(license, LicenseCategory.PublicDomain);
