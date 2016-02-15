@@ -17,8 +17,8 @@
 
 package com.frostwire.search;
 
-import com.frostwire.licences.License;
-import com.frostwire.licences.Licenses;
+import com.frostwire.licenses.License;
+import com.frostwire.licenses.Licenses;
 
 /**
  * @author gubatron

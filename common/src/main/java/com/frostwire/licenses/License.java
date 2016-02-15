@@ -17,7 +17,7 @@
  */
 
 
-package com.frostwire.licences;
+package com.frostwire.licenses;
 
 /**
  * @author gubatron

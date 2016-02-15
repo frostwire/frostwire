@@ -18,8 +18,8 @@
 
 package com.frostwire.search.archiveorg;
 
-import com.frostwire.licences.License;
-import com.frostwire.licences.Licenses;
+import com.frostwire.licenses.License;
+import com.frostwire.licenses.Licenses;
 import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
 

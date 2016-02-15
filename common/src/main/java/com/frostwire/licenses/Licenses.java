@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.licences;
+package com.frostwire.licenses;
 
 import java.util.Arrays;
 import java.util.List;

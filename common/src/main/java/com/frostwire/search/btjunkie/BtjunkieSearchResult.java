@@ -18,8 +18,8 @@
 
 package com.frostwire.search.btjunkie;
 
-import com.frostwire.licences.License;
-import com.frostwire.licences.Licenses;
+import com.frostwire.licenses.License;
+import com.frostwire.licenses.Licenses;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 
 /**

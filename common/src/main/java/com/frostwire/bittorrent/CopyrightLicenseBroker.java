@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.licences.*;
+import com.frostwire.licenses.*;
 
 /**
  * @author gubatron

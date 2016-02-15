@@ -1,6 +1,6 @@
 package com.frostwire.android.tests.search;
 
-import com.frostwire.licences.License;
+import com.frostwire.licenses.License;
 import com.frostwire.search.SearchResult;
 
 public class MockSearchResult implements SearchResult {
