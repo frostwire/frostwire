@@ -161,13 +161,10 @@ public final class BTEngine {
                 return;
             }
 
-            session = new Session(ctx.iface, ctx.port0, ctx.port1 - ctx.port0, false, null);
-
+            session = new Session(ctx.iface, ctx.port0, ctx.port1 - ctx.port0, false, innerListener);
             downloader = new Downloader(session);
 
             loadSettings();
-            session.addListener(innerListener);
-
             fireStarted();
 
         } finally {
@@ -622,7 +619,9 @@ public final class BTEngine {
     }
 
     private void logListenSucceeded(ListenSucceededAlert alert) {
-        String s = "endpoint: " + alert.getEndpoint().toString() + " type:" + alert.getSwig().getSock_type();
+        TcpEndpoint endp = alert.getEndpoint();
+        String addr = endp.address().swig().to_string();
+        String s = "endpoint: " + addr + ":" + endp.port() + " type:" + alert.getSwig().getSock_type();
         LOG.info("Listen succeeded on " + s);
     }
 
