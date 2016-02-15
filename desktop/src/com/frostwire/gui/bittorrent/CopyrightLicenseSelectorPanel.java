@@ -22,6 +22,7 @@ import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.CopyrightLicenseBroker.LicenseCategory;
 import com.frostwire.gui.bittorrent.LicenseToggleButton.LicenseIcon;
 import com.frostwire.licences.License;
+import com.frostwire.licences.Licenses;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
@@ -246,23 +247,23 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         licenseBroker = null;
         License license = null;
         if (apacheButton.isSelected()) {
-            license = CopyrightLicenseBroker.APACHE_LICENSE;
+            license = Licenses.APACHE_LICENSE;
         } else if (bsd2ClauseButton.isSelected()) {
-            license = CopyrightLicenseBroker.BSD_2_CLAUSE_LICENSE;
+            license = Licenses.BSD_2_CLAUSE_LICENSE;
         } else if (bsd3ClauseButton.isSelected()) {
-            license = CopyrightLicenseBroker.BSD_3_CLAUSE_LICENSE;
+            license = Licenses.BSD_3_CLAUSE_LICENSE;
         } else if (gpl3Button.isSelected()) {
-            license = CopyrightLicenseBroker.GPL3_LICENSE;
+            license = Licenses.GPL3_LICENSE;
         } else if (lgplButton.isSelected()) {
-            license = CopyrightLicenseBroker.LGPL_LICENSE;
+            license = Licenses.LGPL_LICENSE;
         } else if (mitButton.isSelected()) {
-            license = CopyrightLicenseBroker.MIT_LICENSE;
+            license = Licenses.MIT_LICENSE;
         } else if (mozillaButton.isSelected()) {
-            license = CopyrightLicenseBroker.MOZILLA_LICENSE;
+            license = Licenses.MOZILLA_LICENSE;
         } else if (cddlButton.isSelected()) {
-            license = CopyrightLicenseBroker.CDDL_LICENSE;
+            license = Licenses.CDDL_LICENSE;
         } else if (eclipseButton.isSelected()) {
-            license = CopyrightLicenseBroker.ECLIPSE_LICENSE;
+            license = Licenses.ECLIPSE_LICENSE;
         }
         
         updateLicenseBroker(license, LicenseCategory.OpenSource);
