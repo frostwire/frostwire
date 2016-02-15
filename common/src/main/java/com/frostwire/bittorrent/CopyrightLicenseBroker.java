@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,25 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.licences.ApacheLicense;
-import com.frostwire.licences.BSD2ClauseLicense;
-import com.frostwire.licences.BSD3ClauseLicense;
-import com.frostwire.licences.CDDLLicense;
-import com.frostwire.licences.CreativeCommonsLicense;
-import com.frostwire.licences.EclipseLicense;
-import com.frostwire.licences.GPL3License;
-import com.frostwire.licences.LGPLLicense;
-import com.frostwire.licences.License;
-import com.frostwire.licences.MITLicense;
-import com.frostwire.licences.MozillaLicense;
-import com.frostwire.licences.PublicDomainDedicationLicense;
-import com.frostwire.licences.PublicDomainMarkLicense;
+import com.frostwire.licences.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class CopyrightLicenseBroker implements Mappable<String, Map<String, String>> {
 
@@ -70,22 +56,34 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
 
     public static final String CC_VERSION = "4.0";
 
-    /** attribution */
+    /**
+     * attribution
+     */
     public static final String CC_BY_URL = "http://creativecommons.org/licenses/by/" + CC_VERSION + "/";
 
-    /** attribution - share alike */
+    /**
+     * attribution - share alike
+     */
     public static final String CC_BY_SA_URL = "http://creativecommons.org/licenses/by-sa/" + CC_VERSION + "/";
 
-    /** attribution - no derivatives */
+    /**
+     * attribution - no derivatives
+     */
     public static final String CC_BY_ND_URL = "http://creativecommons.org/licenses/by-nd/" + CC_VERSION + "/";
 
-    /** attribution - non commercial */
+    /**
+     * attribution - non commercial
+     */
     public static final String CC_BY_NC_URL = "http://creativecommons.org/licenses/by-nc/" + CC_VERSION + "/";
 
-    /** attribution - non commercial - share alike */
+    /**
+     * attribution - non commercial - share alike
+     */
     public static final String CC_BY_NC_SA_URL = "http://creativecommons.org/licenses/by-nc-sa/" + CC_VERSION + "/";
 
-    /** attribution - non commercial - no derivatives */
+    /**
+     * attribution - non commercial - no derivatives
+     */
     public static final String CC_BY_NC_ND_URL = "http://creativecommons.org/licenses/by-nc-nd/" + CC_VERSION + "/";
 
     //creative-commons licenses
@@ -97,15 +95,6 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
     public static final License CC_BY_NC_ND_LICENSE = new CreativeCommonsLicense("CC-BY-NC-ND", "Creative Commons Attribution-NonCommercial-NoDerivs " + CC_VERSION, CC_BY_NC_ND_URL);
 
     //open-source licenses
-    public static final License APACHE_LICENSE = new ApacheLicense();
-    public static final License BSD_2_CLAUSE_LICENSE = new BSD2ClauseLicense();
-    public static final License BSD_3_CLAUSE_LICENSE = new BSD3ClauseLicense();
-    public static final License GPL3_LICENSE = new GPL3License();
-    public static final License LGPL_LICENSE = new LGPLLicense();
-    public static final License MIT_LICENSE = new MITLicense();
-    public static final License MOZILLA_LICENSE = new MozillaLicense();
-    public static final License CDDL_LICENSE = new CDDLLicense();
-    public static final License ECLIPSE_LICENSE = new EclipseLicense();
 
     //public-domain licenses
     public static final License PUBLIC_DOMAIN_MARK_LICENSE = new PublicDomainMarkLicense();
@@ -138,16 +127,16 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         urlToLicense.put(CC_BY_NC_SA_URL, CC_BY_NC_SA_LICENSE);
         urlToLicense.put(CC_BY_NC_ND_URL, CC_BY_NC_ND_LICENSE);
 
-        urlToLicense.put(APACHE_LICENSE.getUrl(), APACHE_LICENSE);
-        urlToLicense.put(BSD_2_CLAUSE_LICENSE.getUrl(), BSD_2_CLAUSE_LICENSE);
-        urlToLicense.put(BSD_3_CLAUSE_LICENSE.getUrl(), BSD_3_CLAUSE_LICENSE);
-        urlToLicense.put(GPL3_LICENSE.getUrl(), GPL3_LICENSE);
-        urlToLicense.put(LGPL_LICENSE.getUrl(), LGPL_LICENSE);
-        urlToLicense.put(MIT_LICENSE.getUrl(), MIT_LICENSE);
-        urlToLicense.put(MOZILLA_LICENSE.getUrl(), MOZILLA_LICENSE);
-        urlToLicense.put(CDDL_LICENSE.getUrl(), CDDL_LICENSE);
-        urlToLicense.put(ECLIPSE_LICENSE.getUrl(), ECLIPSE_LICENSE);
-        
+        urlToLicense.put(Licenses.APACHE_LICENSE.getUrl(), Licenses.APACHE_LICENSE);
+        urlToLicense.put(Licenses.BSD_2_CLAUSE_LICENSE.getUrl(), Licenses.BSD_2_CLAUSE_LICENSE);
+        urlToLicense.put(Licenses.BSD_3_CLAUSE_LICENSE.getUrl(), Licenses.BSD_3_CLAUSE_LICENSE);
+        urlToLicense.put(Licenses.GPL3_LICENSE.getUrl(), Licenses.GPL3_LICENSE);
+        urlToLicense.put(Licenses.LGPL_LICENSE.getUrl(), Licenses.LGPL_LICENSE);
+        urlToLicense.put(Licenses.MIT_LICENSE.getUrl(), Licenses.MIT_LICENSE);
+        urlToLicense.put(Licenses.MOZILLA_LICENSE.getUrl(), Licenses.MOZILLA_LICENSE);
+        urlToLicense.put(Licenses.CDDL_LICENSE.getUrl(), Licenses.CDDL_LICENSE);
+        urlToLicense.put(Licenses.ECLIPSE_LICENSE.getUrl(), Licenses.ECLIPSE_LICENSE);
+
         urlToLicense.put(PUBLIC_DOMAIN_MARK_LICENSE.getUrl(), PUBLIC_DOMAIN_MARK_LICENSE);
         urlToLicense.put(PUBLIC_DOMAIN_CC0_LICENSE.getUrl(), PUBLIC_DOMAIN_CC0_LICENSE);
     }
@@ -165,8 +154,11 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         }
     }
 
-    /** Deserialization constructor
-     * @param map*/
+    /**
+     * Deserialization constructor
+     *
+     * @param map
+     */
     public CopyrightLicenseBroker(Map<String, Entry> map) {
         if (map.containsKey("creative-commons")) {
             licenseCategory = LicenseCategory.CreativeCommons;
@@ -229,7 +221,9 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         return licenseStr == null || licenseStr.isEmpty() || !validLicenseUrls.contains(licenseStr);
     }
 
-    /** This method makes sure you input a valid license, even if you make a mistake combining these parameters */
+    /**
+     * This method makes sure you input a valid license, even if you make a mistake combining these parameters
+     */
     public static String getCreativeCommonsLicenseUrl(boolean shareAlike, boolean nonCommercial, boolean noDerivatives) {
         if (nonCommercial && shareAlike) {
             noDerivatives = false;

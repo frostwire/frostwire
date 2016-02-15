@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public abstract class License {
+public class License {
 
     public static final License UNKNOWN = new UnknownLicense();
 
