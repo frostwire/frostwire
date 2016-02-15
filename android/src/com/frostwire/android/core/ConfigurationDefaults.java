@@ -20,9 +20,7 @@ package com.frostwire.android.core;
 
 import android.content.Context;
 import android.os.Environment;
-import com.frostwire.util.ByteUtils;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +50,7 @@ final class ConfigurationDefaults {
     }
 
     private void load(Context context) {
-        defaultValues.put(Constants.PREF_KEY_CORE_UUID, ByteUtils.uuidToByteArray(UUID.randomUUID()));
+        defaultValues.put(Constants.PREF_KEY_CORE_UUID, uuidToByteArray(UUID.randomUUID()));
         defaultValues.put(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION, "");//won't know until I see it.
         defaultValues.put(Constants.PREF_KEY_CORE_EXPERIMENTAL, false);
 
@@ -128,5 +126,20 @@ final class ConfigurationDefaults {
 
     private void resetValue(String key) {
         resetValues.put(key, defaultValues.get(key));
+    }
+
+    private static byte[] uuidToByteArray(UUID uuid) {
+        long msb = uuid.getMostSignificantBits();
+        long lsb = uuid.getLeastSignificantBits();
+        byte[] buffer = new byte[16];
+
+        for (int i = 0; i < 8; i++) {
+            buffer[i] = (byte) (msb >>> 8 * (7 - i));
+        }
+        for (int i = 8; i < 16; i++) {
+            buffer[i] = (byte) (lsb >>> 8 * (7 - i));
+        }
+
+        return buffer;
     }
 }

@@ -33,13 +33,13 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
-import com.frostwire.util.ByteUtils;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.FlurryStats;
 import com.frostwire.uxstats.UXStats;
 import com.frostwire.uxstats.UXStatsConf;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -370,7 +370,7 @@ public final class SoftwareUpdater {
             return;
         }
 
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE_THRESHOLD, ByteUtils.randomInt(0, 100) < update.config.supportThreshold);
+        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE_THRESHOLD, RandomUtils.nextInt(0, 100) < update.config.supportThreshold);
 
         if (update.config.activeSearchEngines != null && update.config.activeSearchEngines.keySet() != null) {
             for (String name : update.config.activeSearchEngines.keySet()) {
