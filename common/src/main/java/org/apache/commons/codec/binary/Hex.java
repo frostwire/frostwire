@@ -21,7 +21,7 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.codec.BinaryDecoder;
 import org.apache.commons.codec.BinaryEncoder;
-import org.apache.commons.codec.CharEncoding;
+//import org.apache.commons.codec.CharEncoding;
 //import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
@@ -42,14 +42,14 @@ public class Hex implements BinaryEncoder, BinaryDecoder {
      *
      * @since 1.7
      */
-    public static final Charset DEFAULT_CHARSET = Charset.forName(CharEncoding.UTF_8);
+    public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
     /**
      * Default charset name is {@link CharEncoding#UTF_8}
      *
      * @since 1.4
      */
-    public static final String DEFAULT_CHARSET_NAME = CharEncoding.UTF_8;
+    //public static final String DEFAULT_CHARSET_NAME = CharEncoding.UTF_8;
 
     /**
      * Used to build output as Hex
