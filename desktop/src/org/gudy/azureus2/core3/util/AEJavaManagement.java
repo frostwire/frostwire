@@ -27,30 +27,6 @@ AEJavaManagement
 	private static ThreadStuff	thread_stuff;
 	private static MemoryStuff	memory_stuff;
 	
-	public static void
-	initialise()
-	{
-		try{
-			thread_stuff = (ThreadStuff)Class.forName( "org.gudy.azureus2.core3.util.jman.AEThreadMonitor" ).newInstance();
-			
-		}catch( ClassNotFoundException e ){
-			
-		}catch( Throwable e ){
-			
-			e.printStackTrace();
-		}
-		
-		try{
-			memory_stuff = (MemoryStuff)Class.forName( "org.gudy.azureus2.core3.util.jman.AEMemoryMonitor" ).newInstance();
-			
-		}catch( ClassNotFoundException e ){
-			
-		}catch( Throwable e ){
-			
-			e.printStackTrace();
-		}
-	}
-	
 	public static long
 	getThreadCPUTime()
 	{

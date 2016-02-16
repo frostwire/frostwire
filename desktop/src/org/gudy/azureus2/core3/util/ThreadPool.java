@@ -303,7 +303,7 @@ ThreadPool
 	{
 		if ( log_cpu ){
 			
-			long	start_cpu = log_cpu?AEJavaManagement.getThreadCPUTime():0;
+			long	start_cpu = 0;
 			long	start_time	= SystemTime.getHighPrecisionCounter();
 			
 			runnable.run();

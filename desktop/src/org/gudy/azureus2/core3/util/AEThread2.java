@@ -273,7 +273,7 @@ AEThread2
 						if ( TRACE_TIMES ){
 
 							long 	start_time 	= SystemTime.getHighPrecisionCounter();
-							long	start_cpu 	= AEJavaManagement.getThreadCPUTime();
+							long	start_cpu 	= 0;
 
 							try{
 

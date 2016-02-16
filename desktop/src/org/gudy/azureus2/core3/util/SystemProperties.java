@@ -24,7 +24,6 @@ import java.util.Properties;
 
 import org.gudy.azureus2.core3.logging.*;
 import org.gudy.azureus2.core3.internat.*;
-import org.gudy.azureus2.platform.*;
 
 /**
  * Utility class to manage system-dependant information.
@@ -249,30 +248,6 @@ public class SystemProperties {
 				return temp_user_path;
 			}
 
-			// No override, get it from platform manager
-
-			try {
-				PlatformManager platformManager = PlatformManagerFactory.getPlatformManager();
-
-				File loc = platformManager.getLocation(	PlatformManager.LOC_USER_DATA );
-				
-				if ( loc != null ){
-					temp_user_path = loc.getPath() + SEP;
-	
-					if (Logger.isEnabled()) {
-						Logger.log(new LogEvent(LOGID,
-								"SystemProperties::getUserPath: user_path = " + temp_user_path));
-					}
-				}
-			} catch ( Throwable e ){
-				if (Logger.isEnabled()) {
-					Logger.log(new LogEvent(LOGID,
-							"Unable to retrieve user config path from "
-									+ "the platform manager. "
-									+ "Make sure aereg.dll is present."));
-				}
-			}
-
 			// If platform failed, try some hackery
 			if (temp_user_path == null) {
 				String userhome = System.getProperty("user.home");
@@ -368,22 +343,6 @@ public class SystemProperties {
   }
   
   
-  /**
-   * Returns whether or not this running instance was started via
-   * Java's Web Start system.
-   */
-  public static boolean isJavaWebStartInstance() {
-    try {
-      String java_ws_prop = System.getProperty("azureus.javaws");
-      return ( java_ws_prop != null && java_ws_prop.equals( "true" ) );
-    }
-    catch (Throwable e) {
-      //we can get here if running in an applet, as we have no access to system props
-      return false;
-    }
-  }
-  
-  
   
   /**
    * Will attempt to retrieve an OS-specific environmental var.
@@ -450,54 +409,5 @@ public class SystemProperties {
     }
     
     return envVars.getProperty( _var, "" );
-  }
-  
-  public static String getDocPath() {
-	  String explicit_dir = System.getProperty( "azureus.doc.path", null );
-		  
-	  if ( explicit_dir != null ){
-		  File temp = new File( explicit_dir );
-		  if ( !temp.exists()){
-			  if ( !temp.mkdirs()){
-				  System.err.println( "Failed to create document dir: " + temp );
-			  }
-		  }else if ( !(temp.isDirectory() && temp.canWrite())){
-			  System.err.println( "Document dir is not a directory or not writable: " + temp );
-		  }
-		  return( temp.getAbsolutePath());
-	  }
-	  if ( PORTABLE ){
-		 
-		  return( getUserPath());
-	  }
-	  
-		File fDocPath = null;
-		try {
-			PlatformManager platformManager = PlatformManagerFactory.getPlatformManager();
-
-			fDocPath = platformManager.getLocation(PlatformManager.LOC_DOCUMENTS);
-		} catch (Throwable e) {
-		}
-		if (fDocPath == null) {
-			System.err.println( "This is BAD - fix me!" );
-			new Throwable().printStackTrace();
-			// should never happen.. but if we are missing a dll..
-			fDocPath = new File(getUserPath(), "Documents");
-		}
-
-		return fDocPath.getAbsolutePath();
-  }
-  
-  public static String
-  getAzureusJarPath()
-  {
-	  String	str = getApplicationPath();
-
-	  if( Constants.isOSX ){
-
-		  str += SystemProperties.getApplicationName() + ".app/Contents/Resources/Java/";
-	  }
-
-	  return( str + "Azureus2.jar" );			
   }
 }

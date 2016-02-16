@@ -149,44 +149,10 @@ AEDiagnostics
 			debug_dir		= FileUtil.getUserFile( "logs" );
 			
 			debug_save_dir	= new File( debug_dir, "save" );
-			
-//			COConfigurationManager.addAndFireParameterListeners(
-//				new String[]{
-//					"Logger.Enabled",
-//					"Logger.DebugFiles.Enabled",
-//				},
-//				new ParameterListener()
-//				{
-//					public void
-//					parameterChanged(
-//						String parameterName)
-//					{
-//						logging_enabled = COConfigurationManager.getBooleanParameter( "Logger.Enabled" );
-//
-//						loggers_enabled = logging_enabled && COConfigurationManager.getBooleanParameter( "Logger.DebugFiles.Enabled");
-//
-//						if ( !loggers_enabled ){
-//
-//							loggers_enabled = Constants.IS_CVS_VERSION || COConfigurationManager.getBooleanParameter( "Logger.DebugFiles.Enabled.Force" );
-//						}
-//					}
-//				});
+
 			
 			boolean	was_tidy	= true;//COConfigurationManager.getBooleanParameter( CONFIG_KEY );
 
-//			new AEThread2( "asyncify", true )
-//			{
-//				public void
-//				run()
-//				{
-//					SimpleTimer.addEvent("AEDiagnostics:logCleaner",SystemTime.getCurrentTime() + 60000
-//							+ RandomUtils.nextInt(15000), new TimerEventPerformer() {
-//						public void perform(TimerEvent event) {
-//							cleanOldLogs();
-//						}
-//					});
-//				}
-//			}.start();
 
 			if ( debug_dir.exists()){
 				
@@ -236,8 +202,6 @@ AEDiagnostics
 				
 				debug_dir.mkdir();
 			}
-			
-			AEJavaManagement.initialise();
 						
 		}catch( Throwable e ){
 			
@@ -251,12 +215,6 @@ AEDiagnostics
 			
 			startup_complete	= true;
 		}
-	}
-		
-	public static void
-	dumpThreads()
-	{
-		AEJavaManagement.dumpThreads();
 	}
 	
 	/**
@@ -296,14 +254,6 @@ AEDiagnostics
 	isStartupComplete()
 	{
 		return( startup_complete );
-	}
-	
-	public static File
-	getLogDir()
-	{
-		startup( false );
-
-		return( debug_dir );
 	}
 	
 	public static synchronized void

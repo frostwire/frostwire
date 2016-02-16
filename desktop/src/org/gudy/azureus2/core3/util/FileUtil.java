@@ -540,18 +540,6 @@ public class FileUtil {
 	  }
   }*/
   
-  	public static boolean
-  	resilientConfigFileExists(
-  		String		name )
-  	{
- 		File parent_dir = new File(SystemProperties.getUserPath());
-
- 		boolean use_backups = false;//COConfigurationManager.getBooleanParameter("Use Config File Backups" );
-
- 		return( new File( parent_dir, name ).exists() ||
- 				( use_backups && new File( parent_dir, name + ".bak" ).exists()));
-  	}
-  
 	/*public static Map
 	readResilientFile(
 		File		parent_dir,
@@ -847,16 +835,6 @@ public class FileUtil {
 		new File( file.getParentFile(), file.getName() + ".bak" ).delete();
 	}
 	
-	public static void
-	deleteResilientConfigFile(
-		String		name )
-	{
-		File parent_dir = new File(SystemProperties.getUserPath());
-		
-		new File( parent_dir, name ).delete();
-		new File( parent_dir, name + ".bak" ).delete();
-	}
-	
 	private static void
 	getReservedFileHandles()
 	{
@@ -877,46 +855,6 @@ public class FileUtil {
 					Debug.printStackTrace( e );
 				}
 			}
-		}finally{
-			
-			class_mon.exit();
-		}
-	}
-			
-	private static void
-	releaseReservedFileHandles()
-	{
-		try{
-			
-			class_mon.enter();
-			
-			File	lock_file	= new File(SystemProperties.getUserPath() + ".lock");
-				
-			if ( first_reservation ){
-			
-				first_reservation = false;
-				
-				lock_file.delete();
-				
-				is_my_lock_file = lock_file.createNewFile();
-				
-			}else{
-			
-				lock_file.createNewFile();
-			}
-			
-			while(  reserved_file_handles.size() < RESERVED_FILE_HANDLE_COUNT ){
-				
-				// System.out.println( "getting reserved file handle");
-				
-				InputStream	is = new FileInputStream( lock_file );
-				
-				reserved_file_handles.add(is);
-			}
-		}catch( Throwable e ){
-		
-			Debug.printStackTrace( e );
-			
 		}finally{
 			
 			class_mon.exit();
@@ -2165,46 +2103,6 @@ public class FileUtil {
 	
 	private static boolean 	sce_checked;
 	private static String	script_encoding;
-	
-	public static String
-	getScriptCharsetEncoding()
-	{
-		synchronized( FileUtil.class ){
-		
-			if ( sce_checked ){
-				
-				return( script_encoding );
-			}
-			
-			sce_checked = true;
-			
-			String	file_encoding 	= System.getProperty( "file.encoding", null );
-			String	jvm_encoding	= System.getProperty( "sun.jnu.encoding", null );
-			
-			if ( file_encoding == null || jvm_encoding == null || file_encoding.equals( jvm_encoding )){
-				
-				return( null );
-			}
-			
-			try{
-				
-				String	test_str = SystemProperties.getUserPath();
-								
-				if ( !new String( test_str.getBytes( file_encoding ), file_encoding ).equals( test_str )){
-			
-					if ( new String( test_str.getBytes( jvm_encoding ), jvm_encoding ).equals( test_str )){
-						
-						Debug.out( "Script encoding determined to be " + jvm_encoding + " instead of " + file_encoding );
-						
-						script_encoding = jvm_encoding;
-					}
-				}
-			}catch( Throwable e ){
-			}
-			
-			return( script_encoding );
-		}
-	}
 	
 	public static InternedFile
 	internFileComponents(
