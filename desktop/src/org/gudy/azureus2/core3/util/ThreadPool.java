@@ -310,7 +310,7 @@ ThreadPool
 			
 			if ( start_cpu > 0 ){
 				
-				long	end_cpu = log_cpu?AEJavaManagement.getThreadCPUTime():0;
+				long	end_cpu = 0;
 				
 				long	diff_cpu = ( end_cpu - start_cpu ) / 1000000;
 			

@@ -75,8 +75,5 @@ HashWrapper
   {
   	return( hash_code );
   }
-  
-  public String toBase32String() {
-  	return Base32.encode(hash);
-  }
+
 }
