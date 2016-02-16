@@ -17,7 +17,7 @@
  *
  */
 
-package org.gudy.azureus2.core3.internat;
+package org.gudy.azureus2.core3.util;
 
 /**
  * @author parg
@@ -28,8 +28,6 @@ import java.util.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
-
-import org.gudy.azureus2.core3.util.*;
 
 
 public class 

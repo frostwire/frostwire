@@ -27,7 +27,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import com.frostwire.util.UrlUtils;
-import org.gudy.azureus2.core3.internat.MessageText;
+import org.gudy.azureus2.core3.util.MessageText;
 import org.gudy.azureus2.core3.util.Constants;
 import org.gudy.azureus2.core3.util.Debug;
 import org.limewire.util.OSUtils;

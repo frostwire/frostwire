@@ -14,17 +14,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
-package org.gudy.azureus2.core3.logging;
+package org.gudy.azureus2.core3.util;
 
 /**
  * @author TuxPaper
  * @since 2.3.0.7
  */
-public interface ILogEventListener
+public interface ILogAlertListener
 {
-  /** A LogEvent has been generated.
+  /** An alert has been generated
    * 
-   * @param event The newly generated LogEvent
+   * @param alert LogAlert that was generated
    */
-  public void log(LogEvent event);
+  public void alertRaised(LogAlert alert);
 }

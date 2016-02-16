@@ -14,14 +14,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
-package org.gudy.azureus2.core3.logging;
+package org.gudy.azureus2.core3.util;
 
 import java.io.PrintStream;
-
-import org.gudy.azureus2.core3.logging.impl.FileLogging;
-import org.gudy.azureus2.core3.logging.impl.LoggerImpl;
-import org.gudy.azureus2.core3.util.Constants;
-import org.gudy.azureus2.core3.util.Debug;
 
 /**
  * A static implementation of the LoggerImpl class.

@@ -38,7 +38,6 @@ import java.text.NumberFormat;
 //import org.gudy.azureus2.core3.config.*;
 //import org.gudy.azureus2.core3.torrent.TOTorrent;
 //import org.gudy.azureus2.core3.disk.*;
-import org.gudy.azureus2.core3.internat.*;
 
 
 public class

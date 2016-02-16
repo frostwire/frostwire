@@ -17,7 +17,7 @@
  *
  */
 
-package org.gudy.azureus2.core3.internat;
+package org.gudy.azureus2.core3.util;
 
 
 public class 

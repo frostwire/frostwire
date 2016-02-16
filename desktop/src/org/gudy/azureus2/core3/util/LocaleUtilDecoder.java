@@ -1,4 +1,6 @@
 /*
+ * Created on 21-Jun-2004
+ * Created by Paul Gardner
  * Copyright (C) Azureus Software, Inc, All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -12,19 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ *
  */
-package org.gudy.azureus2.core3.logging;
+
+
+package org.gudy.azureus2.core3.util;
 
 /**
- * @author TuxPaper
- * @since 2.3.0.7
+ * @author parg
+ *
  */
-public interface ILogAlertListener
+
+import java.io.*;
+
+public interface 
+LocaleUtilDecoder
 {
-  /** An alert has been generated
-   * 
-   * @param alert LogAlert that was generated
-   */
-  public void alertRaised(LogAlert alert);
+	public String
+	getName();
+
+	public int
+	getIndex();
+	
+	public String
+	tryDecode(
+            byte[] array,
+            boolean lax);
+	
+	public String
+	decodeString(
+            byte[] bytes)
+		
+		throws UnsupportedEncodingException;
 }

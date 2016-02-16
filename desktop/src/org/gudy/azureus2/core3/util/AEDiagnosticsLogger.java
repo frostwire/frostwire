@@ -31,8 +31,6 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.TimeZone;
 
-import org.gudy.azureus2.core3.logging.Logger;
-
 /**
  * @author parg
  *

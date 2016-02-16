@@ -21,8 +21,6 @@ package org.gudy.azureus2.core3.util;
 
 //import org.gudy.azureus2.core3.config.COConfigurationManager;
 //import org.gudy.azureus2.core3.config.ParameterListener;
-import org.gudy.azureus2.core3.internat.MessageText;
-import org.gudy.azureus2.core3.logging.*;
 //import org.gudy.azureus2.platform.PlatformManager;
 //import org.gudy.azureus2.platform.PlatformManagerCapabilities;
 //import org.gudy.azureus2.platform.PlatformManagerFactory;

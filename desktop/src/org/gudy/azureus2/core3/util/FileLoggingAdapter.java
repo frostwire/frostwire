@@ -1,6 +1,5 @@
 /*
- * Created on 21-Jun-2004
- * Created by Paul Gardner
+ * Created on Feb 28, 2006 2:41:30 PM
  * Copyright (C) Azureus Software, Inc, All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -14,36 +13,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
  */
+package org.gudy.azureus2.core3.util;
 
-
-package org.gudy.azureus2.core3.internat;
+import org.gudy.azureus2.core3.util.LogEvent;
 
 /**
- * @author parg
+ * Listeners for FileLogging
+ * 
+ * @author TuxPaper
+ * @created Feb 28, 2006
  *
  */
-
-import java.io.*;
-
-public interface 
-LocaleUtilDecoder
-{
-	public String
-	getName();
-
-	public int
-	getIndex();
-	
-	public String
-	tryDecode(
-            byte[] array,
-            boolean lax);
-	
-	public String
-	decodeString(
-            byte[] bytes)
-		
-		throws UnsupportedEncodingException;
+public class FileLoggingAdapter {
+	/**
+	 * Called when we are about to log an event to file.
+	 * 
+	 * @param event Event being logged to file
+	 * @param lineOut line to be written to file (modifyable)
+	 * @return true-ok to log to file; false-skip logging to file
+	 */
+	public boolean logToFile(LogEvent event, StringBuffer lineOut) {
+		return true;
+	}
 }

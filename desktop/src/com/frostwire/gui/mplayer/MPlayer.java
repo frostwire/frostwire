@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.http.HttpClient;
-import org.gudy.azureus2.core3.internat.MessageText;
+import org.gudy.azureus2.core3.util.MessageText;
 import org.gudy.azureus2.core3.util.Debug;
 
 import com.frostwire.mplayer.BaseMediaPlayer;

@@ -14,7 +14,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
-package org.gudy.azureus2.core3.logging.impl;
+package org.gudy.azureus2.core3.util;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,8 +29,7 @@ import java.util.List;
 //import org.gudy.azureus2.core3.config.COConfigurationListener;
 //import org.gudy.azureus2.core3.config.ParameterListener;
 //import org.gudy.azureus2.core3.config.impl.ConfigurationManager;
-import org.gudy.azureus2.core3.logging.*;
-import org.gudy.azureus2.core3.util.Debug;
+
 
 /**
  * Log events to a file.
@@ -221,7 +220,7 @@ public class FileLogging implements ILogEventListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.gudy.azureus2.core3.logging.ILoggerListener2#log(org.gudy.azureus2.core3.logging.LogEvent)
+	 * @see org.gudy.azureus2.core3.logging.ILoggerListener2#log(org.gudy.azureus2.core3.util.LogEvent)
 	 */
 
 	private final static int DEFPADDING = 100;
