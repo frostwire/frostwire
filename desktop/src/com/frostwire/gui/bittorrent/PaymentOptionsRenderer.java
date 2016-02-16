@@ -23,6 +23,7 @@ import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.bittorrent.PaymentOptions.PaymentMethod;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -124,8 +125,8 @@ public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRende
         if (method == PaymentMethod.PAYPAL && !StringUtils.isNullOrEmpty(paymentOptions.paypalUrl)) {
             paymentOptionsUrl = paymentOptions.paypalUrl;
         } else {
-            String paymentOptionsJSON = StringUtils.encodeUrl(JsonUtils.toJson(paymentOptions).replaceAll("\n", ""));
-            String title = StringUtils.encodeUrl(paymentOptions.getItemName());
+            String paymentOptionsJSON = UrlUtils.encode(JsonUtils.toJson(paymentOptions).replaceAll("\n", ""));
+            String title = UrlUtils.encode(paymentOptions.getItemName());
             paymentOptionsUrl = "http://www.frostwire.com/tips/?method=" + method.toString() + "&po=" + paymentOptionsJSON + "&title=" + title;
 
         }

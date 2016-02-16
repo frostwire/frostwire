@@ -21,18 +21,6 @@ public class URIUtils {
     private static final String RESERVED = ";/?:@&=+$,";
 
     /**
-     * a temporary method to allow the tracking of URI's
-     * that cannot be constructed via java.net.URI.
-     * 
-     * Sends feedback via the ErrorService.
-     * 
-     * @param e
-     */
-    public static void error(URISyntaxException e) {
-       //ErrorService.error(e);
-    }
-
-    /**
      * Creates a <code>URI</code> from the input string.
      * The preferred way to invoke this method is with an URL-encoded string.
      * 

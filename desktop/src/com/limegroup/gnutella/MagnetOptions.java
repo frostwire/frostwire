@@ -14,7 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import com.limegroup.gnutella.util.EncodingUtils;
+import com.frostwire.util.UrlUtils;
 import com.limegroup.gnutella.util.URIUtils;
 import com.limegroup.gnutella.util.URLDecoder;
 
@@ -174,10 +174,10 @@ public class MagnetOptions implements Serializable {
 			ret.append("&xt=").append(xt);
 
 		if (getDisplayName() != null) 
-			ret.append("&dn=").append(EncodingUtils.encode(getDisplayName()));
+			ret.append("&dn=").append(UrlUtils.encode(getDisplayName()));
         
 		if (getKeywordTopic() != null) 
-			ret.append("&kt=").append(EncodingUtils.encode(getKeywordTopic()));
+			ret.append("&kt=").append(UrlUtils.encode(getKeywordTopic()));
         
         for(String xs : getXS())
 			ret.append("&xs=").append(xs);

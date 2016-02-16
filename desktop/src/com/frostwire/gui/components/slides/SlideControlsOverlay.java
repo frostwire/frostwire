@@ -36,6 +36,7 @@ import javax.swing.UIDefaults;
 import javax.swing.plaf.FontUIResource;
 
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.UrlUtils;
 import net.miginfocom.swing.MigLayout;
 
 import com.frostwire.bittorrent.PaymentOptions;
@@ -362,12 +363,12 @@ final class SlideControlsOverlay extends JPanel {
             putValue(LimeAction.ICON_NAME_ROLLOVER, "SLIDE_CONTROLS_OVERLAY_TIP_JAR_ROLLOVER");
             putValue(Action.SHORT_DESCRIPTION, String.format(I18n.tr("Support %s with a tip, donation or voluntary payment"), workTitle));
             
-            String paymentOptionsJSON = StringUtils.encodeUrl(JsonUtils.toJson(paymentOptions).replaceAll("\n", ""));
+            String paymentOptionsJSON = UrlUtils.encode(JsonUtils.toJson(paymentOptions).replaceAll("\n", ""));
             paymentOptionsUrl = String.format(
                     "http://www.frostwire.com/tips/?method=%s&po=%s&title=%s", 
                     getDefaultPaymentMethod(paymentOptions),
                     paymentOptionsJSON,
-                    StringUtils.encodeUrl(workTitle));
+                    UrlUtils.encode(workTitle));
         }
         
         private String getDefaultPaymentMethod(PaymentOptions paymentOptions) {

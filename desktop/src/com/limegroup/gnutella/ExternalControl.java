@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import com.frostwire.util.UrlUtils;
 import org.gudy.azureus2.core3.internat.MessageText;
 import org.gudy.azureus2.core3.util.Constants;
 import org.gudy.azureus2.core3.util.Debug;
@@ -204,7 +205,7 @@ public class ExternalControl {
             } else {
                 //this handles when FrostWire is already open. The second instance forwarded
                 //parameters to us via HTTP.
-                String url = org.gudy.azureus2.core3.util.UrlUtils.decode((String) lc_params.get("url"));
+                String url = UrlUtils.decode((String) lc_params.get("url"));
                 
                 if (!StringUtils.isNullOrEmpty(url) && activityCallback.isRemoteDownloadsAllowed()) {
                     if (url.startsWith("magnet:?")) {
@@ -379,7 +380,7 @@ public class ExternalControl {
             
             String urlParameter = null;
             if (arg != null && (arg.startsWith("http://") || arg.startsWith("https://") || arg.startsWith("magnet:?") || arg.endsWith(".torrent"))) {
-                urlParameter = "/download?url=" + encode(arg);
+                urlParameter = "/download?url=" + UrlUtils.encode(arg);
             }  else {
                 urlParameter = "/show";
             }
@@ -395,16 +396,5 @@ public class ExternalControl {
         }
 
         return false;
-    }
-    
-    private static String encode(String url) {
-        if (url == null) {
-            return "";
-        }
-        try {
-            return URLEncoder.encode(url, "UTF-8").replaceAll("\\+", "%20");
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalArgumentException(e);
-        }
     }
 }

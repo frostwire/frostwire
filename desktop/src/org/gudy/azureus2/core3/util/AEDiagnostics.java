@@ -116,106 +116,6 @@ AEDiagnostics
 	protected static boolean	loggers_enabled;
 	
 	private static List<AEDiagnosticsEvidenceGenerator>		evidence_generators	= new ArrayList<AEDiagnosticsEvidenceGenerator>();
-		
-	public static synchronized void
-	startup(
-		boolean	_enable_pending )
-	{
-		if ( started_up ){
-			
-			return;
-		}
-		
-		started_up	= true;
-		
-		enable_pending_writes = _enable_pending;
-		
-		try{
-				// Minimize risk of loading to much when in transitory startup mode
-			
-			boolean transitoryStartup = System.getProperty("transitory.startup", "0").equals("1");
-			
-			if ( transitoryStartup ){
-				
-					// no xxx_?.log logging for you!
-				
-				loggers_enabled = false;
-				
-					// skip tidy check and more!
-				
-				return;
-			}
-
-			debug_dir		= FileUtil.getUserFile( "logs" );
-			
-			debug_save_dir	= new File( debug_dir, "save" );
-
-			
-			boolean	was_tidy	= true;//COConfigurationManager.getBooleanParameter( CONFIG_KEY );
-
-
-			if ( debug_dir.exists()){
-				
-				boolean save_logs = System.getProperty( "az.logging.save.debug", "true" ).equals( "true" );
-				
-				long	now = SystemTime.getCurrentTime();
-								
-				File[] files = debug_dir.listFiles();
-				
-				if ( files != null ){
-					
-					boolean	file_found	= false;
-					
-					for (int i=0;i<files.length;i++){
-						
-						File	file = files[i];
-						
-						if ( file.isDirectory()){
-							
-							continue;
-						}
-						
-						if ( !was_tidy ){
-				
-							file_found = true;
-							
-							if ( save_logs ){
-								
-								if ( !debug_save_dir.exists()){
-									
-									debug_save_dir.mkdir();
-								}
-								
-								FileUtil.copyFile( file, new File( debug_save_dir, now + "_" + file.getName()));
-							}
-						}
-					}
-					
-					if ( file_found ){
-						
-						Logger.logTextResource(new LogAlert(LogAlert.UNREPEATABLE,
-								LogAlert.AT_WARNING, "diagnostics.log_found"),
-								new String[] { debug_save_dir.toString() });
-					}
-				}
-			}else{
-				
-				debug_dir.mkdir();
-			}
-						
-		}catch( Throwable e ){
-			
-				// with webui we don't have the file stuff so this fails with class not found
-			
-			if ( !(e instanceof NoClassDefFoundError )){
-				
-				Debug.printStackTrace( e );
-			}
-		}finally{
-			
-			startup_complete	= true;
-		}
-	}
 	
 	/**
 	 * 
@@ -272,16 +172,14 @@ AEDiagnostics
 		String		name )
 	{
 		AEDiagnosticsLogger	logger = loggers.get(name);
-		
+
 		if ( logger == null ){
-			
-			startup( false );
-			
+
 			logger	= new AEDiagnosticsLogger( debug_dir, name, MAX_FILE_SIZE, !enable_pending_writes );
-			
+
 			loggers.put( name, logger );
 		}
-		
+
 		return( logger );
 	}
 

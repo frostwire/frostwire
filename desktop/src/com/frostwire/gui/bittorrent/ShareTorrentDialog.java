@@ -20,6 +20,7 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.util.UserAgentGenerator;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListenerAdapter;
@@ -29,7 +30,6 @@ import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import org.apache.commons.lang3.RandomUtils;
-import org.gudy.azureus2.core3.util.UrlUtils;
 import org.limewire.concurrent.ThreadExecutor;
 
 import javax.swing.*;

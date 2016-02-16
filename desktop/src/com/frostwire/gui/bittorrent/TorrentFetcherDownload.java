@@ -26,9 +26,9 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.logging.Logger;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.util.UserAgentGenerator;
 import com.limegroup.gnutella.gui.GUIMediator;
-import org.gudy.azureus2.core3.util.UrlUtils;
 
 import java.io.File;
 import java.util.Date;
