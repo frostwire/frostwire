@@ -68,8 +68,6 @@ sourceSets {
         }
 
         resources {
-            srcDir 'common/src/main/resources'
-
             srcDir 'desktop/resources'
             include '**/*.properties'
             include '**/*.png'
