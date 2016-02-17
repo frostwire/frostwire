@@ -34,9 +34,8 @@ import com.frostwire.gui.bittorrent.CreateTorrentDialog;
 import com.frostwire.gui.bittorrent.SendFileProgressDialog;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
-import com.limegroup.gnutella.gui.AutoCompleteTextField;
+import com.limegroup.gnutella.gui.LimeTextField;
 import com.limegroup.gnutella.gui.ButtonRow;
-import com.limegroup.gnutella.gui.ClearableAutoCompleteTextField;
 import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
@@ -54,11 +53,11 @@ public final class FileMenuActions {
     public static class OpenMagnetTorrentAction extends AbstractAction {
 
         private JDialog dialog = null;
-        private AutoCompleteTextField PATH_FIELD;
+        private LimeTextField PATH_FIELD;
 
         public OpenMagnetTorrentAction() {
             super(I18n.tr("O&pen .Torrent or Magnet"));
-            PATH_FIELD = new ClearableAutoCompleteTextField(34);
+            PATH_FIELD = new LimeTextField(34);
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Opens a magnet link or torrent file"));
         }
 
