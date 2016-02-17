@@ -42,12 +42,10 @@ import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.WeakHashMap;
+import java.util.*;
 
 
 /**
@@ -1541,12 +1539,26 @@ public final class MusicUtils {
         if (adapter == null) {
             return sEmptyList;
         }
-        long[] list;
+
         int count = adapter.getCount() - (adapter.getViewTypeCount() > 1 ? 1 : 0);
-        list = new long[count];
+        List<Long> songList = new LinkedList<>();
         for (int i = 0; i < count; i++) {
-            list[i] = adapter.getItem(i).mSongId;
+            try {
+                long songId = adapter.getItem(i).mSongId;
+                songList.add(songId);
+            } catch (Throwable ignored) {
+                // possible array out of bounds on adapter.getItem(i)
+            }
         }
-        return list;
+
+        if (songList.size() == 0) {
+            return sEmptyList;
+        }
+
+        // until Java supports primitive types as generics, we'll live with this double copy. O(2n)
+        Long[] list = new Long[songList.size()];
+        long[] result = ArrayUtils.toPrimitive(songList.toArray(list));
+        songList.clear();
+        return result;
     }
 }
