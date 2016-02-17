@@ -21,24 +21,13 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JSlider;
-import javax.swing.JToggleButton;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -151,6 +140,8 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     private Pattern twitterURLPattern = Pattern.compile("http(s)?\\:\\/\\/(www\\.)?twitter\\.com\\/([\\w\\p{L}_]*[\\:|\\.]?\\s?)+");
 
     private Pattern twitterUsernamePattern = Pattern.compile("(@[\\w\\p{L}_]*[\\:|\\.]?\\s?)+");
+
+    private Timer longPressTimer;
 
     /**
      * Constructs a new <tt>MediaPlayerComponent</tt>.
@@ -360,13 +351,34 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
     public void registerListeners() {
         PLAY_BUTTON.addActionListener(new PlayListener());
-        PLAY_BUTTON.setLongPressActionListener(new LongPressStopListener());
         PAUSE_BUTTON.addActionListener(new PauseListener());
-        PAUSE_BUTTON.setLongPressActionListener(new LongPressStopListener());
         NEXT_BUTTON.addActionListener(new NextListener());
         PREV_BUTTON.addActionListener(new BackListener());
         VOLUME.addChangeListener(new VolumeSliderListener());
         PROGRESS.addMouseListener(new ProgressBarMouseAdapter());
+
+        longPressTimer = new Timer(1500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stopSong();
+            }
+        });
+        longPressTimer.setRepeats(false);
+
+        MouseListener longPressListener = new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                longPressTimer.start();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                longPressTimer.stop();
+            }
+        };
+
+        PLAY_BUTTON.addMouseListener(longPressListener);
+        PAUSE_BUTTON.addMouseListener(longPressListener);
     }
 
     public void unregisterListeners() {
@@ -752,13 +764,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     private class PlayListener implements ActionListener {
         public void actionPerformed(ActionEvent ae) {
             play();
-        }
-    }
-    
-    /** Listens for the play button being long pressed during playback to stop. */
-    private class LongPressStopListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            stopSong();
         }
     }
 
