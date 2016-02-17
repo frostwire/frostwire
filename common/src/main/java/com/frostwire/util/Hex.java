@@ -17,8 +17,6 @@
 
 package com.frostwire.util;
 
-import org.apache.commons.codec.DecoderException;
-
 /**
  * Converts hexadecimal Strings.
  */

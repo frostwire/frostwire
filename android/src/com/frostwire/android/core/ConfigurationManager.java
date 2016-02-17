@@ -25,7 +25,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import com.frostwire.util.Hex;
 import com.frostwire.util.StringUtils;
-import org.apache.commons.codec.DecoderException;
 
 import java.io.File;
 import java.util.Map;
