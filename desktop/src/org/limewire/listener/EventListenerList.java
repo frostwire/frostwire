@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.limewire.concurrent.ExecutorsHelper;
 import org.limewire.concurrent.ThreadExecutor;
 import org.limewire.util.ExceptionUtils;
-import org.limewire.util.Objects;
 
 import com.frostwire.logging.Logger;
 
@@ -73,7 +72,7 @@ public class EventListenerList<E> implements ListenerSupport<E>, EventBroadcaste
      *        which will result in context not being used.
      */
     public static <E> void dispatch(EventListener<E> listener, E event, EventListenerListContext context) {
-        EventListener<E> proxy = new ListenerProxy<E>(Objects.nonNull(listener, "listener"), context);
+        EventListener<E> proxy = new ListenerProxy<E>(nonNull(listener, "listener"), context);
         proxy.handleEvent(event);
     }
     
@@ -87,12 +86,12 @@ public class EventListenerList<E> implements ListenerSupport<E>, EventBroadcaste
     
     /** Adds the listener. */
     public void addListener(EventListener<E> listener) {
-        listenerList.add(new ListenerProxy<E>(Objects.nonNull(listener, "listener"), context));
+        listenerList.add(new ListenerProxy<E>(nonNull(listener, "listener"), context));
     }
     
     /** Returns true if the listener was removed. */
     public boolean removeListener(EventListener<E> listener) {
-        Objects.nonNull(listener, "listener");
+        nonNull(listener, "listener");
         
         // Find the proxy, then remove it.
         for(ListenerProxy<E> proxyListener : listenerList) {
@@ -114,7 +113,7 @@ public class EventListenerList<E> implements ListenerSupport<E>, EventBroadcaste
     
     /** Broadcasts an event to all listeners. */
     public void broadcast(E event) {
-        Objects.nonNull(event, "event");
+        nonNull(event, "event");
         
         // When broadcasting, capture exceptions to make sure each listeners
         // gets a shot.  If an exception occurs and can be reported immediately,
@@ -145,6 +144,13 @@ public class EventListenerList<E> implements ListenerSupport<E>, EventBroadcaste
     /** Returns the size of the list. */
     public int size() {
         return listenerList.size();
+    }
+
+    /** Throws an exception with the given message if <code>t</code> is null. */
+    private static <T> T nonNull(T t, String msg) {
+        if (t == null)
+            throw new NullPointerException("null: " + msg);
+        return t;
     }
     
     private static final class ListenerProxy<E> implements EventListener<E> {

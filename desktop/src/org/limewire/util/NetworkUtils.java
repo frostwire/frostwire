@@ -42,38 +42,6 @@ public final class NetworkUtils {
     public static boolean isValidPort(int port) {
         return (port > 0 && port <= 0xFFFF);
     }
-
-    /**
-     * @return A non-loopback IPv4 address of a network interface on the local
-     *         host.
-     * @throws UnknownHostException
-     */
-    public static InetAddress getLocalAddress() throws UnknownHostException {
-        InetAddress addr = InetAddress.getLocalHost();
-        
-        if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
-            return addr;
-        }
-        
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            if (interfaces != null) {
-                while (interfaces.hasMoreElements()) {
-                    Enumeration<InetAddress> addresses = interfaces.nextElement().getInetAddresses();
-                    while (addresses.hasMoreElements()) {
-                        addr = addresses.nextElement();
-                        if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
-                            return addr;
-                        }
-                    }
-                }
-            }
-        } catch (SocketException se) {
-        }
-
-        throw new UnknownHostException(
-                "localhost has no interface with a non-loopback IPv4 address");
-    }
     
     /**
      * Returns the IP:Port as byte array.

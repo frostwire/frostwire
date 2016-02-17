@@ -194,10 +194,4 @@ public class LanguageUtils {
     private static boolean matchesOrIsMoreSpecific(String detailed, String generic) {
         return generic.length() == 0 || detailed.equals(generic);
     }
-    
-    public static String getLocaleString() {
-        return ApplicationSettings.LANGUAGE.getValue() + "_" + ApplicationSettings.COUNTRY.getValue() + "_" +
-        ApplicationSettings.LOCALE_VARIANT.getValue();
-    }
-        
 }
