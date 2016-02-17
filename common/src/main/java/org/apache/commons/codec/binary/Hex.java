@@ -157,9 +157,9 @@ public class Hex implements BinaryEncoder, BinaryDecoder {
      * @return A String containing hexadecimal characters
      * @since 1.4
      */
-    public static String encodeHexString(final byte[] data) {
-        return new String(encodeHex(data));
-    }
+//    public static String encodeHexString(final byte[] data) {
+//        return new String(encodeHex(data));
+//    }
 
     /**
      * Converts a hexadecimal character to an integer.
@@ -272,7 +272,7 @@ public class Hex implements BinaryEncoder, BinaryDecoder {
      */
     @Override
     public byte[] encode(final byte[] array) {
-        return encodeHexString(array).getBytes(this.getCharset());
+        return new String(encodeHex(array)).getBytes(this.getCharset());
     }
 
     /**
