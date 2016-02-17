@@ -410,26 +410,6 @@ public class FileUtils {
         return copy(src, (int)length, dst)==length;
     }
     
-    /**
-     * Creates a temporary file using
-     * {@link File#createTempFile(String, String, File)}, trying a few times.
-     * This is a workaround for Sun Bug: 6325169: createTempFile occasionally
-     * fails (throwing an IOException).
-     */
-    public static File createTempFile(String prefix, String suffix, File directory) throws IOException {
-        IOException iox = null;
-        
-        for(int i = 0; i < 10; i++) {
-            try {
-                return File.createTempFile(prefix, suffix, directory);
-            } catch(IOException x) {
-                iox = x;
-            }
-        }
-        
-        throw iox;
-    }
-    
     public static File getJarFromClasspath(ClassLoader classLoader, String markerFile) {
         if (classLoader == null) {
             throw new IllegalArgumentException();
