@@ -688,12 +688,8 @@ public final class MusicUtils {
             }
             final long currentId = mService.getAudioId();
             final int currentQueuePosition = getQueuePosition();
-            if (position != -1 && currentQueuePosition == position && currentId == list[position]) {
-                final long[] playlist = getQueue();
-                if (Arrays.equals(list, playlist)) {
-                    mService.play();
-                    return;
-                }
+            if (continuedPlayingCurrentQueue(list, position, currentId, currentQueuePosition)) {
+                return;
             }
             if (position < 0) {
                 position = 0;
@@ -704,6 +700,23 @@ public final class MusicUtils {
 
         } catch (final RemoteException ignored) {
         }
+    }
+
+    private static boolean continuedPlayingCurrentQueue(long[] list, int position, long currentId, int currentQueuePosition) {
+        if (position != -1 && currentQueuePosition == position && currentId == list[position]) {
+            final long[] playlist = getQueue();
+            if (Arrays.equals(list, playlist)) {
+                try {
+                    mService.play();
+                } catch (Throwable ignored) {
+                    ignored.printStackTrace();
+
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -735,13 +748,9 @@ public final class MusicUtils {
             mService.setShuffleMode(MusicPlaybackService.SHUFFLE_NORMAL);
             final long mCurrentId = mService.getAudioId();
             final int mCurrentQueuePosition = getQueuePosition();
-            if (position != -1 && mCurrentQueuePosition == position
-                    && mCurrentId == mTrackList[position]) {
-                final long[] mPlaylist = getQueue();
-                if (Arrays.equals(mTrackList, mPlaylist)) {
-                    mService.play();
-                    return;
-                }
+
+            if (continuedPlayingCurrentQueue(mTrackList, position, mCurrentId, mCurrentQueuePosition)) {
+                return;
             }
 
             if (mTrackList.length > 0) {
@@ -1079,19 +1088,23 @@ public final class MusicUtils {
             Cursor cursor = context.getContentResolver().query(uri, new String[]{
                     AlbumColumns.NUMBER_OF_SONGS
             }, null, null, null);
-            String songCount = null;
-            if (cursor != null) {
-                cursor.moveToFirst();
-                if (!cursor.isAfterLast()) {
-                    songCount = cursor.getString(0);
-                }
-                cursor.close();
-            }
-            return songCount;
+            return getFirstStringResult(cursor);
         } catch (Throwable e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private static String getFirstStringResult(Cursor cursor) {
+        String result = null;
+        if (cursor != null) {
+            cursor.moveToFirst();
+            if (!cursor.isAfterLast()) {
+                result = cursor.getString(0);
+            }
+            cursor.close();
+        }
+        return result;
     }
 
     /**
@@ -1108,15 +1121,7 @@ public final class MusicUtils {
             Cursor cursor = context.getContentResolver().query(uri, new String[]{
                     AlbumColumns.FIRST_YEAR
             }, null, null, null);
-            String releaseDate = null;
-            if (cursor != null) {
-                cursor.moveToFirst();
-                if (!cursor.isAfterLast()) {
-                    releaseDate = cursor.getString(0);
-                }
-                cursor.close();
-            }
-            return releaseDate;
+            return getFirstStringResult(cursor);
         } catch (Throwable e) {
             // ignore this error since it's not critical
             LOG.error("Error getting release date for album", e);

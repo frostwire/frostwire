@@ -369,6 +369,8 @@ public class MusicPlaybackService extends Service {
      */
     private Cursor mCursor;
 
+    private final Object cursorLock = new Object();
+
     /**
      * The cursor used to retrieve info on the album the current track is
      * part of, if any.
@@ -1024,7 +1026,7 @@ public class MusicPlaybackService extends Service {
     }
 
     private void updateCursor(final String selection, final String[] selectionArgs) {
-        synchronized (this) {
+        synchronized (cursorLock) {
             closeCursor();
             mCursor = openCursorAndGoToFirst(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     PROJECTION, selection, selectionArgs);
@@ -1033,7 +1035,7 @@ public class MusicPlaybackService extends Service {
     }
 
     private void updateCursor(final Uri uri) {
-        synchronized (this) {
+        synchronized (cursorLock) {
             closeCursor();
             mCursor = openCursorAndGoToFirst(uri, PROJECTION, null, null);
         }
@@ -1071,13 +1073,15 @@ public class MusicPlaybackService extends Service {
     }
 
     private void closeCursor() {
-        if (mCursor != null) {
-            mCursor.close();
-            mCursor = null;
-        }
-        if (mAlbumCursor != null) {
-            mAlbumCursor.close();
-            mAlbumCursor = null;
+        synchronized (cursorLock) {
+            if (mCursor != null) {
+                mCursor.close();
+                mCursor = null;
+            }
+            if (mAlbumCursor != null) {
+                mAlbumCursor.close();
+                mAlbumCursor = null;
+            }
         }
     }
 
@@ -1097,7 +1101,9 @@ public class MusicPlaybackService extends Service {
      *                 otherwise.
      */
     private void openCurrentAndMaybeNext(final boolean openNext) {
+        Log.d(TAG, "openCurrentAndMaybeNext() waiting for synchronized(this)");
         synchronized (this) {
+            Log.d(TAG, "openCurrentAndMaybeNext() DONE waiting for synchronized(this)\n");
             closeCursor();
 
             if (mPlayListLen == 0 || mPlayList == null) {
