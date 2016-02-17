@@ -260,7 +260,7 @@ public class MusicPlaybackService extends Service {
     private static final int FADEUP = 7;
 
     /**
-     * Idle time before stopping the foreground notfication (1 minute)
+     * Idle time before stopping the foreground notification (1 minute)
      */
     private static final int IDLE_DELAY = 60000;
 
@@ -2581,6 +2581,8 @@ public class MusicPlaybackService extends Service {
 
         private MediaPlayer mNextMediaPlayer;
 
+        private final Object mNextMediaPlayerLock;
+
         private Handler mHandler;
 
         private boolean mIsInitialized = false;
@@ -2589,7 +2591,8 @@ public class MusicPlaybackService extends Service {
          * Constructor of <code>MultiPlayer</code>
          */
         public MultiPlayer(final MusicPlaybackService service) {
-            mService = new WeakReference<MusicPlaybackService>(service);
+            mService = new WeakReference<>(service);
+            mNextMediaPlayerLock = new Object();
             mCurrentMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
         }
 
@@ -2662,14 +2665,15 @@ public class MusicPlaybackService extends Service {
                 return;
             }
 
-            if (mNextMediaPlayer != null) {
-                mNextMediaPlayer.release();
-                mNextMediaPlayer = null;
-            }
+            releaseNextMediaPlayer();
+
             if (path == null) {
                 return;
             }
-            mNextMediaPlayer = new MediaPlayer();
+
+            synchronized (mNextMediaPlayerLock) {
+                mNextMediaPlayer = new MediaPlayer();
+            }
             mNextMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
 
             try {
@@ -2686,6 +2690,12 @@ public class MusicPlaybackService extends Service {
                     return;
                 }
             } else {
+                releaseNextMediaPlayer();
+            }
+        }
+
+        private void releaseNextMediaPlayer() {
+            synchronized (mNextMediaPlayerLock) {
                 if (mNextMediaPlayer != null) {
                     mNextMediaPlayer.release();
                     mNextMediaPlayer = null;
@@ -2867,7 +2877,7 @@ public class MusicPlaybackService extends Service {
                 if (mp == mCurrentMediaPlayer && mNextMediaPlayer != null) {
                     mCurrentMediaPlayer.release();
                     mCurrentMediaPlayer = mNextMediaPlayer;
-                    mNextMediaPlayer = null;
+                    releaseNextMediaPlayer();
                     mHandler.sendEmptyMessage(TRACK_WENT_TO_NEXT);
                 } else {
                     mService.get().mWakeLock.acquire(30000);
