@@ -368,7 +368,7 @@ AEMonSem
 			name		= _name;
 		}else{
 			
-			name		= StringInterner.intern("(S)" + _name);
+			name		= "(S)" + _name;
 		}
 		
 		if ( DEBUG ){

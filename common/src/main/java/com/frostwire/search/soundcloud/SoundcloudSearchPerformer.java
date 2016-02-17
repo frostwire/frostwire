@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,12 +28,11 @@ import java.util.List;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
-public class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
+public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
-    public static final String SOUNDCLOUD_CLIENTID = "02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea";
-    public static final String SOUNDCLOUD_APP_VERSION = "3833d63";
+    private static final String SOUNDCLOUD_CLIENTID = "02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea";
+    private static final String SOUNDCLOUD_APP_VERSION = "3833d63";
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1);
@@ -48,15 +47,57 @@ public class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
     protected List<? extends SearchResult> searchPage(String page) {
         List<SearchResult> result = new LinkedList<SearchResult>();
 
-        SoundcloudResponse response = JsonUtils.toObject(page, SoundcloudResponse.class);
+        SoundcloudResponse obj = JsonUtils.toObject(page, SoundcloudResponse.class);
 
-        for (SoundcloudItem item : response.collection) {
-            if (!isStopped() && item != null && item.downloadable) {
-                SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
-                result.add(sr);
+        // can't use fromJson here due to the isStopped call
+        if (obj != null && obj.collection != null) {
+            for (SoundcloudItem item : obj.collection) {
+                if (!isStopped() && item != null && item.downloadable) {
+                    SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
+                    result.add(sr);
+                }
             }
         }
 
         return result;
+    }
+
+    public static String resolveUrl(String url) {
+        return "http://api.soundcloud.com/resolve.json?url=" + url + "&client_id=" + SOUNDCLOUD_CLIENTID + "&app_version=" + SOUNDCLOUD_APP_VERSION;
+    }
+
+    public static LinkedList<SoundcloudSearchResult> fromJson(String json) {
+        LinkedList<SoundcloudSearchResult> r = new LinkedList<>();
+        if (json.indexOf("\"collection\":") != -1) {
+            SoundcloudResponse obj = JsonUtils.toObject(json, SoundcloudResponse.class);
+
+            if (obj != null && obj.collection != null) {
+                for (SoundcloudItem item : obj.collection) {
+                    if (item != null && item.downloadable) {
+                        SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
+                        r.add(sr);
+                    }
+                }
+            }
+        } else if (json.indexOf("\"tracks\":") != -1) {
+            SoundcloudPlaylist obj = JsonUtils.toObject(json, SoundcloudPlaylist.class);
+
+            if (obj != null && obj.tracks != null) {
+                for (SoundcloudItem item : obj.tracks) {
+                    if (item != null && item.downloadable) {
+                        SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
+                        r.add(sr);
+                    }
+                }
+            }
+        } else { // assume it's a single item
+            SoundcloudItem item = JsonUtils.toObject(json, SoundcloudItem.class);
+            if (item != null) {
+                SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
+                r.add(sr);
+            }
+        }
+
+        return r;
     }
 }

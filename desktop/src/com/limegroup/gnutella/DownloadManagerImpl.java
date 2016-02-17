@@ -57,7 +57,7 @@ public final class DownloadManagerImpl implements DownloadManager {
                     }
 
                     String name = dl.getName();
-                    if (name==null || (name != null && name.contains("fetchMagnet - "))) {
+                    if (name == null || (name != null && name.contains("fetch_magnet:"))) {
                         return;
                     }
 
@@ -78,10 +78,6 @@ public final class DownloadManagerImpl implements DownloadManager {
                             return;
                         }
                     }
-
-//                if (CommonUtils.isPortable()) {
-//                    updateDownloadManagerPortableSaveLocation(downloadManager);
-//                }
 
                     addDownload(dl);
                 }

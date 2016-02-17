@@ -18,6 +18,7 @@
 package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.StringUtils;
@@ -56,7 +57,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
 
         this.domainName = domainName;
         this.keywords = keywords;
-        this.encodedKeywords = StringUtils.encodeUrl(keywords);
+        this.encodedKeywords = UrlUtils.encode(keywords);
         this.timeout = timeout;
         this.client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
     }

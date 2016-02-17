@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,14 +18,14 @@
 
 package com.frostwire.frostclick;
 
-import com.frostwire.licences.License;
+import com.frostwire.licenses.License;
+import com.frostwire.licenses.Licenses;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import org.apache.commons.io.FilenameUtils;
 
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class TorrentPromotionSearchResult implements TorrentSearchResult {
 
@@ -50,7 +50,7 @@ public class TorrentPromotionSearchResult implements TorrentSearchResult {
 
     @Override
     public String getFilename() {
-        return FilenameUtils.getName(slide.url);
+        return FilenameUtils.getName(slide.torrent);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class TorrentPromotionSearchResult implements TorrentSearchResult {
 
     @Override
     public String getDetailsUrl() {
-        return slide.url;
+        return slide.clickURL;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class TorrentPromotionSearchResult implements TorrentSearchResult {
 
     @Override
     public String getReferrerUrl() {
-        return slide.url;
+        return slide.clickURL;
     }
 
     @Override
@@ -90,7 +90,7 @@ public class TorrentPromotionSearchResult implements TorrentSearchResult {
 
     @Override
     public License getLicense() {
-        return License.UNKNOWN;
+        return Licenses.UNKNOWN;
     }
 
     @Override

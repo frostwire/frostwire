@@ -439,35 +439,4 @@ public class StringUtils {
 
         return str;
     }
-
-    /**
-     * Like URLEncoder.encode, except translates spaces into %20 instead of +
-     * 
-     * @param s
-     * @return
-     */
-    public static String encodeUrl(String s) {
-        String enc = "";
-
-        if (s != null) {
-            try {
-                enc = URLEncoder.encode(s, "UTF-8").replaceAll("\\+", "%20");
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Impossible to run in an environment with lack of UTF-8 support", e);
-            }
-        }
-
-        return enc;
-    }
-
-    public static String decodeUrl(String s) {
-        if (s == null) {
-            return "";
-        }
-        try {
-            return URLDecoder.decode(s, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return s;
-        }
-    }
 }

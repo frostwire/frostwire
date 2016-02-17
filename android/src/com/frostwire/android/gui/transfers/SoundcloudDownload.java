@@ -31,12 +31,14 @@ import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.util.http.HttpClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gubatron
@@ -110,18 +112,15 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
 
     @Override
     public boolean isComplete() {
-        if (delegate != null) {
-            //FIXME: we do this differently here because SoundCloud downloads may not have
-            //the same number of bytes as expected at the end, or maybe we don't
-            //even know exactly how many bytes to expect in the first place.
-            //the fix should probably be calculating this number correctly.
-            //Suggestion: maybe look at the Content-length HTTP header for a size
-            //if sound cloud sends this when the download starts and update the
-            //link.getSize() value with this number as it becomes known.
-            return delegate.getStatusCode() == HttpDownload.STATUS_COMPLETE || delegate.getStatusCode() == HttpDownload.STATUS_ERROR;
-        } else {
-            return false;
-        }
+        //FIXME: we do this differently here because SoundCloud downloads may not have
+//the same number of bytes as expected at the end, or maybe we don't
+//even know exactly how many bytes to expect in the first place.
+//the fix should probably be calculating this number correctly.
+//Suggestion: maybe look at the Content-length HTTP header for a size
+//if sound cloud sends this when the download starts and update the
+//link.getSize() value with this number as it becomes known.
+        return delegate != null && (delegate.getStatusCode() == HttpDownload.STATUS_COMPLETE ||
+                delegate.getStatusCode() == HttpDownload.STATUS_ERROR);
     }
 
     @Override
@@ -154,8 +153,22 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
         try {
             final HttpDownloadLink link = buildDownloadLink();
             if (link != null) {
-                delegate = new HttpDownload(manager, Platforms.temp(), link);
+                delegate = new HttpDownload(manager, Platforms.temp(), link) {
+                    // we could have it here already, but lately SC does not report this number in search results anymore.
+                    public long size = link.getSize();
+
+                    @Override
+                    public long getSize() {
+                        return size;
+                    }
+
+                    @Override
+                    protected void setSize(long s) {
+                        this.size = s;
+                    }
+                };
                 delegate.setListener(new HttpDownloadListener() {
+
                     @Override
                     public void onComplete(HttpDownload download) {
                         downloadAndUpdateCoverArt(download.getSavePath());
@@ -170,6 +183,14 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
                             }
                         } else {
                             classicComplete(download);
+                        }
+                    }
+
+                    @Override
+                    public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
+                        if (headerFields != null && headerFields.containsKey("Content-Length")) {
+                            String lengthStr = headerFields.get("Content-Length").get(0);
+                            delegate.setSize(Long.valueOf(lengthStr));
                         }
                     }
                 });

@@ -19,10 +19,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.security.MessageDigest;
 import java.util.Date;
 
-import com.limegroup.gnutella.SHA1;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 
 /** POJO to represent an UpdateMessage. */
@@ -188,19 +186,13 @@ public final class UpdateMessage extends Object implements Serializable {
     }
 
     public int hashCode() {
-        /** will be a sum of all the bytes (absolute values) of the sha1 of this object.
-         *  the sha1, will be calculated from the concatenation of all the
-         *  properties of the message.
-         */
         if (_hashCode <= 0) {
-            MessageDigest md = new SHA1();
-            String byteString = _message + _url + _messageType + _version + _torrent + _os + _showOnce;
-            md.update(byteString.getBytes());
+            try {
+                String byteString = _message + _url + _messageType + _version + _torrent + _os + _showOnce;
 
-            byte[] digest = md.digest();
-            _hashCode = 0;
-            for (int n:digest) {
-                _hashCode += Math.abs((int) n);
+                _hashCode = byteString.hashCode();
+            } catch (Throwable e) {
+                e.printStackTrace(); // just in case
             }
         }
 

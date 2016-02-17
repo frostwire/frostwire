@@ -484,10 +484,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         th.scrapeTracker();
     }
 
-    public Set<String> getTrackers() {
-        List<AnnounceEntry> trackers = th.getTrackers();
+    public Set<String> trackers() {
+        List<AnnounceEntry> trackers = th.trackers();
 
-        Set<String> urls = new HashSet<String>(trackers.size());
+        Set<String> urls = new HashSet<>(trackers.size());
 
         for (AnnounceEntry e : trackers) {
             urls.add(e.getUrl());
@@ -496,7 +496,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         return urls;
     }
 
-    public void setTrackers(Set<String> trackers) {
+    public void trackers(Set<String> trackers) {
         List<AnnounceEntry> list = new ArrayList<AnnounceEntry>(trackers.size());
 
         for (String url : trackers) {
@@ -633,7 +633,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
             if (file.exists()) {
                 byte[] arr = FileUtils.readFileToByteArray(file);
-                entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
+                entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
                 string_entry_map d = e.dict();
 
                 if (d.has_key(EXTRA_DATA_KEY)) {

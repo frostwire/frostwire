@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2012, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,18 +19,14 @@
 package com.frostwire.search.soundcloud;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public class SoundcloundUser {
+final class SoundcloundUser {
 
     public int id;
     public String kind;
-    public String permalink;
     public String username;
     public String uri;
-    public String permalink_url;
     public String avatar_url;
 }

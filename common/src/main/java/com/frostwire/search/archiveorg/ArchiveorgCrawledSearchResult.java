@@ -21,6 +21,7 @@ package com.frostwire.search.archiveorg;
 import java.util.Locale;
 
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.UrlUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import com.frostwire.search.AbstractCrawledSearchResult;
@@ -46,7 +47,7 @@ public class ArchiveorgCrawledSearchResult extends AbstractCrawledSearchResult i
         super(sr);
         this.filename = file.filename;
         this.displayName = FilenameUtils.getBaseName(filename) + " (" + sr.getDisplayName() + ")";
-        this.downloadUrl = String.format(Locale.US, DOWNLOAD_URL, sr.getDomainName(), sr.getIdentifier(), StringUtils.encodeUrl(filename));
+        this.downloadUrl = String.format(Locale.US, DOWNLOAD_URL, sr.getDomainName(), sr.getIdentifier(), UrlUtils.encode(filename));
         this.size = calcSize(file);
     }
 

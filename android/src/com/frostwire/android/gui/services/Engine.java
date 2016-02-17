@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ import android.telephony.TelephonyManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
+import com.frostwire.android.util.BloomFilter;
 import com.frostwire.logging.Logger;
-import com.frostwire.util.BloomFilter;
 
 import java.io.*;
 import java.util.BitSet;
@@ -38,7 +38,6 @@ import java.util.concurrent.ExecutorService;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class Engine implements IEngineService {
     private static final Logger LOG = Logger.getLogger(Engine.class);
@@ -65,7 +64,7 @@ public final class Engine implements IEngineService {
     }
 
     private Engine(Application context) {
-        notifiedDat = new File(context.getExternalFilesDir(null),"notified.dat");
+        notifiedDat = new File(context.getExternalFilesDir(null), "notified.dat");
         loadNotifiedDownloads();
         startEngineService(context);
     }
@@ -74,24 +73,24 @@ public final class Engine implements IEngineService {
      * loads a dictionary of infohashes that have been already
      * notified from notified.dat. This binary file packs together
      * infohashes 20 bytes at the time.
-     *
+     * <p/>
      * this method goes through the file, 20 bytes at the time and populates
      * a HashMap we can use to query wether or not we should notify the user
      * in constant time.
-     *
+     * <p/>
      * When we have a new infohash, the file conveniently grows by appending the
      * new 20 bytes of the new hash.
      */
     private void loadNotifiedDownloads() {
         notifiedDownloads = new BloomFilter<String>(Constants.NOTIFIED_BLOOM_FILTER_BITSET_SIZE,
-                                                    Constants.NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS);
+                Constants.NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS);
 
         if (!notifiedDat.exists()) {
             try {
                 notifiedDat.createNewFile();
             } catch (Throwable e) {
                 e.printStackTrace();
-                LOG.error("Could not create notified.dat",e);
+                LOG.error("Could not create notified.dat", e);
             }
         } else if (notifiedDat.length() > 0) {
             try {
@@ -104,7 +103,7 @@ public final class Engine implements IEngineService {
                         Constants.NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS,
                         numberOfElements,
                         bs);
-                LOG.info("Loaded bloom filter from notified.dat sucessfully ("+numberOfElements+" elements)");
+                LOG.info("Loaded bloom filter from notified.dat sucessfully (" + numberOfElements + " elements)");
             } catch (Throwable e) {
                 LOG.error("Error reading notified.dat", e);
 
@@ -245,7 +244,6 @@ public final class Engine implements IEngineService {
     }
 
     /**
-     * 
      * @param context This must be the application context, otherwise there will be a leak.
      */
     private void startEngineService(final Context context) {
@@ -309,7 +307,7 @@ public final class Engine implements IEngineService {
     @Override
     public Application getApplication() {
         Application r = null;
-        if (service!= null) {
+        if (service != null) {
             r = service.getApplication();
         }
         return r;

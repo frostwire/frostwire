@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,26 +18,18 @@
 
 package com.frostwire.gui.bittorrent;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
+import com.frostwire.bittorrent.CopyrightLicenseBroker;
+import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.search.soundcloud.SoundCloudRedirectResponse;
-import com.frostwire.transfers.TransferState;
 import com.frostwire.mp3.ID3Wrapper;
 import com.frostwire.mp3.ID3v1Tag;
 import com.frostwire.mp3.ID3v23Tag;
 import com.frostwire.mp3.Mp3File;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
-import com.frostwire.bittorrent.CopyrightLicenseBroker;
-import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.transfers.TransferState;
+import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListener;
-import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.JsonUtils;
 import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.iTunesSettings;
@@ -46,11 +38,15 @@ import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.OSUtils;
 
 import java.io.File;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class SoundcloudDownload implements BTDownload {
 
@@ -296,7 +292,9 @@ public class SoundcloudDownload implements BTDownload {
         cleanupFile(completeFile);
     }
 
-    /** files are saved with (1), (2),... if there's one with the same name already. */
+    /**
+     * files are saved with (1), (2),... if there's one with the same name already.
+     */
     private static File buildFile(File savePath, String name) {
         String baseName = FilenameUtils.getBaseName(name);
         String ext = FilenameUtils.getExtension(name);
@@ -358,42 +356,6 @@ public class SoundcloudDownload implements BTDownload {
                 updateAverageDownloadSpeed();
                 state = TransferState.DOWNLOADING;
             }
-
-            //if we get a redirect result.
-            if (buffer!=null && length > 0 && length < 4096) {
-                handlePossibleRedirect(buffer, length);
-            }
-        }
-
-        private void handlePossibleRedirect(byte[] buffer, int length) {
-            String possibleJsonOutput = "n/a";
-
-            try {
-                possibleJsonOutput = new String(buffer,0, "{\"status\"".length());
-                if (!possibleJsonOutput.startsWith("{\"status")) {
-                    return;
-                }
-                possibleJsonOutput = new String(buffer,0,length);
-                final SoundCloudRedirectResponse redirectResponse = JsonUtils.toObject(possibleJsonOutput, SoundCloudRedirectResponse.class);
-                if (redirectResponse.status.startsWith("302") && redirectResponse.location != null && !redirectResponse.location.isEmpty()) {
-                    redirect(redirectResponse);
-                }
-            } catch (Throwable e) {
-                System.out.println("SoundCloudDownload.handlePossibleRedirect() error: " + e.getMessage());
-               //e.printStackTrace();
-            }
-
-        }
-
-        private void redirect(SoundCloudRedirectResponse redirectResponse) {
-            cleanup();
-            state = TransferState.REDIRECTING;
-            BTDownloadMediator.instance().remove(SoundcloudDownload.this);
-            sr.getSoundcloudItem().download_url = redirectResponse.location;
-            sr.getSoundcloudItem().downloadable = true;
-            state = TransferState.DOWNLOADING;
-            SoundcloudSearchResult scSearchResult = new SoundcloudSearchResult(sr.getSoundcloudItem(), null, null);
-            BTDownloadMediator.instance().downloadSoundcloudFromTrackUrlOrSearchResult(scSearchResult.getDownloadUrl(), scSearchResult);
         }
 
         @Override

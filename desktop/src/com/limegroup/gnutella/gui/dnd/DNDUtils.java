@@ -84,7 +84,7 @@ public class DNDUtils {
                 URI uri = URIUtils.toURI(line);
                 uris.add(uri);
             } catch (URISyntaxException e) {
-                URIUtils.error(e);
+                // ignore
             }
         }
         return uris.toArray(new URI[uris.size()]);

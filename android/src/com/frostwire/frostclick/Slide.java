@@ -26,37 +26,13 @@ package com.frostwire.frostclick;
 public class Slide {
 
     /** Open the URL if available, don't download */
-    public static final int DOWNLOAD_METHOD_OPEN_URL = -1;
+    public static final int DOWNLOAD_METHOD_OPEN_URL = 0;
 
     /** Download the torrent file */
-    public static final int DOWNLOAD_METHOD_TORRENT = 0;
+    public static final int DOWNLOAD_METHOD_TORRENT = 1;
 
     /** Download the file via HTTP */
-    public static final int DOWNLOAD_METHOD_HTTP = 1;
-
-    /** Download and install Pokki (unused on android for now) */
-    public static final int DOWNLOAD_METHOD_INSTALL_POKKI = 2;
-
-    /**
-     * http address where to go if user clicks on this slide
-     */
-    public String url;
-
-    /**
-     * Download method
-     * 0 - Torrent
-     * 1 - HTTP
-     */
-    public int method;
-
-    /**
-     * url of torrent file that should be opened if user clicks on this slide
-     */
-    public String torrent;
-
-    public String httpUrl;
-
-    public boolean uncompress;
+    public static final int DOWNLOAD_METHOD_HTTP = 2;
 
     /**
      * url of image that will be displayed on this slide
@@ -64,16 +40,28 @@ public class Slide {
     public String imageSrc;
 
     /**
+     * http address where to go if user clicks on this slide
+     */
+    public String clickURL;
+
+    /**
      * length of time this slide will be shown
      */
     public long duration;
+
+    /**
+     * url of torrent file that should be opened if user clicks on this slide
+     */
+    public String torrent;
+
+    public String httpDownloadURL;
 
     /**
      * language (optional filter) = Can be given in the forms of:
      * *
      * en
      * en_US
-     * 
+     *
      */
     public String language;
 
@@ -87,6 +75,44 @@ public class Slide {
 
     /** Title of the promotion */
     public String title;
+
+    public String author;
+
+    /**
+     * Download method
+     * 0 - Torrent
+     * 1 - HTTP
+     */
+    public int method;
+
+    public String md5;
+
+    public String saveFileAs;
+
+    public String executeParameters;
+
+    public String includedVersions;
+
+    public String audioURL;
+
+    public String videoURL;
+
+    public String facebook;
+
+    public String twitter;
+
+    public String gplus;
+
+    public String youtube;
+
+    public String instagram;
+
+    public int flags;
+
+    public String uri;
+
+    public boolean uncompress;
+
 
     /** Total size in bytes */
     public long size;

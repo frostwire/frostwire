@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
 
 package com.frostwire.search;
 
-import com.frostwire.licences.License;
+import com.frostwire.licenses.License;
+import com.frostwire.licenses.Licenses;
 
 /**
  * @author gubatron
@@ -29,7 +30,7 @@ public abstract class AbstractSearchResult implements SearchResult {
 
     @Override
     public License getLicense() {
-        return License.UNKNOWN;
+        return Licenses.UNKNOWN;
     }
 
     @Override

@@ -21,8 +21,6 @@ package org.gudy.azureus2.core3.util;
 
 //import org.gudy.azureus2.core3.config.COConfigurationManager;
 //import org.gudy.azureus2.core3.config.ParameterListener;
-import org.gudy.azureus2.core3.internat.MessageText;
-import org.gudy.azureus2.core3.logging.*;
 //import org.gudy.azureus2.platform.PlatformManager;
 //import org.gudy.azureus2.platform.PlatformManagerCapabilities;
 //import org.gudy.azureus2.platform.PlatformManagerFactory;
@@ -116,148 +114,6 @@ AEDiagnostics
 	protected static boolean	loggers_enabled;
 	
 	private static List<AEDiagnosticsEvidenceGenerator>		evidence_generators	= new ArrayList<AEDiagnosticsEvidenceGenerator>();
-		
-	public static synchronized void
-	startup(
-		boolean	_enable_pending )
-	{
-		if ( started_up ){
-			
-			return;
-		}
-		
-		started_up	= true;
-		
-		enable_pending_writes = _enable_pending;
-		
-		try{
-				// Minimize risk of loading to much when in transitory startup mode
-			
-			boolean transitoryStartup = System.getProperty("transitory.startup", "0").equals("1");
-			
-			if ( transitoryStartup ){
-				
-					// no xxx_?.log logging for you!
-				
-				loggers_enabled = false;
-				
-					// skip tidy check and more!
-				
-				return;
-			}
-
-			debug_dir		= FileUtil.getUserFile( "logs" );
-			
-			debug_save_dir	= new File( debug_dir, "save" );
-			
-//			COConfigurationManager.addAndFireParameterListeners(
-//				new String[]{
-//					"Logger.Enabled",
-//					"Logger.DebugFiles.Enabled",
-//				},
-//				new ParameterListener()
-//				{
-//					public void
-//					parameterChanged(
-//						String parameterName)
-//					{
-//						logging_enabled = COConfigurationManager.getBooleanParameter( "Logger.Enabled" );
-//
-//						loggers_enabled = logging_enabled && COConfigurationManager.getBooleanParameter( "Logger.DebugFiles.Enabled");
-//
-//						if ( !loggers_enabled ){
-//
-//							loggers_enabled = Constants.IS_CVS_VERSION || COConfigurationManager.getBooleanParameter( "Logger.DebugFiles.Enabled.Force" );
-//						}
-//					}
-//				});
-			
-			boolean	was_tidy	= true;//COConfigurationManager.getBooleanParameter( CONFIG_KEY );
-
-//			new AEThread2( "asyncify", true )
-//			{
-//				public void
-//				run()
-//				{
-//					SimpleTimer.addEvent("AEDiagnostics:logCleaner",SystemTime.getCurrentTime() + 60000
-//							+ RandomUtils.nextInt(15000), new TimerEventPerformer() {
-//						public void perform(TimerEvent event) {
-//							cleanOldLogs();
-//						}
-//					});
-//				}
-//			}.start();
-
-			if ( debug_dir.exists()){
-				
-				boolean save_logs = System.getProperty( "az.logging.save.debug", "true" ).equals( "true" );
-				
-				long	now = SystemTime.getCurrentTime();
-								
-				File[] files = debug_dir.listFiles();
-				
-				if ( files != null ){
-					
-					boolean	file_found	= false;
-					
-					for (int i=0;i<files.length;i++){
-						
-						File	file = files[i];
-						
-						if ( file.isDirectory()){
-							
-							continue;
-						}
-						
-						if ( !was_tidy ){
-				
-							file_found = true;
-							
-							if ( save_logs ){
-								
-								if ( !debug_save_dir.exists()){
-									
-									debug_save_dir.mkdir();
-								}
-								
-								FileUtil.copyFile( file, new File( debug_save_dir, now + "_" + file.getName()));
-							}
-						}
-					}
-					
-					if ( file_found ){
-						
-						Logger.logTextResource(new LogAlert(LogAlert.UNREPEATABLE,
-								LogAlert.AT_WARNING, "diagnostics.log_found"),
-								new String[] { debug_save_dir.toString() });
-					}
-				}
-			}else{
-				
-				debug_dir.mkdir();
-			}
-			
-			AEJavaManagement.initialise();
-						
-		}catch( Throwable e ){
-			
-				// with webui we don't have the file stuff so this fails with class not found
-			
-			if ( !(e instanceof NoClassDefFoundError )){
-				
-				Debug.printStackTrace( e );
-			}
-		}finally{
-			
-			startup_complete	= true;
-		}
-	}
-		
-	public static void
-	dumpThreads()
-	{
-		AEJavaManagement.dumpThreads();
-	}
 	
 	/**
 	 * 
@@ -298,14 +154,6 @@ AEDiagnostics
 		return( startup_complete );
 	}
 	
-	public static File
-	getLogDir()
-	{
-		startup( false );
-
-		return( debug_dir );
-	}
-	
 	public static synchronized void
 	flushPendingLogs()
 	{
@@ -322,16 +170,14 @@ AEDiagnostics
 		String		name )
 	{
 		AEDiagnosticsLogger	logger = loggers.get(name);
-		
+
 		if ( logger == null ){
-			
-			startup( false );
-			
+
 			logger	= new AEDiagnosticsLogger( debug_dir, name, MAX_FILE_SIZE, !enable_pending_writes );
-			
+
 			loggers.put( name, logger );
 		}
-		
+
 		return( logger );
 	}
 

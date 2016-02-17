@@ -47,6 +47,7 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.DialogOption;
@@ -54,7 +55,6 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
-import org.gudy.azureus2.core3.util.UrlUtils;
 
 import javax.swing.*;
 import java.io.BufferedOutputStream;
@@ -133,7 +133,7 @@ public final class TorrentUtil {
         sb.append("dn=");
         sb.append(UrlUtils.encode(torrent.getName()));
 
-        final List<AnnounceEntry> trackers = torrent.getTrackers();
+        final List<AnnounceEntry> trackers = torrent.trackers();
         for (AnnounceEntry tracker : trackers) {
             final String url = tracker.getUrl();
             sb.append("&tr=");
@@ -211,7 +211,7 @@ public final class TorrentUtil {
             }
 
             final entry torrentEntry = torrentCreator.generate();
-            byte[] bencoded_torrent_bytes = Vectors.char_vector2bytes(torrentEntry.bencode());
+            byte[] bencoded_torrent_bytes = Vectors.byte_vector2bytes(torrentEntry.bencode());
             FileOutputStream fos = new FileOutputStream(torrentFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             bos.write(bencoded_torrent_bytes);

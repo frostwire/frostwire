@@ -562,7 +562,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         }
 
         private void fillTrackers(JTextArea textTrackers) {
-            Set<String> set = dm.getTrackers();
+            Set<String> set = dm.trackers();
             for (String tracker : set) {
                 if (!StringUtils.isNullOrEmpty(tracker, true)) {
                     textTrackers.append(tracker.trim() + System.lineSeparator());
@@ -605,7 +605,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         }
 
         private void setTrackersUrls(List<String> urls) {
-            dm.setTrackers(new HashSet<String>(urls));
+            dm.trackers(new HashSet<>(urls));
         }
     }
 }

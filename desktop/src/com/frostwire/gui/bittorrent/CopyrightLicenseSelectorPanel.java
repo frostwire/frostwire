@@ -21,7 +21,8 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.CopyrightLicenseBroker.LicenseCategory;
 import com.frostwire.gui.bittorrent.LicenseToggleButton.LicenseIcon;
-import com.frostwire.licences.License;
+import com.frostwire.licenses.License;
+import com.frostwire.licenses.Licenses;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
@@ -246,23 +247,23 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         licenseBroker = null;
         License license = null;
         if (apacheButton.isSelected()) {
-            license = CopyrightLicenseBroker.APACHE_LICENSE;
+            license = Licenses.APACHE;
         } else if (bsd2ClauseButton.isSelected()) {
-            license = CopyrightLicenseBroker.BSD_2_CLAUSE_LICENSE;
+            license = Licenses.BSD_2_CLAUSE;
         } else if (bsd3ClauseButton.isSelected()) {
-            license = CopyrightLicenseBroker.BSD_3_CLAUSE_LICENSE;
+            license = Licenses.BSD_3_CLAUSE;
         } else if (gpl3Button.isSelected()) {
-            license = CopyrightLicenseBroker.GPL3_LICENSE;
+            license = Licenses.GPL3;
         } else if (lgplButton.isSelected()) {
-            license = CopyrightLicenseBroker.LGPL_LICENSE;
+            license = Licenses.LGPL;
         } else if (mitButton.isSelected()) {
-            license = CopyrightLicenseBroker.MIT_LICENSE;
+            license = Licenses.MIT;
         } else if (mozillaButton.isSelected()) {
-            license = CopyrightLicenseBroker.MOZILLA_LICENSE;
+            license = Licenses.MOZILLA;
         } else if (cddlButton.isSelected()) {
-            license = CopyrightLicenseBroker.CDDL_LICENSE;
+            license = Licenses.CDDL;
         } else if (eclipseButton.isSelected()) {
-            license = CopyrightLicenseBroker.ECLIPSE_LICENSE;
+            license = Licenses.ECLIPSE;
         }
         
         updateLicenseBroker(license, LicenseCategory.OpenSource);
@@ -271,11 +272,11 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
 
     private void updatePublicDomainPickedLicenseLabel() {
         licenseBroker = null;
-        License license = CopyrightLicenseBroker.PUBLIC_DOMAIN_MARK_LICENSE; 
+        License license = Licenses.PUBLIC_DOMAIN_MARK;
         if (publicDomainButton.isSelected()) {
-            license = CopyrightLicenseBroker.PUBLIC_DOMAIN_MARK_LICENSE;
+            license = Licenses.PUBLIC_DOMAIN_MARK;
         } else if (cc0Button.isSelected()) {
-            license = CopyrightLicenseBroker.PUBLIC_DOMAIN_CC0_LICENSE;
+            license = Licenses.PUBLIC_DOMAIN_CC0;
         }
         
         updateLicenseBroker(license, LicenseCategory.PublicDomain);
