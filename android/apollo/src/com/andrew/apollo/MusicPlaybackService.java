@@ -2587,8 +2587,6 @@ public class MusicPlaybackService extends Service {
 
         private MediaPlayer mNextMediaPlayer;
 
-        private final Object mNextMediaPlayerLock;
-
         private Handler mHandler;
 
         private boolean mIsInitialized = false;
@@ -2598,7 +2596,6 @@ public class MusicPlaybackService extends Service {
          */
         public MultiPlayer(final MusicPlaybackService service) {
             mService = new WeakReference<>(service);
-            mNextMediaPlayerLock = new Object();
             mCurrentMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
         }
 
@@ -2677,16 +2674,7 @@ public class MusicPlaybackService extends Service {
                 return;
             }
 
-            synchronized (mNextMediaPlayerLock) {
-                mNextMediaPlayer = new MediaPlayer();
-            }
-            mNextMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
-
-            try {
-                mNextMediaPlayer.setAudioSessionId(getAudioSessionId());
-            } catch (Throwable e) {
-                Log.e(TAG, "Media player Illegal State exception", e);
-            }
+            initNextMediaPlayer();
 
             if (setDataSourceImpl(mNextMediaPlayer, path)) {
                 try {
@@ -2700,12 +2688,42 @@ public class MusicPlaybackService extends Service {
             }
         }
 
+        private void initNextMediaPlayer() {
+            mNextMediaPlayer = new MediaPlayer();
+            mNextMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
+
+            try {
+                mNextMediaPlayer.setAudioSessionId(getAudioSessionId());
+            } catch (Throwable e) {
+                Log.e(TAG, "Media player Illegal State exception", e);
+            }
+        }
+
+        private void releaseCurrentMediaPlayer() {
+            if (mCurrentMediaPlayer == null) {
+                return;
+            }
+
+            try {
+                mCurrentMediaPlayer.release();
+            } catch (Throwable e) {
+                Log.w(TAG, "releaseCurrentMediaPlayer() couldn't release mCurrentMediaPlayer", e);
+            } finally {
+                mCurrentMediaPlayer = null;
+            }
+        }
+
         private void releaseNextMediaPlayer() {
-            synchronized (mNextMediaPlayerLock) {
-                if (mNextMediaPlayer != null) {
-                    mNextMediaPlayer.release();
-                    mNextMediaPlayer = null;
-                }
+            if (mNextMediaPlayer == null) {
+                return;
+            }
+
+            try {
+                mNextMediaPlayer.release();
+            } catch (Throwable e) {
+                Log.w(TAG, "releaseNextMediaPlayer() couldn't release mNextMediaPlayer", e);
+            } finally {
+                mNextMediaPlayer = null;
             }
         }
 
@@ -2861,7 +2879,7 @@ public class MusicPlaybackService extends Service {
                 case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
                     try {
                         mIsInitialized = false;
-                        mCurrentMediaPlayer.release();
+                        releaseCurrentMediaPlayer();
                         mCurrentMediaPlayer = new MediaPlayer();
                         mCurrentMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
                         mHandler.sendMessageDelayed(mHandler.obtainMessage(SERVER_DIED), 2000);
@@ -2874,6 +2892,7 @@ public class MusicPlaybackService extends Service {
             return false;
         }
 
+
         /**
          * {@inheritDoc}
          */
@@ -2881,9 +2900,9 @@ public class MusicPlaybackService extends Service {
         public void onCompletion(final MediaPlayer mp) {
             try {
                 if (mp == mCurrentMediaPlayer && mNextMediaPlayer != null) {
-                    mCurrentMediaPlayer.release();
+                    releaseCurrentMediaPlayer();
                     mCurrentMediaPlayer = mNextMediaPlayer;
-                    releaseNextMediaPlayer();
+                    mNextMediaPlayer = null;
                     mHandler.sendEmptyMessage(TRACK_WENT_TO_NEXT);
                 } else {
                     mService.get().mWakeLock.acquire(30000);
