@@ -2663,8 +2663,13 @@ public class MusicPlaybackService extends Service {
             }
 
             if (mNextMediaPlayer != null) {
-                mNextMediaPlayer.release();
-                mNextMediaPlayer = null;
+                try {
+                    mNextMediaPlayer.release();
+                } catch (Throwable e) {
+                    Log.w(TAG, "Something wrong releasing mNextMediaPlayer", e);
+                } finally {
+                    mNextMediaPlayer = null;
+                }
             }
             if (path == null) {
                 return;
@@ -2687,8 +2692,13 @@ public class MusicPlaybackService extends Service {
                 }
             } else {
                 if (mNextMediaPlayer != null) {
-                    mNextMediaPlayer.release();
-                    mNextMediaPlayer = null;
+                    try {
+                        mNextMediaPlayer.release();
+                    } catch (Throwable e) {
+                        Log.w(TAG, "Something wrong releasing mNextMediaPlayer", e);
+                    } finally {
+                        mNextMediaPlayer = null;
+                    }
                 }
             }
         }
