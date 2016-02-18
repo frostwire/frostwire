@@ -88,7 +88,8 @@ public class HttpDownload implements DownloadTransfer {
             this.status = STATUS_SAVE_DIR_ERROR;
         }
 
-        if (savePath == null || !savePath.isDirectory() && !savePath.mkdirs()) {
+        FileSystem fs = Platforms.fileSystem();
+        if (savePath == null || !fs.isDirectory(savePath) && !fs.mkdirs(savePath)) {
             this.status = STATUS_SAVE_DIR_ERROR;
         }
 
