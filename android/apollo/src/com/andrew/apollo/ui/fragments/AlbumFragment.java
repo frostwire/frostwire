@@ -82,7 +82,6 @@ public class AlbumFragment extends ApolloFragment<AlbumAdapter, Album> {
                 mItem.mArtistName,
                 mItem.mAlbumId,
                 MusicUtils.getSongListForAlbum(getActivity(), mItem.mAlbumId));
-        getActivity().finish();
     }
 
     @Override
