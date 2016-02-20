@@ -55,11 +55,6 @@ AEThread
 	public void
 	run()
 	{
-		if ( AEThread2.TRACE_TIMES ){
-			
-			System.out.println( TimeFormatter.milliStamp() + ": AEThread:start: " + this );
-		}
-		
 		try{
 			/*
 			if ( !isDaemon()){

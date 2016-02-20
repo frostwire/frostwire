@@ -20,16 +20,12 @@
 
 package org.gudy.azureus2.core3.util;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 import java.util.LinkedList;
 
 
 public abstract class 
 AEThread2 
 {
-	public static final boolean TRACE_TIMES = false;
-	
 	private static final int MIN_RETAINED	= Math.max(Runtime.getRuntime().availableProcessors(),2);
 	private static final int MAX_RETAINED	= Math.max(MIN_RETAINED*4, 16);
 	
@@ -44,9 +40,6 @@ AEThread2
 	
 	private static long	last_timeout_check;
 	
-	private static long	total_starts;
-	private static long	total_creates;
-	
 	
 	private threadWrapper	wrapper;
 	
@@ -54,8 +47,6 @@ AEThread2
 	private boolean				daemon;
 	private int					priority	= Thread.NORM_PRIORITY;
 	private volatile JoinLock	lock		= new JoinLock();
-
-	private final static ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 
 	public
 	AEThread2(
@@ -71,12 +62,6 @@ AEThread2
 	{
 		name		= _name;
 		daemon		= _daemon;
-	}
-
-	public static long getThreadCPUTime() {
-		return threadMXBean.isCurrentThreadCpuTimeSupported() ?
-				threadMXBean.getCurrentThreadCpuTime() :
-				0L;
 	}
 
 	
@@ -103,12 +88,8 @@ AEThread2
 			
 			synchronized( daemon_threads ){
 
-				total_starts++;
-				
 				if ( daemon_threads.isEmpty()){
 				
-					total_creates++;
-					
 					wrapper = new threadWrapper( name, true );
 					
 				}else{
@@ -202,26 +183,6 @@ AEThread2
 	public abstract void
 	run();
 	
-	public static boolean
-	isOurThread(
-		Thread	thread )
-	{
-		return( AEThread.isOurThread( thread ));
-	}
-	
-	public static void
-	setOurThread()
-	{
-		AEThread.setOurThread();
-	}
-	
-	public static void
-	setOurThread(
-		Thread	thread )
-	{
-		AEThread.setOurThread( thread );
-	}
-	
 	public static void
 	setDebug(
 		Object		debug )
@@ -281,29 +242,7 @@ AEThread2
 				
 				synchronized( currentLock ){
 					try{
-						if ( TRACE_TIMES ){
-
-							long 	start_time 	= SystemTime.getHighPrecisionCounter();
-							long	start_cpu 	= 0;
-
-							try{
-
-								target.run();
-
-							}finally{
-								
-								long	time_diff 	= ( SystemTime.getHighPrecisionCounter() - start_time )/1000000;
-								long	cpu_diff	= ( AEThread2.getThreadCPUTime() - start_cpu ) / 1000000;
-								
-								if ( cpu_diff > 10 || time_diff > 10 ){
-								
-									System.out.println( TimeFormatter.milliStamp() + ": Thread: " + target.getName() + ": " + cpu_diff + "/" + time_diff );
-								}
-							}
-						}else{
-
-							target.run();
-						}
+						target.run();
 												
 					}catch( Throwable e ){
 						
