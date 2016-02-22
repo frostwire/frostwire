@@ -318,7 +318,7 @@ public class HttpDownload implements DownloadTransfer {
             success = false;
         }
 
-        performCompletionTasks(success);
+        performCompletionTasks(success, true);
     }
 
     private void safComplete(final FileSystem fs) {
@@ -330,7 +330,7 @@ public class HttpDownload implements DownloadTransfer {
                     if (tempPath.exists() && fs.copy(tempPath, savePath)) {
                         success = true;
                     }
-                    performCompletionTasks(success);
+                    performCompletionTasks(success, false);
 
                     tempPath.delete();
                 } catch (Throwable e) {
@@ -341,7 +341,7 @@ public class HttpDownload implements DownloadTransfer {
         });
     }
 
-    private void performCompletionTasks(boolean success) {
+    private void performCompletionTasks(boolean success, boolean scan) {
         if (success) {
             if (listener != null) {
                 listener.onComplete(HttpDownload.this);
@@ -352,7 +352,7 @@ public class HttpDownload implements DownloadTransfer {
             manager.incrementDownloadsToReview();
             Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
 
-            if (savePath.getAbsoluteFile().exists()) {
+            if (scan && savePath.getAbsoluteFile().exists()) {
                 Librarian.instance().scan(getSavePath().getAbsoluteFile());
             }
         } else {

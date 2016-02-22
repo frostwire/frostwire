@@ -394,7 +394,6 @@ public final class YouTubeDownload implements DownloadTransfer {
                     if (fs.copy(completeFile, finalFile)) {
                         completeFile.delete();
                         completeFile = finalFile;
-                        Librarian.instance().scan(getSavePath().getAbsoluteFile());
                         String hash = String.valueOf(getDisplayName().hashCode());
                         Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, hash);
                     } else {

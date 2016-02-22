@@ -223,7 +223,6 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
                         return;
                     }
 
-                    Librarian.instance().scan(finalFile.getAbsoluteFile());
                     String hash = String.valueOf(getDisplayName().hashCode());
                     Engine.instance().notifyDownloadFinished(getDisplayName(), finalFile, hash);
 

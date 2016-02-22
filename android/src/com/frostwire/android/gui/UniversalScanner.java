@@ -140,7 +140,7 @@ public final class UniversalScanner {
         try {
             int n = context.getContentResolver().delete(oldUri, null, null);
             if (n > 0) {
-                LOG.debug("Deleted from Files provider: " + oldUri);
+                LOG.debug("Deleted from Files provider: " + oldUri + ", path: " + filePath);
             }
             nativeScanFile(context, filePath);
         } catch (Throwable e) {
