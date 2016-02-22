@@ -162,7 +162,9 @@ public class ThemeUtils {
         if (mResources != null) {
             try {
                 final int resourceId = mResources.getIdentifier(resourceName, "color", mThemePackage);
-                return mResources.getColor(resourceId);
+                if (resourceId != 0) { // if not, the color is not here
+                    return mResources.getColor(resourceId);
+                }
             } catch (final Resources.NotFoundException e) {
                 // If the theme designer wants to allow the user to theme a
                 // particular object via the color picker, they just remove the
