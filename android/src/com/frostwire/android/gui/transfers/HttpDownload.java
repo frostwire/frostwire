@@ -333,6 +333,8 @@ public class HttpDownload implements DownloadTransfer {
                     performCompletionTasks(success, false);
 
                     tempPath.delete();
+
+                    Librarian.instance().scan(Uri.fromFile(savePath.getAbsoluteFile()));
                 } catch (Throwable e) {
                     e.printStackTrace();
                     error(new Exception("Error"));
