@@ -66,7 +66,7 @@ public final class AndroidPlatform extends AbstractPlatform {
 
     public static boolean saf() {
         Platform p = Platforms.get();
-        return /*p.experimental() &&*/ p.fileSystem() instanceof LollipopFileSystem;
+        return p.fileSystem() instanceof LollipopFileSystem;
     }
 
     private static FileSystem buildFileSystem(Application app) {
