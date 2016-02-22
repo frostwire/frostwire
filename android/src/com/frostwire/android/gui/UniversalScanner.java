@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -103,6 +103,10 @@ public final class UniversalScanner {
             numCompletedScans++;
             if (numCompletedScans == files.size()) {
                 connection.disconnect();
+            }
+
+            if (path == null || path.contains("/Android/data/" + context.getPackageName() + "/files/temp")) {
+                return;
             }
 
             MediaType mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(path));
