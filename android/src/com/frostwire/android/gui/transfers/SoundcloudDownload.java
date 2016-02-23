@@ -32,9 +32,11 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.http.HttpClient;
+import org.apache.commons.io.FileUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -254,9 +256,11 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
             return;
         }
         File finalFile = YouTubeDownload.buildFile(dataDir, savePath.getName());
-        if (savePath.renameTo(finalFile)) {
+        try {
+            FileUtils.moveFile(savePath, finalFile);
             this.savePath = finalFile;
-        } else {
+        } catch (IOException e) {
+            e.printStackTrace();
             this.savePath = savePath;
         }
     }

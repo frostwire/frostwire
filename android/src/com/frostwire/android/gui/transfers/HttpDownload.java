@@ -29,8 +29,10 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.http.HttpClient;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -312,8 +314,16 @@ public class HttpDownload implements DownloadTransfer {
 
     private void classicComplete() {
         boolean success = true;
-        if (tempPath.exists() && tempPath.renameTo(savePath)) {
-            success = true;
+        if (tempPath.exists()) {
+            try {
+                if (!tempPath.getAbsolutePath().equals(savePath.getAbsolutePath())) {
+                    FileUtils.moveFile(tempPath, savePath);
+                }
+                success = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                success = false;
+            }
         } else {
             success = false;
         }
