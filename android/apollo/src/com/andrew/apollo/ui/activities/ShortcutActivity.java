@@ -43,7 +43,7 @@ import java.util.List;
 
 /**
  * This class is opened when the user touches a Home screen shortcut or album
- * art in an app-wdget, and then carries out the proper action. It is also
+ * art in an app-widget, and then carries out the proper action. It is also
  * responsible for processing voice queries and playing the spoken artist,
  * album, song, playlist, or genre.
  * 
@@ -101,7 +101,7 @@ public class ShortcutActivity extends FragmentActivity implements ServiceConnect
         // Bind Apollo's service
         mToken = MusicUtils.bindToService(this, this);
 
-        // Intiialize the intent
+        // Initialize the intent
         mIntent = getIntent();
         // Get the voice search query
         mVoiceQuery = Capitalize.capitalize(mIntent.getStringExtra(SearchManager.QUERY));
@@ -315,11 +315,7 @@ public class ShortcutActivity extends FragmentActivity implements ServiceConnect
 
         // Check to see if the user spoke the word "Favorite"
         final String favorite = getString(R.string.playlist_favorite);
-        if (mVoiceQuery.equals(favorite)) {
-            return true;
-        }
-
-        return false;
+        return mVoiceQuery.equals(favorite);
     }
 
     /**

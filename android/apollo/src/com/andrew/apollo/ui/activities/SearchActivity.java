@@ -11,19 +11,12 @@
 
 package com.andrew.apollo.ui.activities;
 
-import static com.andrew.apollo.utils.MusicUtils.mService;
-
-import android.app.Activity;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
-import android.content.ComponentName;
-import android.content.CursorLoader;
-import android.content.Context;
-import android.content.Intent;
-import android.content.Loader;
-import android.content.ServiceConnection;
+import android.content.*;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -37,20 +30,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
+import android.widget.*;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.CursorAdapter;
-import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.ImageView.ScaleType;
-import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
-import android.widget.TextView;
-
 import com.andrew.apollo.IApolloService;
-import com.frostwire.android.R;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.format.PrefixHighlighter;
 import com.andrew.apollo.recycler.RecycleHolder;
@@ -60,8 +45,11 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.ThemeUtils;
+import com.frostwire.android.R;
 
 import java.util.Locale;
+
+import static com.andrew.apollo.utils.MusicUtils.mService;
 
 /**
  * Provides the search interface for Apollo.
@@ -111,7 +99,7 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialze the theme resources
+        // Initialize the theme resources
         mResources = new ThemeUtils(this);
         // Set the overflow style
         mResources.setOverflowStyle(this);
@@ -128,8 +116,10 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
         // Theme the action bar
         final ActionBar actionBar = getActionBar();
         mResources.themeActionBar(actionBar, getString(R.string.app_name), getWindow());
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setIcon(R.color.transparent);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setIcon(R.color.transparent);
+        }
 
         // Set the layout
         setContentView(R.layout.grid_base);
@@ -149,13 +139,13 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
         mAdapter = new SearchAdapter(this);
         // Set the prefix
         mAdapter.setPrefix(mFilterString);
-        // Initialze the list
+        // Initialize the list
         mGridView = (GridView)findViewById(R.id.grid_base);
         // Bind the data
         mGridView.setAdapter(mAdapter);
         // Recycle the data
         mGridView.setRecyclerListener(new RecycleHolder());
-        // Seepd up scrolling
+        // Speed up scrolling
         mGridView.setOnScrollListener(this);
         mGridView.setOnItemClickListener(this);
         if (ApolloUtils.isLandscape(this)) {
@@ -447,17 +437,17 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
         @Override
         public void bindView(final View convertView, final Context context, final Cursor cursor) {
             /* Recycle ViewHolder's items */
-            MusicViewHolder holder = (MusicViewHolder)convertView.getTag();
+            MusicViewHolder holder = (MusicViewHolder) convertView.getTag();
             if (holder == null) {
                 holder = new MusicViewHolder(convertView);
                 convertView.setTag(holder);
             }
 
             // Get the MIME type
-            final String mimetype = cursor.getString(cursor
+            final String mimeType = cursor.getString(cursor
                     .getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE));
 
-            if (mimetype.equals("artist")) {
+            if (mimeType.equals("artist")) {
                 holder.mImage.get().setScaleType(ScaleType.CENTER_CROP);
 
                 // Get the artist name
@@ -478,9 +468,9 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
                 // Asynchronously load the artist image into the adapter
                 mImageFetcher.loadArtistImage(artist, holder.mImage.get());
 
-                // Highlght the query
+                // Highlight the query
                 mHighlighter.setText(holder.mLineOne.get(), artist, mPrefix);
-            } else if (mimetype.equals("album")) {
+            } else if (mimeType.equals("album")) {
                 holder.mImage.get().setScaleType(ScaleType.FIT_XY);
 
                 // Get the Id of the album
@@ -499,14 +489,12 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
 
                 // Asynchronously load the album images into the adapter
                 mImageFetcher.loadAlbumImage(artist, album, id, holder.mImage.get());
-                // Asynchronously load the artist image into the adapter
-                mImageFetcher.loadArtistImage(artist, holder.mBackground.get());
 
-                // Highlght the query
+                // Highlight the query
                 mHighlighter.setText(holder.mLineOne.get(), album, mPrefix);
 
-            } else if (mimetype.startsWith("audio/") || mimetype.equals("application/ogg")
-                    || mimetype.equals("application/x-ogg")) {
+            } else if (mimeType.startsWith("audio/") || mimeType.equals("application/ogg")
+                    || mimeType.equals("application/x-ogg")) {
                 holder.mImage.get().setScaleType(ScaleType.FIT_XY);
                 holder.mImage.get().setImageResource(R.drawable.header_temp);
 
@@ -523,10 +511,10 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
                 final String artist = cursor.getString(cursor
                         .getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
                 // Asynchronously load the artist image into the adapter
-                mImageFetcher.loadArtistImage(artist, holder.mBackground.get());
+                mImageFetcher.loadArtistImage(artist, holder.mImage.get());
                 holder.mLineThree.get().setText(artist);
 
-                // Highlght the query
+                // Highlight the query
                 mHighlighter.setText(holder.mLineOne.get(), track, mPrefix);
             }
         }
@@ -537,7 +525,7 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
         @Override
         public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
             return ((Activity)context).getLayoutInflater().inflate(
-                    R.layout.list_item_detailed, parent, false);
+                    R.layout.list_item_detailed_no_background, parent, false);
         }
 
         /**

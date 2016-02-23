@@ -87,7 +87,6 @@ public class MusicViewHolder {
         mOverlay = new WeakReference<>((RelativeLayout)view.findViewById(R.id.image_background));
 
         // Initialize mBackground
-        //mBackground = new WeakReference<>(null);//(ImageView)view.findViewById(R.id.list_item_background));
         mBackground = new WeakReference<>((ImageView)view.findViewById(R.id.list_item_background));
 
         // Initialize mImage
