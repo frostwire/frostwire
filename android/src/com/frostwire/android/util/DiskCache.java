@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import com.squareup.okhttp.internal.DiskLruCache.Editor;
 import com.squareup.okhttp.internal.DiskLruCache.Snapshot;
 import com.squareup.okhttp.internal.Util;
 import com.squareup.okhttp.internal.io.FileSystem;
-import okio.Buffer;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
@@ -184,7 +183,7 @@ public final class DiskCache {
             if (source == null) {
                 return null;
             }
-            return ((Buffer) source).inputStream();
+            return Okio.buffer(source).inputStream();
         }
 
         @Override

@@ -88,7 +88,8 @@ public class HttpDownload implements DownloadTransfer {
             this.status = STATUS_SAVE_DIR_ERROR;
         }
 
-        if (savePath == null || !savePath.isDirectory() && !savePath.mkdirs()) {
+        FileSystem fs = Platforms.fileSystem();
+        if (savePath == null || !fs.isDirectory(savePath) && !fs.mkdirs(savePath)) {
             this.status = STATUS_SAVE_DIR_ERROR;
         }
 
@@ -317,7 +318,7 @@ public class HttpDownload implements DownloadTransfer {
             success = false;
         }
 
-        performCompletionTasks(success);
+        performCompletionTasks(success, true);
     }
 
     private void safComplete(final FileSystem fs) {
@@ -329,9 +330,11 @@ public class HttpDownload implements DownloadTransfer {
                     if (tempPath.exists() && fs.copy(tempPath, savePath)) {
                         success = true;
                     }
-                    performCompletionTasks(success);
+                    performCompletionTasks(success, false);
 
                     tempPath.delete();
+
+                    Librarian.instance().scan(Uri.fromFile(savePath.getAbsoluteFile()));
                 } catch (Throwable e) {
                     e.printStackTrace();
                     error(new Exception("Error"));
@@ -340,7 +343,7 @@ public class HttpDownload implements DownloadTransfer {
         });
     }
 
-    private void performCompletionTasks(boolean success) {
+    private void performCompletionTasks(boolean success, boolean scan) {
         if (success) {
             if (listener != null) {
                 listener.onComplete(HttpDownload.this);
@@ -351,7 +354,7 @@ public class HttpDownload implements DownloadTransfer {
             manager.incrementDownloadsToReview();
             Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
 
-            if (savePath.getAbsoluteFile().exists()) {
+            if (scan && savePath.getAbsoluteFile().exists()) {
                 Librarian.instance().scan(getSavePath().getAbsoluteFile());
             }
         } else {

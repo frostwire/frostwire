@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,6 +105,10 @@ public final class UniversalScanner {
                 connection.disconnect();
             }
 
+            if (path == null || path.contains("/Android/data/" + context.getPackageName() + "/files/temp")) {
+                return;
+            }
+
             MediaType mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(path));
 
             if (uri != null && !path.contains("/Android/data/" + context.getPackageName())) {
@@ -140,7 +144,7 @@ public final class UniversalScanner {
         try {
             int n = context.getContentResolver().delete(oldUri, null, null);
             if (n > 0) {
-                LOG.debug("Deleted from Files provider: " + oldUri);
+                LOG.debug("Deleted from Files provider: " + oldUri + ", path: " + filePath);
             }
             nativeScanFile(context, filePath);
         } catch (Throwable e) {

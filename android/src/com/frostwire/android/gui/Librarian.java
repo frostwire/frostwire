@@ -22,9 +22,9 @@ import android.app.Application;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.BaseColumns;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
@@ -183,6 +183,12 @@ public final class Librarian {
 
     public void scan(File file) {
         scan(file, Transfers.getIgnorableFiles());
+    }
+
+    public void scan(Uri uri) {
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(uri);
+        context.sendBroadcast(intent);
     }
 
     public Finger finger() {

@@ -135,7 +135,7 @@ ThreadPool
 	private long		task_total_last;
 	private Average		task_average	= Average.getInstance( WARN_TIME, 120 );
 	
-	private boolean		log_cpu	= false || AEThread2.TRACE_TIMES;
+	private boolean		log_cpu	= false;
 	
 	public
 	ThreadPool(

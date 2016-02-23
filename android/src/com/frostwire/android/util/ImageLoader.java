@@ -105,7 +105,9 @@ public final class ImageLoader {
             try {
                 if (cursor.moveToFirst()) {
                     String albumArt = cursor.getString(0);
-                    bitmap = BitmapFactory.decodeFile(albumArt);
+                    if (albumArt != null) {
+                        bitmap = BitmapFactory.decodeFile(albumArt);
+                    }
                 }
             } finally {
                 cursor.close();

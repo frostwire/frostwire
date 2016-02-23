@@ -23,9 +23,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
+import com.frostwire.util.Hex;
 import com.frostwire.util.StringUtils;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 
 import java.io.File;
 import java.util.Map;
@@ -122,14 +121,14 @@ public class ConfigurationManager {
         }
 
         try {
-            return Hex.decodeHex(str.toCharArray());
-        } catch (DecoderException e) {
+            return Hex.decode(str);
+        } catch (Throwable e) {
             return null;
         }
     }
 
     public void setByteArray(String key, byte[] value) {
-        setString(key, new String(Hex.encodeHex(value)));
+        setString(key, new String(Hex.encode(value)));
     }
 
     public void resetToDefaults() {
