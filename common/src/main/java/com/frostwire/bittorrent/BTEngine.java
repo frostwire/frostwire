@@ -546,6 +546,7 @@ public final class BTEngine {
 
             FileSystem fs = Platforms.get().fileSystem();
             fs.write(torrentFile, arr);
+            fs.scan(torrentFile);
         } catch (Throwable e) {
             torrentFile = null;
             LOG.warn("Error saving torrent info to file", e);
