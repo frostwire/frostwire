@@ -116,9 +116,8 @@ public class MainApplication extends Application {
         ctx.homeDir = paths.libtorrent();
         ctx.torrentsDir = paths.torrents();
         ctx.dataDir = paths.data();
-        ctx.port0 = 0;
-        ctx.port1 = 0;
-        ctx.iface = "0.0.0.0";
+        ctx.interfaces = "0.0.0.0:0,[::]:0";
+        ctx.retries = 10;
         ctx.optimizeMemory = true;
 
         BTEngine.ctx = ctx;
