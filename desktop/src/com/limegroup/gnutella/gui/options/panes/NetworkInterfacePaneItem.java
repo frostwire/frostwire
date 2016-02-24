@@ -179,7 +179,19 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
             ConnectionSettings.CUSTOM_INETADRESS.setValue(iface);
         }
 
-        String if_string = String.format("%s:%d", iface, BTEngine.ctx.port0);
+        if (iface.equals("0.0.0.0")) {
+            iface = "0.0.0.0:%1$d,[::]:%1$d";
+        } else {
+            iface = iface + ":%1$d";
+        }
+
+        int port0 = 0;
+
+        if (ConnectionSettings.MANUAL_PORT_RANGE.getValue()) {
+            port0 = ConnectionSettings.PORT_RANGE_0.getValue();
+        }
+
+        String if_string = String.format(iface, port0);
         BTEngine.getInstance().setListenInterfaces(if_string);
 
         return isDirty;

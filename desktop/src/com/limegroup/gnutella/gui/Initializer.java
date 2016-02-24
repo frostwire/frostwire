@@ -458,13 +458,20 @@ public final class Initializer {
             iface = ConnectionSettings.CUSTOM_INETADRESS.getValue();
         }
 
+        if (iface.equals("0.0.0.0")) {
+            iface = "0.0.0.0:%1$d,[::]:%1$d";
+        } else {
+            iface = iface + ":%1$d";
+        }
+        String if_string = String.format(iface, port0);
+
         BTContext ctx = new BTContext();
         ctx.homeDir = homeDir;
         ctx.torrentsDir = SharingSettings.TORRENTS_DIR_SETTING.getValue();
         ctx.dataDir = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
-        ctx.port0 = port0;
-        ctx.port1 = port1;
-        ctx.iface = iface;
+
+        ctx.interfaces = if_string;
+        ctx.retries = port1 - port0;
 
         BTEngine.ctx = ctx;
         BTEngine.getInstance().start();
