@@ -47,4 +47,14 @@ public interface FileSystem {
     boolean copy(File src, File dest);
 
     boolean write(File file, byte[] data);
+
+    /**
+     * This should instruct the underlying operating system
+     * that a new file is in place, it could be a simple
+     * notification for update in database or media scan like
+     * in android.
+     *
+     * @param file the file to scan.
+     */
+    void scan(File file);
 }

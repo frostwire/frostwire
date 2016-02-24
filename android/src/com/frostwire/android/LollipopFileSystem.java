@@ -21,6 +21,7 @@ package com.frostwire.android;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
@@ -205,6 +206,17 @@ public final class LollipopFileSystem implements FileSystem {
         }
 
         return write(app, f, data);
+    }
+
+    @Override
+    public void scan(File file) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            intent.setData(Uri.fromFile(file));
+            app.sendBroadcast(intent);
+        } catch (Throwable e) {
+            LOG.error("Unable to trigger scan of file: " + file, e);
+        }
     }
 
     public Uri getDocumentUri(File file) {

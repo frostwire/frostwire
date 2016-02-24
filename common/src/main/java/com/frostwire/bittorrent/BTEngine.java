@@ -161,7 +161,7 @@ public final class BTEngine {
                 return;
             }
 
-            session = new Session(ctx.iface, ctx.port0, ctx.port1 - ctx.port0, false, innerListener);
+            session = new Session(ctx.interfaces, ctx.retries, false, innerListener);
             downloader = new Downloader(session);
 
             loadSettings();
@@ -546,6 +546,7 @@ public final class BTEngine {
 
             FileSystem fs = Platforms.get().fileSystem();
             fs.write(torrentFile, arr);
+            fs.scan(torrentFile);
         } catch (Throwable e) {
             torrentFile = null;
             LOG.warn("Error saving torrent info to file", e);
@@ -809,10 +810,10 @@ public final class BTEngine {
                     doResumeData((TorrentAlert<?>) alert, true);
                     break;
                 case LISTEN_SUCCEEDED:
-                    logListenSucceeded((ListenSucceededAlert) alert);
+                    //logListenSucceeded((ListenSucceededAlert) alert);
                     break;
                 case LISTEN_FAILED:
-                    logListenFailed((ListenFailedAlert) alert);
+                    //logListenFailed((ListenFailedAlert) alert);
                     break;
             }
         }
