@@ -20,7 +20,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.frostwire.android" android:installLocation="auto"
-	android:versionCode="235" android:versionName="1.7.1">
+	android:versionCode="237" android:versionName="1.7.1">
 	<!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
 	<!-- Plus  android:versionCode="9000xyz" (always commit like this, plus!)-->
 	<!-- Basic android:versionCode="8100xyz" (don't commit like this) -->
@@ -303,6 +303,7 @@
 
 		<activity android:name="com.applovin.adview.AppLovinInterstitialActivity" />
 		<activity android:name="com.applovin.adview.AppLovinConfirmationActivity" />
+		<meta-data android:name="applovin.sdk.verbose_logging" android:value="false" />
 		<!-- end of AppLovin -->
 
 		<!-- services -->

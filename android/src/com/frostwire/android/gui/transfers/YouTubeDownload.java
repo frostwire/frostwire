@@ -34,6 +34,7 @@ import com.frostwire.util.MP4Muxer;
 import com.frostwire.util.MP4Muxer.MP4Metadata;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListener;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -366,12 +367,14 @@ public final class YouTubeDownload implements DownloadTransfer {
 
         File finalFile = buildFile(dataDir, completeFile.getName());
 
-        if (completeFile.renameTo(finalFile)) {
+        try {
+            FileUtils.moveFile(completeFile, finalFile);
             completeFile = finalFile;
             Librarian.instance().scan(getSavePath().getAbsoluteFile());
             String hash = String.valueOf(getDisplayName().hashCode());
             Engine.instance().notifyDownloadFinished(getDisplayName(), completeFile, hash);
-        } else {
+        } catch (IOException e) {
+            e.printStackTrace();
             Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
         }
 
@@ -465,12 +468,12 @@ public final class YouTubeDownload implements DownloadTransfer {
         @Override
         public void onComplete(HttpClient client) {
             if (downloadType == DownloadType.VIDEO) {
-                boolean renameTo = tempVideo.renameTo(completeFile);
-
-                if (!renameTo) {
-                    //error(null);
-                } else {
+                try {
+                    FileUtils.moveFile(tempVideo, completeFile);
                     complete();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    //error(null);
                 }
             } else if (downloadType == DownloadType.DEMUX) {
                 try {

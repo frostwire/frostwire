@@ -99,4 +99,9 @@ public class DefaultFileSystem implements FileSystem {
 
         return false;
     }
+
+    @Override
+    public void scan(File file) {
+        // LOG.warn("Scan of file not implemented");
+    }
 }
