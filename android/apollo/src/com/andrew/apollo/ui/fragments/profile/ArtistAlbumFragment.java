@@ -84,7 +84,7 @@ public class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Albu
                             final View view,
                             final int position,
                             final long id) {
-        mItem = mAdapter.getItem(position);
+        mItem = mAdapter.getItem(position - mAdapter.getOffset());
         NavUtils.openAlbumProfile(getActivity(),
                 mItem.mAlbumName,
                 mItem.mArtistName,
