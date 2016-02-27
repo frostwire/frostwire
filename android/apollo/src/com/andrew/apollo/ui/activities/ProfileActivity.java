@@ -115,6 +115,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         mArguments = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
         // Get the MIME type
         mType = mArguments.getString(Config.MIME_TYPE);
+
         // Get the profile title
         mProfileName = mArguments.getString(Config.NAME);
         // Get the artist name
@@ -211,7 +212,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         }
 
         // Initialize the ViewPager
-        mViewPager = (ViewPager)findViewById(R.id.acivity_profile_base_pager);
+        mViewPager = (ViewPager)findViewById(R.id.activity_profile_base_pager);
         // Attach the adapter
         mViewPager.setAdapter(mPagerAdapter);
         // Offscreen limit
