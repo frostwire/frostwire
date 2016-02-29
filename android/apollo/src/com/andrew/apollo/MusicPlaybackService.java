@@ -835,14 +835,21 @@ public class MusicPlaybackService extends Service {
      * @return A card ID used to save and restore playlists, i.e., the queue.
      */
     private int getCardId() {
-        final ContentResolver resolver = getContentResolver();
-        Cursor cursor = resolver.query(Uri.parse("content://media/external/fs_id"), null, null,
-                null, null);
         int mCardId = -1;
-        if (cursor != null && cursor.moveToFirst()) {
-            mCardId = cursor.getInt(0);
-            cursor.close();
-            cursor = null;
+        try {
+            final ContentResolver resolver = getContentResolver();
+            Cursor cursor = resolver.query(Uri.parse("content://media/external/fs_id"), null, null,
+                    null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                mCardId = cursor.getInt(0);
+                cursor.close();
+                cursor = null;
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            // it seems that content://media/external/fs_id is not accessible
+            // from Android 6.0 in some phones or phone states (who knows)
+            // this is an undocumented URI
         }
         return mCardId;
     }
