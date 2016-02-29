@@ -21,6 +21,7 @@ package com.frostwire.android.gui.util;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -290,9 +291,14 @@ public final class UIUtils {
     }
 
     public static void openURL(Context context, String url) {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        context.startActivity(i);
+        try {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            context.startActivity(i);
+        } catch (ActivityNotFoundException e) {
+            // ignore
+            // yes, it happens
+        }
     }
 
     public static String getMimeType(String filePath) {

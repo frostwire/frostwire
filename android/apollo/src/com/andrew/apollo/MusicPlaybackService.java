@@ -559,7 +559,14 @@ public class MusicPlaybackService extends Service {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mMediaButtonReceiverComponent = new ComponentName(getPackageName(),
                 MediaButtonIntentReceiver.class.getName());
-        mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
+        try {
+            mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            // ignore
+            // some times the phone does not grant the MODIFY_PHONE_STATE permission
+            // this permission is for OMEs and we can't do anything about it
+        }
 
         // Use the remote control APIs to set the playback state
         setUpRemoteControlClient();
@@ -830,13 +837,21 @@ public class MusicPlaybackService extends Service {
      * @return A card ID used to save and restore playlists, i.e., the queue.
      */
     private int getCardId() {
-        final ContentResolver resolver = getContentResolver();
-        Cursor cursor = resolver.query(Uri.parse("content://media/external/fs_id"), null, null,
-                null, null);
         int mCardId = -1;
-        if (cursor != null && cursor.moveToFirst()) {
-            mCardId = cursor.getInt(0);
-            cursor.close();
+        try {
+            final ContentResolver resolver = getContentResolver();
+            Cursor cursor = resolver.query(Uri.parse("content://media/external/fs_id"), null, null,
+                    null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                mCardId = cursor.getInt(0);
+                cursor.close();
+                cursor = null;
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            // it seems that content://media/external/fs_id is not accessible
+            // from Android 6.0 in some phones or phone states (who knows)
+            // this is an undocumented URI
         }
         return mCardId;
     }
@@ -1684,10 +1699,12 @@ public class MusicPlaybackService extends Service {
                 }
             }
             mFileToPlay = path;
-            mPlayer.setDataSource(mFileToPlay);
-            if (mPlayer.isInitialized()) {
-                mOpenFailedCounter = 0;
-                return true;
+            if (mPlayer != null) { // machine state issues in general with original Apollo code
+                mPlayer.setDataSource(mFileToPlay);
+                if (mPlayer.isInitialized()) {
+                    mOpenFailedCounter = 0;
+                    return true;
+                }
             }
             stop(true);
             return false;
@@ -2063,8 +2080,13 @@ public class MusicPlaybackService extends Service {
             return;
         }
 
-        mAudioManager.registerMediaButtonEventReceiver(new ComponentName(getPackageName(),
-                MediaButtonIntentReceiver.class.getName()));
+        try {
+            mAudioManager.registerMediaButtonEventReceiver(new ComponentName(getPackageName(),
+                    MediaButtonIntentReceiver.class.getName()));
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            // see explanation in initService
+        }
 
         if (mPlayer != null && mPlayer.isInitialized()) {
             setNextTrack();
@@ -2357,10 +2379,18 @@ public class MusicPlaybackService extends Service {
      * @return The album art for the current album.
      */
     public Bitmap getAlbumArt() {
-        // Return the cached artwork
-        final Bitmap bitmap = mImageFetcher.getArtwork(getAlbumName(),
-                getAlbumId(), getArtistName());
-        return bitmap;
+        try {
+            // Return the cached artwork
+            final Bitmap bitmap = mImageFetcher.getArtwork(getAlbumName(),
+                    getAlbumId(), getArtistName());
+            return bitmap;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            // due to the lifecycle of android components,
+            // mImageFetcher could be null at the moment of call
+            // updateRemoveControlClient.
+        }
+        return null;
     }
 
     /**
