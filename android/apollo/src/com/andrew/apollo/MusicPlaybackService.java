@@ -557,7 +557,14 @@ public class MusicPlaybackService extends Service {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mMediaButtonReceiverComponent = new ComponentName(getPackageName(),
                 MediaButtonIntentReceiver.class.getName());
-        mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
+        try {
+            mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            // ignore
+            // some times the phone does not grant the MODIFY_PHONE_STATE permission
+            // this permission is for OMEs and we can't do anything about it
+        }
 
         // Use the remote control APIs to set the playback state
         setUpRemoteControlClient();
@@ -2060,8 +2067,13 @@ public class MusicPlaybackService extends Service {
             return;
         }
 
-        mAudioManager.registerMediaButtonEventReceiver(new ComponentName(getPackageName(),
-                MediaButtonIntentReceiver.class.getName()));
+        try {
+            mAudioManager.registerMediaButtonEventReceiver(new ComponentName(getPackageName(),
+                    MediaButtonIntentReceiver.class.getName()));
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            // see explanation in initService
+        }
 
         if (mPlayer != null && mPlayer.isInitialized()) {
             setNextTrack();
