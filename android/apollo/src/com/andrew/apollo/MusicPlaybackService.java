@@ -1695,10 +1695,12 @@ public class MusicPlaybackService extends Service {
                 }
             }
             mFileToPlay = path;
-            mPlayer.setDataSource(mFileToPlay);
-            if (mPlayer.isInitialized()) {
-                mOpenFailedCounter = 0;
-                return true;
+            if (mPlayer != null) { // machine state issues in general with original Apollo code
+                mPlayer.setDataSource(mFileToPlay);
+                if (mPlayer.isInitialized()) {
+                    mOpenFailedCounter = 0;
+                    return true;
+                }
             }
             stop(true);
             return false;
