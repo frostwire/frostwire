@@ -2373,10 +2373,18 @@ public class MusicPlaybackService extends Service {
      * @return The album art for the current album.
      */
     public Bitmap getAlbumArt() {
-        // Return the cached artwork
-        final Bitmap bitmap = mImageFetcher.getArtwork(getAlbumName(),
-                getAlbumId(), getArtistName());
-        return bitmap;
+        try {
+            // Return the cached artwork
+            final Bitmap bitmap = mImageFetcher.getArtwork(getAlbumName(),
+                    getAlbumId(), getArtistName());
+            return bitmap;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            // due to the lifecycle of android components,
+            // mImageFetcher could be null at the moment of call
+            // updateRemoveControlClient.
+        }
+        return null;
     }
 
     /**
