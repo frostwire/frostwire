@@ -1,3 +1,7 @@
+FrostWire 1.7.2 - FEBRUARY/29/2016
+ - Updated libraries: gson v2.6.2, okhttp v2.7.5, rxjava v1.1.1,
+   android support v4.23.2.0
+
 FrostWire 1.7.1 - FEBRUARY/24/2016
  - New "Experimental Features" option available. In order to move at a
    faster pace and keep up with Android's endless architectural changes
