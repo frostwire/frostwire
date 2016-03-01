@@ -295,6 +295,7 @@ public final class UIUtils {
             i.setData(Uri.parse(url));
             context.startActivity(i);
         } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
             // ignore
             // yes, it happens
         }
@@ -327,6 +328,7 @@ public final class UIUtils {
                 return false;
             }
         } catch (Throwable e) {
+            e.printStackTrace();
             return false;
         }
     }
