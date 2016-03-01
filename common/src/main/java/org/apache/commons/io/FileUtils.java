@@ -50,7 +50,7 @@ import java.util.zip.Checksum;
 //import org.apache.commons.io.filefilter.IOFileFilter;
 //import org.apache.commons.io.filefilter.SuffixFileFilter;
 //import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.io.output.NullOutputStream;
+//import org.apache.commons.io.output.NullOutputStream;
 
 /**
  * General file manipulation utilities.
@@ -2681,11 +2681,11 @@ public class FileUtils {
      * @throws IOException if an IO error occurs reading the file
      * @since 1.3
      */
-    public static long checksumCRC32(File file) throws IOException {
-        CRC32 crc = new CRC32();
-        checksum(file, crc);
-        return crc.getValue();
-    }
+//    public static long checksumCRC32(File file) throws IOException {
+//        CRC32 crc = new CRC32();
+//        checksum(file, crc);
+//        return crc.getValue();
+//    }
 
     /**
      * Computes the checksum of a file using the specified checksum object.
@@ -2704,19 +2704,19 @@ public class FileUtils {
      * @throws IOException if an IO error occurs reading the file
      * @since 1.3
      */
-    public static Checksum checksum(File file, Checksum checksum) throws IOException {
-        if (file.isDirectory()) {
-            throw new IllegalArgumentException("Checksums can't be computed on directories");
-        }
-        InputStream in = null;
-        try {
-            in = new CheckedInputStream(new FileInputStream(file), checksum);
-            IOUtils.copy(in, new NullOutputStream());
-        } finally {
-            IOUtils.closeQuietly(in);
-        }
-        return checksum;
-    }
+//    public static Checksum checksum(File file, Checksum checksum) throws IOException {
+//        if (file.isDirectory()) {
+//            throw new IllegalArgumentException("Checksums can't be computed on directories");
+//        }
+//        InputStream in = null;
+//        try {
+//            in = new CheckedInputStream(new FileInputStream(file), checksum);
+//            IOUtils.copy(in, new NullOutputStream());
+//        } finally {
+//            IOUtils.closeQuietly(in);
+//        }
+//        return checksum;
+//    }
 
     /**
      * Moves a directory.
