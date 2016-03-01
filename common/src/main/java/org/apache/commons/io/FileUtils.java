@@ -44,12 +44,12 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.Checksum;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.FalseFileFilter;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
+//import org.apache.commons.io.filefilter.DirectoryFileFilter;
+//import org.apache.commons.io.filefilter.FalseFileFilter;
+//import org.apache.commons.io.filefilter.FileFilterUtils;
+//import org.apache.commons.io.filefilter.IOFileFilter;
+//import org.apache.commons.io.filefilter.SuffixFileFilter;
+//import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.output.NullOutputStream;
 
 /**
@@ -473,23 +473,23 @@ public class FileUtils {
      * @param filter the filter to apply to files and directories.
      * @param includeSubDirectories indicates if will include the subdirectories themselves
      */
-    private static void innerListFiles(Collection<File> files, File directory,
-            IOFileFilter filter, boolean includeSubDirectories) {
-        File[] found = directory.listFiles((FileFilter) filter);
-        
-        if (found != null) {
-            for (File file : found) {
-                if (file.isDirectory()) {
-                    if (includeSubDirectories) {
-                        files.add(file);
-                    }
-                    innerListFiles(files, file, filter, includeSubDirectories);
-                } else {
-                    files.add(file);
-                }
-            }
-        }
-    }
+//    private static void innerListFiles(Collection<File> files, File directory,
+//            IOFileFilter filter, boolean includeSubDirectories) {
+//        File[] found = directory.listFiles((FileFilter) filter);
+//
+//        if (found != null) {
+//            for (File file : found) {
+//                if (file.isDirectory()) {
+//                    if (includeSubDirectories) {
+//                        files.add(file);
+//                    }
+//                    innerListFiles(files, file, filter, includeSubDirectories);
+//                } else {
+//                    files.add(file);
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Finds files within a given directory (and optionally its
@@ -516,19 +516,19 @@ public class FileUtils {
      * @see org.apache.commons.io.filefilter.FileFilterUtils
      * @see org.apache.commons.io.filefilter.NameFileFilter
      */
-    public static Collection<File> listFiles(
-            File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
-        validateListFilesParameters(directory, fileFilter);
-
-        IOFileFilter effFileFilter = setUpEffectiveFileFilter(fileFilter);
-        IOFileFilter effDirFilter = setUpEffectiveDirFilter(dirFilter);
-
-        //Find files
-        Collection<File> files = new java.util.LinkedList<File>();
-        innerListFiles(files, directory,
-            FileFilterUtils.or(effFileFilter, effDirFilter), false);
-        return files;
-    }
+//    public static Collection<File> listFiles(
+//            File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
+//        validateListFilesParameters(directory, fileFilter);
+//
+//        IOFileFilter effFileFilter = setUpEffectiveFileFilter(fileFilter);
+//        IOFileFilter effDirFilter = setUpEffectiveDirFilter(dirFilter);
+//
+//        //Find files
+//        Collection<File> files = new java.util.LinkedList<File>();
+//        innerListFiles(files, directory,
+//            FileFilterUtils.or(effFileFilter, effDirFilter), false);
+//        return files;
+//    }
 
     /**
      * Validates the given arguments.
@@ -540,14 +540,14 @@ public class FileUtils {
      * @param directory The File to test
      * @param fileFilter The IOFileFilter to test
      */
-    private static void validateListFilesParameters(File directory, IOFileFilter fileFilter) {
-        if (!directory.isDirectory()) {
-            throw new IllegalArgumentException("Parameter 'directory' is not a directory");
-        }
-        if (fileFilter == null) {
-            throw new NullPointerException("Parameter 'fileFilter' is null");
-        }
-    }
+//    private static void validateListFilesParameters(File directory, IOFileFilter fileFilter) {
+//        if (!directory.isDirectory()) {
+//            throw new IllegalArgumentException("Parameter 'directory' is not a directory");
+//        }
+//        if (fileFilter == null) {
+//            throw new NullPointerException("Parameter 'fileFilter' is null");
+//        }
+//    }
 
     /**
      * Returns a filter that accepts files in addition to the {@link File} objects accepted by the given filter.
@@ -555,9 +555,9 @@ public class FileUtils {
      * @param fileFilter a base filter to add to
      * @return a filter that accepts files 
      */
-    private static IOFileFilter setUpEffectiveFileFilter(IOFileFilter fileFilter) {
-        return FileFilterUtils.and(fileFilter, FileFilterUtils.notFileFilter(DirectoryFileFilter.INSTANCE));
-    }
+//    private static IOFileFilter setUpEffectiveFileFilter(IOFileFilter fileFilter) {
+//        return FileFilterUtils.and(fileFilter, FileFilterUtils.notFileFilter(DirectoryFileFilter.INSTANCE));
+//    }
 
     /**
      * Returns a filter that accepts directories in addition to the {@link File} objects accepted by the given filter.
@@ -565,10 +565,10 @@ public class FileUtils {
      * @param dirFilter a base filter to add to
      * @return a filter that accepts directories 
      */
-    private static IOFileFilter setUpEffectiveDirFilter(IOFileFilter dirFilter) {
-        return dirFilter == null ? FalseFileFilter.INSTANCE : FileFilterUtils.and(dirFilter,
-                DirectoryFileFilter.INSTANCE);
-    }
+//    private static IOFileFilter setUpEffectiveDirFilter(IOFileFilter dirFilter) {
+//        return dirFilter == null ? FalseFileFilter.INSTANCE : FileFilterUtils.and(dirFilter,
+//                DirectoryFileFilter.INSTANCE);
+//    }
 
     /**
      * Finds files within a given directory (and optionally its
@@ -588,22 +588,22 @@ public class FileUtils {
      * @see org.apache.commons.io.filefilter.NameFileFilter
      * @since 2.2
      */
-    public static Collection<File> listFilesAndDirs(
-            File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
-        validateListFilesParameters(directory, fileFilter);
-
-        IOFileFilter effFileFilter = setUpEffectiveFileFilter(fileFilter);
-        IOFileFilter effDirFilter = setUpEffectiveDirFilter(dirFilter);
-
-        //Find files
-        Collection<File> files = new java.util.LinkedList<File>();
-        if (directory.isDirectory()) {
-            files.add(directory);
-        }
-        innerListFiles(files, directory,
-            FileFilterUtils.or(effFileFilter, effDirFilter), true);
-        return files;
-    }
+//    public static Collection<File> listFilesAndDirs(
+//            File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
+//        validateListFilesParameters(directory, fileFilter);
+//
+//        IOFileFilter effFileFilter = setUpEffectiveFileFilter(fileFilter);
+//        IOFileFilter effDirFilter = setUpEffectiveDirFilter(dirFilter);
+//
+//        //Find files
+//        Collection<File> files = new java.util.LinkedList<File>();
+//        if (directory.isDirectory()) {
+//            files.add(directory);
+//        }
+//        innerListFiles(files, directory,
+//            FileFilterUtils.or(effFileFilter, effDirFilter), true);
+//        return files;
+//    }
 
     /**
      * Allows iteration over the files in given directory (and optionally
@@ -623,10 +623,10 @@ public class FileUtils {
      * @see org.apache.commons.io.filefilter.NameFileFilter
      * @since 1.2
      */
-    public static Iterator<File> iterateFiles(
-            File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
-        return listFiles(directory, fileFilter, dirFilter).iterator();
-    }
+//    public static Iterator<File> iterateFiles(
+//            File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
+//        return listFiles(directory, fileFilter, dirFilter).iterator();
+//    }
 
     /**
      * Allows iteration over the files in given directory (and optionally
@@ -648,9 +648,9 @@ public class FileUtils {
      * @see org.apache.commons.io.filefilter.NameFileFilter
      * @since 2.2
      */
-    public static Iterator<File> iterateFilesAndDirs(File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
-        return listFilesAndDirs(directory, fileFilter, dirFilter).iterator();
-    }
+//    public static Iterator<File> iterateFilesAndDirs(File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
+//        return listFilesAndDirs(directory, fileFilter, dirFilter).iterator();
+//    }
 
     //-----------------------------------------------------------------------
     /**
@@ -679,18 +679,18 @@ public class FileUtils {
      * @param recursive  if true all subdirectories are searched as well
      * @return an collection of java.io.File with the matching files
      */
-    public static Collection<File> listFiles(
-            File directory, String[] extensions, boolean recursive) {
-        IOFileFilter filter;
-        if (extensions == null) {
-            filter = TrueFileFilter.INSTANCE;
-        } else {
-            String[] suffixes = toSuffixes(extensions);
-            filter = new SuffixFileFilter(suffixes);
-        }
-        return listFiles(directory, filter,
-            recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
-    }
+//    public static Collection<File> listFiles(
+//            File directory, String[] extensions, boolean recursive) {
+//        IOFileFilter filter;
+//        if (extensions == null) {
+//            filter = TrueFileFilter.INSTANCE;
+//        } else {
+//            String[] suffixes = toSuffixes(extensions);
+//            filter = new SuffixFileFilter(suffixes);
+//        }
+//        return listFiles(directory, filter,
+//            recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
+//    }
 
     /**
      * Allows iteration over the files in a given directory (and optionally
@@ -705,10 +705,10 @@ public class FileUtils {
      * @return an iterator of java.io.File with the matching files
      * @since 1.2
      */
-    public static Iterator<File> iterateFiles(
-            File directory, String[] extensions, boolean recursive) {
-        return listFiles(directory, extensions, recursive).iterator();
-    }
+//    public static Iterator<File> iterateFiles(
+//            File directory, String[] extensions, boolean recursive) {
+//        return listFiles(directory, extensions, recursive).iterator();
+//    }
 
     //-----------------------------------------------------------------------
     /**
