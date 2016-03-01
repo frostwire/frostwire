@@ -58,5 +58,5 @@ public interface FileSystem {
      */
     void scan(File file);
 
-    void walk(File file, boolean recursive, FileFilter filter);
+    void walk(File file, FileFilter filter);
 }

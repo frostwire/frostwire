@@ -28,5 +28,5 @@ public interface FileFilter extends java.io.FileFilter {
 
     boolean accept(File file);
 
-    void walk(File file);
+    void file(File file);
 }

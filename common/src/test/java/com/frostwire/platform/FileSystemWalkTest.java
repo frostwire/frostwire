@@ -48,14 +48,14 @@ public class FileSystemWalkTest {
     public void testAnyFile() {
         final AtomicBoolean b = new AtomicBoolean(false);
 
-        fs.walk(new File("any.txt"), true, new FileFilter() {
+        fs.walk(new File("any.txt"), new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return true;
             }
 
             @Override
-            public void walk(File file) {
+            public void file(File file) {
                 b.set(true);
             }
         });
@@ -64,14 +64,14 @@ public class FileSystemWalkTest {
 
         b.set(false);
 
-        fs.walk(new File("any.txt"), false, new FileFilter() {
+        fs.walk(new File("any.txt"), new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return true;
+                return !file.isDirectory();
             }
 
             @Override
-            public void walk(File file) {
+            public void file(File file) {
                 b.set(true);
             }
         });
@@ -93,14 +93,14 @@ public class FileSystemWalkTest {
 
         final LinkedList<File> l = new LinkedList<>();
 
-        fs.walk(d1, true, new FileFilter() {
+        fs.walk(d1, new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return true;
             }
 
             @Override
-            public void walk(File file) {
+            public void file(File file) {
                 l.add(file);
             }
         });
@@ -111,14 +111,14 @@ public class FileSystemWalkTest {
         assertTrue(l.contains(f2));
 
         l.clear();
-        fs.walk(d1, true, new FileFilter() {
+        fs.walk(d1, new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return !file.equals(d2);
             }
 
             @Override
-            public void walk(File file) {
+            public void file(File file) {
                 l.add(file);
             }
         });
@@ -126,24 +126,6 @@ public class FileSystemWalkTest {
         assertFalse(l.contains(d1));
         assertTrue(l.contains(f1));
         assertFalse(l.contains(d2));
-        assertFalse(l.contains(f2));
-
-        l.clear();
-        fs.walk(d1, false, new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return true;
-            }
-
-            @Override
-            public void walk(File file) {
-                l.add(file);
-            }
-        });
-
-        assertFalse(l.contains(d1));
-        assertTrue(l.contains(f1));
-        assertTrue(l.contains(d2));
         assertFalse(l.contains(f2));
 
         assertTrue(f2.delete());

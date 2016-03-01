@@ -23,9 +23,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
 
 /**
  * @author gubatron
@@ -110,24 +109,21 @@ public class DefaultFileSystem implements FileSystem {
     }
 
     @Override
-    public void walk(File file, boolean recursive, FileFilter filter) {
-        // BFS recursive walk
+    public void walk(File file, FileFilter filter) {
         File[] arr = file.listFiles(filter);
-        if (arr == null || !recursive) {
+        if (arr == null) {
             return;
         }
-        List<File> q = new LinkedList<>(Arrays.asList(arr));
+        Deque<File> q = new LinkedList<>(Arrays.asList(arr));
 
-        ListIterator<File> it = q.listIterator();
-        while (it.hasNext()) {
-            File child = it.next();
-            filter.walk(child);
-            it.remove();
+        while (!q.isEmpty()) {
+            File child = q.pollFirst();
+            filter.file(child);
             if (child.isDirectory()) {
                 arr = child.listFiles(filter);
                 if (arr != null) {
-                    for (int i = 0; i < arr.length; i++) {
-                        it.add(arr[i]);
+                    for (int i = arr.length - 1; i >= 0; i--) {
+                        q.addFirst(arr[i]);
                     }
                 }
             }
