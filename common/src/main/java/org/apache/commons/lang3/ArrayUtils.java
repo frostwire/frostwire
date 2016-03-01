@@ -6323,21 +6323,21 @@ public class ArrayUtils {
      * @return whether the array is sorted according to natural ordering
      * @since 3.4
      */
-    public static boolean isSorted(boolean[] array) {
-        if(array == null || array.length < 2) {
-            return true;
-        }
-
-        boolean previous = array[0];
-        final int n = array.length;
-        for(int i = 1; i < n; i++) {
-            final boolean current = array[i];
-            if(BooleanUtils.compare(previous, current) > 0) {
-                return false;
-            }
-
-            previous = current;
-        }
-        return true;
-    }
+//    public static boolean isSorted(boolean[] array) {
+//        if(array == null || array.length < 2) {
+//            return true;
+//        }
+//
+//        boolean previous = array[0];
+//        final int n = array.length;
+//        for(int i = 1; i < n; i++) {
+//            final boolean current = array[i];
+//            if(BooleanUtils.compare(previous, current) > 0) {
+//                return false;
+//            }
+//
+//            previous = current;
+//        }
+//        return true;
+//    }
 }
