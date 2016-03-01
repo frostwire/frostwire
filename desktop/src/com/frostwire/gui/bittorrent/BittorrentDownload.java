@@ -26,7 +26,6 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.logging.Logger;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
-import com.frostwire.util.DirectoryUtils;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.settings.SharingSettings;
@@ -35,6 +34,7 @@ import com.limegroup.gnutella.settings.iTunesSettings;
 import org.limewire.util.OSUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -402,10 +402,48 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
             File saveLocation = dl.getContentSavePath();
 
             if (saveLocation != null) {
-                DirectoryUtils.deleteEmptyDirectoryRecursive(saveLocation);
+                deleteEmptyDirectoryRecursive(saveLocation);
                 iTunesImportSettings.IMPORT_FILES.remove(saveLocation);
             }
         }
+    }
+
+    public static boolean deleteEmptyDirectoryRecursive(File directory) {
+        // make sure we only delete canonical children of the parent file we
+        // wish to delete. I have a hunch this might be an issue on OSX and
+        // Linux under certain circumstances.
+        // If anyone can test whether this really happens (possibly related to
+        // symlinks), I would much appreciate it.
+        String canonicalParent;
+        try {
+            canonicalParent = directory.getCanonicalPath();
+        } catch (IOException ioe) {
+            return false;
+        }
+
+        if (!directory.isDirectory()) {
+            return false;
+        }
+
+        boolean canDelete = true;
+
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (int i = 0; i < files.length; i++) {
+                try {
+                    if (!files[i].getCanonicalPath().startsWith(canonicalParent))
+                        continue;
+                } catch (IOException ioe) {
+                    canDelete = false;
+                }
+
+                if (!deleteEmptyDirectoryRecursive(files[i])) {
+                    canDelete = false;
+                }
+            }
+        }
+
+        return canDelete ? directory.delete() : false;
     }
 
     private long calculateSize(BTDownload dl) {
