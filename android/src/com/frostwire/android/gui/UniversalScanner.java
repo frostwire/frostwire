@@ -26,17 +26,15 @@ import android.os.SystemClock;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.logging.Logger;
-import org.apache.commons.io.FileUtils;
+import com.frostwire.platform.FileFilter;
+import com.frostwire.platform.Platforms;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author gubatron
@@ -215,6 +213,20 @@ public final class UniversalScanner {
     }
 
     public void scanDir(File privateDir) {
-        scan(FileUtils.listFiles(privateDir, null, true));
+        final List<File> files = new LinkedList<>();
+        Platforms.fileSystem().walk(privateDir, new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return true;
+            }
+
+            @Override
+            public void file(File file) {
+                if (!file.isDirectory()) {
+                    files.add(file);
+                }
+            }
+        });
+        scan(files);
     }
 }

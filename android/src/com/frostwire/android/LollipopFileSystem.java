@@ -29,9 +29,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
 import android.util.LruCache;
 import com.frostwire.logging.Logger;
-import com.frostwire.platform.FileSystem;
-import com.frostwire.platform.Platforms;
-import com.frostwire.platform.SystemPaths;
+import com.frostwire.platform.*;
+import com.frostwire.platform.FileFilter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -217,6 +216,12 @@ public final class LollipopFileSystem implements FileSystem {
         } catch (Throwable e) {
             LOG.error("Unable to trigger scan of file: " + file, e);
         }
+    }
+
+    @Override
+    public void walk(File file, FileFilter filter) {
+        LOG.warn("Visiting file trees are not supported in external SD card");
+        new DefaultFileSystem().walk(file, filter);
     }
 
     public Uri getDocumentUri(File file) {
