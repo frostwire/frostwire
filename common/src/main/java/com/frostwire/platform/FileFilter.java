@@ -24,39 +24,9 @@ import java.io.File;
  * @author gubatron
  * @author aldenml
  */
-public interface FileSystem {
+public interface FileFilter extends java.io.FileFilter {
 
-    boolean isDirectory(File file);
+    boolean accept(File file);
 
-    boolean isFile(File file);
-
-    boolean canRead(File file);
-
-    boolean canWrite(File file);
-
-    long length(File file);
-
-    long lastModified(File file);
-
-    boolean exists(File file);
-
-    boolean mkdirs(File file);
-
-    boolean delete(File file);
-
-    boolean copy(File src, File dest);
-
-    boolean write(File file, byte[] data);
-
-    /**
-     * This should instruct the underlying operating system
-     * that a new file is in place, it could be a simple
-     * notification for update in database or media scan like
-     * in android.
-     *
-     * @param file the file to scan.
-     */
-    void scan(File file);
-
-    void walk(File file, boolean recursive, FileFilter filter);
+    void walk(File file);
 }
