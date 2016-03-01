@@ -24,11 +24,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author gubatron
@@ -104,6 +105,9 @@ public class FileSystemWalkTest {
                 l.add(file);
             }
         });
+
+        Set<File> set = new LinkedHashSet<>(l);
+        assertEquals(set.size(), l.size());
 
         assertFalse(l.contains(d1));
         assertTrue(l.contains(f1));
