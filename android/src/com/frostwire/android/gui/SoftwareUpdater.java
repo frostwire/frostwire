@@ -39,15 +39,11 @@ import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.FlurryStats;
 import com.frostwire.uxstats.UXStats;
 import com.frostwire.uxstats.UXStatsConf;
-import org.apache.commons.lang3.RandomUtils;
 
 import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author gubatron
@@ -370,7 +366,7 @@ public final class SoftwareUpdater {
             return;
         }
 
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE_THRESHOLD, RandomUtils.nextInt(0, 100) < update.config.supportThreshold);
+        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE_THRESHOLD, new Random().nextInt(100) < update.config.supportThreshold);
 
         if (update.config.activeSearchEngines != null && update.config.activeSearchEngines.keySet() != null) {
             for (String name : update.config.activeSearchEngines.keySet()) {
