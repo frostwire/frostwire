@@ -44,6 +44,7 @@ import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.logging.Logger;
 import com.viewpagerindicator.TitlePageIndicator;
 
 import java.util.List;
@@ -61,7 +62,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         AbsListView.OnScrollListener,
         MusicStateListener {
 
-    //private static Logger LOGGER = Logger.getLogger(ApolloFragment.class);
+    private static Logger LOGGER = Logger.getLogger(ApolloFragment.class);
 
     private final int GROUP_ID;
     /**
@@ -300,7 +301,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     private boolean onRemoveFromRecent()  {
         RecentStore.getInstance(getActivity()).removeItem(mSelectedId);
         MusicUtils.refresh();
-        refresh();
+        restartLoader(true);
         return true;
     }
 
@@ -325,6 +326,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 refresh();
             }
         }).show(getFragmentManager(), "DeleteDialog");
+        restartLoader(true);
         return true;
     }
 
@@ -334,7 +336,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         if (mItem instanceof Song) {
             Song song = (Song) mItem;
             MusicUtils.removeFromPlaylist(getActivity(), song.mSongId, mPlaylistId);
-            refresh();
+            restartLoader(true);
             return true;
         }
         return false;
@@ -369,7 +371,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         mAdapter.remove(mItem);
         mAdapter.notifyDataSetChanged();
         FavoritesStore.getInstance(getActivity()).removeItem(mSelectedId);
-        restartLoader(true);
+        refresh();
     }
 
     /**
@@ -380,7 +382,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         super.onActivityCreated(savedInstanceState);
         // Enable the options menu
         setHasOptionsMenu(true);
-        restartLoader(true);
+        initLoader();
     }
 
     @Override
@@ -465,7 +467,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             mAdapter.clear();
         }
 
-        restartLoader(true);
+        restartLoader(); // this won't be executed if it was recently called. no risk of endless loop.
 
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
@@ -493,7 +495,12 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         if (force || (System.currentTimeMillis() - lastRestartLoader) >= 5000) {
             lastRestartLoader = System.currentTimeMillis();
             getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
+            refresh(); // won't end up in recursive call because we just refreshed.
         }
+    }
+
+    public void initLoader() {
+        getLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
     public void onMetaChanged() {

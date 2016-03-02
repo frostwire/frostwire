@@ -209,18 +209,10 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     @Override
     public int getCount() {
         if (mDataList != null) {
-            return mDataList.size();
+            int size = mDataList.size();
+            return size == 0 ? 0 : size + getOffset();
         }
         return super.getCount();
-    }
-
-    /**
-     * The view count, including a header element if present for this adapter.
-     *
-     * @return
-     */
-    public int getViewCount() {
-        return getCount() + getOffset();
     }
 
     /**

@@ -48,11 +48,7 @@ public class FavoriteFragment extends ApolloFragment<ProfileSongAdapter, Song> {
 
     @Override
     protected ProfileSongAdapter createAdapter() {
-        return new ProfileSongAdapter(
-                getActivity(),
-                R.layout.list_item_simple,
-                ProfileSongAdapter.DISPLAY_PLAYLIST_SETTING
-        );
+        return new ProfileSongAdapter(getActivity(), R.layout.list_item_simple, ProfileSongAdapter.DISPLAY_PLAYLIST_SETTING);
     }
 
     @Override
