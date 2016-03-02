@@ -45,8 +45,6 @@ public final class Hex {
      * @param data
      *            An array of characters containing hexadecimal digits
      * @return A byte array containing binary data decoded from the supplied char array.
-     * @throws DecoderException
-     *             Thrown if an odd number or illegal of characters is supplied
      */
     public static byte[] decode(final char[] data) {
 
@@ -130,8 +128,6 @@ public final class Hex {
      * @param index
      *            The index of the character in the source
      * @return An integer
-     * @throws DecoderException
-     *             Thrown if ch is an illegal hex character
      */
     private static int toDigit(final char ch, final int index) {
         final int digit = Character.digit(ch, 16);

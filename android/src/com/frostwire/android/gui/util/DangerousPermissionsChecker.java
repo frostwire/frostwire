@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,13 +44,6 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         void onPermissionsGranted();
     }
 
-    public interface PermissionsCheckerHolder {
-        // unused, but will leave, as the abstraction was useful to get a hold of the permissionchecker instance
-        // held by MainActivity. We shouldn't create these instances except at the Activity level to play ball
-        // with the moronic design by Google's engineers.
-        DangerousPermissionsChecker getPermissionsChecker(int requestCode);
-    }
-
     public static final int EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE = 0x000A;
 
     private final WeakReference<Activity> activityRef;
@@ -61,7 +54,8 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         if (activity instanceof ActivityCompat.OnRequestPermissionsResultCallback) {
             this.requestCode = requestCode;
             this.activityRef = Ref.weak(activity);
-        } else throw new IllegalArgumentException("The activity must implement ActivityCompat.OnRequestPermissionsResultCallback");
+        } else
+            throw new IllegalArgumentException("The activity must implement ActivityCompat.OnRequestPermissionsResultCallback");
     }
 
     public void setPermissionsGrantedCallback(OnPermissionsGrantedCallback onPermissionsGrantedCallback) {
@@ -79,7 +73,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         }
         Activity activity = activityRef.get();
         return ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
-               ActivityCompat.checkSelfPermission(activity,  Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
+                ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
     }
 
     public void requestPermissions() {
@@ -124,10 +118,10 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             return false;
         }
         final Activity activity = activityRef.get();
-        for (int i=0; i<permissions.length; i++) {
-            if (grantResults[i]== PackageManager.PERMISSION_DENIED) {
+        for (int i = 0; i < permissions.length; i++) {
+            if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                 if (permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
-                    permissions[i].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        permissions[i].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                     builder.setIcon(R.drawable.sd_card_notification);
                     builder.setTitle(R.string.why_we_need_storage_permissions);
@@ -162,19 +156,5 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         Offers.stopAdNetworks(activity);
         activity.finish();
         Engine.instance().shutdown();
-    }
-
-    public void restartFrostWire(int delayInMS) {
-        if (!Ref.alive(activityRef)) {
-            return;
-        }
-        final Activity activity = activityRef.get();
-        PendingIntent intent = PendingIntent.getActivity(activity.getBaseContext(),
-                0,
-                new Intent(activity.getIntent()),
-                activity.getIntent().getFlags());
-        AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-        manager.set(AlarmManager.RTC, System.currentTimeMillis() + delayInMS, intent);
-        shutdownFrostWire();
     }
 }

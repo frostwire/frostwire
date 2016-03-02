@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.io.input.ClosedInputStream;
+//import org.apache.commons.io.input.ClosedInputStream;
 
 /**
  * This class implements an output stream in which the data is 
@@ -273,12 +273,12 @@ public class ByteArrayOutputStream extends OutputStream {
      * @throws IOException if an I/O error occurs
      * @since 2.0
      */
-    public static InputStream toBufferedInputStream(InputStream input)
-            throws IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        output.write(input);
-        return output.toBufferedInputStream();
-    }
+//    public static InputStream toBufferedInputStream(InputStream input)
+//            throws IOException {
+//        ByteArrayOutputStream output = new ByteArrayOutputStream();
+//        output.write(input);
+//        return output.toBufferedInputStream();
+//    }
 
     /**
      * Gets the current contents of this byte stream as a Input Stream. The
@@ -290,22 +290,22 @@ public class ByteArrayOutputStream extends OutputStream {
      * @see #reset()
      * @since 2.0
      */
-    private InputStream toBufferedInputStream() {
-        int remaining = count;
-        if (remaining == 0) {
-            return new ClosedInputStream();
-        }
-        List<ByteArrayInputStream> list = new ArrayList<ByteArrayInputStream>(buffers.size());
-        for (byte[] buf : buffers) {
-            int c = Math.min(buf.length, remaining);
-            list.add(new ByteArrayInputStream(buf, 0, c));
-            remaining -= c;
-            if (remaining == 0) {
-                break;
-            }
-        }
-        return new SequenceInputStream(Collections.enumeration(list));
-    }
+//    private InputStream toBufferedInputStream() {
+//        int remaining = count;
+//        if (remaining == 0) {
+//            return new ClosedInputStream();
+//        }
+//        List<ByteArrayInputStream> list = new ArrayList<ByteArrayInputStream>(buffers.size());
+//        for (byte[] buf : buffers) {
+//            int c = Math.min(buf.length, remaining);
+//            list.add(new ByteArrayInputStream(buf, 0, c));
+//            remaining -= c;
+//            if (remaining == 0) {
+//                break;
+//            }
+//        }
+//        return new SequenceInputStream(Collections.enumeration(list));
+//    }
 
     /**
      * Gets the curent contents of this byte stream as a byte array.

@@ -21,7 +21,6 @@ package com.frostwire.android.gui.transfers;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.provider.MediaStore;
-import android.util.Log;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
@@ -30,7 +29,6 @@ import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTDownloadListener;
@@ -38,13 +36,15 @@ import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
-import com.frostwire.util.DirectoryUtils;
 import com.frostwire.util.Ref;
-import com.frostwire.util.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author gubatron
@@ -337,7 +337,45 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             }
         }
 
-        DirectoryUtils.deleteEmptyDirectoryRecursive(dl.getSavePath());
+        deleteEmptyDirectoryRecursive(dl.getSavePath());
+    }
+
+    private static boolean deleteEmptyDirectoryRecursive(File directory) {
+        // make sure we only delete canonical children of the parent file we
+        // wish to delete. I have a hunch this might be an issue on OSX and
+        // Linux under certain circumstances.
+        // If anyone can test whether this really happens (possibly related to
+        // symlinks), I would much appreciate it.
+        String canonicalParent;
+        try {
+            canonicalParent = directory.getCanonicalPath();
+        } catch (IOException ioe) {
+            return false;
+        }
+
+        if (!directory.isDirectory()) {
+            return false;
+        }
+
+        boolean canDelete = true;
+
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (int i = 0; i < files.length; i++) {
+                try {
+                    if (!files[i].getCanonicalPath().startsWith(canonicalParent))
+                        continue;
+                } catch (IOException ioe) {
+                    canDelete = false;
+                }
+
+                if (!deleteEmptyDirectoryRecursive(files[i])) {
+                    canDelete = false;
+                }
+            }
+        }
+
+        return canDelete ? directory.delete() : false;
     }
 
     private long calculateSize(BTDownload dl) {

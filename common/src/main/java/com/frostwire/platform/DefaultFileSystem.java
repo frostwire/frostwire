@@ -22,6 +22,9 @@ import com.frostwire.logging.Logger;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
 
 /**
  * @author gubatron
@@ -103,5 +106,27 @@ public class DefaultFileSystem implements FileSystem {
     @Override
     public void scan(File file) {
         // LOG.warn("Scan of file not implemented");
+    }
+
+    @Override
+    public void walk(File file, FileFilter filter) {
+        File[] arr = file.listFiles(filter);
+        if (arr == null) {
+            return;
+        }
+        Deque<File> q = new LinkedList<>(Arrays.asList(arr));
+
+        while (!q.isEmpty()) {
+            File child = q.pollFirst();
+            filter.file(child);
+            if (child.isDirectory()) {
+                arr = child.listFiles(filter);
+                if (arr != null) {
+                    for (int i = arr.length - 1; i >= 0; i--) {
+                        q.addFirst(arr[i]);
+                    }
+                }
+            }
+        }
     }
 }

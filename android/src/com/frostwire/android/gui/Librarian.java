@@ -42,10 +42,7 @@ import com.frostwire.util.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The Librarian is in charge of:
@@ -384,7 +381,7 @@ public final class Librarian {
 
             new UniversalScanner(context).scan(file.getAbsolutePath());
         } else if (file.isDirectory() && file.canRead()) {
-            Collection<File> flattenedFiles = DirectoryUtils.getAllFolderFiles(file, null);
+            Collection<File> flattenedFiles = getAllFolderFiles(file, null);
 
             if (ignorableFiles != null && !ignorableFiles.isEmpty()) {
                 flattenedFiles.removeAll(ignorableFiles);
@@ -394,6 +391,49 @@ public final class Librarian {
                 new UniversalScanner(context).scan(flattenedFiles);
             }
         }
+    }
+
+    /** Given a folder path it'll return all the files contained within it and it's subfolders
+     * as a flat set of Files.
+     *
+     * Non-recursive implementation, up to 20% faster in tests than recursive implementation. :)
+     *
+     * @author gubatron
+     * @param folder
+     * @param extensions If you only need certain files filtered by their extensions, use this string array (without the "."). or set to null if you want all files. e.g. ["txt","jpg"] if you only want text files and jpegs.
+     *
+     * @return The set of files.
+     */
+    private static Collection<File> getAllFolderFiles(File folder, String[] extensions) {
+        Set<File> results = new HashSet<File>();
+        Stack<File> subFolders = new Stack<File>();
+        File currentFolder = folder;
+        while (currentFolder != null && currentFolder.isDirectory() && currentFolder.canRead()) {
+            File[] fs = null;
+            try {
+                fs = currentFolder.listFiles();
+            } catch (SecurityException e) {
+            }
+
+            if (fs != null && fs.length > 0) {
+                for (File f : fs) {
+                    if (!f.isDirectory()) {
+                        if (extensions == null || FilenameUtils.isExtension(f.getName(), extensions)) {
+                            results.add(f);
+                        }
+                    } else {
+                        subFolders.push(f);
+                    }
+                }
+            }
+
+            if (!subFolders.isEmpty()) {
+                currentFolder = subFolders.pop();
+            } else {
+                currentFolder = null;
+            }
+        }
+        return results;
     }
 
     /**

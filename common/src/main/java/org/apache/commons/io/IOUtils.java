@@ -427,9 +427,9 @@ public class IOUtils {
      * @throws IOException if an I/O error occurs
      * @since 2.0
      */
-    public static InputStream toBufferedInputStream(InputStream input) throws IOException {
-        return ByteArrayOutputStream.toBufferedInputStream(input);
-    }
+//    public static InputStream toBufferedInputStream(InputStream input) throws IOException {
+//        return ByteArrayOutputStream.toBufferedInputStream(input);
+//    }
 
     /**
      * Returns the given reader if it is a {@link BufferedReader}, otherwise creates a toBufferedReader for the given

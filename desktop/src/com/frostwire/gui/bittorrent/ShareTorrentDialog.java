@@ -29,7 +29,6 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
-import org.apache.commons.lang3.RandomUtils;
 import org.limewire.concurrent.ThreadExecutor;
 
 import javax.swing.*;
@@ -40,6 +39,7 @@ import java.awt.event.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author gubatron
@@ -146,7 +146,7 @@ public class ShareTorrentDialog extends JDialog {
         container.add(textArea, c);
 
         initURLShortenerListeners();
-        performAsyncURLShortening(shortenerListeners.get(RandomUtils.nextInt(0, shortenerListeners.size() - 1)));
+        performAsyncURLShortening(shortenerListeners.get(new Random().nextInt(shortenerListeners.size() - 1)));
 
         // BUTTON ROW
         initActions();

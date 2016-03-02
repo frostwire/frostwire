@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import org.apache.commons.lang3.Conversion;
 
 import java.util.Collections;
 import java.util.List;
@@ -200,12 +199,12 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
     private static byte[] long2array(long l) {
         byte[] arr = new byte[Long.SIZE / Byte.SIZE];
-        Conversion.longToByteArray(l, 0, arr, 0, arr.length);
+        longToByteArray(l, 0, arr, 0, arr.length);
         return arr;
     }
 
     private static long array2long(byte[] arr) {
-        return Conversion.byteArrayToLong(arr, 0, 0, 0, Long.SIZE / Byte.SIZE);
+        return byteArrayToLong(arr, 0, 0, 0, Long.SIZE / Byte.SIZE);
     }
 
 
@@ -225,5 +224,40 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
             }
         }
         return result;
+    }
+
+    private static long byteArrayToLong(final byte[] src, final int srcPos, final long dstInit, final int dstPos,
+                                        final int nBytes) {
+        if ((src.length == 0 && srcPos == 0) || 0 == nBytes) {
+            return dstInit;
+        }
+        if ((nBytes - 1) * 8 + dstPos >= 64) {
+            throw new IllegalArgumentException("(nBytes-1)*8+dstPos is greather or equal to than 64");
+        }
+        long out = dstInit;
+        int shift = 0;
+        for (int i = 0; i < nBytes; i++) {
+            shift = i * 8 + dstPos;
+            final long bits = (0xffL & src[i + srcPos]) << shift;
+            final long mask = 0xffL << shift;
+            out = (out & ~mask) | bits;
+        }
+        return out;
+    }
+
+    private static byte[] longToByteArray(final long src, final int srcPos, final byte[] dst, final int dstPos,
+                                          final int nBytes) {
+        if (0 == nBytes) {
+            return dst;
+        }
+        if ((nBytes - 1) * 8 + srcPos >= 64) {
+            throw new IllegalArgumentException("(nBytes-1)*8+srcPos is greather or equal to than 64");
+        }
+        int shift = 0;
+        for (int i = 0; i < nBytes; i++) {
+            shift = i * 8 + srcPos;
+            dst[dstPos + i] = (byte) (0xff & (src >> shift));
+        }
+        return dst;
     }
 }

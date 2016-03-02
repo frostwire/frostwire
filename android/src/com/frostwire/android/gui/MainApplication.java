@@ -34,7 +34,7 @@ import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
 import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
-import com.frostwire.util.DirectoryUtils;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -137,7 +137,9 @@ public class MainApplication extends Application {
     private void cleanTemp() {
         try {
             File tmp = Platforms.get().systemPaths().temp();
-            DirectoryUtils.deleteFolderRecursively(tmp);
+            if (tmp.exists()) {
+                FileUtils.cleanDirectory(tmp);
+            }
         } catch (Throwable e) {
             LOG.error("Error during setup of temp directory", e);
         }
