@@ -327,16 +327,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
                 return true;
             }
             case android.R.id.home:
-                // If an album profile, go up to the artist profile
-                if (isAlbum()) {
-                    final Long artistId = mArguments.getLong(Config.ID);
-                    long[] tracks = MusicUtils.getSongListForArtist(this, artistId);
-                    NavUtils.openArtistProfile(this, mArtistName, tracks);
-                    finish();
-                } else {
-                    // Otherwise just go back
-                    goBack();
-                }
+                goBack();
                 return true;
             case R.id.menu_add_to_homescreen: {
                 // Place the artist, album, genre, or playlist onto the Home
@@ -673,6 +664,12 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * Finishes the activity and overrides the default animation.
      */
     private void goBack() {
+        // If an album profile, go up to the artist profile
+        if (isAlbum()) {
+            final Long artistId = mArguments.getLong(Config.ID);
+            long[] tracks = MusicUtils.getSongListForArtist(this, artistId);
+            NavUtils.openArtistProfile(this, mArtistName, tracks);
+        }
         finish();
     }
 

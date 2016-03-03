@@ -44,9 +44,7 @@ public class LastAddedLoader extends SongLoader {
 
     @Override
     public Cursor makeCursor(Context context) {
-        LOGGER.info("makeCursor() start. (Overrides SongLoader's makeCursor())");
         Cursor c = makeLastAddedCursor(getContext());
-        LOGGER.info("makCursor() finished.");
         return c;
     }
 
@@ -55,7 +53,6 @@ public class LastAddedLoader extends SongLoader {
      * @return The {@link Cursor} used to run the song query.
      */
     public static Cursor makeLastAddedCursor(final Context context) {
-        LOGGER.info("makeLastAddedCursor() start.");
         final int fourWeeks = 4 * 3600 * 24 * 7;
         final StringBuilder selection = new StringBuilder();
         selection.append(AudioColumns.IS_MUSIC + "=1");
@@ -75,7 +72,6 @@ public class LastAddedLoader extends SongLoader {
                         /* 4 */
                         AudioColumns.DURATION
                 }, selection.toString(), null, MediaStore.Audio.Media.DATE_ADDED + " DESC");
-        LOGGER.info("makeLastAddedCursor() finished with " + c.getCount() + " elements.");
         return c;
     }
 }

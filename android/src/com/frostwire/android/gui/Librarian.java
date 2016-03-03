@@ -29,7 +29,9 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.android.core.*;
+import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.MediaType;
 import com.frostwire.android.core.player.EphemeralPlaylist;
 import com.frostwire.android.core.player.PlaylistItem;
 import com.frostwire.android.core.providers.TableFetcher;
@@ -37,7 +39,6 @@ import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.transfers.Transfers;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
-import com.frostwire.util.DirectoryUtils;
 import com.frostwire.util.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 

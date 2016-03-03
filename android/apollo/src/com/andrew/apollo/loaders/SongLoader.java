@@ -58,7 +58,7 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
         }
 
         if (mCursor == null) {
-            LOGGER.warn("loadInBackground() - cursor == null, returning empty list.");
+            //LOGGER.warn("loadInBackground() - cursor == null, returning empty list.");
             return Collections.EMPTY_LIST;
         }
 
@@ -98,7 +98,7 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
         if (mCursor != null) {
             mCursor.close();
         }
-        LOGGER.info("loadInBackground() done (" + mSongList.size() + " songs)");
+        //LOGGER.info("loadInBackground() done (" + mSongList.size() + " songs)");
         return mSongList;
     }
 

@@ -20,22 +20,14 @@ package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
 import android.content.DialogInterface;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.*;
-import com.frostwire.android.gui.transfers.BittorrentDownload;
-import com.frostwire.android.gui.transfers.DownloadTransfer;
-import com.frostwire.android.gui.transfers.Transfer;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
-import com.frostwire.transfers.*;
-import com.frostwire.util.DirectoryUtils;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
-
-import java.io.File;
 
 /**
  * @author gubatron

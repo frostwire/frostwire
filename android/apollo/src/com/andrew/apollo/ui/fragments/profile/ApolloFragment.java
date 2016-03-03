@@ -19,6 +19,7 @@
 package com.andrew.apollo.ui.fragments.profile;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -323,10 +324,10 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         DeleteDialog.newInstance(title, songList, null).setOnDeleteCallback(new DeleteDialog.DeleteDialogCallback() {
             @Override
             public void onDelete(long[] id) {
+                restartLoader(true);
                 refresh();
             }
         }).show(getFragmentManager(), "DeleteDialog");
-        restartLoader(true);
         return true;
     }
 
@@ -500,7 +501,12 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     public void initLoader() {
-        getLoaderManager().initLoader(LOADER_ID, null, this);
+        final Intent intent = getActivity().getIntent();
+        if (intent != null && intent.getExtras() != null) {
+            getLoaderManager().initLoader(LOADER_ID, intent.getExtras(), this);
+        } else {
+            restartLoader(true);
+        }
     }
 
     public void onMetaChanged() {
