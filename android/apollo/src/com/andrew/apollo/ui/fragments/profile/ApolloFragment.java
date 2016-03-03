@@ -430,9 +430,11 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         if (mAdapter != null) {
             mAdapter.setDataList(data);
 
+            mAdapter.setNotifyOnChange(false);
             for (final I item : data) {
                 mAdapter.add(item);
             }
+            mAdapter.setNotifyOnChange(true);
 
             if (mAdapter instanceof ApolloFragmentAdapter.Cacheable) {
                 ((ApolloFragmentAdapter.Cacheable) mAdapter).buildCache();
@@ -455,6 +457,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * (Don't do so until 10 seconds later if you refreshed already)
      */
     public void refresh() {
+        LOGGER.info(getClass().getSimpleName() + ":refresh() invoked.");
         // Scroll to the stop of the list before restarting the loader.
         // Otherwise, if the user has scrolled enough to move the header, it
         // becomes misplaced and needs to be reset.
@@ -466,12 +469,14 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
         if (mAdapter != null) {
             mAdapter.clear();
+            LOGGER.info(getClass().getSimpleName() + ":refresh() - adapter cleared.");
         }
 
         restartLoader(); // this won't be executed if it was recently called. no risk of endless loop.
 
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
+            LOGGER.info(getClass().getSimpleName() + ":refresh() mAdapter.notifyDataSetChanged() finished.");
         }
     }
 
@@ -489,15 +494,20 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     public void restartLoader() {
-        restartLoader(false);
+        if  (!restartLoader(false)) {
+            LOGGER.info(getClass().getSimpleName() + ":restartLoader skipped.");
+        } else {
+            LOGGER.info(getClass().getSimpleName() + ":restartLoader reloaded data.");
+        }
     }
 
-    public void restartLoader(boolean force) {
+    public boolean restartLoader(boolean force) {
         if (force || (System.currentTimeMillis() - lastRestartLoader) >= 5000) {
             lastRestartLoader = System.currentTimeMillis();
             getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
-            refresh(); // won't end up in recursive call because we just refreshed.
+            return true;
         }
+        return false;
     }
 
     public void initLoader() {

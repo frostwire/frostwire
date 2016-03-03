@@ -53,7 +53,7 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
     /**
      * Number of views (ImageView, TextView, header)
      */
-    private static final int VIEW_TYPE_COUNT = 3;
+    private static final int VIEW_TYPE_COUNT = 2;
 
     /**
      * LayoutInflater
@@ -185,5 +185,10 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
             return ITEM_VIEW_TYPE_HEADER;
         }
         return ITEM_VIEW_TYPE_MUSIC;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position-1;
     }
 }

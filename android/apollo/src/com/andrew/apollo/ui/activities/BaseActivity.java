@@ -339,7 +339,6 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
             // playing
             bottomActionBar.setOnClickListener(mOpenNowPlaying);
 
-            //new StopListener(this, false)
             mPlayPauseButton.setOnLongClickListener(new StopAndHideBottomActionBarListener(this, false));
         }
         setBottomActionBarVisible(isPlaying);

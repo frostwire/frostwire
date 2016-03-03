@@ -208,15 +208,20 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      */
     @Override
     public int getCount() {
+        int count = super.getCount();;
         if (mDataList != null) {
             int size = mDataList.size();
-            return size == 0 ? 0 : size + getOffset();
+            count = size==0 ? 0 : size + getOffset();
         }
-        return super.getCount();
+
+        LOGGER.info("getCount() -> " + count)   ;
+        return count;
     }
 
     /**
-     * @param position - The ACTUAL position in the model container. If you're using an offset based on a list view that has a header element at 0, you must subtract to the position you might have.
+     * @param position - The ACTUAL position in the model container.
+     * If you're using an offset based on a list view that has a header element at 0,
+     * you must subtract to the position you might have.
      * @return The element at the indexed position in the model container (not the view). null if position is out of bounds.
      */
     public I getItem(int position) {

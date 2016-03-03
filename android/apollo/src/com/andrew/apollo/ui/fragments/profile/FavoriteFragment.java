@@ -73,4 +73,5 @@ public class FavoriteFragment extends ApolloFragment<ProfileSongAdapter, Song> {
     protected String getLayoutTypeName() {
         return PreferenceUtils.SIMPLE_LAYOUT;
     }
+
 }
