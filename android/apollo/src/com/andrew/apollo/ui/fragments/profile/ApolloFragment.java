@@ -60,7 +60,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         extends Fragment implements
         LoaderManager.LoaderCallbacks<List<I>>,
         AdapterView.OnItemClickListener,
-        AbsListView.OnScrollListener,
         MusicStateListener {
 
     private static Logger LOGGER = Logger.getLogger(ApolloFragment.class);
@@ -154,6 +153,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             mRootView = (ViewGroup) inflater.inflate(R.layout.grid_base, null);
             initGridView();
         }
+
         return mRootView;
     }
 
@@ -457,7 +457,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * (Don't do so until 10 seconds later if you refreshed already)
      */
     public void refresh() {
-        LOGGER.info(getClass().getSimpleName() + ":refresh() invoked.");
         // Scroll to the stop of the list before restarting the loader.
         // Otherwise, if the user has scrolled enough to move the header, it
         // becomes misplaced and needs to be reset.
@@ -469,14 +468,12 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
         if (mAdapter != null) {
             mAdapter.clear();
-            LOGGER.info(getClass().getSimpleName() + ":refresh() - adapter cleared.");
         }
 
         restartLoader(); // this won't be executed if it was recently called. no risk of endless loop.
 
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
-            LOGGER.info(getClass().getSimpleName() + ":refresh() mAdapter.notifyDataSetChanged() finished.");
         }
     }
 
@@ -488,17 +485,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         }
     }
 
-    @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-
-    }
-
     public void restartLoader() {
-        if  (!restartLoader(false)) {
-            LOGGER.info(getClass().getSimpleName() + ":restartLoader skipped.");
-        } else {
-            LOGGER.info(getClass().getSimpleName() + ":restartLoader reloaded data.");
-        }
+        restartLoader(false);
     }
 
     public boolean restartLoader(boolean force) {
@@ -582,9 +570,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         list.setOnCreateContextMenuListener(this);
         // Show the albums and songs from the selected artist
         list.setOnItemClickListener(this);
-        // To help make scrolling smooth
-        // from initAbsListView original code.
-        list.setOnScrollListener(this);
+
         // To help make scrolling smooth
         if (mProfileTabCarousel != null) {
             list.setOnScrollListener(new VerticalScrollListener(null, mProfileTabCarousel, 0));
@@ -612,34 +598,20 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         initAbsListView(mListView);
     }
 
-    @Override
-    public void onScrollStateChanged(final AbsListView view, final int scrollState) {
-        // Pause disk cache access to ensure smoother scrolling
-        if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING
-                || scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-            mAdapter.setPauseDiskCache(true);
-        } else {
-            mAdapter.setPauseDiskCache(false);
-            mAdapter.notifyDataSetChanged();
-        }
-    }
-
     /**
      * Pause disk cache access to ensure smoother scrolling
      */
     protected final VerticalScrollListener.ScrollableHeader mScrollableHeader = new VerticalScrollListener.ScrollableHeader() {
         @Override
         public void onScrollStateChanged(final AbsListView view, final int scrollState) {
+            // Pause disk cache access to ensure smoother scrolling
             if (mAdapter == null) {
                 return;
             }
-            if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING
-                    || scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                mAdapter.setPauseDiskCache(true);
-            } else {
-                mAdapter.setPauseDiskCache(false);
-                mAdapter.notifyDataSetChanged();
-            }
+            mAdapter.setPauseDiskCache(
+                    scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING ||
+                    scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
+
         }
     };
 

@@ -53,12 +53,12 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     /**
      * The header view
      */
-    protected static final int ITEM_VIEW_TYPE_HEADER = -1;
+    protected static final int ITEM_VIEW_TYPE_HEADER = 0;
 
     /**
      * * The data in the list.
      */
-    protected static final int ITEM_VIEW_TYPE_MUSIC = 0;
+    protected static final int ITEM_VIEW_TYPE_MUSIC = 1;
 
 
     /**
@@ -213,8 +213,6 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
             int size = mDataList.size();
             count = size==0 ? 0 : size + getOffset();
         }
-
-        LOGGER.info("getCount() -> " + count)   ;
         return count;
     }
 

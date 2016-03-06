@@ -139,6 +139,10 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
             // Build the album
             final Album album = getItem(i);
 
+            if (album == null) {
+                continue;
+            }
+
             // Build the data holder
             mData[i] = new DataHolder();
             // Album Id

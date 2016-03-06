@@ -51,9 +51,9 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
     public static final int DISPLAY_ALBUM_SETTING = 2;
 
     /**
-     * Number of views (ImageView, TextView, header)
+     * Number of views (1.ImageView, 2.TextView, 3. header)
      */
-    private static final int VIEW_TYPE_COUNT = 2;
+    private static final int VIEW_TYPE_COUNT = 3;
 
     /**
      * LayoutInflater
@@ -116,6 +116,7 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
 
         // Recycle MusicHolder's items
         MusicViewHolder holder;
+
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
             holder = new MusicViewHolder(convertView);
@@ -127,8 +128,7 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
         }
 
         // Retrieve the album
-        LOGGER.info("getView(position=="+position+") : getOffset() -> " + getOffset() + " => position - getOffset() => " + (position - getOffset()));
-        final Song song = getItem(position - getOffset());
+        final Song song = getItem(position - 1);//getOffset());
 
         // Set each track name (line one)
         holder.mLineOne.get().setText(song.mSongName);
@@ -187,8 +187,9 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
         return ITEM_VIEW_TYPE_MUSIC;
     }
 
+
     @Override
-    public long getItemId(int position) {
+    public long getItemId(final int position) {
         return position-1;
     }
 }

@@ -15,11 +15,12 @@ import android.annotation.SuppressLint;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-
-import com.andrew.apollo.utils.ApolloUtils;
+import com.frostwire.logging.Logger;
 
 @SuppressLint("NewApi")
 public class VerticalScrollListener implements OnScrollListener {
+
+    private static final Logger LOGGER = Logger.getLogger(VerticalScrollListener.class);
 
     /* Used to determine the off set to scroll the header */
     private final ScrollableHeader mHeader;
@@ -42,6 +43,8 @@ public class VerticalScrollListener implements OnScrollListener {
     public void onScroll(final AbsListView view, final int firstVisibleItem,
             final int visibleItemCount, final int totalItemCount) {
 
+        view.setVerticalScrollBarEnabled(firstVisibleItem > 0);
+
         if (mTabCarousel == null || mTabCarousel.isTabCarouselIsAnimating()) {
             return;
         }
@@ -51,9 +54,8 @@ public class VerticalScrollListener implements OnScrollListener {
             return;
         }
 
-        if (firstVisibleItem != 0) {
-            mTabCarousel.moveToYCoordinate(mPageIndex,
-                    -mTabCarousel.getAllowedVerticalScrollLength());
+        if (firstVisibleItem > 0) {
+            mTabCarousel.moveToYCoordinate(mPageIndex, -mTabCarousel.getAllowedVerticalScrollLength());
             return;
         }
 
@@ -76,7 +78,6 @@ public class VerticalScrollListener implements OnScrollListener {
     public interface ScrollableHeader {
 
         /* Used the pause the disk cache while scrolling */
-        public void onScrollStateChanged(AbsListView view, int scrollState);
+        void onScrollStateChanged(AbsListView view, int scrollState);
     }
-
 }

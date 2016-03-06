@@ -108,6 +108,9 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
         for (int i = 0; i < getCount(); i++) {
             // Build the artist
             final Playlist playlist = getItem(i);
+            if (playlist == null) {
+                continue;
+            }
 
             // Build the data holder
             mData[i] = new DataHolder();

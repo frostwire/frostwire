@@ -89,6 +89,10 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
             // Build the song
             final Song song = getItem(i);
 
+            if (song == null) {
+                continue;
+            }
+
             // Build the data holder
             mData[i] = new DataHolder();
             // Song Id
