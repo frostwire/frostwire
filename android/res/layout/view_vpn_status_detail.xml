@@ -48,49 +48,139 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
-            android:text="@string/unprotected_connection" />
+            android:text="@string/connection_header_title" />
 
-        <!-- Get VPN Button -->
+        <TextView
+            android:id="@+id/view_vpn_status_header"
+            style="@style/VPNTitle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal" />
+
+        <!-- VPN description text -->
+        <TextView
+            android:id="@+id/view_vpn_status_vpn_text"
+            style="@style/VPNText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="18dp"
+            android:text="@string/unprotected_connections_visibility_bullet_html" />
+
+        <!-- Unprotected connection button -->
         <Button
-            android:id="@+id/view_vpn_status_get_vpn_button"
+            android:id="@+id/view_vpn_status_get_vpn_button_top"
             style="@style/GetVPNButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="15dp"
-            android:layout_marginTop="15dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:text="@string/protect_my_privacy" />
+            android:layout_marginTop="30dp" />
 
-        <!-- privacy as a human right paragraph -->
         <TextView
-            style="@style/VPNSubTitle"
-            android:layout_width="fill_parent"
+            android:id="@+id/view_vpn_status_money_back"
+            style="@style/VPNSmallText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/view_vpn_status_vpn_price"
+            style="@style/VPNSmallText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal" />
+
+        <!-- Protected connection button -->
+        <Button
+            android:id="@+id/view_vpn_status_learn_more_button"
+            style="@style/GetVPNButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:padding="0dp"
-            android:text="@string/your_privacy_is_a_fundamental_right_html" />
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp" />
 
-        <!-- explanation about what is open -->
+
+        <ImageView
+            style="@style/divider_line"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginBottom="22dp"
+            android:layout_marginTop="22dp"
+            android:adjustViewBounds="false" />
+
+
+        <!-- VPN client's feature list -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <TextView style="@style/VPNTitleSecond"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="5dp"
+                android:text="@string/VPN_what_you_get_with" />
+
+            <TextView style="@style/VPNTitleSecond.Color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/VPN_client" />
+        </LinearLayout>
+
+        <TextView android:id="@+id/view_vpn_status_vpn_client_feature_1"
+            style="@style/VPNText.Regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/VPN_client_feature_1" />
+        <TextView android:id="@+id/view_vpn_status_vpn_client_feature_2"
+            style="@style/VPNText.Regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/VPN_client_feature_2" />
+        <TextView android:id="@+id/view_vpn_status_vpn_client_feature_3"
+            style="@style/VPNText.Regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/VPN_client_feature_3" />
+        <TextView android:id="@+id/view_vpn_status_vpn_client_feature_4"
+            style="@style/VPNText.Regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/VPN_client_feature_4" />
+
+        <!-- Bullet - VPN not required for FrostWire but highly recommended -->
         <TextView
-            android:id="@+id/VPNText"
+            android:id="@+id/view_vpn_status_bullet_textview"
             style="@style/VPNText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="15dp"
-            android:text="@string/unprotected_connections_visibility_bullet" />
-
-        <!-- Bullet - VPN not required for FrostWire but highly recommended -->
-        <com.frostwire.android.gui.views.HTMLTextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:layout_marginTop="20dp"
-            android:fontFamily="sans-serif-normal"
-            android:padding="0dp"
-            android:text="@string/you_dont_need_a_vpn_to_use_frostwire_bullet_html"
-            android:textColor="@color/app_text_secondary"
-            android:textSize="@dimen/text_size_medium" />
+            android:gravity="center_horizontal"
+            android:padding="0dp" />
+
+        <!-- ExpressVPN graphic -->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="15dp"
+            android:src="@drawable/express_vpn" />
+
+        <!-- GetVPN bottom button -->
+        <Button
+            android:id="@+id/view_vpn_status_get_vpn_button_bottom"
+            style="@style/GetVPNButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/get_VPN_client" />
 
     </LinearLayout>
 </ScrollView>

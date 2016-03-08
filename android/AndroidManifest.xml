@@ -257,6 +257,7 @@
 		</activity>
 		<!-- VPN Status -->
 		<activity android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
+			      android:label="@string/activity_VPN"
 				  android:excludeFromRecents="true"
 				  android:noHistory="true"/>
 

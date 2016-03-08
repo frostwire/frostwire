@@ -74,5 +74,6 @@
 
     <color name="tpi_unselected_text_color">@color/basic_white</color>
     <color name="warning_red">#ffff0000</color>
+    <color name="approval_green">#05a751</color>
 
 </resources>
