@@ -403,7 +403,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      *
      * @see #getChecked()
      */
-    private void initCheckBox(View view, T item) {
+    protected void initCheckBox(View view, T item) {
 
         CheckBox checkbox = findView(view, R.id.view_selectable_list_item_checkbox);
 
@@ -419,7 +419,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
     }
 
-    private void initTouchFeedback(View v, T item) {
+    protected void initTouchFeedback(View v, T item) {
         if (v == null || v instanceof CheckBox) {
             return;
         }
