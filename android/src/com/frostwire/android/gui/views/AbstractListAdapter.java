@@ -279,7 +279,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
             initTouchFeedback(view, item);
             initCheckBox(view, item);
-
+            //TODO: initRadioButton(view, item);
             populateView(view, item);
 
         } catch (Throwable e) {

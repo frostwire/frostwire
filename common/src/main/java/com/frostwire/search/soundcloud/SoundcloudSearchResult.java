@@ -173,4 +173,6 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     public String toString() {
         return "SoundcloudSearchResult.downloadUrl: " + getDownloadUrl();
     }
+
+
 }
