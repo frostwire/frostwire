@@ -21,7 +21,10 @@ package com.frostwire.android.gui.dialogs;
 import android.content.Context;
 import android.net.Uri;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -84,6 +87,36 @@ public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends Abs
     public ConfirmListDialogDefaultAdapter(Context context, List<T> list, SelectionMode selectionMode) {
         super(context, selectionModeToLayoutId.get(selectionMode).intValue(), list);
         this.selectionMode = selectionMode;
+    }
+
+    @Override
+    public View getView(int position, View view, ViewGroup parent) {
+        SearchResult item = (SearchResult) getItem(position);
+        Context ctx = getContext();
+
+        if (view == null && ctx != null) {
+            int layoutId = selectionModeToLayoutId.get(selectionMode).intValue();
+            // every list view item is wrapped in a generic container which has a hidden checkbox on the left hand side.
+            view = View.inflate(ctx, layoutId, null);
+            //LinearLayout container = findView(view, R.id.view_selectable_list_item_container);
+            //View.inflate(ctx, viewItemId, container);
+        }
+
+        try {
+
+            initTouchFeedback(view, item);
+            setCheckboxesVisibility(selectionMode == SelectionMode.MULTIPLE_SELECTION);
+            initCheckBox(view, item);
+            //TODO: setRadioButtonsVisibility(selectionMode == SelectionMode.SINGLE_SELECTION);
+            //TODO: initRadioButton(view, item);
+            populateView(view, item);
+
+        } catch (Throwable e) {
+            LOGGER.error("Fatal error getting view: " + e.getMessage(), e);
+        }
+
+        return view;
+
     }
 
     @Override
