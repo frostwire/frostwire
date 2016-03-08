@@ -20,18 +20,20 @@ package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Spanned;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.text.Html;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ClickAdapter;
-
 
 /**
  *
@@ -58,35 +60,78 @@ public class VPNStatusDetailActivity extends AbstractActivity {
         
         final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
         final TextView headerTitle = findView(R.id.view_vpn_status_header_title);
-        final Button button = findView(R.id.view_vpn_status_get_vpn_button);
+        final TextView unProtectedTitle = findView(R.id.view_vpn_status_header_un_protected);
+        final TextView VPNMoneyBack = findView(R.id.view_vpn_money_back);
+        final TextView VPNPrice = findView(R.id.view_vpn_price);
         final TextView VPNText = findView(R.id.VPNText);
+        final TextView VPNFeatureList = findView(R.id.VPNFeatures);
+        final TextView VPNBullet = findView(R.id.vpn_bullet);
+        final Button getVPNButtonTop = findView(R.id.view_vpn_status_get_vpn_button);
+        final Button learnVPNButton = findView(R.id.view_vpn_status_learn_more_button);
+        final Button getVPNButtonBottom = findView(R.id.button_VPN);
+
+
+        String VPNHtmlFeatures = getString(R.string.VPN_feature_list_html);
+        Spanned VPNFeaturesAsSpanned = Html.fromHtml(VPNHtmlFeatures);
+        VPNFeatureList.setText(VPNFeaturesAsSpanned);
+
+        String VPNHtmlBullet = getString(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html);
+        Spanned VPNBulletAsSpanned = Html.fromHtml(VPNHtmlBullet);
+        VPNBullet.setText(VPNBulletAsSpanned);
 
         // By default the layout has icon and title set to unprotected.
         if (isProtectedConnection) {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_on_info);
             // Current Status Title
-            headerTitle.setText(R.string.protected_connection);
-            VPNText.setText(R.string.protected_connections_visibility_bullet);
-            button.setText(R.string.learn_more);
+            headerTitle.setText(R.string.connection_header_title);
+            unProtectedTitle.setText(R.string.protected_connection);
+            unProtectedTitle.setTextColor(getResources().getColor(R.color.approval_green));
+            VPNMoneyBack.setVisibility(View.GONE);
+            VPNPrice.setVisibility(View.GONE);
+            // Current Status Text
+            String VPNHtmlText = getString(R.string.protected_connections_visibility_bullet_html);
+            Spanned VPNTextAsSpanned = Html.fromHtml(VPNHtmlText);
+            VPNText.setText(VPNTextAsSpanned);
+            // getVPNButtonTop/learnVPNButton
+            getVPNButtonTop.setVisibility(View.GONE);
+            learnVPNButton.setText(R.string.learn_more);
+            // getVPNButtonBottom
+            getVPNButtonBottom.setText(R.string.visit_VPN_client);
         }
         else {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_off_info);
             // Current Status Title
-            headerTitle.setText(R.string.unprotected_connection);
-            VPNText.setText(R.string.unprotected_connections_visibility_bullet);
-            button.setText(R.string.protect_my_privacy);
+            headerTitle.setText(R.string.connection_header_title);
+            unProtectedTitle.setText(R.string.unprotected_connection);
+            unProtectedTitle.setTextColor(Color.RED);
+            // Current Status VPN client price
+            VPNMoneyBack.setText(R.string.VPN_money_back);
+            VPNPrice.setText(R.string.VPN_price);
+            // Current Status Text
+            String VPNHtmlText = getString(R.string.unprotected_connections_visibility_bullet_html);
+            Spanned VPNTextAsSpanned = Html.fromHtml(VPNHtmlText);
+            VPNText.setText(VPNTextAsSpanned);
+            // getVPNButtonTop/learnVPNButton
+            learnVPNButton.setVisibility(View.GONE);
+            getVPNButtonTop.setText(R.string.get_express_VPN);
+            // getVPNButtonBottom
+            getVPNButtonBottom.setText(R.string.get_express_VPN);
         }
 
         final OnGetVPNClickListener onGetVPNClickListener = new OnGetVPNClickListener(this, isProtectedConnection);
         headerIcon.setOnClickListener(onGetVPNClickListener);
         headerTitle.setOnClickListener(onGetVPNClickListener);
-        button.setOnClickListener(onGetVPNClickListener);
+        getVPNButtonTop.setOnClickListener(onGetVPNClickListener);
+        getVPNButtonBottom.setOnClickListener(onGetVPNClickListener);
+        learnVPNButton.setOnClickListener(onGetVPNClickListener);
 
         headerIcon.setOnLongClickListener(onGetVPNClickListener);
         headerTitle.setOnLongClickListener(onGetVPNClickListener);
-        button.setOnLongClickListener(onGetVPNClickListener);
+        getVPNButtonTop.setOnLongClickListener(onGetVPNClickListener);
+        getVPNButtonBottom.setOnLongClickListener(onGetVPNClickListener);
+        learnVPNButton.setOnLongClickListener(onGetVPNClickListener);
     }
 
     @Override
