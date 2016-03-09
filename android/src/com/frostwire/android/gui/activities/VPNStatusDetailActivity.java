@@ -59,16 +59,16 @@ public class VPNStatusDetailActivity extends AbstractActivity {
                 intent.getAction().equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED);
         
         final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
-        final TextView headerTitle = findView(R.id.view_vpn_status_header_title);
-        final TextView unProtectedTitle = findView(R.id.view_vpn_status_header_un_protected);
-        final TextView VPNMoneyBack = findView(R.id.view_vpn_money_back);
-        final TextView VPNPrice = findView(R.id.view_vpn_price);
-        final TextView VPNText = findView(R.id.VPNText);
-        final TextView VPNFeatureList = findView(R.id.VPNFeatures);
-        final TextView VPNBullet = findView(R.id.vpn_bullet);
-        final Button getVPNButtonTop = findView(R.id.view_vpn_status_get_vpn_button);
+        final TextView headerStatus = findView(R.id.view_vpn_status_header);
+        final TextView VPNText = findView(R.id.view_vpn_status_vpn_text);
+        final TextView VPNMoneyBack = findView(R.id.view_vpn_status_money_back);
+        final TextView VPNPrice = findView(R.id.view_vpn_status_vpn_price);
+        final TextView VPNFeatureList = findView(R.id.view_vpn_status_client_features);
+        final TextView VPNBullet = findView(R.id.view_vpn_status_bullet_textview);
+
+        final Button getVPNButtonTop = findView(R.id.view_vpn_status_get_vpn_button_top);
         final Button learnVPNButton = findView(R.id.view_vpn_status_learn_more_button);
-        final Button getVPNButtonBottom = findView(R.id.button_VPN);
+        final Button getVPNButtonBottom = findView(R.id.view_vpn_status_get_vpn_button_bottom);
 
 
         String VPNHtmlFeatures = getString(R.string.VPN_feature_list_html);
@@ -84,9 +84,8 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_on_info);
             // Current Status Title
-            headerTitle.setText(R.string.connection_header_title);
-            unProtectedTitle.setText(R.string.protected_connection);
-            unProtectedTitle.setTextColor(getResources().getColor(R.color.approval_green));
+            headerStatus.setText(R.string.protected_connection);
+            headerStatus.setTextColor(getResources().getColor(R.color.approval_green));
             VPNMoneyBack.setVisibility(View.GONE);
             VPNPrice.setVisibility(View.GONE);
             // Current Status Text
@@ -103,9 +102,8 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_off_info);
             // Current Status Title
-            headerTitle.setText(R.string.connection_header_title);
-            unProtectedTitle.setText(R.string.unprotected_connection);
-            unProtectedTitle.setTextColor(Color.RED);
+            headerStatus.setText(R.string.unprotected_connection);
+            headerStatus.setTextColor(Color.RED);
             // Current Status VPN client price
             VPNMoneyBack.setText(R.string.VPN_money_back);
             VPNPrice.setText(R.string.VPN_price);
@@ -122,13 +120,13 @@ public class VPNStatusDetailActivity extends AbstractActivity {
 
         final OnGetVPNClickListener onGetVPNClickListener = new OnGetVPNClickListener(this, isProtectedConnection);
         headerIcon.setOnClickListener(onGetVPNClickListener);
-        headerTitle.setOnClickListener(onGetVPNClickListener);
+        headerStatus.setOnClickListener(onGetVPNClickListener);
         getVPNButtonTop.setOnClickListener(onGetVPNClickListener);
         getVPNButtonBottom.setOnClickListener(onGetVPNClickListener);
         learnVPNButton.setOnClickListener(onGetVPNClickListener);
 
         headerIcon.setOnLongClickListener(onGetVPNClickListener);
-        headerTitle.setOnLongClickListener(onGetVPNClickListener);
+        headerStatus.setOnLongClickListener(onGetVPNClickListener);
         getVPNButtonTop.setOnLongClickListener(onGetVPNClickListener);
         getVPNButtonBottom.setOnLongClickListener(onGetVPNClickListener);
         learnVPNButton.setOnLongClickListener(onGetVPNClickListener);

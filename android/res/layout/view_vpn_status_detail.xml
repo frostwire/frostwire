@@ -51,7 +51,7 @@
             android:text="@string/connection_header_title" />
 
         <TextView
-            android:id="@+id/view_vpn_status_header_un_protected"
+            android:id="@+id/view_vpn_status_header"
             style="@style/VPNTitle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -59,7 +59,7 @@
 
         <!-- VPN description text -->
         <TextView
-            android:id="@+id/VPNText"
+            android:id="@+id/view_vpn_status_vpn_text"
             style="@style/VPNText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -68,7 +68,7 @@
 
         <!-- Unprotected connection button -->
         <Button
-            android:id="@+id/view_vpn_status_get_vpn_button"
+            android:id="@+id/view_vpn_status_get_vpn_button_top"
             style="@style/GetVPNButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -76,14 +76,14 @@
             android:layout_marginTop="30dp" />
 
         <TextView
-            android:id="@+id/view_vpn_money_back"
+            android:id="@+id/view_vpn_status_money_back"
             style="@style/VPNSmallText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_horizontal" />
 
         <TextView
-            android:id="@+id/view_vpn_price"
+            android:id="@+id/view_vpn_status_vpn_price"
             style="@style/VPNSmallText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -100,7 +100,6 @@
 
 
         <ImageView
-            android:id="@+id/imageView"
             style="@style/divider_line"
             android:layout_width="match_parent"
             android:layout_height="2dp"
@@ -119,7 +118,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/VPN_what_do_you_get"
+                android:id="@+id/view_vpn_status_what_do_you_get_textview"
                 style="@style/VPNTitleSecond"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -127,7 +126,7 @@
                 android:text="@string/VPN_what_you_get_with" />
 
             <TextView
-                android:id="@+id/VPN_client"
+                android:id="@+id/view_vpn_status_client_textview"
                 style="@style/VPNTitleSecond.Color"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -135,7 +134,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/VPNFeatures"
+            android:id="@+id/view_vpn_status_client_features"
             style="@style/VPNText.Regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -144,7 +143,7 @@
 
         <!-- Bullet - VPN not required for FrostWire but highly recommended -->
         <TextView
-            android:id="@+id/vpn_bullet"
+            android:id="@+id/view_vpn_status_bullet_textview"
             style="@style/VPNText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -166,7 +165,7 @@
 
         <!-- GetVPN bottom button -->
         <Button
-            android:id="@+id/button_VPN"
+            android:id="@+id/view_vpn_status_get_vpn_button_bottom"
             style="@style/GetVPNButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
