@@ -49,7 +49,8 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).mPlaylistId;
+        final Playlist item = getItem(position);
+        return item != null ? item.mPlaylistId : -1;
     }
 
     /**
