@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ package com.frostwire.search;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.ThreadPool;
 import rx.Observable;
-import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
 import java.util.Collections;
@@ -67,11 +66,15 @@ public class SearchManagerImpl implements SearchManager {
                 throw new IllegalArgumentException("Search token id must be >= 0");
             }
 
-            performer.observable().subscribe(new Action1<List<? extends SearchResult>>() {
-                // NOTE: This is what's called when we do subject.onNext(List<>)
+            performer.listener(new SearchListener() {
                 @Override
-                public void call(List<? extends SearchResult> results) {
+                public void onResults(long token, List<? extends SearchResult> results) {
                     performerOnResults(performer, results);
+                }
+
+                @Override
+                public void onStopped(long token) {
+                    // nothing since this is calculated in aggregation
                 }
             });
 
