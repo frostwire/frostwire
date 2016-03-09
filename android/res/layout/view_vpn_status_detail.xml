@@ -165,11 +165,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="20dp"
-            android:fontFamily="sans-serif-normal"
             android:gravity="center_horizontal"
-            android:padding="0dp"
-            android:textColor="@color/app_text_secondary"
-            android:textSize="@dimen/text_size_medium" />
+            android:padding="0dp" />
 
         <!-- ExpressVPN graphic -->
         <ImageView
