@@ -134,12 +134,29 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/view_vpn_status_client_features"
             style="@style/VPNText.Regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="@string/VPN_feature_list_html" />
+            android:text="@string/VPN_client_feature_1" />
+        <TextView
+            style="@style/VPNText.Regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/VPN_client_feature_2" />
+        <TextView
+            style="@style/VPNText.Regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/VPN_client_feature_3" />
+        <TextView
+            style="@style/VPNText.Regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/VPN_client_feature_4" />
 
         <!-- Bullet - VPN not required for FrostWire but highly recommended -->
         <TextView

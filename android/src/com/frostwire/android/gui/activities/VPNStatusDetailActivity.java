@@ -63,17 +63,12 @@ public class VPNStatusDetailActivity extends AbstractActivity {
         final TextView VPNText = findView(R.id.view_vpn_status_vpn_text);
         final TextView VPNMoneyBack = findView(R.id.view_vpn_status_money_back);
         final TextView VPNPrice = findView(R.id.view_vpn_status_vpn_price);
-        final TextView VPNFeatureList = findView(R.id.view_vpn_status_client_features);
         final TextView VPNBullet = findView(R.id.view_vpn_status_bullet_textview);
 
         final Button getVPNButtonTop = findView(R.id.view_vpn_status_get_vpn_button_top);
         final Button learnVPNButton = findView(R.id.view_vpn_status_learn_more_button);
         final Button getVPNButtonBottom = findView(R.id.view_vpn_status_get_vpn_button_bottom);
 
-
-        String VPNHtmlFeatures = getString(R.string.VPN_feature_list_html);
-        Spanned VPNFeaturesAsSpanned = Html.fromHtml(VPNHtmlFeatures);
-        VPNFeatureList.setText(VPNFeaturesAsSpanned);
 
         String VPNHtmlBullet = getString(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html);
         Spanned VPNBulletAsSpanned = Html.fromHtml(VPNHtmlBullet);

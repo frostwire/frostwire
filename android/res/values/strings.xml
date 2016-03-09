@@ -24,13 +24,6 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you do not need a VPN to use FrostWire. </b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
-    <string name="VPN_feature_list_html"><![CDATA[
-    <ul>
-        <li><b>&#8226;</b> Military-grade encryption</li><br><br>
-        <li><b>&#8226;</b> Unlimited download speed</li><br><br>
-        <li><b>&#8226;</b> Private and logless browsing</li><br><br>
-        <li><b>&#8226;</b> 24/7 customer support</li><br>
-    </ul>]]></string>
 
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
@@ -573,6 +566,10 @@
     <string name="VPN_client">ExpressVPN</string>
     <string name="get_VPN_client">Get ExpressVPN</string>
     <string name="visit_VPN_client">Visit ExpressVPN</string>
+    <string name="VPN_client_feature_1">&#8226; Military-grade encryption</string>
+    <string name="VPN_client_feature_2">&#8226; Unlimited download speed</string>
+    <string name="VPN_client_feature_3">&#8226; Private and logless browsing</string>
+    <string name="VPN_client_feature_4">&#8226; 24/7 customer support</string>
     <string name="dht_contacts">DHT contacts</string>
     <string name="notify_frostwire_is_running">Notify if FrostWire is running</string>
     <string name="notify_frostwire_is_running_summary">Show a permanent Android notification with status of transfers</string>
