@@ -124,8 +124,6 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
         return results;
     }
 
-
-
     private static class OnStartDownloadsClickListener implements View.OnClickListener {
         private final WeakReference<Context> ctxRef;
         private WeakReference<AbstractConfirmListDialog> dlgRef;
@@ -143,21 +141,19 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
         public void onClick(View v) {
             if (Ref.alive(ctxRef) && Ref.alive(dlgRef)) {
                 AbstractConfirmListDialog dlg = dlgRef.get();
-                List<SoundcloudSearchResult> results = dlg.getList();
+                List<SoundcloudSearchResult> results = dlg.getList(); // for no selection case.
 
                 if (dlg.getSelectionMode() == AbstractConfirmListDialog.SelectionMode.MULTIPLE_SELECTION) {
                     results = new ArrayList<>(dlg.getChecked());
-                    // TODO: If results is empty, then we should probably trigger an error message in the dialog
-                    // if (results == null || results.isEmpty()) { dlg.displayErrorNotice(ERROR_CODE); return; }
-
                 } else if (dlg.getSelectionMode() == AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION) {
                     SoundcloudSearchResult selected = results.get(dlg.getLastSelected());
+                    if (selected == null) {
+                        // MIGHT DO: dlg.displayErrorNotice(ERROR_CODE);
+                        return;
+                    }
                     results = new ArrayList<>();
                     results.add(selected);
-                    // TODO: If results is empty, then we should probably trigger an error message in the dialog
-                    // if (results == null || results.isEmpty()) { dlg.displayErrorNotice(ERROR_CODE); return; }
                 }
-
                 startDownloads(ctxRef.get(), results);
                 dlg.dismiss();
             }
