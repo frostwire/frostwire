@@ -144,6 +144,7 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
             if (Ref.alive(ctxRef) && Ref.alive(dlgRef)) {
                 AbstractConfirmListDialog dlg = dlgRef.get();
                 List<SoundcloudSearchResult> results = dlg.getList();
+
                 if (dlg.getSelectionMode() == AbstractConfirmListDialog.SelectionMode.MULTIPLE_SELECTION) {
                     results = new ArrayList<>(dlg.getChecked());
                     // TODO: If results is empty, then we should probably trigger an error message in the dialog
@@ -152,7 +153,10 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
                 } else if (dlg.getSelectionMode() == AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION) {
                     // TODO: If results is empty, then we should probably trigger an error message in the dialog
                     // if (results == null || results.isEmpty()) { dlg.displayErrorNotice(ERROR_CODE); return; }
+                } else {
+                    //We already know have NO_SELECTION mode. Then
                 }
+
                 startDownloads(ctxRef.get(), results);
                 dlg.dismiss();
             }
@@ -173,7 +177,7 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
                                                                   String dialogText,
                                                                   List<SoundcloudSearchResult> listData) {
 
-            ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog(SelectionMode.MULTIPLE_SELECTION);
+            ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog(SelectionMode.SINGLE_SELECTION);  //TODO: Set this back to MULTIPLE SELECTION
             SoundcloudSearchResultList srList = new SoundcloudSearchResultList();
             srList.listData = listData;
             dlg.prepareArguments(dialogTitle, dialogText, JsonUtils.toJson(srList));
