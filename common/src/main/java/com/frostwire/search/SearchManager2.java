@@ -19,8 +19,6 @@ package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.util.ThreadPool;
-import rx.Observable;
-import rx.subjects.PublishSubject;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -28,62 +26,49 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class SearchManagerImpl implements SearchManager {
+public final class SearchManager2 {
 
-    private static final Logger LOG = Logger.getLogger(SearchManagerImpl.class);
-
-    private static final int DEFAULT_NTHREADS = 6;
+    private static final Logger LOG = Logger.getLogger(SearchManager2.class);
 
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
-    private final PublishSubject<SearchManagerSignal> subject;
 
-    public SearchManagerImpl(int nThreads) {
+    private SearchListener listener;
+
+    public SearchManager2(int nThreads) {
         this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
-        this.subject = PublishSubject.create();
     }
 
-    public SearchManagerImpl() {
-        this(DEFAULT_NTHREADS);
-    }
 
-    @Override
-    public Observable<SearchManagerSignal> observable() {
-        return subject;
-    }
-
-    @Override
     public void perform(final SearchPerformer performer) {
-        if (performer != null) {
-            if (performer.getToken() < 0) {
-                throw new IllegalArgumentException("Search token id must be >= 0");
+        if (performer == null) {
+            throw new IllegalArgumentException("Search performer argument can't be null");
+        }
+        if (performer.getToken() < 0) {
+            throw new IllegalArgumentException("Search token id must be >= 0");
+        }
+
+        performer.setListener(new SearchListener() {
+            @Override
+            public void onResults(long token, List<? extends SearchResult> results) {
+                performerOnResults(performer, results);
             }
 
-            performer.setListener(new SearchListener() {
-                @Override
-                public void onResults(long token, List<? extends SearchResult> results) {
-                    performerOnResults(performer, results);
-                }
+            @Override
+            public void onStopped(long token) {
+                // nothing since this is calculated in aggregation
+            }
+        });
 
-                @Override
-                public void onStopped(long token) {
-                    // nothing since this is calculated in aggregation
-                }
-            });
+        SearchTask task = new PerformTask(this, performer, getOrder(performer.getToken()));
 
-            SearchTask task = new PerformTask(this, performer, getOrder(performer.getToken()));
-
-            submitSearchTask(task);
-        } else {
-            LOG.warn("Search performer is null, review your logic");
-        }
+        submitSearchTask(task);
     }
 
     public void submitSearchTask(SearchTask task) {
@@ -91,54 +76,39 @@ public class SearchManagerImpl implements SearchManager {
         executor.execute(task);
     }
 
-    @Override
     public void stop() {
         stopTasks(-1L);
     }
 
-    @Override
     public void stop(long token) {
         stopTasks(token);
     }
 
-    @Override
-    public boolean shutdown(long timeout, TimeUnit unit) {
-        stop();
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(timeout, unit)) {
-                executor.shutdownNow();
-                // wait a while for tasks to respond to being cancelled
-                if (!executor.awaitTermination(timeout, unit)) {
-                    LOG.error("Pool did not terminate");
-                    return false;
-                }
-            }
-        } catch (InterruptedException ie) {
-            // (re-)cancel if current thread also interrupted
-            executor.shutdownNow();
-            // preserve interrupt status
-            Thread.currentThread().interrupt();
-        }
-
-        return tasks.isEmpty();
+    public SearchListener getListener() {
+        return listener;
     }
 
-    protected void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
+    public void setListener(SearchListener listener) {
+        this.listener = listener;
+    }
+
+    private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
         try {
-            if (results != null) {
-                subject.onNext(new SearchManagerSignal.Results(performer.getToken(), results));
+            if (results != null && listener != null) {
+                listener.onResults(performer.getToken(), results);
             }
         } catch (Throwable e) {
-            LOG.warn("Error sending results back to receiver: " + e.getMessage(), e);
+            LOG.warn("Error sending results to listener: " + e.getMessage(), e);
         }
     }
 
-    protected void onFinished(long token) {
+    private void onStopped(long token) {
         try {
-            subject.onNext(new SearchManagerSignal.End(token));
+            if (listener != null) {
+                listener.onStopped(token);
+            }
         } catch (Throwable e) {
-            LOG.warn("Error sending results back to receiver: " + e.getMessage(), e);
+            LOG.warn("Error sending stopped signal to listener: " + e.getMessage(), e);
         }
     }
 
@@ -185,7 +155,7 @@ public class SearchManagerImpl implements SearchManager {
         }
 
         if (pendingTask == null) {
-            onFinished(performer.getToken());
+            onStopped(performer.getToken());
         }
     }
 
@@ -227,11 +197,11 @@ public class SearchManagerImpl implements SearchManager {
 
     private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {
 
-        protected final SearchManagerImpl manager;
+        protected final SearchManager2 manager;
         protected final SearchPerformer performer;
         private final int order;
 
-        public SearchTask(SearchManagerImpl manager, SearchPerformer performer, int order) {
+        public SearchTask(SearchManager2 manager, SearchPerformer performer, int order) {
             this.manager = manager;
             this.performer = performer;
             this.order = order;
@@ -258,7 +228,7 @@ public class SearchManagerImpl implements SearchManager {
 
     private static final class PerformTask extends SearchTask {
 
-        public PerformTask(SearchManagerImpl manager, SearchPerformer performer, int order) {
+        public PerformTask(SearchManager2 manager, SearchPerformer performer, int order) {
             super(manager, performer, order);
         }
 
@@ -282,7 +252,7 @@ public class SearchManagerImpl implements SearchManager {
 
         private final CrawlableSearchResult sr;
 
-        public CrawlTask(SearchManagerImpl manager, SearchPerformer performer, CrawlableSearchResult sr, int order) {
+        public CrawlTask(SearchManager2 manager, SearchPerformer performer, CrawlableSearchResult sr, int order) {
             super(manager, performer, order);
             this.sr = sr;
         }

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,25 +15,33 @@
  * limitations under the License.
  */
 
-package com.frostwire.search;
+package com.frostwire.search.filter;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface SearchPerformer {
+public final class SourceKey extends FilterKeyBase {
 
-    long getToken();
+    private final String source;
+    private final int ordinal;
 
-    void perform();
+    public SourceKey(String source, int ordinal, String display) {
+        super(display);
+        this.source = source;
+        this.ordinal = ordinal;
+    }
 
-    void crawl(CrawlableSearchResult sr);
+    public String source() {
+        return source;
+    }
 
-    void stop();
+    @Override
+    public int compareTo(FilterKey o) {
+        if (!(o instanceof SourceKey)) {
+            return -1;
+        }
 
-    boolean isStopped();
-
-    SearchListener getListener();
-
-    void setListener(SearchListener listener);
+        return Integer.compare(ordinal, ((SourceKey) o).ordinal);
+    }
 }

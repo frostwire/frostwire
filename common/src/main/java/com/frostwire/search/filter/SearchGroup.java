@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,25 +15,35 @@
  * limitations under the License.
  */
 
-package com.frostwire.search;
+package com.frostwire.search.filter;
+
+import com.frostwire.search.SearchResult;
+
+import java.util.Collections;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface SearchPerformer {
+public final class SearchGroup {
 
-    long getToken();
+    private final NavigableSet<SearchResult> data;
 
-    void perform();
+    SearchGroup(SearchFilter filter) {
+        this.data = new TreeSet<>(filter.comparator());
+    }
 
-    void crawl(CrawlableSearchResult sr);
+    public NavigableSet<SearchResult> data() {
+        return Collections.unmodifiableNavigableSet(data);
+    }
 
-    void stop();
+    void add(SearchResult sr) {
+        data.add(sr);
+    }
 
-    boolean isStopped();
-
-    SearchListener getListener();
-
-    void setListener(SearchListener listener);
+    void clear() {
+        data.clear();
+    }
 }

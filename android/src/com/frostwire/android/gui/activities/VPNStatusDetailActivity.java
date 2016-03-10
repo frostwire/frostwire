@@ -20,7 +20,10 @@ package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +34,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ClickAdapter;
-
 
 /**
  *
@@ -47,6 +49,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
 
     @Override
     protected void initComponents(Bundle savedInstanceState) {
+        final String UNICODE_BULLET = "&#8226; ";
         final ActionBar bar = getActionBar();
         if (bar != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -57,36 +60,76 @@ public class VPNStatusDetailActivity extends AbstractActivity {
                 intent.getAction().equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED);
         
         final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
-        final TextView headerTitle = findView(R.id.view_vpn_status_header_title);
-        final Button button = findView(R.id.view_vpn_status_get_vpn_button);
-        final TextView VPNText = findView(R.id.VPNText);
+        final TextView headerStatus = findView(R.id.view_vpn_status_header);
+        final TextView vpnText = findView(R.id.view_vpn_status_vpn_text);
+        final TextView vpnMoneyBack = findView(R.id.view_vpn_status_money_back);
+        final TextView vpnPrice = findView(R.id.view_vpn_status_vpn_price);
+
+        final TextView vpnBullet = findView(R.id.view_vpn_status_bullet_textview);
+        vpnBullet.setText(Html.fromHtml(getString(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html)));
+
+        final TextView vpnClientFeature1 = findView(R.id.view_vpn_status_vpn_client_feature_1);
+        final TextView vpnClientFeature2 = findView(R.id.view_vpn_status_vpn_client_feature_2);
+        final TextView vpnClientFeature3 = findView(R.id.view_vpn_status_vpn_client_feature_3);
+        final TextView vpnClientFeature4 = findView(R.id.view_vpn_status_vpn_client_feature_4);
+        vpnClientFeature1.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature1.getText()));
+        vpnClientFeature2.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature2.getText()));
+        vpnClientFeature3.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature3.getText()));
+        vpnClientFeature4.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature4.getText()));
+
+        final Button getVPNButtonTop = findView(R.id.view_vpn_status_get_vpn_button_top);
+        final Button learnVPNButton = findView(R.id.view_vpn_status_learn_more_button);
+        final Button getVPNButtonBottom = findView(R.id.view_vpn_status_get_vpn_button_bottom);
 
         // By default the layout has icon and title set to unprotected.
         if (isProtectedConnection) {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_on_info);
             // Current Status Title
-            headerTitle.setText(R.string.protected_connection);
-            VPNText.setText(R.string.protected_connections_visibility_bullet);
-            button.setText(R.string.learn_more);
+            headerStatus.setText(R.string.protected_connection);
+            headerStatus.setTextColor(getResources().getColor(R.color.approval_green));
+            vpnMoneyBack.setVisibility(View.GONE);
+            vpnPrice.setVisibility(View.GONE);
+            // Current Status Text
+            vpnText.setText(Html.fromHtml(getString(R.string.protected_connections_visibility_bullet_html)));
+            // getVPNButtonTop/learnVPNButton
+            getVPNButtonTop.setVisibility(View.GONE);
+            learnVPNButton.setText(R.string.learn_more);
+            // getVPNButtonBottom
+            getVPNButtonBottom.setText(R.string.visit_vpn_client);
         }
         else {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_off_info);
             // Current Status Title
-            headerTitle.setText(R.string.unprotected_connection);
-            VPNText.setText(R.string.unprotected_connections_visibility_bullet);
-            button.setText(R.string.protect_my_privacy);
+            headerStatus.setText(R.string.unprotected_connection);
+            headerStatus.setTextColor(Color.RED);
+            // Current Status VPN client price
+            vpnMoneyBack.setText(R.string.vpn_money_back);
+            vpnPrice.setText(R.string.vpn_price);
+            // Current Status Text
+            String VPNHtmlText = getString(R.string.unprotected_connections_visibility_bullet_html);
+            Spanned VPNTextAsSpanned = Html.fromHtml(VPNHtmlText);
+            vpnText.setText(VPNTextAsSpanned);
+            // getVPNButtonTop/learnVPNButton
+            learnVPNButton.setVisibility(View.GONE);
+            getVPNButtonTop.setText(R.string.get_express_VPN);
+            // getVPNButtonBottom
+            getVPNButtonBottom.setText(R.string.get_express_VPN);
         }
 
         final OnGetVPNClickListener onGetVPNClickListener = new OnGetVPNClickListener(this, isProtectedConnection);
         headerIcon.setOnClickListener(onGetVPNClickListener);
-        headerTitle.setOnClickListener(onGetVPNClickListener);
-        button.setOnClickListener(onGetVPNClickListener);
+        headerStatus.setOnClickListener(onGetVPNClickListener);
+        getVPNButtonTop.setOnClickListener(onGetVPNClickListener);
+        getVPNButtonBottom.setOnClickListener(onGetVPNClickListener);
+        learnVPNButton.setOnClickListener(onGetVPNClickListener);
 
         headerIcon.setOnLongClickListener(onGetVPNClickListener);
-        headerTitle.setOnLongClickListener(onGetVPNClickListener);
-        button.setOnLongClickListener(onGetVPNClickListener);
+        headerStatus.setOnLongClickListener(onGetVPNClickListener);
+        getVPNButtonTop.setOnLongClickListener(onGetVPNClickListener);
+        getVPNButtonBottom.setOnLongClickListener(onGetVPNClickListener);
+        learnVPNButton.setOnLongClickListener(onGetVPNClickListener);
     }
 
     @Override
