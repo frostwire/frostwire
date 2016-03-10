@@ -234,4 +234,8 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
         }
         return result;
     }
+
+    public int getLastSelected(){
+        return adapter.getLastSelectedRadioButtonIndex();
+    }
 }

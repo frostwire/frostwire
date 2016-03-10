@@ -606,4 +606,8 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             radioButton.setChecked(tag.position == lastSelectedRadioButtonIndex);
         }
     }
+
+    public int getLastSelectedRadioButtonIndex(){
+        return lastSelectedRadioButtonIndex;
+    }
 }
