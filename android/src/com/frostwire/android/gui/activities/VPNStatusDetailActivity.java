@@ -91,9 +91,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             vpnMoneyBack.setVisibility(View.GONE);
             vpnPrice.setVisibility(View.GONE);
             // Current Status Text
-            String VPNHtmlText = getString(R.string.protected_connections_visibility_bullet_html);
-            Spanned VPNTextAsSpanned = Html.fromHtml(VPNHtmlText);
-            vpnText.setText(VPNTextAsSpanned);
+            vpnText.setText(Html.fromHtml(getString(R.string.protected_connections_visibility_bullet_html)));
             // getVPNButtonTop/learnVPNButton
             getVPNButtonTop.setVisibility(View.GONE);
             learnVPNButton.setText(R.string.learn_more);
