@@ -151,10 +151,11 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
                     // if (results == null || results.isEmpty()) { dlg.displayErrorNotice(ERROR_CODE); return; }
 
                 } else if (dlg.getSelectionMode() == AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION) {
+                    SoundcloudSearchResult selected = results.get(dlg.getLastSelected());
+                    results = new ArrayList<>();
+                    results.add(selected);
                     // TODO: If results is empty, then we should probably trigger an error message in the dialog
                     // if (results == null || results.isEmpty()) { dlg.displayErrorNotice(ERROR_CODE); return; }
-                } else {
-                    //We already know have NO_SELECTION mode. Then
                 }
 
                 startDownloads(ctxRef.get(), results);
