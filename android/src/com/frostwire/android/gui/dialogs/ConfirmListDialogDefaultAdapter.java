@@ -22,9 +22,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -54,6 +52,7 @@ import java.util.Map;
  */
 public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends AbstractListAdapter {
     private static final Logger LOGGER = Logger.getLogger(ConfirmListDialogDefaultAdapter.class);
+    private boolean radioButtonVisibility;
     private static final int ITEM_TITLE = 0;
     private static final int ITEM_SIZE = 1;
     private static final int ITEM_ART = 2;
@@ -95,28 +94,24 @@ public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends Abs
         Context ctx = getContext();
 
         if (view == null && ctx != null) {
-            int layoutId = selectionModeToLayoutId.get(selectionMode).intValue();
-            // every list view item is wrapped in a generic container which has a hidden checkbox on the left hand side.
+            int layoutId = selectionModeToLayoutId.get(selectionMode);
             view = View.inflate(ctx, layoutId, null);
-            //LinearLayout container = findView(view, R.id.view_selectable_list_item_container);
-            //View.inflate(ctx, viewItemId, container);
         }
 
         try {
 
             initTouchFeedback(view, item);
-            setCheckboxesVisibility(selectionMode == SelectionMode.MULTIPLE_SELECTION);
-            initCheckBox(view, item);
-            //TODO: setRadioButtonsVisibility(selectionMode == SelectionMode.SINGLE_SELECTION);
-            //TODO: initRadioButton(view, item);
+            if(selectionMode == SelectionMode.MULTIPLE_SELECTION) {
+                initCheckBox(view, item);
+                setCheckboxesVisibility(selectionMode == SelectionMode.MULTIPLE_SELECTION);
+            } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
+                initRadioButton(view, new RadioButtonTag((T) item, position));
+            }
             populateView(view, item);
-
         } catch (Throwable e) {
             LOGGER.error("Fatal error getting view: " + e.getMessage(), e);
         }
-
         return view;
-
     }
 
     @Override
@@ -141,4 +136,5 @@ public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends Abs
             LOGGER.warn("populateView(data): data is not a SearchResult instance ("+data.getClass().getSimpleName()+")");
         }
     }
+
 }

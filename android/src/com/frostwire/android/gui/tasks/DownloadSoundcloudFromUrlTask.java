@@ -153,7 +153,7 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
                     // TODO: If results is empty, then we should probably trigger an error message in the dialog
                     // if (results == null || results.isEmpty()) { dlg.displayErrorNotice(ERROR_CODE); return; }
                 }
-               startDownloads(ctxRef.get(), results);
+                startDownloads(ctxRef.get(), results);
                 dlg.dismiss();
             }
         }
@@ -172,6 +172,7 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
         public static ConfirmSoundcloudDownloadDialog newInstance(String dialogTitle,
                                                                   String dialogText,
                                                                   List<SoundcloudSearchResult> listData) {
+
             ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog(SelectionMode.MULTIPLE_SELECTION);
             SoundcloudSearchResultList srList = new SoundcloudSearchResultList();
             srList.listData = listData;
