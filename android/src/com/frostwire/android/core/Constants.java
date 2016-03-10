@@ -180,8 +180,8 @@ public final class Constants {
     public static final String SOCIAL_URL_TWITTER_PAGE = "https://twitter.com/frostwire";
     public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
 
-    public static final String VPN_LEARN_MORE_URL = "https://www.expressvpn.com/internet-security/private-vpn/buy?a_aid=frostwire";
-    public static final String PIA_URL = "https://www.privateinternetaccess.com/pages/android-vpn-app/FROSTWIRE";
-    public static final String EXPRESSVPN_URL_BASIC = "https://www.expressvpn.com/order?a_aid=frostwire";
-    public static final String EXPRESSVPN_URL_PLUS = "https://www.expressvpn.com/order?a_aid=frostwire";
+    public static final String VPN_LEARN_MORE_URL = "http://www.frostwire.com/vpn.expressvpn.learnmore";
+    public static final String PIA_URL = "http://www.frostwire.com/vpn.pia";
+    public static final String EXPRESSVPN_URL_BASIC = "http://www.frostwire.com/vpn.expressvpn";
+    public static final String EXPRESSVPN_URL_PLUS = "http://www.frostwire.com/vpn.expressvpn";
 }
