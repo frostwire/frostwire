@@ -27,12 +27,25 @@ import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+
 import com.frostwire.android.R;
 import com.frostwire.logging.Logger;
+import com.frostwire.util.Ref;
 
-import java.util.*;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * We extend from ListAdapter to populate our ListViews.
@@ -63,6 +76,8 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     protected List<T> list;
     protected Set<T> checked;
     protected List<T> visualList;
+
+    protected int lastSelectedRadioButtonIndex = 0;
 
     public AbstractListAdapter(Context context, int viewItemId, List<T> list, Set<T> checked) {
         this.context = context;
@@ -255,12 +270,12 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * Inflates the view out of the XML.
-     * <p>
+     * <p/>
      * Sets click and long click listeners in case you need them. (Override onItemClicked and onItemLongClicked)
-     * <p>
+     * <p/>
      * Let's the adapter know that the view has been created, in case you need to go deeper and create
      * more advanced click behavior or even add new Views during runtime.
-     * <p>
+     * <p/>
      * It will also bind the data to the view, you can refer to it if you need it by doing a .getTag()
      */
     public View getView(int position, View view, ViewGroup parent) {
@@ -279,7 +294,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
             initTouchFeedback(view, item);
             initCheckBox(view, item);
-            //TODO: initRadioButton(view, item);
+            initRadioButton(view, new RadioButtonTag(item, position));
             populateView(view, item);
 
         } catch (Throwable e) {
@@ -396,7 +411,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * Sets up the behavior of a possible checkbox to check this item.
-     * <p>
+     * <p/>
      * Takes in consideration:
      * - Only so many views are created and reused by the ListView
      * - Setting the correct checked/unchecked value without triggering the onCheckedChanged event.
@@ -541,4 +556,61 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
 
     }
+
+    private final class RadioButtonOnCheckedChangeListener implements OnClickListener {
+
+        private final AbstractListAdapter adapter;
+        private WeakReference<RadioButton> lastRadioButtonChecked = null;
+
+        public RadioButtonOnCheckedChangeListener(AbstractListAdapter adapter) {
+            this.adapter = adapter;
+            System.out.println("Adding checked listener");
+        }
+
+        @Override
+        public void onClick(View v) {
+            System.out.println("On Click Event");
+            if (v instanceof RadioButton) {
+                RadioButton radioButton = (RadioButton) v;
+                RadioButtonTag tag = (RadioButtonTag) radioButton.getTag();
+
+                if (Ref.alive(lastRadioButtonChecked)) {
+                    lastRadioButtonChecked.get().setChecked(false);
+                }
+
+                lastSelectedRadioButtonIndex = tag.position;
+                radioButton.setChecked(true);
+
+                Ref.free(lastRadioButtonChecked);
+                lastRadioButtonChecked = new WeakReference<RadioButton>(radioButton);
+            }
+        }
+    }
+
+    protected final class RadioButtonTag {
+        T item;
+        int position;
+
+        public RadioButtonTag(T item, int position) {
+            this.item = item;
+            this.position = position;
+        }
+    }
+
+    protected void initRadioButton(View view, RadioButtonTag tag) {
+        RadioButton radioButton = (RadioButton) findView(view, R.id.view_selectable_list_item_radiobutton);
+
+        if (radioButton != null) {
+            radioButton.setVisibility(View.VISIBLE);
+            radioButton.setChecked(false);
+            radioButton.setTag(tag);
+
+            if (!radioButton.hasOnClickListeners()) {
+                radioButton.setOnClickListener(new RadioButtonOnCheckedChangeListener(this));
+            }
+
+            radioButton.setChecked(tag.position == lastSelectedRadioButtonIndex);
+        }
+    }
+
 }

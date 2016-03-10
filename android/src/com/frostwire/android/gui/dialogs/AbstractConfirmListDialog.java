@@ -24,6 +24,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -114,7 +116,7 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
 
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
-    	//TODO: Add checkbox on list item and make sure the adapter
+    	//TODO: Make sure the adapter
     	//will know what items have been selected and that we can
     	//reinit the right checkboxes selected here when orientation change occurs.
     	
@@ -126,6 +128,21 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
         TextView textView = findView(dlg, R.id.dialog_confirm_list_text);
         textView.setText(dialogText);
 
+
+        if (selectionMode == SelectionMode.MULTIPLE_SELECTION){
+            CheckBox checkBox = findView(dlg, R.id.dialog_confirm_list_select_all_checkbox);
+            checkBox.setVisibility(View.VISIBLE);
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(buttonView.isChecked()){
+                        adapter.checkAll();
+                    } else {
+                        adapter.clearChecked();
+                    }
+                }
+            });
+        }
 
         ListView listView = findView(dlg, R.id.dialog_confirm_list_list);
         String listDataString = bundle.getString("listData");
@@ -214,9 +231,7 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
                     LOGGER.warn("getSelected() is not finding the checked items on the list. Verify your classes implement equals() and hashCode()");
                 }
             }
-
         }
         return result;
     }
-
 }
