@@ -129,13 +129,13 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
         textView.setText(dialogText);
 
 
-        if (selectionMode == SelectionMode.MULTIPLE_SELECTION){
+        if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
             CheckBox checkBox = findView(dlg, R.id.dialog_confirm_list_select_all_checkbox);
             checkBox.setVisibility(View.VISIBLE);
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(buttonView.isChecked()){
+                    if (buttonView.isChecked()) {
                         adapter.checkAll();
                     } else {
                         adapter.clearChecked();

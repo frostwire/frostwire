@@ -78,6 +78,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     protected List<T> visualList;
 
     protected int lastSelectedRadioButtonIndex = 0;
+    private final OnCheckedChangeListener radioButtonCheckedChangeListener;
 
     public AbstractListAdapter(Context context, int viewItemId, List<T> list, Set<T> checked) {
         this.context = context;
@@ -92,6 +93,8 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         this.list = list.equals(Collections.emptyList()) ? new ArrayList<T>() : list;
         this.checked = checked;
         this.visualList = list;
+
+        this.radioButtonCheckedChangeListener = new RadioButtonOnCheckedChangeListener(this);
     }
 
     public AbstractListAdapter(Context context, int viewItemId, List<T> list) {
@@ -557,31 +560,28 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     }
 
-    private final class RadioButtonOnCheckedChangeListener implements OnClickListener {
+    private final class RadioButtonOnCheckedChangeListener implements OnCheckedChangeListener {
 
         private final AbstractListAdapter adapter;
         private WeakReference<RadioButton> lastRadioButtonChecked = null;
 
         public RadioButtonOnCheckedChangeListener(AbstractListAdapter adapter) {
             this.adapter = adapter;
-            System.out.println("Adding checked listener");
         }
 
         @Override
-        public void onClick(View v) {
-            System.out.println("On Click Event");
-            if (v instanceof RadioButton) {
-                RadioButton radioButton = (RadioButton) v;
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (buttonView instanceof RadioButton && isChecked){
+                RadioButton radioButton = (RadioButton) buttonView;
                 RadioButtonTag tag = (RadioButtonTag) radioButton.getTag();
 
-                if (Ref.alive(lastRadioButtonChecked)) {
+                if(Ref.alive(lastRadioButtonChecked)){
                     lastRadioButtonChecked.get().setChecked(false);
+                    Ref.free(lastRadioButtonChecked);
                 }
 
                 lastSelectedRadioButtonIndex = tag.position;
                 radioButton.setChecked(true);
-
-                Ref.free(lastRadioButtonChecked);
                 lastRadioButtonChecked = new WeakReference<RadioButton>(radioButton);
             }
         }
@@ -598,19 +598,12 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     protected void initRadioButton(View view, RadioButtonTag tag) {
-        RadioButton radioButton = (RadioButton) findView(view, R.id.view_selectable_list_item_radiobutton);
-
+        RadioButton radioButton = findView(view, R.id.view_selectable_list_item_radiobutton);
         if (radioButton != null) {
             radioButton.setVisibility(View.VISIBLE);
-            radioButton.setChecked(false);
             radioButton.setTag(tag);
-
-            if (!radioButton.hasOnClickListeners()) {
-                radioButton.setOnClickListener(new RadioButtonOnCheckedChangeListener(this));
-            }
-
+            radioButton.setOnCheckedChangeListener(radioButtonCheckedChangeListener);
             radioButton.setChecked(tag.position == lastSelectedRadioButtonIndex);
         }
     }
-
 }
