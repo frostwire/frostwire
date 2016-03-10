@@ -22,13 +22,13 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.Spanned;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.text.Html;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
@@ -49,6 +49,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
 
     @Override
     protected void initComponents(Bundle savedInstanceState) {
+        final String UNICODE_BULLET = "&#8226; ";
         final ActionBar bar = getActionBar();
         if (bar != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -60,19 +61,25 @@ public class VPNStatusDetailActivity extends AbstractActivity {
         
         final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
         final TextView headerStatus = findView(R.id.view_vpn_status_header);
-        final TextView VPNText = findView(R.id.view_vpn_status_vpn_text);
-        final TextView VPNMoneyBack = findView(R.id.view_vpn_status_money_back);
-        final TextView VPNPrice = findView(R.id.view_vpn_status_vpn_price);
-        final TextView VPNBullet = findView(R.id.view_vpn_status_bullet_textview);
+        final TextView vpnText = findView(R.id.view_vpn_status_vpn_text);
+        final TextView vpnMoneyBack = findView(R.id.view_vpn_status_money_back);
+        final TextView vpnPrice = findView(R.id.view_vpn_status_vpn_price);
+
+        final TextView vpnBullet = findView(R.id.view_vpn_status_bullet_textview);
+        vpnBullet.setText(Html.fromHtml(getString(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html)));
+
+        final TextView vpnClientFeature1 = findView(R.id.view_vpn_status_vpn_client_feature_1);
+        final TextView vpnClientFeature2 = findView(R.id.view_vpn_status_vpn_client_feature_2);
+        final TextView vpnClientFeature3 = findView(R.id.view_vpn_status_vpn_client_feature_3);
+        final TextView vpnClientFeature4 = findView(R.id.view_vpn_status_vpn_client_feature_4);
+        vpnClientFeature1.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature1.getText()));
+        vpnClientFeature2.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature2.getText()));
+        vpnClientFeature3.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature3.getText()));
+        vpnClientFeature4.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature4.getText()));
 
         final Button getVPNButtonTop = findView(R.id.view_vpn_status_get_vpn_button_top);
         final Button learnVPNButton = findView(R.id.view_vpn_status_learn_more_button);
         final Button getVPNButtonBottom = findView(R.id.view_vpn_status_get_vpn_button_bottom);
-
-
-        String VPNHtmlBullet = getString(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html);
-        Spanned VPNBulletAsSpanned = Html.fromHtml(VPNHtmlBullet);
-        VPNBullet.setText(VPNBulletAsSpanned);
 
         // By default the layout has icon and title set to unprotected.
         if (isProtectedConnection) {
@@ -81,12 +88,12 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             // Current Status Title
             headerStatus.setText(R.string.protected_connection);
             headerStatus.setTextColor(getResources().getColor(R.color.approval_green));
-            VPNMoneyBack.setVisibility(View.GONE);
-            VPNPrice.setVisibility(View.GONE);
+            vpnMoneyBack.setVisibility(View.GONE);
+            vpnPrice.setVisibility(View.GONE);
             // Current Status Text
             String VPNHtmlText = getString(R.string.protected_connections_visibility_bullet_html);
             Spanned VPNTextAsSpanned = Html.fromHtml(VPNHtmlText);
-            VPNText.setText(VPNTextAsSpanned);
+            vpnText.setText(VPNTextAsSpanned);
             // getVPNButtonTop/learnVPNButton
             getVPNButtonTop.setVisibility(View.GONE);
             learnVPNButton.setText(R.string.learn_more);
@@ -100,12 +107,12 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             headerStatus.setText(R.string.unprotected_connection);
             headerStatus.setTextColor(Color.RED);
             // Current Status VPN client price
-            VPNMoneyBack.setText(R.string.VPN_money_back);
-            VPNPrice.setText(R.string.VPN_price);
+            vpnMoneyBack.setText(R.string.VPN_money_back);
+            vpnPrice.setText(R.string.VPN_price);
             // Current Status Text
             String VPNHtmlText = getString(R.string.unprotected_connections_visibility_bullet_html);
             Spanned VPNTextAsSpanned = Html.fromHtml(VPNHtmlText);
-            VPNText.setText(VPNTextAsSpanned);
+            vpnText.setText(VPNTextAsSpanned);
             // getVPNButtonTop/learnVPNButton
             learnVPNButton.setVisibility(View.GONE);
             getVPNButtonTop.setText(R.string.get_express_VPN);

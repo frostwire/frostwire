@@ -566,10 +566,10 @@
     <string name="VPN_client">ExpressVPN</string>
     <string name="get_VPN_client">Get ExpressVPN</string>
     <string name="visit_VPN_client">Visit ExpressVPN</string>
-    <string name="VPN_client_feature_1">&#8226; Military-grade encryption</string>
-    <string name="VPN_client_feature_2">&#8226; Unlimited download speed</string>
-    <string name="VPN_client_feature_3">&#8226; Private and logless browsing</string>
-    <string name="VPN_client_feature_4">&#8226; 24/7 customer support</string>
+    <string name="VPN_client_feature_1">Military-grade encryption</string>
+    <string name="VPN_client_feature_2">Unlimited download speed</string>
+    <string name="VPN_client_feature_3">Private and logless browsing</string>
+    <string name="VPN_client_feature_4">24/7 customer support</string>
     <string name="dht_contacts">DHT contacts</string>
     <string name="notify_frostwire_is_running">Notify if FrostWire is running</string>
     <string name="notify_frostwire_is_running_summary">Show a permanent Android notification with status of transfers</string>

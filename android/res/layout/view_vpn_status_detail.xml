@@ -117,41 +117,37 @@
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/view_vpn_status_what_do_you_get_textview"
-                style="@style/VPNTitleSecond"
+            <TextView style="@style/VPNTitleSecond"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="5dp"
                 android:text="@string/VPN_what_you_get_with" />
 
-            <TextView
-                android:id="@+id/view_vpn_status_client_textview"
-                style="@style/VPNTitleSecond.Color"
+            <TextView style="@style/VPNTitleSecond.Color"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/VPN_client" />
         </LinearLayout>
 
-        <TextView
+        <TextView android:id="@+id/view_vpn_status_vpn_client_feature_1"
             style="@style/VPNText.Regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/VPN_client_feature_1" />
-        <TextView
+        <TextView android:id="@+id/view_vpn_status_vpn_client_feature_2"
             style="@style/VPNText.Regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/VPN_client_feature_2" />
-        <TextView
+        <TextView android:id="@+id/view_vpn_status_vpn_client_feature_3"
             style="@style/VPNText.Regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/VPN_client_feature_3" />
-        <TextView
+        <TextView android:id="@+id/view_vpn_status_vpn_client_feature_4"
             style="@style/VPNText.Regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
