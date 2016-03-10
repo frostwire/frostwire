@@ -66,7 +66,7 @@ public class SearchManagerImpl implements SearchManager {
                 throw new IllegalArgumentException("Search token id must be >= 0");
             }
 
-            performer.listener(new SearchListener() {
+            performer.setListener(new SearchListener() {
                 @Override
                 public void onResults(long token, List<? extends SearchResult> results) {
                     performerOnResults(performer, results);

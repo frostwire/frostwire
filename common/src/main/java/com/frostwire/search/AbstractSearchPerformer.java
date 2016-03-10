@@ -45,16 +45,6 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     }
 
     @Override
-    public SearchListener listener() {
-        return listener;
-    }
-
-    @Override
-    public void listener(SearchListener listener) {
-        this.listener = listener;
-    }
-
-    @Override
     public void stop() {
         stopped = true;
         try {
@@ -69,6 +59,16 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     @Override
     public boolean isStopped() {
         return stopped;
+    }
+
+    @Override
+    public SearchListener getListener() {
+        return listener;
+    }
+
+    @Override
+    public void setListener(SearchListener listener) {
+        this.listener = listener;
     }
 
     protected void onResults(List<? extends SearchResult> results) {

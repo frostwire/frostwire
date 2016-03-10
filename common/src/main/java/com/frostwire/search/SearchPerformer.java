@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,6 @@
 
 package com.frostwire.search;
 
-import rx.Observable;
-
-import java.util.List;
-
 /**
  * @author gubatron
  * @author aldenml
@@ -29,10 +25,6 @@ public interface SearchPerformer {
 
     long getToken();
 
-    SearchListener listener();
-
-    void listener(SearchListener listener);
-
     void perform();
 
     void crawl(CrawlableSearchResult sr);
@@ -40,4 +32,8 @@ public interface SearchPerformer {
     void stop();
 
     boolean isStopped();
+
+    SearchListener getListener();
+
+    void setListener(SearchListener listener);
 }
