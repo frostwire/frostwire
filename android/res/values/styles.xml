@@ -381,6 +381,13 @@
         <item name="android:layout_marginTop">15dp</item>
     </style>
 
+    <style name="GetVPNToastNotification">
+        <item name="android:textColor">@color/basic_white</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">15dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">20dp</item>
+    </style>
 
     <style name="DonationButton">
         <item name="android:background">@drawable/donation_button_background_selector</item>
