@@ -46,7 +46,7 @@ public final class SearchView {
     }
 
     public NavigableMap<FilterKey, SearchGroup> groups() {
-        return Collections.unmodifiableNavigableMap(groups);
+        return null;//Collections.unmodifiableNavigableMap(groups);
     }
 
     public void add(List<? extends SearchResult> results) {

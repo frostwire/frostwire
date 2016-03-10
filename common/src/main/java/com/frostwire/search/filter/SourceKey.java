@@ -42,6 +42,8 @@ public final class SourceKey extends FilterKeyBase {
             return -1;
         }
 
-        return Integer.compare(ordinal, ((SourceKey) o).ordinal);
+        int x = ordinal;
+        int y = ((SourceKey) o).ordinal;
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 }

@@ -36,7 +36,7 @@ public final class SearchGroup {
     }
 
     public NavigableSet<SearchResult> data() {
-        return Collections.unmodifiableNavigableSet(data);
+        return null;//Collections.unmodifiableNavigableSet(data);
     }
 
     void add(SearchResult sr) {

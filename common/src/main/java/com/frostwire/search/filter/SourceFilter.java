@@ -32,9 +32,9 @@ public final class SourceFilter implements SearchFilter {
     private static final Comparator<SearchResult> CMP = new Comparator<SearchResult>() {
         @Override
         public int compare(SearchResult o1, SearchResult o2) {
-            int n1 = o1 instanceof TorrentSearchResult ? ((TorrentSearchResult) o1).getSeeds() : 0;
-            int n2 = o2 instanceof TorrentSearchResult ? ((TorrentSearchResult) o2).getSeeds() : 0;
-            return Integer.compare(n1, n2);
+            int x = o1 instanceof TorrentSearchResult ? ((TorrentSearchResult) o1).getSeeds() : 0;
+            int y = o2 instanceof TorrentSearchResult ? ((TorrentSearchResult) o2).getSeeds() : 0;
+            return (x < y) ? -1 : ((x == y) ? 0 : 1);
         }
     };
 
