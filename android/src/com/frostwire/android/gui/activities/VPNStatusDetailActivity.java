@@ -96,7 +96,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             getVPNButtonTop.setVisibility(View.GONE);
             learnVPNButton.setText(R.string.learn_more);
             // getVPNButtonBottom
-            getVPNButtonBottom.setText(R.string.visit_VPN_client);
+            getVPNButtonBottom.setText(R.string.visit_vpn_client);
         }
         else {
             // Current Status Icon
@@ -105,8 +105,8 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             headerStatus.setText(R.string.unprotected_connection);
             headerStatus.setTextColor(Color.RED);
             // Current Status VPN client price
-            vpnMoneyBack.setText(R.string.VPN_money_back);
-            vpnPrice.setText(R.string.VPN_price);
+            vpnMoneyBack.setText(R.string.vpn_money_back);
+            vpnPrice.setText(R.string.vpn_price);
             // Current Status Text
             String VPNHtmlText = getString(R.string.unprotected_connections_visibility_bullet_html);
             Spanned VPNTextAsSpanned = Html.fromHtml(VPNHtmlText);
