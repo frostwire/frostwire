@@ -52,7 +52,6 @@ import java.util.Map;
  */
 public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends AbstractListAdapter {
     private static final Logger LOGGER = Logger.getLogger(ConfirmListDialogDefaultAdapter.class);
-    private boolean radioButtonVisibility;
     private static final int ITEM_TITLE = 0;
     private static final int ITEM_SIZE = 1;
     private static final int ITEM_ART = 2;
