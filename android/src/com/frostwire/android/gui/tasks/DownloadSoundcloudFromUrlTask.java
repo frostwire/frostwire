@@ -177,7 +177,7 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
             ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog(SelectionMode.SINGLE_SELECTION);  //TODO: Set this back to MULTIPLE SELECTION
             SoundcloudSearchResultList srList = new SoundcloudSearchResultList();
             srList.listData = listData;
-            dlg.prepareArguments(dialogTitle, dialogText, JsonUtils.toJson(srList));
+            dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(srList));
             return dlg;
         }
 

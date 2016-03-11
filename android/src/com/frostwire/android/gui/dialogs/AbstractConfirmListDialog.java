@@ -23,6 +23,7 @@ import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -72,9 +73,10 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
     private String title;
     private String dialogText;
     private final SelectionMode selectionMode;
+    private Dialog dlg;
     private OnCancelListener onCancelListener;
     private OnClickListener onYesListener;
-    private ConfirmListDialogDefaultAdapter<T> customAdapter;
+    //private ConfirmListDialogDefaultAdapter<T> customAdapter;
     private ConfirmListDialogDefaultAdapter<T> adapter;
 
     abstract protected OnClickListener createOnYesListener(AbstractConfirmListDialog dlg);
@@ -86,7 +88,6 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
                                      ConfirmListDialogDefaultAdapter customAdapter) {
         super(TAG, R.layout.dialog_confirm_list);
         this.selectionMode = selectionMode;
-        this.customAdapter = customAdapter;
         this.adapter = customAdapter;
     }
 
@@ -98,11 +99,13 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
         return selectionMode;
     }
 
-    protected void prepareArguments(String dialogTitle,
+    protected void prepareArguments(int dialogIcon,
+                                    String dialogTitle,
                                     String dialogText,
                                     String listDataInJSON,
                                     SelectionMode selectionMode) {
         Bundle bundle = new Bundle();
+        bundle.putInt("dialogIcon", dialogIcon);
         bundle.putString("title", dialogTitle);
         bundle.putString("dialogText", dialogText);
         bundle.putString("listData", listDataInJSON);
@@ -110,29 +113,30 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
         setArguments(bundle);
     }
 
-    protected void prepareArguments(String dialogTitle, String dialogText, String listDataInJSON){
-        prepareArguments(dialogTitle, dialogText, listDataInJSON, selectionMode);
+    protected void prepareArguments(int dialogIcon, String dialogTitle, String dialogText, String listDataInJSON){
+        prepareArguments(dialogIcon, dialogTitle, dialogText, listDataInJSON, selectionMode);
     }
 
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
-    	//TODO: Make sure the adapter
-    	//will know what items have been selected and that we can
-    	//reinit the right checkboxes selected here when orientation change occurs.
-    	
+        this.dlg = dlg;
         Bundle bundle = getArguments();
+        int dialogIcon = bundle.getInt("dialogIcon", -1);
+        if (dialogIcon > 0) {
+            dlg.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, dialogIcon);
+        }
+
         title = bundle.getString("title");
         dlg.setTitle(title);
-        
-        dialogText = bundle.getString("dialogText");
-        TextView textView = findView(dlg, R.id.dialog_confirm_list_text);
-        textView.setText(dialogText);
 
+        dialogText = bundle.getString("dialogText");
+        TextView confirmTextView = findView(dlg, R.id.dialog_confirm_list_text);
+        confirmTextView.setText(dialogText);
 
         if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
-            CheckBox checkBox = findView(dlg, R.id.dialog_confirm_list_select_all_checkbox);
-            checkBox.setVisibility(View.VISIBLE);
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            CheckBox selectAllCheckbox = findView(dlg, R.id.dialog_confirm_list_select_all_checkbox);
+            selectAllCheckbox.setVisibility(View.VISIBLE);
+            selectAllCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (buttonView.isChecked()) {
@@ -140,25 +144,21 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
                     } else {
                         adapter.clearChecked();
                     }
+                    updateSelectedCount();
                 }
             });
         }
-
         ListView listView = findView(dlg, R.id.dialog_confirm_list_list);
         String listDataString = bundle.getString("listData");
         List<T> listData = deserializeData(listDataString);
-
-        if (customAdapter != null) {
-            customAdapter.addList(listData);
-            adapter = customAdapter;
+        if (adapter != null) {
+            adapter.addList(listData);
         } else {
             adapter = new ConfirmListDialogDefaultAdapter<>(getActivity(),
                             listData,
                             selectionMode);
         }
-
         listView.setAdapter(adapter);
-        
         final Dialog dialog = dlg;
         Button noButton = findView(dialog, R.id.dialog_confirm_list_button_no);
         noButton.setOnClickListener(new OnClickListener() {
@@ -170,13 +170,10 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
                 dialog.dismiss();
             }
         });
-        
         if (onCancelListener != null){
             dialog.setOnCancelListener(onCancelListener);
         }
-        
         onYesListener = createOnYesListener(this);
-
         if (onYesListener != null) {
         	Button yesButton = findView(dialog, R.id.dialog_confirm_list_button_yes);
         	yesButton.setOnClickListener(onYesListener);
@@ -237,5 +234,18 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
 
     public int getLastSelected(){
         return adapter.getLastSelectedRadioButtonIndex();
+    }
+
+    public void updateSelectedCount() {
+        final Set checked = adapter.getChecked();
+        int selected = 0;
+        if (checked != null && !checked.isEmpty()) {
+            selected = checked.size();
+        }
+        final TextView selectedCountTextView = findView(dlg, R.id.dialog_confirm_list_selected_count_textview);
+        if (selectedCountTextView != null) {
+            selectedCountTextView.setText(selected + " " + getString(R.string.selected));
+            selectedCountTextView.setVisibility(selected > 0 ? View.VISIBLE : View.GONE);
+        }
     }
 }

@@ -27,25 +27,14 @@ import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-
 import com.frostwire.android.R;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * We extend from ListAdapter to populate our ListViews.
@@ -422,9 +411,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * @see #getChecked()
      */
     protected void initCheckBox(View view, T item) {
-
         CheckBox checkbox = findView(view, R.id.view_selectable_list_item_checkbox);
-
         if (checkbox != null) {
             checkbox.setVisibility((checkboxesVisibility) ? View.VISIBLE : View.GONE);
 
