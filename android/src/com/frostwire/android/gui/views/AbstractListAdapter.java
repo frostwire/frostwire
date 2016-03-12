@@ -68,6 +68,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     protected int lastSelectedRadioButtonIndex = 0;
     private final OnCheckedChangeListener radioButtonCheckedChangeListener;
+    private OnItemCheckedListener onItemCheckedListener;
 
     public AbstractListAdapter(Context context, int viewItemId, List<T> list, Set<T> checked) {
         this.context = context;
@@ -354,6 +355,9 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     protected void onItemChecked(View v, boolean isChecked) {
+        if (onItemCheckedListener != null) {
+            onItemCheckedListener.onItemChecked(v, isChecked);
+        }
     }
 
     /**
@@ -444,6 +448,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
                 }
             }
         }
+    }
+
+    public interface OnItemCheckedListener {
+        void onItemChecked(View v, boolean checked);
+    }
+
+    public void setOnItemCheckedListener(OnItemCheckedListener onItemCheckedListener) {
+        this.onItemCheckedListener = onItemCheckedListener;
     }
 
     private final class ViewOnClickListener implements OnClickListener {
@@ -569,7 +581,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
                 lastSelectedRadioButtonIndex = tag.position;
                 radioButton.setChecked(true);
-                lastRadioButtonChecked = new WeakReference<RadioButton>(radioButton);
+                lastRadioButtonChecked = new WeakReference<>(radioButton);
             }
         }
     }

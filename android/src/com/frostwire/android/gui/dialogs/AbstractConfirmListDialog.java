@@ -24,14 +24,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ListView;
-import android.widget.TextView;
-
+import android.widget.*;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
+import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.SearchResult;
 
@@ -55,7 +51,7 @@ import java.util.Set;
  * @author gubatron
  * @author votaguz
  */
-public abstract class AbstractConfirmListDialog<T extends SearchResult> extends AbstractDialog {
+public abstract class AbstractConfirmListDialog<T extends SearchResult> extends AbstractDialog implements AbstractListAdapter.OnItemCheckedListener {
 
     /**
      * TODOS: 1. Add an optional text filter control that will be connected to the adapter.
@@ -133,9 +129,12 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
         TextView confirmTextView = findView(dlg, R.id.dialog_confirm_list_text);
         confirmTextView.setText(dialogText);
 
+        CheckBox selectAllCheckbox = findView(dlg, R.id.dialog_confirm_list_select_all_checkbox);
+        selectAllCheckbox.setVisibility(selectionMode == SelectionMode.MULTIPLE_SELECTION ? View.VISIBLE : View.GONE);
+
         if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
-            CheckBox selectAllCheckbox = findView(dlg, R.id.dialog_confirm_list_select_all_checkbox);
             selectAllCheckbox.setVisibility(View.VISIBLE);
+            updateSelectedCount();
             selectAllCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -157,6 +156,7 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
             adapter = new ConfirmListDialogDefaultAdapter<>(getActivity(),
                             listData,
                             selectionMode);
+            adapter.setOnItemCheckedListener(this);
         }
         listView.setAdapter(adapter);
         final Dialog dialog = dlg;
@@ -237,6 +237,9 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
     }
 
     public void updateSelectedCount() {
+        if (adapter == null) {
+            return;
+        }
         final Set checked = adapter.getChecked();
         int selected = 0;
         if (checked != null && !checked.isEmpty()) {
@@ -247,5 +250,11 @@ public abstract class AbstractConfirmListDialog<T extends SearchResult> extends 
             selectedCountTextView.setText(selected + " " + getString(R.string.selected));
             selectedCountTextView.setVisibility(selected > 0 ? View.VISIBLE : View.GONE);
         }
+    }
+
+    // AbstractListAdapter.OnItemCheckedListener
+    @Override
+    public void onItemChecked(View v, boolean checked) {
+        updateSelectedCount();
     }
 }
