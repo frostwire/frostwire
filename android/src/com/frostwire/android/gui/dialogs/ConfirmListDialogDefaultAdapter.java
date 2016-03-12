@@ -98,7 +98,6 @@ public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends Abs
         }
 
         try {
-
             initTouchFeedback(view, item);
             if(selectionMode == SelectionMode.MULTIPLE_SELECTION) {
                 initCheckBox(view, item);
