@@ -166,6 +166,10 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
 
     public static class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<SoundcloudSearchResult> {
 
+        public ConfirmSoundcloudDownloadDialog() {
+            super(SelectionMode.MULTIPLE_SELECTION);
+        }
+
         public ConfirmSoundcloudDownloadDialog(SelectionMode selectionMode) {
             super(selectionMode);
         }
@@ -174,7 +178,7 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
                                                                   String dialogText,
                                                                   List<SoundcloudSearchResult> listData) {
 
-            ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog(SelectionMode.SINGLE_SELECTION);  //TODO: Set this back to MULTIPLE SELECTION
+            ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog(SelectionMode.MULTIPLE_SELECTION);  //TODO: Set this back to MULTIPLE SELECTION
             SoundcloudSearchResultList srList = new SoundcloudSearchResultList();
             srList.listData = listData;
             dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(srList));
