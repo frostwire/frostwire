@@ -40,9 +40,17 @@ public final class SearchManager2 {
 
     private SearchListener listener;
 
-    public SearchManager2(int nThreads) {
+    private SearchManager2(int nThreads) {
         this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
+    }
+
+    private static class Loader {
+        static final SearchManager2 INSTANCE = new SearchManager2(6);
+    }
+
+    public static SearchManager2 getInstance() {
+        return Loader.INSTANCE;
     }
 
     public void perform(final SearchPerformer performer) {
