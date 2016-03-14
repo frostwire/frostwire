@@ -22,34 +22,21 @@ package com.frostwire.platform;
  * @author gubatron
  * @author aldenml
  */
-public interface Platform {
+public interface AppSettings {
 
-    FileSystem fileSystem();
+    String string(String key);
 
-    SystemPaths systemPaths();
+    void string(String key, String value);
 
-    AppSettings appSettings();
+    int int32(String key);
 
-    /**
-     * Returns true if we are under a platform that
-     * it is(or can mimic) and Android OS.
-     *
-     * @return
-     */
-    boolean android();
+    void int32(String key, int value);
 
-    /**
-     * Returns the number of the SDK version if the
-     * platform is android, -1 otherwise.
-     *
-     * @return
-     */
-    int androidVersion();
+    long int64(String key);
 
-    /**
-     * Returns true if we are supporting experimental features.
-     *
-     * @return
-     */
-    boolean experimental();
+    void int64(String key, long value);
+
+    boolean bool(String key);
+
+    void bool(String key, boolean value);
 }
