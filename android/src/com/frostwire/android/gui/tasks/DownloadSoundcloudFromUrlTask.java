@@ -19,11 +19,14 @@
 package com.frostwire.android.gui.tasks;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 
+import android.widget.CompoundButton;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.AbstractConfirmListDialog;
+import com.frostwire.android.gui.dialogs.ConfirmListDialogDefaultAdapter;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ContextTask;
 import com.frostwire.logging.Logger;
@@ -61,7 +64,7 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
         String text = ctx.getString(R.string.are_you_sure_you_want_to_download_the_following, whatToDownload, totalSize);
 
         //AbstractConfirmListDialog
-        ConfirmSoundcloudDownloadDialog dlg = ConfirmSoundcloudDownloadDialog.newInstance(title, text, results);
+        ConfirmSoundcloudDownloadDialog dlg = ConfirmSoundcloudDownloadDialog.newInstance(ctx, title, text, results);
         dlg.setOnYesListener(new OnStartDownloadsClickListener(ctx, dlg));
         return dlg;
     }
@@ -130,7 +133,7 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
 
         public OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
             ctxRef = new WeakReference<>(ctx);
-            dlgRef = new WeakReference<AbstractConfirmListDialog>(dlg);
+            dlgRef = new WeakReference<>(dlg);
         }
 
         public void setDialog(AbstractConfirmListDialog dlg) {
@@ -141,17 +144,19 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
         public void onClick(View v) {
             if (Ref.alive(ctxRef) && Ref.alive(dlgRef)) {
                 AbstractConfirmListDialog dlg = dlgRef.get();
-                List<SoundcloudSearchResult> results = dlg.getList(); // for no selection case.
+                final AbstractConfirmListDialog.SelectionMode selectionMode = dlg.getSelectionMode();
+                List<SoundcloudSearchResult> results = (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION) ?
+                        (List<SoundcloudSearchResult>) dlg.getList() :
+                        new ArrayList<SoundcloudSearchResult>();
 
-                if (dlg.getSelectionMode() == AbstractConfirmListDialog.SelectionMode.MULTIPLE_SELECTION) {
-                    results = new ArrayList<>(dlg.getChecked());
-                } else if (dlg.getSelectionMode() == AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION) {
+                if (selectionMode == AbstractConfirmListDialog.SelectionMode.MULTIPLE_SELECTION) {
+                    results.addAll(dlg.getChecked());
+                } else if (selectionMode == AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION) {
                     SoundcloudSearchResult selected = results.get(dlg.getLastSelected());
                     if (selected == null) {
                         // MIGHT DO: dlg.displayErrorNotice(ERROR_CODE);
                         return;
                     }
-                    results = new ArrayList<>();
                     results.add(selected);
                 }
                 startDownloads(ctxRef.get(), results);
@@ -164,21 +169,43 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
         List<SoundcloudSearchResult> listData;
     }
 
+    private static class SoundcloudPlaylistConfirmListDialogAdapter extends ConfirmListDialogDefaultAdapter<SoundcloudSearchResult> {
+        public SoundcloudPlaylistConfirmListDialogAdapter(Context context, List list, AbstractConfirmListDialog.SelectionMode selectionMode) {
+            super(context, list, selectionMode);
+        }
+
+        @Override
+        public CharSequence getItemTitle(SoundcloudSearchResult data) {
+            return data.getDisplayName();
+        }
+
+        @Override
+        public long getItemSize(SoundcloudSearchResult data) {
+            return data.getSize();
+        }
+
+        @Override
+        public CharSequence getItemThumbnailUrl(SoundcloudSearchResult data) {
+            return data.getDisplayName();
+        }
+
+        @Override
+        public int getItemThumbnailResourceId(SoundcloudSearchResult data) {
+            return -1;
+        }
+    }
+
     public static class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<SoundcloudSearchResult> {
-
-        public ConfirmSoundcloudDownloadDialog() {
-            super(SelectionMode.MULTIPLE_SELECTION);
+        public ConfirmSoundcloudDownloadDialog(Context context, List<SoundcloudSearchResult> listData, SelectionMode selectionMode) {
+            super(context, listData, selectionMode, null);
         }
 
-        public ConfirmSoundcloudDownloadDialog(SelectionMode selectionMode) {
-            super(selectionMode);
-        }
-
-        public static ConfirmSoundcloudDownloadDialog newInstance(String dialogTitle,
-                                                                  String dialogText,
-                                                                  List<SoundcloudSearchResult> listData) {
-
-            ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog(SelectionMode.MULTIPLE_SELECTION);  //TODO: Set this back to MULTIPLE SELECTION
+        public static ConfirmSoundcloudDownloadDialog newInstance(
+                Context ctx,
+                String dialogTitle,
+                String dialogText,
+                List<SoundcloudSearchResult> listData) {
+            ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog(ctx, listData, SelectionMode.MULTIPLE_SELECTION);
             SoundcloudSearchResultList srList = new SoundcloudSearchResultList();
             srList.listData = listData;
             dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(srList));
@@ -191,12 +218,25 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
             return srList.listData;
         }
 
+        @Override
+        public ConfirmListDialogDefaultAdapter<SoundcloudSearchResult> createAdapter(Context context,
+                                                                                     List<SoundcloudSearchResult> listData,
+                                                                                     SelectionMode selectionMode,
+                                                                                     Bundle bundle) {
+            return new SoundcloudPlaylistConfirmListDialogAdapter(context, listData, selectionMode);
+        }
+
 
         @Override
         protected OnStartDownloadsClickListener createOnYesListener(final AbstractConfirmListDialog dlg) {
             OnStartDownloadsClickListener listener = new OnStartDownloadsClickListener(getActivity(), dlg);
             listener.setDialog(this);
             return listener;
+        }
+
+        @Override
+        public void onItemChecked(CompoundButton v, boolean checked) {
+
         }
     }
 }

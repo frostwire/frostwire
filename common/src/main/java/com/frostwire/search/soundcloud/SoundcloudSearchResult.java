@@ -20,6 +20,7 @@ package com.frostwire.search.soundcloud;
 
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
+import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 
 import java.text.ParseException;
@@ -174,5 +175,21 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         return "SoundcloudSearchResult.downloadUrl: " + getDownloadUrl();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o==null || !(o instanceof SoundcloudSearchResult)) {
+            return false;
+        }
+        SoundcloudSearchResult other = (SoundcloudSearchResult) o;
+        return this.getDetailsUrl().equals(other.getDetailsUrl()) &&
+               this.getDisplayName().equals(other.getDisplayName()) &&
+               this.getDownloadUrl().equals(other.getDownloadUrl());
+    }
 
+    @Override
+    public int hashCode() {
+        return getDetailsUrl().hashCode() +
+               getDisplayName().hashCode() +
+               getDownloadUrl().hashCode();
+    }
 }

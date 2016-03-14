@@ -24,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.dialogs.AbstractConfirmListDialog.SelectionMode;
 import com.frostwire.android.gui.util.UIUtils;
@@ -50,7 +49,7 @@ import java.util.Map;
  * @author votaguz
  *
  */
-public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends AbstractListAdapter {
+public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
     private static final Logger LOGGER = Logger.getLogger(ConfirmListDialogDefaultAdapter.class);
     private static final int ITEM_TITLE = 0;
     private static final int ITEM_SIZE = 1;
@@ -79,7 +78,6 @@ public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends Abs
         layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_TITLE, R.id.confirmation_dialog_multiple_selection_list_item_title);
         layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_SIZE, R.id.confirmation_dialog_multiple_selection_list_item_size);
         layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_ART, R.id.confirmation_dialog_multiple_selection_list_item_art);
-
     }
 
     public ConfirmListDialogDefaultAdapter(Context context, List<T> list, SelectionMode selectionMode) {
@@ -99,11 +97,12 @@ public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends Abs
 
         try {
             initTouchFeedback(view, item);
+            ItemTag itemTag = new ItemTag(item, position);
             if(selectionMode == SelectionMode.MULTIPLE_SELECTION) {
-                initCheckBox(view, item);
-                setCheckboxesVisibility(selectionMode == SelectionMode.MULTIPLE_SELECTION);
+                initCheckBox(view, itemTag);
+                setCheckboxesVisibility(true);
             } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
-                initRadioButton(view, new RadioButtonTag((T) item, position));
+                initRadioButton(view, itemTag);
             }
             populateView(view, item);
         } catch (Throwable e) {
@@ -111,6 +110,11 @@ public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends Abs
         }
         return view;
     }
+
+    public abstract CharSequence getItemTitle(T data);
+    public abstract long getItemSize(T data);
+    public abstract CharSequence getItemThumbnailUrl(T data);
+    public abstract int getItemThumbnailResourceId(T data);
 
     @Override
     protected void populateView(View view, Object data) {
@@ -130,9 +134,10 @@ public class ConfirmListDialogDefaultAdapter<T extends SearchResult> extends Abs
                 ImageView imageView = (ImageView) findView(view, layoutMapping.get(selectionMode).get(ITEM_ART));
                 ImageLoader.getInstance(getContext()).load(Uri.parse(sr.getThumbnailUrl()), imageView);
             }
-        } else {
-            LOGGER.warn("populateView(data): data is not a SearchResult instance ("+data.getClass().getSimpleName()+")");
         }
     }
 
+    public SelectionMode getSelectionMode() {
+        return selectionMode;
+    }
 }
