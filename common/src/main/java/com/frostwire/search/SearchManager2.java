@@ -45,7 +45,6 @@ public final class SearchManager2 {
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
     }
 
-
     public void perform(final SearchPerformer performer) {
         if (performer == null) {
             throw new IllegalArgumentException("Search performer argument can't be null");
@@ -57,7 +56,16 @@ public final class SearchManager2 {
         performer.setListener(new SearchListener() {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {
-                performerOnResults(performer, results);
+                if (performer.getToken() == token) {
+                    SearchManager2.this.onResults(performer, results);
+                } else {
+                    LOG.warn("Performer token does not match listener onResults token, review your logic");
+                }
+            }
+
+            @Override
+            public void onError(long token, SearchError error) {
+                SearchManager2.this.onError(token, error);
             }
 
             @Override
@@ -66,14 +74,8 @@ public final class SearchManager2 {
             }
         });
 
-        SearchTask task = new PerformTask(this, performer, getOrder(performer.getToken()));
-
-        submitSearchTask(task);
-    }
-
-    public void submitSearchTask(SearchTask task) {
-        tasks.add(task);
-        executor.execute(task);
+        SearchTask task = new PerformTask(this, performer, nextOrdinal(performer.getToken()));
+        submit(task);
     }
 
     public void stop() {
@@ -92,88 +94,12 @@ public final class SearchManager2 {
         this.listener = listener;
     }
 
+    private void submit(SearchTask task) {
+        tasks.add(task);
+        executor.execute(task);
+    }
+
     private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
-        try {
-            if (results != null && listener != null) {
-                listener.onResults(performer.getToken(), results);
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error sending results to listener: " + e.getMessage(), e);
-        }
-    }
-
-    private void onStopped(long token) {
-        try {
-            if (listener != null) {
-                listener.onStopped(token);
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error sending stopped signal to listener: " + e.getMessage(), e);
-        }
-    }
-
-    private void crawl(SearchPerformer performer, CrawlableSearchResult sr) {
-        if (performer != null && !performer.isStopped()) {
-            try {
-                SearchTask task = new CrawlTask(this, performer, sr, getOrder(performer.getToken()));
-                submitSearchTask(task);
-            } catch (Throwable e) {
-                LOG.warn("Error scheduling crawling of search result: " + sr);
-            }
-        } else {
-            LOG.warn("Search performer is null or stopped, review your logic");
-        }
-    }
-
-    private void stopTasks(long token) {
-        synchronized (tasks) {
-            Iterator<SearchTask> it = tasks.iterator();
-            while (it.hasNext()) {
-                SearchTask task = it.next();
-                if (token == -1L || task.getToken() == token) {
-                    task.stopSearch();
-                }
-            }
-        }
-    }
-
-    private void checkIfFinished(SearchPerformer performer) {
-        SearchTask pendingTask = null;
-
-        synchronized (tasks) {
-            Iterator<SearchTask> it = tasks.iterator();
-            while (it.hasNext() && pendingTask == null) {
-                SearchTask task = it.next();
-                if (task.getToken() == performer.getToken() && !task.isStopped()) {
-                    pendingTask = task;
-                }
-
-                if (task.isStopped()) {
-                    it.remove();
-                }
-            }
-        }
-
-        if (pendingTask == null) {
-            onStopped(performer.getToken());
-        }
-    }
-
-    private int getOrder(long token) {
-        int order = 0;
-        synchronized (tasks) {
-            Iterator<SearchTask> it = tasks.iterator();
-            while (it.hasNext()) {
-                SearchTask task = it.next();
-                if (task.getToken() == token) {
-                    order = order + 1;
-                }
-            }
-        }
-        return order;
-    }
-
-    private void performerOnResults(SearchPerformer performer, List<? extends SearchResult> results) {
         List<SearchResult> list = new LinkedList<SearchResult>();
 
         for (SearchResult sr : results) {
@@ -191,28 +117,119 @@ public final class SearchManager2 {
         }
 
         if (!list.isEmpty()) {
-            onResults(performer, list);
+            onResults(performer.getToken(), list);
         }
+    }
+
+    private void onResults(long token, List<? extends SearchResult> results) {
+        try {
+            if (results != null && listener != null) {
+                listener.onResults(token, results);
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error sending results to listener: " + e.getMessage(), e);
+        }
+    }
+
+    private void onError(long token, SearchError error) {
+        try {
+            if (error != null && listener != null) {
+                listener.onError(token, error);
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error sending search error to listener: " + e.getMessage(), e);
+        }
+    }
+
+    private void onStopped(long token) {
+        try {
+            if (listener != null) {
+                listener.onStopped(token);
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error sending stopped signal to listener: " + e.getMessage(), e);
+        }
+    }
+
+    private void crawl(SearchPerformer performer, CrawlableSearchResult sr) {
+        if (performer != null && !performer.isStopped()) {
+            try {
+                SearchTask task = new CrawlTask(this, performer, sr, nextOrdinal(performer.getToken()));
+                submit(task);
+            } catch (Throwable e) {
+                LOG.warn("Error scheduling crawling of search result: " + sr);
+            }
+        } else {
+            LOG.warn("Search performer is null or stopped, review your logic");
+        }
+    }
+
+    private void stopTasks(long token) {
+        synchronized (tasks) {
+            Iterator<SearchTask> it = tasks.iterator();
+            while (it.hasNext()) {
+                SearchTask task = it.next();
+                if (token == -1L || task.token() == token) {
+                    task.stopSearch();
+                }
+            }
+        }
+    }
+
+    private void checkIfFinished(long token) {
+        SearchTask pendingTask = null;
+
+        synchronized (tasks) {
+            Iterator<SearchTask> it = tasks.iterator();
+            while (it.hasNext() && pendingTask == null) {
+                SearchTask task = it.next();
+                if (task.token() == token && !task.stopped()) {
+                    pendingTask = task;
+                }
+
+                if (task.stopped()) {
+                    it.remove();
+                }
+            }
+        }
+
+        if (pendingTask == null) {
+            onStopped(token);
+        }
+    }
+
+    private int nextOrdinal(long token) {
+        int ordinal = 0;
+        synchronized (tasks) {
+            Iterator<SearchTask> it = tasks.iterator();
+            while (it.hasNext()) {
+                SearchTask task = it.next();
+                if (task.token() == token) {
+                    ordinal = ordinal + 1;
+                }
+            }
+        }
+        return ordinal;
     }
 
     private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {
 
         protected final SearchManager2 manager;
         protected final SearchPerformer performer;
-        private final int order;
+        private final int ordinal;
 
-        public SearchTask(SearchManager2 manager, SearchPerformer performer, int order) {
+        public SearchTask(SearchManager2 manager, SearchPerformer performer, int ordinal) {
             this.manager = manager;
             this.performer = performer;
-            this.order = order;
+            this.ordinal = ordinal;
             this.setName(performer.getClass().getName() + "-SearchTask");
         }
 
-        public long getToken() {
+        public long token() {
             return performer.getToken();
         }
 
-        public boolean isStopped() {
+        public boolean stopped() {
             return performer.isStopped();
         }
 
@@ -222,7 +239,9 @@ public final class SearchManager2 {
 
         @Override
         public int compareTo(SearchTask o) {
-            return order - o.order;
+            int x = ordinal;
+            int y = o.ordinal;
+            return (x < y) ? -1 : ((x == y) ? 0 : 1);
         }
     }
 
@@ -235,14 +254,14 @@ public final class SearchManager2 {
         @Override
         public void run() {
             try {
-                if (!isStopped()) {
+                if (!stopped()) {
                     performer.perform();
                 }
             } catch (Throwable e) {
                 LOG.warn("Error performing search: " + performer + ", e=" + e.getMessage());
             } finally {
                 if (manager.tasks.remove(this)) {
-                    manager.checkIfFinished(performer);
+                    manager.checkIfFinished(performer.getToken());
                 }
             }
         }
@@ -260,14 +279,14 @@ public final class SearchManager2 {
         @Override
         public void run() {
             try {
-                if (!isStopped()) {
+                if (!stopped()) {
                     performer.crawl(sr);
                 }
             } catch (Throwable e) {
                 LOG.warn("Error performing crawling of: " + sr + ", e=" + e.getMessage());
             } finally {
                 if (manager.tasks.remove(this)) {
-                    manager.checkIfFinished(performer);
+                    manager.checkIfFinished(performer.getToken());
                 }
             }
         }

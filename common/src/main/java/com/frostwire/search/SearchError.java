@@ -17,17 +17,19 @@
 
 package com.frostwire.search;
 
-import java.util.List;
-
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface SearchListener {
+public final class SearchError {
 
-    void onResults(long token, List<? extends SearchResult> results);
+    private final int code;
 
-    void onError(long token, SearchError error);
+    public SearchError(int code) {
+        this.code = code;
+    }
 
-    void onStopped(long token);
+    public int code() {
+        return code;
+    }
 }

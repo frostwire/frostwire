@@ -73,6 +73,11 @@ public class SearchManagerImpl implements SearchManager {
                 }
 
                 @Override
+                public void onError(long token, SearchError error) {
+                    // still not supported
+                }
+
+                @Override
                 public void onStopped(long token) {
                     // nothing since this is calculated in aggregation
                 }
