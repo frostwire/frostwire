@@ -18,9 +18,9 @@
 
 package com.frostwire.search.soundcloud;
 
+import com.frostwire.logging.Logger;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
-import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 
 import java.text.ParseException;
@@ -32,7 +32,7 @@ import java.util.Locale;
  * @author aldenml
  */
 public final class SoundcloudSearchResult extends AbstractFileSearchResult implements HttpSearchResult, StreamableSearchResult {
-
+    private static Logger LOGGER = Logger.getLogger(SoundcloudSearchResult.class);
     private static final String DATE_FORMAT = "yyyy/mm/dd HH:mm:ss Z";
 
     private final String displayName;
@@ -172,7 +172,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
 
     @Override
     public String toString() {
-        return "SoundcloudSearchResult.downloadUrl: " + getDownloadUrl();
+        return "SoundcloudSearchResult.getDisplayName(): " + getDisplayName();
     }
 
     @Override

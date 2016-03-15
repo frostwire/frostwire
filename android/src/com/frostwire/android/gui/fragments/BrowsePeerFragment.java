@@ -388,7 +388,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             adapter = new FileListAdapter(getActivity(), items, fileType) {
 
                 @Override
-                protected void onItemChecked(View v, boolean isChecked) {
+                protected void onItemChecked(CompoundButton v, boolean isChecked) {
                     if (!isChecked) {
                         filesBar.clearCheckAll();
                     }

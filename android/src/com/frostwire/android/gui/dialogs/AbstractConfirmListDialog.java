@@ -220,14 +220,12 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
             final boolean[] checkedOffsets = bundle.getBooleanArray("checkedOffsets");
             for (int i=0; i < checkedOffsets.length; i++) {
                 adapter.setChecked(i, checkedOffsets[i]);
-                LOGGER.info(" adapter.setChecked");
             }
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        LOGGER.info("onSaveInstanceState()");
         if (adapter != null) {
             final Set checked = adapter.getChecked();
             if (outState != null && checked != null && !checked.isEmpty()) {
@@ -293,7 +291,6 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
             return;
         }
 
-        LOGGER.info("AbstractConfirmListDialog.updateSelectedCount()");
         if (adapter == null) {
             return;
         }
@@ -327,8 +324,7 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
 
     // AbstractListAdapter.OnItemCheckedListener
     @Override
-    public void onItemChecked(View v, boolean checked) {
-        LOGGER.info("AbstractConfirmListDialog.onItemChecked(checked = "+checked+")");
+    public void onItemChecked(CompoundButton v, boolean checked) {
         updateSelectedCount();
     }
 }
