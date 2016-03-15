@@ -55,6 +55,15 @@ public final class Platforms {
     }
 
     /**
+     * Shortcut to current platform application settings.
+     *
+     * @return
+     */
+    public static AppSettings appSettings() {
+        return get().appSettings();
+    }
+
+    /**
      * Shortcut to current platform file system data method.
      *
      * @return

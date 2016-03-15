@@ -39,4 +39,9 @@ public interface AppSettings {
     boolean bool(String key);
 
     void bool(String key, boolean value);
+
+    interface SearchKeys {
+
+        public static final String YOUTUBE_ENABLE = "";
+    }
 }
