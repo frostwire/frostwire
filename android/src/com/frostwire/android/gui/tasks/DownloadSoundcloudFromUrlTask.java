@@ -143,24 +143,30 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
         @Override
         public void onClick(View v) {
             if (Ref.alive(ctxRef) && Ref.alive(dlgRef)) {
-                AbstractConfirmListDialog dlg = dlgRef.get();
-                final AbstractConfirmListDialog.SelectionMode selectionMode = dlg.getSelectionMode();
-                List<SoundcloudSearchResult> results = (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION) ?
-                        (List<SoundcloudSearchResult>) dlg.getList() :
-                        new ArrayList<SoundcloudSearchResult>();
+                final AbstractConfirmListDialog dlg = dlgRef.get();
+                try {
+                    final AbstractConfirmListDialog.SelectionMode selectionMode = dlg.getSelectionMode();
+                    List<SoundcloudSearchResult> results = (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION) ?
+                            (List<SoundcloudSearchResult>) dlg.getList() :
+                            new ArrayList<SoundcloudSearchResult>();
 
-                if (selectionMode == AbstractConfirmListDialog.SelectionMode.MULTIPLE_SELECTION) {
-                    results.addAll(dlg.getChecked());
-                } else if (selectionMode == AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION) {
-                    SoundcloudSearchResult selected = results.get(dlg.getLastSelected());
-                    if (selected == null) {
-                        // MIGHT DO: dlg.displayErrorNotice(ERROR_CODE);
-                        return;
+                    if (selectionMode == AbstractConfirmListDialog.SelectionMode.MULTIPLE_SELECTION) {
+                        results.addAll(dlg.getChecked());
+                    } else if (selectionMode == AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION) {
+                        if (results == null || results.isEmpty()) {
+                            return;
+                        }
+                        SoundcloudSearchResult selected = results.get(dlg.getLastSelected());
+                        if (selected == null) {
+
+                            return;
+                        }
+                        results.add(selected);
                     }
-                    results.add(selected);
+                    startDownloads(ctxRef.get(), results);
+                } finally {
+                    dlg.dismiss();
                 }
-                startDownloads(ctxRef.get(), results);
-                dlg.dismiss();
             }
         }
     }
@@ -196,7 +202,7 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
     }
 
     public static class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<SoundcloudSearchResult> {
-        public ConfirmSoundcloudDownloadDialog(Context context, List<SoundcloudSearchResult> listData, SelectionMode selectionMode) {
+        private ConfirmSoundcloudDownloadDialog(Context context, List<SoundcloudSearchResult> listData, SelectionMode selectionMode) {
             super(context, listData, selectionMode, null);
         }
 
