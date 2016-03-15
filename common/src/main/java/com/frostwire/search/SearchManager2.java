@@ -18,12 +18,24 @@
 package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.AppSettings;
+import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
+import com.frostwire.search.bitsnoop.BitSnoopSearchPerformer;
+import com.frostwire.search.btjunkie.BtjunkieSearchPerformer;
+import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
+import com.frostwire.search.eztv.EztvSearchPerformer;
+import com.frostwire.search.frostclick.FrostClickSearchPerformer;
+import com.frostwire.search.kat.KATSearchPerformer;
+import com.frostwire.search.mininova.MininovaSearchPerformer;
+import com.frostwire.search.monova.MonovaSearchPerformer;
+import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
+import com.frostwire.search.torlock.TorLockSearchPerformer;
+import com.frostwire.search.tpb.TPBSearchPerformer;
+import com.frostwire.search.yify.YifySearchPerformer;
+import com.frostwire.search.youtube.YouTubeSearchPerformer;
 import com.frostwire.util.ThreadPool;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -299,4 +311,108 @@ public final class SearchManager2 {
             }
         }
     }
+
+    // search engines
+
+    private static final int DEFAULT_SEARCH_PERFORMER_TIMEOUT = 10000;
+
+    public static final SearchEngine EXTRATORRENT = new SearchEngine("Extratorrent", AppSettings.SEARCH_EXTRATORRENT_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new ExtratorrentSearchPerformer("extratorrent.cc", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine MININOVA = new SearchEngine("Mininova", AppSettings.SEARCH_MININOVA_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new MininovaSearchPerformer("www.mininova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine YOUTUBE = new SearchEngine("YouTube", AppSettings.SEARCH_YOUTUBE_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new YouTubeSearchPerformer("www.youtube.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine SOUNCLOUD = new SearchEngine("Soundcloud", AppSettings.SEARCH_SOUNDCLOUD_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new SoundcloudSearchPerformer("api.sndcdn.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine ARCHIVE = new SearchEngine("Archive", AppSettings.SEARCH_ARCHIVE_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new ArchiveorgSearchPerformer("archive.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine FROSTCLICK = new SearchEngine("FrostClick", AppSettings.SEARCH_FROSTCLICK_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new FrostClickSearchPerformer("api.frostclick.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT, null);
+        }
+    };
+
+    public static final SearchEngine BITSNOOP = new SearchEngine("BitSnoop", AppSettings.SEARCH_BITSNOOP_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new BitSnoopSearchPerformer("bitsnoop.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine TORLOCK = new SearchEngine("TorLock", AppSettings.SEARCH_TORLOCK_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new TorLockSearchPerformer("www.torlock.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine EZTV = new SearchEngine("Eztv", AppSettings.SEARCH_EZTV_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new EztvSearchPerformer("eztv.ag", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine TPB = new SearchEngine("TPB", AppSettings.SEARCH_TBP_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new TPBSearchPerformer("thepiratebay.se", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine MONOVA = new SearchEngine("Monova", AppSettings.SEARCH_MONOVA_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new MonovaSearchPerformer("www.monova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine YIFY = new SearchEngine("Yify", AppSettings.SEARCH_YIFY_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new YifySearchPerformer("www.yify-torrent.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine BTJUNKIE = new SearchEngine("Btjunkie", AppSettings.SEARCH_BTJUNKIE_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new BtjunkieSearchPerformer("btjunkie.eu", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine KAT = new SearchEngine("KAT", AppSettings.SEARCH_KAT_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new KATSearchPerformer("kat.cr", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, KAT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, BTJUNKIE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, BITSNOOP, EZTV);
 }

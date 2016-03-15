@@ -40,8 +40,20 @@ public interface AppSettings {
 
     void bool(String key, boolean value);
 
-    interface SearchKeys {
+    // keys
 
-        public static final String YOUTUBE_ENABLE = "";
-    }
+    String SEARCH_EXTRATORRENT_ENABLED = "search_extratorrent_enabled";
+    String SEARCH_MININOVA_ENABLED = "search_mininova_enabled";
+    String SEARCH_YOUTUBE_ENABLED = "search_youtube_enabled";
+    String SEARCH_SOUNDCLOUD_ENABLED = "search_soundcloud_enabled";
+    String SEARCH_ARCHIVE_ENABLED = "search_archive_enabled";
+    String SEARCH_FROSTCLICK_ENABLED = "search_frostclick_enabled";
+    String SEARCH_BITSNOOP_ENABLED = "search_bitsnoop_enabled";
+    String SEARCH_TORLOCK_ENABLED = "search_torlock_enabled";
+    String SEARCH_EZTV_ENABLED = "search_eztv_enabled";
+    String SEARCH_TBP_ENABLED = "search_tbp_enabled";
+    String SEARCH_MONOVA_ENABLED = "search_monova_enabled";
+    String SEARCH_YIFY_ENABLED = "search_yify_enabled";
+    String SEARCH_BTJUNKIE_ENABLED = "search_btjunkie_enabled";
+    String SEARCH_KAT_ENABLED = "search_kat_enabled";
 }

@@ -17,6 +17,7 @@
 
 package com.frostwire.search;
 
+import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 
 /**
@@ -25,28 +26,46 @@ import com.frostwire.platform.Platforms;
  */
 public abstract class SearchEngine {
 
+    private final String name;
     private final String settingKey;
+    private final boolean mobile;
 
-    private boolean remoteEnable;
+    private boolean remoteEnabled;
 
-    SearchEngine(String settingKey) {
+    SearchEngine(String name, String settingKey, boolean mobile) {
+        this.name = name;
         this.settingKey = settingKey;
-        this.remoteEnable = true;
+        this.mobile = mobile;
+        this.remoteEnabled = true;
     }
 
-    public boolean localEnable() {
-        return Platforms.appSettings().bool(settingKey);
+    SearchEngine(String name, String settingKey) {
+        this(name, settingKey, true);
     }
 
-    public boolean remoteEnable() {
-        return remoteEnable;
+    public final String name() {
+        return name;
     }
 
-    public void remoteEnable(boolean value) {
-        remoteEnable = value;
+    public final boolean localEnabled() {
+        if (!Platforms.appSettings().bool(settingKey)) {
+            return false;
+        }
+
+        return mobile || Platforms.get().networkType() != Platform.NetworkType.MOBILE;
     }
 
-    public boolean enable() {
-        return localEnable() && remoteEnable();
+    public final boolean remoteEnabled() {
+        return remoteEnabled;
     }
+
+    public final void remoteEnabled(boolean value) {
+        remoteEnabled = value;
+    }
+
+    public boolean enabled() {
+        return localEnabled() && remoteEnabled();
+    }
+
+    public abstract SearchPerformer newPerformer(long token, String keywords);
 }
