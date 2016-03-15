@@ -99,12 +99,11 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
 
         try {
             initTouchFeedback(view, item);
-            ItemTag itemTag = new ItemTag(item, position);
             if(selectionMode == SelectionMode.MULTIPLE_SELECTION) {
-                initCheckBox(view, itemTag);
+                initCheckBox(view, item);
                 setCheckboxesVisibility(true);
             } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
-                initRadioButton(view, itemTag);
+                initRadioButton(view, item, position);
             }
             populateView(view, item);
         } catch (Throwable e) {

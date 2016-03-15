@@ -54,7 +54,11 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private final OnClickListener viewOnClickListener;
     private final ViewOnLongClickListener viewOnLongClickListener;
     private final ViewOnKeyListener viewOnKeyListener;
+
     private final CheckboxOnCheckedChangeListener checkboxOnCheckedChangeListener;
+    protected int lastSelectedRadioButtonIndex = 0;
+    private final RadioButtonOnCheckedChangeListener radioButtonCheckedChangeListener;
+    private OnItemCheckedListener onItemCheckedListener;
 
     private ListAdapterFilter<T> filter;
     private boolean checkboxesVisibility;
@@ -65,10 +69,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     protected List<T> list;
     protected Set<T> checked;
     protected List<T> visualList;
-
-    protected int lastSelectedRadioButtonIndex = 0;
-    private final OnCheckedChangeListener radioButtonCheckedChangeListener;
-    private OnItemCheckedListener onItemCheckedListener;
 
     public AbstractListAdapter(Context context,
                                int viewItemId,
@@ -275,7 +275,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * It will also bind the data to the view, you can refer to it if you need it by doing a .getTag()
      */
     public View getView(int position, View view, ViewGroup parent) {
-
         T item = getItem(position);
         Context ctx = getContext();
 
@@ -287,11 +286,9 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
 
         try {
-
             initTouchFeedback(view, item);
-            ItemTag itemTag = new ItemTag(item, position);
-            initCheckBox(view, itemTag);
-            initRadioButton(view, itemTag);
+            initCheckBox(view, item);
+            initRadioButton(view, item, position);
             populateView(view, item);
 
         } catch (Throwable e) {
@@ -359,6 +356,15 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     protected void onItemChecked(CompoundButton v, boolean isChecked) {
+        T item = (T) v.getTag();
+        if (item != null) {
+            if (v.isChecked() && !checked.contains(item)) {
+                checked.add(item);
+            } else {
+                checked.remove(item);
+            }
+        }
+
         if (onItemCheckedListener != null) {
             onItemCheckedListener.onItemChecked(v, isChecked);
         }
@@ -418,15 +424,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      *
      * @see #getChecked()
      */
-    protected void initCheckBox(View view, ItemTag itemTag) {
+    protected void initCheckBox(View view, T item) {
         CheckBox checkbox = findView(view, R.id.view_selectable_list_item_checkbox);
         if (checkbox != null) {
             checkbox.setVisibility((checkboxesVisibility) ? View.VISIBLE : View.GONE);
             if (checkbox.getVisibility() == View.VISIBLE) {
-                printCheckedItems();
                 checkbox.setOnCheckedChangeListener(null);
-                checkbox.setChecked(checked.contains(itemTag.item));
-                checkbox.setTag(itemTag);
+                checkbox.setChecked(checked.contains(item));
+                checkbox.setTag(item);
                 checkbox.setOnCheckedChangeListener(checkboxOnCheckedChangeListener);
             }
         }
@@ -516,34 +521,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private final class CheckboxOnCheckedChangeListener implements OnCheckedChangeListener {
         @SuppressWarnings("unchecked")
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            Object tag = buttonView.getTag();
-            T item = (T) tag;
-            if (tag.getClass().equals(ItemTag.class)) {
-                item = ((ItemTag) tag).item;
-            }
-            if (buttonView.isChecked() && !checked.contains(item)) {
-                checked.add(item);
-            } else {
-                checked.remove(item);
-            }
             onItemChecked(buttonView, isChecked);
-        }
-    }
-
-    private void printCheckedItems() {
-        if (checked == null || checked.isEmpty()) {
-            LOG.info("{no checked items}");
-            return;
-        }
-
-        LOG.info(checked.size() + " checked items:");
-        for (T c : checked) {
-            if (c.getClass().equals(ItemTag.class)) {
-                ItemTag itemTag = (ItemTag) c;
-                LOG.info(itemTag.position + " -> [" + itemTag.item.toString() + "]");
-            } else {
-                LOG.info("[checked] -> [" + c.toString() + "]");
-            }
         }
     }
 
@@ -598,37 +576,41 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if (buttonView instanceof RadioButton && isChecked){
                 RadioButton radioButton = (RadioButton) buttonView;
-                ItemTag tag = (ItemTag) radioButton.getTag();
+                T item = (T) radioButton.getTag();
+                int position = (item == null) ? 0 : getList().indexOf(item);
 
                 if(Ref.alive(lastRadioButtonChecked)){
                     lastRadioButtonChecked.get().setChecked(false);
                     Ref.free(lastRadioButtonChecked);
                 }
 
-                lastSelectedRadioButtonIndex = tag.position;
+                lastSelectedRadioButtonIndex = position;
+                radioButton.setOnCheckedChangeListener(null);
                 radioButton.setChecked(true);
+                radioButton.setOnCheckedChangeListener(this);
                 lastRadioButtonChecked = new WeakReference<>(radioButton);
             }
         }
-    }
 
-    protected final class ItemTag {
-        T item;
-        int position;
-
-        public ItemTag(T item, int position) {
-            this.item = item;
-            this.position = position;
+        public void updateLastRadioButtonChecked(RadioButton radioButton) {
+            if(Ref.alive(lastRadioButtonChecked)){
+                Ref.free(lastRadioButtonChecked);
+            }
+            lastRadioButtonChecked = new WeakReference<>(radioButton);
         }
     }
 
-    protected void initRadioButton(View view, ItemTag tag) {
+    protected void initRadioButton(View view, T tag, int position) {
         RadioButton radioButton = findView(view, R.id.view_selectable_list_item_radiobutton);
         if (radioButton != null) {
             radioButton.setVisibility(View.VISIBLE);
             radioButton.setTag(tag);
             radioButton.setOnCheckedChangeListener(radioButtonCheckedChangeListener);
-            radioButton.setChecked(tag.position == lastSelectedRadioButtonIndex);
+            radioButton.setChecked(position == lastSelectedRadioButtonIndex);
+
+            if (position == lastSelectedRadioButtonIndex) {
+                radioButtonCheckedChangeListener.updateLastRadioButtonChecked(radioButton);
+            }
         }
     }
 
