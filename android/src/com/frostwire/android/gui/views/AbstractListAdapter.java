@@ -360,7 +360,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     protected void onItemChecked(CompoundButton v, boolean isChecked) {
         if (onItemCheckedListener != null) {
-            LOG.info("AbstractListAdapter.onItemChecked("+isChecked+")");
             onItemCheckedListener.onItemChecked(v, isChecked);
         }
     }
@@ -423,10 +422,13 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         CheckBox checkbox = findView(view, R.id.view_selectable_list_item_checkbox);
         if (checkbox != null) {
             checkbox.setVisibility((checkboxesVisibility) ? View.VISIBLE : View.GONE);
-            checkbox.setOnCheckedChangeListener(null);
-            checkbox.setChecked(checkboxesVisibility && checked.contains(itemTag.item));
-            checkbox.setTag(itemTag);
-            checkbox.setOnCheckedChangeListener(checkboxOnCheckedChangeListener);
+            if (checkbox.getVisibility() == View.VISIBLE) {
+                printCheckedItems();
+                checkbox.setOnCheckedChangeListener(null);
+                checkbox.setChecked(checked.contains(itemTag.item));
+                checkbox.setTag(itemTag);
+                checkbox.setOnCheckedChangeListener(checkboxOnCheckedChangeListener);
+            }
         }
     }
 
@@ -514,14 +516,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private final class CheckboxOnCheckedChangeListener implements OnCheckedChangeListener {
         @SuppressWarnings("unchecked")
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            LOG.info("AbstractListAdapter.CheckboxOnCheckedChangeListener.onCheckedChanged(isChecked = "+isChecked+")");
-            T item = (T) buttonView.getTag();
-            printCheckedItems();
+            Object tag = buttonView.getTag();
+            T item = (T) tag;
+            if (tag.getClass().equals(ItemTag.class)) {
+                item = ((ItemTag) tag).item;
+            }
             if (buttonView.isChecked() && !checked.contains(item)) {
-                LOG.info("Didn't have item: ["+item.toString()+"]");
                 checked.add(item);
             } else {
-                LOG.info("Removing item: ["+item.toString()+"]");
                 checked.remove(item);
             }
             onItemChecked(buttonView, isChecked);
@@ -535,11 +537,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
 
         LOG.info(checked.size() + " checked items:");
-        int i=0;
         for (T c : checked) {
-            LOG.info(i + ". " + c.toString());
+            if (c.getClass().equals(ItemTag.class)) {
+                ItemTag itemTag = (ItemTag) c;
+                LOG.info(itemTag.position + " -> [" + itemTag.item.toString() + "]");
+            } else {
+                LOG.info("[checked] -> [" + c.toString() + "]");
+            }
         }
-        LOG.info("================================");
     }
 
     private final class AbstractListAdapterFilter extends Filter {
@@ -584,7 +589,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             adapter.visualList = (List<T>) results.values;
             notifyDataSetInvalidated();
         }
-
     }
 
     private final class RadioButtonOnCheckedChangeListener implements OnCheckedChangeListener {
@@ -592,7 +596,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            LOG.info("AbstractListAdapter.RadioButtonOnCheckedChangeListener.onCheckedChanged()");
             if (buttonView instanceof RadioButton && isChecked){
                 RadioButton radioButton = (RadioButton) buttonView;
                 ItemTag tag = (ItemTag) radioButton.getTag();

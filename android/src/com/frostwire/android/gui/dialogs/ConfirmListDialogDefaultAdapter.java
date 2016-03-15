@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.dialogs;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,6 +84,7 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
     public ConfirmListDialogDefaultAdapter(Context context, List<T> list, SelectionMode selectionMode) {
         super(context, selectionModeToLayoutId.get(selectionMode).intValue(), list);
         this.selectionMode = selectionMode;
+        setCheckboxesVisibility(selectionMode != SelectionMode.NO_SELECTION);
     }
 
     @Override
@@ -118,21 +120,31 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
 
     @Override
     protected void populateView(View view, Object data) {
-        if (data instanceof  SearchResult) {
-            SearchResult sr = (SearchResult) data;
-            TextView trackTitle = (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_TITLE));
-            trackTitle.setText(sr.getDisplayName());
+        T item = (T) data;
 
-            TextView trackSizeInHuman = (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_SIZE));
-            if (sr instanceof FileSearchResult){
-                trackSizeInHuman.setText(UIUtils.getBytesInHuman(((FileSearchResult) sr).getSize()));
-            } else {
-                trackSizeInHuman.setVisibility(View.GONE);
-            }
+        TextView trackTitle = (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_TITLE));
+        trackTitle.setText(getItemTitle(item));
 
-            if (!StringUtils.isNullOrEmpty(sr.getThumbnailUrl())) {
-                ImageView imageView = (ImageView) findView(view, layoutMapping.get(selectionMode).get(ITEM_ART));
-                ImageLoader.getInstance(getContext()).load(Uri.parse(sr.getThumbnailUrl()), imageView);
+        final long itemSize = getItemSize(item);
+        TextView trackSizeInHuman = (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_SIZE));
+        if (itemSize != -1) {
+            trackSizeInHuman.setText(UIUtils.getBytesInHuman(itemSize));
+            trackSizeInHuman.setVisibility(View.VISIBLE);
+        } else {
+            trackSizeInHuman.setVisibility(View.GONE);
+        }
+
+        ImageView imageView = (ImageView) findView(view, layoutMapping.get(selectionMode).get(ITEM_ART));
+        final CharSequence itemThumbnailUrl = getItemThumbnailUrl(item);
+        if (itemThumbnailUrl != null && itemThumbnailUrl.length() != 0) {
+            ImageLoader.getInstance(getContext()).load(Uri.parse((String) itemThumbnailUrl), imageView);
+        }
+
+        final int itemThumbnailResourceId = getItemThumbnailResourceId(item);
+        if (itemThumbnailResourceId != -1) {
+            Drawable thumbnail = getContext().getResources().getDrawable(itemThumbnailResourceId);
+            if (thumbnail != null) {
+                imageView.setImageDrawable(thumbnail);
             }
         }
     }

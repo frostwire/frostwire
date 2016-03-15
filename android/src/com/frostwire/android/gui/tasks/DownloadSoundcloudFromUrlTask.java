@@ -233,10 +233,5 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
             listener.setDialog(this);
             return listener;
         }
-
-        @Override
-        public void onItemChecked(CompoundButton v, boolean checked) {
-
-        }
     }
 }
