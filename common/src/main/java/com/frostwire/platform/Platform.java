@@ -98,6 +98,11 @@ public interface Platform {
          * The Default Ethernet data connection.  When active, all data traffic
          * will use this connection by default.
          */
-        ETHERNET
+        ETHERNET,
+
+        /**
+         *
+         */
+        UNKNOWN
     }
 }
