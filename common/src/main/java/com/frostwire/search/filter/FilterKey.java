@@ -34,6 +34,10 @@ public interface FilterKey extends Comparable<FilterKey> {
 
         @Override
         public int compareTo(FilterKey o) {
+            if (this.equals(o)) {
+                return 0;
+            }
+
             return 1;
         }
     };

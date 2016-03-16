@@ -21,19 +21,31 @@ package com.frostwire.search.filter;
  * @author gubatron
  * @author aldenml
  */
-public final class SourceKey extends FilterKeyBase {
+public final class SourceKey implements FilterKey {
 
     private final String source;
     private final int ordinal;
 
-    public SourceKey(String source, int ordinal, String display) {
-        super(display);
+    private String display;
+
+    public SourceKey(String source, int ordinal) {
         this.source = source;
         this.ordinal = ordinal;
+
+        this.display = source;
     }
 
     public String source() {
         return source;
+    }
+
+    @Override
+    public String display() {
+        return display;
+    }
+
+    public void display(String value) {
+        this.display = value;
     }
 
     @Override

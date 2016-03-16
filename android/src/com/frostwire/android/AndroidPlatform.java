@@ -23,6 +23,7 @@ import android.os.Build;
 import android.support.v4.provider.DocumentFile;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.jlibtorrent.swig.posix_stat;
 import com.frostwire.jlibtorrent.swig.posix_wrapper;
@@ -44,7 +45,7 @@ public final class AndroidPlatform extends AbstractPlatform {
     private final int sdk;
 
     public AndroidPlatform(Application app) {
-        super(buildFileSystem(app), new AndroidPaths(app));
+        super(buildFileSystem(app), new AndroidPaths(app), new AndroidSettings());
 
         this.sdk = Build.VERSION.SDK_INT;
     }
@@ -62,6 +63,19 @@ public final class AndroidPlatform extends AbstractPlatform {
     @Override
     public boolean experimental() {
         return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_CORE_EXPERIMENTAL);
+    }
+
+    @Override
+    public NetworkType networkType() {
+        if (NetworkManager.instance().isDataMobileUp()) {
+            return NetworkType.MOBILE;
+        }
+
+        if (NetworkManager.instance().isDataWIFIUp()) {
+            return NetworkType.MOBILE;
+        }
+
+        return NetworkType.NONE;
     }
 
     public static boolean saf() {

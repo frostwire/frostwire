@@ -26,19 +26,25 @@ public abstract class AbstractPlatform implements Platform {
 
     private final FileSystem fileSystem;
     private final SystemPaths systemPaths;
+    private final AppSettings appSettings;
 
-    public AbstractPlatform(FileSystem fileSystem, SystemPaths systemPaths) {
+    public AbstractPlatform(FileSystem fileSystem, SystemPaths systemPaths, AppSettings appSettings) {
         if (fileSystem == null) {
             throw new IllegalArgumentException("FileSystem can't be null");
         }
         if (systemPaths == null) {
             throw new IllegalArgumentException("SystemPaths can't be null");
         }
+        if (appSettings == null) {
+            throw new IllegalArgumentException("AppSettings can't be null");
+        }
 
         this.fileSystem = fileSystem;
         this.systemPaths = systemPaths;
+        this.appSettings = appSettings;
     }
 
+    @Override
     public FileSystem fileSystem() {
         return fileSystem;
     }
@@ -46,6 +52,11 @@ public abstract class AbstractPlatform implements Platform {
     @Override
     public SystemPaths systemPaths() {
         return systemPaths;
+    }
+
+    @Override
+    public AppSettings appSettings() {
+        return appSettings;
     }
 
     @Override
@@ -61,5 +72,10 @@ public abstract class AbstractPlatform implements Platform {
     @Override
     public boolean experimental() {
         return false;
+    }
+
+    @Override
+    public NetworkType networkType() {
+        return NetworkType.UNKNOWN;
     }
 }

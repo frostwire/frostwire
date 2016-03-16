@@ -18,12 +18,27 @@
 package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.AppSettings;
+import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
+import com.frostwire.search.bitsnoop.BitSnoopSearchPerformer;
+import com.frostwire.search.btjunkie.BtjunkieSearchPerformer;
+import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
+import com.frostwire.search.eztv.EztvSearchPerformer;
+import com.frostwire.search.filter.SearchTable;
+import com.frostwire.search.frostclick.FrostClickSearchPerformer;
+import com.frostwire.search.kat.KATSearchPerformer;
+import com.frostwire.search.mininova.MininovaSearchPerformer;
+import com.frostwire.search.monova.MonovaSearchPerformer;
+import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
+import com.frostwire.search.torlock.TorLockSearchPerformer;
+import com.frostwire.search.tpb.TPBSearchPerformer;
+import com.frostwire.search.yify.YifySearchPerformer;
+import com.frostwire.search.youtube.YouTubeSearchPerformer;
+import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.ref.WeakReference;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -37,14 +52,24 @@ public final class SearchManager2 {
 
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
+    private final List<WeakReference<SearchTable>> tables;
 
     private SearchListener listener;
+    private SearchTable lastTable;
 
-    public SearchManager2(int nThreads) {
+    private SearchManager2(int nThreads) {
         this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
+        this.tables = Collections.synchronizedList(new LinkedList<WeakReference<SearchTable>>());
     }
 
+    private static class Loader {
+        static final SearchManager2 INSTANCE = new SearchManager2(6);
+    }
+
+    public static SearchManager2 getInstance() {
+        return Loader.INSTANCE;
+    }
 
     public void perform(final SearchPerformer performer) {
         if (performer == null) {
@@ -57,7 +82,16 @@ public final class SearchManager2 {
         performer.setListener(new SearchListener() {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {
-                performerOnResults(performer, results);
+                if (performer.getToken() == token) {
+                    SearchManager2.this.onResults(performer, results);
+                } else {
+                    LOG.warn("Performer token does not match listener onResults token, review your logic");
+                }
+            }
+
+            @Override
+            public void onError(long token, SearchError error) {
+                SearchManager2.this.onError(token, error);
             }
 
             @Override
@@ -66,14 +100,8 @@ public final class SearchManager2 {
             }
         });
 
-        SearchTask task = new PerformTask(this, performer, getOrder(performer.getToken()));
-
-        submitSearchTask(task);
-    }
-
-    public void submitSearchTask(SearchTask task) {
-        tasks.add(task);
-        executor.execute(task);
+        SearchTask task = new PerformTask(this, performer, nextOrdinal(performer.getToken()));
+        submit(task);
     }
 
     public void stop() {
@@ -84,6 +112,26 @@ public final class SearchManager2 {
         stopTasks(token);
     }
 
+    public SearchTable newTable(long token) {
+        synchronized (tables) {
+            Iterator<WeakReference<SearchTable>> it = tables.iterator();
+            while (it.hasNext()) {
+                WeakReference<SearchTable> t = it.next();
+                if (!Ref.alive(t)) {
+                    it.remove();
+                }
+            }
+        }
+        SearchTable t = new SearchTable(token);
+        lastTable = t;
+        tables.add(Ref.weak(t));
+        return t;
+    }
+
+    public SearchTable lastTable() {
+        return lastTable;
+    }
+
     public SearchListener getListener() {
         return listener;
     }
@@ -92,88 +140,12 @@ public final class SearchManager2 {
         this.listener = listener;
     }
 
+    private void submit(SearchTask task) {
+        tasks.add(task);
+        executor.execute(task);
+    }
+
     private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
-        try {
-            if (results != null && listener != null) {
-                listener.onResults(performer.getToken(), results);
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error sending results to listener: " + e.getMessage(), e);
-        }
-    }
-
-    private void onStopped(long token) {
-        try {
-            if (listener != null) {
-                listener.onStopped(token);
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error sending stopped signal to listener: " + e.getMessage(), e);
-        }
-    }
-
-    private void crawl(SearchPerformer performer, CrawlableSearchResult sr) {
-        if (performer != null && !performer.isStopped()) {
-            try {
-                SearchTask task = new CrawlTask(this, performer, sr, getOrder(performer.getToken()));
-                submitSearchTask(task);
-            } catch (Throwable e) {
-                LOG.warn("Error scheduling crawling of search result: " + sr);
-            }
-        } else {
-            LOG.warn("Search performer is null or stopped, review your logic");
-        }
-    }
-
-    private void stopTasks(long token) {
-        synchronized (tasks) {
-            Iterator<SearchTask> it = tasks.iterator();
-            while (it.hasNext()) {
-                SearchTask task = it.next();
-                if (token == -1L || task.getToken() == token) {
-                    task.stopSearch();
-                }
-            }
-        }
-    }
-
-    private void checkIfFinished(SearchPerformer performer) {
-        SearchTask pendingTask = null;
-
-        synchronized (tasks) {
-            Iterator<SearchTask> it = tasks.iterator();
-            while (it.hasNext() && pendingTask == null) {
-                SearchTask task = it.next();
-                if (task.getToken() == performer.getToken() && !task.isStopped()) {
-                    pendingTask = task;
-                }
-
-                if (task.isStopped()) {
-                    it.remove();
-                }
-            }
-        }
-
-        if (pendingTask == null) {
-            onStopped(performer.getToken());
-        }
-    }
-
-    private int getOrder(long token) {
-        int order = 0;
-        synchronized (tasks) {
-            Iterator<SearchTask> it = tasks.iterator();
-            while (it.hasNext()) {
-                SearchTask task = it.next();
-                if (task.getToken() == token) {
-                    order = order + 1;
-                }
-            }
-        }
-        return order;
-    }
-
-    private void performerOnResults(SearchPerformer performer, List<? extends SearchResult> results) {
         List<SearchResult> list = new LinkedList<SearchResult>();
 
         for (SearchResult sr : results) {
@@ -191,28 +163,131 @@ public final class SearchManager2 {
         }
 
         if (!list.isEmpty()) {
-            onResults(performer, list);
+            onResults(performer.getToken(), list);
         }
+    }
+
+    private void onResults(long token, List<? extends SearchResult> results) {
+        try {
+            if (results != null && listener != null) {
+                listener.onResults(token, results);
+            }
+
+            synchronized (tables) {
+                Iterator<WeakReference<SearchTable>> it = tables.iterator();
+                while (it.hasNext()) {
+                    WeakReference<SearchTable> t = it.next();
+                    if (Ref.alive(t)) {
+                        t.get().add(results);
+                    } else {
+                        it.remove();
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error sending results to listener: " + e.getMessage(), e);
+        }
+    }
+
+    private void onError(long token, SearchError error) {
+        try {
+            if (error != null && listener != null) {
+                listener.onError(token, error);
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error sending search error to listener: " + e.getMessage(), e);
+        }
+    }
+
+    private void onStopped(long token) {
+        try {
+            if (listener != null) {
+                listener.onStopped(token);
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error sending stopped signal to listener: " + e.getMessage(), e);
+        }
+    }
+
+    private void crawl(SearchPerformer performer, CrawlableSearchResult sr) {
+        if (performer != null && !performer.isStopped()) {
+            try {
+                SearchTask task = new CrawlTask(this, performer, sr, nextOrdinal(performer.getToken()));
+                submit(task);
+            } catch (Throwable e) {
+                LOG.warn("Error scheduling crawling of search result: " + sr);
+            }
+        } else {
+            LOG.warn("Search performer is null or stopped, review your logic");
+        }
+    }
+
+    private void stopTasks(long token) {
+        synchronized (tasks) {
+            Iterator<SearchTask> it = tasks.iterator();
+            while (it.hasNext()) {
+                SearchTask task = it.next();
+                if (token == -1L || task.token() == token) {
+                    task.stopSearch();
+                }
+            }
+        }
+    }
+
+    private void checkIfFinished(long token) {
+        SearchTask pendingTask = null;
+
+        synchronized (tasks) {
+            Iterator<SearchTask> it = tasks.iterator();
+            while (it.hasNext() && pendingTask == null) {
+                SearchTask task = it.next();
+                if (task.token() == token && !task.stopped()) {
+                    pendingTask = task;
+                }
+
+                if (task.stopped()) {
+                    it.remove();
+                }
+            }
+        }
+
+        if (pendingTask == null) {
+            onStopped(token);
+        }
+    }
+
+    private int nextOrdinal(long token) {
+        int ordinal = 0;
+        synchronized (tasks) {
+            Iterator<SearchTask> it = tasks.iterator();
+            while (it.hasNext()) {
+                SearchTask task = it.next();
+                if (task.token() == token) {
+                    ordinal = ordinal + 1;
+                }
+            }
+        }
+        return ordinal;
     }
 
     private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {
 
         protected final SearchManager2 manager;
         protected final SearchPerformer performer;
-        private final int order;
+        private final int ordinal;
 
-        public SearchTask(SearchManager2 manager, SearchPerformer performer, int order) {
+        public SearchTask(SearchManager2 manager, SearchPerformer performer, int ordinal) {
             this.manager = manager;
             this.performer = performer;
-            this.order = order;
+            this.ordinal = ordinal;
             this.setName(performer.getClass().getName() + "-SearchTask");
         }
 
-        public long getToken() {
+        public long token() {
             return performer.getToken();
         }
 
-        public boolean isStopped() {
+        public boolean stopped() {
             return performer.isStopped();
         }
 
@@ -222,7 +297,9 @@ public final class SearchManager2 {
 
         @Override
         public int compareTo(SearchTask o) {
-            return order - o.order;
+            int x = ordinal;
+            int y = o.ordinal;
+            return (x < y) ? -1 : ((x == y) ? 0 : 1);
         }
     }
 
@@ -235,14 +312,14 @@ public final class SearchManager2 {
         @Override
         public void run() {
             try {
-                if (!isStopped()) {
+                if (!stopped()) {
                     performer.perform();
                 }
             } catch (Throwable e) {
                 LOG.warn("Error performing search: " + performer + ", e=" + e.getMessage());
             } finally {
                 if (manager.tasks.remove(this)) {
-                    manager.checkIfFinished(performer);
+                    manager.checkIfFinished(performer.getToken());
                 }
             }
         }
@@ -260,16 +337,120 @@ public final class SearchManager2 {
         @Override
         public void run() {
             try {
-                if (!isStopped()) {
+                if (!stopped()) {
                     performer.crawl(sr);
                 }
             } catch (Throwable e) {
                 LOG.warn("Error performing crawling of: " + sr + ", e=" + e.getMessage());
             } finally {
                 if (manager.tasks.remove(this)) {
-                    manager.checkIfFinished(performer);
+                    manager.checkIfFinished(performer.getToken());
                 }
             }
         }
     }
+
+    // search engines
+
+    private static final int DEFAULT_SEARCH_PERFORMER_TIMEOUT = 10000;
+
+    public static final SearchEngine EXTRATORRENT = new SearchEngine("Extratorrent", AppSettings.SEARCH_EXTRATORRENT_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new ExtratorrentSearchPerformer("extratorrent.cc", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine MININOVA = new SearchEngine("Mininova", AppSettings.SEARCH_MININOVA_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new MininovaSearchPerformer("www.mininova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine YOUTUBE = new SearchEngine("YouTube", AppSettings.SEARCH_YOUTUBE_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new YouTubeSearchPerformer("www.youtube.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine SOUNCLOUD = new SearchEngine("Soundcloud", AppSettings.SEARCH_SOUNDCLOUD_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new SoundcloudSearchPerformer("api.sndcdn.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine ARCHIVE = new SearchEngine("Archive", AppSettings.SEARCH_ARCHIVE_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new ArchiveorgSearchPerformer("archive.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine FROSTCLICK = new SearchEngine("FrostClick", AppSettings.SEARCH_FROSTCLICK_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new FrostClickSearchPerformer("api.frostclick.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT, null);
+        }
+    };
+
+    public static final SearchEngine BITSNOOP = new SearchEngine("BitSnoop", AppSettings.SEARCH_BITSNOOP_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new BitSnoopSearchPerformer("bitsnoop.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine TORLOCK = new SearchEngine("TorLock", AppSettings.SEARCH_TORLOCK_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new TorLockSearchPerformer("www.torlock.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine EZTV = new SearchEngine("Eztv", AppSettings.SEARCH_EZTV_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new EztvSearchPerformer("eztv.ag", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine TPB = new SearchEngine("TPB", AppSettings.SEARCH_TBP_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new TPBSearchPerformer("thepiratebay.se", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine MONOVA = new SearchEngine("Monova", AppSettings.SEARCH_MONOVA_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new MonovaSearchPerformer("www.monova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine YIFY = new SearchEngine("Yify", AppSettings.SEARCH_YIFY_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new YifySearchPerformer("www.yify-torrent.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine BTJUNKIE = new SearchEngine("Btjunkie", AppSettings.SEARCH_BTJUNKIE_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new BtjunkieSearchPerformer("btjunkie.eu", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine KAT = new SearchEngine("KAT", AppSettings.SEARCH_KAT_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new KATSearchPerformer("kat.cr", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, KAT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, BTJUNKIE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, BITSNOOP, EZTV);
 }

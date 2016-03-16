@@ -20,7 +20,7 @@ package com.frostwire.search.filter;
 import com.frostwire.search.SearchResult;
 
 import java.util.Collections;
-import java.util.NavigableSet;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
@@ -29,14 +29,14 @@ import java.util.TreeSet;
  */
 public final class SearchGroup {
 
-    private final NavigableSet<SearchResult> data;
+    private final SortedSet<SearchResult> data;
 
     SearchGroup(SearchFilter filter) {
         this.data = new TreeSet<>(filter.comparator());
     }
 
-    public NavigableSet<SearchResult> data() {
-        return null;//Collections.unmodifiableNavigableSet(data);
+    public SortedSet<SearchResult> data() {
+        return Collections.unmodifiableSortedSet(data);
     }
 
     void add(SearchResult sr) {
