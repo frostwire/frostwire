@@ -24,6 +24,7 @@ import com.frostwire.search.bitsnoop.BitSnoopSearchPerformer;
 import com.frostwire.search.btjunkie.BtjunkieSearchPerformer;
 import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
+import com.frostwire.search.filter.SearchTable;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.kat.KATSearchPerformer;
 import com.frostwire.search.mininova.MininovaSearchPerformer;
@@ -33,8 +34,10 @@ import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.youtube.YouTubeSearchPerformer;
+import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -49,12 +52,15 @@ public final class SearchManager2 {
 
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
+    private final List<WeakReference<SearchTable>> tables;
 
     private SearchListener listener;
+    private SearchTable lastTable;
 
     private SearchManager2(int nThreads) {
         this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
+        this.tables = Collections.synchronizedList(new LinkedList<WeakReference<SearchTable>>());
     }
 
     private static class Loader {
@@ -106,6 +112,26 @@ public final class SearchManager2 {
         stopTasks(token);
     }
 
+    public SearchTable newTable(long token) {
+        synchronized (tables) {
+            Iterator<WeakReference<SearchTable>> it = tables.iterator();
+            while (it.hasNext()) {
+                WeakReference<SearchTable> t = it.next();
+                if (!Ref.alive(t)) {
+                    it.remove();
+                }
+            }
+        }
+        SearchTable t = new SearchTable(token);
+        lastTable = t;
+        tables.add(Ref.weak(t));
+        return t;
+    }
+
+    public SearchTable lastTable() {
+        return lastTable;
+    }
+
     public SearchListener getListener() {
         return listener;
     }
@@ -145,6 +171,18 @@ public final class SearchManager2 {
         try {
             if (results != null && listener != null) {
                 listener.onResults(token, results);
+            }
+
+            synchronized (tables) {
+                Iterator<WeakReference<SearchTable>> it = tables.iterator();
+                while (it.hasNext()) {
+                    WeakReference<SearchTable> t = it.next();
+                    if (Ref.alive(t)) {
+                        t.get().add(results);
+                    } else {
+                        it.remove();
+                    }
+                }
             }
         } catch (Throwable e) {
             LOG.warn("Error sending results to listener: " + e.getMessage(), e);
