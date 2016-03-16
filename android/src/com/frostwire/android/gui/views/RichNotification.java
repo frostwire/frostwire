@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,17 +56,20 @@ public class RichNotification extends LinearLayout {
     }
 
 	public static final List<Integer> wasDismissed = new ArrayList<Integer>();
-	private final boolean titleUnderlined;
-	private final String title;
+	private boolean titleUnderlined;
+	private String title;
 	private String description;
-	private final Drawable icon;
-	private final int numberOfActionLinks;
-    private final int actionLinksHorizontalMargin;
+	private Drawable icon;
+	private int numberOfActionLinks;
+    private int actionLinksHorizontalMargin;
 	private OnClickListener clickListener;
     public final List<RichNotificationActionLink> actionLinks = new LinkedList<RichNotificationActionLink>();
 	
 	public RichNotification(Context context, AttributeSet attrs) {
-		super(context, attrs);		
+		super(context, attrs);
+		if (isInEditMode()) {
+			return;
+		}
 		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.RichNotification);
 		icon = attributes.getDrawable(R.styleable.RichNotification_rich_notification_icon);
 		titleUnderlined = attributes.getBoolean(R.styleable.RichNotification_rich_notification_title_underlined, false);
