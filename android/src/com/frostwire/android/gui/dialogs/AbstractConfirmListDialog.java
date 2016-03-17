@@ -262,7 +262,7 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     public boolean[] getSelected() {
         boolean[] result = new boolean[0];
         if (adapter != null) {
-            List<T> checked = (List<T>) adapter.getChecked();
+            Set<T> checked = adapter.getChecked();
             if (checked == null || checked.isEmpty()) {
                 return result;
             }

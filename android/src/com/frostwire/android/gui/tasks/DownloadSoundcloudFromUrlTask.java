@@ -68,7 +68,7 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
 
     @Override
     protected void onPostExecute(Context ctx, List<SoundcloudSearchResult> results) {
-        if (!results.isEmpty()) {
+        if (ctx != null && !results.isEmpty()) {
             MainActivity activity = (MainActivity) ctx;
             ConfirmSoundcloudDownloadDialog dlg = createConfirmListDialog(ctx, results);
             dlg.show(activity.getFragmentManager());
@@ -78,20 +78,15 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
     @Override
     protected List<SoundcloudSearchResult> doInBackground() {
         List<SoundcloudSearchResult> results = new ArrayList<>();
-
         try {
             String url = soundcloudUrl;
             if (soundcloudUrl.contains("?in=")) {
                 url = soundcloudUrl.substring(0, url.indexOf("?in="));
             }
-
             String resolveURL = SoundcloudSearchPerformer.resolveUrl(url);
-
             HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
             String json = client.get(resolveURL, 10000);
-
             results = SoundcloudSearchPerformer.fromJson(json);
-
         } catch (Throwable e) {
             e.printStackTrace();
         }
