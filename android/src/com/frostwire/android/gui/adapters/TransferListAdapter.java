@@ -65,7 +65,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     private final OpenOnClickListener playOnClickListener;
 
     /**
-     * Keep track of all dialogs ever opened so we dismiss when we leave to avoid memleaks
+     * Keep track of all dialogs ever opened so we dismiss when we leave to avoid memory leaks
      */
     private final List<Dialog> dialogs;
     private List<Transfer> list;
@@ -243,9 +243,9 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         } else if (transfer instanceof HttpDownload) {
             populateHttpDownload(view, (HttpDownload) transfer);
         } else if (transfer instanceof YouTubeDownload) {
-            populateYouTubeDownload(view, (YouTubeDownload) transfer);
+            populateCloudDownload(view, (YouTubeDownload) transfer);
         } else if (transfer instanceof SoundcloudDownload) {
-            populateSoundcloudDownload(view, (SoundcloudDownload) transfer);
+            populateCloudDownload(view, (SoundcloudDownload) transfer);
         }
     }
 
@@ -406,7 +406,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                     groupIndicator.setImageResource(R.drawable.browse_peer_application_icon_selector_menu);
                 }
             } else {
-                groupIndicator.setImageResource(getFileTypeIconId(extension));
+                groupIndicator.setImageResource(MediaType.getFileTypeIconId(extension));
             }
         }
     }
@@ -459,15 +459,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         if (items != null && items.size() == 1) {
             TransferItem item = items.get(0);
             buttonPlay.setTag(item);
-            if (item.isComplete()) {
-                buttonPlay.setVisibility(View.VISIBLE);
-            } else {
-                if (item instanceof BTDownloadItem) {
-                    buttonPlay.setVisibility(previewFile((BTDownloadItem) item) != null ? View.VISIBLE : View.GONE);
-                } else {
-                    buttonPlay.setVisibility(View.GONE);
-                }
-            }
+            updatePlayButtonVisibility(item, buttonPlay);
             buttonPlay.setOnClickListener(playOnClickListener);
         } else {
             buttonPlay.setVisibility(View.GONE);
@@ -521,12 +513,17 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         TextView size = findView(view, R.id.view_transfer_item_list_item_size);
         ImageButton buttonPlay = findView(view, R.id.view_transfer_item_list_item_button_play);
 
-        icon.setImageResource(getFileTypeIconId(FilenameUtils.getExtension(item.getFile().getAbsolutePath())));
+        icon.setImageResource(MediaType.getFileTypeIconId(FilenameUtils.getExtension(item.getFile().getAbsolutePath())));
         title.setText(item.getDisplayName());
         progress.setProgress(item.getProgress());
         size.setText(UIUtils.getBytesInHuman(item.getSize()));
 
         buttonPlay.setTag(item);
+        updatePlayButtonVisibility(item, buttonPlay);
+        buttonPlay.setOnClickListener(playOnClickListener);
+    }
+
+    private void updatePlayButtonVisibility(TransferItem item, ImageButton buttonPlay) {
         if (item.isComplete()) {
             buttonPlay.setVisibility(View.VISIBLE);
         } else {
@@ -536,39 +533,9 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 buttonPlay.setVisibility(View.GONE);
             }
         }
-        buttonPlay.setOnClickListener(playOnClickListener);
     }
 
-    private void populateYouTubeDownload(View view, YouTubeDownload download) {
-        TextView title = findView(view, R.id.view_transfer_list_item_title);
-        ProgressBar progress = findView(view, R.id.view_transfer_list_item_progress);
-        TextView status = findView(view, R.id.view_transfer_list_item_status);
-        TextView speed = findView(view, R.id.view_transfer_list_item_speed);
-        TextView size = findView(view, R.id.view_transfer_list_item_size);
-        TextView seeds = findView(view, R.id.view_transfer_list_item_seeds);
-        TextView peers = findView(view, R.id.view_transfer_list_item_peers);
-        ImageButton buttonPlay = findView(view, R.id.view_transfer_list_item_button_play);
-
-        seeds.setText("");
-        peers.setText("");
-        title.setText(download.getDisplayName());
-        title.setCompoundDrawables(null, null, null, null);
-        progress.setProgress(download.getProgress());
-        status.setText(getStatusFromResId(download.getStatus()));
-        speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
-        size.setText(UIUtils.getBytesInHuman(download.getSize()));
-
-        File previewFile = download.previewFile();
-        if (previewFile != null) {
-            buttonPlay.setTag(previewFile);
-            buttonPlay.setVisibility(View.VISIBLE);
-            buttonPlay.setOnClickListener(playOnClickListener);
-        } else {
-            buttonPlay.setVisibility(View.GONE);
-        }
-    }
-
-    private void populateSoundcloudDownload(View view, SoundcloudDownload download) {
+    private void populateCloudDownload(View view, DownloadTransfer download) {
         TextView title = findView(view, R.id.view_transfer_list_item_title);
         ProgressBar progress = findView(view, R.id.view_transfer_list_item_progress);
         TextView status = findView(view, R.id.view_transfer_list_item_status);
@@ -605,28 +572,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             // ignore
         }
         return s;
-    }
-
-    private static int getFileTypeIconId(String ext) {
-        MediaType mt = MediaType.getMediaTypeForExtension(ext);
-        if (mt == null) {
-            return R.drawable.question_mark;
-        }
-        if (mt.equals(MediaType.getApplicationsMediaType())) {
-            return R.drawable.browse_peer_application_icon_selector_menu;
-        } else if (mt.equals(MediaType.getAudioMediaType())) {
-            return R.drawable.browse_peer_audio_icon_selector_menu;
-        } else if (mt.equals(MediaType.getDocumentMediaType())) {
-            return R.drawable.browse_peer_document_icon_selector_menu;
-        } else if (mt.equals(MediaType.getImageMediaType())) {
-            return R.drawable.browse_peer_picture_icon_selector_menu;
-        } else if (mt.equals(MediaType.getVideoMediaType())) {
-            return R.drawable.browse_peer_video_icon_selector_menu;
-        } else if (mt.equals(MediaType.getTorrentMediaType())) {
-            return R.drawable.browse_peer_torrent_icon_selector_menu;
-        } else {
-            return R.drawable.question_mark;
-        }
     }
 
     private boolean showTransferItemMenu(View v) {
