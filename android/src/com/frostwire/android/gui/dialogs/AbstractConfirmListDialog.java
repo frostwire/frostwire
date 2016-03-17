@@ -62,7 +62,7 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
 
     public enum SelectionMode {
         NO_SELECTION,
-        SINGLE_SELECTION,
+        SINGLE_SELECTION, // still work to do, crashes on rotate, won't auto select 0
         MULTIPLE_SELECTION,
     }
 
