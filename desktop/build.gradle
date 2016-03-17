@@ -13,7 +13,7 @@ group 'com.frostwire'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
-apply from: "$rootDir/common/dependencies.gradle"
+apply from: '../common/dependencies.gradle'
 
 sourceCompatibility = 1.7
 
@@ -49,15 +49,15 @@ dependencies {
         compile 'com.frostwire:jlibtorrent:1.1.0.22'
     }
 
-    compile fileTree(dir: 'desktop/lib/jars', include: ['*.jar'])
+    compile fileTree(dir: 'lib/jars', include: ['*.jar'])
 }
 
 sourceSets {
     main {
         java {
             // frostwire-common
-            srcDir 'common/src/main/java'
-            srcDir 'desktop/src'
+            srcDir '../common/src/main/java'
+            srcDir 'src'
 
             if (!useJlibtorrentFromMaven) {
                 //To avoid 'Can't register given path of type 'SOURCE' ... error in intelliJ
@@ -68,7 +68,7 @@ sourceSets {
         }
 
         resources {
-            srcDir 'desktop/resources'
+            srcDir 'resources'
             include '**/*.properties'
             include '**/*.png'
             include '**/*.gif'
@@ -101,10 +101,10 @@ task gettextInit {
     description 'Loads and define the ant gettext related tasks'
 
     doLast {
-        ant.taskdef(name: 'gettextExtract', classname: 'org.xnap.commons.ant.gettext.GettextExtractKeysTask', classpath: 'desktop/lib/jars/gettext-ant-tasks-0.9.7.jar')
-        ant.taskdef(name: 'gettextMerge', classname: 'org.xnap.commons.ant.gettext.GettextMergeKeysTask', classpath: 'desktop/lib/jars/gettext-ant-tasks-0.9.7.jar')
-        ant.taskdef(name: 'gettextGenerateDefault', classname: 'org.xnap.commons.ant.gettext.GenerateDefaultBundleTask', classpath: 'desktop/lib/jars/gettext-ant-tasks-0.9.7.jar')
-        ant.taskdef(name: 'gettextDist', classname: 'org.xnap.commons.ant.gettext.GettextDistTask', classpath: 'desktop/lib/jars/gettext-ant-tasks-0.9.7.jar')
+        ant.taskdef(name: 'gettextExtract', classname: 'org.xnap.commons.ant.gettext.GettextExtractKeysTask', classpath: 'lib/jars/gettext-ant-tasks-0.9.7.jar')
+        ant.taskdef(name: 'gettextMerge', classname: 'org.xnap.commons.ant.gettext.GettextMergeKeysTask', classpath: 'lib/jars/gettext-ant-tasks-0.9.7.jar')
+        ant.taskdef(name: 'gettextGenerateDefault', classname: 'org.xnap.commons.ant.gettext.GenerateDefaultBundleTask', classpath: 'lib/jars/gettext-ant-tasks-0.9.7.jar')
+        ant.taskdef(name: 'gettextDist', classname: 'org.xnap.commons.ant.gettext.GettextDistTask', classpath: 'lib/jars/gettext-ant-tasks-0.9.7.jar')
     }
 }
 
@@ -114,15 +114,15 @@ task gettextExtract {
     doLast {
         println 'gettext extract...'
         ant.gettextExtract(keysFile: 'frostwire.pot',
-                poDirectory: 'desktop/lib/messagebundles',
+                poDirectory: 'lib/messagebundles',
                 keywords: '-kgetStringResource -kgetFormattedStringResource -ktrc -ktr -ktrn:1,2 -ktrl') {
-            fileset(dir: "desktop/src") {
+            fileset(dir: "src") {
                 include(name: '**/*.java')
             }
         }
 
         println 'gettext merge...'
-        ant.gettextMerge(keysFile: "frostwire.pot", poDirectory: "desktop/lib/messagebundles")
+        ant.gettextMerge(keysFile: "frostwire.pot", poDirectory: "lib/messagebundles")
     }
 }
 
@@ -133,39 +133,39 @@ task gettextBundle {
         // clean up
         println 'gettext bundle...'
         println 'cleaning up...'
-        delete 'desktop/lib/messagebundles/org'
+        delete 'lib/messagebundles/org'
 
         // generate default bundle for complete messages
         println 'gettext generate default'
         ant.gettextGenerateDefault(targetBundle: 'org.limewire.i18n.Messages',
-                outputDirectory: 'desktop/lib/messagebundles',
-                potfile: 'desktop/lib/messagebundles/frostwire.pot')
+                outputDirectory: 'lib/messagebundles',
+                potfile: 'lib/messagebundles/frostwire.pot')
 
         // generate complete bundles
         println 'gettext dist (complete bundles)'
         ant.gettextDist(targetBundle: 'org.limewire.i18n.Messages',
-                poDirectory: 'desktop/lib/messagebundles',
-                outputDirectory: 'desktop/lib/messagebundles',
+                poDirectory: 'lib/messagebundles',
+                outputDirectory: 'lib/messagebundles',
                 percentage: '35')
 
         // generate the empty en.po file without percentage
         println 'gettext dist (empty en.po file without percentage)'
         ant.gettextDist(targetBundle: 'org.limewire.i18n.Messages',
-                outputDirectory: 'desktop/lib/messagebundles') {
-            fileset(dir: 'desktop/lib/messagebundles') {
+                outputDirectory: 'lib/messagebundles') {
+            fileset(dir: 'lib/messagebundles') {
                 include(name: 'en.po')
             }
         }
 
         // jar them
         println 'jar it...'
-        ant.jar(destfile: 'desktop/lib/jars/messages.jar',
-                basedir: 'desktop/lib/messagebundles',
+        ant.jar(destfile: 'lib/jars/messages.jar',
+                basedir: 'lib/messagebundles',
                 includes: "org/**")
 
         // clean up
         println 'cleaning up...'
-        delete 'desktop/lib/messagebundles/org'
+        delete 'lib/messagebundles/org'
     }
 }
 
