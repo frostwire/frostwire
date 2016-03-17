@@ -62,7 +62,6 @@ public abstract class AbstractDialog extends DialogFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
         activityRef = Ref.weak(activity);
     }
 
