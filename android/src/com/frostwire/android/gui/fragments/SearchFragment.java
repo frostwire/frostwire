@@ -171,6 +171,11 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     @Override
+    public void onShow() {
+
+    }
+
+    @Override
     protected void initComponents(final View view) {
 
         searchInput = findView(view, R.id.fragment_search_input);

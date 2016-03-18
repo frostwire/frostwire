@@ -197,6 +197,11 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     @Override
+    public void onShow() {
+
+    }
+
+    @Override
     protected void initComponents(View v) {
         filesBar = findView(v, R.id.fragment_browse_peer_files_bar);
         filesBar.setOnActionListener(new OnActionListener() {
