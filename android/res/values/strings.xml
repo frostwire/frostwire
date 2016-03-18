@@ -570,6 +570,8 @@
     <string name="vpn_client_feature_2">Unlimited download speed</string>
     <string name="vpn_client_feature_3">Private and logless browsing</string>
     <string name="vpn_client_feature_4">24/7 customer support</string>
+    <string name="vpn_on_toast_notification">You\'re connected to a VPN.</string>
+    <string name="vpn_off_toast_notification">Your connection may not be private.</string>
     <string name="dht_contacts">DHT contacts</string>
     <string name="notify_frostwire_is_running">Notify if FrostWire is running</string>
     <string name="notify_frostwire_is_running_summary">Show a permanent Android notification with status of transfers</string>

@@ -57,5 +57,10 @@ public abstract class AbstractFragment extends Fragment {
         return result;
     }
 
+    /** Executed when the fragment is shown, and others are hidden.
+     *  @see MainActivity.switchContent()
+     */
+    public abstract void onShow();
+
     protected abstract void initComponents(View rootView);
 }
