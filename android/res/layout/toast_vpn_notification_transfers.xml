@@ -6,11 +6,11 @@
     android:background="@android:color/transparent"
     android:clickable="false">
 
-    <TextView android:id="@+id/toast_vpn_notificatoin_transfers_text"
+    <TextView android:id="@+id/toast_vpn_notification_transfers_text"
         style="@style/GetVPNToastNotification"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/VPN_off_toast_notification"
+        android:text="@string/vpn_off_toast_notification"
         android:layout_marginLeft="8dp"
         android:layout_marginBottom="5dp"
         android:background="@drawable/toast_vpn_status_bgd" />
