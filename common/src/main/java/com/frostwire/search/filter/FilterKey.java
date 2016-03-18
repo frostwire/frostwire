@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,25 +15,30 @@
  * limitations under the License.
  */
 
-package com.frostwire.search;
+package com.frostwire.search.filter;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface SearchPerformer {
+public interface FilterKey extends Comparable<FilterKey> {
 
-    long getToken();
+    String display();
 
-    void perform();
+    FilterKey NULL = new FilterKey() {
 
-    void crawl(CrawlableSearchResult sr);
+        @Override
+        public String display() {
+            return "";
+        }
 
-    void stop();
+        @Override
+        public int compareTo(FilterKey o) {
+            if (this.equals(o)) {
+                return 0;
+            }
 
-    boolean isStopped();
-
-    SearchListener getListener();
-
-    void setListener(SearchListener listener);
+            return 1;
+        }
+    };
 }

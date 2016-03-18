@@ -18,16 +18,51 @@
 
 package com.frostwire.desktop;
 
-import com.frostwire.platform.AbstractPlatform;
-import com.frostwire.platform.DefaultFileSystem;
+import com.frostwire.platform.AppSettings;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class DesktopPlatform extends AbstractPlatform {
+public final class DesktopSettings implements AppSettings {
 
-    public DesktopPlatform() {
-        super(new DefaultFileSystem(), new DesktopPaths(), new DesktopSettings());
+    @Override
+    public String string(String key) {
+        return null;
+    }
+
+    @Override
+    public void string(String key, String value) {
+
+    }
+
+    @Override
+    public int int32(String key) {
+        return 0;
+    }
+
+    @Override
+    public void int32(String key, int value) {
+
+    }
+
+    @Override
+    public long int64(String key) {
+        return 0;
+    }
+
+    @Override
+    public void int64(String key, long value) {
+
+    }
+
+    @Override
+    public boolean bool(String key) {
+        return false;
+    }
+
+    @Override
+    public void bool(String key, boolean value) {
+
     }
 }

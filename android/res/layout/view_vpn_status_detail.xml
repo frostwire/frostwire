@@ -121,12 +121,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="5dp"
-                android:text="@string/VPN_what_you_get_with" />
+                android:text="@string/vpn_what_you_get_with" />
 
             <TextView style="@style/VPNTitleSecond.Color"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/VPN_client" />
+                android:text="@string/vpn_client" />
         </LinearLayout>
 
         <TextView android:id="@+id/view_vpn_status_vpn_client_feature_1"
@@ -134,25 +134,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="@string/VPN_client_feature_1" />
+            android:text="@string/vpn_client_feature_1" />
         <TextView android:id="@+id/view_vpn_status_vpn_client_feature_2"
             style="@style/VPNText.Regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="@string/VPN_client_feature_2" />
+            android:text="@string/vpn_client_feature_2" />
         <TextView android:id="@+id/view_vpn_status_vpn_client_feature_3"
             style="@style/VPNText.Regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="@string/VPN_client_feature_3" />
+            android:text="@string/vpn_client_feature_3" />
         <TextView android:id="@+id/view_vpn_status_vpn_client_feature_4"
             style="@style/VPNText.Regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="@string/VPN_client_feature_4" />
+            android:text="@string/vpn_client_feature_4" />
 
         <!-- Bullet - VPN not required for FrostWire but highly recommended -->
         <TextView
@@ -180,7 +180,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/get_VPN_client" />
+            android:text="@string/get_vpn_client" />
 
     </LinearLayout>
 </ScrollView>

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
-import rx.Observable;
-import rx.subjects.PublishSubject;
 
 import java.util.List;
 
@@ -32,13 +30,12 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     private static final Logger LOG = Logger.getLogger(AbstractSearchPerformer.class);
 
     private final long token;
-    private final PublishSubject<List<? extends SearchResult>> subject;
 
+    private SearchListener listener;
     private boolean stopped;
 
     public AbstractSearchPerformer(long token) {
         this.token = token;
-        this.subject = PublishSubject.create();
         this.stopped = false;
     }
 
@@ -48,14 +45,15 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     }
 
     @Override
-    public Observable<List<? extends SearchResult>> observable() {
-        return subject;
-    }
-
-    @Override
     public void stop() {
-        subject.onCompleted();
         stopped = true;
+        try {
+            if (listener != null) {
+                listener.onStopped(token);
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error sending finished signal to listener: " + e.getMessage());
+        }
     }
 
     @Override
@@ -63,13 +61,23 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
         return stopped;
     }
 
+    @Override
+    public SearchListener getListener() {
+        return listener;
+    }
+
+    @Override
+    public void setListener(SearchListener listener) {
+        this.listener = listener;
+    }
+
     protected void onResults(List<? extends SearchResult> results) {
         try {
             if (results != null && !stopped) {
-                subject.onNext(results);
+                listener.onResults(token, results);
             }
         } catch (Throwable e) {
-            LOG.warn("Error sending results back to receiver: " + e.getMessage());
+            LOG.warn("Error sending results to listener: " + e.getMessage());
         }
     }
 }

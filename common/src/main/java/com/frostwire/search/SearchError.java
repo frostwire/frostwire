@@ -21,19 +21,15 @@ package com.frostwire.search;
  * @author gubatron
  * @author aldenml
  */
-public interface SearchPerformer {
+public final class SearchError {
 
-    long getToken();
+    private final int code;
 
-    void perform();
+    public SearchError(int code) {
+        this.code = code;
+    }
 
-    void crawl(CrawlableSearchResult sr);
-
-    void stop();
-
-    boolean isStopped();
-
-    SearchListener getListener();
-
-    void setListener(SearchListener listener);
+    public int code() {
+        return code;
+    }
 }
