@@ -87,7 +87,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private static boolean isVPNactive;
     private final OnVPNStatusCallback onVPNStatusCallback;
     private final EngineService.CheckDHTUICallback onDHTCheckCallback;
-    private boolean firstTimeShown;
+    private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
     private final long VPN_NOTIFICATION_DURATION = 10000;
 
@@ -99,7 +99,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         selectedStatus = TransferStatus.ALL;
         this.onVPNStatusCallback = new OnVPNStatusCallback();
         this.onDHTCheckCallback = new OnCheckDHTCallback();
-        firstTimeShown = true;
         vpnRichToastHandler = new Handler();
     }
 
