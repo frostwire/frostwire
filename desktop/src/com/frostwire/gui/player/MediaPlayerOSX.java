@@ -29,7 +29,7 @@ public class MediaPlayerOSX extends MediaPlayer {
         //System.out.println("MediaPlayerOSX: getFrostWireJarPath() -> " + FrostWireUtils.getFrostWireJarPath());
         // Path running from command line:  .../frostwire/build/libs
         // Path running from IntelliJ:      .../frostwire/build/classes
-        boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire/build");
+        boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire/desktop/build");
         return (isRelease) ? getReleasePlayerPath() : getNonReleasePlayerPath();
     }
 
@@ -56,6 +56,6 @@ public class MediaPlayerOSX extends MediaPlayer {
         // Path running from IntelliJ:      .../frostwire/build/classes
         // we want pathPrefix to be .../frostwire/
         String pathPrefix = new File(FrostWireUtils.getFrostWireJarPath()).getParentFile().getParentFile().getAbsolutePath() + "/";
-        return pathPrefix + "desktop/lib/native/fwplayer_osx";
+        return pathPrefix + "lib/native/fwplayer_osx";
     }
 }
