@@ -22,6 +22,7 @@ import com.frostwire.gui.AlphaIcon;
 import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.bittorrent.TorrentUtil;
+import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
@@ -30,6 +31,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import static com.frostwire.uxstats.UXAction.LIBRARY_SHARE_FROM_ROW_ACTION;
 
 /**
  * 
@@ -75,8 +78,6 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
         if (table.getSelectedRowCount() == 1 && row == table.getSelectedRow()) {
             lastClickedActionsHolder = actionsHolder;
         }
-
-        System.out.println("new actionsHolder at row " + row + " -> " + actionsHolder.getFile().getName());
 
         showSolid = mouseIsOverRow(table, row);
         updatePlayButton();
@@ -145,6 +146,8 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
                 final BTDownload dl = BTDownloadMediator.instance().findBTDownload(lastClickedActionsHolder.getFile());
                 dl.setDeleteDataWhenRemove(false);
             }
+
+            UXStats.instance().log(LIBRARY_SHARE_FROM_ROW_ACTION);
         }
     }
 
