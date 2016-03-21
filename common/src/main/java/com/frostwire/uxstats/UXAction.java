@@ -89,6 +89,7 @@ public final class UXAction {
     public static final int LIBRARY_BROWSE_FILE_TYPE_APPLICATIONS = LIBRARY_BASE + 15; // both
     public static final int LIBRARY_BROWSE_FILE_TYPE_DOCUMENTS = LIBRARY_BASE + 16; // both
     public static final int LIBRARY_BROWSE_FILE_TYPE_TORRENTS = LIBRARY_BASE + 17; // both
+    public static final int LIBRARY_SHARE_FROM_ROW_ACTION = LIBRARY_BASE + 18; // desktop only
 
     public static final int PLAYER_BASE = 6000;
     public static final int PLAYER_GESTURE_SWIPE_SONG = PLAYER_BASE + 1; // android only
