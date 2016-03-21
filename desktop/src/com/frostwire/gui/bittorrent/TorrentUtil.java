@@ -187,18 +187,38 @@ public final class TorrentUtil {
         return allowedToResume;
     }
 
+    /**
+     * Creates a DHT based torrent (no trackers set) and optionally shows the share dialog.
+     * @param file - The file/dir to make a torrent out of
+     * @param uiTorrentMakerListener - an optional listener of this process
+     * @param showShareTorrentDialog - show the share dialog when done
+     */
     public static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog) {
+        makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, true);
+    }
+
+    /**
+     *
+     * @param file - The file/dir to make a torrent out of
+     * @param uiTorrentMakerListener - an optional listener of this process
+     * @param showShareTorrentDialog - show the share dialog when done
+     * @param dhtTrackedOnly - if true, no trackers are added, otherwise adds a list of default trackers.
+     */
+    public static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog, boolean dhtTrackedOnly) {
         try {
             file_storage fs = new file_storage();
             libtorrent.add_files(fs, file.getAbsolutePath());
             create_torrent torrentCreator = new create_torrent(fs);
-            torrentCreator.add_tracker("udp://tracker.openbittorrent.com:80");
-            torrentCreator.add_tracker("udp://tracker.publicbt.com:80");
-            torrentCreator.add_tracker("udp://open.demonii.com:1337");
-            torrentCreator.add_tracker("udp://tracker.coppersurfer.tk:6969");
-            torrentCreator.add_tracker("udp://tracker.leechers-paradise.org:6969");
-            torrentCreator.add_tracker("udp://exodus.desync.com:6969");
-            torrentCreator.add_tracker("udp://tracker.pomf.se");
+
+            if (dhtTrackedOnly) {
+                torrentCreator.add_tracker("udp://tracker.openbittorrent.com:80");
+                torrentCreator.add_tracker("udp://tracker.publicbt.com:80");
+                torrentCreator.add_tracker("udp://open.demonii.com:1337");
+                torrentCreator.add_tracker("udp://tracker.coppersurfer.tk:6969");
+                torrentCreator.add_tracker("udp://tracker.leechers-paradise.org:6969");
+                torrentCreator.add_tracker("udp://exodus.desync.com:6969");
+                torrentCreator.add_tracker("udp://tracker.pomf.se");
+            }
 
             torrentCreator.set_priv(false);
             torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());

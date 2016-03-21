@@ -124,7 +124,6 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
         }
     }
 
-
     private boolean isDlBeingPlayed() {
         File file = dl.getPreviewFile();
         return file != null && MediaPlayer.instance().isThisBeingPlayed(dl.getPreviewFile());
