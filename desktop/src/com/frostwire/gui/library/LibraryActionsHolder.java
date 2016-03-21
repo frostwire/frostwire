@@ -22,6 +22,8 @@ import com.frostwire.gui.player.MediaPlayer;
 import com.limegroup.gnutella.gui.tables.AbstractActionsHolder;
 import com.limegroup.gnutella.gui.tables.DataLine;
 
+import java.io.File;
+
 /**
  * 
  * @author gubatron
@@ -49,5 +51,15 @@ public class LibraryActionsHolder extends AbstractActionsHolder {
     @Override
     public boolean isDownloadable() {
         return false;
+    }
+
+    @Override
+    public File getFile() {
+        AbstractLibraryTableDataLine<File> dl = (AbstractLibraryTableDataLine<File>) getDataLine();
+        if (dl == null) {
+            return null;
+        }
+
+        return dl.getFile();
     }
 }

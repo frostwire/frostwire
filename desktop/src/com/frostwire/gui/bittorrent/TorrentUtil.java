@@ -47,6 +47,7 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.transfers.TransferState;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -258,5 +259,21 @@ public final class TorrentUtil {
                 uiTorrentMakerListener.onException();
             }
         }
+    }
+
+    public static boolean isActive(BTDownload dl) {
+        if (dl == null) {
+            return false;
+        }
+
+        final TransferState state = dl.getState();
+
+        return state == TransferState.ALLOCATING ||
+               state == TransferState.CHECKING ||
+               state == TransferState.DOWNLOADING ||
+               state == TransferState.DOWNLOADING_METADATA ||
+               state == TransferState.DOWNLOADING_TORRENT ||
+               state == TransferState.SEEDING ||
+               state == TransferState.UPLOADING;
     }
 }
