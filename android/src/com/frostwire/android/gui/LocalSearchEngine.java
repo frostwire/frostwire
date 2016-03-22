@@ -26,9 +26,6 @@ import com.frostwire.search.kat.KATSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.StringUtils;
-import rx.Observable;
-import rx.functions.Action1;
-import rx.subjects.PublishSubject;
 
 import java.text.Normalizer;
 import java.util.*;
@@ -39,7 +36,7 @@ import java.util.*;
  */
 public final class LocalSearchEngine {
 
-    private final SearchManager2 manager;
+    private final SearchManager manager;
     private SearchListener listener;
 
     // filter constants
@@ -64,7 +61,7 @@ public final class LocalSearchEngine {
     }
 
     private LocalSearchEngine() {
-        this.manager = SearchManager2.getInstance();
+        this.manager = SearchManager.getInstance();
         this.manager.setListener(new SearchListener() {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {

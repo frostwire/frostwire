@@ -91,7 +91,7 @@ public final class SearchMediator {
 
     static final String CLOSE_TABS_TO_THE_RIGHT = I18n.tr("Close Tabs to the Right");
 
-    private final SearchManager2 manager;
+    private final SearchManager manager;
 
     /**
      * This instance handles the display of all search results.
@@ -135,7 +135,7 @@ public final class SearchMediator {
 
         CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
 
-        this.manager = SearchManager2.getInstance();
+        this.manager = SearchManager.getInstance();
         this.manager.setListener(new SearchListener() {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {
