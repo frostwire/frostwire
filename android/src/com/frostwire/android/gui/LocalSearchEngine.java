@@ -39,8 +39,8 @@ import java.util.*;
  */
 public final class LocalSearchEngine {
 
-    private final SearchManager manager;
-    private final PublishSubject<SearchManagerSignal> subject;
+    private final SearchManager2 manager;
+    private SearchListener listener;
 
     // filter constants
     private static final int KAT_MIN_SEEDS_TORRENT_RESULT = 2;
@@ -64,28 +64,34 @@ public final class LocalSearchEngine {
     }
 
     private LocalSearchEngine() {
-        this.manager = new SearchManagerImpl();
-        this.manager.observable().subscribe(new Action1<SearchManagerSignal>() {
+        this.manager = SearchManager2.getInstance();
+        this.manager.setListener(new SearchListener() {
             @Override
-            public void call(SearchManagerSignal s) {
-                if (s instanceof SearchManagerSignal.Results) {
-                    onResults((SearchManagerSignal.Results) s);
-                } else if (s instanceof SearchManagerSignal.End) {
-                    // the subject to which we are subscribed (on SearchManagerImpl)
-                    // never sends an onComplete call, it always emits onNext() signals
-                    // so that it won't go to a finalized state.
-                    onFinished((SearchManagerSignal.End) s);
-                }
+            public void onResults(long token, List<? extends SearchResult> results) {
+                LocalSearchEngine.this.onResults(token, results);
+            }
+
+            @Override
+            public void onError(long token, SearchError error) {
+
+            }
+
+            @Override
+            public void onStopped(long token) {
+                LocalSearchEngine.this.onFinished(token);
             }
         });
-        this.subject = PublishSubject.create();
 
         // TODO: review the logic behind putting this in a preference
         this.MIN_SEEDS_TORRENT_RESULT = 10;//ConfigurationManager.instance().getInt(Constants.PREF_KEY_SEARCH_MIN_SEEDS_FOR_TORRENT_RESULT);
     }
 
-    public Observable<SearchManagerSignal> observable() {
-        return subject;
+    public SearchListener getListener() {
+        return listener;
+    }
+
+    public void setListener(SearchListener listener) {
+        this.listener = listener;
     }
 
     public void performSearch(String query) {
@@ -141,24 +147,25 @@ public final class LocalSearchEngine {
         return sr != null && opened.contains(sr.uid());
     }
 
-    private void onResults(SearchManagerSignal.Results signal) {
-        long token = signal.token;
-        final List<? extends SearchResult> results = signal.elements;
-
+    private void onResults(long token, List<? extends SearchResult> results) {
         if (token == currentSearchToken) { // one more additional protection
             @SuppressWarnings("unchecked")
             List<SearchResult> filtered = filter(results);
 
             if (!filtered.isEmpty()) {
-                subject.onNext(new SearchManagerSignal.Results(token, filtered));
+                if (listener != null) {
+                    listener.onResults(token, filtered);
+                }
             }
         }
     }
 
-    private void onFinished(SearchManagerSignal.End signal) {
-        if (signal.token == currentSearchToken) {
+    private void onFinished(long token) {
+        if (token == currentSearchToken) {
             searchFinished = true;
-            subject.onNext(signal);
+            if (listener != null) {
+                listener.onStopped(token);
+            }
         }
     }
 
