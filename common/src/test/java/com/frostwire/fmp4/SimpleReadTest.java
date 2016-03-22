@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,12 @@ public class SimpleReadTest {
         File f = new File("/Users/aldenml/Downloads/test2.mp4");
         RandomAccessFile in = new RandomAccessFile("/Users/aldenml/Downloads/test2.mp4", "r");
         InputChannel ch = new InputChannel(in.getChannel());
-        IsoMedia.read(ch, f.length());
+
+        IsoMedia.read(ch, f.length(), new IsoMedia.ReadListener() {
+            @Override
+            public void onBox(Box b) {
+                System.out.println(Bits.make4cc(b.type));
+            }
+        });
     }
 }

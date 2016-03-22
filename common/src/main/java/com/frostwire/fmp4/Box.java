@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@ package com.frostwire.fmp4;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -48,6 +49,8 @@ public class Box {
     protected Long largesize;
     protected byte[] usertype;
 
+    protected LinkedList<Box> boxes;
+
     Box() {
     }
 
@@ -59,7 +62,7 @@ public class Box {
         throw new UnsupportedOperationException();
     }
 
-    long length() {
+    final long length() {
         long n = size - 8;
         if (size == 1) {
             n = largesize - 16;
@@ -70,7 +73,7 @@ public class Box {
             n -= 16;
         }
 
-        return n;
+        return n >= 0 ? n : -1;
     }
 
     @Override
@@ -90,6 +93,12 @@ public class Box {
     private static Map<Integer, BoxLambda> buildMapping() {
         Map<Integer, BoxLambda> map = new HashMap<>();
 
+        map.put(mdat, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MediaDataBox();
+            }
+        });
         map.put(ftyp, new BoxLambda() {
             @Override
             public Box empty() {

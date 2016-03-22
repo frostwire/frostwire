@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,17 +30,17 @@ public final class IsoMedia {
     private IsoMedia() {
     }
 
-    static void read(InputChannel in) throws IOException {
+    static void read(InputChannel ch) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(1 * 1024);
-        read(in, -1, null, buf);
+        read(ch, -1, null, null, buf);
     }
 
-    static void read(InputChannel in, long len) throws IOException {
+    static void read(InputChannel ch, long len, ReadListener l) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(1 * 1024);
-        read(in, len, null, buf);
+        read(ch, len, null, l, buf);
     }
 
-    public static void read(InputChannel ch, long len, Box parent, ByteBuffer buf) throws IOException {
+    public static void read(InputChannel ch, long len, Box p, ReadListener l, ByteBuffer buf) throws IOException {
         long n = ch.count();
         do {
             IO.read(ch, 8, buf);
@@ -61,24 +61,51 @@ public final class IsoMedia {
                 buf.get(usertype);
             }
 
-            System.out.println(Bits.make4cc(type));
             Box b = Box.empty(type);
             b.size = size;
             b.type = type;
             b.largesize = largesize;
             b.usertype = usertype;
+
             long r = ch.count();
             b.read(ch, buf);
             r = ch.count() - r;
 
-            if (type == Box.mdat) {
-                System.out.println("need to handle mdat");
-                //return;
+            if (p != null) {
+                if (p.boxes == null) {
+                    p.boxes = new LinkedList<>();
+                }
+                p.boxes.add(b);
             }
 
-            if (r < b.length()) {
-                read(ch, b.length() - r, b, buf);
+            if (l != null) {
+                l.onBox(b);
+            }
+
+            long length = b.length();
+            if (r < length) {
+                if (type != Box.mdat) {
+                    read(ch, length - r, b, l, buf);
+                } else {
+                    if (length > 0) {
+                        IO.skip(ch, length - r, buf);
+                    } else {
+                        IO.skip(ch, buf);
+                    }
+                }
             }
         } while (len == -1 || ch.count() - n < len);
+    }
+
+    public interface ReadListener {
+
+        /**
+         * Give the opportunity to react on box reading and together
+         * with the {@link InputChannel#count()} you can keep a good
+         * progress of the reading in the ISO media (stream or file).
+         *
+         * @param b
+         */
+        void onBox(Box b);
     }
 }
