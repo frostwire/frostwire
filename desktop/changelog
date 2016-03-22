@@ -7,8 +7,9 @@ frostwire (6.2.3) stable; urgency=high
   * jlibtorrent: improve reliability of binding listen sockets
   * jlibtorrent: support SNI in https web seeds and trackers
   * jlibtorrent: fix unhandled exception in DHT when receiving a DHT packet over IPv6
+  * Dropped rxjava library. KISS.
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 21 Mar 2016 16:58:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Tue, 22 Mar 2016 19:12:00 -0500
 
 frostwire (6.2.2) stable; urgency=high
   * YT search fixes.
