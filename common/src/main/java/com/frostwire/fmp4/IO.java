@@ -49,13 +49,6 @@ final class IO {
         buf.flip();
     }
 
-    public static void read1(InputChannel in, long len, ByteBuffer buf) throws IOException {
-        if (len <= 0 || Integer.MAX_VALUE < len) {
-            throw new IllegalArgumentException("len must be in (0, Integer.MAX_VALUE]: len=");
-        }
-        IO.read(in, (int) len, buf);
-    }
-
     public static void skip(InputChannel in, long len, ByteBuffer buf) throws IOException {
         if (len <= 0) {
             throw new IllegalArgumentException("len argument must be > 0");

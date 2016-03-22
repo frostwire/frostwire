@@ -40,39 +40,36 @@ public final class IsoMedia {
         read(in, len, null, buf);
     }
 
-    public static void read(InputChannel in, long len, Box parent, ByteBuffer buf) throws IOException {
-        long n = in.count();
+    public static void read(InputChannel ch, long len, Box parent, ByteBuffer buf) throws IOException {
+        long n = ch.count();
         do {
-            IO.read(in, 8, buf);
+            IO.read(ch, 8, buf);
 
             int size = buf.getInt();
             int type = buf.getInt();
 
             Long largesize = null;
             if (size == 1) {
-                IO.read(in, 8, buf);
+                IO.read(ch, 8, buf);
                 largesize = buf.getLong();
             }
 
             byte[] usertype = null;
             if (type == Box.uuid) {
                 usertype = new byte[16];
-                IO.read(in, 16, buf);
+                IO.read(ch, 16, buf);
                 buf.get(usertype);
             }
 
             System.out.println(Bits.make4cc(type));
             Box b = Box.empty(type);
-            b.header(size, type, largesize, usertype);
-            long r = in.count();
-            b.read(in, buf);
-            r = in.count() - r;
-            if (parent != null) {
-                if (parent.boxes == null) {
-                    parent.boxes = new LinkedList<>();
-                }
-                parent.boxes.add(b);
-            }
+            b.size = size;
+            b.type = type;
+            b.largesize = largesize;
+            b.usertype = usertype;
+            long r = ch.count();
+            b.read(ch, buf);
+            r = ch.count() - r;
 
             if (type == Box.mdat) {
                 System.out.println("need to handle mdat");
@@ -80,8 +77,8 @@ public final class IsoMedia {
             }
 
             if (r < b.length()) {
-                read(in, b.length() - r, b, buf);
+                read(ch, b.length() - r, b, buf);
             }
-        } while (len == -1 || in.count() - n < len);
+        } while (len == -1 || ch.count() - n < len);
     }
 }

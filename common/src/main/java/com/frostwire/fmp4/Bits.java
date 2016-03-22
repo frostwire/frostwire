@@ -71,4 +71,11 @@ final class Bits {
 
         return int32(code[0], code[1], code[2], code[3]);
     }
+
+    public static int l2i(long n) {
+        if (n < Integer.MIN_VALUE || Integer.MAX_VALUE < n) {
+            throw new IllegalArgumentException("Can't convert long to int: " + n);
+        }
+        return (int) n;
+    }
 }

@@ -35,7 +35,7 @@ public final class ObjectDescriptorBox extends FullBox {
     void read(InputChannel in, ByteBuffer buf) throws IOException {
         super.read(in, buf);
         long len = length() - 4;
-        IO.read1(in, len, buf);
+        IO.read(in, Bits.l2i(len), buf);
         data = new byte[(int) len];
         buf.get(data);
     }

@@ -20,14 +20,13 @@ package com.frostwire.fmp4;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public abstract class Box {
+public class Box {
 
     public static final int uuid = Bits.make4cc("uuid");
     public static final int mdat = Bits.make4cc("mdat");
@@ -48,43 +47,30 @@ public abstract class Box {
     protected int type;
     protected Long largesize;
     protected byte[] usertype;
-    protected LinkedList<Box> boxes;
-
-    private long length;
 
     Box() {
     }
 
-    void header(int size, int type, Long largesize, byte[] usertype) {
-        this.size = size;
-        this.type = type;
-        this.largesize = largesize;
-        this.usertype = usertype;
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+        throw new UnsupportedOperationException();
+    }
 
-        // set length
-        length = size - 8;
-        if (size == 1) {
-            length = largesize - 16;
-        } else if (size == 0) {
-            length = -1;
-        }
-        if (type == uuid) {
-            length -= 16;
-        }
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        throw new UnsupportedOperationException();
     }
 
     long length() {
-        return length;
-    }
-
-    void read(InputChannel in, ByteBuffer buf) throws IOException {
-        long len = length();
-
-        if (len > 0) {
-            IO.skip(in, len, buf);
-        } else {
-            IO.skip(in, buf);
+        long n = size - 8;
+        if (size == 1) {
+            n = largesize - 16;
+        } else if (size == 0) {
+            n = -1;
         }
+        if (type == uuid) {
+            n -= 16;
+        }
+
+        return n;
     }
 
     @Override

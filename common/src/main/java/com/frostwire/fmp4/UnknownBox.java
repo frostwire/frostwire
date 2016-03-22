@@ -30,8 +30,14 @@ public final class UnknownBox extends Box {
     }
 
     @Override
-    void read(InputChannel in, ByteBuffer buf) throws IOException {
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
         System.out.println("Reading unknown box: " + Bits.make4cc(type));
-        super.read(in, buf);
+
+        long len = length();
+        if (len > 0) {
+            IO.skip(ch, len, buf);
+        } else {
+            IO.skip(ch, buf);
+        }
     }
 }
