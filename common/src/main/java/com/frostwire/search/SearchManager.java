@@ -46,9 +46,9 @@ import java.util.concurrent.PriorityBlockingQueue;
  * @author gubatron
  * @author aldenml
  */
-public final class SearchManager2 {
+public final class SearchManager {
 
-    private static final Logger LOG = Logger.getLogger(SearchManager2.class);
+    private static final Logger LOG = Logger.getLogger(SearchManager.class);
 
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
@@ -57,17 +57,17 @@ public final class SearchManager2 {
     private SearchListener listener;
     private SearchTable lastTable;
 
-    private SearchManager2(int nThreads) {
+    private SearchManager(int nThreads) {
         this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
         this.tables = Collections.synchronizedList(new LinkedList<WeakReference<SearchTable>>());
     }
 
     private static class Loader {
-        static final SearchManager2 INSTANCE = new SearchManager2(6);
+        static final SearchManager INSTANCE = new SearchManager(6);
     }
 
-    public static SearchManager2 getInstance() {
+    public static SearchManager getInstance() {
         return Loader.INSTANCE;
     }
 
@@ -83,7 +83,7 @@ public final class SearchManager2 {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {
                 if (performer.getToken() == token) {
-                    SearchManager2.this.onResults(performer, results);
+                    SearchManager.this.onResults(performer, results);
                 } else {
                     LOG.warn("Performer token does not match listener onResults token, review your logic");
                 }
@@ -91,7 +91,7 @@ public final class SearchManager2 {
 
             @Override
             public void onError(long token, SearchError error) {
-                SearchManager2.this.onError(token, error);
+                SearchManager.this.onError(token, error);
             }
 
             @Override
@@ -272,11 +272,11 @@ public final class SearchManager2 {
 
     private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {
 
-        protected final SearchManager2 manager;
+        protected final SearchManager manager;
         protected final SearchPerformer performer;
         private final int ordinal;
 
-        public SearchTask(SearchManager2 manager, SearchPerformer performer, int ordinal) {
+        public SearchTask(SearchManager manager, SearchPerformer performer, int ordinal) {
             this.manager = manager;
             this.performer = performer;
             this.ordinal = ordinal;
@@ -305,7 +305,7 @@ public final class SearchManager2 {
 
     private static final class PerformTask extends SearchTask {
 
-        public PerformTask(SearchManager2 manager, SearchPerformer performer, int order) {
+        public PerformTask(SearchManager manager, SearchPerformer performer, int order) {
             super(manager, performer, order);
         }
 
@@ -329,7 +329,7 @@ public final class SearchManager2 {
 
         private final CrawlableSearchResult sr;
 
-        public CrawlTask(SearchManager2 manager, SearchPerformer performer, CrawlableSearchResult sr, int order) {
+        public CrawlTask(SearchManager manager, SearchPerformer performer, CrawlableSearchResult sr, int order) {
             super(manager, performer, order);
             this.sr = sr;
         }
