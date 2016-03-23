@@ -24,5 +24,6 @@ package com.frostwire.fmp4;
 public final class UserDataBox extends ContainerBox {
 
     UserDataBox() {
+        super(udta);
     }
 }

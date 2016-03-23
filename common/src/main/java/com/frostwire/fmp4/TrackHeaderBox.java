@@ -41,6 +41,7 @@ public final class TrackHeaderBox extends FullBox {
     protected int height;
 
     TrackHeaderBox() {
+        super(tkhd);
     }
 
     @Override
@@ -74,5 +75,16 @@ public final class TrackHeaderBox extends FullBox {
         IO.get(buf, matrix);
         width = buf.getInt();
         height = buf.getInt();
+    }
+
+    @Override
+    void update() {
+        long s = 60;
+        if (version == 1) {
+            s += 32;
+        } else { // version == 0
+            s += 20;
+        }
+        length(s);
     }
 }

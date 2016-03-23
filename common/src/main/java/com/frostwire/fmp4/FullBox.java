@@ -24,12 +24,13 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public abstract class FullBox extends Box {
+public class FullBox extends Box {
 
     protected byte version;
     protected int flags;
 
-    FullBox() {
+    FullBox(int type) {
+        super(type);
     }
 
     @Override

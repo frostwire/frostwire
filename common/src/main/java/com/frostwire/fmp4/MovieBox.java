@@ -24,5 +24,6 @@ package com.frostwire.fmp4;
 public final class MovieBox extends ContainerBox {
 
     MovieBox() {
+        super(moov);
     }
 }

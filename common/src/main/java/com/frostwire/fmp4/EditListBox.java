@@ -30,6 +30,7 @@ public final class EditListBox extends FullBox {
     protected Entry[] entries;
 
     EditListBox() {
+        super(elst);
     }
 
     @Override
@@ -37,7 +38,7 @@ public final class EditListBox extends FullBox {
         super.read(in, buf);
 
         IO.read(in, 4, buf);
-        entry_count = buf.getInt();
+        entry_count = Bits.l2i(Bits.i2u(buf.getInt())); // it's unrealistic to have more than 2G elements
         entries = new Entry[entry_count];
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
@@ -55,6 +56,19 @@ public final class EditListBox extends FullBox {
             e.media_rate_fraction = buf.getShort();
             entries[i] = e;
         }
+    }
+
+    @Override
+    void update() {
+        long s = 8; // 4 entry_count + 4 full box
+        for (int i = 0; i < entries.length; i++) {
+            if (version == 1) {
+                s = Bits.l2u(s + 20);
+            } else {
+                s = Bits.l2u(s + 12);
+            }
+        }
+        length(s);
     }
 
     private static final class Entry {

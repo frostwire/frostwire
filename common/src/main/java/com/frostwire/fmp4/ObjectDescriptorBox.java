@@ -29,6 +29,7 @@ public final class ObjectDescriptorBox extends FullBox {
     protected byte[] data;
 
     ObjectDescriptorBox() {
+        super(iods);
     }
 
     @Override
@@ -38,5 +39,10 @@ public final class ObjectDescriptorBox extends FullBox {
         IO.read(in, Bits.l2i(len), buf);
         data = new byte[(int) len];
         buf.get(data);
+    }
+
+    @Override
+    void update() {
+        length(data.length);
     }
 }

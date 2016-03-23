@@ -39,6 +39,7 @@ public final class MovieHeaderBox extends FullBox {
     protected int next_track_ID;
 
     MovieHeaderBox() {
+        super(mvhd);
     }
 
     @Override
@@ -70,5 +71,16 @@ public final class MovieHeaderBox extends FullBox {
         pre_defined = new int[6];
         IO.get(buf, pre_defined);
         next_track_ID = buf.getInt();
+    }
+
+    @Override
+    void update() {
+        long s = 80;
+        if (version == 1) {
+            s += 28;
+        } else { // version == 0
+            s += 16;
+        }
+        length(s);
     }
 }

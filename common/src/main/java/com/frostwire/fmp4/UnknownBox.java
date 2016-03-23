@@ -26,7 +26,8 @@ import java.nio.ByteBuffer;
  */
 public final class UnknownBox extends Box {
 
-    UnknownBox() {
+    UnknownBox(int type) {
+        super(type);
     }
 
     @Override
