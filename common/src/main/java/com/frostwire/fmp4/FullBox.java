@@ -34,8 +34,8 @@ public class FullBox extends Box {
     }
 
     @Override
-    void read(InputChannel in, ByteBuffer buf) throws IOException {
-        IO.read(in, 4, buf);
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+        IO.read(ch, 4, buf);
         int n = buf.getInt();
 
         version = Bits.int3(n);

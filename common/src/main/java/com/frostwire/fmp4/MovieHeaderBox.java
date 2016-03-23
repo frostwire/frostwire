@@ -43,24 +43,24 @@ public final class MovieHeaderBox extends FullBox {
     }
 
     @Override
-    void read(InputChannel in, ByteBuffer buf) throws IOException {
-        super.read(in, buf);
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+        super.read(ch, buf);
 
         if (version == 1) {
-            IO.read(in, 28, buf);
+            IO.read(ch, 28, buf);
             creation_time = buf.getLong();
             modification_time = buf.getLong();
             timescale = buf.getInt();
             duration = buf.getLong();
         } else { // version == 0
-            IO.read(in, 16, buf);
+            IO.read(ch, 16, buf);
             creation_time = buf.getInt();
             modification_time = buf.getInt();
             timescale = buf.getInt();
             duration = buf.getInt();
         }
 
-        IO.read(in, 80, buf);
+        IO.read(ch, 80, buf);
         rate = buf.getInt();
         volume = buf.getShort();
         reserved1 = buf.getShort();

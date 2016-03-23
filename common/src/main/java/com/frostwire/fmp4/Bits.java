@@ -89,4 +89,11 @@ final class Bits {
         }
         return n;
     }
+
+    public static int i2ui(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("Can't convert negative int to unsigned: " + n);
+        }
+        return n;
+    }
 }

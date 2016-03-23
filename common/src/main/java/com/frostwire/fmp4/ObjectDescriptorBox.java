@@ -33,10 +33,11 @@ public final class ObjectDescriptorBox extends FullBox {
     }
 
     @Override
-    void read(InputChannel in, ByteBuffer buf) throws IOException {
-        super.read(in, buf);
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+        super.read(ch, buf);
+
         long len = length() - 4;
-        IO.read(in, Bits.l2i(len), buf);
+        IO.read(ch, Bits.l2i(len), buf);
         data = new byte[(int) len];
         buf.get(data);
     }

@@ -17,29 +17,40 @@
 
 package com.frostwire.fmp4;
 
-import org.junit.Test;
-
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class SimpleReadTest {
+public final class HintMediaHeaderBox extends FullBox {
 
-    @Test
-    public void testRead() throws IOException {
-        File f = new File("/Users/aldenml/Downloads/test.mp4");
-        RandomAccessFile in = new RandomAccessFile(f, "r");
-        InputChannel ch = new InputChannel(in.getChannel());
+    protected short maxPDUsize;
+    protected short avgPDUsize;
+    protected int maxbitrate;
+    protected int avgbitrate;
+    protected int reserved;
 
-        IsoMedia.read(ch, f.length(), new IsoMedia.ReadListener() {
-            @Override
-            public void onBox(Box b) {
-                System.out.println(Bits.make4cc(b.type));
-            }
-        });
+    HintMediaHeaderBox() {
+        super(hmhd);
+    }
+
+    @Override
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+        super.read(ch, buf);
+
+        IO.read(ch, 16, buf);
+        maxPDUsize = buf.getShort();
+        avgPDUsize = buf.getShort();
+        maxbitrate = buf.getInt();
+        avgbitrate = buf.getInt();
+        reserved = buf.getInt();
+    }
+
+    @Override
+    void update() {
+        long s = 16 + 4; // + 4 full box
+        length(s);
     }
 }

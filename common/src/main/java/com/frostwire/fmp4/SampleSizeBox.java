@@ -24,57 +24,42 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class EditListBox extends FullBox {
+public final class SampleSizeBox extends FullBox {
 
-    protected int entry_count;
+    protected int sample_size;
+    protected int sample_count;
     protected Entry[] entries;
 
-    EditListBox() {
-        super(elst);
+    SampleSizeBox() {
+        super(stsz);
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        IO.read(ch, 4, buf);
-        entry_count = Bits.l2i(Bits.i2u(buf.getInt())); // it's unrealistic to have more than 2G elements
-        entries = new Entry[entry_count];
-        for (int i = 0; i < entry_count; i++) {
+        IO.read(ch, 8, buf);
+        sample_size = buf.getInt();
+        sample_count = Bits.l2i(Bits.i2u(buf.getInt())); // it's unrealistic to have more than 2G elements
+        entries = new Entry[sample_count];
+        for (int i = 0; i < sample_count; i++) {
             Entry e = new Entry();
-            if (version == 1) {
-                IO.read(ch, 16, buf);
-                e.segment_duration = buf.getLong();
-                e.media_time = buf.getLong();
-            } else {
-                IO.read(ch, 8, buf);
-                e.segment_duration = buf.getInt();
-                e.media_time = buf.getInt();
-            }
             IO.read(ch, 4, buf);
-            e.media_rate_integer = buf.getShort();
-            e.media_rate_fraction = buf.getShort();
+            e.entry_size = buf.getInt();
             entries[i] = e;
         }
     }
 
     @Override
     void update() {
-        long s = 8; // 4 entry_count + 4 full box
-        for (int i = 0; i < entries.length; i++) {
-            if (version == 1) {
-                s = Bits.l2u(s + 20);
-            } else {
-                s = Bits.l2u(s + 12);
-            }
+        long s = 8 + 4; // + 4 full box
+        for (int i = 0; i < sample_count; i++) {
+            s = Bits.l2u(s + 4);
         }
         length(s);
     }
 
     private static final class Entry {
-        public long segment_duration;
-        public long media_time;
-        public short media_rate_integer;
-        public short media_rate_fraction;
+        public int entry_size;
     }
 }

@@ -24,15 +24,13 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class HandlerBox extends FullBox {
+public final class DataEntryUrnBox extends FullBox {
 
-    protected int pre_defined;
-    protected int handler_type;
-    protected int[] reserved;
     protected byte[] name;
+    protected byte[] location;
 
-    HandlerBox() {
-        super(hdlr);
+    DataEntryUrnBox() {
+        super(urn_);
     }
 
     public String name() {
@@ -45,26 +43,40 @@ public final class HandlerBox extends FullBox {
         }
     }
 
+    public String location() {
+        return location != null ? Utf8.convert(location) : null;
+    }
+
+    public void location(String value) {
+        if (value != null) {
+            location = Utf8.convert(value);
+        }
+    }
+
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
         long len = length() - 4;
-        IO.read(ch, Bits.l2i(len), buf);
-        pre_defined = buf.getInt();
-        handler_type = buf.getInt();
-        reserved = new int[3];
-        IO.get(buf, reserved);
-        if (buf.remaining() > 0) {
-            name = IO.str(buf);
+        if (len > 0) {
+            IO.read(ch, Bits.l2i(len), buf);
+            if (buf.remaining() > 0) {
+                name = IO.str(buf);
+            }
+            if (buf.remaining() > 0) {
+                location = IO.str(buf);
+            }
         }
     }
 
     @Override
     void update() {
-        long s = 20 + 4; // + 4 full box
+        long s = 4; // + 4 full box
         if (name != null) {
             s = Bits.l2u(s + name.length + 1);
+        }
+        if (location != null) {
+            s = Bits.l2u(s + location.length + 1);
         }
         length(s);
     }

@@ -45,18 +45,18 @@ public final class TrackHeaderBox extends FullBox {
     }
 
     @Override
-    void read(InputChannel in, ByteBuffer buf) throws IOException {
-        super.read(in, buf);
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+        super.read(ch, buf);
 
         if (version == 1) {
-            IO.read(in, 32, buf);
+            IO.read(ch, 32, buf);
             creation_time = buf.getLong();
             modification_time = buf.getLong();
             track_ID = buf.getInt();
             reserved1 = buf.getInt();
             duration = buf.getLong();
         } else { // version == 0
-            IO.read(in, 20, buf);
+            IO.read(ch, 20, buf);
             creation_time = buf.getInt();
             modification_time = buf.getInt();
             track_ID = buf.getInt();
@@ -64,7 +64,7 @@ public final class TrackHeaderBox extends FullBox {
             duration = buf.getInt();
         }
 
-        IO.read(in, 60, buf);
+        IO.read(ch, 60, buf);
         reserved2 = new int[2];
         IO.get(buf, reserved2);
         layer = buf.getShort();

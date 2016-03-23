@@ -17,29 +17,29 @@
 
 package com.frostwire.fmp4;
 
-import org.junit.Test;
-
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.util.LinkedList;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class SimpleReadTest {
+public final class MetaBox extends FullBox {
 
-    @Test
-    public void testRead() throws IOException {
-        File f = new File("/Users/aldenml/Downloads/test.mp4");
-        RandomAccessFile in = new RandomAccessFile(f, "r");
-        InputChannel ch = new InputChannel(in.getChannel());
+    MetaBox() {
+        super(meta);
+        boxes = new LinkedList<>();
+    }
 
-        IsoMedia.read(ch, f.length(), new IsoMedia.ReadListener() {
-            @Override
-            public void onBox(Box b) {
-                System.out.println(Bits.make4cc(b.type));
-            }
-        });
+    @Override
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+        super.read(ch, buf);
+    }
+
+    @Override
+    void update() {
+        long s = ContainerBox.length(boxes);
+        length(s);
     }
 }

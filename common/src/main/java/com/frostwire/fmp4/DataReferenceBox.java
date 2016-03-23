@@ -24,13 +24,13 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class EditListBox extends FullBox {
+public final class DataReferenceBox extends FullBox {
 
     protected int entry_count;
-    protected Entry[] entries;
+    protected Box[] entries;
 
-    EditListBox() {
-        super(elst);
+    DataReferenceBox() {
+        super(dref);
     }
 
     @Override
@@ -39,22 +39,26 @@ public final class EditListBox extends FullBox {
 
         IO.read(ch, 4, buf);
         entry_count = Bits.l2i(Bits.i2u(buf.getInt())); // it's unrealistic to have more than 2G elements
-        entries = new Entry[entry_count];
+        entries = new Box[entry_count];
         for (int i = 0; i < entry_count; i++) {
-            Entry e = new Entry();
-            if (version == 1) {
-                IO.read(ch, 16, buf);
-                e.segment_duration = buf.getLong();
-                e.media_time = buf.getLong();
-            } else {
+            IO.read(ch, 8, buf);
+
+            int size = buf.getInt();
+            int type = buf.getInt();
+
+            Long largesize = null;
+            if (size == 1) {
                 IO.read(ch, 8, buf);
-                e.segment_duration = buf.getInt();
-                e.media_time = buf.getInt();
+                largesize = buf.getLong();
             }
-            IO.read(ch, 4, buf);
-            e.media_rate_integer = buf.getShort();
-            e.media_rate_fraction = buf.getShort();
-            entries[i] = e;
+
+            Box b = Box.empty(type);
+            b.size = size;
+            b.largesize = largesize;
+
+            b.read(ch, buf);
+
+            entries[i] = b;
         }
     }
 
@@ -62,19 +66,14 @@ public final class EditListBox extends FullBox {
     void update() {
         long s = 8; // 4 entry_count + 4 full box
         for (int i = 0; i < entries.length; i++) {
-            if (version == 1) {
-                s = Bits.l2u(s + 20);
+            Box b = entries[i];
+            b.update();
+            if (b.size == 1) {
+                s = Bits.l2u(s + b.largesize);
             } else {
-                s = Bits.l2u(s + 12);
+                s = Bits.l2u(s + b.size);
             }
         }
         length(s);
-    }
-
-    private static final class Entry {
-        public long segment_duration;
-        public long media_time;
-        public short media_rate_integer;
-        public short media_rate_fraction;
     }
 }

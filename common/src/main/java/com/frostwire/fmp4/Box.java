@@ -30,6 +30,10 @@ import java.util.Map;
 public class Box {
 
     public static final int uuid = Bits.make4cc("uuid");
+    public static final int soun = Bits.make4cc("soun");
+    public static final int vide = Bits.make4cc("vide");
+    public static final int hint = Bits.make4cc("hint");
+
     public static final int mdat = Bits.make4cc("mdat");
     public static final int ftyp = Bits.make4cc("ftyp");
     public static final int moov = Bits.make4cc("moov");
@@ -44,6 +48,32 @@ public class Box {
     public static final int mdhd = Bits.make4cc("mdhd");
     public static final int hdlr = Bits.make4cc("hdlr");
     public static final int minf = Bits.make4cc("minf");
+    public static final int vmhd = Bits.make4cc("vmhd");
+    public static final int smhd = Bits.make4cc("smhd");
+    public static final int hmhd = Bits.make4cc("hmhd");
+    public static final int nmhd = Bits.make4cc("nmhd");
+    public static final int dinf = Bits.make4cc("dinf");
+    public static final int dref = Bits.make4cc("dref");
+    public static final int url_ = Bits.make4cc("url ");
+    public static final int urn_ = Bits.make4cc("urn ");
+    public static final int stbl = Bits.make4cc("stbl");
+    public static final int stsd = Bits.make4cc("stsd");
+    public static final int stts = Bits.make4cc("stts");
+    public static final int stss = Bits.make4cc("stss");
+    public static final int stsc = Bits.make4cc("stsc");
+    public static final int stsz = Bits.make4cc("stsz");
+    public static final int stz2 = Bits.make4cc("stz2");
+    public static final int stco = Bits.make4cc("stco");
+    public static final int co64 = Bits.make4cc("co64");
+    public static final int esds = Bits.make4cc("esds");
+    public static final int meta = Bits.make4cc("meta");
+    public static final int ilst = Bits.make4cc("ilst");
+    public static final int Cnam = Bits.make4cc("©nam");
+    public static final int CART = Bits.make4cc("©ART");
+    public static final int aART = Bits.make4cc("aART");
+    public static final int Calb = Bits.make4cc("©alb");
+    public static final int stik = Bits.make4cc("stik");
+    public static final int covr = Bits.make4cc("covr");
 
     private static final Map<Integer, BoxLambda> mapping = buildMapping();
 
@@ -51,6 +81,9 @@ public class Box {
     protected final int type;
     protected Long largesize;
     protected byte[] usertype;
+
+    protected LinkedList<Box> boxes;
+    protected Box parent;
 
     Box(int type) {
         this.type = type;
@@ -61,10 +94,6 @@ public class Box {
     }
 
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    LinkedList<Box> boxes() {
         throw new UnsupportedOperationException();
     }
 
@@ -199,6 +228,162 @@ public class Box {
             @Override
             public Box empty() {
                 return new MediaInformationBox();
+            }
+        });
+        map.put(vmhd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new VideoMediaHeaderBox();
+            }
+        });
+        map.put(smhd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new SoundMediaHeaderBox();
+            }
+        });
+        map.put(hmhd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new HintMediaHeaderBox();
+            }
+        });
+        map.put(nmhd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new NullMediaHeaderBox();
+            }
+        });
+        map.put(dinf, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new DataInformationBox();
+            }
+        });
+        map.put(dref, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new DataReferenceBox();
+            }
+        });
+        map.put(url_, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new DataEntryUrlBox();
+            }
+        });
+        map.put(urn_, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new DataEntryUrnBox();
+            }
+        });
+        map.put(stbl, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new SampleTableBox();
+            }
+        });
+        map.put(stsd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new SampleDescriptionBox();
+            }
+        });
+        map.put(stts, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TimeToSampleBox();
+            }
+        });
+        map.put(stss, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new SyncSampleBox();
+            }
+        });
+        map.put(stsc, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new SampleToChunkBox();
+            }
+        });
+        map.put(stsz, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new SampleSizeBox();
+            }
+        });
+        map.put(stz2, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new CompactSampleSizeBox();
+            }
+        });
+        map.put(stco, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new ChunkOffsetBox();
+            }
+        });
+        map.put(co64, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new ChunkLargeOffsetBox();
+            }
+        });
+        map.put(esds, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new ESDBox();
+            }
+        });
+        map.put(meta, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MetaBox();
+            }
+        });
+        map.put(ilst, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleItemListBox();
+            }
+        });
+        map.put(Cnam, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleNameBox();
+            }
+        });
+        map.put(CART, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleArtistBox();
+            }
+        });
+        map.put(aART, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleArtist2Box();
+            }
+        });
+        map.put(Calb, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleAlbumBox();
+            }
+        });
+        map.put(stik, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleMediaTypeBox();
+            }
+        });
+        map.put(covr, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleCoverBox();
             }
         });
 

@@ -24,47 +24,45 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class HandlerBox extends FullBox {
+public class AppleCoverBox extends AppleDataBox {
 
-    protected int pre_defined;
-    protected int handler_type;
-    protected int[] reserved;
-    protected byte[] name;
+    private byte[] value;
 
-    HandlerBox() {
-        super(hdlr);
+    AppleCoverBox() {
+        super(covr);
+        this.dataType = 1;
     }
 
-    public String name() {
-        return name != null ? Utf8.convert(name) : null;
+    public byte[] value() {
+        return value;
     }
 
-    public void name(String value) {
-        if (value != null) {
-            name = Utf8.convert(value);
-        }
+    public void value(byte[] value) {
+        this.value = value;
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        long len = length() - 4;
-        IO.read(ch, Bits.l2i(len), buf);
-        pre_defined = buf.getInt();
-        handler_type = buf.getInt();
-        reserved = new int[3];
-        IO.get(buf, reserved);
-        if (buf.remaining() > 0) {
-            name = IO.str(buf);
+        long len = length() - 16;
+        if (len > 0) {
+            buf.clear();
+            int ilen = Bits.l2i(len);
+            if (buf.capacity() < ilen) {
+                buf = ByteBuffer.allocate(ilen);
+            }
+            IO.read(ch, ilen, buf);
+            value = new byte[ilen];
+            buf.get(value);
         }
     }
 
     @Override
     void update() {
-        long s = 20 + 4; // + 4 full box
-        if (name != null) {
-            s = Bits.l2u(s + name.length + 1);
+        long s = 16; // + 16 apple data box
+        if (value != null) {
+            s = Bits.l2u(s + value.length);
         }
         length(s);
     }

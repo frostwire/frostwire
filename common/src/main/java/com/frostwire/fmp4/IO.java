@@ -87,12 +87,19 @@ final class IO {
         return buf;
     }
 
-    public static String utf8(ByteBuffer buf) {
+    public static ByteBuffer get(ByteBuffer buf, short[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = buf.getShort();
+        }
+        return buf;
+    }
+
+    public static byte[] str(ByteBuffer buf) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte b;
         while ((b = buf.get()) != 0) {
             out.write(b);
         }
-        return Utf8.convert(out.toByteArray());
+        return out.toByteArray();
     }
 }

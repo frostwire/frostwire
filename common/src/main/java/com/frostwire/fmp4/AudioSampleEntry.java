@@ -24,48 +24,36 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class HandlerBox extends FullBox {
+public final class AudioSampleEntry extends SampleEntry {
 
-    protected int pre_defined;
-    protected int handler_type;
-    protected int[] reserved;
-    protected byte[] name;
+    protected int[] reserved1;
+    protected short channelcount;
+    protected short samplesize;
+    protected short pre_defined;
+    protected short reserved2;
+    protected int samplerate;
 
-    HandlerBox() {
-        super(hdlr);
-    }
-
-    public String name() {
-        return name != null ? Utf8.convert(name) : null;
-    }
-
-    public void name(String value) {
-        if (value != null) {
-            name = Utf8.convert(value);
-        }
+    AudioSampleEntry(int codingname) {
+        super(codingname);
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        long len = length() - 4;
-        IO.read(ch, Bits.l2i(len), buf);
-        pre_defined = buf.getInt();
-        handler_type = buf.getInt();
-        reserved = new int[3];
-        IO.get(buf, reserved);
-        if (buf.remaining() > 0) {
-            name = IO.str(buf);
-        }
+        IO.read(ch, 20, buf);
+        reserved1 = new int[2];
+        IO.get(buf, reserved1);
+        channelcount = buf.getShort();
+        samplesize = buf.getShort();
+        pre_defined = buf.getShort();
+        reserved2 = buf.getShort();
+        samplerate = buf.getInt();
     }
 
     @Override
     void update() {
-        long s = 20 + 4; // + 4 full box
-        if (name != null) {
-            s = Bits.l2u(s + name.length + 1);
-        }
+        long s = 20 + 8; // + 8 sample entry
         length(s);
     }
 }

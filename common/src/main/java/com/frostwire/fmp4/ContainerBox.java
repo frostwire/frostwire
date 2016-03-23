@@ -27,11 +27,9 @@ import java.util.LinkedList;
  */
 public class ContainerBox extends Box {
 
-    private final LinkedList<Box> boxes;
-
     ContainerBox(int type) {
         super(type);
-        this.boxes = new LinkedList<>();
+        boxes = new LinkedList<>();
     }
 
     @Override
@@ -43,12 +41,12 @@ public class ContainerBox extends Box {
     }
 
     @Override
-    LinkedList<Box> boxes() {
-        return boxes;
+    void update() {
+        long s = length(boxes);
+        length(s);
     }
 
-    @Override
-    void update() {
+    static long length(LinkedList<Box> boxes) {
         long s = 0;
         for (Box b : boxes) {
             b.update();
@@ -60,6 +58,6 @@ public class ContainerBox extends Box {
                 s = Bits.l2u(s + b.size);
             }
         }
-        length(s);
+        return s;
     }
 }

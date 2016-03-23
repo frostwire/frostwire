@@ -24,13 +24,13 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class EditListBox extends FullBox {
+public final class TimeToSampleBox extends FullBox {
 
     protected int entry_count;
     protected Entry[] entries;
 
-    EditListBox() {
-        super(elst);
+    TimeToSampleBox() {
+        super(stts);
     }
 
     @Override
@@ -42,18 +42,9 @@ public final class EditListBox extends FullBox {
         entries = new Entry[entry_count];
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
-            if (version == 1) {
-                IO.read(ch, 16, buf);
-                e.segment_duration = buf.getLong();
-                e.media_time = buf.getLong();
-            } else {
-                IO.read(ch, 8, buf);
-                e.segment_duration = buf.getInt();
-                e.media_time = buf.getInt();
-            }
-            IO.read(ch, 4, buf);
-            e.media_rate_integer = buf.getShort();
-            e.media_rate_fraction = buf.getShort();
+            IO.read(ch, 8, buf);
+            e.sample_count = buf.getInt();
+            e.sample_delta = buf.getInt();
             entries[i] = e;
         }
     }
@@ -61,20 +52,14 @@ public final class EditListBox extends FullBox {
     @Override
     void update() {
         long s = 8; // 4 entry_count + 4 full box
-        for (int i = 0; i < entries.length; i++) {
-            if (version == 1) {
-                s = Bits.l2u(s + 20);
-            } else {
-                s = Bits.l2u(s + 12);
-            }
+        for (int i = 0; i < entry_count; i++) {
+            s = Bits.l2u(s + 8);
         }
         length(s);
     }
 
     private static final class Entry {
-        public long segment_duration;
-        public long media_time;
-        public short media_rate_integer;
-        public short media_rate_fraction;
+        public int sample_count;
+        public int sample_delta;
     }
 }

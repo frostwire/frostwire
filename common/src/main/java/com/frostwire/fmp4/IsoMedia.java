@@ -66,12 +66,14 @@ public final class IsoMedia {
             b.largesize = largesize;
             b.usertype = usertype;
 
+            b.parent = p;
+
             long r = ch.count();
             b.read(ch, buf);
             r = ch.count() - r;
 
             if (p != null) {
-                p.boxes().add(b);
+                p.boxes.add(b);
             }
 
             if (l != null) {
