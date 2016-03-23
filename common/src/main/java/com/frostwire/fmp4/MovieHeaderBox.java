@@ -75,7 +75,7 @@ public final class MovieHeaderBox extends FullBox {
 
     @Override
     void update() {
-        long s = 80;
+        long s = 80 + 4; // + 4 full box
         if (version == 1) {
             s += 28;
         } else { // version == 0

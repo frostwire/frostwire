@@ -17,33 +17,34 @@
 
 package com.frostwire.fmp4;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.UnsupportedEncodingException;
 
-/**
- * @author gubatron
- * @author aldenml
- */
-public final class ObjectDescriptorBox extends FullBox {
+final class Utf8 {
 
-    protected byte[] data;
-
-    ObjectDescriptorBox() {
-        super(iods);
+    private Utf8() {
     }
 
-    @Override
-    void read(InputChannel in, ByteBuffer buf) throws IOException {
-        super.read(in, buf);
-        long len = length() - 4;
-        IO.read(in, Bits.l2i(len), buf);
-        data = new byte[(int) len];
-        buf.get(data);
+    public static byte[] convert(String s) {
+        try {
+            if (s != null) {
+                return s.getBytes("UTF-8");
+            } else {
+                return null;
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Override
-    void update() {
-        long s = Bits.l2u(data.length + 4); // + 4 full box
-        length(s);
+    public static String convert(byte[] b) {
+        try {
+            if (b != null) {
+                return new String(b, "UTF-8");
+            } else {
+                return null;
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

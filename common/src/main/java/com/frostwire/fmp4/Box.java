@@ -41,6 +41,9 @@ public class Box {
     public static final int elst = Bits.make4cc("elst");
     public static final int udta = Bits.make4cc("udta");
     public static final int mdia = Bits.make4cc("mdia");
+    public static final int mdhd = Bits.make4cc("mdhd");
+    public static final int hdlr = Bits.make4cc("hdlr");
+    public static final int minf = Bits.make4cc("minf");
 
     private static final Map<Integer, BoxLambda> mapping = buildMapping();
 
@@ -178,6 +181,24 @@ public class Box {
             @Override
             public Box empty() {
                 return new MediaBox();
+            }
+        });
+        map.put(mdhd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MediaHeaderBox();
+            }
+        });
+        map.put(hdlr, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new HandlerBox();
+            }
+        });
+        map.put(minf, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MediaInformationBox();
             }
         });
 

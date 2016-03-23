@@ -17,6 +17,7 @@
 
 package com.frostwire.fmp4;
 
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -84,5 +85,14 @@ final class IO {
             arr[i] = buf.getInt();
         }
         return buf;
+    }
+
+    public static String utf8(ByteBuffer buf) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte b;
+        while ((b = buf.get()) != 0) {
+            out.write(b);
+        }
+        return Utf8.convert(out.toByteArray());
     }
 }
