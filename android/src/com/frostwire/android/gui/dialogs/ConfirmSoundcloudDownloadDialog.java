@@ -16,24 +16,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<SoundcloudSearchResult> {
-    private ConfirmSoundcloudDownloadDialog(Context context, List<SoundcloudSearchResult> listData, SelectionMode selectionMode) {
-        super(context, listData, selectionMode, null);
-    }
 
     public static ConfirmSoundcloudDownloadDialog newInstance(
             Context ctx,
             String dialogTitle,
             String dialogText,
             List<SoundcloudSearchResult> listData) {
-        ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog(ctx, listData, SelectionMode.MULTIPLE_SELECTION);
+        ConfirmSoundcloudDownloadDialog dlg = new ConfirmSoundcloudDownloadDialog();
         SoundcloudSearchResultList srList = new SoundcloudSearchResultList();
         srList.listData = listData;
-        dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(srList));
+
+        // this creates a bundle that gets passed to setArguments(). It's supposed to be ready
+        // before the dialog is attached to the underlying activity, after we attach to it, then
+        // we are able to use such Bundle to create our adapter.
+        dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(srList), SelectionMode.MULTIPLE_SELECTION);
+
         dlg.setOnYesListener(new OnStartDownloadsClickListener(ctx, dlg));
         return dlg;
     }
 
-    public static void startDownloads(Context ctx, List<? extends SearchResult> srs) {
+    private static void startDownloads(Context ctx, List<? extends SearchResult> srs) {
         if (srs != null && !srs.isEmpty()) {
             for (SearchResult sr : srs) {
                 StartDownloadTask task = new StartDownloadTask(ctx, sr);
@@ -73,7 +75,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
         private final WeakReference<Context> ctxRef;
         private WeakReference<AbstractConfirmListDialog> dlgRef;
 
-        public OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
+        OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
             ctxRef = new WeakReference<>(ctx);
             dlgRef = new WeakReference<>(dlg);
         }
@@ -86,27 +88,27 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
         public void onClick(View v) {
             if (Ref.alive(ctxRef) && Ref.alive(dlgRef)) {
                 final AbstractConfirmListDialog dlg = dlgRef.get();
-                try {
-                    final AbstractConfirmListDialog.SelectionMode selectionMode = dlg.getSelectionMode();
-                    List<SoundcloudSearchResult> results = (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION) ?
-                            (List<SoundcloudSearchResult>) dlg.getList() :
-                            new ArrayList<SoundcloudSearchResult>();
 
-                    if (selectionMode == AbstractConfirmListDialog.SelectionMode.MULTIPLE_SELECTION) {
-                        results.addAll(dlg.getChecked());
-                    } else if (selectionMode == AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION) {
-                        if (results == null || results.isEmpty()) {
-                            return;
-                        }
-                        SoundcloudSearchResult selected = results.get(dlg.getLastSelected());
-                        if (selected == null) {
+                final AbstractConfirmListDialog.SelectionMode selectionMode = dlg.getSelectionMode();
+                List<SoundcloudSearchResult> results = (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION) ?
+                        (List<SoundcloudSearchResult>) dlg.getList() :
+                        new ArrayList<SoundcloudSearchResult>();
 
-                            return;
-                        }
-                        results.add(selected);
+                if (selectionMode == AbstractConfirmListDialog.SelectionMode.MULTIPLE_SELECTION) {
+                    results.addAll(dlg.getChecked());
+                } else if (selectionMode == AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION) {
+                    if (results.isEmpty()) {
+                        return;
                     }
+                    SoundcloudSearchResult selected = results.get(dlg.getLastSelected());
+                    if (selected == null) {
+                        return;
+                    }
+                    results.add(selected);
+                }
+
+                if (!results.isEmpty()) {
                     startDownloads(ctxRef.get(), results);
-                } finally {
                     dlg.dismiss();
                 }
             }

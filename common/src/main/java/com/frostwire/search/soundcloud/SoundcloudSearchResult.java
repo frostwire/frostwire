@@ -182,8 +182,8 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         }
         SoundcloudSearchResult other = (SoundcloudSearchResult) o;
         return this.getDetailsUrl().equals(other.getDetailsUrl()) &&
-               this.getDisplayName().equals(other.getDisplayName()) &&
-               this.getDownloadUrl().equals(other.getDownloadUrl());
+                this.getDisplayName().equals(other.getDisplayName()) &&
+                this.getDownloadUrl().equals(other.getDownloadUrl());
     }
 
     @Override
