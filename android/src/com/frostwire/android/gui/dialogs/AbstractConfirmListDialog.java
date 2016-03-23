@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
@@ -63,13 +64,23 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     public enum SelectionMode {
         NO_SELECTION,
         SINGLE_SELECTION, // still work to do, crashes on rotate, won't auto select 0
-        MULTIPLE_SELECTION,
+        MULTIPLE_SELECTION;
+
+       public static SelectionMode fromInt(int n) {
+           SelectionMode selectionMode = SelectionMode.NO_SELECTION;
+           if (n == SelectionMode.MULTIPLE_SELECTION.ordinal()) {
+               selectionMode = SelectionMode.MULTIPLE_SELECTION;
+           } else if (n == SelectionMode.SINGLE_SELECTION.ordinal()) {
+               selectionMode = SelectionMode.SINGLE_SELECTION;
+           }
+           return selectionMode;
+       }
     }
 
-    private final static String TAG = "confirm_list_dialog";
+    protected final static String TAG = "confirm_list_dialog";
     private String title;
     private String dialogText;
-    private final SelectionMode selectionMode;
+    private SelectionMode selectionMode;
     private Dialog dlg;
     private OnCancelListener onCancelListener;
     private OnClickListener onYesListener;
@@ -80,22 +91,13 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     /** rebuilds list of objects from json and does listView.setAdapter(YourAdapter(theObjectList)) */
     abstract public List<T> deserializeData(String listDataInJSON);
 
-    public AbstractConfirmListDialog(Context context, List<T> list, SelectionMode selectionMode, Bundle bundle) {
+    public AbstractConfirmListDialog() {
         super(TAG, R.layout.dialog_confirm_list);
-        final ConfirmListDialogDefaultAdapter<T> adapter = createAdapter(context, list, selectionMode, bundle);
-        this.adapter = adapter;
-        this.selectionMode = adapter.getSelectionMode();
     }
 
-    public AbstractConfirmListDialog(ConfirmListDialogDefaultAdapter customAdapter) {
-        super(TAG, R.layout.dialog_confirm_list);
-        if (customAdapter != null) {
-            this.adapter = customAdapter;
-            this.selectionMode = customAdapter.getSelectionMode();
-        } else {
-            this.adapter = null;
-            this.selectionMode = SelectionMode.MULTIPLE_SELECTION;
-        }
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
     }
 
     public SelectionMode getSelectionMode() {
@@ -113,11 +115,8 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         bundle.putString("dialogText", dialogText);
         bundle.putString("listData", listDataInJSON);
         bundle.putInt("selectionMode", selectionMode.ordinal());
+        this.selectionMode = selectionMode;
         setArguments(bundle);
-    }
-
-    protected void prepareArguments(int dialogIcon, String dialogTitle, String dialogText, String listDataInJSON){
-        prepareArguments(dialogIcon, dialogTitle, dialogText, listDataInJSON, selectionMode);
     }
 
     @Override
@@ -193,6 +192,11 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         ListView listView = findView(dlg, R.id.dialog_confirm_list_list);
         String listDataString = bundle.getString("listData");
         List<T> listData = deserializeData(listDataString);
+
+        if (selectionMode == null) {
+            selectionMode = SelectionMode.fromInt(bundle.getInt("selectionMode"));
+        }
+
         if (adapter == null &&
             listData != null  &&
             !listData.isEmpty()) {
@@ -266,16 +270,14 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
             if (checked == null || checked.isEmpty()) {
                 return result;
             }
-            result = new boolean[checked.size()];
+            result = new boolean[adapter.getCount()];
             List<T> all = adapter.getList();
             Iterator<T> iterator = checked.iterator();
             while (iterator.hasNext()) {
                 T item = iterator.next();
                 int i = all.indexOf(item);
-                if (i >= 0 && i < result.length) {
+                if (i >= 0) {
                     result[i]=true;
-                } else {
-                    LOGGER.warn("getSelected() is not finding the checked items on the list. Verify your classes implement equals() and hashCode()");
                 }
             }
         }
@@ -287,17 +289,18 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     }
 
     public void updateSelectedCount() {
-        if (selectionMode != SelectionMode.MULTIPLE_SELECTION) {
-            return;
-        }
-
-        if (adapter == null) {
+        if (adapter == null || selectionMode != SelectionMode.MULTIPLE_SELECTION) {
             return;
         }
 
         int selected = adapter.getCheckedCount();
         updatedSelectedCount(selected);
         autoToggleSelectAllCheckbox(selected);
+
+        final Bundle arguments = getArguments();
+        if (arguments != null) {
+            arguments.putBooleanArray("checkedOffsets", getSelected());
+        }
     }
 
     private void updatedSelectedCount(int selected) {
