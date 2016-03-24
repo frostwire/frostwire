@@ -18,6 +18,8 @@
 
 package com.limegroup.gnutella.gui.tables;
 
+import java.io.File;
+
 /**
  * 
  * @author gubatron
@@ -49,4 +51,6 @@ public abstract class AbstractActionsHolder {
     public abstract boolean isPlayable();
 
     public abstract boolean isDownloadable();
+
+    public abstract File getFile();
 }

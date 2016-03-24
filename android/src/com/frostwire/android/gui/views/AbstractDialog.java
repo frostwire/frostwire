@@ -18,22 +18,18 @@
 
 package com.frostwire.android.gui.views;
 
-import java.io.Serializable;
-import java.lang.ref.WeakReference;
-import java.util.List;
-
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.app.*;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager.LayoutParams;
-
 import com.frostwire.util.Ref;
+
+import java.io.Serializable;
+import java.lang.ref.WeakReference;
+import java.util.List;
 
 /**
  * 
@@ -54,7 +50,7 @@ public abstract class AbstractDialog extends DialogFragment {
     public static final int BUTTON_NEGATIVE = Dialog.BUTTON_NEGATIVE;
 
     private final String tag;
-    private final int layoutResId;
+    protected final int layoutResId;
 
     private WeakReference<Activity> activityRef;
 
@@ -66,17 +62,15 @@ public abstract class AbstractDialog extends DialogFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
         activityRef = Ref.weak(activity);
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dlg = super.onCreateDialog(savedInstanceState);
-
+        dlg.requestWindowFeature(Window.FEATURE_LEFT_ICON);
         setContentView(dlg, layoutResId);
         initComponents(dlg, savedInstanceState);
-
         return dlg;
     }
 

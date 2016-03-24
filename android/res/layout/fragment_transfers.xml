@@ -89,7 +89,7 @@
         android:layout_width="match_parent"
         android:layout_height="64sp"  
     />
-    
+
     <com.frostwire.android.gui.views.RichNotification
         android:id="@+id/fragment_transfers_internal_memory_notification"
         frostwire:rich_notification_icon="@drawable/internal_memory_notification"
@@ -100,16 +100,29 @@
         android:layout_height="64sp"  
     />
 
-    <ExpandableListView
-        android:id="@+id/fragment_transfers_list"
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="1"
-        android:background="@color/body_background_gray_light"
-        android:fadingEdge="none"
-        android:groupIndicator="@android:color/transparent" />
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@color/body_background_gray_light">
+        <ExpandableListView
+                android:id="@+id/fragment_transfers_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/body_background_gray_light"
+                android:fadingEdge="none"
+                android:groupIndicator="@android:color/transparent"/>
+        <TextView android:id="@+id/toast_vpn_notification_transfers_text"
+                  style="@style/GetVPNToastNotification"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/vpn_off_toast_notification"
+                  android:layout_marginLeft="8dp"
+                  android:layout_marginBottom="5dp"
+                  android:background="@drawable/toast_vpn_status_bgd"
+                  android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
 
-    <View
+    <View android:id="@+id/fragment_transfers_indicators_top_border"
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:background="#ff1d2934" />

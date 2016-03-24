@@ -21,7 +21,7 @@ import com.frostwire.search.SearchResult;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.NavigableMap;
+import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
@@ -43,10 +43,10 @@ public class SearchTableTest {
         assertEquals(data.size(), 1);
 
         SearchView view = t.view(SearchFilter.NONE);
-        NavigableMap<FilterKey, SearchGroup> groups = view.groups();
+        SortedMap<FilterKey, SearchGroup> groups = view.groups();
         assertEquals(groups.size(), 1);
 
-        SearchGroup group = groups.firstEntry().getValue();
+        SearchGroup group = groups.get(groups.firstKey());
         assertEquals(group.data().size(), 1);
 
         t.clear();

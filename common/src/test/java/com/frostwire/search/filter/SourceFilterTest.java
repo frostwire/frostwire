@@ -38,7 +38,7 @@ public class SourceFilterTest {
         TestSearchResult sr2 = new TestSearchResult("b");
         sr2 = sr2.clone().source("test");
 
-        SourceKey k = new SourceKey("test", 0, "test");
+        SourceKey k = new SourceKey("test", 0);
         SourceFilter f = new SourceFilter(k);
 
         SearchView view = t.view(f);
@@ -58,8 +58,8 @@ public class SourceFilterTest {
         TestSearchResult sr2 = new TestSearchResult("b");
         sr2 = sr2.clone().source("test2");
 
-        SourceKey k1 = new SourceKey("test1", 0, "test");
-        SourceKey k2 = new SourceKey("test2", 1, "test");
+        SourceKey k1 = new SourceKey("test1", 0);
+        SourceKey k2 = new SourceKey("test2", 1);
         SourceFilter f = new SourceFilter(k1, k2);
 
         SearchView view = t.view(f);

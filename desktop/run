@@ -7,7 +7,7 @@ if [ -z ${JAVA_HOME} ]; then
    exit 1
 fi
 
-CLASSPATH=../build/libs/frostwire.jar
+CLASSPATH=build/libs/frostwire.jar
 PS=":"
 
 OPTS="-Xms64m -Xmx512m -Djava.library.path=lib/native"

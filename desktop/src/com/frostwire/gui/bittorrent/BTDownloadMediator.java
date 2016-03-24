@@ -167,6 +167,33 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         updateTableFilters();
     }
 
+    public BTDownload findBTDownload(File saveLocation) {
+        if (saveLocation == null || saveLocation.equals("")) {
+            return null;
+        }
+        final List<BTDownload> downloads = getDownloads();
+        for (BTDownload dl : downloads) {
+            final File dlSaveLocation = dl.getSaveLocation();
+            if (saveLocation.equals(dlSaveLocation) && TorrentUtil.isActive(dl)) {
+                return dl;
+            }
+        }
+        return null;
+    }
+
+    // Linear complexity, take it easy, try no to use on refresh methods, only on actions.
+    public boolean isActiveTorrentDownload(File saveLocation) {
+        if (saveLocation == null || saveLocation.equals("")) {
+            return false;
+        }
+        int active = getActiveDownloads() + getActiveUploads();
+        if (active == 0) {
+            return false;
+        }
+        final BTDownload btDownload = findBTDownload(saveLocation);
+        return btDownload != null && TorrentUtil.isActive(btDownload);
+    }
+
     /**
      * Filter out all the models who are being seeded.
      *

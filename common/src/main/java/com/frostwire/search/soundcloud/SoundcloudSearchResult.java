@@ -18,6 +18,7 @@
 
 package com.frostwire.search.soundcloud;
 
+import com.frostwire.logging.Logger;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.StreamableSearchResult;
@@ -31,7 +32,7 @@ import java.util.Locale;
  * @author aldenml
  */
 public final class SoundcloudSearchResult extends AbstractFileSearchResult implements HttpSearchResult, StreamableSearchResult {
-
+    private static Logger LOGGER = Logger.getLogger(SoundcloudSearchResult.class);
     private static final String DATE_FORMAT = "yyyy/mm/dd HH:mm:ss Z";
 
     private final String displayName;
@@ -171,6 +172,24 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
 
     @Override
     public String toString() {
-        return "SoundcloudSearchResult.downloadUrl: " + getDownloadUrl();
+        return "SoundcloudSearchResult.getDisplayName(): " + getDisplayName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o==null || !(o instanceof SoundcloudSearchResult)) {
+            return false;
+        }
+        SoundcloudSearchResult other = (SoundcloudSearchResult) o;
+        return this.getDetailsUrl().equals(other.getDetailsUrl()) &&
+                this.getDisplayName().equals(other.getDisplayName()) &&
+                this.getDownloadUrl().equals(other.getDownloadUrl());
+    }
+
+    @Override
+    public int hashCode() {
+        return getDetailsUrl().hashCode() +
+               getDisplayName().hashCode() +
+               getDownloadUrl().hashCode();
     }
 }

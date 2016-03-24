@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
-
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,36 +15,34 @@
  * limitations under the License.
  */
 
-package com.frostwire.search;
+package com.frostwire.fmp4;
 
-import java.util.List;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public abstract class SearchManagerSignal {
+public class AppleDataBox extends Box {
 
-    public SearchManagerSignal(long token) {
-        this.token = token;
+    protected int dataLength;
+    protected int data4cc;
+    protected int dataType;
+    protected short dataCountry;
+    protected short dataLanguage;
+
+    AppleDataBox(int type) {
+        super(type);
     }
 
-    public final long token;
-
-    public static final class Results extends SearchManagerSignal {
-
-        public Results(long token, List<? extends SearchResult> elements) {
-            super(token);
-            this.elements = elements;
-        }
-        
-        public final List<? extends SearchResult> elements;
-    }
-
-    public static final class End extends SearchManagerSignal {
-
-        End(long token) {
-            super(token);
-        }
+    @Override
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+        IO.read(ch, 16, buf);
+        dataLength = buf.getInt();
+        data4cc = buf.getInt();
+        dataType = buf.getInt();
+        dataCountry = buf.getShort();
+        dataLanguage = buf.getShort();
     }
 }

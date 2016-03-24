@@ -197,6 +197,11 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     @Override
+    public void onShow() {
+
+    }
+
+    @Override
     protected void initComponents(View v) {
         filesBar = findView(v, R.id.fragment_browse_peer_files_bar);
         filesBar.setOnActionListener(new OnActionListener() {
@@ -388,10 +393,11 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             adapter = new FileListAdapter(getActivity(), items, fileType) {
 
                 @Override
-                protected void onItemChecked(View v, boolean isChecked) {
+                protected void onItemChecked(CompoundButton v, boolean isChecked) {
                     if (!isChecked) {
                         filesBar.clearCheckAll();
                     }
+                    super.onItemChecked(v, isChecked);
                 }
 
                 @Override

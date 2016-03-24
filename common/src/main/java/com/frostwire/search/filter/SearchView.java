@@ -29,7 +29,7 @@ public final class SearchView {
 
     private final SearchTable table;
     private final SearchFilter filter;
-    private final NavigableMap<FilterKey, SearchGroup> groups;
+    private final SortedMap<FilterKey, SearchGroup> groups;
 
     private SearchViewListener listener;
 
@@ -45,8 +45,8 @@ public final class SearchView {
         return filter;
     }
 
-    public NavigableMap<FilterKey, SearchGroup> groups() {
-        return Collections.unmodifiableNavigableMap(groups);
+    public SortedMap<FilterKey, SearchGroup> groups() {
+        return Collections.unmodifiableSortedMap(groups);
     }
 
     public void add(List<? extends SearchResult> results) {

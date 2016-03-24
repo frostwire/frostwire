@@ -31,12 +31,10 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.SearchSettings;
 import org.limewire.util.I18NConvert;
 import org.limewire.util.StringUtils;
-import rx.functions.Action1;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.io.File;
 import java.text.Normalizer;
 import java.util.*;
 
@@ -93,9 +91,6 @@ public final class SearchMediator {
 
     static final String CLOSE_TABS_TO_THE_RIGHT = I18n.tr("Close Tabs to the Right");
 
-    private static final int SEARCH_MANAGER_NUM_THREADS = 6;
-
-
     private final SearchManager manager;
 
     /**
@@ -140,15 +135,21 @@ public final class SearchMediator {
 
         CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
 
-        this.manager = new SearchManagerImpl(SEARCH_MANAGER_NUM_THREADS);
-        this.manager.observable().subscribe(new Action1<SearchManagerSignal>() {
+        this.manager = SearchManager.getInstance();
+        this.manager.setListener(new SearchListener() {
             @Override
-            public void call(SearchManagerSignal s) {
-                if (s instanceof SearchManagerSignal.Results) {
-                    onResults(s.token, ((SearchManagerSignal.Results) s).elements);
-                } else {
-                    onFinished(s.token);
-                }
+            public void onResults(long token, List<? extends SearchResult> results) {
+                SearchMediator.this.onResults(token, results);
+            }
+
+            @Override
+            public void onError(long token, SearchError error) {
+
+            }
+
+            @Override
+            public void onStopped(long token) {
+                SearchMediator.this.onFinished(token);
             }
         });
     }

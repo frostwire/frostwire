@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,6 +78,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TextView textDHTPeers;
     private TextView textDownloads;
     private TextView textUploads;
+    private TextView vpnRichToast;
     private ClearableEditTextView addTransferUrlTextView;
     private TransferListAdapter adapter;
     private TransferStatus selectedStatus;
@@ -85,6 +87,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private static boolean isVPNactive;
     private final OnVPNStatusCallback onVPNStatusCallback;
     private final EngineService.CheckDHTUICallback onDHTCheckCallback;
+    private static boolean firstTimeShown = true;
+    private Handler vpnRichToastHandler;
+    private final long VPN_NOTIFICATION_DURATION = 10000;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -94,6 +99,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         selectedStatus = TransferStatus.ALL;
         this.onVPNStatusCallback = new OnVPNStatusCallback();
         this.onDHTCheckCallback = new OnCheckDHTCallback();
+        vpnRichToastHandler = new Handler();
     }
 
     @Override
@@ -192,10 +198,16 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
+        boolean wasActiveBefore = TransfersFragment.isVPNactive && !vpnActive;
+
         TransfersFragment.isVPNactive = vpnActive;
         final ImageView view = findView(getView(), R.id.fragment_transfers_status_vpn_icon);
         if (view != null) {
             view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
+        }
+
+        if (wasActiveBefore) {
+            showVPNRichToast();
         }
     }
 
@@ -256,6 +268,28 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     @Override
+    public void onShow() {
+        if (firstTimeShown) {
+            firstTimeShown = false;
+            if (!TransfersFragment.isVPNactive) {
+                showVPNRichToast();
+            }
+        } else {
+            //LOG.info("Shown some other time.");
+        }
+    }
+
+    private void showVPNRichToast() {
+        vpnRichToast.setVisibility(View.VISIBLE);
+        vpnRichToastHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                vpnRichToast.setVisibility(View.GONE);
+            }
+        }, VPN_NOTIFICATION_DURATION);
+    }
+
+    @Override
     protected void initComponents(View v) {
 	    initStorageRelatedRichNotifications(v);
     	
@@ -275,6 +309,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         textDownloads = findView(v, R.id.fragment_transfers_text_downloads);
         textUploads = findView(v, R.id.fragment_transfers_text_uploads);
 
+        vpnRichToast = findView(v, R.id.toast_vpn_notification_transfers_text);
+        vpnRichToast.setVisibility(View.GONE);
+        vpnRichToast.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                vpnRichToast.setVisibility(View.GONE);
+            }
+        });
         initVPNStatusButton(v);
     }
 

@@ -1,6 +1,14 @@
-FrostWire 1.7.2 - FEBRUARY/29/2016
+FrostWire 1.7.2 - MARCH/24/2016
  - Updated libraries: gson v2.6.2, okhttp v2.7.5, rxjava v1.1.1,
    android support v4.23.2.0
+ - New jlibtorrent 1.1.0.22.
+ - New song hand picker soundcloud playlist downloading confirmation dialog.
+ - jlibtorrent: fix issue in checking outgoing interfaces
+ - jlibtorrent: optimize enumeration of network interfaces on windows
+ - jlibtorrent: improve reliability of binding listen sockets
+ - jlibtorrent: support SNI in https web seeds and trackers
+ - jlibtorrent: fix unhandled exception in DHT when receiving a DHT packet over IPv6
+ - Dropped rxjava library. KISS.
 
 FrostWire 1.7.1 - FEBRUARY/24/2016
  - New "Experimental Features" option available. In order to move at a

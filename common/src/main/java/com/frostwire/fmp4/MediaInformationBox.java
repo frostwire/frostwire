@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,22 +15,15 @@
  * limitations under the License.
  */
 
-package com.frostwire.search.filter;
+package com.frostwire.fmp4;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public abstract class FilterKeyBase implements FilterKey {
+public final class MediaInformationBox extends ContainerBox {
 
-    private final String display;
-
-    FilterKeyBase(String display) {
-        this.display = display;
-    }
-
-    @Override
-    public String display() {
-        return display;
+    MediaInformationBox() {
+        super(minf);
     }
 }

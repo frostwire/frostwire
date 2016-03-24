@@ -28,6 +28,6 @@ import com.frostwire.platform.DefaultFileSystem;
 public final class DesktopPlatform extends AbstractPlatform {
 
     public DesktopPlatform() {
-        super(new DefaultFileSystem(), new DesktopPaths());
+        super(new DefaultFileSystem(), new DesktopPaths(), new DesktopSettings());
     }
 }

@@ -57,10 +57,7 @@ import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
 import com.frostwire.logging.Logger;
-import com.frostwire.search.FileSearchResult;
-import com.frostwire.search.HttpSearchResult;
-import com.frostwire.search.SearchManagerSignal;
-import com.frostwire.search.SearchResult;
+import com.frostwire.search.*;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.HttpClientFactory;
@@ -69,8 +66,6 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
-import rx.Observer;
-import rx.Subscription;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -100,7 +95,6 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     private String currentQuery;
 
     private final FileTypeCounter fileTypeCounter;
-    private Subscription localSearchSubscription;
 
     public SearchFragment() {
         super(R.layout.fragment_search);
@@ -160,14 +154,13 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
     @Override
     public void onDestroy() {
-        if (this.localSearchSubscription != null) {
-            try {
-                this.localSearchSubscription.unsubscribe();
-            } catch (Throwable ignored) {
-
-            }
-        }
+        LocalSearchEngine.instance().setListener(null);
         super.onDestroy();
+    }
+
+    @Override
+    public void onShow() {
+
     }
 
     @Override
@@ -264,13 +257,31 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                 }
             };
 
-            this.localSearchSubscription = LocalSearchEngine.instance().observable().subscribe(new Observer<SearchManagerSignal>() {
+            LocalSearchEngine.instance().setListener(new SearchListener() {
                 @Override
-                public void onCompleted() {
-                    // IMPORTANT: This method is never called by the PublishSubject (aka "Publisher"), as the publisher
-                    // is reused by the observers and we don't want it to end. Instead the publisher sends SearchManagerSignals
-                    // and when the signal is a SearchManagerSignal.End, it's captured by the onNext() method below, which
-                    // will then invoke this one.
+                public void onResults(long token, final List<? extends SearchResult> results) {
+                    FilteredSearchResults fsr = adapter.filter((List<SearchResult>) results);
+                    final List<SearchResult> filteredList = fsr.filtered;
+
+                    fileTypeCounter.add(fsr);
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.addResults(results, filteredList);
+                            showSearchView(getView());
+                            refreshFileTypeCounters(true);
+                        }
+                    });
+                }
+
+                @Override
+                public void onError(long token, SearchError error) {
+                    LOG.error("Some error in search stream: " + error);
+                }
+
+                @Override
+                public void onStopped(long token) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -278,34 +289,6 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                             deepSearchProgress.setVisibility(View.GONE);
                         }
                     });
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    LOG.error("Some error in the rx stream", e);
-                }
-
-                @Override
-                public void onNext(final SearchManagerSignal signal) {
-                    if (signal instanceof SearchManagerSignal.Results){
-                        @SuppressWarnings("unchecked")
-                        final SearchManagerSignal.Results resultsSignal = (SearchManagerSignal.Results) signal;
-                        FilteredSearchResults fsr = adapter.filter((List<SearchResult>) resultsSignal.elements);
-                        final List<SearchResult> filteredList = fsr.filtered;
-
-                        fileTypeCounter.add(fsr);
-
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapter.addResults(resultsSignal.elements, filteredList);
-                                showSearchView(getView());
-                                refreshFileTypeCounters(true);
-                            }
-                        });
-                    } else if (signal instanceof SearchManagerSignal.End) {
-                        onCompleted();
-                    }
                 }
             });
         }
