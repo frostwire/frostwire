@@ -36,15 +36,32 @@ public final class HintSampleEntry extends SampleEntry {
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        long len = length() - 8;
-        IO.read(ch, Bits.l2i(len), buf);
-        data = new byte[(int) len];
-        buf.get(data);
+        int len = (int) (length() - 8);
+        if (len != 0) {
+            IO.read(ch, len, buf);
+            data = new byte[len];
+            buf.get(data);
+        }
+    }
+
+    @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        if (data != null) {
+            buf.put(data);
+            IO.write(ch, data.length, buf);
+        }
     }
 
     @Override
     void update() {
-        long s = Bits.l2u(data.length + 8); // + 8 sample entry
+        long s = 0;
+        s += 8; // sample entry
+        if (data != null) {
+            s += data.length;
+        }
+        s += ContainerBox.length(boxes);
         length(s);
     }
 }

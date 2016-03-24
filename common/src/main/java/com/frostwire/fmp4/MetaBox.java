@@ -38,8 +38,15 @@ public final class MetaBox extends FullBox {
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+    }
+
+    @Override
     void update() {
-        long s = ContainerBox.length(boxes);
+        long s = 0;
+        s += 4; // full box
+        s += ContainerBox.length(boxes);
         length(s);
     }
 }

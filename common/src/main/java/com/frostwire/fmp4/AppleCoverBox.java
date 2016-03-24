@@ -24,13 +24,13 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public class AppleCoverBox extends AppleDataBox {
+public final class AppleCoverBox extends AppleDataBox {
 
     private byte[] value;
 
     AppleCoverBox() {
         super(covr);
-        this.dataType = 1;
+        dataType = 1;
     }
 
     public byte[] value() {
@@ -45,24 +45,30 @@ public class AppleCoverBox extends AppleDataBox {
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        long len = length() - 16;
-        if (len > 0) {
-            buf.clear();
-            int ilen = Bits.l2i(len);
-            if (buf.capacity() < ilen) {
-                buf = ByteBuffer.allocate(ilen);
-            }
-            IO.read(ch, ilen, buf);
-            value = new byte[ilen];
-            buf.get(value);
+        int len = (int) (length() - 16);
+        if (len != 0) {
+            value = new byte[len];
+            buf = ByteBuffer.wrap(value);
+            IO.read(ch, len, buf);
+        }
+    }
+
+    @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        if (value != null) {
+            buf = ByteBuffer.wrap(value);
+            IO.write(ch, value.length, buf);
         }
     }
 
     @Override
     void update() {
-        long s = 16; // + 16 apple data box
+        long s = 0;
+        s += 16; // apple data box
         if (value != null) {
-            s = Bits.l2u(s + value.length);
+            s += value.length;
         }
         length(s);
     }

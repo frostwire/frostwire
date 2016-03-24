@@ -49,8 +49,22 @@ public final class HintMediaHeaderBox extends FullBox {
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.putShort(maxPDUsize);
+        buf.putShort(avgPDUsize);
+        buf.putInt(maxbitrate);
+        buf.putInt(avgbitrate);
+        buf.putInt(reserved);
+        IO.write(ch, 16, buf);
+    }
+
+    @Override
     void update() {
-        long s = 16 + 4; // + 4 full box
+        long s = 0;
+        s += 4; // full box
+        s += 16;
         length(s);
     }
 }

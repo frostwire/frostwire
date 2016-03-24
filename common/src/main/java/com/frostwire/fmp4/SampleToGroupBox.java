@@ -24,27 +24,29 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class TimeToSampleBox extends FullBox {
+public final class SampleToGroupBox extends FullBox {
 
+    protected int grouping_type;
     protected int entry_count;
     protected Entry[] entries;
 
-    TimeToSampleBox() {
-        super(stts);
+    SampleToGroupBox() {
+        super(sbgp);
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        IO.read(ch, 4, buf);
-        entry_count = Bits.i2ui(buf.getInt());
+        IO.read(ch, 8, buf);
+        grouping_type = buf.getInt();
+        entry_count = buf.getInt();
         entries = new Entry[entry_count];
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
             IO.read(ch, 8, buf);
             e.sample_count = buf.getInt();
-            e.sample_delta = buf.getInt();
+            e.group_description_index = buf.getInt();
             entries[i] = e;
         }
     }
@@ -53,12 +55,13 @@ public final class TimeToSampleBox extends FullBox {
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
 
+        buf.putInt(grouping_type);
         buf.putInt(entry_count);
-        IO.write(ch, 4, buf);
+        IO.write(ch, 8, buf);
         for (int i = 0; i < entry_count; i++) {
             Entry e = entries[i];
             buf.putInt(e.sample_count);
-            buf.putInt(e.sample_delta);
+            buf.putInt(e.group_description_index);
             IO.write(ch, 8, buf);
         }
     }
@@ -67,13 +70,13 @@ public final class TimeToSampleBox extends FullBox {
     void update() {
         long s = 0;
         s += 4; // full box
-        s += 4; // entry_count
+        s += 8;
         s += entry_count * 8;
         length(s);
     }
 
     public static final class Entry {
         public int sample_count;
-        public int sample_delta;
+        public int group_description_index;
     }
 }

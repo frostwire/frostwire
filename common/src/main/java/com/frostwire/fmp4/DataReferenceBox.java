@@ -38,11 +38,10 @@ public final class DataReferenceBox extends FullBox {
         super.read(ch, buf);
 
         IO.read(ch, 4, buf);
-        entry_count = Bits.l2i(Bits.i2u(buf.getInt())); // it's unrealistic to have more than 2G elements
+        entry_count = buf.getInt();
         entries = new Box[entry_count];
         for (int i = 0; i < entry_count; i++) {
             IO.read(ch, 8, buf);
-
             int size = buf.getInt();
             int type = buf.getInt();
 
@@ -63,15 +62,39 @@ public final class DataReferenceBox extends FullBox {
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.putInt(entry_count);
+        IO.write(ch, 4, buf);
+        for (int i = 0; i < entry_count; i++) {
+            Box b = entries[i];
+
+            buf.putInt(b.size);
+            buf.putInt(b.type);
+            IO.write(ch, 8, buf);
+
+            if (b.largesize != null) {
+                buf.putLong(b.largesize);
+                IO.write(ch, 8, buf);
+            }
+
+            b.write(ch, buf);
+        }
+    }
+
+    @Override
     void update() {
-        long s = 8; // 4 entry_count + 4 full box
-        for (int i = 0; i < entries.length; i++) {
+        long s = 0;
+        s += 4; // full box
+        s += 4; // entry_count
+        for (int i = 0; i < entry_count; i++) {
             Box b = entries[i];
             b.update();
             if (b.size == 1) {
-                s = Bits.l2u(s + b.largesize);
+                s += b.largesize;
             } else {
-                s = Bits.l2u(s + b.size);
+                s += b.size;
             }
         }
         length(s);

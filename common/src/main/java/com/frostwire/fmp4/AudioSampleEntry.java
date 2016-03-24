@@ -17,6 +17,8 @@
 
 package com.frostwire.fmp4;
 
+import com.frostwire.mp4.Container;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -26,7 +28,7 @@ import java.nio.ByteBuffer;
  */
 public final class AudioSampleEntry extends SampleEntry {
 
-    protected int[] reserved1;
+    protected final int[] reserved1;
     protected short channelcount;
     protected short samplesize;
     protected short pre_defined;
@@ -35,6 +37,7 @@ public final class AudioSampleEntry extends SampleEntry {
 
     AudioSampleEntry(int codingname) {
         super(codingname);
+        reserved1 = new int[2];
     }
 
     @Override
@@ -42,7 +45,6 @@ public final class AudioSampleEntry extends SampleEntry {
         super.read(ch, buf);
 
         IO.read(ch, 20, buf);
-        reserved1 = new int[2];
         IO.get(buf, reserved1);
         channelcount = buf.getShort();
         samplesize = buf.getShort();
@@ -52,8 +54,24 @@ public final class AudioSampleEntry extends SampleEntry {
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        IO.put(buf, reserved1);
+        buf.putShort(channelcount);
+        buf.putShort(samplesize);
+        buf.putShort(pre_defined);
+        buf.putShort(reserved2);
+        buf.putInt(samplerate);
+        IO.write(ch, 20, buf);
+    }
+
+    @Override
     void update() {
-        long s = 20 + 8; // + 8 sample entry
+        long s = 0;
+        s += 8; // sample entry
+        s += 20;
+        s += ContainerBox.length(boxes);
         length(s);
     }
 }

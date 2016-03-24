@@ -37,4 +37,8 @@ public final class MediaDataBox extends Box {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
     }
+
+    @Override
+    void update() {
+    }
 }

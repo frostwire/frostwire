@@ -51,15 +51,30 @@ public final class SampleToChunkBox extends FullBox {
     }
 
     @Override
-    void update() {
-        long s = 8; // 4 entry_count + 4 full box
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.putInt(entry_count);
+        IO.write(ch, 4, buf);
         for (int i = 0; i < entry_count; i++) {
-            s = Bits.l2u(s + 12);
+            Entry e = entries[i];
+            buf.putInt(e.first_chunk);
+            buf.putInt(e.samples_per_chunk);
+            buf.putInt(e.sample_description_index);
+            IO.write(ch, 12, buf);
         }
+    }
+
+    @Override
+    void update() {
+        long s = 0;
+        s += 4; // full box
+        s += 4; // entry_count
+        s += entry_count * 12;
         length(s);
     }
 
-    private static final class Entry {
+    public static final class Entry {
         public int first_chunk;
         public int samples_per_chunk;
         public int sample_description_index;

@@ -40,26 +40,44 @@ public final class SampleSizeBox extends FullBox {
 
         IO.read(ch, 8, buf);
         sample_size = buf.getInt();
-        sample_count = Bits.l2i(Bits.i2u(buf.getInt())); // it's unrealistic to have more than 2G elements
-        entries = new Entry[sample_count];
-        for (int i = 0; i < sample_count; i++) {
-            Entry e = new Entry();
-            IO.read(ch, 4, buf);
-            e.entry_size = buf.getInt();
-            entries[i] = e;
+        sample_count = buf.getInt();
+        if (sample_size == 0) {
+            entries = new Entry[sample_count];
+            for (int i = 0; i < sample_count; i++) {
+                Entry e = new Entry();
+                IO.read(ch, 4, buf);
+                e.entry_size = buf.getInt();
+                entries[i] = e;
+            }
+        }
+    }
+
+    @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.putInt(sample_size);
+        buf.putInt(sample_count);
+        IO.write(ch, 8, buf);
+        if (entries != null) {
+            for (int i = 0; i < sample_count; i++) {
+                Entry e = entries[i];
+                buf.putInt(e.entry_size);
+                IO.write(ch, 4, buf);
+            }
         }
     }
 
     @Override
     void update() {
-        long s = 8 + 4; // + 4 full box
-        for (int i = 0; i < sample_count; i++) {
-            s = Bits.l2u(s + 4);
-        }
+        long s = 0;
+        s += 4; // full box
+        s += 8;
+        s += entries != null ? sample_count * 4 : 0;
         length(s);
     }
 
-    private static final class Entry {
+    public static final class Entry {
         public int entry_size;
     }
 }

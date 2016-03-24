@@ -30,45 +30,67 @@ public final class MediaHeaderBox extends FullBox {
     protected long modification_time;
     protected int timescale;
     protected long duration;
-    protected byte[] language;
+    protected final byte[] language;
     protected short pre_defined;
 
     MediaHeaderBox() {
         super(mdhd);
+        language = new byte[2];
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
+        IO.read(ch, (version == 1 ? 28 : 16) + 4, buf);
         if (version == 1) {
-            IO.read(ch, 28, buf);
             creation_time = buf.getLong();
             modification_time = buf.getLong();
             timescale = buf.getInt();
             duration = buf.getLong();
         } else { // version == 0
-            IO.read(ch, 16, buf);
             creation_time = buf.getInt();
             modification_time = buf.getInt();
             timescale = buf.getInt();
             duration = buf.getInt();
         }
 
-        IO.read(ch, 4, buf);
-        language = new byte[2];
         buf.get(language);
         pre_defined = buf.getShort();
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        if (version == 1) {
+            buf.putLong(creation_time);
+            buf.putLong(modification_time);
+            buf.putInt(timescale);
+            buf.putLong(duration);
+        } else { // version == 0
+            buf.putInt((int) creation_time);
+            buf.putInt((int) modification_time);
+            buf.putInt(timescale);
+            buf.putInt((int) duration);
+        }
+
+        buf.put(language);
+        buf.putShort(pre_defined);
+        IO.write(ch, (version == 1 ? 28 : 16) + 4, buf);
+    }
+
+    @Override
     void update() {
-        long s = 4 + 4; // + 4 full box
+        long s = 0;
+        s += 4; // full box
         if (version == 1) {
             s += 28;
         } else { // version == 0
             s += 16;
         }
+        s += 2; // language
+        s += 2; // pre_defined
         length(s);
     }
 }

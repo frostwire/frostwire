@@ -24,39 +24,56 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class FileTypeBox extends Box {
+public final class CompositionOffsetBox extends FullBox {
 
-    protected int major_brand;
-    protected int minor_version;
-    protected int[] compatible_brands;
+    protected int entry_count;
+    protected Entry[] entries;
 
-    FileTypeBox() {
-        super(ftyp);
+    CompositionOffsetBox() {
+        super(ctts);
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        IO.read(ch, Bits.l2i(length()), buf);
-        major_brand = buf.getInt();
-        minor_version = buf.getInt();
-        compatible_brands = new int[buf.remaining() / 4];
-        IO.get(buf, compatible_brands);
+        super.read(ch, buf);
+
+        IO.read(ch, 4, buf);
+        entry_count = Bits.i2ui(buf.getInt());
+        entries = new Entry[entry_count];
+        for (int i = 0; i < entry_count; i++) {
+            Entry e = new Entry();
+            IO.read(ch, 8, buf);
+            e.sample_count = buf.getInt();
+            e.sample_offset = buf.getInt();
+            entries[i] = e;
+        }
     }
 
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        buf.putInt(major_brand);
-        buf.putInt(minor_version);
-        IO.put(buf, compatible_brands);
-        IO.write(ch, buf.position(), buf);
+        super.write(ch, buf);
+
+        buf.putInt(entry_count);
+        IO.write(ch, 4, buf);
+        for (int i = 0; i < entry_count; i++) {
+            Entry e = entries[i];
+            buf.putInt(e.sample_count);
+            buf.putInt(e.sample_offset);
+            IO.write(ch, 8, buf);
+        }
     }
 
     @Override
     void update() {
         long s = 0;
-        s += 4; // major_brand
-        s += 4; // minor_version
-        s += compatible_brands.length * 4;
+        s += 4; // full box
+        s += 4; // entry_count
+        s += entry_count * 8;
         length(s);
+    }
+
+    public static final class Entry {
+        public int sample_count;
+        public int sample_offset;
     }
 }

@@ -37,8 +37,14 @@ public class FullBox extends Box {
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         IO.read(ch, 4, buf);
         int n = buf.getInt();
-
         version = Bits.int3(n);
-        flags = Bits.int32((byte) 0, Bits.int3(n), Bits.int2(n), Bits.int0(n));
+        flags = Bits.int32((byte) 0, Bits.int2(n), Bits.int1(n), Bits.int0(n));
+    }
+
+    @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        int n = Bits.int32(version, Bits.int2(flags), Bits.int1(flags), Bits.int0(flags));
+        buf.putInt(n);
+        IO.write(ch, 4, buf);
     }
 }

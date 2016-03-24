@@ -17,36 +17,13 @@
 
 package com.frostwire.fmp4;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.LinkedList;
-
 /**
  * @author gubatron
  * @author aldenml
  */
-public class SampleEntry extends Box {
+public final class AppleGenreIDBox extends AppleIntegerBox {
 
-    protected final byte[] reserved;
-    protected short data_reference_index;
-
-    SampleEntry(int format) {
-        super(format);
-        boxes = new LinkedList<>();
-        reserved = new byte[6];
-    }
-
-    @Override
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        IO.read(ch, 8, buf);
-        buf.get(reserved);
-        data_reference_index = buf.getShort();
-    }
-
-    @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        buf.put(reserved);
-        buf.putShort(data_reference_index);
-        IO.write(ch, 8, buf);
+    AppleGenreIDBox() {
+        super(gnre);
     }
 }

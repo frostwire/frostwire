@@ -45,4 +45,14 @@ public class AppleDataBox extends Box {
         dataCountry = buf.getShort();
         dataLanguage = buf.getShort();
     }
+
+    @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        buf.putInt(dataLength);
+        buf.putInt(data4cc);
+        buf.putInt(dataType);
+        buf.putShort(dataCountry);
+        buf.putShort(dataLanguage);
+        IO.write(ch, 16, buf);
+    }
 }

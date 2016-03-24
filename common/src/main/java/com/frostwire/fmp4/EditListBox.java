@@ -38,20 +38,18 @@ public final class EditListBox extends FullBox {
         super.read(ch, buf);
 
         IO.read(ch, 4, buf);
-        entry_count = Bits.l2i(Bits.i2u(buf.getInt())); // it's unrealistic to have more than 2G elements
+        entry_count = Bits.i2ui(buf.getInt());
         entries = new Entry[entry_count];
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
+            IO.read(ch, version == 1 ? 20 : 12, buf);
             if (version == 1) {
-                IO.read(ch, 16, buf);
                 e.segment_duration = buf.getLong();
                 e.media_time = buf.getLong();
             } else {
-                IO.read(ch, 8, buf);
                 e.segment_duration = buf.getInt();
                 e.media_time = buf.getInt();
             }
-            IO.read(ch, 4, buf);
             e.media_rate_integer = buf.getShort();
             e.media_rate_fraction = buf.getShort();
             entries[i] = e;
@@ -59,19 +57,36 @@ public final class EditListBox extends FullBox {
     }
 
     @Override
-    void update() {
-        long s = 8; // 4 entry_count + 4 full box
-        for (int i = 0; i < entries.length; i++) {
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.putInt(entry_count);
+        IO.write(ch, 4, buf);
+        for (int i = 0; i < entry_count; i++) {
+            Entry e = entries[i];
             if (version == 1) {
-                s = Bits.l2u(s + 20);
+                buf.putLong(e.segment_duration);
+                buf.putLong(e.media_time);
             } else {
-                s = Bits.l2u(s + 12);
+                buf.putInt((int) e.segment_duration);
+                buf.putInt((int) e.media_time);
             }
+            buf.putShort(e.media_rate_integer);
+            buf.putShort(e.media_rate_fraction);
+            IO.write(ch, version == 1 ? 20 : 12, buf);
         }
+    }
+
+    @Override
+    void update() {
+        long s = 0;
+        s += 4; // full box
+        s += 4; // entry_count
+        s += entry_count * (version == 1 ? 20 : 12);
         length(s);
     }
 
-    private static final class Entry {
+    public static final class Entry {
         public long segment_duration;
         public long media_time;
         public short media_rate_integer;

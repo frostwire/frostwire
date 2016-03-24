@@ -31,7 +31,7 @@ final class IO {
     private IO() {
     }
 
-    public static void read(InputChannel in, int len, ByteBuffer buf) throws IOException {
+    public static void read(InputChannel ch, int len, ByteBuffer buf) throws IOException {
         if (len <= 0) {
             throw new IllegalArgumentException("len argument must be > 0");
         }
@@ -41,7 +41,7 @@ final class IO {
         int n = 0;
         int r;
         do {
-            if ((r = in.read(buf)) < 0) {
+            if ((r = ch.read(buf)) < 0) {
                 throw new EOFException();
             }
             n += r;
@@ -50,7 +50,7 @@ final class IO {
         buf.flip();
     }
 
-    public static void skip(InputChannel in, long len, ByteBuffer buf) throws IOException {
+    public static void skip(InputChannel ch, long len, ByteBuffer buf) throws IOException {
         if (len <= 0) {
             throw new IllegalArgumentException("len argument must be > 0");
         }
@@ -60,24 +60,77 @@ final class IO {
         int b = (int) (len % size);
 
         for (long i = 0; i < a; i++) {
-            read(in, size, buf);
+            read(ch, size, buf);
         }
 
         if (b > 0) {
-            read(in, b, buf);
+            read(ch, b, buf);
         }
     }
 
-    public static void skip(InputChannel in, ByteBuffer buf) throws IOException {
+    public static void skip(InputChannel ch, ByteBuffer buf) throws IOException {
         long len = Long.MAX_VALUE;
         boolean eof = false;
         do {
             try {
-                skip(in, len, buf);
+                skip(ch, len, buf);
             } catch (EOFException e) {
                 eof = true;
             }
         } while (!eof);
+    }
+
+    public static void write(OutputChannel ch, int len, ByteBuffer buf) throws IOException {
+        if (len <= 0) {
+            throw new IllegalArgumentException("len argument must be > 0");
+        }
+
+        buf.flip().limit(len);
+
+        int n = 0;
+        do {
+            n += ch.write(buf);
+        } while (n < len);
+
+        buf.clear();
+    }
+
+    public static void skip(OutputChannel ch, long len, ByteBuffer buf) throws IOException {
+        if (len <= 0) {
+            throw new IllegalArgumentException("len argument must be > 0");
+        }
+
+        int size = buf.clear().capacity();
+        long a = len / size;
+        int b = (int) (len % size);
+
+        for (long i = 0; i < a; i++) {
+            write(ch, size, buf);
+        }
+
+        if (b > 0) {
+            write(ch, b, buf);
+        }
+    }
+
+    public static void copy(InputChannel src, OutputChannel dst, long len, ByteBuffer buf) throws IOException {
+        if (len <= 0) {
+            throw new IllegalArgumentException("len argument must be > 0");
+        }
+
+        int size = buf.clear().capacity();
+        long a = len / size;
+        int b = (int) (len % size);
+
+        for (long i = 0; i < a; i++) {
+            read(src, size, buf);
+            write(dst, size, buf);
+        }
+
+        if (b > 0) {
+            read(src, b, buf);
+            write(dst, b, buf);
+        }
     }
 
     public static ByteBuffer get(ByteBuffer buf, int[] arr) {
@@ -101,5 +154,19 @@ final class IO {
             out.write(b);
         }
         return out.toByteArray();
+    }
+
+    public static ByteBuffer put(ByteBuffer buf, int[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            buf.putInt(arr[i]);
+        }
+        return buf;
+    }
+
+    public static ByteBuffer put(ByteBuffer buf, short[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            buf.putShort(arr[i]);
+        }
+        return buf;
     }
 }
