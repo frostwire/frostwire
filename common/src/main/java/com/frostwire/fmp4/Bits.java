@@ -78,4 +78,15 @@ final class Bits {
         }
         return (int) n;
     }
+
+    public static long i2u(int n) {
+        return ((long) n) & 0xffffffffL;
+    }
+
+    public static long l2u(long n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("Can't convert negative long to unsigned: " + n);
+        }
+        return n;
+    }
 }

@@ -24,24 +24,17 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class TrackHeaderBox extends FullBox {
+public final class MediaHeaderBox extends FullBox {
 
     protected long creation_time;
     protected long modification_time;
-    protected int track_ID;
-    protected int reserved1;
+    protected int timescale;
     protected long duration;
-    protected int[] reserved2;
-    protected short layer;
-    protected short alternate_group;
-    protected short volume;
-    protected short reserved3;
-    protected int[] matrix;
-    protected int width;
-    protected int height;
+    protected byte[] language;
+    protected short pre_defined;
 
-    TrackHeaderBox() {
-        super(tkhd);
+    MediaHeaderBox() {
+        super(mdhd);
     }
 
     @Override
@@ -49,41 +42,32 @@ public final class TrackHeaderBox extends FullBox {
         super.read(in, buf);
 
         if (version == 1) {
-            IO.read(in, 32, buf);
+            IO.read(in, 28, buf);
             creation_time = buf.getLong();
             modification_time = buf.getLong();
-            track_ID = buf.getInt();
-            reserved1 = buf.getInt();
+            timescale = buf.getInt();
             duration = buf.getLong();
         } else { // version == 0
-            IO.read(in, 20, buf);
+            IO.read(in, 16, buf);
             creation_time = buf.getInt();
             modification_time = buf.getInt();
-            track_ID = buf.getInt();
-            reserved1 = buf.getInt();
+            timescale = buf.getInt();
             duration = buf.getInt();
         }
 
-        IO.read(in, 60, buf);
-        reserved2 = new int[2];
-        IO.get(buf, reserved2);
-        layer = buf.getShort();
-        alternate_group = buf.getShort();
-        volume = buf.getShort();
-        reserved3 = buf.getShort();
-        matrix = new int[9];
-        IO.get(buf, matrix);
-        width = buf.getInt();
-        height = buf.getInt();
+        IO.read(in, 4, buf);
+        language = new byte[2];
+        buf.get(language);
+        pre_defined = buf.getShort();
     }
 
     @Override
     void update() {
-        long s = 60 + 4; // + 4 full box
+        long s = 4 + 4; // + 4 full box
         if (version == 1) {
-            s += 32;
+            s += 28;
         } else { // version == 0
-            s += 20;
+            s += 16;
         }
         length(s);
     }

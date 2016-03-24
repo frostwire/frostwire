@@ -63,7 +63,6 @@ public final class IsoMedia {
 
             Box b = Box.empty(type);
             b.size = size;
-            b.type = type;
             b.largesize = largesize;
             b.usertype = usertype;
 
@@ -72,10 +71,7 @@ public final class IsoMedia {
             r = ch.count() - r;
 
             if (p != null) {
-                if (p.boxes == null) {
-                    p.boxes = new LinkedList<>();
-                }
-                p.boxes.add(b);
+                p.boxes().add(b);
             }
 
             if (l != null) {
@@ -95,6 +91,10 @@ public final class IsoMedia {
                 }
             }
         } while (len == -1 || ch.count() - n < len);
+    }
+
+    public static void write(OutputChannel ch, LinkedList<Box> boxes) {
+
     }
 
     public interface ReadListener {

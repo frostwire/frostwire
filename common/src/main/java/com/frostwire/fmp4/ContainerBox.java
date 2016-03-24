@@ -19,6 +19,7 @@ package com.frostwire.fmp4;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
 
 /**
  * @author gubatron
@@ -26,7 +27,11 @@ import java.nio.ByteBuffer;
  */
 public class ContainerBox extends Box {
 
-    ContainerBox() {
+    private final LinkedList<Box> boxes;
+
+    ContainerBox(int type) {
+        super(type);
+        this.boxes = new LinkedList<>();
     }
 
     @Override
@@ -35,5 +40,26 @@ public class ContainerBox extends Box {
 
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+    }
+
+    @Override
+    LinkedList<Box> boxes() {
+        return boxes;
+    }
+
+    @Override
+    void update() {
+        long s = 0;
+        for (Box b : boxes) {
+            b.update();
+            if (b.size == 1) {
+                s = Bits.l2u(s + b.largesize);
+            } else if (b.size == 0) {
+                throw new UnsupportedOperationException();
+            } else {
+                s = Bits.l2u(s + b.size);
+            }
+        }
+        length(s);
     }
 }

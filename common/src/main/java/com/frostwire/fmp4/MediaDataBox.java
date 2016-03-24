@@ -27,6 +27,7 @@ import java.nio.ByteBuffer;
 public final class MediaDataBox extends Box {
 
     MediaDataBox() {
+        super(mdat);
     }
 
     @Override

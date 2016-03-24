@@ -17,33 +17,13 @@
 
 package com.frostwire.fmp4;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class ObjectDescriptorBox extends FullBox {
+public final class MediaInformationBox extends ContainerBox {
 
-    protected byte[] data;
-
-    ObjectDescriptorBox() {
-        super(iods);
-    }
-
-    @Override
-    void read(InputChannel in, ByteBuffer buf) throws IOException {
-        super.read(in, buf);
-        long len = length() - 4;
-        IO.read(in, Bits.l2i(len), buf);
-        data = new byte[(int) len];
-        buf.get(data);
-    }
-
-    @Override
-    void update() {
-        long s = Bits.l2u(data.length + 4); // + 4 full box
-        length(s);
+    MediaInformationBox() {
+        super(minf);
     }
 }

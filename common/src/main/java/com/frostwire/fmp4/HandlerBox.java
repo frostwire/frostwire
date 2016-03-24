@@ -24,26 +24,38 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class ObjectDescriptorBox extends FullBox {
+public final class HandlerBox extends FullBox {
 
-    protected byte[] data;
+    protected int pre_defined;
+    protected int handler_type;
+    protected int[] reserved;
+    protected String name;
 
-    ObjectDescriptorBox() {
-        super(iods);
+    HandlerBox() {
+        super(hdlr);
     }
 
     @Override
     void read(InputChannel in, ByteBuffer buf) throws IOException {
         super.read(in, buf);
+
         long len = length() - 4;
         IO.read(in, Bits.l2i(len), buf);
-        data = new byte[(int) len];
-        buf.get(data);
+        pre_defined = buf.getInt();
+        handler_type = buf.getInt();
+        reserved = new int[3];
+        if (buf.remaining() > 0) {
+            IO.get(buf, reserved);
+            name = IO.utf8(buf);
+        }
     }
 
     @Override
     void update() {
-        long s = Bits.l2u(data.length + 4); // + 4 full box
+        long s = 20 + 4; // + 4 full box
+        if (name != null) {
+            s = Bits.l2u(s + Utf8.convert(name).length + 1);
+        }
         length(s);
     }
 }

@@ -31,6 +31,7 @@ public final class FileTypeBox extends Box {
     protected int[] compatible_brands;
 
     FileTypeBox() {
+        super(ftyp);
     }
 
     @Override
@@ -41,5 +42,12 @@ public final class FileTypeBox extends Box {
         minor_version = buf.getInt();
         compatible_brands = new int[buf.remaining() / 4];
         IO.get(buf, compatible_brands);
+    }
+
+    @Override
+    void update() {
+        long s = 8;
+        s = Bits.l2u(s + compatible_brands.length);
+        length(s);
     }
 }

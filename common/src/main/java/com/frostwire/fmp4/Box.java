@@ -41,17 +41,19 @@ public class Box {
     public static final int elst = Bits.make4cc("elst");
     public static final int udta = Bits.make4cc("udta");
     public static final int mdia = Bits.make4cc("mdia");
+    public static final int mdhd = Bits.make4cc("mdhd");
+    public static final int hdlr = Bits.make4cc("hdlr");
+    public static final int minf = Bits.make4cc("minf");
 
     private static final Map<Integer, BoxLambda> mapping = buildMapping();
 
     protected int size;
-    protected int type;
+    protected final int type;
     protected Long largesize;
     protected byte[] usertype;
 
-    protected LinkedList<Box> boxes;
-
-    Box() {
+    Box(int type) {
+        this.type = type;
     }
 
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
@@ -62,18 +64,40 @@ public class Box {
         throw new UnsupportedOperationException();
     }
 
+    LinkedList<Box> boxes() {
+        throw new UnsupportedOperationException();
+    }
+
+    void update() {
+        throw new UnsupportedOperationException();
+    }
+
     final long length() {
         long n = size - 8;
         if (size == 1) {
             n = largesize - 16;
         } else if (size == 0) {
-            n = -1;
+            return -1;
         }
         if (type == uuid) {
-            n -= 16;
+            n = n - 16;
         }
 
-        return n >= 0 ? n : -1;
+        return Bits.l2u(n);
+    }
+
+    final void length(long value) {
+        long s = value;
+        if (type == uuid) {
+            s = Bits.l2u(s + 16);
+        }
+        if (s <= Integer.MAX_VALUE - 8) {
+            size = (int) (s + 8);
+            largesize = null;
+        } else {
+            size = 1;
+            largesize = Bits.l2u(s + 16);
+        }
     }
 
     @Override
@@ -86,7 +110,7 @@ public class Box {
         if (p != null) {
             return p.empty();
         } else {
-            return new UnknownBox();
+            return new UnknownBox(type);
         }
     }
 
@@ -157,6 +181,24 @@ public class Box {
             @Override
             public Box empty() {
                 return new MediaBox();
+            }
+        });
+        map.put(mdhd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MediaHeaderBox();
+            }
+        });
+        map.put(hdlr, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new HandlerBox();
+            }
+        });
+        map.put(minf, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MediaInformationBox();
             }
         });
 

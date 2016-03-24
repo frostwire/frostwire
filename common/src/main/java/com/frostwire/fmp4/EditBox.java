@@ -24,5 +24,6 @@ package com.frostwire.fmp4;
 public final class EditBox extends ContainerBox {
 
     EditBox() {
+        super(edts);
     }
 }

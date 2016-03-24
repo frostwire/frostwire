@@ -24,5 +24,6 @@ package com.frostwire.fmp4;
 public final class TrackBox extends ContainerBox {
 
     TrackBox() {
+        super(trak);
     }
 }
