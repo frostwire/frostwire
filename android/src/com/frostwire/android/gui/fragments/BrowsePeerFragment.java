@@ -397,6 +397,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     if (!isChecked) {
                         filesBar.clearCheckAll();
                     }
+                    super.onItemChecked(v, isChecked);
                 }
 
                 @Override
