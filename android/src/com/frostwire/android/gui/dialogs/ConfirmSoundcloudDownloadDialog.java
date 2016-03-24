@@ -29,7 +29,8 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
         // this creates a bundle that gets passed to setArguments(). It's supposed to be ready
         // before the dialog is attached to the underlying activity, after we attach to it, then
         // we are able to use such Bundle to create our adapter.
-        dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(srList), SelectionMode.MULTIPLE_SELECTION);
+        dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(srList),
+                SelectionMode.MULTIPLE_SELECTION);
 
         dlg.setOnYesListener(new OnStartDownloadsClickListener(ctx, dlg));
         return dlg;
@@ -94,17 +95,8 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
                         (List<SoundcloudSearchResult>) dlg.getList() :
                         new ArrayList<SoundcloudSearchResult>();
 
-                if (selectionMode == AbstractConfirmListDialog.SelectionMode.MULTIPLE_SELECTION) {
+                if (results.isEmpty()) {
                     results.addAll(dlg.getChecked());
-                } else if (selectionMode == AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION) {
-                    if (results.isEmpty()) {
-                        return;
-                    }
-                    SoundcloudSearchResult selected = results.get(dlg.getLastSelected());
-                    if (selected == null) {
-                        return;
-                    }
-                    results.add(selected);
                 }
 
                 if (!results.isEmpty()) {
@@ -116,7 +108,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
     }
 
     private static class SoundcloudPlaylistConfirmListDialogAdapter extends ConfirmListDialogDefaultAdapter<SoundcloudSearchResult> {
-        public SoundcloudPlaylistConfirmListDialogAdapter(Context context, List list, AbstractConfirmListDialog.SelectionMode selectionMode) {
+        SoundcloudPlaylistConfirmListDialogAdapter(Context context, List list, AbstractConfirmListDialog.SelectionMode selectionMode) {
             super(context, list, selectionMode);
         }
 

@@ -32,10 +32,7 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.logging.Logger;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This dialog should evolve to allow us for reuse on a number of situations in which you
@@ -52,18 +49,28 @@ import java.util.Set;
  * @author gubatron
  * @author votaguz
  */
-public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements AbstractListAdapter.OnItemCheckedListener {
+@SuppressWarnings("ALL")
+abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
+        AbstractListAdapter.OnItemCheckedListener {
+
+    private static final String BUNDLE_KEY_DIALOG_ICON = "dialogIcon";
+    private static final String BUNDLE_KEY_CHECKED_OFFSETS = "checkedOffsets";
+    private static final String BUNDLE_KEY_DIALOG_TITLE = "title";
+    private static final String BUNDLE_KEY_DIALOG_TEXT = "dialogText";
+    private static final String BUNDLE_KEY_LIST_DATA = "listData";
+    private static final String BUNDLE_KEY_SELECTION_MODE = "selectionMode";
+    private static final String BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX = "lastSelectedRadioButtonIndex";
 
     /**
      * TODOS: 1. Add an optional text filter control that will be connected to the adapter.
      */
 
-    Logger LOGGER = Logger.getLogger(AbstractConfirmListDialog.class);
+    private Logger LOGGER = Logger.getLogger(AbstractConfirmListDialog.class);
     private CompoundButton.OnCheckedChangeListener selectAllCheckboxOnCheckedChangeListener;
 
-    public enum SelectionMode {
+    enum SelectionMode {
         NO_SELECTION,
-        SINGLE_SELECTION, // still work to do, crashes on rotate, won't auto select 0
+        SINGLE_SELECTION,
         MULTIPLE_SELECTION;
 
        public static SelectionMode fromInt(int n) {
@@ -78,7 +85,7 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     }
 
     protected final static String TAG = "confirm_list_dialog";
-    private String title;
+
     private String dialogText;
     private SelectionMode selectionMode;
     private Dialog dlg;
@@ -100,22 +107,27 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         super.onAttach(activity);
     }
 
-    public SelectionMode getSelectionMode() {
+    SelectionMode getSelectionMode() {
         return selectionMode;
     }
 
-    protected void prepareArguments(int dialogIcon,
-                                    String dialogTitle,
-                                    String dialogText,
-                                    String listDataInJSON,
-                                    SelectionMode selectionMode) {
+    void prepareArguments(int dialogIcon,
+                          String dialogTitle,
+                          String dialogText,
+                          String listDataInJSON,
+                          SelectionMode selectionMode) {
         Bundle bundle = new Bundle();
-        bundle.putInt("dialogIcon", dialogIcon);
-        bundle.putString("title", dialogTitle);
-        bundle.putString("dialogText", dialogText);
-        bundle.putString("listData", listDataInJSON);
-        bundle.putInt("selectionMode", selectionMode.ordinal());
+        bundle.putInt(BUNDLE_KEY_DIALOG_ICON, dialogIcon);
+        bundle.putString(BUNDLE_KEY_DIALOG_TITLE, dialogTitle);
+        bundle.putString(BUNDLE_KEY_DIALOG_TEXT, dialogText);
+        bundle.putString(BUNDLE_KEY_LIST_DATA, listDataInJSON);
+        bundle.putInt(BUNDLE_KEY_SELECTION_MODE, selectionMode.ordinal());
         this.selectionMode = selectionMode;
+
+        if (selectionMode == SelectionMode.SINGLE_SELECTION) {
+            bundle.putInt(BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX, 0);
+        }
+
         setArguments(bundle);
     }
 
@@ -123,15 +135,15 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         this.dlg = dlg;
         Bundle bundle = getArguments();
-        int dialogIcon = bundle.getInt("dialogIcon", -1);
+        int dialogIcon = bundle.getInt(BUNDLE_KEY_DIALOG_ICON, -1);
         if (dialogIcon > 0) {
             dlg.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, dialogIcon);
         }
 
-        title = bundle.getString("title");
+        String title = bundle.getString(BUNDLE_KEY_DIALOG_TITLE);
         dlg.setTitle(title);
 
-        dialogText = bundle.getString("dialogText");
+        dialogText = bundle.getString(BUNDLE_KEY_DIALOG_TEXT);
         TextView confirmTextView = findView(dlg, R.id.dialog_confirm_list_text);
         confirmTextView.setText(dialogText);
 
@@ -152,9 +164,7 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
                 dialog.dismiss();
             }
         });
-        if (onCancelListener != null){
-            dialog.setOnCancelListener(onCancelListener);
-        }
+
         onYesListener = createOnYesListener(this);
         if (onYesListener != null) {
             Button yesButton = findView(dialog, R.id.dialog_confirm_list_button_yes);
@@ -163,6 +173,13 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     }
 
     private void initSelectAllCheckbox() {
+        final CheckBox selectAllCheckbox = findView(dlg, R.id.dialog_confirm_list_select_all_checkbox);
+
+        if (selectionMode != SelectionMode.MULTIPLE_SELECTION) {
+            selectAllCheckbox.setVisibility(View.GONE);
+            return;
+        }
+
         selectAllCheckboxOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -172,15 +189,12 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
                     adapter.clearChecked();
                 }
                 updateSelectedCount();
+                updateSelectedInBundle();
             }
         };
 
-        CheckBox selectAllCheckbox = findView(dlg, R.id.dialog_confirm_list_select_all_checkbox);
-        selectAllCheckbox.setVisibility(selectionMode == SelectionMode.MULTIPLE_SELECTION ? View.VISIBLE : View.GONE);
-        if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
-            selectAllCheckbox.setVisibility(View.VISIBLE);
-            selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxOnCheckedChangeListener);
-        }
+        selectAllCheckbox.setVisibility(View.VISIBLE);
+        selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxOnCheckedChangeListener);
     }
 
     public abstract ConfirmListDialogDefaultAdapter<T> createAdapter(Context context,
@@ -190,27 +204,30 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
 
     private void initListViewAndAdapter(Bundle bundle) {
         ListView listView = findView(dlg, R.id.dialog_confirm_list_list);
-        String listDataString = bundle.getString("listData");
+
+        String listDataString = bundle.getString(BUNDLE_KEY_LIST_DATA);
         List<T> listData = deserializeData(listDataString);
 
         if (selectionMode == null) {
-            selectionMode = SelectionMode.fromInt(bundle.getInt("selectionMode"));
+            selectionMode = SelectionMode.fromInt(bundle.getInt(BUNDLE_KEY_SELECTION_MODE));
         }
 
         if (adapter == null &&
             listData != null  &&
             !listData.isEmpty()) {
             adapter = createAdapter(getActivity(), listData, selectionMode, bundle);
-        } else if (adapter.getTotalCount() == 0 && !listData.isEmpty()) {
+        } else if (adapter != null && adapter.getTotalCount() == 0 && !listData.isEmpty()) {
             adapter.addList(listData);
         }
 
         if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
-            precheckCheckboxes(bundle);
+            updateAdapterChecked(bundle);
+        } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
+            updateAdapterLastSelected(bundle);
+            scrollToSelectedRadioButton();
         }
 
         if (adapter != null) {
-            adapter.setOnItemCheckedListener(null);
             listView.setAdapter(adapter);
             if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
                 updateSelectedCount();
@@ -219,9 +236,20 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         }
     }
 
-    private void precheckCheckboxes(Bundle bundle) {
-        if (bundle.containsKey("checkedOffsets")) {
-            final boolean[] checkedOffsets = bundle.getBooleanArray("checkedOffsets");
+    private void updateAdapterLastSelected(Bundle bundle) {
+        if (adapter != null && bundle.containsKey(BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX)) {
+            int index = bundle.getInt(BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX);
+            adapter.setLastSelectedRadioButton(index);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void updateAdapterChecked(Bundle bundle) {
+        if (adapter == null) {
+            return;
+        }
+        if (bundle.containsKey(BUNDLE_KEY_CHECKED_OFFSETS)) {
+            final boolean[] checkedOffsets = bundle.getBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS);
             for (int i=0; i < checkedOffsets.length; i++) {
                 adapter.setChecked(i, checkedOffsets[i]);
             }
@@ -231,15 +259,19 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     @Override
     public void onSaveInstanceState(Bundle outState) {
         if (adapter != null) {
-            final Set checked = adapter.getChecked();
-            if (outState != null && checked != null && !checked.isEmpty()) {
-                outState.putBooleanArray("checkedOffsets", getSelected());
+            if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
+                final Set checked = adapter.getChecked();
+                if (outState != null && checked != null && !checked.isEmpty()) {
+                    outState.putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, getSelected());
+                }
+            } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
+                outState.putInt(BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX, adapter.getLastSelectedRadioButtonIndex());
             }
         }
         super.onSaveInstanceState(outState);
     }
 
-    public void setOnYesListener(OnClickListener listener) {
+    void setOnYesListener(OnClickListener listener) {
         onYesListener = listener;
     }
 
@@ -248,15 +280,21 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     }
 
     public Set<T> getChecked() {
-        Set<T> result = Collections.EMPTY_SET;
+        Set<T> result = new HashSet<>();
         if (adapter != null) {
-            result = adapter.getChecked();
+            if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
+                result = (Set<T>) adapter.getChecked();
+            } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
+                result.add((T) adapter.getSelectedItem());
+            } else if (selectionMode == SelectionMode.NO_SELECTION) {
+                result.addAll(adapter.getList());
+            }
         }
         return result;
     }
 
     public List<T> getList() {
-        List<T> result = Collections.EMPTY_LIST;
+        List<T> result = (List<T>) Collections.EMPTY_LIST;
         if (adapter != null) {
             result = adapter.getList();
         }
@@ -278,17 +316,19 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
                 int i = all.indexOf(item);
                 if (i >= 0) {
                     result[i]=true;
+                } else {
+                    LOGGER.warn("getSelected() is not finding the checked items on the list. Verify that [" + item.getClass().getSimpleName() + "] implements equals() and hashCode()");
                 }
             }
         }
         return result;
     }
 
-    public int getLastSelected(){
+    int getLastSelected(){
         return adapter.getLastSelectedRadioButtonIndex();
     }
 
-    public void updateSelectedCount() {
+    private void updateSelectedCount() {
         if (adapter == null || selectionMode != SelectionMode.MULTIPLE_SELECTION) {
             return;
         }
@@ -296,10 +336,16 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         int selected = adapter.getCheckedCount();
         updatedSelectedCount(selected);
         autoToggleSelectAllCheckbox(selected);
+    }
 
+    private void updateSelectedInBundle() {
         final Bundle arguments = getArguments();
         if (arguments != null) {
-            arguments.putBooleanArray("checkedOffsets", getSelected());
+            if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
+                arguments.putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, getSelected());
+            } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
+                arguments.putInt(BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX, getLastSelected());
+            }
         }
     }
 
@@ -325,9 +371,45 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
         selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxOnCheckedChangeListener);
     }
 
-    // AbstractListAdapter.OnItemCheckedListener
+    // AbstractListAdapter.OnItemCheckedListener.onItemChecked(CompoundButton v, boolean checked)
     @Override
     public void onItemChecked(CompoundButton v, boolean checked) {
-        updateSelectedCount();
+        if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
+            updateSelectedCount();
+        }
+        updateSelectedInBundle();
+        scrollToSelectedRadioButton();
+    }
+
+    private void scrollToSelectedRadioButton() {
+        if (dlg != null && selectionMode == SelectionMode.SINGLE_SELECTION ) {
+            ListView listView = findView(dlg, R.id.dialog_confirm_list_list);
+            if (listView == null) {
+                return;
+            }
+
+            // TODO: Fix for dialog rotation, as it won't scroll if the element selected
+            //       has't been painted yet. Works fine if the element would be painted from the get go
+            //       then it can scroll as getChildAt() does return a view.
+            // I've tried:
+            // - Calculating the offset by multiplying the first visible element's height x lastSelectedIndex.
+            //   it does scroll, but it doesn't populate the views, so you see blank unless you then
+            //   manually scroll up and down.
+            // - Populating the views with adapter.getView(), but I ended up in an infinite loop and this dialog has taken too long now.
+            //   this is probably the path to fixing it. maybe you gotta turn off some listener that ends up calling
+            //   this method again.
+
+            if (listView.getAdapter() != null && listView.getChildCount() > 0) {
+                View selectedView = listView.getChildAt(adapter.getLastSelectedRadioButtonIndex());
+
+                if (selectedView == null) {
+                    selectedView = adapter.getView(getLastSelected(),null,listView);
+                }
+
+                if (selectedView != null) {
+                    listView.scrollTo(0, Math.max(0, (int) selectedView.getY()-(selectedView.getHeight()/2)));
+                }
+            }
+        }
     }
 }

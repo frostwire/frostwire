@@ -1,5 +1,5 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Jose Molina (votaguz)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Jose Molina (@votaguz)
  * Copyright (c) 2011, 2014, FrostWire(TM). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,9 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.dialogs.AbstractConfirmListDialog.SelectionMode;
@@ -31,9 +33,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.logging.Logger;
-import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
-import com.frostwire.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +50,7 @@ import java.util.Map;
  * @author votaguz
  *
  */
-public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
+abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
     private static final Logger LOGGER = Logger.getLogger(ConfirmListDialogDefaultAdapter.class);
     private static final int ITEM_TITLE = 0;
     private static final int ITEM_SIZE = 1;
@@ -81,8 +81,8 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
         layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_ART, R.id.confirmation_dialog_multiple_selection_list_item_art);
     }
 
-    public ConfirmListDialogDefaultAdapter(Context context, List<T> list, SelectionMode selectionMode) {
-        super(context, selectionModeToLayoutId.get(selectionMode).intValue(), list);
+    ConfirmListDialogDefaultAdapter(Context context, List<T> list, SelectionMode selectionMode) {
+        super(context, selectionModeToLayoutId.get(selectionMode), list);
         this.selectionMode = selectionMode;
         setCheckboxesVisibility(selectionMode != SelectionMode.NO_SELECTION);
     }
@@ -109,6 +109,7 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
         } catch (Throwable e) {
             LOGGER.error("Fatal error getting view: " + e.getMessage(), e);
         }
+
         return view;
     }
 
@@ -148,7 +149,23 @@ public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAda
         }
     }
 
-    public SelectionMode getSelectionMode() {
-        return selectionMode;
+    @Override
+    protected void onItemClicked(View v) {
+        if (selectionMode != SelectionMode.NO_SELECTION) {
+            final T tag = (T) v.getTag();
+            int i = list.indexOf(tag);
+            if (i != -1 && v.getParent() instanceof LinearLayout) {
+                final LinearLayout parent = (LinearLayout) v.getParent();
+                if (parent instanceof View) {
+                    CompoundButton compoundButton = (CompoundButton) findView(parent,
+                            selectionMode == SelectionMode.SINGLE_SELECTION ?
+                                    R.id.view_selectable_list_item_radiobutton :
+                                    R.id.view_selectable_list_item_checkbox);
+                    if (compoundButton != null) {
+                        onItemChecked(compoundButton, true);
+                    }
+                }
+            }
+        }
     }
 }

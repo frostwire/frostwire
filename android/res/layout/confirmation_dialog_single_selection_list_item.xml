@@ -34,10 +34,12 @@
         android:src="@drawable/app_icon" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="1.0">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1.0"
+            android:paddingTop="4px"
+            android:paddingBottom="4px">
 
         <TextView
             android:id="@+id/confirmation_dialog_single_selection_list_item_title"
@@ -45,13 +47,16 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:ellipsize="end"
-            android:layout_gravity="center_vertical|left" />
+            android:layout_gravity="left"
+            android:text="@string/dummy_title" />
 
         <TextView
             android:id="@+id/confirmation_dialog_single_selection_list_item_size"
-            android:layout_gravity="center_vertical|right"
+            android:layout_gravity="left"
             android:layout_width="50dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_x_small"
+            android:text="@string/dummy_size" />
 
     </LinearLayout>
 
