@@ -37,6 +37,7 @@ import java.util.*;
 /**
  * We extend from ListAdapter to populate our ListViews.
  * This one allows us to click and long click on the elements of our ListViews.
+ * Supports checkbox and radio button selection.
  *
  * @param <T>
  * @author gubatron
@@ -52,7 +53,11 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private final OnClickListener viewOnClickListener;
     private final ViewOnLongClickListener viewOnLongClickListener;
     private final ViewOnKeyListener viewOnKeyListener;
+
     private final CheckboxOnCheckedChangeListener checkboxOnCheckedChangeListener;
+    private int lastSelectedRadioButtonIndex = -1;
+    private final RadioButtonOnCheckedChangeListener radioButtonCheckedChangeListener;
+    private OnItemCheckedListener onItemCheckedListener;
 
     private ListAdapterFilter<T> filter;
     private boolean checkboxesVisibility;
@@ -64,17 +69,19 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     protected Set<T> checked;
     protected List<T> visualList;
 
-    public AbstractListAdapter(Context context, int viewItemId, List<T> list, Set<T> checked) {
+    private AbstractListAdapter(Context context,
+                                int viewItemId,
+                                List<T> list,
+                                Set<T> checked) {
         this.context = context;
         this.viewItemId = viewItemId;
         this.viewOnClickListener = new ViewOnClickListener();
         this.viewOnLongClickListener = new ViewOnLongClickListener();
         this.viewOnKeyListener = new ViewOnKeyListener();
         this.checkboxOnCheckedChangeListener = new CheckboxOnCheckedChangeListener();
-
+        this.radioButtonCheckedChangeListener = new RadioButtonOnCheckedChangeListener();
         this.dialogs = new ArrayList<>();
-
-        this.list = list.equals(Collections.emptyList()) ? new ArrayList<T>() : list;
+        this.list = (list==null || list.equals(Collections.emptyList())) ? new ArrayList<T>() : list;
         this.checked = checked;
         this.visualList = list;
     }
@@ -87,7 +94,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         this(context, viewItemId, new ArrayList<T>(), new HashSet<T>());
     }
 
-    public int getViewItemId() {
+    protected int getViewItemId() {
         return viewItemId;
     }
 
@@ -115,14 +122,27 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         return getCount() == 0;
     }
 
+    /**
+     * @return List of items chosen with checkboxes.
+     */
     public Set<T> getChecked() {
-        return checked;
+       return checked;
+    }
+
+    /**
+     * @return The last item selected on a radio button.
+     */
+    public T getSelectedItem() {
+       return getItem(lastSelectedRadioButtonIndex);
     }
 
     public void setChecked(Set<T> newChecked) {
         checked = newChecked;
     }
 
+    public int getCheckedCount() {
+        return (checked == null || checked.isEmpty()) ? 0 : checked.size();
+    }
 
     public void clearChecked() {
         if (checked != null && checked.size() > 0) {
@@ -181,7 +201,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         notifyDataSetInvalidated();
     }
 
-    public void addList(List<T> g, boolean checked) {
+    private void addList(List<T> g, boolean checked) {
         visualList.addAll(g);
         if (visualList != list) {
             list.addAll(g);
@@ -255,16 +275,15 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * Inflates the view out of the XML.
-     * <p>
+     * <p/>
      * Sets click and long click listeners in case you need them. (Override onItemClicked and onItemLongClicked)
-     * <p>
+     * <p/>
      * Let's the adapter know that the view has been created, in case you need to go deeper and create
      * more advanced click behavior or even add new Views during runtime.
-     * <p>
+     * <p/>
      * It will also bind the data to the view, you can refer to it if you need it by doing a .getTag()
      */
     public View getView(int position, View view, ViewGroup parent) {
-
         T item = getItem(position);
         Context ctx = getContext();
 
@@ -276,12 +295,10 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
 
         try {
-
             initTouchFeedback(view, item);
             initCheckBox(view, item);
-
+            initRadioButton(view, item, position);
             populateView(view, item);
-
         } catch (Throwable e) {
             LOG.error("Fatal error getting view: " + e.getMessage(), e);
         }
@@ -342,11 +359,48 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * @param v
      * @return if handled
      */
-    protected boolean onItemKeyMaster(View v) {
+    private boolean onItemKeyMaster(View v) {
         return false;
     }
 
-    protected void onItemChecked(View v, boolean isChecked) {
+    protected void onItemChecked(CompoundButton v, boolean isChecked) {
+        if (v instanceof CheckBox) {
+            onCheckboxItemChecked(v, isChecked);
+        } else if (v instanceof RadioButton) {
+            onRadioButtonItemChecked(v, isChecked);
+        }
+
+        notifyDataSetInvalidated();
+
+        if (onItemCheckedListener != null) {
+            onItemCheckedListener.onItemChecked(v, isChecked);
+        }
+    }
+
+    private void onCheckboxItemChecked(CompoundButton v, boolean isChecked) {
+        T item = (T) v.getTag();
+        if (item != null) {
+            if (isChecked && !checked.contains(item)) {
+                checked.add(item);
+            } else {
+                checked.remove(item);
+            }
+        }
+    }
+
+
+    private void updateLastRadioButtonChecked(int position) {
+        lastSelectedRadioButtonIndex = position;
+
+    }
+
+    private void onRadioButtonItemChecked(CompoundButton buttonView, boolean isChecked) {
+        if (buttonView instanceof RadioButton && isChecked){
+            final RadioButton radioButton = (RadioButton) buttonView;
+            T item = (T) radioButton.getTag();
+            int position = (item == null) ? 0 : getList().indexOf(item);
+            updateLastRadioButtonChecked(position);
+        }
     }
 
     /**
@@ -396,30 +450,27 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * Sets up the behavior of a possible checkbox to check this item.
-     * <p>
+     * <p/>
      * Takes in consideration:
      * - Only so many views are created and reused by the ListView
      * - Setting the correct checked/unchecked value without triggering the onCheckedChanged event.
      *
      * @see #getChecked()
      */
-    private void initCheckBox(View view, T item) {
-
+    protected void initCheckBox(View view, T item) {
         CheckBox checkbox = findView(view, R.id.view_selectable_list_item_checkbox);
-
         if (checkbox != null) {
             checkbox.setVisibility((checkboxesVisibility) ? View.VISIBLE : View.GONE);
-
-            // so we won't re-trigger a onCheckedChangeListener, we do this because views are re-used.
-            checkbox.setOnCheckedChangeListener(null);
-            checkbox.setChecked(checkboxesVisibility && checked.contains(item));
-
-            checkbox.setTag(item);
-            checkbox.setOnCheckedChangeListener(checkboxOnCheckedChangeListener);
+            if (checkbox.getVisibility() == View.VISIBLE) {
+                checkbox.setOnCheckedChangeListener(null);
+                checkbox.setChecked(checked.contains(item));
+                checkbox.setTag(item);
+                checkbox.setOnCheckedChangeListener(checkboxOnCheckedChangeListener);
+            }
         }
     }
 
-    private void initTouchFeedback(View v, T item) {
+    protected void initTouchFeedback(View v, T item) {
         if (v == null || v instanceof CheckBox) {
             return;
         }
@@ -439,6 +490,34 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
                 }
             }
         }
+    }
+
+    public void setChecked(int checkedOffset, boolean checked) {
+        final T item = getItem(checkedOffset);
+        if (item != null) {
+            if (getChecked().contains(item) && !checked) {
+                getChecked().remove(item);
+            } else if (!getChecked().contains(item) && checked) {
+                getChecked().add(item);
+            }
+        }
+    }
+
+    /** Meant to be overridden. Here you must return a String that shows the sum of all the checked elements
+     *  and some significant unit. For files, this would be the amount of total bytes if we summed all the selected
+     *  files. If you had a list of items to purchase, this could be total amount of money and a currency symbol.
+     * @return
+     */
+    public String getCheckedSum() {
+        return null;
+    }
+
+    public interface OnItemCheckedListener {
+        void onItemChecked(CompoundButton v, boolean checked);
+    }
+
+    public void setOnItemCheckedListener(OnItemCheckedListener onItemCheckedListener) {
+        this.onItemCheckedListener = onItemCheckedListener;
     }
 
     private final class ViewOnClickListener implements OnClickListener {
@@ -484,15 +563,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private final class CheckboxOnCheckedChangeListener implements OnCheckedChangeListener {
         @SuppressWarnings("unchecked")
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-            T item = (T) buttonView.getTag();
-
-            if (isChecked && !checked.contains(item)) {
-                checked.add(item);
-            } else {
-                checked.remove(item);
-            }
-
             onItemChecked(buttonView, isChecked);
         }
     }
@@ -502,7 +572,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         private final AbstractListAdapter<T> adapter;
         private final ListAdapterFilter<T> filter;
 
-        public AbstractListAdapterFilter(AbstractListAdapter<T> adapter, ListAdapterFilter<T> filter) {
+        AbstractListAdapterFilter(AbstractListAdapter<T> adapter, ListAdapterFilter<T> filter) {
             this.adapter = adapter;
             this.filter = filter;
         }
@@ -539,6 +609,34 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             adapter.visualList = (List<T>) results.values;
             notifyDataSetInvalidated();
         }
+    }
 
+    private final class RadioButtonOnCheckedChangeListener implements OnCheckedChangeListener {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            onItemChecked(buttonView, isChecked);
+        }
+    }
+
+    public void setLastSelectedRadioButton(int index) {
+        lastSelectedRadioButtonIndex = index;
+    }
+
+    protected void initRadioButton(View view, T tag, int position) {
+        final RadioButton radioButton = findView(view, R.id.view_selectable_list_item_radiobutton);
+        if (radioButton != null) {
+            radioButton.setVisibility(View.VISIBLE);
+            radioButton.setTag(tag);
+            radioButton.setOnCheckedChangeListener(null);
+            radioButton.setChecked(position == lastSelectedRadioButtonIndex);
+            radioButton.setOnCheckedChangeListener(radioButtonCheckedChangeListener);
+            if (position == lastSelectedRadioButtonIndex) {
+                updateLastRadioButtonChecked(position);
+            }
+        }
+    }
+
+    public int getLastSelectedRadioButtonIndex(){
+        return lastSelectedRadioButtonIndex;
     }
 }
