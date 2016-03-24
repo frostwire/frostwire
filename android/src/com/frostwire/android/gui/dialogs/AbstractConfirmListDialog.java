@@ -203,7 +203,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
                                                                      Bundle bundle);
 
     private void initListViewAndAdapter(Bundle bundle) {
-        ListView listView = findView(dlg, R.id.dialog_confirm_list_list);
+        ListView listView = findView(dlg, R.id.dialog_confirm_list_listview);
 
         String listDataString = bundle.getString(BUNDLE_KEY_LIST_DATA);
         List<T> listData = deserializeData(listDataString);
@@ -324,18 +324,8 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         return result;
     }
 
-    int getLastSelected(){
+    int getLastSelected() {
         return adapter.getLastSelectedRadioButtonIndex();
-    }
-
-    private void updateSelectedCount() {
-        if (adapter == null || selectionMode != SelectionMode.MULTIPLE_SELECTION) {
-            return;
-        }
-
-        int selected = adapter.getCheckedCount();
-        updatedSelectedCount(selected);
-        autoToggleSelectAllCheckbox(selected);
     }
 
     private void updateSelectedInBundle() {
@@ -349,11 +339,39 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         }
     }
 
-    private void updatedSelectedCount(int selected) {
-        final TextView selectedCountTextView = findView(dlg, R.id.dialog_confirm_list_selected_count_textview);
-        if (selectedCountTextView != null) {
-            selectedCountTextView.setText(selected + " " + getString(R.string.selected));
-            selectedCountTextView.setVisibility(selected > 0 ? View.VISIBLE : View.GONE);
+    private void updateSelectedCount() {
+        if (adapter == null || selectionMode != SelectionMode.MULTIPLE_SELECTION) {
+            return;
+        }
+
+        int selected = adapter.getCheckedCount();
+        String selectedSum = adapter.getCheckedSum();
+        updatedSelectedCount(selected, selectedSum);
+        autoToggleSelectAllCheckbox(selected);
+    }
+
+
+    private void updatedSelectedCount(int selected, String selectedSum) {
+        final LinearLayout summaryLayout = findView(dlg, R.id.dialog_confirm_list_selection_summary);
+        final TextView numCheckedTextView = findView(dlg, R.id.dialog_confirm_list_num_checked_textview);
+
+        boolean summaryVisible = selected > 0 &&
+                                 selectionMode == SelectionMode.MULTIPLE_SELECTION &&
+                                 summaryLayout != null &&
+                                 numCheckedTextView != null;
+
+        if (summaryLayout != null) {
+            summaryLayout.setVisibility(summaryVisible ? View.VISIBLE : View.GONE);
+            numCheckedTextView.setText(selected + " " + getString(R.string.selected));
+            numCheckedTextView.setVisibility(summaryVisible ? View.VISIBLE : View.GONE);
+
+            final TextView sumCheckedTextView = findView(dlg, R.id.dialog_confirm_list_sum_checked_textview);
+            if (sumCheckedTextView != null) {
+                sumCheckedTextView.setVisibility(selectedSum != null && !selectedSum.equals("") ? View.VISIBLE : View.GONE);
+                if (selectedSum != null && !selectedSum.equals("")) {
+                    sumCheckedTextView.setText(selectedSum);
+                }
+            }
         }
     }
 
@@ -383,7 +401,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
     private void scrollToSelectedRadioButton() {
         if (dlg != null && selectionMode == SelectionMode.SINGLE_SELECTION ) {
-            ListView listView = findView(dlg, R.id.dialog_confirm_list_list);
+            ListView listView = findView(dlg, R.id.dialog_confirm_list_listview);
             if (listView == null) {
                 return;
             }

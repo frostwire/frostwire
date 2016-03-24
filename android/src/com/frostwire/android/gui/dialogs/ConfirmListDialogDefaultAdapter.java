@@ -81,6 +81,8 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
         layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_ART, R.id.confirmation_dialog_multiple_selection_list_item_art);
     }
 
+    private String checkedSum;
+
     ConfirmListDialogDefaultAdapter(Context context, List<T> list, SelectionMode selectionMode) {
         super(context, selectionModeToLayoutId.get(selectionMode), list);
         this.selectionMode = selectionMode;

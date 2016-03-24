@@ -223,12 +223,13 @@ public final class UIUtils {
         });
     }
 
-    public static String getBytesInHuman(float size) {
+    public static String getBytesInHuman(long size) {
         int i;
-        for (i = 0; size > 1024; i++) {
-            size /= 1024f;
+        float sizeFloat = (float) size;
+        for (i = 0; sizeFloat > 1024; i++) {
+            sizeFloat /= 1024f;
         }
-        return String.format(Locale.US, "%.2f %s", size, BYTE_UNITS[i]);
+        return String.format(Locale.US, "%.2f %s", sizeFloat, BYTE_UNITS[i]);
     }
 
     /**

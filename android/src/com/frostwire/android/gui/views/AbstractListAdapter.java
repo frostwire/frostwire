@@ -503,6 +503,15 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
     }
 
+    /** Meant to be overridden. Here you must return a String that shows the sum of all the checked elements
+     *  and some significant unit. For files, this would be the amount of total bytes if we summed all the selected
+     *  files. If you had a list of items to purchase, this could be total amount of money and a currency symbol.
+     * @return
+     */
+    public String getCheckedSum() {
+        return null;
+    }
+
     public interface OnItemCheckedListener {
         void onItemChecked(CompoundButton v, boolean checked);
     }
