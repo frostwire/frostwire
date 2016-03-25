@@ -20,7 +20,6 @@ package com.frostwire.fmp4;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * @author gubatron
@@ -33,7 +32,6 @@ public final class SampleDescriptionBox extends FullBox {
 
     SampleDescriptionBox() {
         super(stsd);
-        boxes = new LinkedList<>();
     }
 
     @Override
@@ -41,12 +39,11 @@ public final class SampleDescriptionBox extends FullBox {
         super.read(ch, buf);
 
         IO.read(ch, 4, buf);
-        entry_count = Bits.l2i(Bits.i2u(buf.getInt())); // it's unrealistic to have more than 2G elements
+        entry_count = buf.getInt();
         entries = new SampleEntry[entry_count];
         int handler_type = handler_type();
         for (int i = 0; i < entry_count; i++) {
             IO.read(ch, 8, buf);
-
             int size = buf.getInt();
             int type = buf.getInt();
 
@@ -56,48 +53,97 @@ public final class SampleDescriptionBox extends FullBox {
                 largesize = buf.getLong();
             }
 
-            SampleEntry e = null;
+            SampleEntry e;
             if (handler_type == soun) {
                 e = new AudioSampleEntry(type);
             } else if (handler_type == vide) {
                 e = new VisualSampleEntry(type);
             } else if (handler_type == hint) {
                 e = new HintSampleEntry(type);
+            } else {
+                throw new UnsupportedOperationException("Can't decode for such handler_type: " + Bits.make4cc(handler_type));
             }
             e.size = size;
             e.largesize = largesize;
 
+            long r = ch.count();
             e.read(ch, buf);
+            r = ch.count() - r;
+
+            long length = e.length();
+            if (r < length) {
+                IsoMedia.read(ch, length - r, e, new IsoMedia.OnBoxListener() {
+                    @Override
+                    public boolean onBox(Box b) {
+                        return true;
+                    }
+                }, buf);
+            }
 
             entries[i] = e;
         }
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.putInt(entry_count);
+        IO.write(ch, 4, buf);
+        for (int i = 0; i < entry_count; i++) {
+            Box b = entries[i];
+
+            buf.putInt(b.size);
+            buf.putInt(b.type);
+            IO.write(ch, 8, buf);
+
+            if (b.largesize != null) {
+                buf.putLong(b.largesize);
+                IO.write(ch, 8, buf);
+            }
+
+            b.write(ch, buf);
+
+            IsoMedia.write(ch, b.boxes, new IsoMedia.OnBoxListener() {
+                @Override
+                public boolean onBox(Box b) {
+                    return true;
+                }
+            }, buf);
+        }
+    }
+
+    @Override
     void update() {
-        long s = 8; // 4 entry_count + 4 full box
-        for (int i = 0; i < entries.length; i++) {
+        long s = 0;
+        s += 4; // full box
+        s += 4; // entry_count
+        for (int i = 0; i < entry_count; i++) {
             SampleEntry e = entries[i];
             e.update();
             if (e.size == 1) {
-                s = Bits.l2u(s + e.largesize);
+                s += e.largesize;
             } else {
-                s = Bits.l2u(s + e.size);
+                s += e.size;
             }
         }
         length(s);
     }
 
-    private int handler_type() {
-        Box b = parent.parent.parent;
-        Iterator<Box> it = b.boxes.iterator();
-        while (it.hasNext()) {
-            Box t = it.next();
-            if (t.type == hdlr) {
-                b = t;
-                break;
+    private int handler_type() throws IOException {
+        try {
+            Box b = parent.parent.parent;
+            Iterator<Box> it = b.boxes.iterator();
+            while (it.hasNext()) {
+                Box t = it.next();
+                if (t.type == hdlr) {
+                    b = t;
+                    break;
+                }
             }
+            return ((HandlerBox) b).handler_type;
+        } catch (Throwable e) {
+            throw new IOException("Can't detect handler type for proper reading", e);
         }
-        return ((HandlerBox) b).handler_type;
     }
 }

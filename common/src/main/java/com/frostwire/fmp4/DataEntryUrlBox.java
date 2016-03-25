@@ -37,18 +37,16 @@ public final class DataEntryUrlBox extends FullBox {
     }
 
     public void location(String value) {
-        if (value != null) {
-            location = Utf8.convert(value);
-        }
+        location = value != null ? Utf8.convert(value) : null;
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        long len = length() - 4;
-        if (len > 0) {
-            IO.read(ch, Bits.l2i(len), buf);
+        int len = (int) (length() - 4);
+        if (len != 0) {
+            IO.read(ch, len, buf);
             if (buf.remaining() > 0) {
                 location = IO.str(buf);
             }
@@ -56,10 +54,24 @@ public final class DataEntryUrlBox extends FullBox {
     }
 
     @Override
-    void update() {
-        long s = 4; // + 4 full box
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
         if (location != null) {
-            s = Bits.l2u(s + location.length + 1);
+            buf.put(location);
+            buf.put((byte) 0);
+        }
+        if (buf.position() > 0) {
+            IO.write(ch, buf.position(), buf);
+        }
+    }
+
+    @Override
+    void update() {
+        long s = 0;
+        s += 4; // full box
+        if (location != null) {
+            s += location.length + 1;
         }
         length(s);
     }

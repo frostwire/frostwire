@@ -371,23 +371,21 @@ public final class TransferManager {
         return transfer instanceof UIBittorrentDownload || transfer instanceof TorrentFetcherDownload;
     }
 
-    public boolean isBittorrentSearchResultAndMobileDataSavingsOn(SearchResult sr) {
-        return sr instanceof TorrentSearchResult &&
-                NetworkManager.instance().isDataMobileUp() &&
+    public boolean isMobileAndDataSavingsOn() {
+        return NetworkManager.instance().isDataMobileUp() &&
                 !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
     }
 
+    public boolean isBittorrentSearchResultAndMobileDataSavingsOn(SearchResult sr) {
+        return sr instanceof TorrentSearchResult && isMobileAndDataSavingsOn();
+    }
 
     public boolean isBittorrentDownloadAndMobileDataSavingsOn(DownloadTransfer transfer) {
-        return isBittorrentDownload(transfer) &&
-                NetworkManager.instance().isDataMobileUp() &&
-                !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
+        return isBittorrentDownload(transfer) && isMobileAndDataSavingsOn();
     }
 
     public boolean isBittorrentDownloadAndMobileDataSavingsOff(DownloadTransfer transfer) {
-        return isBittorrentDownload(transfer) &&
-                NetworkManager.instance().isDataMobileUp() &&
-                ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
+        return isBittorrentDownload(transfer) && isMobileAndDataSavingsOn();
     }
 
     public boolean isBittorrentDisconnected() {

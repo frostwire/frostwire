@@ -42,7 +42,8 @@ public class ContainerBox extends Box {
 
     @Override
     void update() {
-        long s = length(boxes);
+        long s = 0;
+        s += length(boxes);
         length(s);
     }
 
@@ -51,11 +52,11 @@ public class ContainerBox extends Box {
         for (Box b : boxes) {
             b.update();
             if (b.size == 1) {
-                s = Bits.l2u(s + b.largesize);
+                s = s + b.largesize;
             } else if (b.size == 0) {
                 throw new UnsupportedOperationException();
             } else {
-                s = Bits.l2u(s + b.size);
+                s = s + b.size;
             }
         }
         return s;

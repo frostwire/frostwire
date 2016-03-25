@@ -24,6 +24,6 @@ package com.frostwire.fmp4;
 public final class DataInformationBox extends ContainerBox {
 
     DataInformationBox() {
-        super(edts);
+        super(dinf);
     }
 }

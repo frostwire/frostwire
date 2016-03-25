@@ -24,13 +24,13 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class TimeToSampleBox extends FullBox {
+public final class ShadowSyncSampleBox extends FullBox {
 
     protected int entry_count;
     protected Entry[] entries;
 
-    TimeToSampleBox() {
-        super(stts);
+    ShadowSyncSampleBox() {
+        super(stsh);
     }
 
     @Override
@@ -43,8 +43,8 @@ public final class TimeToSampleBox extends FullBox {
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
             IO.read(ch, 8, buf);
-            e.sample_count = buf.getInt();
-            e.sample_delta = buf.getInt();
+            e.shadowed_sample_number = buf.getInt();
+            e.sync_sample_number = buf.getInt();
             entries[i] = e;
         }
     }
@@ -57,8 +57,8 @@ public final class TimeToSampleBox extends FullBox {
         IO.write(ch, 4, buf);
         for (int i = 0; i < entry_count; i++) {
             Entry e = entries[i];
-            buf.putInt(e.sample_count);
-            buf.putInt(e.sample_delta);
+            buf.putInt(e.shadowed_sample_number);
+            buf.putInt(e.sync_sample_number);
             IO.write(ch, 8, buf);
         }
     }
@@ -73,7 +73,7 @@ public final class TimeToSampleBox extends FullBox {
     }
 
     public static final class Entry {
-        public int sample_count;
-        public int sample_delta;
+        public int shadowed_sample_number;
+        public int sync_sample_number;
     }
 }

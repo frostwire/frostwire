@@ -36,6 +36,11 @@ public final class NullMediaHeaderBox extends FullBox {
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+    }
+
+    @Override
     void update() {
         long s = 4; // + 4 full box
         length(s);

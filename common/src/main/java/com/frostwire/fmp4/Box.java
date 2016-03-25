@@ -59,7 +59,10 @@ public class Box {
     public static final int stbl = Bits.make4cc("stbl");
     public static final int stsd = Bits.make4cc("stsd");
     public static final int stts = Bits.make4cc("stts");
+    public static final int ctts = Bits.make4cc("ctts");
     public static final int stss = Bits.make4cc("stss");
+    public static final int stsh = Bits.make4cc("stsh");
+    public static final int sbgp = Bits.make4cc("sbgp");
     public static final int stsc = Bits.make4cc("stsc");
     public static final int stsz = Bits.make4cc("stsz");
     public static final int stz2 = Bits.make4cc("stz2");
@@ -74,6 +77,11 @@ public class Box {
     public static final int Calb = Bits.make4cc("©alb");
     public static final int stik = Bits.make4cc("stik");
     public static final int covr = Bits.make4cc("covr");
+    public static final int Ccmt = Bits.make4cc("©cmt");
+    public static final int Cgen = Bits.make4cc("©gen");
+    public static final int gnre = Bits.make4cc("gnre");
+    public static final int free = Bits.make4cc("free");
+    public static final int skip = Bits.make4cc("skip");
 
     private static final Map<Integer, BoxLambda> mapping = buildMapping();
 
@@ -82,23 +90,23 @@ public class Box {
     protected Long largesize;
     protected byte[] usertype;
 
-    protected LinkedList<Box> boxes;
     protected Box parent;
+    protected LinkedList<Box> boxes;
 
     Box(int type) {
         this.type = type;
     }
 
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(Bits.make4cc(type));
     }
 
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(Bits.make4cc(type));
     }
 
     void update() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(Bits.make4cc(type));
     }
 
     final long length() {
@@ -112,20 +120,27 @@ public class Box {
             n = n - 16;
         }
 
-        return Bits.l2u(n);
+        if (n < 0) {
+            throw new UnsupportedOperationException("negative long value: " + n);
+        }
+
+        return n;
     }
 
     final void length(long value) {
+        if (value < 0) {
+            throw new IllegalArgumentException("negative long value: " + value);
+        }
         long s = value;
         if (type == uuid) {
-            s = Bits.l2u(s + 16);
+            s = s + 16;
         }
         if (s <= Integer.MAX_VALUE - 8) {
             size = (int) (s + 8);
             largesize = null;
         } else {
             size = 1;
-            largesize = Bits.l2u(s + 16);
+            largesize = s + 16;
         }
     }
 
@@ -296,10 +311,28 @@ public class Box {
                 return new TimeToSampleBox();
             }
         });
+        map.put(ctts, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new CompositionOffsetBox();
+            }
+        });
         map.put(stss, new BoxLambda() {
             @Override
             public Box empty() {
                 return new SyncSampleBox();
+            }
+        });
+        map.put(stsh, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new ShadowSyncSampleBox();
+            }
+        });
+        map.put(sbgp, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new SampleToGroupBox();
             }
         });
         map.put(stsc, new BoxLambda() {
@@ -384,6 +417,36 @@ public class Box {
             @Override
             public Box empty() {
                 return new AppleCoverBox();
+            }
+        });
+        map.put(Ccmt, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleCommentBox();
+            }
+        });
+        map.put(Cgen, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleGenreBox();
+            }
+        });
+        map.put(gnre, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleGenreIDBox();
+            }
+        });
+        map.put(free, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new FreeSpaceBox(free);
+            }
+        });
+        map.put(skip, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new FreeSpaceBox(skip);
             }
         });
 

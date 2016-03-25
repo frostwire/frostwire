@@ -43,8 +43,20 @@ public final class SoundMediaHeaderBox extends FullBox {
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.putShort(balance);
+        buf.putShort(reserved);
+        IO.write(ch, 4, buf);
+    }
+
+    @Override
     void update() {
-        long s = 4 + 4; // + 4 full box
+        long s = 0;
+        s += 4; // full box
+        s += 2; // balance
+        s += 2; // reserved
         length(s);
     }
 }

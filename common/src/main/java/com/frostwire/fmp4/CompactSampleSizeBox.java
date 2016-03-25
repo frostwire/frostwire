@@ -26,13 +26,14 @@ import java.nio.ByteBuffer;
  */
 public final class CompactSampleSizeBox extends FullBox {
 
-    protected byte[] reserved;
+    protected final byte[] reserved;
     protected byte field_size;
     protected int sample_count;
     protected Entry[] entries;
 
     CompactSampleSizeBox() {
         super(stz2);
+        reserved = new byte[3];
     }
 
     @Override
@@ -40,10 +41,9 @@ public final class CompactSampleSizeBox extends FullBox {
         super.read(ch, buf);
 
         IO.read(ch, 8, buf);
-        reserved = new byte[3];
         buf.get(reserved);
         field_size = buf.get();
-        sample_count = Bits.l2i(Bits.i2u(buf.getInt())); // it's unrealistic to have more than 2G elements
+        sample_count = buf.getInt();
         entries = new Entry[sample_count];
         for (int i = 0; i < sample_count; i++) {
             Entry e = new Entry();
@@ -64,15 +64,40 @@ public final class CompactSampleSizeBox extends FullBox {
     }
 
     @Override
-    void update() {
-        long s = 8 + 4; // + 4 full box
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.put(reserved);
+        buf.put(field_size);
+        buf.putInt(sample_count);
+        IO.write(ch, 8, buf);
         for (int i = 0; i < sample_count; i++) {
-            s = Bits.l2u(s + field_size);
+            Entry e = entries[i];
+            switch (field_size) {
+                case 4:
+                    throw new UnsupportedOperationException();
+                case 8:
+                    buf.put((byte) e.entry_size);
+                    IO.write(ch, 1, buf);
+                    break;
+                case 16:
+                    buf.putShort(e.entry_size);
+                    IO.write(ch, 2, buf);
+                    break;
+            }
         }
+    }
+
+    @Override
+    void update() {
+        long s = 0;
+        s += 4; // full box
+        s += 8;
+        s += sample_count * field_size;
         length(s);
     }
 
-    private static final class Entry {
+    public static final class Entry {
         public short entry_size;
     }
 }

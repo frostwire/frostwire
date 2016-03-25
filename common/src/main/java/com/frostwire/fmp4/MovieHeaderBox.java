@@ -33,49 +33,77 @@ public final class MovieHeaderBox extends FullBox {
     protected int rate;
     protected short volume;
     protected short reserved1;
-    protected int[] reserved2;
-    protected int[] matrix;
-    protected int[] pre_defined;
+    protected final int[] reserved2;
+    protected final int[] matrix;
+    protected final int[] pre_defined;
     protected int next_track_ID;
 
     MovieHeaderBox() {
         super(mvhd);
+        rate = 0x00010000;
+        volume = 0x0100;
+        reserved2 = new int[2];
+        matrix = new int[]{0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000};
+        pre_defined = new int[6];
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
+        IO.read(ch, (version == 1 ? 28 : 16) + 80, buf);
         if (version == 1) {
-            IO.read(ch, 28, buf);
             creation_time = buf.getLong();
             modification_time = buf.getLong();
             timescale = buf.getInt();
             duration = buf.getLong();
         } else { // version == 0
-            IO.read(ch, 16, buf);
             creation_time = buf.getInt();
             modification_time = buf.getInt();
             timescale = buf.getInt();
             duration = buf.getInt();
         }
 
-        IO.read(ch, 80, buf);
         rate = buf.getInt();
         volume = buf.getShort();
         reserved1 = buf.getShort();
-        reserved2 = new int[2];
         IO.get(buf, reserved2);
-        matrix = new int[9];
         IO.get(buf, matrix);
-        pre_defined = new int[6];
         IO.get(buf, pre_defined);
         next_track_ID = buf.getInt();
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        if (version == 1) {
+            buf.putLong(creation_time);
+            buf.putLong(modification_time);
+            buf.putInt(timescale);
+            buf.putLong(duration);
+        } else { // version == 0
+            buf.putInt((int) creation_time);
+            buf.putInt((int) modification_time);
+            buf.putInt(timescale);
+            buf.putInt((int) duration);
+        }
+
+        buf.putInt(rate);
+        buf.putShort(volume);
+        buf.putShort(reserved1);
+        IO.put(buf, reserved2);
+        IO.put(buf, matrix);
+        IO.put(buf, pre_defined);
+        buf.putInt(next_track_ID);
+        IO.write(ch, (version == 1 ? 28 : 16) + 80, buf);
+    }
+
+    @Override
     void update() {
-        long s = 80 + 4; // + 4 full box
+        long s = 0;
+        s += 4; // full box
+        s += 80;
         if (version == 1) {
             s += 28;
         } else { // version == 0

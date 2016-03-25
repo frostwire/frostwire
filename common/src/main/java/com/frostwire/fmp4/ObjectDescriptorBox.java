@@ -36,15 +36,25 @@ public final class ObjectDescriptorBox extends FullBox {
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        long len = length() - 4;
-        IO.read(ch, Bits.l2i(len), buf);
-        data = new byte[(int) len];
+        int len = (int) (length() - 4);
+        IO.read(ch, len, buf);
+        data = new byte[len];
         buf.get(data);
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.put(data);
+        IO.write(ch, data.length, buf);
+    }
+
+    @Override
     void update() {
-        long s = Bits.l2u(data.length + 4); // + 4 full box
+        long s = 0;
+        s += 4; // full box
+        s += data.length;
         length(s);
     }
 }

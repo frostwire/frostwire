@@ -35,16 +35,15 @@ public final class IsoMedia {
         read(ch, -1, null, null, buf);
     }
 
-    static void read(InputChannel ch, long len, ReadListener l) throws IOException {
+    static void read(InputChannel ch, long len, OnBoxListener l) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(1 * 1024);
         read(ch, len, null, l, buf);
     }
 
-    public static void read(InputChannel ch, long len, Box p, ReadListener l, ByteBuffer buf) throws IOException {
+    public static boolean read(InputChannel ch, long len, Box p, OnBoxListener l, ByteBuffer buf) throws IOException {
         long n = ch.count();
         do {
             IO.read(ch, 8, buf);
-
             int size = buf.getInt();
             int type = buf.getInt();
 
@@ -77,13 +76,17 @@ public final class IsoMedia {
             }
 
             if (l != null) {
-                l.onBox(b);
+                if (!l.onBox(b)) {
+                    return false;
+                }
             }
 
             long length = b.length();
             if (r < length) {
                 if (type != Box.mdat) {
-                    read(ch, length - r, b, l, buf);
+                    if (!read(ch, length - r, b, l, buf)) {
+                        return false;
+                    }
                 } else {
                     if (length > 0) {
                         IO.skip(ch, length - r, buf);
@@ -93,21 +96,90 @@ public final class IsoMedia {
                 }
             }
         } while (len == -1 || ch.count() - n < len);
+
+        return true;
     }
 
-    public static void write(OutputChannel ch, LinkedList<Box> boxes) {
-
+    public static void write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l) throws IOException {
+        ByteBuffer buf = ByteBuffer.allocate(4 * 1024);
+        write(ch, boxes, l, buf);
     }
 
-    public interface ReadListener {
+    public static boolean write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l, ByteBuffer buf) throws IOException {
+        for (Box b : boxes) {
+            buf.putInt(b.size);
+            buf.putInt(b.type);
+            IO.write(ch, 8, buf);
+
+            if (b.largesize != null) {
+                buf.putLong(b.largesize);
+                IO.write(ch, 8, buf);
+            }
+
+            if (b.usertype != null) {
+                buf.put(b.usertype);
+                IO.write(ch, 16, buf);
+            }
+
+            long length = b.length();
+            long w = ch.count();
+
+            b.write(ch, buf);
+
+            if (l != null) {
+                if (!l.onBox(b)) {
+                    return false;
+                }
+            }
+
+            if (b.boxes != null) {
+                if (!write(ch, b.boxes, l, buf)) {
+                    return false;
+                }
+            }
+
+            w = ch.count() - w;
+            if (w != length && b.type != Box.mdat) {
+                throw new IOException("Inconsistent box data: " + Bits.make4cc(b.type));
+            }
+        }
+
+        return true;
+    }
+
+    public static <T extends Box> LinkedList<T> find(LinkedList<Box> boxes, int type) {
+        LinkedList<T> l = new LinkedList<>();
+
+        for (Box b : boxes) {
+            if (b.type == type) {
+                l.add((T) b);
+            }
+        }
+
+        if (l.isEmpty()) {
+            for (Box b : boxes) {
+                if (b.boxes != null) {
+                    LinkedList<T> t = find(b.boxes, type);
+                    if (!t.isEmpty()) {
+                        l.addAll(t);
+                    }
+                }
+            }
+        }
+
+        return l;
+    }
+
+    public interface OnBoxListener {
 
         /**
-         * Give the opportunity to react on box reading and together
-         * with the {@link InputChannel#count()} you can keep a good
-         * progress of the reading in the ISO media (stream or file).
+         * Give the opportunity to react on box read/write and together
+         * with the channel {@code count()} you can keep a good
+         * progress of the progress in the ISO media (stream or file).
          *
          * @param b
+         * @return true if you want to stop
          */
-        void onBox(Box b);
+        boolean onBox(Box b);
     }
 }

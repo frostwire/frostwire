@@ -31,32 +31,33 @@ public final class TrackHeaderBox extends FullBox {
     protected int track_ID;
     protected int reserved1;
     protected long duration;
-    protected int[] reserved2;
+    protected final int[] reserved2;
     protected short layer;
     protected short alternate_group;
     protected short volume;
     protected short reserved3;
-    protected int[] matrix;
+    protected final int[] matrix;
     protected int width;
     protected int height;
 
     TrackHeaderBox() {
         super(tkhd);
+        reserved2 = new int[2];
+        matrix = new int[]{0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000};
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
+        IO.read(ch, (version == 1 ? 32 : 20) + 60, buf);
         if (version == 1) {
-            IO.read(ch, 32, buf);
             creation_time = buf.getLong();
             modification_time = buf.getLong();
             track_ID = buf.getInt();
             reserved1 = buf.getInt();
             duration = buf.getLong();
         } else { // version == 0
-            IO.read(ch, 20, buf);
             creation_time = buf.getInt();
             modification_time = buf.getInt();
             track_ID = buf.getInt();
@@ -64,22 +65,50 @@ public final class TrackHeaderBox extends FullBox {
             duration = buf.getInt();
         }
 
-        IO.read(ch, 60, buf);
-        reserved2 = new int[2];
         IO.get(buf, reserved2);
         layer = buf.getShort();
         alternate_group = buf.getShort();
         volume = buf.getShort();
         reserved3 = buf.getShort();
-        matrix = new int[9];
         IO.get(buf, matrix);
         width = buf.getInt();
         height = buf.getInt();
     }
 
     @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        if (version == 1) {
+            buf.putLong(creation_time);
+            buf.putLong(modification_time);
+            buf.putInt(track_ID);
+            buf.putInt(reserved1);
+            buf.putLong(duration);
+        } else { // version == 0
+            buf.putInt((int) creation_time);
+            buf.putInt((int) modification_time);
+            buf.putInt(track_ID);
+            buf.putInt(reserved1);
+            buf.putInt((int) duration);
+        }
+
+        IO.put(buf, reserved2);
+        buf.putShort(layer);
+        buf.putShort(alternate_group);
+        buf.putShort(volume);
+        buf.putShort(reserved3);
+        IO.put(buf, matrix);
+        buf.putInt(width);
+        buf.putInt(height);
+        IO.write(ch, (version == 1 ? 32 : 20) + 60, buf);
+    }
+
+    @Override
     void update() {
-        long s = 60 + 4; // + 4 full box
+        long s = 0;
+        s += 4; // full box
+        s += 60;
         if (version == 1) {
             s += 32;
         } else { // version == 0

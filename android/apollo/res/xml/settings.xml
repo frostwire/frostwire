@@ -16,7 +16,7 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <!-- UI catetgory -->
+    <!-- UI category -->
     <PreferenceCategory android:title="@string/settings_ui_category" >
 
         <!-- Color scheme -->

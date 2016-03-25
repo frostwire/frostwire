@@ -30,7 +30,7 @@ public class AppleIntegerBox extends AppleDataBox {
 
     AppleIntegerBox(int type) {
         super(type);
-        this.dataType = 15;
+        dataType = 15;
     }
 
     public int value() {
@@ -60,19 +60,30 @@ public class AppleIntegerBox extends AppleDataBox {
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        long len = length() - 16;
-        if (len > 0) {
-            IO.read(ch, Bits.l2i(len), buf);
-            value = new byte[buf.remaining()];
+        int len = (int) (length() - 16);
+        if (len != 0) {
+            IO.read(ch, len, buf);
+            value = new byte[len];
             buf.get(value);
         }
     }
 
     @Override
-    void update() {
-        long s = 16; // + 16 apple data box
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
         if (value != null) {
-            s = Bits.l2u(s + value.length);
+            buf.put(value);
+            IO.write(ch, value.length, buf);
+        }
+    }
+
+    @Override
+    void update() {
+        long s = 0;
+        s += 16; // apple data box
+        if (value != null) {
+            s += value.length;
         }
         length(s);
     }

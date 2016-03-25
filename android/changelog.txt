@@ -1,4 +1,6 @@
-FrostWire 1.7.2 - MARCH/24/2016
+FrostWire 1.7.2 - MARCH/25/2016
+ - Improved connection status display on Transfers screen.
+ - Faster mp4 -> m4a demuxing.
  - Updated libraries: gson v2.6.2, okhttp v2.7.5, rxjava v1.1.1,
    android support v4.23.2.0
  - New jlibtorrent 1.1.0.22.

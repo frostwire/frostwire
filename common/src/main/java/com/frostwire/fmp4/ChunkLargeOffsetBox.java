@@ -38,7 +38,7 @@ public final class ChunkLargeOffsetBox extends FullBox {
         super.read(ch, buf);
 
         IO.read(ch, 4, buf);
-        entry_count = Bits.l2i(Bits.i2u(buf.getInt())); // it's unrealistic to have more than 2G elements
+        entry_count = buf.getInt();
         entries = new Entry[entry_count];
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
@@ -49,15 +49,28 @@ public final class ChunkLargeOffsetBox extends FullBox {
     }
 
     @Override
-    void update() {
-        long s = 8; // 4 entry_count + 4 full box
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.putInt(entry_count);
+        IO.write(ch, 4, buf);
         for (int i = 0; i < entry_count; i++) {
-            s = Bits.l2u(s + 8);
+            Entry e = entries[i];
+            buf.putLong(e.chunk_offset);
+            IO.write(ch, 8, buf);
         }
+    }
+
+    @Override
+    void update() {
+        long s = 0;
+        s += 4; // full box
+        s += 4; // entry_count
+        s += entry_count * 8;
         length(s);
     }
 
-    private static final class Entry {
+    public static final class Entry {
         public long chunk_offset;
     }
 }

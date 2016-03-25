@@ -24,39 +24,60 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class FileTypeBox extends Box {
+public final class FreeSpaceBox extends Box {
 
-    protected int major_brand;
-    protected int minor_version;
-    protected int[] compatible_brands;
+    private static final int MAX_DATA_SIZE = 1024 * 1024; // 1MB
 
-    FileTypeBox() {
-        super(ftyp);
+    protected byte[] data;
+
+    FreeSpaceBox(int type) {
+        super(type);
+    }
+
+    FreeSpaceBox(int type, long length) {
+        super(type);
+        data = new byte[(int) length];
+        update();
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        IO.read(ch, Bits.l2i(length()), buf);
-        major_brand = buf.getInt();
-        minor_version = buf.getInt();
-        compatible_brands = new int[buf.remaining() / 4];
-        IO.get(buf, compatible_brands);
+        int len = (int) length();
+        if (len > 0) {
+            if (len <= MAX_DATA_SIZE) {
+                data = new byte[len];
+                buf = ByteBuffer.wrap(data);
+                IO.read(ch, len, buf);
+            } else {
+                IO.skip(ch, len, buf);
+            }
+        } else {
+            IO.skip(ch, buf);
+        }
     }
 
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        buf.putInt(major_brand);
-        buf.putInt(minor_version);
-        IO.put(buf, compatible_brands);
-        IO.write(ch, buf.position(), buf);
+        if (data != null) {
+            buf = ByteBuffer.wrap(data);
+            IO.write(ch, data.length, buf);
+        }
     }
 
     @Override
     void update() {
         long s = 0;
-        s += 4; // major_brand
-        s += 4; // minor_version
-        s += compatible_brands.length * 4;
+        if (data != null) {
+            s += data.length;
+        }
         length(s);
+    }
+
+    public static FreeSpaceBox free(long length) {
+        return new FreeSpaceBox(free, length);
+    }
+
+    public static FreeSpaceBox skip(long length) {
+        return new FreeSpaceBox(skip, length);
     }
 }

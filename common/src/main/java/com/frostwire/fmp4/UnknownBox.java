@@ -26,7 +26,7 @@ import java.nio.ByteBuffer;
  */
 public final class UnknownBox extends Box {
 
-    private static final int MAX_DATA_SIZE = 1023 * 1024;
+    private static final int MAX_DATA_SIZE = 1024 * 1024; // 1MB
 
     protected byte[] data;
 
@@ -36,13 +36,12 @@ public final class UnknownBox extends Box {
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        long len = length();
+        int len = (int) length();
         if (len > 0) {
             if (len <= MAX_DATA_SIZE) {
-                int ilen = Bits.l2i(len);
-                data = new byte[ilen];
+                data = new byte[len];
                 buf = ByteBuffer.wrap(data);
-                IO.read(ch, ilen, buf);
+                IO.read(ch, len, buf);
             } else {
                 IO.skip(ch, len, buf);
             }
@@ -52,11 +51,19 @@ public final class UnknownBox extends Box {
     }
 
     @Override
-    void update() {
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         if (data != null) {
-            length(data.length);
-        } else {
-            throw new UnsupportedOperationException();
+            buf = ByteBuffer.wrap(data);
+            IO.write(ch, data.length, buf);
         }
+    }
+
+    @Override
+    void update() {
+        long s = 0;
+        if (data != null) {
+            s += data.length;
+        }
+        length(s);
     }
 }

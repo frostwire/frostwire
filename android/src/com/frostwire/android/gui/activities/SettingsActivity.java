@@ -23,26 +23,25 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.*;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
+import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SearchEngine;
-import com.frostwire.android.StoragePicker;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -52,7 +51,6 @@ import com.frostwire.android.gui.views.preference.SimpleActionPreference;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.logging.Logger;
-import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
@@ -67,6 +65,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     private static final Logger LOG = Logger.getLogger(SettingsActivity.class);
     private static String currentPreferenceKey = null;
+    private boolean finishOnBack = false;
 
     @Override
     protected void onResume() {
@@ -89,9 +88,15 @@ public class SettingsActivity extends PreferenceActivity {
         setupComponents();
 
         String action = getIntent().getAction();
-        if (action != null && action.equals(Constants.ACTION_SETTINGS_SELECT_STORAGE)) {
+        if (action != null) {
             getIntent().setAction(null);
-            StoragePreference.invokeStoragePreference(this);
+            if (action.equals(Constants.ACTION_SETTINGS_SELECT_STORAGE)) {
+                StoragePreference.invokeStoragePreference(this);
+            } else if (action.equals(Constants.ACTION_SETTINGS_OPEN_TORRENT_SETTINGS)) {
+                finishOnBack = true;
+                openPreference("frostwire.prefs.torrent.preference_category");
+                return;
+            }
         }
 
         updateConnectSwitch();
@@ -524,8 +529,24 @@ public class SettingsActivity extends PreferenceActivity {
      * @param preferenceScreen
      */
     private void initializePreferenceScreen(PreferenceScreen preferenceScreen) {
+        if (preferenceScreen == null) {
+            return;
+        }
+
         final Dialog dialog = preferenceScreen.getDialog();
         if (dialog != null) {
+
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    dialog.dismiss();
+                    if (finishOnBack) {
+                        finish();
+                        return;
+                    }
+                }
+            });
+
             hideActionBarIcon(dialog.getActionBar());
             View homeButton = dialog.findViewById(android.R.id.home);
 
@@ -533,6 +554,10 @@ public class SettingsActivity extends PreferenceActivity {
                 OnClickListener dismissDialogClickListener = new OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (finishOnBack) {
+                            finish();
+                            return;
+                        }
                         dialog.dismiss();
                     }
                 };
@@ -549,6 +574,20 @@ public class SettingsActivity extends PreferenceActivity {
                 } else {
                     homeButton.setOnClickListener(dismissDialogClickListener);
                 }
+            }
+        }
+    }
+
+    private void openPreference(String key) {
+        PreferenceScreen preferenceScreen = getPreferenceScreen();
+        final ListAdapter listAdapter = preferenceScreen.getRootAdapter();
+
+        final int itemsCount = listAdapter.getCount();
+        int itemNumber;
+        for (itemNumber = 0; itemNumber < itemsCount; ++itemNumber) {
+            if (listAdapter.getItem(itemNumber).equals(findPreference(key))) {
+                preferenceScreen.onItemClick(null, null, itemNumber, 0);
+                break;
             }
         }
     }

@@ -28,11 +28,12 @@ public final class HandlerBox extends FullBox {
 
     protected int pre_defined;
     protected int handler_type;
-    protected int[] reserved;
+    protected final int[] reserved;
     protected byte[] name;
 
     HandlerBox() {
         super(hdlr);
+        reserved = new int[3];
     }
 
     public String name() {
@@ -40,20 +41,17 @@ public final class HandlerBox extends FullBox {
     }
 
     public void name(String value) {
-        if (value != null) {
-            name = Utf8.convert(value);
-        }
+        name = value != null ? Utf8.convert(value) : null;
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        long len = length() - 4;
-        IO.read(ch, Bits.l2i(len), buf);
+        int len = (int) (length() - 4);
+        IO.read(ch, len, buf);
         pre_defined = buf.getInt();
         handler_type = buf.getInt();
-        reserved = new int[3];
         IO.get(buf, reserved);
         if (buf.remaining() > 0) {
             name = IO.str(buf);
@@ -61,10 +59,26 @@ public final class HandlerBox extends FullBox {
     }
 
     @Override
-    void update() {
-        long s = 20 + 4; // + 4 full box
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
+        buf.putInt(pre_defined);
+        buf.putInt(handler_type);
+        IO.put(buf, reserved);
         if (name != null) {
-            s = Bits.l2u(s + name.length + 1);
+            buf.put(name);
+            buf.put((byte) 0);
+        }
+        IO.write(ch, buf.position(), buf);
+    }
+
+    @Override
+    void update() {
+        long s = 0;
+        s += 4; // full box
+        s += 20;
+        if (name != null) {
+            s += name.length + 1;
         }
         length(s);
     }
