@@ -121,4 +121,9 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
             mData[i].mLineOne = playlist.mPlaylistName;
         }
     }
+
+    @Override
+    public int getOffset() {
+        return 0;
+    }
 }

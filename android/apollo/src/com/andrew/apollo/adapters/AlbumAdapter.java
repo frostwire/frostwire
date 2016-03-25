@@ -201,4 +201,9 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
             return -1;
         }
     }
+
+    @Override
+    public int getOffset() {
+        return 0;
+    }
 }

@@ -115,4 +115,8 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
         return song.mSongId;
     }
 
+    @Override
+    public int getOffset() {
+        return 0;
+    }
 }
