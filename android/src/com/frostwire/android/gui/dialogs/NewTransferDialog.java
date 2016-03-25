@@ -80,7 +80,7 @@ public class NewTransferDialog extends AbstractDialog {
         SearchResultData data = (SearchResultData) args.getSerializable(SEARCH_RESULT_DATA_KEY);
         boolean hideCheckShow = args.getBoolean(HIDE_CHECK_SHOW_KEY);
 
-        dlg.setTitle(R.string.dialog_new_transfer_title);
+        dlg.setTitle(R.string.confirm_download);
 
         Context ctx = dlg.getContext();
 
