@@ -82,6 +82,15 @@ public class Box {
     public static final int gnre = Bits.make4cc("gnre");
     public static final int free = Bits.make4cc("free");
     public static final int skip = Bits.make4cc("skip");
+    public static final int mvex = Bits.make4cc("mvex");
+    public static final int trex = Bits.make4cc("trex");
+    public static final int sidx = Bits.make4cc("sidx");
+    public static final int moof = Bits.make4cc("moof");
+    public static final int mfhd = Bits.make4cc("mfhd");
+    public static final int traf = Bits.make4cc("traf");
+    public static final int tfhd = Bits.make4cc("tfhd");
+    public static final int tfdt = Bits.make4cc("tfdt");
+    public static final int trun = Bits.make4cc("trun");
 
     private static final Map<Integer, BoxLambda> mapping = buildMapping();
 
@@ -447,6 +456,60 @@ public class Box {
             @Override
             public Box empty() {
                 return new FreeSpaceBox(skip);
+            }
+        });
+        map.put(mvex, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MovieExtendsBox();
+            }
+        });
+        map.put(trex, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TrackExtendsBox();
+            }
+        });
+        map.put(sidx, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new SegmentIndexBox();
+            }
+        });
+        map.put(moof, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MovieFragmentBox();
+            }
+        });
+        map.put(mfhd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MovieFragmentHeaderBox();
+            }
+        });
+        map.put(traf, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TrackFragmentBox();
+            }
+        });
+        map.put(tfhd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TrackFragmentHeaderBox();
+            }
+        });
+        map.put(tfdt, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TrackFragmentBaseMediaDecodeTimeBox();
+            }
+        });
+        map.put(trun, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TrackRunBox();
             }
         });
 

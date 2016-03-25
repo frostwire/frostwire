@@ -31,12 +31,12 @@ public final class IsoMedia {
     }
 
     static void read(InputChannel ch) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(1 * 1024);
+        ByteBuffer buf = ByteBuffer.allocate(10 * 1024);
         read(ch, -1, null, null, buf);
     }
 
     static void read(InputChannel ch, long len, OnBoxListener l) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(1 * 1024);
+        ByteBuffer buf = ByteBuffer.allocate(10 * 1024);
         read(ch, len, null, l, buf);
     }
 
@@ -76,8 +76,18 @@ public final class IsoMedia {
             }
 
             if (l != null) {
+                long pos = ch.count();
                 if (!l.onBox(b)) {
                     return false;
+                }
+                if (pos != ch.count()) {
+                    // there was a read inside the listener
+                    // this operation is only allowed if the
+                    // client read the entire box
+                    r = ch.count() - pos;
+                    if (r != b.length()) {
+                        throw new UnsupportedOperationException("Invalid read inside listener");
+                    }
                 }
             }
 
@@ -101,7 +111,7 @@ public final class IsoMedia {
     }
 
     public static void write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(4 * 1024);
+        ByteBuffer buf = ByteBuffer.allocate(10 * 1024);
         write(ch, boxes, l, buf);
     }
 
@@ -168,6 +178,10 @@ public final class IsoMedia {
         }
 
         return l;
+    }
+
+    public static <T extends Box> T findFirst(LinkedList<Box> boxes, int type) {
+        return (T) find(boxes, type).peekFirst();
     }
 
     public interface OnBoxListener {

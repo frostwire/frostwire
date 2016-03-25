@@ -17,7 +17,6 @@
 
 package com.frostwire.fmp4;
 
-import com.frostwire.mp4.Track;
 import org.junit.Test;
 
 import java.io.File;
@@ -35,22 +34,32 @@ public class SimpleReadTest {
 
     @Test
     public void testRead() throws IOException {
-        File f = new File("/Users/aldenml/Downloads/test.mp4");
+        File f = new File("/Users/aldenml/Downloads/test_raw.m4a");
         RandomAccessFile in = new RandomAccessFile(f, "r");
         InputChannel ch = new InputChannel(in.getChannel());
+
+        final LinkedList<Box> boxes = new LinkedList<>();
 
         IsoMedia.read(ch, f.length(), new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
+                if (b instanceof UnknownBox) {
+                    System.out.print("Unknow box: ");
+                }
                 System.out.println(Bits.make4cc(b.type));
+                if (b.parent == null) {
+                    boxes.add(b);
+                }
                 return true;
             }
         });
+
+        System.out.println("Num boxes: " + boxes.size());
     }
 
     @Test
     public void testCopy() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test.mp4");
+        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
         File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
         RandomAccessFile in = new RandomAccessFile(fIn, "r");
         RandomAccessFile out = new RandomAccessFile(fOut, "rw");
@@ -84,7 +93,7 @@ public class SimpleReadTest {
 
     @Test
     public void testCopyUpdate() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test.mp4");
+        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
         File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
         RandomAccessFile in = new RandomAccessFile(fIn, "r");
         RandomAccessFile out = new RandomAccessFile(fOut, "rw");
@@ -335,5 +344,43 @@ public class SimpleReadTest {
 
             IO.copy(chIn, chOut, chunkSize[i], buf);
         }
+    }
+
+    @Test
+    public void testReadFragmented() throws IOException {
+        File f = new File("/Users/aldenml/Downloads/test_raw.m4a");
+        RandomAccessFile in = new RandomAccessFile(f, "r");
+        InputChannel ch = new InputChannel(in.getChannel());
+
+        final LinkedList<Box> boxes = new LinkedList<>();
+
+        IsoMedia.read(ch, f.length(), new IsoMedia.OnBoxListener() {
+            @Override
+            public boolean onBox(Box b) {
+                if (b instanceof UnknownBox) {
+                    System.out.print("Unknow box: ");
+                }
+                System.out.println(Bits.make4cc(b.type));
+                if (b.parent == null) {
+                    boxes.add(b);
+                }
+                return true;
+            }
+        });
+
+        LinkedList<TrackFragmentBox> trafs = IsoMedia.find(boxes, Box.traf);
+        for (TrackFragmentBox traf : trafs) {
+            TrackFragmentHeaderBox tfhd = IsoMedia.<TrackFragmentHeaderBox>find(traf.boxes, Box.tfhd).getFirst();
+            TrackRunBox trun = IsoMedia.<TrackRunBox>find(traf.boxes, Box.trun).getFirst();
+            for (TrackRunBox.Entry e : trun.entries) {
+                if (trun.sampleDurationPresent()) {
+                    System.out.println("trun.sampleDurationPresent() -> true");
+                } else {
+                    System.out.println("trun.sampleDurationPresent() -> false");
+                }
+            }
+        }
+
+        System.out.println("Num boxes: " + boxes.size());
     }
 }
