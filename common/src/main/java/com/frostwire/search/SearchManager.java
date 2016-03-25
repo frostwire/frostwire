@@ -72,36 +72,40 @@ public final class SearchManager {
     }
 
     public void perform(final SearchPerformer performer) {
-        if (performer == null) {
-            throw new IllegalArgumentException("Search performer argument can't be null");
-        }
-        if (performer.getToken() < 0) {
-            throw new IllegalArgumentException("Search token id must be >= 0");
-        }
+//        if (performer == null) {
+//            throw new IllegalArgumentException("Search performer argument can't be null");
+//        }
+        if (performer != null) {
+            if (performer.getToken() < 0) {
+                throw new IllegalArgumentException("Search token id must be >= 0");
+            }
 
-        performer.setListener(new SearchListener() {
-            @Override
-            public void onResults(long token, List<? extends SearchResult> results) {
-                if (performer.getToken() == token) {
-                    SearchManager.this.onResults(performer, results);
-                } else {
-                    LOG.warn("Performer token does not match listener onResults token, review your logic");
+            performer.setListener(new SearchListener() {
+                @Override
+                public void onResults(long token, List<? extends SearchResult> results) {
+                    if (performer.getToken() == token) {
+                        SearchManager.this.onResults(performer, results);
+                    } else {
+                        LOG.warn("Performer token does not match listener onResults token, review your logic");
+                    }
                 }
-            }
 
-            @Override
-            public void onError(long token, SearchError error) {
-                SearchManager.this.onError(token, error);
-            }
+                @Override
+                public void onError(long token, SearchError error) {
+                    SearchManager.this.onError(token, error);
+                }
 
-            @Override
-            public void onStopped(long token) {
-                // nothing since this is calculated in aggregation
-            }
-        });
+                @Override
+                public void onStopped(long token) {
+                    // nothing since this is calculated in aggregation
+                }
+            });
 
-        SearchTask task = new PerformTask(this, performer, nextOrdinal(performer.getToken()));
-        submit(task);
+            SearchTask task = new PerformTask(this, performer, nextOrdinal(performer.getToken()));
+            submit(task);
+        } else {
+            LOG.warn("Search performer is null, review your logic");
+        }
     }
 
     public void stop() {
