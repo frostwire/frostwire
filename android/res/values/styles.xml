@@ -474,4 +474,9 @@
         <item name="android:layout_marginTop">15dp</item>
         <item name="android:layout_marginBottom">15dp</item>
     </style>
+
+    <style name="MediumText">
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
 </resources>
