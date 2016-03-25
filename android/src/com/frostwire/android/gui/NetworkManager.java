@@ -50,6 +50,10 @@ public final class NetworkManager {
         this.context = context;
     }
 
+    public boolean isInternetDown() {
+        return !isDataWIFIUp() && !isDataMobileUp() && !isDataWiMAXUp();
+    }
+
     public boolean isDataUp() {
         // boolean logic trick, since sometimes android reports WIFI and MOBILE up at the same time
         return (isDataWIFIUp() != isDataMobileUp()) || isDataWiMAXUp();

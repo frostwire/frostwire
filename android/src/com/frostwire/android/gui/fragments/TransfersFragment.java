@@ -43,6 +43,7 @@ import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.dialogs.MenuDialog;
 import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.*;
@@ -89,7 +90,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private final EngineService.CheckDHTUICallback onDHTCheckCallback;
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
-    private final long VPN_NOTIFICATION_DURATION = 10000;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -221,15 +221,56 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     private class OnCheckDHTCallback implements EngineService.CheckDHTUICallback {
+        private View.OnClickListener onTextDHTPeersClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(v.getContext(), SettingsActivity.class);
+                if (showTorrentSettingsOnClick) {
+                    i.setAction(Constants.ACTION_SETTINGS_OPEN_TORRENT_SETTINGS);
+                }
+                v.getContext().startActivity(i);
+            }
+        };
+
+        private boolean showTorrentSettingsOnClick;
+
         @Override
         public void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
             if (textDHTPeers==null || !TransfersFragment.this.isAdded()) {
                 return;
             }
-            textDHTPeers.setVisibility(dhtEnabled ? View.VISIBLE : View.GONE);
-            if (!dhtEnabled) {
+
+            textDHTPeers.setVisibility(View.VISIBLE);
+            textDHTPeers.setOnClickListener(onTextDHTPeersClickListener);
+            showTorrentSettingsOnClick = true;
+
+            // No Internet
+            if (NetworkManager.instance().isInternetDown()) {
+                textDHTPeers.setText(R.string.check_internet_connection);
                 return;
             }
+
+            // Saving Data on Mobile
+            if (TransferManager.instance().isMobileAndDataSavingsOn()) {
+                textDHTPeers.setText(R.string.bittorrent_off_data_saver_on);
+                return;
+            }
+
+            // BitTorrent Turned off
+            if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
+                // takes you to main settings screen so you can turn it back on.
+                showTorrentSettingsOnClick = false;
+                textDHTPeers.setText(R.string.bittorrent_off);
+                return;
+            }
+
+            // No DHT
+            if (!dhtEnabled) {
+                textDHTPeers.setVisibility(View.GONE);
+                return;
+            }
+
+            // DHT On.
             textDHTPeers.setText(dhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
         }
     }
@@ -274,13 +315,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             if (!TransfersFragment.isVPNactive) {
                 showVPNRichToast();
             }
-        } else {
-            //LOG.info("Shown some other time.");
         }
     }
 
     private void showVPNRichToast() {
         vpnRichToast.setVisibility(View.VISIBLE);
+        long VPN_NOTIFICATION_DURATION = 10000;
         vpnRichToastHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -538,7 +578,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         return false;
     }
 
-    public void startTransferFromURL() {
+    private void startTransferFromURL() {
         String url = addTransferUrlTextView.getText();
         if (!StringUtils.isNullOrEmpty(url) && (url.startsWith("magnet") || url.startsWith("http"))) {
             toggleAddTransferControls();
@@ -634,7 +674,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
      * Is it using the SD Card's private (non-persistent after uninstall) app folder to save
      * downloaded files?
      */
-    public static boolean isUsingSDCardPrivateStorage() {
+    private static boolean isUsingSDCardPrivateStorage() {
         String primaryPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         String currentPath = ConfigurationManager.instance().getStoragePath();
 
@@ -689,7 +729,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private static final class ButtonAddTransferListener extends ClickAdapter<TransfersFragment> {
 
-        public ButtonAddTransferListener(TransfersFragment f) {
+        ButtonAddTransferListener(TransfersFragment f) {
             super(f);
         }
 
@@ -701,7 +741,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private static final class ButtonMenuListener extends ClickAdapter<TransfersFragment> {
 
-        public ButtonMenuListener(TransfersFragment f) {
+        ButtonMenuListener(TransfersFragment f) {
             super(f);
         }
 
@@ -713,7 +753,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private static final class AddTransferTextListener extends ClickAdapter<TransfersFragment> implements OnItemClickListener, OnActionListener {
 
-        public AddTransferTextListener(TransfersFragment owner) {
+        AddTransferTextListener(TransfersFragment owner) {
             super(owner);
         }
 
@@ -752,7 +792,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
         private final TransferStatus status;
 
-        public ButtonTabListener(TransfersFragment f, TransferStatus status) {
+        ButtonTabListener(TransfersFragment f, TransferStatus status) {
             super(f);
             this.status = status;
         }
@@ -766,7 +806,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     
     private static final class SDCardNotificationListener extends ClickAdapter<TransfersFragment> {
 
-		public SDCardNotificationListener(TransfersFragment owner) {
+		SDCardNotificationListener(TransfersFragment owner) {
 			super(owner);
 		}
     	

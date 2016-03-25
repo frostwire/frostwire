@@ -585,4 +585,7 @@
     <string name="learn_more">Learn more</string>
     <string name="enable_experimental">Experimental Features</string>
     <string name="selected">selected</string>
+    <string name="check_internet_connection">Check Internet connection</string>
+    <string name="bittorrent_off_data_saver_on">"BitTorrent off (Data Saver On)"</string>
+    <string name="bittorrent_off">BitTorrent off</string>
 </resources>
