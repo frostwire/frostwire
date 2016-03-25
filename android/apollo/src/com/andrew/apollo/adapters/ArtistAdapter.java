@@ -165,4 +165,9 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
             return -1;
         }
     }
+
+    @Override
+    public int getOffset() {
+        return 0;
+    }
 }

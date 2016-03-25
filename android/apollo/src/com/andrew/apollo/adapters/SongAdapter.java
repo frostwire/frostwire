@@ -108,7 +108,11 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).mSongId;
+        final Song song = getItem(position);
+        if (song == null) {
+            return -1;
+        }
+        return song.mSongId;
     }
 
 }
