@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
 * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
 * Copyright (c) 2011, 2014, FrostWire(TM). All rights reserved.
@@ -19,91 +18,90 @@
 */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical"
-              android:padding="0dp"
-              android:scrollbars="vertical">
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="0dp"
+    android:scrollbars="vertical">
 
     <TextView
-            android:id="@+id/dialog_confirm_list_text"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="this is a parameter"
-            android:textSize="18sp"/>
+        android:id="@+id/dialog_confirm_list_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="this is a parameter"
+        android:textSize="18sp" />
 
-    <View android:layout_width="match_parent"
-          android:layout_height="1dp"
-          android:background="@color/basic_blue_highlight">
-    </View>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/basic_blue_highlight"></View>
 
-    <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:paddingTop="2dp"
-                  android:paddingBottom="2dp"
-                  android:paddingRight="5dp"
-                  android:background="#ffe4e9ec"><!-- TODO for @marcelinkaaa Use theme colors. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffe4e9ec"
+        android:orientation="horizontal"
+        android:paddingBottom="2dp"
+        android:paddingRight="5dp"
+        android:paddingTop="2dp"><!-- TODO for @marcelinkaaa Use theme colors. -->
 
         <CheckBox
-                android:id="@+id/dialog_confirm_list_select_all_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/select_all"
-                android:visibility="visible"
-                android:layout_weight="1.0"
-                android:gravity="left|center_vertical"
-        />
+            android:id="@+id/dialog_confirm_list_select_all_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:gravity="left|center_vertical"
+            android:text="@string/select_all"
+            android:visibility="visible" />
     </LinearLayout>
 
     <com.frostwire.android.gui.views.ListView
-            android:id="@+id/dialog_confirm_list_listview"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@color/body_background_gray_light"
-            android:fastScrollEnabled="true"/>
+        android:id="@+id/dialog_confirm_list_listview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/body_background_gray_light"
+        android:fastScrollEnabled="true" />
 
     <!-- summary of what was selected, only visible for selection mode in [multiple choice, no-choice] -->
     <LinearLayout
-            android:id="@+id/dialog_confirm_list_selection_summary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#ffdadada"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"> <!-- TODO for @marcelinkaaa Use theme colors. -->
+        android:id="@+id/dialog_confirm_list_selection_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/basic_gray_medium"
+        android:paddingBottom="8dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="8dp">
 
         <!-- the number of selected items -->
-        <TextView android:id="@+id/dialog_confirm_list_num_checked_textview"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:gravity="center_vertical"
-                  android:textSize="@dimen/text_x_small"
-                  android:textStyle="bold"/>
-        <!-- spacer -->
-        <View android:layout_weight="1.0"
-              android:layout_width="0dp"
-              android:layout_height="match_parent"/>
+        <TextView
+            android:id="@+id/dialog_confirm_list_num_checked_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:textSize="@dimen/text_small"
+            android:textStyle="bold" />
 
         <!-- selection sum, e.g. for files, this would be the number of total bytes -->
-        <TextView android:id="@+id/dialog_confirm_list_sum_checked_textview"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:gravity="center_vertical"
-                  android:textSize="@dimen/text_x_small"/>
+        <TextView
+            android:id="@+id/dialog_confirm_list_sum_checked_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:gravity="right"
+            android:textSize="@dimen/text_small" />
     </LinearLayout>
 
     <!-- buttons -->
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:background="@color/basic_gray_medium"
-        android:paddingTop="1dp"
+        android:orientation="horizontal"
         android:paddingBottom="1dp"
+        android:paddingTop="1dp"
         android:weightSum="1.0">
 
         <Button
@@ -111,20 +109,20 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
+            android:background="@color/app_light_background"
             android:minLines="1"
             android:text="@android:string/no"
-            android:background="@color/app_light_background"
             android:textSize="15sp" />
 
         <Button
             android:id="@+id/dialog_confirm_list_button_yes"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="1dp"
             android:layout_weight="0.5"
+            android:background="@color/app_light_background"
             android:minLines="1"
             android:text="@android:string/yes"
-            android:layout_marginLeft="1dp"
-            android:background="@color/app_light_background"
             android:textSize="15sp" />
     </LinearLayout>
 
