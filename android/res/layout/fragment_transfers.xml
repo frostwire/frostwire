@@ -148,14 +148,14 @@
         <!-- DHT peers -->
         <TextView android:id="@+id/fragment_transfers_dht_peers"
                   android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
+                  android:layout_height="match_parent"
                   android:textColor="@color/app_light_gray_text"
                   android:textSize="@dimen/text_size_extra_micro"
+                  android:gravity="center_vertical"
                   android:layout_gravity="center_vertical"
                   android:layout_marginLeft="5dp"
+                  android:layout_weight="1.0"
                   android:text="@string/dht_contacts"/>
-
-        <View android:layout_weight="1.0" android:layout_width="0dp" android:layout_height="fill_parent"/>
 
         <LinearLayout android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
