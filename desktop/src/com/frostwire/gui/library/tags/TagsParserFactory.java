@@ -44,7 +44,7 @@ class TagsParserFactory {
         if (isMP3(ext)) {
             return new MP3Parser(file);
         } else if (isM4A(ext)) {
-            return new M4AParser(file);
+            return new MP4Parser(file); // M4AParser(file);
         } else if (isMP4(ext)) {
             return new MP4Parser(file);
         } else if (isOgg(ext)) {
