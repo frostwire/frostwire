@@ -110,13 +110,13 @@ public final class IsoMedia {
         }
     }
 
-    public static LinkedList<Box> head(RandomAccessFile in) throws IOException {
+    public static LinkedList<Box> head(RandomAccessFile in, ByteBuffer buf) throws IOException {
         in.seek(0);
 
         final InputChannel ch = new InputChannel(in.getChannel());
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        read(ch, new OnBoxListener() {
+        read(ch, -1, null, new OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 if (b.parent == null) {
@@ -125,11 +125,15 @@ public final class IsoMedia {
 
                 return b.type != Box.mdat;
             }
-        });
+        }, buf);
 
         in.seek(0);
 
         return boxes;
+    }
+
+    public static LinkedList<Box> head(RandomAccessFile in) throws IOException {
+        return head(in, ByteBuffer.allocate(10 * 1024));
     }
 
     public static boolean write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l, ByteBuffer buf) throws IOException {

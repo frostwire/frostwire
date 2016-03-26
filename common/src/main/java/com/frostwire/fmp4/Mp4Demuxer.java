@@ -30,18 +30,24 @@ import java.util.ListIterator;
  */
 public final class Mp4Demuxer {
 
-    public static void track(int id, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out) throws IOException {
-        LinkedList<Box> head = IsoMedia.head(in);
+    public static void track(int id, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out, DemuxerListener l) throws IOException {
+        ByteBuffer buf = ByteBuffer.allocate(100 * 1024);
+        LinkedList<Box> head = IsoMedia.head(in, buf);
         boolean fragments = Box.findFirst(head, Box.mvex) != null;
-        track(id, fragments, head, tags, in, out);
+        track(id, fragments, head, tags, in, out, l, buf);
     }
 
-    public static void audio(File intput, File output, Mp4Tags tags) throws IOException {
-        RandomAccessFile in = new RandomAccessFile(intput, "r");
+    public static void track(int id, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out) throws IOException {
+        track(id, tags, in, out, null);
+    }
+
+    public static void audio(File input, File output, Mp4Tags tags, DemuxerListener l) throws IOException {
+        RandomAccessFile in = new RandomAccessFile(input, "r");
         RandomAccessFile out = new RandomAccessFile(output, "rw");
 
         try {
-            LinkedList<Box> head = IsoMedia.head(in);
+            ByteBuffer buf = ByteBuffer.allocate(100 * 1024);
+            LinkedList<Box> head = IsoMedia.head(in, buf);
 
             // find audio track
             SoundMediaHeaderBox smhd = Box.findFirst(head, Box.smhd);
@@ -49,7 +55,7 @@ public final class Mp4Demuxer {
             TrackHeaderBox tkhd = trak.findFirst(Box.tkhd);
 
             boolean fragments = Box.findFirst(head, Box.mvex) != null;
-            track(tkhd.trackId(), fragments, head, tags, in, out);
+            track(tkhd.trackId(), fragments, head, tags, in, out, l, buf);
 
         } finally {
             close(in);
@@ -57,19 +63,22 @@ public final class Mp4Demuxer {
         }
     }
 
-    private static void track(int id, boolean fragments, LinkedList<Box> head, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out) throws IOException {
+    public static void audio(File input, File output, Mp4Tags tags) throws IOException {
+        audio(input, output, tags, null);
+    }
+
+    private static void track(int id, boolean fragments, LinkedList<Box> head, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out, final DemuxerListener l, final ByteBuffer buf) throws IOException {
         out.setLength(0);
 
         if (fragments) {
-            trackFragments(id, head, tags, in, out);
+            trackFragments(id, head, tags, in, out, l, buf);
         } else {
-            trackSimple(id, tags, in, out);
+            trackSimple(id, tags, in, out, l, buf);
         }
     }
 
-    private static void trackFragments(int id, LinkedList<Box> head, Mp4Tags tags, RandomAccessFile fIn, RandomAccessFile fOut) throws IOException {
+    private static void trackFragments(int id, LinkedList<Box> head, Mp4Tags tags, RandomAccessFile fIn, RandomAccessFile fOut, final DemuxerListener l, final ByteBuffer buf) throws IOException {
         final int trackId = id;
-        final ByteBuffer buf = ByteBuffer.allocate(10 * 1024);
         final int mdatOffset = calcMdatOffset(head, fIn.length(), tags);
         fOut.seek(mdatOffset);
 
@@ -96,6 +105,7 @@ public final class Mp4Demuxer {
 
             @Override
             public boolean onBox(Box b) {
+                notifyCount(l, in.count(), out.count());
                 if (b.parent == null && b.type != Box.mdat && b.type != Box.moof) {
                     boxes.add(b);
                 }
@@ -209,6 +219,7 @@ public final class Mp4Demuxer {
 
                 try {
                     IO.copy(in, out, mdat.length(), buf);
+                    notifyCount(l, in.count(), out.count());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -311,17 +322,17 @@ public final class Mp4Demuxer {
         }, buf);
     }
 
-    private static void trackSimple(int id, Mp4Tags tags, RandomAccessFile fIn, RandomAccessFile fOut) throws IOException {
+    private static void trackSimple(int id, Mp4Tags tags, RandomAccessFile fIn, RandomAccessFile fOut, final DemuxerListener l, final ByteBuffer buf) throws IOException {
         int trackId = id;
-        ByteBuffer buf = ByteBuffer.allocate(10 * 1024);
-        InputChannel in = new InputChannel(fIn.getChannel());
-        OutputChannel out = new OutputChannel(fOut.getChannel());
+        final InputChannel in = new InputChannel(fIn.getChannel());
+        final OutputChannel out = new OutputChannel(fOut.getChannel());
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
         IsoMedia.read(in, fIn.length(), null, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
+                notifyCount(l, in.count(), out.count());
                 if (b.parent == null) {
                     boxes.add(b);
                 }
@@ -405,6 +416,7 @@ public final class Mp4Demuxer {
         IsoMedia.write(out, boxes, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
+                notifyCount(l, in.count(), out.count());
                 return true;
             }
         }, buf);
@@ -414,8 +426,10 @@ public final class Mp4Demuxer {
 
             int skp = chunkOffsetOrg[i] - pos;
             IO.skip(in, skp, buf);
+            notifyCount(l, in.count(), out.count());
 
             IO.copy(in, out, chunkSize[i], buf);
+            notifyCount(l, in.count(), out.count());
         }
     }
 
@@ -490,5 +504,16 @@ public final class Mp4Demuxer {
         } catch (IOException ioe) {
             // ignore
         }
+    }
+
+    private static void notifyCount(DemuxerListener l, long readCount, long writeCount) {
+        if (l != null) {
+            l.onCount(readCount, writeCount);
+        }
+    }
+
+    public interface DemuxerListener {
+
+        void onCount(long readCount, long writeCount);
     }
 }

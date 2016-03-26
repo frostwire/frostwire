@@ -108,7 +108,7 @@ public final class MP4Muxer {
         }
     }
 
-    public void demuxAudio(String video, String output, final MP4Metadata mt) throws IOException {
+    public void demuxAudio(String video, String output, final MP4Metadata mt, Mp4Demuxer.DemuxerListener l) throws IOException {
         try {
             Mp4Tags tags = new Mp4Tags();
             tags.compatibleBrands = new int[]{com.frostwire.fmp4.Box.M4A_, com.frostwire.fmp4.Box.mp42, com.frostwire.fmp4.Box.isom, com.frostwire.fmp4.Box.zero};
@@ -116,7 +116,7 @@ public final class MP4Muxer {
             tags.author = mt.author;
             tags.source = mt.source;
             tags.jpg = mt.jpg;
-            Mp4Demuxer.audio(new File(video), new File(output), tags);
+            Mp4Demuxer.audio(new File(video), new File(output), tags, l);
         } catch (Throwable e) {
             e.printStackTrace();
             demuxAudioUsingMP4Parser(video, output, mt);
