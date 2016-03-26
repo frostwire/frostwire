@@ -28,7 +28,7 @@ public final class TrackHeaderBox extends FullBox {
 
     protected long creation_time;
     protected long modification_time;
-    protected int track_ID;
+    private int track_ID;
     protected int reserved1;
     protected long duration;
     protected final int[] reserved2;
@@ -44,6 +44,62 @@ public final class TrackHeaderBox extends FullBox {
         super(tkhd);
         reserved2 = new int[2];
         matrix = new int[]{0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000};
+    }
+
+    public int trackId() {
+        return track_ID;
+    }
+
+    public void trackId(int value) {
+        track_ID = value;
+    }
+
+    public boolean enabled() {
+        return (flags & 0x1) == 0x1;
+    }
+
+    public void enabled(boolean value) {
+        if (value) {
+            flags = (flags | 0x1);
+        } else {
+            flags = (flags & ~0x1);
+        }
+    }
+
+    public boolean inMovie() {
+        return (flags & 0x2) == 0x2;
+    }
+
+    public void inMovie(boolean value) {
+        if (value) {
+            flags = (flags | 0x2);
+        } else {
+            flags = (flags & ~0x2);
+        }
+    }
+
+    public boolean inPreview() {
+        return (flags & 0x4) == 0x4;
+    }
+
+    public void inPreview(boolean value) {
+        if (value) {
+            flags = (flags | 0x4);
+        } else {
+            flags = (flags & ~0x4);
+        }
+    }
+
+    public boolean inPoster() {
+        return (flags & 0x8) == 0x8;
+    }
+
+    public void inPoster(boolean value) {
+        if (value) {
+            flags = (flags | 0x8);
+        } else {
+            flags = (flags & ~0x8);
+        }
     }
 
     @Override

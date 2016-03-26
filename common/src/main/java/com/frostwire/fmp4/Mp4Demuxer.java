@@ -17,8 +17,6 @@
 
 package com.frostwire.fmp4;
 
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -29,16 +27,53 @@ import java.util.LinkedList;
  * @author gubatron
  * @author aldenml
  */
-public class FragmentedDemuxTest {
+public final class Mp4Demuxer {
 
-    @Test
-    public void testFragmented1() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
-        File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
-        RandomAccessFile in = new RandomAccessFile(fIn, "r");
-        RandomAccessFile out = new RandomAccessFile(fOut, "rw");
-        final InputChannel chIn = new InputChannel(in.getChannel());
-        final OutputChannel chOut = new OutputChannel(out.getChannel());
+    public static void track(int id, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out) throws IOException {
+        LinkedList<Box> head = IsoMedia.head(in);
+        boolean fragments = Box.findFirst(head, Box.mvex) != null;
+        track(id, fragments, head, tags, in, out);
+    }
+
+    public static void audio(File intput, File output, Mp4Tags tags) throws IOException {
+        RandomAccessFile in = new RandomAccessFile(intput, "r");
+        RandomAccessFile out = new RandomAccessFile(output, "rw");
+
+        try {
+            LinkedList<Box> head = IsoMedia.head(in);
+
+            // find audio track
+            SoundMediaHeaderBox smhd = Box.findFirst(head, Box.smhd);
+            TrackBox trak = (TrackBox) smhd.parent.parent.parent;
+            TrackHeaderBox tkhd = trak.findFirst(Box.tkhd);
+
+            boolean fragments = Box.findFirst(head, Box.mvex) != null;
+            track(tkhd.trackId(), fragments, head, tags, in, out);
+
+        } finally {
+            close(in);
+            close(out);
+        }
+    }
+
+    private static void track(int id, boolean fragments, LinkedList<Box> head, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out) throws IOException {
+        out.setLength(0);
+
+        if (fragments) {
+            trackFragments(id, head, tags, in, out);
+        } else {
+            trackSimple(id);
+        }
+    }
+
+    private static void trackFragments(int id, LinkedList<Box> head, Mp4Tags tags, RandomAccessFile fIn, RandomAccessFile fOut) throws IOException {
+        final int trackId = id;
+        final ByteBuffer buf = ByteBuffer.allocate(10 * 1024);
+        final int mdatOffset = calcMdatOffset(head, fIn.length(), tags);
+        fOut.seek(mdatOffset);
+
+        final InputChannel in = new InputChannel(fIn.getChannel());
+        final OutputChannel out = new OutputChannel(fOut.getChannel());
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
@@ -49,53 +84,55 @@ public class FragmentedDemuxTest {
         final LinkedList<SampleToChunkBox.Entry> stscList = new LinkedList<>();
         final LinkedList<ChunkOffsetBox.Entry> stcoList = new LinkedList<>();
 
-        final ByteBuffer buf = ByteBuffer.allocate(10 * 1024);
-
-        // move 200Kb in out to make space for header
-        final int mdatOffset = 3 * 1024 * 1024;
-        IO.skip(chOut, mdatOffset, buf);
-
-        IsoMedia.read(chIn, fIn.length(), null, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(in, fIn.length(), null, new IsoMedia.OnBoxListener() {
 
             TrackExtendsBox trex;
-            TrackRunBox lastTrun;
+            TrackRunBox trun;
+            MediaDataBox mdat;
             int chunkNumber = 1;
             int chunkOffset = mdatOffset;
             int sampleNumber = 1;
 
             @Override
             public boolean onBox(Box b) {
-                if (b.parent == null &&
-                        b.type != Box.mdat &&
-                        b.type != Box.moof) {
+                if (b.parent == null && b.type != Box.mdat && b.type != Box.moof) {
                     boxes.add(b);
                 }
 
                 if (b.type == Box.trex) {
                     trex = (TrackExtendsBox) b;
+                    if (trex.track_ID != trackId) {
+                        trex = null;
+                    }
                 }
 
                 if (b.type == Box.trun) {
-                    lastTrun = (TrackRunBox) b;
+                    trun = (TrackRunBox) b;
+                }
+
+                if (b.type == Box.mdat) {
+                    mdat = (MediaDataBox) b;
                 }
 
                 if (b.type != Box.mdat) {
                     return true;
                 }
 
-                MediaDataBox mdat = (MediaDataBox) b;
-                TrackRunBox trun = lastTrun;
                 TrackFragmentHeaderBox tfhd = trun.parent.findFirst(Box.tfhd);
 
-                SampleToChunkBox.Entry e2 = new SampleToChunkBox.Entry();
-                e2.first_chunk = chunkNumber;
-                e2.samples_per_chunk = trun.sample_count;
-                e2.sample_description_index = 1;
-                stscList.add(e2);
+                if (tfhd.track_ID != trackId) {
+                    return true;
+                }
 
-                ChunkOffsetBox.Entry e3 = new ChunkOffsetBox.Entry();
-                e3.chunk_offset = chunkOffset;
-                stcoList.add(e3);
+                SampleToChunkBox.Entry stscEntry = new SampleToChunkBox.Entry();
+                stscEntry.first_chunk = chunkNumber;
+                stscEntry.samples_per_chunk = trun.sample_count;
+                stscEntry.sample_description_index = 1;
+                stscList.add(stscEntry);
+
+                ChunkOffsetBox.Entry stcoEntry = new ChunkOffsetBox.Entry();
+                stcoEntry.chunk_offset = chunkOffset;
+                stcoList.add(stcoEntry);
 
                 boolean first = true;
                 for (TrackRunBox.Entry entry : trun.entries) {
@@ -137,11 +174,11 @@ public class FragmentedDemuxTest {
                         }
                     }
 
-                    SampleSizeBox.Entry e1 = new SampleSizeBox.Entry();
-                    e1.entry_size = entry.sample_size;
-                    stszList.add(e1);
+                    SampleSizeBox.Entry stszEntry = new SampleSizeBox.Entry();
+                    stszEntry.entry_size = entry.sample_size;
+                    stszList.add(stszEntry);
 
-                    final int sampleFlags;
+                    int sampleFlags;
                     if (trun.sampleFlagsPresent()) {
                         sampleFlags = entry.sample_flags;
                     } else {
@@ -170,17 +207,14 @@ public class FragmentedDemuxTest {
                 chunkOffset += (int) mdat.length();
 
                 try {
-                    IO.copy(chIn, chOut, mdat.length(), buf);
+                    IO.copy(in, out, mdat.length(), buf);
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    return false;
+                    throw new RuntimeException(e);
                 }
 
                 return true;
             }
         }, buf);
-
-        out.close();
 
         SampleTableBox stbl = Box.findFirst(boxes, Box.stbl);
         TimeToSampleBox stts = stbl.findFirst(Box.stts);
@@ -215,55 +249,122 @@ public class FragmentedDemuxTest {
             stco.entries = stcoList.toArray(new ChunkOffsetBox.Entry[0]);
         }
 
+        // some fixes
         Box mvex = Box.findFirst(boxes, Box.mvex);
         mvex.parent.boxes.remove(mvex);
+        Box sidx = Box.findFirst(boxes, Box.sidx);
+        boxes.remove(sidx);
+        TrackHeaderBox tkhd = Box.findFirst(boxes, Box.tkhd);
+        tkhd.enabled(true);
+        tkhd.inMovie(true);
+        tkhd.inPreview(true);
+        tkhd.inPoster(true);
+        MediaHeaderBox mdhd = Box.findFirst(boxes, Box.mdhd);
+        mdhd.language("eng");
 
-        long newLen = ContainerBox.length(boxes);
+        // add tags
+        if (tags != null) {
+            if (tags.compatibleBrands != null) {
+                FileTypeBox ftyp = Box.findFirst(boxes, Box.ftyp);
+                ftyp.compatible_brands = tags.compatibleBrands;
+            }
+            UserDataBox udta = createUdta(tags);
+            MovieBox moov = Box.findFirst(boxes, Box.moov);
+            moov.boxes.add(udta);
+        }
+
         MediaDataBox mdat = new MediaDataBox();
-        mdat.length(fOut.length() - newLen);
+        mdat.length(0);
         boxes.add(mdat);
-        newLen = ContainerBox.length(boxes);
+        long len = ContainerBox.length(boxes); // this update the boxes
+        if (len > mdatOffset) {
+            throw new IOException("Movie header bigger than mdat offset");
+        }
+        mdat.length(fOut.length() - len);
 
-        out = new RandomAccessFile(fOut, "rw");
-        final OutputChannel chOut1 = new OutputChannel(out.getChannel());
-        IsoMedia.write(chOut1, boxes, new IsoMedia.OnBoxListener() {
+        fOut.seek(0);
+        IsoMedia.write(out, boxes, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 return true;
             }
         }, buf);
-        out.close();
     }
 
-    @Test
-    public void testFragmented2() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
-        File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
-        RandomAccessFile in = new RandomAccessFile(fIn, "r");
-        RandomAccessFile out = new RandomAccessFile(fOut, "rw");
-
-        Mp4Tags tags = new Mp4Tags();
-        tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
-        tags.title = "ti";
-        tags.author = "au";
-        tags.source = "sr";
-        tags.jpg = null;
-
-        Mp4Demuxer.track(1, tags, in, out);
+    private static void trackSimple(int id) {
+        throw new UnsupportedOperationException();
     }
 
-    @Test
-    public void testFragmented3() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
-        File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
+    private static int calcMdatOffset(LinkedList<Box> head, long length, Mp4Tags tags) throws IOException {
+        MovieFragmentBox moof = Box.findFirst(head, Box.moof);
+        MediaDataBox mdat = Box.findFirst(head, Box.mdat);
 
-        Mp4Tags tags = new Mp4Tags();
-        tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
-        tags.title = "ti";
-        tags.author = "au";
-        tags.source = "sr";
-        tags.jpg = null;
+        int n = (int) (length / mdat.size);
+        int len = n * moof.size * 4;
+        len += 100000; // header room
+        len += tags != null && tags.jpg != null ? tags.jpg.length : 0;
 
-        Mp4Demuxer.audio(fIn, fOut, tags);
+        return len;
+    }
+
+    private static UserDataBox createUdta(Mp4Tags tags) {
+        //"/moov/udta/meta/ilst/covr/data"
+        UserDataBox udta = new UserDataBox();
+
+        MetaBox meta = new MetaBox();
+        udta.boxes.add(meta);
+
+        HandlerBox hdlr = new HandlerBox();
+        hdlr.handler_type = Bits.make4cc("mdir");
+        meta.boxes.add(hdlr);
+
+        AppleItemListBox ilst = new AppleItemListBox();
+        meta.boxes.add(ilst);
+
+        if (tags.title != null) {
+            AppleNameBox cnam = new AppleNameBox();
+            cnam.value(tags.title);
+            ilst.boxes.add(cnam);
+        }
+
+        if (tags.author != null) {
+            AppleArtistBox cART = new AppleArtistBox();
+            cART.value(tags.author);
+            ilst.boxes.add(cART);
+        }
+
+        if (tags.title != null || tags.author != null) {
+            AppleArtist2Box aART = new AppleArtist2Box();
+            aART.value(tags.title + " " + tags.author);
+            ilst.boxes.add(aART);
+        }
+
+        if (tags.title != null || tags.author != null || tags.source != null) {
+            AppleAlbumBox calb = new AppleAlbumBox();
+            calb.value(tags.title + " " + tags.author + " via " + tags.source);
+            ilst.boxes.add(calb);
+        }
+
+        AppleMediaTypeBox stik = new AppleMediaTypeBox();
+        stik.value(1);
+        ilst.boxes.add(stik);
+
+        if (tags.jpg != null) {
+            AppleCoverBox covr = new AppleCoverBox();
+            covr.value(tags.jpg);
+            ilst.boxes.add(covr);
+        }
+
+        return udta;
+    }
+
+    private static void close(RandomAccessFile f) {
+        try {
+            if (f != null) {
+                f.close();
+            }
+        } catch (IOException ioe) {
+            // ignore
+        }
     }
 }

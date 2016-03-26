@@ -33,6 +33,7 @@ public class Box {
     public static final int soun = Bits.make4cc("soun");
     public static final int vide = Bits.make4cc("vide");
     public static final int hint = Bits.make4cc("hint");
+    public static final int data = Bits.make4cc("data");
 
     public static final int mdat = Bits.make4cc("mdat");
     public static final int ftyp = Bits.make4cc("ftyp");

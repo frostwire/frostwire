@@ -54,6 +54,8 @@ public class AppleIntegerBox extends AppleDataBox {
         } else {
             this.value = new byte[]{Bits.int3(value), Bits.int2(value), Bits.int1(value), Bits.int0(value)};
         }
+
+        dataLength = this.value.length + 16;
     }
 
     @Override

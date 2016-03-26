@@ -71,4 +71,32 @@ final class Bits {
 
         return int32(code[0], code[1], code[2], code[3]);
     }
+
+    public static String iso639(byte[] arr) {
+        if (arr.length != 2) {
+            throw new IllegalArgumentException("array must be of length 2");
+        }
+        int bits = Bits.int32((byte) 0, (byte) 0, arr[0], arr[1]);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            int c = (bits >> (2 - i) * 5) & 0x1f;
+            sb.append((char) (c + 0x60));
+        }
+        return sb.toString();
+    }
+
+
+    public static byte[] iso639(String s) {
+        byte[] arr = Utf8.convert(s);
+        if (arr.length != 3) {
+            throw new IllegalArgumentException("string must be of length 3");
+        }
+        int bits = 0;
+        for (int i = 0; i < 3; i++) {
+            bits += (arr[i] - 0x60) << (2 - i) * 5;
+        }
+        byte b1 = Bits.int1(bits);
+        byte b0 = Bits.int0(bits);
+        return new byte[]{b1, b0};
+    }
 }

@@ -39,6 +39,9 @@ public final class AppleCoverBox extends AppleDataBox {
 
     public void value(byte[] value) {
         this.value = value;
+        if (value != null) {
+            dataLength = value.length + 16;
+        }
     }
 
     @Override
