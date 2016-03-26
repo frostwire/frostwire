@@ -85,7 +85,7 @@ public class FragmentedDemuxTest {
 
                 MediaDataBox mdat = (MediaDataBox) b;
                 TrackRunBox trun = lastTrun;
-                TrackFragmentHeaderBox tfhd = IsoMedia.<TrackFragmentHeaderBox>find(trun.parent.boxes, Box.tfhd).getFirst();
+                TrackFragmentHeaderBox tfhd = trun.parent.findFirst(Box.tfhd);
 
                 SampleToChunkBox.Entry e2 = new SampleToChunkBox.Entry();
                 e2.first_chunk = chunkNumber;
@@ -182,40 +182,40 @@ public class FragmentedDemuxTest {
 
         out.close();
 
-        SampleTableBox stbl = IsoMedia.findFirst(boxes, Box.stbl);
-        TimeToSampleBox stts = IsoMedia.findFirst(stbl.boxes, Box.stts);
+        SampleTableBox stbl = Box.findFirst(boxes, Box.stbl);
+        TimeToSampleBox stts = stbl.findFirst(Box.stts);
         if (stts != null) {
             stts.entry_count = sttsList.size();
             stts.entries = sttsList.toArray(new TimeToSampleBox.Entry[0]);
         }
-        CompositionOffsetBox ctts = IsoMedia.findFirst(stbl.boxes, Box.ctts);
+        CompositionOffsetBox ctts = stbl.findFirst(Box.ctts);
         if (ctts != null) {
             ctts.entry_count = cttsList.size();
             ctts.entries = cttsList.toArray(new CompositionOffsetBox.Entry[0]);
         }
-        SyncSampleBox stss = IsoMedia.findFirst(stbl.boxes, Box.stss);
+        SyncSampleBox stss = stbl.findFirst(Box.stss);
         if (stss != null) {
             stss.entry_count = stssList.size();
             stss.entries = stssList.toArray(new SyncSampleBox.Entry[0]);
         }
-        SampleSizeBox stsz = IsoMedia.findFirst(stbl.boxes, Box.stsz);
+        SampleSizeBox stsz = stbl.findFirst(Box.stsz);
         if (stsz != null) {
             stsz.sample_size = 0;
             stsz.sample_count = stszList.size();
             stsz.entries = stszList.toArray(new SampleSizeBox.Entry[0]);
         }
-        SampleToChunkBox stsc = IsoMedia.findFirst(stbl.boxes, Box.stsc);
+        SampleToChunkBox stsc = stbl.findFirst(Box.stsc);
         if (stsc != null) {
             stsc.entry_count = stscList.size();
             stsc.entries = stscList.toArray(new SampleToChunkBox.Entry[0]);
         }
-        ChunkOffsetBox stco = IsoMedia.findFirst(stbl.boxes, Box.stco);
+        ChunkOffsetBox stco = stbl.findFirst(Box.stco);
         if (stco != null) {
             stco.entry_count = stcoList.size();
             stco.entries = stcoList.toArray(new ChunkOffsetBox.Entry[0]);
         }
 
-        Box mvex = IsoMedia.findFirst(boxes, Box.mvex);
+        Box mvex = Box.findFirst(boxes, Box.mvex);
         mvex.parent.boxes.remove(mvex);
 
         long newLen = ContainerBox.length(boxes);

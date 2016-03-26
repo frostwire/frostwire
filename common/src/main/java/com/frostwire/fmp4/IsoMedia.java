@@ -157,33 +157,6 @@ public final class IsoMedia {
         return true;
     }
 
-    public static <T extends Box> LinkedList<T> find(LinkedList<Box> boxes, int type) {
-        LinkedList<T> l = new LinkedList<>();
-
-        for (Box b : boxes) {
-            if (b.type == type) {
-                l.add((T) b);
-            }
-        }
-
-        if (l.isEmpty()) {
-            for (Box b : boxes) {
-                if (b.boxes != null) {
-                    LinkedList<T> t = find(b.boxes, type);
-                    if (!t.isEmpty()) {
-                        l.addAll(t);
-                    }
-                }
-            }
-        }
-
-        return l;
-    }
-
-    public static <T extends Box> T findFirst(LinkedList<Box> boxes, int type) {
-        return (T) find(boxes, type).peekFirst();
-    }
-
     public interface OnBoxListener {
 
         /**

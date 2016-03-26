@@ -154,7 +154,7 @@ public class SimpleReadTest {
         });
 
         // find
-        VideoMediaHeaderBox vmhd = IsoMedia.<VideoMediaHeaderBox>find(boxes, Box.vmhd).getFirst();
+        VideoMediaHeaderBox vmhd = Box.findFirst(boxes, Box.vmhd);
         TrackBox trak = (TrackBox) vmhd.parent.parent.parent;
         MovieBox moov = (MovieBox) trak.parent;
 
@@ -201,8 +201,8 @@ public class SimpleReadTest {
         });
 
         // find
-        VideoMediaHeaderBox vmhd = IsoMedia.<VideoMediaHeaderBox>find(boxes, Box.vmhd).getFirst();
-        SoundMediaHeaderBox smhd = IsoMedia.<SoundMediaHeaderBox>find(boxes, Box.smhd).getFirst();
+        VideoMediaHeaderBox vmhd = Box.findFirst(boxes, Box.vmhd);
+        SoundMediaHeaderBox smhd = Box.findFirst(boxes, Box.smhd);
 
         TrackBox trak = (TrackBox) vmhd.parent.parent.parent;
         MovieBox moov = (MovieBox) trak.parent;
@@ -216,9 +216,9 @@ public class SimpleReadTest {
         }
 
         trak = (TrackBox) smhd.parent.parent.parent;
-        SampleToChunkBox stsc = IsoMedia.<SampleToChunkBox>find(trak.boxes, Box.stsc).getFirst();
-        SampleSizeBox stsz = IsoMedia.<SampleSizeBox>find(trak.boxes, Box.stsz).getFirst();
-        ChunkOffsetBox stco = IsoMedia.<ChunkOffsetBox>find(trak.boxes, Box.stco).getFirst();
+        SampleToChunkBox stsc = trak.findFirst(Box.stsc);
+        SampleSizeBox stsz = trak.findFirst(Box.stsz);
+        ChunkOffsetBox stco = trak.findFirst(Box.stco);
 
         int[] chunkSize = new int[stco.entry_count];
 
@@ -281,9 +281,9 @@ public class SimpleReadTest {
         });
 
         // find
-        MediaDataBox mdat = IsoMedia.<MediaDataBox>find(boxes, Box.mdat).getFirst();
-        VideoMediaHeaderBox vmhd = IsoMedia.<VideoMediaHeaderBox>find(boxes, Box.vmhd).getFirst();
-        SoundMediaHeaderBox smhd = IsoMedia.<SoundMediaHeaderBox>find(boxes, Box.smhd).getFirst();
+        MediaDataBox mdat = Box.findFirst(boxes, Box.mdat);
+        VideoMediaHeaderBox vmhd = Box.findFirst(boxes, Box.vmhd);
+        SoundMediaHeaderBox smhd = Box.findFirst(boxes, Box.smhd);
 
         TrackBox trak = (TrackBox) vmhd.parent.parent.parent;
         MovieBox moov = (MovieBox) trak.parent;
@@ -297,9 +297,9 @@ public class SimpleReadTest {
         }
 
         trak = (TrackBox) smhd.parent.parent.parent;
-        SampleToChunkBox stsc = IsoMedia.<SampleToChunkBox>find(trak.boxes, Box.stsc).getFirst();
-        SampleSizeBox stsz = IsoMedia.<SampleSizeBox>find(trak.boxes, Box.stsz).getFirst();
-        ChunkOffsetBox stco = IsoMedia.<ChunkOffsetBox>find(trak.boxes, Box.stco).getFirst();
+        SampleToChunkBox stsc = trak.findFirst(Box.stsc);
+        SampleSizeBox stsz = trak.findFirst(Box.stsz);
+        ChunkOffsetBox stco = trak.findFirst(Box.stco);
 
         int[] chunkSize = new int[stco.entry_count];
 
@@ -368,10 +368,10 @@ public class SimpleReadTest {
             }
         });
 
-        LinkedList<TrackFragmentBox> trafs = IsoMedia.find(boxes, Box.traf);
+        LinkedList<TrackFragmentBox> trafs = Box.find(boxes, Box.traf);
         for (TrackFragmentBox traf : trafs) {
-            TrackFragmentHeaderBox tfhd = IsoMedia.<TrackFragmentHeaderBox>find(traf.boxes, Box.tfhd).getFirst();
-            TrackRunBox trun = IsoMedia.<TrackRunBox>find(traf.boxes, Box.trun).getFirst();
+            TrackFragmentHeaderBox tfhd = traf.findFirst(Box.tfhd);
+            TrackRunBox trun = traf.findFirst(Box.trun);
             for (TrackRunBox.Entry e : trun.entries) {
                 if (trun.sampleDurationPresent()) {
                     System.out.println("trun.sampleDurationPresent() -> true");

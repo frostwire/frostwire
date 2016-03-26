@@ -71,29 +71,4 @@ final class Bits {
 
         return int32(code[0], code[1], code[2], code[3]);
     }
-
-    public static int l2i(long n) {
-        if (n < Integer.MIN_VALUE || Integer.MAX_VALUE < n) {
-            throw new IllegalArgumentException("Can't convert long to int: " + n);
-        }
-        return (int) n;
-    }
-
-    public static long i2u(int n) {
-        return ((long) n) & 0xffffffffL;
-    }
-
-    public static long l2u(long n) {
-        if (n < 0) {
-            throw new IllegalArgumentException("Can't convert negative long to unsigned: " + n);
-        }
-        return n;
-    }
-
-    public static int i2ui(int n) {
-        if (n < 0) {
-            throw new IllegalArgumentException("Can't convert negative int to unsigned: " + n);
-        }
-        return n;
-    }
 }

@@ -38,7 +38,7 @@ public final class CompositionOffsetBox extends FullBox {
         super.read(ch, buf);
 
         IO.read(ch, 4, buf);
-        entry_count = Bits.i2ui(buf.getInt());
+        entry_count = buf.getInt();
         entries = new Entry[entry_count];
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();

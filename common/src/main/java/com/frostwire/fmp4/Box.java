@@ -153,9 +153,44 @@ public class Box {
         }
     }
 
+    public final <T extends Box> LinkedList<T> find(int type) {
+        return boxes != null ? Box.<T>find(boxes, type) : new LinkedList<T>();
+    }
+
+    public final <T extends Box> T findFirst(int type) {
+        return Box.<T>findFirst(boxes, type);
+    }
+
     @Override
     public String toString() {
         return Bits.make4cc(type);
+    }
+
+    static <T extends Box> LinkedList<T> find(LinkedList<Box> boxes, int type) {
+        LinkedList<T> l = new LinkedList<>();
+
+        for (Box b : boxes) {
+            if (b.type == type) {
+                l.add((T) b);
+            }
+        }
+
+        if (l.isEmpty()) {
+            for (Box b : boxes) {
+                if (b.boxes != null) {
+                    LinkedList<T> t = find(b.boxes, type);
+                    if (!t.isEmpty()) {
+                        l.addAll(t);
+                    }
+                }
+            }
+        }
+
+        return l;
+    }
+
+    static <T extends Box> T findFirst(LinkedList<Box> boxes, int type) {
+        return Box.<T>find(boxes, type).peekFirst();
     }
 
     static Box empty(int type) throws IOException {
