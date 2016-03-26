@@ -26,21 +26,32 @@ import java.nio.ByteBuffer;
  */
 public final class AppleCoverBox extends AppleDataBox {
 
+    private static final int IMAGE_TYPE_JPG = 13;
+    private static final int IMAGE_TYPE_PNG = 14;
+
     private byte[] value;
 
     AppleCoverBox() {
         super(covr);
-        dataType = 1;
     }
 
     public byte[] value() {
         return value;
     }
 
-    public void value(byte[] value) {
+    public void setJpg(byte[] data) {
+        value(data, IMAGE_TYPE_JPG);
+    }
+
+    public void setPng(byte[] data) {
+        value(data, IMAGE_TYPE_PNG);
+    }
+
+    private void value(byte[] value, int dataType) {
         this.value = value;
         if (value != null) {
-            dataLength = value.length + 16;
+            this.dataLength = value.length + 16;
+            this.dataType = dataType;
         }
     }
 

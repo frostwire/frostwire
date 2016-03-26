@@ -475,7 +475,7 @@ public final class Mp4Demuxer {
 
         if (tags.jpg != null) {
             AppleCoverBox covr = new AppleCoverBox();
-            covr.value(tags.jpg);
+            covr.setJpg(tags.jpg);
             ilst.boxes.add(covr);
         }
 
