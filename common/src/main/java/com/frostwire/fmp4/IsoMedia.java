@@ -133,6 +133,8 @@ public final class IsoMedia {
     }
 
     public static boolean write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l, ByteBuffer buf) throws IOException {
+        buf.clear();
+
         for (Box b : boxes) {
             buf.putInt(b.size);
             buf.putInt(b.type);

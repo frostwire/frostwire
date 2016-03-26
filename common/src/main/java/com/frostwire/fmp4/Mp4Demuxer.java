@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  * @author gubatron
@@ -62,7 +63,7 @@ public final class Mp4Demuxer {
         if (fragments) {
             trackFragments(id, head, tags, in, out);
         } else {
-            trackSimple(id);
+            trackSimple(id, tags, in, out);
         }
     }
 
@@ -216,6 +217,22 @@ public final class Mp4Demuxer {
             }
         }, buf);
 
+        // remove other tracks
+        MovieBox moov = Box.findFirst(boxes, Box.moov);
+        ListIterator<Box> it = moov.boxes.listIterator();
+        while (it.hasNext()) {
+            Box b = it.next();
+            if (b.type != Box.trak) {
+                continue;
+            }
+
+            TrackHeaderBox tkhd = b.findFirst(Box.tkhd);
+            if (tkhd.trackId() != trackId) {
+                it.remove();
+            }
+        }
+
+        // recreate sample tables
         SampleTableBox stbl = Box.findFirst(boxes, Box.stbl);
         TimeToSampleBox stts = stbl.findFirst(Box.stts);
         if (stts != null) {
@@ -268,8 +285,11 @@ public final class Mp4Demuxer {
                 FileTypeBox ftyp = Box.findFirst(boxes, Box.ftyp);
                 ftyp.compatible_brands = tags.compatibleBrands;
             }
+            // remove old udta boxes
+            for (UserDataBox b : moov.<UserDataBox>find(Box.udta)) {
+                moov.boxes.remove(b);
+            }
             UserDataBox udta = createUdta(tags);
-            MovieBox moov = Box.findFirst(boxes, Box.moov);
             moov.boxes.add(udta);
         }
 
@@ -291,8 +311,112 @@ public final class Mp4Demuxer {
         }, buf);
     }
 
-    private static void trackSimple(int id) {
-        throw new UnsupportedOperationException();
+    private static void trackSimple(int id, Mp4Tags tags, RandomAccessFile fIn, RandomAccessFile fOut) throws IOException {
+        int trackId = id;
+        ByteBuffer buf = ByteBuffer.allocate(10 * 1024);
+        InputChannel in = new InputChannel(fIn.getChannel());
+        OutputChannel out = new OutputChannel(fOut.getChannel());
+
+        final LinkedList<Box> boxes = new LinkedList<>();
+
+        IsoMedia.read(in, fIn.length(), null, new IsoMedia.OnBoxListener() {
+            @Override
+            public boolean onBox(Box b) {
+                if (b.parent == null) {
+                    boxes.add(b);
+                }
+                return b.type != Box.mdat;
+            }
+        }, buf);
+
+        MovieBox moov = Box.findFirst(boxes, Box.moov);
+        TrackBox trak = null;
+
+        // remove other tracks
+        ListIterator<Box> it = moov.boxes.listIterator();
+        while (it.hasNext()) {
+            Box b = it.next();
+            if (b.type != Box.trak) {
+                continue;
+            }
+
+            TrackHeaderBox tkhd = b.findFirst(Box.tkhd);
+            if (tkhd.trackId() != trackId) {
+                it.remove();
+            } else {
+                trak = (TrackBox) b;
+            }
+        }
+
+        // some fixes
+        TrackHeaderBox tkhd = Box.findFirst(boxes, Box.tkhd);
+        tkhd.enabled(true);
+        tkhd.inMovie(true);
+        tkhd.inPreview(true);
+        tkhd.inPoster(true);
+        MediaHeaderBox mdhd = Box.findFirst(boxes, Box.mdhd);
+        mdhd.language("eng");
+
+        // add tags
+        if (tags != null) {
+            if (tags.compatibleBrands != null) {
+                FileTypeBox ftyp = Box.findFirst(boxes, Box.ftyp);
+                ftyp.compatible_brands = tags.compatibleBrands;
+            }
+            // remove old udta boxes
+            for (UserDataBox b : moov.<UserDataBox>find(Box.udta)) {
+                moov.boxes.remove(b);
+            }
+            UserDataBox udta = createUdta(tags);
+            moov.boxes.add(udta);
+        }
+
+        MediaDataBox mdat = Box.findFirst(boxes, Box.mdat);
+        SampleToChunkBox stsc = trak.findFirst(Box.stsc);
+        SampleSizeBox stsz = trak.findFirst(Box.stsz);
+        ChunkOffsetBox stco = trak.findFirst(Box.stco);
+
+        int[] chunkSize = new int[stco.entry_count];
+
+        int chunkIdx = 0;
+        int sampleIdx = 0;
+        for (int i = 0; i < stsc.entry_count; i++) {
+            int a = stsc.entries[i].first_chunk;
+            int b = i < stsc.entry_count - 1 ? stsc.entries[i + 1].first_chunk : a + 1;
+            for (int j = a; j < b; j++) {
+                int sampleSize = 0;
+                for (int k = 0; k < stsc.entries[i].samples_per_chunk; k++) {
+                    sampleSize += stsz.sample_size != 0 ? stsz.sample_size : stsz.entries[sampleIdx].entry_size;
+                    sampleIdx++;
+                }
+                chunkSize[chunkIdx] += sampleSize;
+                chunkIdx++;
+            }
+        }
+
+        int[] chunkOffsetOrg = new int[stco.entry_count];
+        int offset = (int) (ContainerBox.length(boxes) - mdat.length());
+        for (int i = 0; i < stco.entry_count; i++) {
+            chunkOffsetOrg[i] = stco.entries[i].chunk_offset;
+            stco.entries[i].chunk_offset = offset;
+            offset += chunkSize[i];
+        }
+
+        IsoMedia.write(out, boxes, new IsoMedia.OnBoxListener() {
+            @Override
+            public boolean onBox(Box b) {
+                return true;
+            }
+        }, buf);
+
+        for (int i = 0; i < stco.entry_count; i++) {
+            int pos = (int) in.count();
+
+            int skp = chunkOffsetOrg[i] - pos;
+            IO.skip(in, skp, buf);
+
+            IO.copy(in, out, chunkSize[i], buf);
+        }
     }
 
     private static int calcMdatOffset(LinkedList<Box> head, long length, Mp4Tags tags) throws IOException {
