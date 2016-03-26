@@ -399,7 +399,7 @@ public class YouTubeDownload implements BTDownload {
                 }
             } else if (downloadType == DownloadType.DEMUX) {
                 try {
-                    new MP4Muxer().demuxAudio(tempAudio.getAbsolutePath(), completeFile.getAbsolutePath(), buildMetadata());
+                    new MP4Muxer().demuxAudio(tempAudio.getAbsolutePath(), completeFile.getAbsolutePath(), buildMetadata(), null);
 
                     if (!completeFile.exists()) {
                         state = TransferState.ERROR_MOVING_INCOMPLETE;

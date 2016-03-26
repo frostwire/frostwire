@@ -986,7 +986,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
                     String mp4 = file.getAbsolutePath();
                     String m4a = new File(file.getParentFile(), FilenameUtils.getBaseName(mp4) + ".m4a").getAbsolutePath();
                     try {
-                        new MP4Muxer().demuxAudio(mp4, m4a, null);
+                        new MP4Muxer().demuxAudio(mp4, m4a, null, null);
                         demuxedFiles.add(new File(m4a));
                         updateDemuxingStatus(new File(m4a), files.size(), true);
                     } catch (Throwable e) {
