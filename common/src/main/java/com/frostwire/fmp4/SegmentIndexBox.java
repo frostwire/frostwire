@@ -24,59 +24,37 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class SampleToChunkBox extends FullBox {
+public final class SegmentIndexBox extends FullBox {
 
-    protected int entry_count;
-    protected Entry[] entries;
+    protected byte[] data;
 
-    SampleToChunkBox() {
-        super(stsc);
+    SegmentIndexBox() {
+        super(sidx);
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        IO.read(ch, 4, buf);
-        entry_count = buf.getInt();
-        entries = new Entry[entry_count];
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = new Entry();
-            IO.read(ch, 12, buf);
-            e.first_chunk = buf.getInt();
-            e.samples_per_chunk = buf.getInt();
-            e.sample_description_index = buf.getInt();
-            entries[i] = e;
-        }
+        int len = (int) (length() - 4);
+        IO.read(ch, len, buf);
+        data = new byte[len];
+        buf.get(data);
     }
 
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
 
-        buf.putInt(entry_count);
-        IO.write(ch, 4, buf);
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = entries[i];
-            buf.putInt(e.first_chunk);
-            buf.putInt(e.samples_per_chunk);
-            buf.putInt(e.sample_description_index);
-            IO.write(ch, 12, buf);
-        }
+        buf.put(data);
+        IO.write(ch, data.length, buf);
     }
 
     @Override
     void update() {
         long s = 0;
         s += 4; // full box
-        s += 4; // entry_count
-        s += entry_count * 12;
+        s += data.length;
         length(s);
-    }
-
-    public static final class Entry {
-        public int first_chunk;
-        public int samples_per_chunk;
-        public int sample_description_index;
     }
 }

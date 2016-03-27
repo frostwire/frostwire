@@ -39,6 +39,9 @@ public class AppleUtf8Box extends AppleDataBox {
 
     public void value(String value) {
         this.value = value != null ? Utf8.convert(value) : null;
+        if (this.value != null) {
+            dataLength = this.value.length + 16;
+        }
     }
 
     @Override

@@ -30,12 +30,20 @@ public final class MediaHeaderBox extends FullBox {
     protected long modification_time;
     protected int timescale;
     protected long duration;
-    protected final byte[] language;
+    private byte[] language;
     protected short pre_defined;
 
     MediaHeaderBox() {
         super(mdhd);
         language = new byte[2];
+    }
+
+    public String language() {
+        return Bits.iso639(language);
+    }
+
+    public void language(String value) {
+        language = value != null ? Bits.iso639(value) : new byte[2];
     }
 
     @Override

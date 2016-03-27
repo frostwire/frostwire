@@ -23,6 +23,7 @@ import android.content.Context;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
@@ -31,19 +32,23 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class Offers {
 
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(Offers.class);
+
     static final ThreadPool THREAD_POOL = new ThreadPool("SearchManager", 1, 5, 1L, new LinkedBlockingQueue<Runnable>(), true);
-    public static boolean MOBILE_CORE_NATIVE_ADS_READY = false;
+    private static long lastInterstitialShownTimestamp = -1;
+    static boolean MOBILE_CORE_NATIVE_ADS_READY = false;
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
     //private final static MobileCoreAdNetwork MOBILE_CORE = new MobileCoreAdNetwork();
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
     private static List<AdNetwork> AD_NETWORKS;
 
     public static void initAdNetworks(Activity activity) {
-        AD_NETWORKS = Arrays.asList(new AdNetwork[]{APP_LOVIN, IN_MOBI}); //, MOBILE_CORE});
+        AD_NETWORKS = Arrays.asList(APP_LOVIN, IN_MOBI); //, MOBILE_CORE});
         for (AdNetwork adNetwork : AD_NETWORKS) {
             adNetwork.initialize(activity);
         }
@@ -63,11 +68,12 @@ public class Offers {
         try {
             config = ConfigurationManager.instance();
             isFreeAppsEnabled = (config.getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE) && config.getBoolean(Constants.PREF_KEY_GUI_USE_MOBILE_CORE)) && Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
-        } catch (Throwable t) {
+        } catch (Throwable ignored) {
         }
         return isFreeAppsEnabled;
     }
 
+    @SuppressWarnings("UnusedParameters")
     public static void onFreeAppsClick(Context context) {
         /**
         if (isFreeAppsEnabled() && MOBILE_CORE.started() && MOBILE_CORE.isDirectToMarketReady()) {
@@ -99,6 +105,26 @@ public class Offers {
             if (shutdownAfterwards && activity instanceof MainActivity) {
                 ((MainActivity) activity).shutdown();
             }
+        }
+    }
+
+    public static void showInterstitialOfferIfNecessary(Activity ctx) {
+        TransferManager TM = TransferManager.instance();
+        int startedTransfers = TM.incrementStartedTransfers();
+        ConfigurationManager CM = ConfigurationManager.instance();
+        final int INTERSTITIAL_OFFERS_TRANSFER_STARTS = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS);
+        final int INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
+        final long INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS = TimeUnit.MINUTES.toMillis(INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
+
+        long timeSinceLastOffer = System.currentTimeMillis() - Offers.lastInterstitialShownTimestamp;
+        boolean itsBeenLongEnough = timeSinceLastOffer >= INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS;
+        boolean startedEnoughTransfers = startedTransfers >= INTERSTITIAL_OFFERS_TRANSFER_STARTS;
+        boolean shouldDisplayFirstOne = (Offers.lastInterstitialShownTimestamp == -1 && startedEnoughTransfers);
+
+        if (shouldDisplayFirstOne || (itsBeenLongEnough && startedEnoughTransfers)) {
+            Offers.showInterstitial(ctx, false, false);
+            TM.resetStartedTransfers();
+            Offers.lastInterstitialShownTimestamp = System.currentTimeMillis();
         }
     }
 }

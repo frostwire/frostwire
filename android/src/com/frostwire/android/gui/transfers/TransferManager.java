@@ -57,6 +57,8 @@ public final class TransferManager {
 
     private int downloadsToReview;
 
+    private int startedTransfers = 0;
+
     private final Object alreadyDownloadingMonitor = new Object();
 
     private volatile static TransferManager instance;
@@ -310,7 +312,7 @@ public final class TransferManager {
         if (sr instanceof TorrentCrawledSearchResult) {
             BTEngine.getInstance().download((TorrentCrawledSearchResult) sr, null);
         } else if (sr instanceof ScrapedTorrentFileSearchResult) {
-            return new TorrentFetcherDownload(manager, new TorrentSearchResultInfo(sr, ((ScrapedTorrentFileSearchResult) sr).getReferrerUrl()));
+            return new TorrentFetcherDownload(manager, new TorrentSearchResultInfo(sr, sr.getReferrerUrl()));
         } else if (sr.getTorrentUrl() != null) {
             return new TorrentFetcherDownload(manager, new TorrentSearchResultInfo(sr));
         }
@@ -367,7 +369,7 @@ public final class TransferManager {
         return download;
     }
 
-    private boolean isBittorrentDownload(DownloadTransfer transfer) {
+    public boolean isBittorrentDownload(DownloadTransfer transfer) {
         return transfer instanceof UIBittorrentDownload || transfer instanceof TorrentFetcherDownload;
     }
 
@@ -423,6 +425,19 @@ public final class TransferManager {
             }
         }
     }
+
+    public int getStartedTransfers() {
+        return startedTransfers;
+    }
+
+    public int incrementStartedTransfers() {
+        return ++startedTransfers;
+    }
+
+    public void resetStartedTransfers() {
+        startedTransfers = 0;
+    }
+
 
     /**
      * @return true if less than 10MB available

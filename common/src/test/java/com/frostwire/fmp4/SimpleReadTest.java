@@ -17,7 +17,6 @@
 
 package com.frostwire.fmp4;
 
-import com.frostwire.mp4.Track;
 import org.junit.Test;
 
 import java.io.File;
@@ -35,22 +34,32 @@ public class SimpleReadTest {
 
     @Test
     public void testRead() throws IOException {
-        File f = new File("/Users/aldenml/Downloads/test.mp4");
+        File f = new File("/Users/aldenml/Downloads/test_out.mp4");
         RandomAccessFile in = new RandomAccessFile(f, "r");
         InputChannel ch = new InputChannel(in.getChannel());
 
-        IsoMedia.read(ch, f.length(), new IsoMedia.OnBoxListener() {
+        final LinkedList<Box> boxes = new LinkedList<>();
+
+        IsoMedia.read(ch, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
+                if (b instanceof UnknownBox) {
+                    System.out.print("Unknow box: ");
+                }
                 System.out.println(Bits.make4cc(b.type));
+                if (b.parent == null) {
+                    boxes.add(b);
+                }
                 return true;
             }
         });
+
+        System.out.println("Num boxes: " + boxes.size());
     }
 
     @Test
     public void testCopy() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test.mp4");
+        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
         File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
         RandomAccessFile in = new RandomAccessFile(fIn, "r");
         RandomAccessFile out = new RandomAccessFile(fOut, "rw");
@@ -59,7 +68,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(chIn, fIn.length(), new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 System.out.println(Bits.make4cc(b.type));
@@ -84,7 +93,7 @@ public class SimpleReadTest {
 
     @Test
     public void testCopyUpdate() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test.mp4");
+        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
         File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
         RandomAccessFile in = new RandomAccessFile(fIn, "r");
         RandomAccessFile out = new RandomAccessFile(fOut, "rw");
@@ -93,7 +102,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(chIn, fIn.length(), new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 System.out.println(Bits.make4cc(b.type));
@@ -133,7 +142,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(chIn, fIn.length(), new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 //System.out.println(Bits.make4cc(b.type));
@@ -145,7 +154,7 @@ public class SimpleReadTest {
         });
 
         // find
-        VideoMediaHeaderBox vmhd = IsoMedia.<VideoMediaHeaderBox>find(boxes, Box.vmhd).getFirst();
+        VideoMediaHeaderBox vmhd = Box.findFirst(boxes, Box.vmhd);
         TrackBox trak = (TrackBox) vmhd.parent.parent.parent;
         MovieBox moov = (MovieBox) trak.parent;
 
@@ -180,7 +189,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(chIn, fIn.length(), new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 //System.out.println(Bits.make4cc(b.type));
@@ -192,8 +201,8 @@ public class SimpleReadTest {
         });
 
         // find
-        VideoMediaHeaderBox vmhd = IsoMedia.<VideoMediaHeaderBox>find(boxes, Box.vmhd).getFirst();
-        SoundMediaHeaderBox smhd = IsoMedia.<SoundMediaHeaderBox>find(boxes, Box.smhd).getFirst();
+        VideoMediaHeaderBox vmhd = Box.findFirst(boxes, Box.vmhd);
+        SoundMediaHeaderBox smhd = Box.findFirst(boxes, Box.smhd);
 
         TrackBox trak = (TrackBox) vmhd.parent.parent.parent;
         MovieBox moov = (MovieBox) trak.parent;
@@ -207,9 +216,9 @@ public class SimpleReadTest {
         }
 
         trak = (TrackBox) smhd.parent.parent.parent;
-        SampleToChunkBox stsc = IsoMedia.<SampleToChunkBox>find(trak.boxes, Box.stsc).getFirst();
-        SampleSizeBox stsz = IsoMedia.<SampleSizeBox>find(trak.boxes, Box.stsz).getFirst();
-        ChunkOffsetBox stco = IsoMedia.<ChunkOffsetBox>find(trak.boxes, Box.stco).getFirst();
+        SampleToChunkBox stsc = trak.findFirst(Box.stsc);
+        SampleSizeBox stsz = trak.findFirst(Box.stsz);
+        ChunkOffsetBox stco = trak.findFirst(Box.stco);
 
         int[] chunkSize = new int[stco.entry_count];
 
@@ -260,7 +269,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(chIn, fIn.length(), new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 //System.out.println(Bits.make4cc(b.type));
@@ -272,9 +281,9 @@ public class SimpleReadTest {
         });
 
         // find
-        MediaDataBox mdat = IsoMedia.<MediaDataBox>find(boxes, Box.mdat).getFirst();
-        VideoMediaHeaderBox vmhd = IsoMedia.<VideoMediaHeaderBox>find(boxes, Box.vmhd).getFirst();
-        SoundMediaHeaderBox smhd = IsoMedia.<SoundMediaHeaderBox>find(boxes, Box.smhd).getFirst();
+        MediaDataBox mdat = Box.findFirst(boxes, Box.mdat);
+        VideoMediaHeaderBox vmhd = Box.findFirst(boxes, Box.vmhd);
+        SoundMediaHeaderBox smhd = Box.findFirst(boxes, Box.smhd);
 
         TrackBox trak = (TrackBox) vmhd.parent.parent.parent;
         MovieBox moov = (MovieBox) trak.parent;
@@ -288,9 +297,9 @@ public class SimpleReadTest {
         }
 
         trak = (TrackBox) smhd.parent.parent.parent;
-        SampleToChunkBox stsc = IsoMedia.<SampleToChunkBox>find(trak.boxes, Box.stsc).getFirst();
-        SampleSizeBox stsz = IsoMedia.<SampleSizeBox>find(trak.boxes, Box.stsz).getFirst();
-        ChunkOffsetBox stco = IsoMedia.<ChunkOffsetBox>find(trak.boxes, Box.stco).getFirst();
+        SampleToChunkBox stsc = trak.findFirst(Box.stsc);
+        SampleSizeBox stsz = trak.findFirst(Box.stsz);
+        ChunkOffsetBox stco = trak.findFirst(Box.stco);
 
         int[] chunkSize = new int[stco.entry_count];
 
@@ -335,5 +344,43 @@ public class SimpleReadTest {
 
             IO.copy(chIn, chOut, chunkSize[i], buf);
         }
+    }
+
+    @Test
+    public void testReadFragmented() throws IOException {
+        File f = new File("/Users/aldenml/Downloads/test_raw.m4a");
+        RandomAccessFile in = new RandomAccessFile(f, "r");
+        InputChannel ch = new InputChannel(in.getChannel());
+
+        final LinkedList<Box> boxes = new LinkedList<>();
+
+        IsoMedia.read(ch, new IsoMedia.OnBoxListener() {
+            @Override
+            public boolean onBox(Box b) {
+                if (b instanceof UnknownBox) {
+                    System.out.print("Unknow box: ");
+                }
+                System.out.println(Bits.make4cc(b.type));
+                if (b.parent == null) {
+                    boxes.add(b);
+                }
+                return true;
+            }
+        });
+
+        LinkedList<TrackFragmentBox> trafs = Box.find(boxes, Box.traf);
+        for (TrackFragmentBox traf : trafs) {
+            TrackFragmentHeaderBox tfhd = traf.findFirst(Box.tfhd);
+            TrackRunBox trun = traf.findFirst(Box.trun);
+            for (TrackRunBox.Entry e : trun.entries) {
+                if (trun.sampleDurationPresent()) {
+                    System.out.println("trun.sampleDurationPresent() -> true");
+                } else {
+                    System.out.println("trun.sampleDurationPresent() -> false");
+                }
+            }
+        }
+
+        System.out.println("Num boxes: " + boxes.size());
     }
 }

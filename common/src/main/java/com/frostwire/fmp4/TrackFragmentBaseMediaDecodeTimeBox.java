@@ -24,29 +24,24 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class SampleToChunkBox extends FullBox {
+public final class TrackFragmentBaseMediaDecodeTimeBox extends FullBox {
 
-    protected int entry_count;
-    protected Entry[] entries;
+    protected long base_media_decode_time;
 
-    SampleToChunkBox() {
-        super(stsc);
+    TrackFragmentBaseMediaDecodeTimeBox() {
+        super(tfdt);
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
 
-        IO.read(ch, 4, buf);
-        entry_count = buf.getInt();
-        entries = new Entry[entry_count];
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = new Entry();
-            IO.read(ch, 12, buf);
-            e.first_chunk = buf.getInt();
-            e.samples_per_chunk = buf.getInt();
-            e.sample_description_index = buf.getInt();
-            entries[i] = e;
+        if (version == 1) {
+            IO.read(ch, 8, buf);
+            base_media_decode_time = buf.getLong();
+        } else { // version == 0
+            IO.read(ch, 4, buf);
+            base_media_decode_time = buf.getInt();
         }
     }
 
@@ -54,14 +49,12 @@ public final class SampleToChunkBox extends FullBox {
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
 
-        buf.putInt(entry_count);
-        IO.write(ch, 4, buf);
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = entries[i];
-            buf.putInt(e.first_chunk);
-            buf.putInt(e.samples_per_chunk);
-            buf.putInt(e.sample_description_index);
-            IO.write(ch, 12, buf);
+        if (version == 1) {
+            buf.putLong(base_media_decode_time);
+            IO.write(ch, 8, buf);
+        } else { // version == 0
+            buf.putInt((int) base_media_decode_time);
+            IO.write(ch, 4, buf);
         }
     }
 
@@ -69,14 +62,7 @@ public final class SampleToChunkBox extends FullBox {
     void update() {
         long s = 0;
         s += 4; // full box
-        s += 4; // entry_count
-        s += entry_count * 12;
+        s += version == 1 ? 8 : 4; // base_media_decode_time
         length(s);
-    }
-
-    public static final class Entry {
-        public int first_chunk;
-        public int samples_per_chunk;
-        public int sample_description_index;
     }
 }

@@ -72,28 +72,31 @@ final class Bits {
         return int32(code[0], code[1], code[2], code[3]);
     }
 
-    public static int l2i(long n) {
-        if (n < Integer.MIN_VALUE || Integer.MAX_VALUE < n) {
-            throw new IllegalArgumentException("Can't convert long to int: " + n);
+    public static String iso639(byte[] arr) {
+        if (arr.length != 2) {
+            throw new IllegalArgumentException("array must be of length 2");
         }
-        return (int) n;
+        int bits = Bits.int32((byte) 0, (byte) 0, arr[0], arr[1]);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            int c = (bits >> (2 - i) * 5) & 0x1f;
+            sb.append((char) (c + 0x60));
+        }
+        return sb.toString();
     }
 
-    public static long i2u(int n) {
-        return ((long) n) & 0xffffffffL;
-    }
 
-    public static long l2u(long n) {
-        if (n < 0) {
-            throw new IllegalArgumentException("Can't convert negative long to unsigned: " + n);
+    public static byte[] iso639(String s) {
+        byte[] arr = Utf8.convert(s);
+        if (arr.length != 3) {
+            throw new IllegalArgumentException("string must be of length 3");
         }
-        return n;
-    }
-
-    public static int i2ui(int n) {
-        if (n < 0) {
-            throw new IllegalArgumentException("Can't convert negative int to unsigned: " + n);
+        int bits = 0;
+        for (int i = 0; i < 3; i++) {
+            bits += (arr[i] - 0x60) << (2 - i) * 5;
         }
-        return n;
+        byte b1 = Bits.int1(bits);
+        byte b0 = Bits.int0(bits);
+        return new byte[]{b1, b0};
     }
 }

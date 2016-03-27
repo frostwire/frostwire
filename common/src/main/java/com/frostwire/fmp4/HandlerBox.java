@@ -34,14 +34,15 @@ public final class HandlerBox extends FullBox {
     HandlerBox() {
         super(hdlr);
         reserved = new int[3];
+        name = new byte[0];
     }
 
     public String name() {
-        return name != null ? Utf8.convert(name) : null;
+        return Utf8.convert(name);
     }
 
     public void name(String value) {
-        name = value != null ? Utf8.convert(value) : null;
+        name = value != null ? Utf8.convert(value) : new byte[0];
     }
 
     @Override
@@ -65,10 +66,8 @@ public final class HandlerBox extends FullBox {
         buf.putInt(pre_defined);
         buf.putInt(handler_type);
         IO.put(buf, reserved);
-        if (name != null) {
-            buf.put(name);
-            buf.put((byte) 0);
-        }
+        buf.put(name);
+        buf.put((byte) 0);
         IO.write(ch, buf.position(), buf);
     }
 
@@ -77,9 +76,7 @@ public final class HandlerBox extends FullBox {
         long s = 0;
         s += 4; // full box
         s += 20;
-        if (name != null) {
-            s += name.length + 1;
-        }
+        s += name.length + 1;
         length(s);
     }
 }

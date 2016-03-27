@@ -33,6 +33,11 @@ public class Box {
     public static final int soun = Bits.make4cc("soun");
     public static final int vide = Bits.make4cc("vide");
     public static final int hint = Bits.make4cc("hint");
+    public static final int data = Bits.make4cc("data");
+    public static final int M4A_ = Bits.make4cc("M4A ");
+    public static final int mp42 = Bits.make4cc("mp42");
+    public static final int isom = Bits.make4cc("isom");
+    public static final int zero = Bits.make4cc("\0\0\0\0");
 
     public static final int mdat = Bits.make4cc("mdat");
     public static final int ftyp = Bits.make4cc("ftyp");
@@ -82,6 +87,15 @@ public class Box {
     public static final int gnre = Bits.make4cc("gnre");
     public static final int free = Bits.make4cc("free");
     public static final int skip = Bits.make4cc("skip");
+    public static final int mvex = Bits.make4cc("mvex");
+    public static final int trex = Bits.make4cc("trex");
+    public static final int sidx = Bits.make4cc("sidx");
+    public static final int moof = Bits.make4cc("moof");
+    public static final int mfhd = Bits.make4cc("mfhd");
+    public static final int traf = Bits.make4cc("traf");
+    public static final int tfhd = Bits.make4cc("tfhd");
+    public static final int tfdt = Bits.make4cc("tfdt");
+    public static final int trun = Bits.make4cc("trun");
 
     private static final Map<Integer, BoxLambda> mapping = buildMapping();
 
@@ -144,9 +158,44 @@ public class Box {
         }
     }
 
+    public final <T extends Box> LinkedList<T> find(int type) {
+        return boxes != null ? Box.<T>find(boxes, type) : new LinkedList<T>();
+    }
+
+    public final <T extends Box> T findFirst(int type) {
+        return Box.<T>findFirst(boxes, type);
+    }
+
     @Override
     public String toString() {
         return Bits.make4cc(type);
+    }
+
+    static <T extends Box> LinkedList<T> find(LinkedList<Box> boxes, int type) {
+        LinkedList<T> l = new LinkedList<>();
+
+        for (Box b : boxes) {
+            if (b.type == type) {
+                l.add((T) b);
+            }
+        }
+
+        if (l.isEmpty()) {
+            for (Box b : boxes) {
+                if (b.boxes != null) {
+                    LinkedList<T> t = find(b.boxes, type);
+                    if (!t.isEmpty()) {
+                        l.addAll(t);
+                    }
+                }
+            }
+        }
+
+        return l;
+    }
+
+    static <T extends Box> T findFirst(LinkedList<Box> boxes, int type) {
+        return Box.<T>find(boxes, type).peekFirst();
     }
 
     static Box empty(int type) throws IOException {
@@ -447,6 +496,60 @@ public class Box {
             @Override
             public Box empty() {
                 return new FreeSpaceBox(skip);
+            }
+        });
+        map.put(mvex, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MovieExtendsBox();
+            }
+        });
+        map.put(trex, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TrackExtendsBox();
+            }
+        });
+        map.put(sidx, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new SegmentIndexBox();
+            }
+        });
+        map.put(moof, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MovieFragmentBox();
+            }
+        });
+        map.put(mfhd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new MovieFragmentHeaderBox();
+            }
+        });
+        map.put(traf, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TrackFragmentBox();
+            }
+        });
+        map.put(tfhd, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TrackFragmentHeaderBox();
+            }
+        });
+        map.put(tfdt, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TrackFragmentBaseMediaDecodeTimeBox();
+            }
+        });
+        map.put(trun, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new TrackRunBox();
             }
         });
 

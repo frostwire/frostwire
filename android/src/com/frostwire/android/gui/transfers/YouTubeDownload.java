@@ -19,11 +19,12 @@
 package com.frostwire.android.gui.transfers;
 
 import android.net.Uri;
-import android.util.Log;
 import com.frostwire.android.LollipopFileSystem;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.fmp4.Mp4Demuxer;
+import com.frostwire.logging.Logger;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
@@ -50,7 +51,7 @@ import java.util.Map;
  */
 public final class YouTubeDownload implements DownloadTransfer {
 
-    private static final String TAG = "FW.HttpDownload";
+    private static final Logger LOGGER = Logger.getLogger(YouTubeDownload.class);
 
     private static final int STATUS_DOWNLOADING = 1;
     private static final int STATUS_COMPLETE = 2;
@@ -83,6 +84,9 @@ public final class YouTubeDownload implements DownloadTransfer {
     // variables to keep the download rate of file transfer
     private long speedMarkTimestamp;
     private long totalReceivedSinceLastSpeedStamp;
+
+    private long demuxerReadCount;
+    private long demuxerWriteCount;
 
     YouTubeDownload(TransferManager manager, YouTubeCrawledSearchResult sr) {
         this.manager = manager;
@@ -166,6 +170,18 @@ public final class YouTubeDownload implements DownloadTransfer {
     }
 
     public int getProgress() {
+        if (status == STATUS_DEMUXING) {
+            try {
+                if (demuxerReadCount > 0) { // in case fmp4 fail
+                    int r = (int) (demuxerReadCount * 100 / completeFile.length());
+                    LOGGER.info("getProgress() -> " + r);
+                    return r;
+                }
+            } catch (Throwable e) {
+                // ignore, fall back to old logic
+            }
+        }
+
         if (size > 0) {
             return isComplete() ? 100 : (int) ((bytesReceived * 100) / size);
         } else {
@@ -417,9 +433,9 @@ public final class YouTubeDownload implements DownloadTransfer {
     private void error(Throwable e) {
         if (status != STATUS_CANCELLED) {
             if (e != null) {
-                Log.e(TAG, String.format("Error downloading url: %s", sr.getDownloadUrl()), e);
+                LOGGER.error(String.format("Error downloading url: %s", sr.getDownloadUrl()), e);
             } else {
-                Log.e(TAG, String.format("Error downloading url: %s", sr.getDownloadUrl()));
+                LOGGER.error(String.format("Error downloading url: %s", sr.getDownloadUrl()));
             }
 
             status = STATUS_ERROR;
@@ -478,7 +494,13 @@ public final class YouTubeDownload implements DownloadTransfer {
             } else if (downloadType == DownloadType.DEMUX) {
                 try {
                     status = STATUS_DEMUXING;
-                    new MP4Muxer().demuxAudio(tempAudio.getAbsolutePath(), completeFile.getAbsolutePath(), buildMetadata());
+                    new MP4Muxer().demuxAudio(tempAudio.getAbsolutePath(), completeFile.getAbsolutePath(), buildMetadata(), new Mp4Demuxer.DemuxerListener() {
+                        @Override
+                        public void onCount(long readCount, long writeCount) {
+                            demuxerReadCount = readCount;
+                            demuxerWriteCount = writeCount;
+                        }
+                    });
 
                     if (!completeFile.exists()) {
                         //error(null);

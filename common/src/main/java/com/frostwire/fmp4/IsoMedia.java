@@ -17,7 +17,9 @@
 
 package com.frostwire.fmp4;
 
+import java.io.EOFException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
@@ -28,16 +30,6 @@ import java.util.LinkedList;
 public final class IsoMedia {
 
     private IsoMedia() {
-    }
-
-    static void read(InputChannel ch) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(1 * 1024);
-        read(ch, -1, null, null, buf);
-    }
-
-    static void read(InputChannel ch, long len, OnBoxListener l) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(1 * 1024);
-        read(ch, len, null, l, buf);
     }
 
     public static boolean read(InputChannel ch, long len, Box p, OnBoxListener l, ByteBuffer buf) throws IOException {
@@ -76,8 +68,18 @@ public final class IsoMedia {
             }
 
             if (l != null) {
+                long pos = ch.count();
                 if (!l.onBox(b)) {
                     return false;
+                }
+                if (pos != ch.count()) {
+                    // there was a read inside the listener
+                    // this operation is only allowed if the
+                    // client read the entire box
+                    r = ch.count() - pos;
+                    if (r != b.length()) {
+                        throw new UnsupportedOperationException("Invalid read inside listener");
+                    }
                 }
             }
 
@@ -100,12 +102,43 @@ public final class IsoMedia {
         return true;
     }
 
-    public static void write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(4 * 1024);
-        write(ch, boxes, l, buf);
+    public static void read(InputChannel ch, OnBoxListener l) throws IOException {
+        try {
+            read(ch, -1, null, l, ByteBuffer.allocate(10 * 1024));
+        } catch (EOFException e) {
+            // ignore, it's the end
+        }
+    }
+
+    public static LinkedList<Box> head(RandomAccessFile in, ByteBuffer buf) throws IOException {
+        in.seek(0);
+
+        final InputChannel ch = new InputChannel(in.getChannel());
+        final LinkedList<Box> boxes = new LinkedList<>();
+
+        read(ch, -1, null, new OnBoxListener() {
+            @Override
+            public boolean onBox(Box b) {
+                if (b.parent == null) {
+                    boxes.add(b);
+                }
+
+                return b.type != Box.mdat;
+            }
+        }, buf);
+
+        in.seek(0);
+
+        return boxes;
+    }
+
+    public static LinkedList<Box> head(RandomAccessFile in) throws IOException {
+        return head(in, ByteBuffer.allocate(10 * 1024));
     }
 
     public static boolean write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l, ByteBuffer buf) throws IOException {
+        buf.clear();
+
         for (Box b : boxes) {
             buf.putInt(b.size);
             buf.putInt(b.type);
@@ -147,27 +180,8 @@ public final class IsoMedia {
         return true;
     }
 
-    public static <T extends Box> LinkedList<T> find(LinkedList<Box> boxes, int type) {
-        LinkedList<T> l = new LinkedList<>();
-
-        for (Box b : boxes) {
-            if (b.type == type) {
-                l.add((T) b);
-            }
-        }
-
-        if (l.isEmpty()) {
-            for (Box b : boxes) {
-                if (b.boxes != null) {
-                    LinkedList<T> t = find(b.boxes, type);
-                    if (!t.isEmpty()) {
-                        l.addAll(t);
-                    }
-                }
-            }
-        }
-
-        return l;
+    public static void write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l) throws IOException {
+        write(ch, boxes, l, ByteBuffer.allocate(10 * 1024));
     }
 
     public interface OnBoxListener {

@@ -34,6 +34,7 @@ public class AppleDataBox extends Box {
 
     AppleDataBox(int type) {
         super(type);
+        data4cc = data;
     }
 
     @Override

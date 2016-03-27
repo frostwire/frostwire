@@ -36,7 +36,7 @@ public final class FileTypeBox extends Box {
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        IO.read(ch, Bits.l2i(length()), buf);
+        IO.read(ch, (int) length(), buf);
         major_brand = buf.getInt();
         minor_version = buf.getInt();
         compatible_brands = new int[buf.remaining() / 4];
