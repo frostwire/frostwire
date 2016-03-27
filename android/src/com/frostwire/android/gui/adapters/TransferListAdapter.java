@@ -562,6 +562,14 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         } else {
             buttonPlay.setVisibility(View.GONE);
         }
+
+        // hack to fill the demuxing state
+        if (download instanceof YouTubeDownload) {
+            YouTubeDownload yt = (YouTubeDownload) download;
+            if (yt.isDemuxing()) {
+                status.setText(getStatusFromResId(download.getStatus()) + " (" + yt.getDemuxingProgress() + "%)");
+            }
+        }
     }
 
     private String getStatusFromResId(String str) {

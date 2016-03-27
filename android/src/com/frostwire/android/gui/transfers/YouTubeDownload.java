@@ -169,7 +169,11 @@ public final class YouTubeDownload implements DownloadTransfer {
         return getStatusString(status);
     }
 
-    public int getProgress() {
+    public boolean isDemuxing() {
+        return status == STATUS_DEMUXING;
+    }
+
+    public int getDemuxingProgress() {
         if (status == STATUS_DEMUXING) {
             try {
                 if (demuxerReadCount > 0) { // in case fmp4 fail
@@ -182,6 +186,10 @@ public final class YouTubeDownload implements DownloadTransfer {
             }
         }
 
+        return 0;
+    }
+
+    public int getProgress() {
         if (size > 0) {
             return isComplete() ? 100 : (int) ((bytesReceived * 100) / size);
         } else {
