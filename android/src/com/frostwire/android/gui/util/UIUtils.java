@@ -67,9 +67,9 @@ public final class UIUtils {
      */
     private static NumberFormat NUMBER_FORMAT0; // localized "#,##0"
 
-    private static String[] BYTE_UNITS = new String[]{"b", "KB", "Mb", "Gb", "Tb"};
+    private static final String[] BYTE_UNITS = new String[]{"b", "KB", "Mb", "Gb", "Tb"};
 
-    public static String GENERAL_UNIT_KBPSEC = "KB/s";
+    public static final String GENERAL_UNIT_KBPSEC = "KB/s";
 
     static {
         NUMBER_FORMAT0 = NumberFormat.getNumberInstance(Locale.getDefault());
