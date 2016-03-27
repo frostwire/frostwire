@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class SampleToChunkBox extends FullBox {
+public final class SampleToChunkBox extends EntryBaseBox {
 
     protected int entry_count;
     protected Entry[] entries;
@@ -51,18 +51,27 @@ public final class SampleToChunkBox extends FullBox {
     }
 
     @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        super.write(ch, buf);
-
+    void writeFields(OutputChannel ch, ByteBuffer buf) throws IOException {
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = entries[i];
-            buf.putInt(e.first_chunk);
-            buf.putInt(e.samples_per_chunk);
-            buf.putInt(e.sample_description_index);
-            IO.write(ch, 12, buf);
-        }
+    }
+
+    @Override
+    int entryCount() {
+        return entry_count;
+    }
+
+    @Override
+    int entrySize() {
+        return 12;
+    }
+
+    @Override
+    void putEntry(int i, ByteBuffer buf) {
+        Entry e = entries[i];
+        buf.putInt(e.first_chunk);
+        buf.putInt(e.samples_per_chunk);
+        buf.putInt(e.sample_description_index);
     }
 
     @Override

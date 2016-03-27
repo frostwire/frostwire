@@ -24,62 +24,46 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class ChunkOffsetBox extends EntryBaseBox {
+public class EntryBaseBox extends FullBox {
 
-    protected int entry_count;
-    protected Entry[] entries;
-
-    ChunkOffsetBox() {
-        super(stco);
+    EntryBaseBox(int type) {
+        super(type);
     }
 
     @Override
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        super.read(ch, buf);
+    final void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
 
-        IO.read(ch, 4, buf);
-        entry_count = buf.getInt();
-        entries = new Entry[entry_count];
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = new Entry();
-            IO.read(ch, 4, buf);
-            e.chunk_offset = buf.getInt();
-            entries[i] = e;
+        writeFields(ch, buf);
+        int entry_count = entryCount();
+        int entry_size = entrySize();
+
+        if (entry_count > 0) {
+            for (int i = 0; i < entry_count; i++) {
+                if (buf.position() > 0 && buf.remaining() < entry_size) {
+                    IO.write(ch, buf.position(), buf);
+                }
+                putEntry(i, buf);
+            }
+            if (buf.position() > 0) {
+                IO.write(ch, buf.position(), buf);
+            }
         }
     }
 
-    @Override
     void writeFields(OutputChannel ch, ByteBuffer buf) throws IOException {
-        buf.putInt(entry_count);
-        IO.write(ch, 4, buf);
+        throw new UnsupportedOperationException(Bits.make4cc(type));
     }
 
-    @Override
     int entryCount() {
-        return entry_count;
+        throw new UnsupportedOperationException(Bits.make4cc(type));
     }
 
-    @Override
     int entrySize() {
-        return 4;
+        throw new UnsupportedOperationException(Bits.make4cc(type));
     }
 
-    @Override
     void putEntry(int i, ByteBuffer buf) {
-        Entry e = entries[i];
-        buf.putInt(e.chunk_offset);
-    }
-
-    @Override
-    void update() {
-        long s = 0;
-        s += 4; // full box
-        s += 4; // entry_count
-        s += entry_count * 4;
-        length(s);
-    }
-
-    public static final class Entry {
-        public int chunk_offset;
+        throw new UnsupportedOperationException(Bits.make4cc(type));
     }
 }

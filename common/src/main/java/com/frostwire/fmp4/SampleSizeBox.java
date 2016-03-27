@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class SampleSizeBox extends FullBox {
+public final class SampleSizeBox extends EntryBaseBox {
 
     protected int sample_size;
     protected int sample_count;
@@ -53,19 +53,26 @@ public final class SampleSizeBox extends FullBox {
     }
 
     @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        super.write(ch, buf);
-
+    void writeFields(OutputChannel ch, ByteBuffer buf) throws IOException {
         buf.putInt(sample_size);
         buf.putInt(sample_count);
         IO.write(ch, 8, buf);
-        if (entries != null) {
-            for (int i = 0; i < sample_count; i++) {
-                Entry e = entries[i];
-                buf.putInt(e.entry_size);
-                IO.write(ch, 4, buf);
-            }
-        }
+    }
+
+    @Override
+    int entryCount() {
+        return entries != null ? sample_count : 0;
+    }
+
+    @Override
+    int entrySize() {
+        return 4;
+    }
+
+    @Override
+    void putEntry(int i, ByteBuffer buf) {
+        Entry e = entries[i];
+        buf.putInt(e.entry_size);
     }
 
     @Override
