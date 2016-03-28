@@ -72,12 +72,7 @@ public final class SampleDescriptionBox extends FullBox {
 
             long length = e.length();
             if (r < length) {
-                IsoMedia.read(ch, length - r, e, new IsoMedia.OnBoxListener() {
-                    @Override
-                    public boolean onBox(Box b) {
-                        return true;
-                    }
-                }, buf);
+                IsoMedia.read(ch, length - r, e, IsoMedia.OnBoxListener.ALL, buf);
             }
 
             entries[i] = e;
@@ -104,12 +99,7 @@ public final class SampleDescriptionBox extends FullBox {
 
             b.write(ch, buf);
 
-            IsoMedia.write(ch, b.boxes, new IsoMedia.OnBoxListener() {
-                @Override
-                public boolean onBox(Box b) {
-                    return true;
-                }
-            }, buf);
+            IsoMedia.write(ch, b.boxes, IsoMedia.OnBoxListener.ALL, buf);
         }
     }
 
@@ -133,14 +123,7 @@ public final class SampleDescriptionBox extends FullBox {
     private int handler_type() throws IOException {
         try {
             Box b = parent.parent.parent;
-            Iterator<Box> it = b.boxes.iterator();
-            while (it.hasNext()) {
-                Box t = it.next();
-                if (t.type == hdlr) {
-                    b = t;
-                    break;
-                }
-            }
+            b = b.findFirst(Box.hdlr);
             return ((HandlerBox) b).handler_type;
         } catch (Throwable e) {
             throw new IOException("Can't detect handler type for proper reading", e);

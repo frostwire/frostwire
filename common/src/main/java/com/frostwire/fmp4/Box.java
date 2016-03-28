@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 /**
  * @author gubatron
@@ -46,6 +45,7 @@ public class Box {
     public static final int iods = Bits.make4cc("iods");
     public static final int trak = Bits.make4cc("trak");
     public static final int tkhd = Bits.make4cc("tkhd");
+    public static final int tref = Bits.make4cc("tref");
     public static final int edts = Bits.make4cc("edts");
     public static final int elst = Bits.make4cc("elst");
     public static final int udta = Bits.make4cc("udta");
@@ -85,6 +85,8 @@ public class Box {
     public static final int Ccmt = Bits.make4cc("©cmt");
     public static final int Cgen = Bits.make4cc("©gen");
     public static final int gnre = Bits.make4cc("gnre");
+    public static final int Cday = Bits.make4cc("©day");
+    public static final int trkn = Bits.make4cc("trkn");
     public static final int free = Bits.make4cc("free");
     public static final int skip = Bits.make4cc("skip");
     public static final int mvex = Bits.make4cc("mvex");
@@ -96,8 +98,30 @@ public class Box {
     public static final int tfhd = Bits.make4cc("tfhd");
     public static final int tfdt = Bits.make4cc("tfdt");
     public static final int trun = Bits.make4cc("trun");
+    public static final int ipmc = Bits.make4cc("ipmc");
+    public static final int padb = Bits.make4cc("padb");
+    public static final int stdp = Bits.make4cc("stdp");
+    public static final int sdtp = Bits.make4cc("sdtp");
+    public static final int sgpd = Bits.make4cc("sgpd");
+    public static final int subs = Bits.make4cc("subs");
+    public static final int mehd = Bits.make4cc("mehd");
+    public static final int mfra = Bits.make4cc("mfra");
+    public static final int tfra = Bits.make4cc("tfra");
+    public static final int mfro = Bits.make4cc("mfro");
+    public static final int cprt = Bits.make4cc("cprt");
+    public static final int iloc = Bits.make4cc("iloc");
+    public static final int ipro = Bits.make4cc("ipro");
+    public static final int iinf = Bits.make4cc("iinf");
+    public static final int xml_ = Bits.make4cc("xml ");
+    public static final int bxml = Bits.make4cc("bxml");
+    public static final int pitm = Bits.make4cc("pitm");
+    public static final int sinf = Bits.make4cc("sinf");
+    public static final int frma = Bits.make4cc("frma");
+    public static final int imif = Bits.make4cc("imif");
+    public static final int schm = Bits.make4cc("schm");
+    public static final int schi = Bits.make4cc("schi");
 
-    private static final Map<Integer, BoxLambda> mapping = buildMapping();
+    private static final HashMap<Integer, BoxLambda> mapping = buildMapping();
 
     protected int size;
     protected final int type;
@@ -224,8 +248,8 @@ public class Box {
         }
     }
 
-    private static Map<Integer, BoxLambda> buildMapping() {
-        Map<Integer, BoxLambda> map = new HashMap<>();
+    private static HashMap<Integer, BoxLambda> buildMapping() {
+        HashMap<Integer, BoxLambda> map = new HashMap<>();
 
         map.put(mdat, new BoxLambda() {
             @Override

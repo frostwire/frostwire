@@ -218,5 +218,12 @@ public final class IsoMedia {
          * @return true if you want to stop
          */
         boolean onBox(Box b);
+
+        OnBoxListener ALL = new OnBoxListener() {
+            @Override
+            public boolean onBox(Box b) {
+                return true;
+            }
+        };
     }
 }

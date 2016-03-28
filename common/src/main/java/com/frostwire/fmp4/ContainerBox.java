@@ -19,6 +19,9 @@ package com.frostwire.fmp4;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
@@ -26,6 +29,8 @@ import java.util.LinkedList;
  * @author aldenml
  */
 public class ContainerBox extends Box {
+
+    private static final HashMap<Integer, int[]> mapping = buildMapping();
 
     ContainerBox(int type) {
         super(type);
@@ -41,7 +46,12 @@ public class ContainerBox extends Box {
     }
 
     @Override
-    void update() {
+    final void update() {
+        int[] list = mapping.get(type);
+        if (list != null) {
+            sort(boxes, list);
+        }
+
         long s = 0;
         s += length(boxes);
         length(s);
@@ -60,5 +70,47 @@ public class ContainerBox extends Box {
             }
         }
         return s;
+    }
+
+    static void sort(LinkedList<Box> boxes, final int[] list) {
+        Collections.sort(boxes, new Comparator<Box>() {
+            @Override
+            public int compare(Box o1, Box o2) {
+                int x = Integer.MAX_VALUE;
+                int y = Integer.MAX_VALUE;
+                for (int i = 0; i < list.length; i++) {
+                    if (list[i] == o1.type) {
+                        x = i;
+                    }
+                    if (list[i] == o2.type) {
+                        y = i;
+                    }
+                }
+                return (x < y) ? -1 : ((x == y) ? 0 : 1);
+            }
+        });
+    }
+
+    private static HashMap<Integer, int[]> buildMapping() {
+        HashMap<Integer, int[]> map = new HashMap<>();
+
+        map.put(moov, new int[]{mvhd, trak, mvex, ipmc, udta});
+        map.put(trak, new int[]{tkhd, tref, edts, mdia, udta});
+        map.put(edts, new int[]{elst});
+        map.put(mdia, new int[]{mdhd, hdlr, minf});
+        map.put(minf, new int[]{vmhd, smhd, hmhd, nmhd, dinf, stbl});
+        map.put(dinf, new int[]{dref});
+        map.put(stbl, new int[]{stsd, stts, ctts, stsc, stsz, stz2, stco, co64, stss, stsh, padb, stdp, sdtp, sbgp, sgpd, subs});
+        map.put(mvex, new int[]{mehd, trex});
+        map.put(moof, new int[]{mfhd, traf});
+        map.put(traf, new int[]{tfhd, trun, sdtp, sbgp, subs});
+        map.put(mfra, new int[]{tfra, mfro});
+        map.put(udta, new int[]{cprt});
+        map.put(meta, new int[]{hdlr, dinf, ipmc, iloc, ipro, iinf, xml_, bxml, pitm});
+        map.put(ipro, new int[]{sinf});
+        map.put(sinf, new int[]{frma, imif, schm, schi});
+        map.put(ilst, new int[]{Cnam, CART, aART, Calb, Cgen, gnre, Cday, trkn, stik, covr});
+
+        return map;
     }
 }
