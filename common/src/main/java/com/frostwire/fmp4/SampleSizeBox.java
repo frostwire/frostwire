@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class SampleSizeBox extends EntryBaseBox {
+public final class SampleSizeBox extends FullBox {
 
     protected int sample_size;
     protected int sample_count;
@@ -41,38 +41,23 @@ public final class SampleSizeBox extends EntryBaseBox {
         IO.read(ch, 8, buf);
         sample_size = buf.getInt();
         sample_count = buf.getInt();
-        if (sample_size == 0) {
-            entries = new Entry[sample_count];
-            for (int i = 0; i < sample_count; i++) {
-                Entry e = new Entry();
-                IO.read(ch, 4, buf);
-                e.entry_size = buf.getInt();
-                entries[i] = e;
-            }
+        entries = new Entry[sample_count];
+        for (int i = 0; i < sample_count; i++) {
+            Entry e = new Entry();
+            IO.read(ch, 4, buf);
+            e.get(buf);
+            entries[i] = e;
         }
     }
 
     @Override
-    void writeFields(OutputChannel ch, ByteBuffer buf) throws IOException {
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
         buf.putInt(sample_size);
         buf.putInt(sample_count);
         IO.write(ch, 8, buf);
-    }
-
-    @Override
-    int entryCount() {
-        return entries != null ? sample_count : 0;
-    }
-
-    @Override
-    int entrySize() {
-        return 4;
-    }
-
-    @Override
-    void putEntry(int i, ByteBuffer buf) {
-        Entry e = entries[i];
-        buf.putInt(e.entry_size);
+        IsoMedia.write(ch, sample_count, 4, entries, buf);
     }
 
     @Override
@@ -80,11 +65,22 @@ public final class SampleSizeBox extends EntryBaseBox {
         long s = 0;
         s += 4; // full box
         s += 8;
-        s += entries != null ? sample_count * 4 : 0;
+        s += sample_count * 4;
         length(s);
     }
 
-    public static final class Entry {
+    public static final class Entry extends BoxEntry {
+
         public int entry_size;
+
+        @Override
+        void get(ByteBuffer buf) throws IOException {
+            entry_size = buf.getInt();
+        }
+
+        @Override
+        void put(ByteBuffer buf) throws IOException {
+            buf.putInt(entry_size);
+        }
     }
 }

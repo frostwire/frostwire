@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class ChunkOffsetBox extends EntryBaseBox {
+public final class ChunkOffsetBox extends FullBox {
 
     protected int entry_count;
     protected Entry[] entries;
@@ -43,31 +43,18 @@ public final class ChunkOffsetBox extends EntryBaseBox {
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
             IO.read(ch, 4, buf);
-            e.chunk_offset = buf.getInt();
+            e.get(buf);
             entries[i] = e;
         }
     }
 
     @Override
-    void writeFields(OutputChannel ch, ByteBuffer buf) throws IOException {
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
-    }
-
-    @Override
-    int entryCount() {
-        return entry_count;
-    }
-
-    @Override
-    int entrySize() {
-        return 4;
-    }
-
-    @Override
-    void putEntry(int i, ByteBuffer buf) {
-        Entry e = entries[i];
-        buf.putInt(e.chunk_offset);
+        IsoMedia.write(ch, entry_count, 4, entries, buf);
     }
 
     @Override
@@ -79,7 +66,18 @@ public final class ChunkOffsetBox extends EntryBaseBox {
         length(s);
     }
 
-    public static final class Entry {
+    public static final class Entry extends BoxEntry {
+
         public int chunk_offset;
+
+        @Override
+        void get(ByteBuffer buf) throws IOException {
+            chunk_offset = buf.getInt();
+        }
+
+        @Override
+        void put(ByteBuffer buf) throws IOException {
+            buf.putInt(chunk_offset);
+        }
     }
 }

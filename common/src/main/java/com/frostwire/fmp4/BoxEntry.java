@@ -17,32 +17,20 @@
 
 package com.frostwire.fmp4;
 
-import org.junit.Test;
-
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class SimpleDemuxTest {
+public class BoxEntry {
 
-    @Test
-    public void testSimpleAudio() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
-        File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
+    void get(ByteBuffer buf) throws IOException {
+        throw new UnsupportedOperationException();
+    }
 
-        Mp4Tags tags = new Mp4Tags();
-        tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
-        tags.title = "ti";
-        tags.author = "au";
-        tags.source = "sr";
-        tags.jpg = null;
-
-        Mp4Demuxer.audio(fIn, fOut, tags);
+    void put(ByteBuffer buf) throws IOException {
+        throw new UnsupportedOperationException();
     }
 }

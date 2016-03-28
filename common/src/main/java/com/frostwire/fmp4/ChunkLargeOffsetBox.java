@@ -43,7 +43,7 @@ public final class ChunkLargeOffsetBox extends FullBox {
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
             IO.read(ch, 8, buf);
-            e.chunk_offset = buf.getLong();
+            e.get(buf);
             entries[i] = e;
         }
     }
@@ -54,11 +54,7 @@ public final class ChunkLargeOffsetBox extends FullBox {
 
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = entries[i];
-            buf.putLong(e.chunk_offset);
-            IO.write(ch, 8, buf);
-        }
+        IsoMedia.write(ch, entry_count, 8, entries, buf);
     }
 
     @Override
@@ -70,7 +66,18 @@ public final class ChunkLargeOffsetBox extends FullBox {
         length(s);
     }
 
-    public static final class Entry {
+    public static final class Entry extends BoxEntry {
+
         public long chunk_offset;
+
+        @Override
+        void get(ByteBuffer buf) throws IOException {
+            chunk_offset = buf.getLong();
+        }
+
+        @Override
+        void put(ByteBuffer buf) throws IOException {
+            buf.putLong(chunk_offset);
+        }
     }
 }

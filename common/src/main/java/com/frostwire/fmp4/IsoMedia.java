@@ -29,6 +29,8 @@ import java.util.LinkedList;
  */
 public final class IsoMedia {
 
+    private static final int DEFAULT_BUFFER_SIZE = 10 * 1014; // 10K
+
     private IsoMedia() {
     }
 
@@ -104,7 +106,8 @@ public final class IsoMedia {
 
     public static void read(InputChannel ch, OnBoxListener l) throws IOException {
         try {
-            read(ch, -1, null, l, ByteBuffer.allocate(10 * 1024));
+            ByteBuffer buf = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
+            read(ch, -1, null, l, buf);
         } catch (EOFException e) {
             // ignore, it's the end
         }
@@ -116,16 +119,20 @@ public final class IsoMedia {
         final InputChannel ch = new InputChannel(in.getChannel());
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        read(ch, -1, null, new OnBoxListener() {
-            @Override
-            public boolean onBox(Box b) {
-                if (b.parent == null) {
-                    boxes.add(b);
-                }
+        try {
+            read(ch, -1, null, new OnBoxListener() {
+                @Override
+                public boolean onBox(Box b) {
+                    if (b.parent == null) {
+                        boxes.add(b);
+                    }
 
-                return b.type != Box.mdat;
-            }
-        }, buf);
+                    return b.type != Box.mdat;
+                }
+            }, buf);
+        } catch (EOFException e) {
+            // ignore, it's the end
+        }
 
         in.seek(0);
 
@@ -133,7 +140,8 @@ public final class IsoMedia {
     }
 
     public static LinkedList<Box> head(RandomAccessFile in) throws IOException {
-        return head(in, ByteBuffer.allocate(10 * 1024));
+        ByteBuffer buf = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
+        return head(in, buf);
     }
 
     public static boolean write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l, ByteBuffer buf) throws IOException {
@@ -181,7 +189,22 @@ public final class IsoMedia {
     }
 
     public static void write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l) throws IOException {
-        write(ch, boxes, l, ByteBuffer.allocate(10 * 1024));
+        ByteBuffer buf = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
+        write(ch, boxes, l, buf);
+    }
+
+    static void write(OutputChannel ch, int count, int size, BoxEntry[] entries, ByteBuffer buf) throws IOException {
+        if (count > 0) {
+            for (int i = 0; i < count; i++) {
+                if (buf.position() > 0 && buf.remaining() < size) {
+                    IO.write(ch, buf.position(), buf);
+                }
+                entries[i].put(buf);
+            }
+            if (buf.position() > 0) {
+                IO.write(ch, buf.position(), buf);
+            }
+        }
     }
 
     public interface OnBoxListener {

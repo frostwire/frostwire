@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class TimeToSampleBox extends EntryBaseBox {
+public final class TimeToSampleBox extends FullBox {
 
     protected int entry_count;
     protected Entry[] entries;
@@ -43,33 +43,18 @@ public final class TimeToSampleBox extends EntryBaseBox {
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
             IO.read(ch, 8, buf);
-            e.sample_count = buf.getInt();
-            e.sample_delta = buf.getInt();
+            e.get(buf);
             entries[i] = e;
         }
     }
 
     @Override
-    void writeFields(OutputChannel ch, ByteBuffer buf) throws IOException {
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
-    }
-
-    @Override
-    int entryCount() {
-        return entry_count;
-    }
-
-    @Override
-    int entrySize() {
-        return 8;
-    }
-
-    @Override
-    void putEntry(int i, ByteBuffer buf) {
-        Entry e = entries[i];
-        buf.putInt(e.sample_count);
-        buf.putInt(e.sample_delta);
+        IsoMedia.write(ch, entry_count, 8, entries, buf);
     }
 
     @Override
@@ -81,8 +66,21 @@ public final class TimeToSampleBox extends EntryBaseBox {
         length(s);
     }
 
-    public static final class Entry {
+    public static final class Entry extends BoxEntry {
+
         public int sample_count;
         public int sample_delta;
+
+        @Override
+        void get(ByteBuffer buf) throws IOException {
+            sample_count = buf.getInt();
+            sample_delta = buf.getInt();
+        }
+
+        @Override
+        void put(ByteBuffer buf) throws IOException {
+            buf.putInt(sample_count);
+            buf.putInt(sample_delta);
+        }
     }
 }

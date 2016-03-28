@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public final class SampleToChunkBox extends EntryBaseBox {
+public final class SampleToChunkBox extends FullBox {
 
     protected int entry_count;
     protected Entry[] entries;
@@ -43,35 +43,18 @@ public final class SampleToChunkBox extends EntryBaseBox {
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
             IO.read(ch, 12, buf);
-            e.first_chunk = buf.getInt();
-            e.samples_per_chunk = buf.getInt();
-            e.sample_description_index = buf.getInt();
+            e.get(buf);
             entries[i] = e;
         }
     }
 
     @Override
-    void writeFields(OutputChannel ch, ByteBuffer buf) throws IOException {
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        super.write(ch, buf);
+
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
-    }
-
-    @Override
-    int entryCount() {
-        return entry_count;
-    }
-
-    @Override
-    int entrySize() {
-        return 12;
-    }
-
-    @Override
-    void putEntry(int i, ByteBuffer buf) {
-        Entry e = entries[i];
-        buf.putInt(e.first_chunk);
-        buf.putInt(e.samples_per_chunk);
-        buf.putInt(e.sample_description_index);
+        IsoMedia.write(ch, entry_count, 12, entries, buf);
     }
 
     @Override
@@ -83,9 +66,24 @@ public final class SampleToChunkBox extends EntryBaseBox {
         length(s);
     }
 
-    public static final class Entry {
+    public static final class Entry extends BoxEntry {
+
         public int first_chunk;
         public int samples_per_chunk;
         public int sample_description_index;
+
+        @Override
+        void get(ByteBuffer buf) throws IOException {
+            first_chunk = buf.getInt();
+            samples_per_chunk = buf.getInt();
+            sample_description_index = buf.getInt();
+        }
+
+        @Override
+        void put(ByteBuffer buf) throws IOException {
+            buf.putInt(first_chunk);
+            buf.putInt(samples_per_chunk);
+            buf.putInt(sample_description_index);
+        }
     }
 }

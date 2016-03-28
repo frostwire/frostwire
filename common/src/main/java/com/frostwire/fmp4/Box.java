@@ -163,7 +163,7 @@ public class Box {
     }
 
     public final <T extends Box> T findFirst(int type) {
-        return Box.<T>findFirst(boxes, type);
+        return boxes != null ? Box.<T>findFirst(boxes, type) : null;
     }
 
     @Override
@@ -195,7 +195,24 @@ public class Box {
     }
 
     static <T extends Box> T findFirst(LinkedList<Box> boxes, int type) {
-        return Box.<T>find(boxes, type).peekFirst();
+        T r = null;
+
+        for (Box b : boxes) {
+            if (b.type == type) {
+                return (T) b;
+            }
+        }
+
+        for (Box b : boxes) {
+            if (b.boxes != null) {
+                T t = findFirst(b.boxes, type);
+                if (t != null) {
+                    return t;
+                }
+            }
+        }
+
+        return null;
     }
 
     static Box empty(int type) throws IOException {

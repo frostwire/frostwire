@@ -45,8 +45,7 @@ public final class SampleToGroupBox extends FullBox {
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
             IO.read(ch, 8, buf);
-            e.sample_count = buf.getInt();
-            e.group_description_index = buf.getInt();
+            e.get(buf);
             entries[i] = e;
         }
     }
@@ -58,12 +57,7 @@ public final class SampleToGroupBox extends FullBox {
         buf.putInt(grouping_type);
         buf.putInt(entry_count);
         IO.write(ch, 8, buf);
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = entries[i];
-            buf.putInt(e.sample_count);
-            buf.putInt(e.group_description_index);
-            IO.write(ch, 8, buf);
-        }
+        IsoMedia.write(ch, entry_count, 8, entries, buf);
     }
 
     @Override
@@ -75,8 +69,21 @@ public final class SampleToGroupBox extends FullBox {
         length(s);
     }
 
-    public static final class Entry {
+    public static final class Entry extends BoxEntry {
+
         public int sample_count;
         public int group_description_index;
+
+        @Override
+        void get(ByteBuffer buf) throws IOException {
+            sample_count = buf.getInt();
+            group_description_index = buf.getInt();
+        }
+
+        @Override
+        void put(ByteBuffer buf) throws IOException {
+            buf.putInt(sample_count);
+            buf.putInt(group_description_index);
+        }
     }
 }

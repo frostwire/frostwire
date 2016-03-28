@@ -43,8 +43,7 @@ public final class CompositionOffsetBox extends FullBox {
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
             IO.read(ch, 8, buf);
-            e.sample_count = buf.getInt();
-            e.sample_offset = buf.getInt();
+            e.get(buf);
             entries[i] = e;
         }
     }
@@ -55,12 +54,7 @@ public final class CompositionOffsetBox extends FullBox {
 
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = entries[i];
-            buf.putInt(e.sample_count);
-            buf.putInt(e.sample_offset);
-            IO.write(ch, 8, buf);
-        }
+        IsoMedia.write(ch, entry_count, 8, entries, buf);
     }
 
     @Override
@@ -72,8 +66,21 @@ public final class CompositionOffsetBox extends FullBox {
         length(s);
     }
 
-    public static final class Entry {
+    public static final class Entry extends BoxEntry {
+
         public int sample_count;
         public int sample_offset;
+
+        @Override
+        void get(ByteBuffer buf) throws IOException {
+            sample_count = buf.getInt();
+            sample_offset = buf.getInt();
+        }
+
+        @Override
+        void put(ByteBuffer buf) throws IOException {
+            buf.putInt(sample_count);
+            buf.putInt(sample_offset);
+        }
     }
 }

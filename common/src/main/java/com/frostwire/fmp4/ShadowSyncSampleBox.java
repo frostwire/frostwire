@@ -43,8 +43,7 @@ public final class ShadowSyncSampleBox extends FullBox {
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
             IO.read(ch, 8, buf);
-            e.shadowed_sample_number = buf.getInt();
-            e.sync_sample_number = buf.getInt();
+            e.get(buf);
             entries[i] = e;
         }
     }
@@ -55,12 +54,7 @@ public final class ShadowSyncSampleBox extends FullBox {
 
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = entries[i];
-            buf.putInt(e.shadowed_sample_number);
-            buf.putInt(e.sync_sample_number);
-            IO.write(ch, 8, buf);
-        }
+        IsoMedia.write(ch, entry_count, 8, entries, buf);
     }
 
     @Override
@@ -72,8 +66,21 @@ public final class ShadowSyncSampleBox extends FullBox {
         length(s);
     }
 
-    public static final class Entry {
+    public static final class Entry extends BoxEntry {
+
         public int shadowed_sample_number;
         public int sync_sample_number;
+
+        @Override
+        void get(ByteBuffer buf) throws IOException {
+            shadowed_sample_number = buf.getInt();
+            sync_sample_number = buf.getInt();
+        }
+
+        @Override
+        void put(ByteBuffer buf) throws IOException {
+            buf.putInt(shadowed_sample_number);
+            buf.putInt(sync_sample_number);
+        }
     }
 }

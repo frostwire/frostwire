@@ -43,7 +43,7 @@ public final class SyncSampleBox extends FullBox {
         for (int i = 0; i < entry_count; i++) {
             Entry e = new Entry();
             IO.read(ch, 4, buf);
-            e.sample_number = buf.getInt();
+            e.get(buf);
             entries[i] = e;
         }
     }
@@ -54,11 +54,7 @@ public final class SyncSampleBox extends FullBox {
 
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
-        for (int i = 0; i < entry_count; i++) {
-            Entry e = entries[i];
-            buf.putInt(e.sample_number);
-            IO.write(ch, 4, buf);
-        }
+        IsoMedia.write(ch, entry_count, 4, entries, buf);
     }
 
     @Override
@@ -70,7 +66,18 @@ public final class SyncSampleBox extends FullBox {
         length(s);
     }
 
-    public static final class Entry {
+    public static final class Entry extends BoxEntry {
+
         public int sample_number;
+
+        @Override
+        void get(ByteBuffer buf) throws IOException {
+            sample_number = buf.getInt();
+        }
+
+        @Override
+        void put(ByteBuffer buf) throws IOException {
+            buf.putInt(sample_number);
+        }
     }
 }
