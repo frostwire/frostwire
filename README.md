@@ -92,12 +92,22 @@ Go inside the `desktop` directory and type:
 **Additional Desktop requirements**
 
 ***gettext***
-If you want to work with the translation (i18n) bundles, you will need to install gettext to perform the text extraction and bundling tasks (`gradle gettextExtract`, `gradle gettextbundle`)
 
-If you are on Mac, `gettext` installation is very simple with brew: `brew install gettext`.
-If you are on Ubuntu, `gettext` installation can be done with `sudo apt-get install gettext`.
+If you want to work with the translation (i18n) bundles, you will need to install `gettext` to perform the text extraction and bundling tasks (`gradle gettextExtract`, `gradle gettextBundle`)
 
-If you are developing in Windows we recommend you work with MinGW and install the `gettext` package. We also recommend you use [git's terminal](https://git-scm.com/download/win) if you want all scripts to work as if you were working in Linux/Mac. Git's terminal supports window resizing, completion and basic GNU tools.
+If you are on Mac, `gettext` installation is very simple with brew: 
+
+`brew install gettext`.
+
+If you are on Ubuntu, `gettext` installation can be done with 
+
+`sudo apt-get install gettext`.
+
+
+***Windows developers***
+If you are developing in Windows we recommend you work with [MinGW](https://sourceforge.net/projects/mingw/files/) and install the `gettext` package. 
+
+We also recommend you use [git for window's terminal](https://git-scm.com/download/win) instead of `cmd.exe`. All of our scripts will work as if you were working in Linux/Mac. Git's terminal supports window resizing, completion and basic GNU tools.
 
 ### Android
 Go inside the `android` directory and type:
