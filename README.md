@@ -83,13 +83,29 @@ Tip for next commit: [![tip for next commit](https://tip4commit.com/projects/431
 
 # How to build
 
-Instructions on how to build are included inside each project, we're still making the migration into this monorepo structure, so we'll accept gladly any commits refering to the README.md files found here.
+To build you will need the [Java Developer Kit 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html), [Apache Ant](http://ant.apache.org/) and [Gradle](http://gradle.org/)
 
-For now, `desktop/` has to be built from the root of the monorepo as simple as doing:
+### Desktop
+Go inside the `desktop` directory and type:
 `gradle build`
 
-For `android/`, go inside the directory and do:
+**Additional Desktop requirements**
+
+***gettext***
+If you want to work with the translation (i18n) bundles, you will need to install gettext to perform the text extraction and bundling tasks (`gradle gettextExtract`, `gradle gettextbundle`)
+
+If you are on Mac, `gettext` installation is very simple with brew: `brew install gettext`.
+If you are on Ubuntu, `gettext` installation can be done with `sudo apt-get install gettext`.
+
+If you are developing in Windows we recommend you work with MinGW and install the `gettext` package. We also recommend you use [git's terminal](https://git-scm.com/download/win) if you want all scripts to work as if you were working in Linux/Mac. Git's terminal supports window resizing, completion and basic GNU tools.
+
+### Android
+Go inside the `android` directory and type:
 `./gradlew assembleDebug`
+
+**Additional Android requirements**
+
+For Android developers we recommend working with [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) and the [Stand-Alone SDK Tools](http://developer.android.com/sdk/index.html#Other) (instead of Android Studio, which in our experience falls short if you want to also develop for our desktop client)
 
 ### License
 
