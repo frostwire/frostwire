@@ -29,12 +29,10 @@ import java.util.LinkedList;
  */
 public final class IsoMedia {
 
-    private static final int DEFAULT_BUFFER_SIZE = 10 * 1014; // 10K
-
     private IsoMedia() {
     }
 
-    public static boolean read(InputChannel ch, long len, Box p, ByteBuffer buf, OnBoxListener l) throws IOException {
+    static boolean read(InputChannel ch, long len, Box p, ByteBuffer buf, OnBoxListener l) throws IOException {
         long n = ch.count();
         do {
             IO.read(ch, 8, buf);
@@ -104,9 +102,8 @@ public final class IsoMedia {
         return true;
     }
 
-    public static void read(InputChannel ch, OnBoxListener l) throws IOException {
+    public static void read(InputChannel ch, ByteBuffer buf, OnBoxListener l) throws IOException {
         try {
-            ByteBuffer buf = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
             read(ch, -1, null, buf, l);
         } catch (EOFException e) {
             // ignore, it's the end
@@ -137,11 +134,6 @@ public final class IsoMedia {
         in.seek(0);
 
         return boxes;
-    }
-
-    public static LinkedList<Box> head(RandomAccessFile in) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
-        return head(in, buf);
     }
 
     public static boolean write(OutputChannel ch, LinkedList<Box> boxes, ByteBuffer buf, OnBoxListener l) throws IOException {
@@ -186,11 +178,6 @@ public final class IsoMedia {
         }
 
         return true;
-    }
-
-    public static void write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
-        write(ch, boxes, buf, l);
     }
 
     static void write(OutputChannel ch, int count, int size, BoxEntry[] entries, ByteBuffer buf) throws IOException {

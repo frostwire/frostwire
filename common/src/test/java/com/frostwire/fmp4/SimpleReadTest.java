@@ -32,6 +32,8 @@ import java.util.ListIterator;
  */
 public class SimpleReadTest {
 
+    private static final ByteBuffer BUF = ByteBuffer.allocate(100 * 1024);
+
     @Test
     public void testRead() throws IOException {
         File f = new File("/Users/aldenml/Downloads/test_out.mp4");
@@ -40,7 +42,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(ch, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(ch, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 if (b instanceof UnknownBox) {
@@ -68,7 +70,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(chIn, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 System.out.println(Bits.make4cc(b.type));
@@ -79,7 +81,7 @@ public class SimpleReadTest {
             }
         });
 
-        IsoMedia.write(chOut, boxes, new IsoMedia.OnBoxListener() {
+        IsoMedia.write(chOut, boxes, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 System.out.println("Write: " + Bits.make4cc(b.type));
@@ -102,7 +104,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(chIn, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 System.out.println(Bits.make4cc(b.type));
@@ -119,7 +121,7 @@ public class SimpleReadTest {
             }
         }
 
-        IsoMedia.write(chOut, boxes, new IsoMedia.OnBoxListener() {
+        IsoMedia.write(chOut, boxes, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 System.out.println("Write: " + Bits.make4cc(b.type));
@@ -142,7 +144,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(chIn, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 //System.out.println(Bits.make4cc(b.type));
@@ -166,7 +168,7 @@ public class SimpleReadTest {
             }
         }
 
-        IsoMedia.write(chOut, boxes, new IsoMedia.OnBoxListener() {
+        IsoMedia.write(chOut, boxes, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 System.out.println("Write: " + Bits.make4cc(b.type));
@@ -189,7 +191,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(chIn, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 //System.out.println(Bits.make4cc(b.type));
@@ -238,7 +240,7 @@ public class SimpleReadTest {
             }
         }
 
-        IsoMedia.write(chOut, boxes, new IsoMedia.OnBoxListener() {
+        IsoMedia.write(chOut, boxes, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 System.out.println("Write: " + Bits.make4cc(b.type));
@@ -269,7 +271,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(chIn, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 //System.out.println(Bits.make4cc(b.type));
@@ -327,7 +329,7 @@ public class SimpleReadTest {
             offset += chunkSize[i];
         }
 
-        IsoMedia.write(chOut, boxes, new IsoMedia.OnBoxListener() {
+        IsoMedia.write(chOut, boxes, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 System.out.println("Write: " + Bits.make4cc(b.type));
@@ -354,7 +356,7 @@ public class SimpleReadTest {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(ch, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(ch, BUF, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 if (b instanceof UnknownBox) {
