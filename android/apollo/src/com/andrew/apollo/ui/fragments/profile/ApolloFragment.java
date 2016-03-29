@@ -62,13 +62,14 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         AdapterView.OnItemClickListener,
         MusicStateListener {
 
+    @SuppressWarnings("unused")
     private static Logger LOGGER = Logger.getLogger(ApolloFragment.class);
 
     private final int GROUP_ID;
     /**
      * LoaderCallbacks identifier
      */
-    protected final int LOADER_ID;
+    private final int LOADER_ID;
     /**
      * The list view
      */
@@ -91,27 +92,27 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     /**
      * Song list. The playlist's, the album's, the artist's discography available.
      */
-    protected long[] mSongList;
+    private long[] mSongList;
 
     /**
      * Id of a context menu item
      */
-    protected long mSelectedId;
+    private long mSelectedId;
 
     /**
      * The Id of the playlist the song belongs to
      */
-    protected long mPlaylistId;
+    long mPlaylistId;
 
     /**
      * Song, album, and artist name used in the context menu
      */
-    protected String mSongName, mAlbumName, mArtistName;
+    private String mSongName, mAlbumName, mArtistName;
 
     /**
      * Profile header
      */
-    protected ProfileTabCarousel mProfileTabCarousel;
+    ProfileTabCarousel mProfileTabCarousel;
 
     protected ViewGroup mRootView;
 
@@ -272,7 +273,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     return true;
                 case FragmentMenuItems.NEW_PLAYLIST:
                     CreateNewPlaylist.getInstance(songList).show(getFragmentManager(), "CreatePlaylist");
-                    refresh();
                     return true;
                 case FragmentMenuItems.PLAYLIST_SELECTED:
                     final long playlistId = item.getIntent().getLongExtra("playlist", 0);
@@ -489,7 +489,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         restartLoader(false);
     }
 
-    public boolean restartLoader(boolean force) {
+    protected boolean restartLoader(boolean force) {
         if (force || (System.currentTimeMillis() - lastRestartLoader) >= 5000) {
             lastRestartLoader = System.currentTimeMillis();
             getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
@@ -498,7 +498,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         return false;
     }
 
-    public void initLoader() {
+    private void initLoader() {
         final Intent intent = getActivity().getIntent();
         if (intent != null && intent.getExtras() != null) {
             getLoaderManager().initLoader(LOADER_ID, intent.getExtras(), this);
@@ -523,7 +523,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     /**
      * Sets up the grid view
      */
-    protected void initGridView() {
+    private void initGridView() {
         if (mRootView == null) {
             throw new RuntimeException("initGridView(): mRootView == null");
         }
@@ -601,7 +601,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     /**
      * Pause disk cache access to ensure smoother scrolling
      */
-    protected final VerticalScrollListener.ScrollableHeader mScrollableHeader = new VerticalScrollListener.ScrollableHeader() {
+    final VerticalScrollListener.ScrollableHeader mScrollableHeader = new VerticalScrollListener.ScrollableHeader() {
         @Override
         public void onScrollStateChanged(final AbsListView view, final int scrollState) {
             // Pause disk cache access to ensure smoother scrolling
@@ -619,7 +619,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * @return The position of an item in the list or grid based on the id of
      *         the currently playing album.
      */
-    protected int getItemPositionByAlbum() {
+    private int getItemPositionByAlbum() {
         final long albumId = MusicUtils.getCurrentAlbumId();
         if (mAdapter == null) {
             return 0;
@@ -662,7 +662,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * @return The position of an item in the list based on the name of the
      *         currently playing song.
      */
-    protected int getItemPositionBySong() {
+    private int getItemPositionBySong() {
         final long trackId = MusicUtils.getCurrentAudioId();
         if (mAdapter == null) {
             return 0;

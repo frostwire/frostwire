@@ -24,31 +24,40 @@ import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-
-import com.frostwire.android.R;
+import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.R;
+import com.frostwire.logging.Logger;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * A simple base class for the playlist dialogs.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public abstract class BasePlaylistDialog extends DialogFragment {
+abstract class BasePlaylistDialog extends DialogFragment {
+
+    @SuppressWarnings("unused")
+    private static final Logger LOGGER = Logger.getLogger(BasePlaylistDialog.class);
 
     /* The actual dialog */
-    protected AlertDialog mPlaylistDialog;
+    private AlertDialog mPlaylistDialog;
 
     /* Used to make new playlist names */
-    protected EditText mPlaylist;
+    EditText mPlaylist;
 
     /* The dialog save button */
-    protected Button mSaveButton;
+    private Button mSaveButton;
 
     /* The dialog prompt */
-    protected String mPrompt;
+    String mPrompt;
 
     /* The default edit text text */
-    protected String mDefaultname;
+    String mDefaultname;
+
+    private WeakReference<ApolloFragment> apolloFragmentRef;
 
     /**
      * {@inheritDoc}
@@ -73,6 +82,9 @@ public abstract class BasePlaylistDialog extends DialogFragment {
                         onSaveClick();
                         MusicUtils.refresh();
                         dialog.dismiss();
+                        if (Ref.alive(apolloFragmentRef)) {
+                            getApolloFragment().refresh();
+                        }
                     }
                 });
         // Set the cancel button action
@@ -97,7 +109,7 @@ public abstract class BasePlaylistDialog extends DialogFragment {
                 mPlaylist.requestFocus();
                 // Select the playlist name
                 mPlaylist.selectAll();
-            };
+            }
         });
 
         initObjects(savedInstanceState);
@@ -113,7 +125,7 @@ public abstract class BasePlaylistDialog extends DialogFragment {
     /**
      * Opens the soft keyboard
      */
-    protected void openKeyboard() {
+    private void openKeyboard() {
         final InputMethodManager mInputMethodManager = (InputMethodManager)getActivity()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         mInputMethodManager.toggleSoftInputFromWindow(mPlaylist.getApplicationWindowToken(),
@@ -123,10 +135,55 @@ public abstract class BasePlaylistDialog extends DialogFragment {
     /**
      * Closes the soft keyboard
      */
-    protected void closeKeyboard() {
+    void closeKeyboard() {
         final InputMethodManager mInputMethodManager = (InputMethodManager)getActivity()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         mInputMethodManager.hideSoftInputFromWindow(mPlaylist.getWindowToken(), 0);
+    }
+
+    private ApolloFragment getApolloFragment() {
+        if (Ref.alive(apolloFragmentRef)) {
+            return apolloFragmentRef.get();
+        }
+        return null;
+    }
+
+    void updateApolloFragmentReference(ApolloFragment frag) {
+        if (apolloFragmentRef == null) {
+            if (frag != null) {
+                apolloFragmentRef = Ref.weak(frag);
+            }
+        } else {
+            Ref.free(apolloFragmentRef);
+
+            if (frag != null) {
+                apolloFragmentRef = Ref.weak(frag);
+            } else {
+                apolloFragmentRef = null;
+            }
+        }
+    }
+
+    private void onTextChangedListener() {
+        mSaveButton = mPlaylistDialog.getButton(Dialog.BUTTON_POSITIVE);
+        if (mSaveButton == null) {
+            return;
+        }
+        final String playlistName = mPlaylist.getText().toString();
+        enableSaveButton(playlistName);
+    }
+
+    private void enableSaveButton(final String playlistName) {
+        if (playlistName.trim().length() == 0) {
+            mSaveButton.setEnabled(false);
+        } else {
+            mSaveButton.setEnabled(true);
+            if (MusicUtils.getIdForPlaylist(getActivity(), playlistName) >= 0) {
+                mSaveButton.setText(R.string.overwrite);
+            } else {
+                mSaveButton.setText(R.string.save);
+            }
+        }
     }
 
     /**
@@ -170,10 +227,4 @@ public abstract class BasePlaylistDialog extends DialogFragment {
      * Called when the save button of our {@link AlertDialog} is pressed
      */
     public abstract void onSaveClick();
-
-    /**
-     * Called in our {@link TextWatcher} during a text change
-     */
-    public abstract void onTextChangedListener();
-
 }

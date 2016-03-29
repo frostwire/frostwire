@@ -11,16 +11,22 @@
 
 package com.andrew.apollo.menu;
 
-import android.app.Dialog;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
-
+import android.support.v4.app.Fragment;
+import com.andrew.apollo.adapters.PlaylistAdapter;
+import com.andrew.apollo.format.Capitalize;
+import com.andrew.apollo.ui.fragments.PlaylistFragment;
+import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
+import com.andrew.apollo.utils.MusicUtils;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
-import com.andrew.apollo.format.Capitalize;
-import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.logging.Logger;
+
+import java.util.List;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com) TODO - The playlist names are
@@ -29,6 +35,9 @@ import com.andrew.apollo.utils.MusicUtils;
  *         or not.
  */
 public class CreateNewPlaylist extends BasePlaylistDialog {
+
+    @SuppressWarnings("unused")
+    private Logger LOGGER = Logger.getLogger(CreateNewPlaylist.class);
 
     // The playlist list
     private long[] mPlaylistList = new long[] {};
@@ -49,8 +58,8 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
      * {@inheritDoc}
      */
     @Override
-    public void onSaveInstanceState(final Bundle outcicle) {
-        outcicle.putString("defaultname", mPlaylist.getText().toString());
+    public void onSaveInstanceState(final Bundle bundle) {
+        bundle.putString("defaultname", mPlaylist.getText().toString());
     }
 
     /**
@@ -65,14 +74,17 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
             getDialog().dismiss();
             return;
         }
-        final String promptformat = getString(R.string.create_playlist_prompt);
-        mPrompt = String.format(promptformat, mDefaultname);
+        final String promptFormat = getString(R.string.create_playlist_prompt);
+        mPrompt = String.format(promptFormat, mDefaultname);
     }
 
     @Override
     public void onSaveClick() {
+        if (mPlaylist.getText() == null) {
+            return;
+        }
         final String playlistName = mPlaylist.getText().toString();
-        if (playlistName != null && playlistName.length() > 0) {
+        if (playlistName.length() > 0) {
             final int playlistId = (int)MusicUtils.getIdForPlaylist(getActivity(),
                     playlistName);
             if (playlistId >= 0) {
@@ -83,37 +95,13 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
                         Capitalize.capitalize(playlistName));
                 MusicUtils.addToPlaylist(getActivity(), mPlaylistList, newId);
             }
-
             int added;
             if (mPlaylistList != null && (added=mPlaylistList.length) > 0) {
                 final String message = getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, added, added);
                 AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
             }
-
             closeKeyboard();
             getDialog().dismiss();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onTextChangedListener() {
-        final String playlistName = mPlaylist.getText().toString();
-        mSaveButton = mPlaylistDialog.getButton(Dialog.BUTTON_POSITIVE);
-        if (mSaveButton == null) {
-            return;
-        }
-        if (playlistName.trim().length() == 0) {
-            mSaveButton.setEnabled(false);
-        } else {
-            mSaveButton.setEnabled(true);
-            if (MusicUtils.getIdForPlaylist(getActivity(), playlistName) >= 0) {
-                mSaveButton.setText(R.string.overwrite);
-            } else {
-                mSaveButton.setText(R.string.save);
-            }
         }
     }
 
@@ -131,23 +119,44 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
             return null;
         }
 
-        String suggestedname;
-        suggestedname = String.format(template, num++);
+        String suggestedName;
+        suggestedName = String.format(template, num++);
         boolean done = false;
         while (!done) {
             done = true;
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
-                final String playlistname = cursor.getString(0);
-                if (playlistname.compareToIgnoreCase(suggestedname) == 0) {
-                    suggestedname = String.format(template, num++);
+                final String playlistName = cursor.getString(0);
+                if (playlistName.compareToIgnoreCase(suggestedName) == 0) {
+                    suggestedName = String.format(template, num++);
                     done = false;
                 }
                 cursor.moveToNext();
             }
         }
         cursor.close();
-        cursor = null;
-        return suggestedname;
+        return suggestedName;
+    }
+
+    /** Looks for the PlaylistFragment and keeps it as a weak reference in case its found.
+     * This way we can invoke that fragment's refresh() method when we need it, keeping
+     * all the on Ok logic here and not forcing ApolloFragment to implement OnDialogClick
+     * and having to handle each possible's dialog click with a bunch of conditions. */
+    private void lookForPlaylistFragment() {
+        final List<Fragment> fragments = getFragmentManager().getFragments();
+        if (fragments != null && !fragments.isEmpty()) {
+            for (Fragment f : fragments) {
+                if (f instanceof PlaylistFragment) {
+                    updateApolloFragmentReference((ApolloFragment) f);
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        lookForPlaylistFragment();
     }
 }

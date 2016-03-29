@@ -19,13 +19,13 @@ package com.andrew.apollo.menu;
  */
 public class FragmentMenuItems {
 
-    /* Removes a single album from the recents pages */
+    /* Removes a single album from the recent pages */
     public static final int REMOVE_FROM_RECENT = 0;
 
     /* Used to play the selected artist, album, song, playlist, or genre */
     public static final int PLAY_SELECTION = 1;
 
-    /* Used to add to the qeueue */
+    /* Used to add to the queue */
     public static final int ADD_TO_QUEUE = 2;
 
     /* Used to add to a playlist */

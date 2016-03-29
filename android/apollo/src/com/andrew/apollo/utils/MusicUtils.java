@@ -1088,21 +1088,23 @@ public final class MusicUtils {
             Cursor cursor = context.getContentResolver().query(uri, new String[]{
                     AlbumColumns.NUMBER_OF_SONGS
             }, null, null, null);
-            return getFirstStringResult(cursor);
+            return getFirstStringResult(cursor, true);
         } catch (Throwable e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    private static String getFirstStringResult(Cursor cursor) {
+    public static String getFirstStringResult(Cursor cursor, boolean closeCursor) {
         String result = null;
         if (cursor != null) {
             cursor.moveToFirst();
             if (!cursor.isAfterLast()) {
                 result = cursor.getString(0);
             }
-            cursor.close();
+            if (closeCursor) {
+                cursor.close();
+            }
         }
         return result;
     }
@@ -1121,7 +1123,7 @@ public final class MusicUtils {
             Cursor cursor = context.getContentResolver().query(uri, new String[]{
                     AlbumColumns.FIRST_YEAR
             }, null, null, null);
-            return getFirstStringResult(cursor);
+            return getFirstStringResult(cursor, true);
         } catch (Throwable e) {
             // ignore this error since it's not critical
             LOG.error("Error getting release date for album", e);
@@ -1313,7 +1315,7 @@ public final class MusicUtils {
             while (!cursor.isAfterLast()) {
                 final Intent intent = new Intent();
                 String name = cursor.getString(1);
-                LOG.info("makePlaylistMenu - add ["+name+"]");
+                //LOG.info("makePlaylistMenu - add ["+name+"]");
                 if (name != null) {
                     intent.putExtra("playlist", getIdForPlaylist(context, name));
                     subMenu.add(groupId, FragmentMenuItems.PLAYLIST_SELECTED, Menu.NONE,
