@@ -105,9 +105,10 @@ If you are on Ubuntu, `gettext` installation can be done with
 
 
 ***Windows developers***
+
 If you are developing in Windows we recommend you work with [MinGW](https://sourceforge.net/projects/mingw/files/) and install the `gettext` package. 
 
-We also recommend you use [git for window's terminal](https://git-scm.com/download/win) instead of `cmd.exe`. All of our scripts will work as if you were working in Linux/Mac. Git's terminal supports window resizing, completion and basic GNU tools.
+We also recommend you use [git for window's terminal](https://git-scm.com/download/win) instead of `cmd.exe`. All of our scripts will work as if you were working in Linux/Mac. Git's terminal supports window resizing, more convenient copying and pasting, `Tab` text completion, `Ctrl+R` reverse search, common bash keyboard shortcuts and basic GNU tools right out of the box.
 
 ### Android
 Go inside the `android` directory and type:
