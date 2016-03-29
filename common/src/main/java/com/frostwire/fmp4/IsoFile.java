@@ -52,4 +52,26 @@ public final class IsoFile {
 
         return boxes;
     }
+
+    public static int count(RandomAccessFile in, final int type, ByteBuffer buf) throws IOException {
+        in.seek(0);
+
+        final InputChannel ch = new InputChannel(in.getChannel());
+        final Int32 n = new Int32(0);
+
+        IsoMedia.read(ch, buf, new IsoMedia.OnBoxListener() {
+            @Override
+            public boolean onBox(Box b) {
+                if (b.type == type || type == 0) {
+                    n.increment();
+                }
+
+                return true;
+            }
+        });
+
+        in.seek(0);
+
+        return n.get();
+    }
 }

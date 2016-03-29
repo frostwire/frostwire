@@ -385,4 +385,13 @@ public class SimpleReadTest {
 
         System.out.println("Num boxes: " + boxes.size());
     }
+
+    @Test
+    public void testCount() throws IOException {
+        File f = new File("/Users/aldenml/Downloads/audio_frag.mp4");
+        RandomAccessFile in = new RandomAccessFile(f, "r");
+        int n = IsoFile.count(in, Box.moof, BUF);
+
+        System.out.println("Num boxes: " + n);
+    }
 }
