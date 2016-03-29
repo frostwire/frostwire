@@ -19,7 +19,6 @@ package com.frostwire.fmp4;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
@@ -108,32 +107,6 @@ public final class IsoMedia {
         } catch (EOFException e) {
             // ignore, it's the end
         }
-    }
-
-    public static LinkedList<Box> head(RandomAccessFile in, ByteBuffer buf) throws IOException {
-        in.seek(0);
-
-        final InputChannel ch = new InputChannel(in.getChannel());
-        final LinkedList<Box> boxes = new LinkedList<>();
-
-        try {
-            read(ch, -1, null, buf, new OnBoxListener() {
-                @Override
-                public boolean onBox(Box b) {
-                    if (b.parent == null) {
-                        boxes.add(b);
-                    }
-
-                    return b.type != Box.mdat;
-                }
-            });
-        } catch (EOFException e) {
-            // ignore, it's the end
-        }
-
-        in.seek(0);
-
-        return boxes;
     }
 
     public static boolean write(OutputChannel ch, LinkedList<Box> boxes, ByteBuffer buf, OnBoxListener l) throws IOException {

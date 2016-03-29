@@ -18,6 +18,7 @@
 package com.frostwire.fmp4;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -168,5 +169,15 @@ final class IO {
             buf.putShort(arr[i]);
         }
         return buf;
+    }
+
+    public static void close(Closeable f) {
+        try {
+            if (f != null) {
+                f.close();
+            }
+        } catch (IOException ioe) {
+            // ignore
+        }
     }
 }

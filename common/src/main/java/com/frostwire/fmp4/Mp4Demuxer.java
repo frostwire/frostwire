@@ -32,7 +32,7 @@ public final class Mp4Demuxer {
 
     public static void track(int id, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out, DemuxerListener l) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(100 * 1024);
-        LinkedList<Box> head = IsoMedia.head(in, buf);
+        LinkedList<Box> head = IsoFile.head(in, buf);
         boolean fragments = Box.findFirst(head, Box.mvex) != null;
         track(id, fragments, head, tags, in, out, l, buf);
     }
@@ -47,7 +47,7 @@ public final class Mp4Demuxer {
 
         try {
             ByteBuffer buf = ByteBuffer.allocate(100 * 1024);
-            LinkedList<Box> head = IsoMedia.head(in, buf);
+            LinkedList<Box> head = IsoFile.head(in, buf);
 
             // find audio track
             SoundMediaHeaderBox smhd = Box.findFirst(head, Box.smhd);
@@ -58,8 +58,8 @@ public final class Mp4Demuxer {
             track(tkhd.trackId(), fragments, head, tags, in, out, l, buf);
 
         } finally {
-            close(in);
-            close(out);
+            IO.close(in);
+            IO.close(out);
         }
     }
 
@@ -494,16 +494,6 @@ public final class Mp4Demuxer {
         }
 
         return udta;
-    }
-
-    private static void close(RandomAccessFile f) {
-        try {
-            if (f != null) {
-                f.close();
-            }
-        } catch (IOException ioe) {
-            // ignore
-        }
     }
 
     private static void notifyCount(DemuxerListener l, long readCount, long writeCount) {
