@@ -16,7 +16,6 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
-
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
@@ -25,22 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Used to query {@link MediaStore.Audio.Media.EXTERNAL_CONTENT_URI} and return
+ * Used to query MediaStore.Audio.Media.EXTERNAL_CONTENT_URI and return
  * the Song for a particular album.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
-public class AlbumSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
-
-    /**
-     * The result
-     */
-    private final ArrayList<Song> mSongList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
+public class AlbumSongLoader extends SongLoader {
 
     /**
      * The Id of the album the songs belong to.
@@ -58,47 +48,9 @@ public class AlbumSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
         mAlbumID = albumId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Song> loadInBackground() {
-        // Create the Cursor
-        mCursor = makeAlbumSongCursor(getContext(), mAlbumID);
-        // Gather the data
-        if (mCursor != null && mCursor.moveToFirst()) {
-            do {
-                // Copy the song Id
-                final long id = mCursor.getLong(0);
-
-                // Copy the song name
-                final String songName = mCursor.getString(1);
-
-                // Copy the artist name
-                final String artist = mCursor.getString(2);
-
-                // Copy the album name
-                final String album = mCursor.getString(3);
-
-                // Copy the duration
-                final long duration = mCursor.getLong(4);
-
-                // Make the duration label
-                final int seconds = (int) (duration / 1000);
-
-                // Create a new song
-                final Song song = new Song(id, songName, artist, album, seconds);
-
-                // Add everything up
-                mSongList.add(song);
-            } while (mCursor.moveToNext());
-        }
-        // Close the cursor
-        if (mCursor != null) {
-            mCursor.close();
-            mCursor = null;
-        }
-        return mSongList;
+    public Cursor makeCursor(Context context) {
+        return makeAlbumSongCursor(context, mAlbumID);
     }
 
     /**
@@ -106,12 +58,12 @@ public class AlbumSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
      * @param albumId The Id of the album the songs belong to.
      * @return The {@link Cursor} used to run the query.
      */
-    public static final Cursor makeAlbumSongCursor(final Context context, final Long albumId) {
+    public static Cursor makeAlbumSongCursor(final Context context, final Long albumId) {
         // Match the songs up with the artist
         final StringBuilder selection = new StringBuilder();
         selection.append(AudioColumns.IS_MUSIC + "=1");
         selection.append(" AND " + AudioColumns.TITLE + " != ''");
-        selection.append(" AND " + AudioColumns.ALBUM_ID + "=" + albumId);
+        selection.append(" AND " + AudioColumns.ALBUM_ID + "=").append(albumId);
         return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 new String[] {
                         /* 0 */
@@ -127,5 +79,4 @@ public class AlbumSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
                 }, selection.toString(), null,
                 PreferenceUtils.getInstance(context).getAlbumSongSortOrder());
     }
-
 }

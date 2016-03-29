@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Gunstelling</string>
   <string name="playlist_favorites">Gunstellinge</string>
   <string name="playlist_last_added">Laaste bygevoeg</string>
-  <string name="new_playlist">Skep speellys</string>
+  <string name="new_empty_playlist">Skep speellys</string>
   <string name="save">Stoor</string>
   <string name="cancel">Kanselleer</string>
   <string name="overwrite">Oorskryf</string>

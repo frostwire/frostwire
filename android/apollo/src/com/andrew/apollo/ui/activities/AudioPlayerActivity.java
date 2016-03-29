@@ -42,11 +42,8 @@ import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.ui.fragments.QueueFragment;
-import com.andrew.apollo.utils.ApolloUtils;
-import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.*;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
-import com.andrew.apollo.utils.NavUtils;
-import com.andrew.apollo.utils.ThemeUtils;
 import com.andrew.apollo.widgets.PlayPauseButton;
 import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
@@ -55,7 +52,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.views.AbstractSwipeDetector;
 import com.frostwire.android.gui.views.ClickAdapter;
-import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
@@ -627,7 +623,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         boolean handled = false;
 
         if (uri != null && uri.toString().length() > 0) {
-            MusicUtils.playFile(this, uri);
+            MusicUtils.playFile(uri);
             handled = true;
         } else if (Playlists.CONTENT_TYPE.equals(mimeType)) {
             long id = parseIdFromIntent(intent, "playlistId", "playlist", -1);
@@ -944,8 +940,16 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         @Override
         public void onClick(final View v) {
-            NavUtils.openAlbumProfile(AudioPlayerActivity.this, MusicUtils.getAlbumName(),
-                    MusicUtils.getArtistName(), MusicUtils.getCurrentAlbumId());
+            long albumId = MusicUtils.getCurrentAlbumId();
+            try {
+                NavUtils.openAlbumProfile(AudioPlayerActivity.this,
+                        MusicUtils.getAlbumName(),
+                        MusicUtils.getArtistName(),
+                        albumId,
+                        MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
+            } catch (Throwable ignored) {
+                ignored.printStackTrace();
+            }
         }
     };
 

@@ -35,7 +35,7 @@ import android.widget.GridView;
 
 import com.frostwire.android.R;
 import com.andrew.apollo.recycler.RecycleHolder;
-import com.andrew.apollo.ui.MusicHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.utils.ThemeUtils;
 import com.devspark.appmsg.AppMsg;
 
@@ -246,13 +246,13 @@ public class ThemeFragment extends Fragment implements OnItemClickListener {
         public View getView(final int position, View convertView, final ViewGroup parent) {
 
             /* Recycle ViewHolder's items */
-            MusicHolder holder;
+            MusicViewHolder holder;
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(mLayoutID, parent, false);
-                holder = new MusicHolder(convertView);
+                holder = new MusicViewHolder(convertView);
                 convertView.setTag(holder);
             } else {
-                holder = (MusicHolder)convertView.getTag();
+                holder = (MusicViewHolder)convertView.getTag();
             }
 
             // Retrieve the data holder

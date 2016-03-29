@@ -13,32 +13,17 @@ package com.andrew.apollo.loaders;
 
 import android.content.Context;
 import android.database.Cursor;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.provider.RecentStore.RecentStoreColumns;
-import com.andrew.apollo.utils.Lists;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Used to query {@link RecentStore} and return the last listened to albums.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
-public class RecentLoader extends WrappedAsyncTaskLoader<List<Album>> {
-
-    /**
-     * The result
-     */
-    private final ArrayList<Album> mAlbumsList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
+public class RecentLoader extends AlbumLoader {
 
     /**
      * Constructor of <code>RecentLoader</code>
@@ -49,49 +34,9 @@ public class RecentLoader extends WrappedAsyncTaskLoader<List<Album>> {
         super(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Album> loadInBackground() {
-        // Create the Cursor
-        mCursor = makeRecentCursor(getContext());
-        // Gather the data
-        if (mCursor != null && mCursor.moveToFirst()) {
-            do {
-                // Copy the album id
-                final long id = mCursor.getLong(mCursor
-                        .getColumnIndexOrThrow(RecentStoreColumns.ID));
-
-                // Copy the album name
-                final String albumName = mCursor.getString(mCursor
-                        .getColumnIndexOrThrow(RecentStoreColumns.ALBUMNAME));
-
-                // Copy the artist name
-                final String artist = mCursor.getString(mCursor
-                        .getColumnIndexOrThrow(RecentStoreColumns.ARTISTNAME));
-
-                // Copy the number of songs
-                final int songCount = mCursor.getInt(mCursor
-                        .getColumnIndexOrThrow(RecentStoreColumns.ALBUMSONGCOUNT));
-
-                // Copy the release year
-                final String year = mCursor.getString(mCursor
-                        .getColumnIndexOrThrow(RecentStoreColumns.ALBUMYEAR));
-
-                // Create a new album
-                final Album album = new Album(id, albumName, artist, songCount, year);
-
-                // Add everything up
-                mAlbumsList.add(album);
-            } while (mCursor.moveToNext());
-        }
-        // Close the cursor
-        if (mCursor != null) {
-            mCursor.close();
-            mCursor = null;
-        }
-        return mAlbumsList;
+    public Cursor makeCursor(Context context) {
+        return makeRecentCursor(getContext());
     }
 
     /**
@@ -100,16 +45,34 @@ public class RecentLoader extends WrappedAsyncTaskLoader<List<Album>> {
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the album query.
      */
-    public static final Cursor makeRecentCursor(final Context context) {
+    public static Cursor makeRecentCursor(final Context context) {
         return RecentStore
                 .getInstance(context)
                 .getReadableDatabase()
                 .query(RecentStoreColumns.NAME,
                         new String[] {
-                                RecentStoreColumns.ID + " as id", RecentStoreColumns.ID,
-                                RecentStoreColumns.ALBUMNAME, RecentStoreColumns.ARTISTNAME,
-                                RecentStoreColumns.ALBUMSONGCOUNT, RecentStoreColumns.ALBUMYEAR,
-                                RecentStoreColumns.TIMEPLAYED
+                                RecentStoreColumns.ID + " as id",  /** 0 - id */
+                                RecentStoreColumns.ID,             /** 1 - albumid */
+                                RecentStoreColumns.ALBUMNAME,      /** 2 - itemname */
+                                RecentStoreColumns.ARTISTNAME,     /** 3 - artistname */
+                                RecentStoreColumns.ALBUMSONGCOUNT, /** 4 - albumsongcount */
+                                RecentStoreColumns.ALBUMYEAR,      /** 5 - albumyear */
+                                RecentStoreColumns.TIMEPLAYED      /** 6 - timeplayed */
                         }, null, null, null, null, RecentStoreColumns.TIMEPLAYED + " DESC");
+    }
+
+    protected Album getAlbumEntryFromCursor(Cursor cursor) {
+        // Copy the album id
+        final long id = cursor.getLong(0);
+        // Copy the album name
+        final String albumName = cursor.getString(2);
+        // Copy the artist name
+        final String artist = cursor.getString(3);
+        // Copy the number of songs
+        final int songCount = cursor.getInt(4);
+        // Copy the release year
+        final String year = cursor.getString(5);
+        // Create a new album
+        return new Album(id, albumName, artist, songCount, year);
     }
 }

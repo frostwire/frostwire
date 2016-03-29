@@ -19,28 +19,22 @@ import android.provider.MediaStore.Audio.AlbumColumns;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
+import com.frostwire.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Used to query {@link MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI} and return
+ * Used to query MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI and return
  * the albums on a user's device.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
 public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
 
-    /**
-     * The result
-     */
-    private final ArrayList<Album> mAlbumsList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
+    private static Logger LOGGER = Logger.getLogger(AlbumLoader.class);
 
     /**
      * Constructor of <code>AlbumLoader</code>
@@ -56,9 +50,12 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
      */
     @Override
     public List<Album> loadInBackground() {
+        final ArrayList<Album> mAlbumsList = Lists.newArrayList();
+
         // Create the Cursor
+        Cursor mCursor;
         try {
-            mCursor = makeAlbumCursor(getContext());
+            mCursor = makeCursor(getContext());
         } catch (Throwable e) {
             return Collections.EMPTY_LIST;
         }
@@ -66,34 +63,32 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
-                // Copy the album id
-                final long id = mCursor.getLong(0);
-
-                // Copy the album name
-                final String albumName = mCursor.getString(1);
-
-                // Copy the artist name
-                final String artist = mCursor.getString(2);
-
-                // Copy the number of songs
-                final int songCount = mCursor.getInt(3);
-
-                // Copy the release year
-                final String year = mCursor.getString(4);
-
-                // Create a new album
-                final Album album = new Album(id, albumName, artist, songCount, year);
-
-                // Add everything up
-                mAlbumsList.add(album);
+                mAlbumsList.add(getAlbumEntryFromCursor(mCursor));
+                //String an = mCursor.getString(1) != null ? mCursor.getString(1) : "n/a";
+                //String art = mCursor.getString(2) != null ? mCursor.getString(2) : "n/a";
+                //LOGGER.info("Adding id: " + mCursor.getLong(0) + " - albumName: " + an + " - artist: " + art);
             } while (mCursor.moveToNext());
         }
         // Close the cursor
         if (mCursor != null) {
             mCursor.close();
-            mCursor = null;
         }
         return mAlbumsList;
+    }
+
+    protected Album getAlbumEntryFromCursor(Cursor cursor) {
+        // Copy the album id
+        final long id = cursor.getLong(0);
+        // Copy the album name
+        final String albumName = cursor.getString(1);
+        // Copy the artist name
+        final String artist = cursor.getString(2);
+        // Copy the number of songs
+        final int songCount = cursor.getInt(3);
+        // Copy the release year
+        final String year = cursor.getString(4);
+        // Create a new album
+        return new Album(id, albumName, artist, songCount, year);
     }
 
     /**
@@ -102,7 +97,7 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the album query.
      */
-    public static final Cursor makeAlbumCursor(final Context context) {
+    private Cursor makeAlbumCursor(final Context context) {
         return context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
                 new String[] {
                         /* 0 */
@@ -116,5 +111,9 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
                         /* 4 */
                         AlbumColumns.FIRST_YEAR
                 }, null, null, PreferenceUtils.getInstance(context).getAlbumSortOrder());
+    }
+
+    public Cursor makeCursor(final Context context) {
+        return makeAlbumCursor(context);
     }
 }

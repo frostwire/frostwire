@@ -27,18 +27,20 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
+import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.menu.PhotoSelectionDialog;
 import com.andrew.apollo.menu.PhotoSelectionDialog.ProfileType;
+import com.andrew.apollo.ui.fragments.TabFragmentOrder;
 import com.andrew.apollo.ui.fragments.profile.*;
 import com.andrew.apollo.utils.*;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.ProfileTabCarousel.Listener;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 
 /**
  * The {@link Activity} is used to display the data for specific
@@ -61,7 +63,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     private ViewPager mViewPager;
 
     /**
-     * Pager adpater
+     * Pager adapter
      */
     private PagerAdapter mPagerAdapter;
 
@@ -79,6 +81,8 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * Artist name passed into the class
      */
     private String mArtistName;
+
+    private long mArtistId;
 
     /**
      * The main profile title
@@ -98,29 +102,31 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Temporay until I can work out a nice landscape layout
+        // Temporary until I can work out a nice landscape layout
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Get the preferences
         mPreferences = PreferenceUtils.getInstance(this);
 
-        // Initialze the image fetcher
+        // Initialize the image fetcher
         mImageFetcher = ApolloUtils.getImageFetcher(this);
 
         // Initialize the Bundle
         mArguments = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
         // Get the MIME type
         mType = mArguments.getString(Config.MIME_TYPE);
+
         // Get the profile title
         mProfileName = mArguments.getString(Config.NAME);
         // Get the artist name
         if (isArtist() || isAlbum()) {
             mArtistName = mArguments.getString(Config.ARTIST_NAME);
+            if (isArtist()) {
+                mArtistId = mArguments.getLong(Config.ID);
+            }
         }
-
         // Initialize the pager adapter
         mPagerAdapter = new PagerAdapter(this);
-
         // Initialize the carousel
         mTabCarousel = (ProfileTabCarousel)findViewById(R.id.activity_profile_base_tab_carousel);
         mTabCarousel.reset();
@@ -142,17 +148,17 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         });
         // Set up the action bar
         final ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         /* Set up the artist profile */
         if (isArtist()) {
             // Add the carousel images
             mTabCarousel.setArtistProfileHeader(this, mArtistName);
-
             // Artist profile fragments
             mPagerAdapter.add(ArtistSongFragment.class, mArguments);
             mPagerAdapter.add(ArtistAlbumFragment.class, mArguments);
-
             // Action bar title
             mResources.setTitle(mArtistName);
 
@@ -161,10 +167,8 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         if (isAlbum()) {
             // Add the carousel images
             mTabCarousel.setAlbumProfileHeader(this, mProfileName, mArtistName);
-
             // Album profile fragments
             mPagerAdapter.add(AlbumSongFragment.class, mArguments);
-
             // Action bar title = album name
             mResources.setTitle(mProfileName);
             // Action bar subtitle = year released
@@ -174,10 +178,8 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         if (isFavorites()) {
             // Add the carousel images
             mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
-
             // Favorite fragment
             mPagerAdapter.add(FavoriteFragment.class, null);
-
             // Action bar title = Favorites
             mResources.setTitle(mProfileName);
         } else
@@ -185,10 +187,8 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         if (isLastAdded()) {
             // Add the carousel images
             mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
-
             // Last added fragment
             mPagerAdapter.add(LastAddedFragment.class, null);
-
             // Action bar title = Last added
             mResources.setTitle(mProfileName);
         } else
@@ -196,10 +196,8 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         if (isPlaylist()) {
             // Add the carousel images
             mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
-
             // Playlist profile fragments
             mPagerAdapter.add(PlaylistSongFragment.class, mArguments);
-
             // Action bar title = playlist name
             mResources.setTitle(mProfileName);
         } else
@@ -207,17 +205,15 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         if (isGenre()) {
             // Add the carousel images
             mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
-
             // Genre profile fragments
             mPagerAdapter.add(GenreSongFragment.class, mArguments);
-
             // Action bar title = playlist name
             mResources.setTitle(mProfileName);
         }
 
         // Initialize the ViewPager
-        mViewPager = (ViewPager)findViewById(R.id.acivity_profile_base_pager);
-        // Attch the adapter
+        mViewPager = (ViewPager)findViewById(R.id.activity_profile_base_pager);
+        // Attach the adapter
         mViewPager.setAdapter(mPagerAdapter);
         // Offscreen limit
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
@@ -257,7 +253,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         } else {
             // Set the shuffle all title to "play all" if a playlist.
             final MenuItem shuffle = menu.findItem(R.id.menu_shuffle);
-            String title = null;
+            String title;
             if(isFavorites() || isLastAdded() || isPlaylist()) {
                 title = getString(R.string.menu_play_all);
             } else {
@@ -270,7 +266,8 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     }
 
     /**
-     * {@inheritDoc}
+     * This is the options menu that gets created when inside an artist/album
+     * on the action bar "..." button.
      */
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -286,6 +283,15 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
         } else if (isAlbum()) {
             getMenuInflater().inflate(R.menu.album_song_sort_by, menu);
         }
+        // Add to playlist
+        if (isArtist() || isAlbum()) {
+            final SubMenu subMenu = menu.addSubMenu(
+                    TabFragmentOrder.ALBUMS_POSITION,
+                    FragmentMenuItems.ADD_TO_PLAYLIST,
+                    Menu.NONE, R.string.add_to_playlist);
+            MusicUtils.makePlaylistMenu(this, TabFragmentOrder.ALBUMS_POSITION, subMenu, false);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -295,19 +301,33 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
+            // Create Empty New Playlist
+            // Add to playlist
+            case FragmentMenuItems.NEW_PLAYLIST:
             case R.id.menu_new_playlist:
-                CreateNewPlaylistMenuAction createPlaylistAction = new CreateNewPlaylistMenuAction(this, null);
-                createPlaylistAction.onClick();
+                onOptionsItemNewPlaylistSelected();
                 return true;
-            case android.R.id.home:
-                // If an album profile, go up to the artist profile
-                if (isAlbum()) {
-                    NavUtils.openArtistProfile(this, mArtistName);
-                    finish();
-                } else {
-                    // Otherwise just go back
-                    goBack();
+
+            case FragmentMenuItems.PLAYLIST_SELECTED: {
+                // Add to existing playlist or to new playlist
+                if (isAlbum() || isArtist()) {
+                    long playlistId = -1;
+                    // playlist id has been bundled with an intent extra along with the menu item.
+                    if (item.getIntent()!=null && item.getIntent().hasExtra("playlist")) {
+                        playlistId = item.getIntent().getLongExtra("playlist", -1);
+                    }
+
+                    if (playlistId != -1) {
+                        long[] tracks = mArguments.getLongArray(Config.TRACKS);
+                        if (playlistId != -1 && tracks != null && tracks.length > 0) {
+                            MusicUtils.addToPlaylist(this, tracks, playlistId);
+                        }
+                    }
                 }
+                return true;
+            }
+            case android.R.id.home:
+                goBack();
                 return true;
             case R.id.menu_add_to_homescreen: {
                 // Place the artist, album, genre, or playlist onto the Home
@@ -335,7 +355,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
                     MusicUtils.playLastAdded(this);
                 } else {
                     if (list != null && list.length > 0) {
-                        MusicUtils.playAll(this, list, 0, true);
+                        MusicUtils.playAll(list, 0, true);
                     }
                 }
                 return true;
@@ -582,7 +602,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     }
 
     /**
-     * Fetchs for the artist or album art, other wise sets the default header
+     * Fetches for the artist or album art, other wise sets the default header
      * image.
      */
     public void selectOldPhoto() {
@@ -644,6 +664,12 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * Finishes the activity and overrides the default animation.
      */
     private void goBack() {
+        // If an album profile, go up to the artist profile
+        if (isAlbum()) {
+            final Long artistId = mArguments.getLong(Config.ID);
+            long[] tracks = MusicUtils.getSongListForArtist(this, artistId);
+            NavUtils.openArtistProfile(this, mArtistName, tracks);
+        }
         finish();
     }
 
@@ -651,7 +677,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * @return True if the MIME type is vnd.android.cursor.dir/artists, false
      *         otherwise.
      */
-    private final boolean isArtist() {
+    private boolean isArtist() {
         return mType.equals(MediaStore.Audio.Artists.CONTENT_TYPE);
     }
 
@@ -659,7 +685,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * @return True if the MIME type is vnd.android.cursor.dir/albums, false
      *         otherwise.
      */
-    private final boolean isAlbum() {
+    private boolean isAlbum() {
         return mType.equals(MediaStore.Audio.Albums.CONTENT_TYPE);
     }
 
@@ -667,7 +693,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * @return True if the MIME type is vnd.android.cursor.dir/gere, false
      *         otherwise.
      */
-    private final boolean isGenre() {
+    private boolean isGenre() {
         return mType.equals(MediaStore.Audio.Genres.CONTENT_TYPE);
     }
 
@@ -675,7 +701,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * @return True if the MIME type is vnd.android.cursor.dir/playlist, false
      *         otherwise.
      */
-    private final boolean isPlaylist() {
+    private boolean isPlaylist() {
         return mType.equals(MediaStore.Audio.Playlists.CONTENT_TYPE);
     }
 
@@ -683,7 +709,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * @return True if the MIME type is one of the playlist types and the playlist is empty, false
      *         otherwise.
      */
-    private final boolean isEmptyPlaylist() {
+    private boolean isEmptyPlaylist() {
         long[] list = null;
         if (isPlaylist()) {
             final long id = mArguments.getLong(Config.ID);
@@ -699,14 +725,14 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     /**
      * @return True if the MIME type is "Favorites", false otherwise.
      */
-    private final boolean isFavorites() {
+    private boolean isFavorites() {
         return mType.equals(getString(R.string.playlist_favorites));
     }
 
     /**
      * @return True if the MIME type is "LastAdded", false otherwise.
      */
-    private final boolean isLastAdded() {
+    private boolean isLastAdded() {
         return mType.equals(getString(R.string.playlist_last_added));
     }
 
@@ -727,6 +753,6 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
     }
 
     private AlbumSongFragment getAlbumSongFragment() {
-        return (AlbumSongFragment)mPagerAdapter.getFragment(0);
+        return (AlbumSongFragment) mPagerAdapter.getFragment(0);
     }
 }

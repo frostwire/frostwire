@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Service;
-import android.os.RemoteException;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
@@ -44,7 +43,7 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
             }
         }
 
-        MusicUtils.playAll(service, list, position, false);
+        MusicUtils.playAll(list, position, false);
     }
 
     @Override

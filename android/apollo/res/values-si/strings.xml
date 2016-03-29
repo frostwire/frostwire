@@ -57,7 +57,7 @@
   <string name="playlist_favorite">ප්‍රියතමය</string>
   <string name="playlist_favorites">ප්‍රියතමයන්</string>
   <string name="playlist_last_added">අන්තිමට එක් කල</string>
-  <string name="new_playlist">අලුත් ධාවනලැයිස්තුවක්</string>
+  <string name="new_empty_playlist">අලුත් ධාවනලැයිස්තුවක්</string>
   <string name="save">සුරකින්න</string>
   <string name="cancel">අවලංගුයි</string>
   <string name="overwrite">උඩින්ලියන්න</string>

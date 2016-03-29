@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Favori</string>
   <string name="playlist_favorites">Favoriler</string>
   <string name="playlist_last_added">En son eklenen</string>
-  <string name="new_playlist">Yeni çalma listesi</string>
+  <string name="new_empty_playlist">Yeni çalma listesi</string>
   <string name="save">Kaydet</string>
   <string name="cancel">İptal</string>
   <string name="overwrite">Üzerine yaz</string>

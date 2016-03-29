@@ -57,7 +57,7 @@
   <string name="playlist_favorite">รายการโปรด</string>
   <string name="playlist_favorites">รายการโปรด</string>
   <string name="playlist_last_added">เพิ่มครั้งล่าสุด</string>
-  <string name="new_playlist">รายการเพลงใหม่</string>
+  <string name="new_empty_playlist">รายการเพลงใหม่</string>
   <string name="save">บันทึก</string>
   <string name="cancel">ยกเลิก</string>
   <string name="overwrite">เขียนทับ</string>

@@ -17,12 +17,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.model.Playlist;
-import com.andrew.apollo.ui.MusicHolder;
-import com.andrew.apollo.ui.MusicHolder.DataHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
+import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
+import com.andrew.apollo.utils.Ref;
+import com.frostwire.android.R;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the playlists on a user's
@@ -30,22 +30,12 @@ import com.andrew.apollo.ui.fragments.PlaylistFragment;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class PlaylistAdapter extends ArrayAdapter<Playlist> {
+public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements ApolloFragmentAdapter.Cacheable {
 
     /**
      * Number of views (TextView)
      */
     private static final int VIEW_TYPE_COUNT = 1;
-
-    /**
-     * The resource Id of the layout to inflate
-     */
-    private final int mLayoutId;
-
-    /**
-     * Used to cache the playlist info
-     */
-    private DataHolder[] mData;
 
     /**
      * Constructor of <code>PlaylistAdapter</code>
@@ -54,9 +44,13 @@ public class PlaylistAdapter extends ArrayAdapter<Playlist> {
      * @param layoutId The resource Id of the view to inflate.
      */
     public PlaylistAdapter(final Context context, final int layoutId) {
-        super(context, 0);
-        // Get the layout Id
-        mLayoutId = layoutId;
+        super(context, layoutId, 0);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        final Playlist item = getItem(position);
+        return item != null ? item.mPlaylistId : -1;
     }
 
     /**
@@ -65,10 +59,10 @@ public class PlaylistAdapter extends ArrayAdapter<Playlist> {
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         // Recycle ViewHolder's items
-        MusicHolder holder;
+        MusicViewHolder holder;
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
+            holder = new MusicViewHolder(convertView);
             // Hide the second and third lines of text
             holder.mLineTwo.get().setVisibility(View.GONE);
             holder.mLineThree.get().setVisibility(View.GONE);
@@ -77,7 +71,7 @@ public class PlaylistAdapter extends ArrayAdapter<Playlist> {
                     getContext().getResources().getDimension(R.dimen.text_size_large));
             convertView.setTag(holder);
         } else {
-            holder = (MusicHolder)convertView.getTag();
+            holder = (MusicViewHolder)convertView.getTag();
         }
 
         // Retrieve the data holder
@@ -104,6 +98,7 @@ public class PlaylistAdapter extends ArrayAdapter<Playlist> {
         return VIEW_TYPE_COUNT;
     }
 
+
     /**
      * Method used to cache the data used to populate the list or grid. The idea
      * is to cache everything before {@code #getView(int, View, ViewGroup)} is
@@ -114,6 +109,9 @@ public class PlaylistAdapter extends ArrayAdapter<Playlist> {
         for (int i = 0; i < getCount(); i++) {
             // Build the artist
             final Playlist playlist = getItem(i);
+            if (playlist == null) {
+                continue;
+            }
 
             // Build the data holder
             mData[i] = new DataHolder();
@@ -124,12 +122,8 @@ public class PlaylistAdapter extends ArrayAdapter<Playlist> {
         }
     }
 
-    /**
-     * Method that unloads and clears the items in the adapter
-     */
-    public void unload() {
-        clear();
-        mData = null;
+    @Override
+    public int getOffset() {
+        return 0;
     }
-
 }

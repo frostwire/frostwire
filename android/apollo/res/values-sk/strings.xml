@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Obľúbené</string>
   <string name="playlist_favorites">Obľúbené</string>
   <string name="playlist_last_added">Naposledy pridané</string>
-  <string name="new_playlist">Nový zoznam skladieb</string>
+  <string name="new_empty_playlist">Nový zoznam skladieb</string>
   <string name="save">Uložiť</string>
   <string name="cancel">Zrušiť</string>
   <string name="overwrite">Prepísať</string>

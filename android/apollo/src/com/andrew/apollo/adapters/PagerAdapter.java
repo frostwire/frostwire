@@ -33,7 +33,7 @@ import java.util.Locale;
  */
 public class PagerAdapter extends FragmentPagerAdapter {
 
-    private final SparseArray<WeakReference<Fragment>> mFragmentArray = new SparseArray<WeakReference<Fragment>>();
+    private final SparseArray<WeakReference<Fragment>> mFragmentArray = new SparseArray<>();
 
     private final List<Holder> mHolderList = Lists.newArrayList();
 
@@ -42,7 +42,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
     private int mCurrentPage;
 
     /**
-     * Constructor of <code>PagerAdatper<code>
+     * Constructor of <code>PagerAdapter<code>
      * 
      * @param fragmentActivity The {@link Activity} of the
      *            {@link Fragment}.
@@ -95,7 +95,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
         if (mWeakFragment != null) {
             mWeakFragment.clear();
         }
-        mFragmentArray.put(position, new WeakReference<Fragment>(mFragment));
+        mFragmentArray.put(position, new WeakReference<>(mFragment));
         return mFragment;
     }
 
@@ -105,9 +105,8 @@ public class PagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(final int position) {
         final Holder mCurrentHolder = mHolderList.get(position);
-        final Fragment mFragment = Fragment.instantiate(mFragmentActivity,
+        return Fragment.instantiate(mFragmentActivity,
                 mCurrentHolder.mClassName, mCurrentHolder.mParams);
-        return mFragment;
     }
 
     /**
@@ -184,11 +183,11 @@ public class PagerAdapter extends FragmentPagerAdapter {
         /**
          * The album fragment
          */
-        ALBUM(AlbumFragment.class),
+        ALBUM(AlbumFragment.class);
         /**
-         * The genre fragment
+         * The genre fragment: On its way out if nobody complains. This isn't working properly. Let's empower playlists instead.
          */
-        GENRE(GenreFragment.class);
+        //GENRE(GenreFragment.class);
 
         private Class<? extends Fragment> mFragmentClass;
 
@@ -197,7 +196,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
          * 
          * @param fragmentClass The fragment class
          */
-        private MusicFragments(final Class<? extends Fragment> fragmentClass) {
+        MusicFragments(final Class<? extends Fragment> fragmentClass) {
             mFragmentClass = fragmentClass;
         }
 

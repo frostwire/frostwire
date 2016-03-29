@@ -14,22 +14,12 @@ package com.andrew.apollo.ui.fragments.phone;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.andrew.apollo.ui.fragments.*;
-import com.frostwire.android.R;
+import android.view.*;
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.adapters.PagerAdapter.MusicFragments;
-import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.NavUtils;
-import com.andrew.apollo.utils.PreferenceUtils;
-import com.andrew.apollo.utils.SortOrder;
-import com.andrew.apollo.utils.ThemeUtils;
+import com.andrew.apollo.ui.fragments.*;
+import com.andrew.apollo.utils.*;
+import com.frostwire.android.R;
 import com.viewpagerindicator.TitlePageIndicator;
 import com.viewpagerindicator.TitlePageIndicator.OnCenterItemClickListener;
 
@@ -123,7 +113,7 @@ public class MusicBrowserPhoneFragment extends Fragment implements
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // Initialze the theme resources
+        // Initialize the theme resources
         mResources = new ThemeUtils(getActivity());
         // Enable the options menu
         setHasOptionsMenu(true);
@@ -154,6 +144,10 @@ public class MusicBrowserPhoneFragment extends Fragment implements
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        if (isPlaylistPage()) {
+            inflater.inflate(R.menu.new_playlist, menu);
+        }
+
         // Favorite action
         inflater.inflate(R.menu.favorite, menu);
         // Shuffle all
@@ -346,6 +340,10 @@ public class MusicBrowserPhoneFragment extends Fragment implements
 
     private boolean isRecentPage() {
         return mViewPager.getCurrentItem() == TabFragmentOrder.RECENT_POSITION;
+    }
+
+    private boolean isPlaylistPage() {
+        return mViewPager.getCurrentItem() == TabFragmentOrder.PLAYLISTS_POSITION;
     }
 
     private RecentFragment getRecentFragment() {

@@ -16,30 +16,22 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.GenresColumns;
-
 import com.andrew.apollo.model.Genre;
 import com.andrew.apollo.utils.Lists;
+import com.frostwire.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Used to query {@link MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI} and return
+ * Used to query MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI and return
  * the genres on a user's device.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
 public class GenreLoader extends WrappedAsyncTaskLoader<List<Genre>> {
-
-    /**
-     * The result
-     */
-    private final ArrayList<Genre> mGenreList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private Cursor mCursor;
+    static Logger LOGGER = Logger.getLogger(GenreLoader.class);
 
     /**
      * Constructor of <code>GenreLoader</code>
@@ -55,8 +47,10 @@ public class GenreLoader extends WrappedAsyncTaskLoader<List<Genre>> {
      */
     @Override
     public List<Genre> loadInBackground() {
+        ArrayList<Genre> mGenreList = Lists.newArrayList();
+
         // Create the Cursor
-        mCursor = makeGenreCursor(getContext());
+        Cursor mCursor = makeGenreCursor(getContext());
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
@@ -76,8 +70,8 @@ public class GenreLoader extends WrappedAsyncTaskLoader<List<Genre>> {
         // Close the cursor
         if (mCursor != null) {
             mCursor.close();
-            mCursor = null;
         }
+        LOGGER.info("Loaded genre list ("+mGenreList.size()+" genres)");
         return mGenreList;
     }
 
@@ -87,15 +81,13 @@ public class GenreLoader extends WrappedAsyncTaskLoader<List<Genre>> {
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the genre query.
      */
-    public static final Cursor makeGenreCursor(final Context context) {
-        final StringBuilder selection = new StringBuilder();
-        selection.append(MediaStore.Audio.Genres.NAME + " != ''");
+    public static Cursor makeGenreCursor(final Context context) {
         return context.getContentResolver().query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,
                 new String[] {
                         /* 0 */
                         BaseColumns._ID,
                         /* 1 */
                         GenresColumns.NAME
-                }, selection.toString(), null, MediaStore.Audio.Genres.DEFAULT_SORT_ORDER);
+                }, (MediaStore.Audio.Genres.NAME + " != ''"), null, MediaStore.Audio.Genres.DEFAULT_SORT_ORDER);
     }
 }

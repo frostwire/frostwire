@@ -13,20 +13,16 @@ package com.andrew.apollo.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-
-import com.frostwire.android.R;
-import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.Artist;
-import com.andrew.apollo.ui.MusicHolder;
-import com.andrew.apollo.ui.MusicHolder.DataHolder;
-import com.andrew.apollo.utils.ApolloUtils;
+import com.andrew.apollo.ui.MusicViewHolder;
+import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.Ref;
+import com.frostwire.android.R;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the artists on a user's
@@ -37,7 +33,7 @@ import com.andrew.apollo.utils.MusicUtils;
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class ArtistAdapter extends ArrayAdapter<Artist> {
+public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements ApolloFragmentAdapter.Cacheable {
 
     /**
      * Number of views (ImageView and TextView)
@@ -45,29 +41,9 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
     private static final int VIEW_TYPE_COUNT = 2;
 
     /**
-     * The resource Id of the layout to inflate
-     */
-    private final int mLayoutId;
-
-    /**
-     * Image cache and image fetcher
-     */
-    private final ImageFetcher mImageFetcher;
-
-    /**
      * Semi-transparent overlay
      */
-    private final int mOverlay;
-
-    /**
-     * Used to cache the artist info
-     */
-    private DataHolder[] mData;
-
-    /**
-     * Loads line three and the background image if the user decides to.
-     */
-    private boolean mLoadExtraData = false;
+    private final int mOverlayColor;
 
     /**
      * Constructor of <code>ArtistAdapter</code>
@@ -76,13 +52,9 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
      * @param layoutId The resource Id of the view to inflate.
      */
     public ArtistAdapter(final Activity context, final int layoutId) {
-        super(context, 0);
-        // Get the layout Id
-        mLayoutId = layoutId;
-        // Initialize the cache & image fetcher
-        mImageFetcher = ApolloUtils.getImageFetcher(context);
+        super(context, layoutId, 0);
         // Cache the transparent overlay
-        mOverlay = context.getResources().getColor(R.color.list_item_background);
+        mOverlayColor = context.getResources().getColor(R.color.list_item_background);
     }
 
     /**
@@ -90,41 +62,41 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
      */
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
-        // Recycle ViewHolder's items
-        MusicHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
-            convertView.setTag(holder);
-        } else {
-            holder = (MusicHolder)convertView.getTag();
-        }
-
-        // Retrieve the data holder
+        convertView = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = (MusicViewHolder) convertView.getTag();
         final DataHolder dataHolder = mData[position];
+        updateFirstTwoArtistLines(holder, dataHolder);
+        if (mImageFetcher != null && dataHolder != null && Ref.alive(holder.mImage)) {
+            // Asynchronously load the artist image into the adapter
+            mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mImage.get());
+        }
+        if (mLoadExtraData && mImageFetcher != null && holder != null) {
+            if (Ref.alive(holder.mOverlay)) {
+                // Make sure the background layer gets set
+                holder.mOverlay.get().setBackgroundColor(mOverlayColor);
+            }
+            if (Ref.alive(holder.mLineThree)) {
+                // Set the number of songs (line three)
+                holder.mLineThree.get().setText(dataHolder.mLineThree);
+            }
+            if (Ref.alive(holder.mBackground)) {
+                if (mLayoutId == R.layout.list_item_detailed_no_background) {
+                   holder.mBackground.get().setBackground(null);
+                   holder.mBackground.get().setBackgroundColor(convertView.getResources().getColor(R.color.app_light_background));
+                }  else {
+                    // Set the background image
+                    mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mBackground.get());
+                }
+            }
 
-        // Set each artist name (line one)
-        holder.mLineOne.get().setText(dataHolder.mLineOne);
-        // Set the number of albums (line two)
-        holder.mLineTwo.get().setText(dataHolder.mLineTwo);
-        // Asynchronously load the artist image into the adapter
-        mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mImage.get());
-        if (mLoadExtraData) {
-            // Make sure the background layer gets set
-            holder.mOverlay.get().setBackgroundColor(mOverlay);
-            // Set the number of songs (line three)
-            holder.mLineThree.get().setText(dataHolder.mLineThree);
-            // Set the background image
-            mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mBackground.get());
-            // Play the artist when the artwork is touched
-            playArtist(holder.mImage.get(), position);
+            if (Ref.alive(holder.mImage)) {
+                // Play the artist when the artwork is touched
+                initArtistPlayOnClick(holder.mImage.get(), position);
+            }
         }
         return convertView;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasStableIds() {
         return true;
@@ -149,18 +121,20 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
             // Build the artist
             final Artist artist = getItem(i);
 
-            // Build the data holder
-            mData[i] = new DataHolder();
-            // Artist Id
-            mData[i].mItemId = artist.mArtistId;
-            // Artist names (line one)
-            mData[i].mLineOne = artist.mArtistName;
-            // Number of albums (line two)
-            mData[i].mLineTwo = MusicUtils.makeLabel(getContext(),
-                    R.plurals.Nalbums, artist.mAlbumNumber);
-            // Number of songs (line three)
-            mData[i].mLineThree = MusicUtils.makeLabel(getContext(),
-                    R.plurals.Nsongs, artist.mSongNumber);
+            if (artist != null) {
+                // Build the data holder
+                mData[i] = new DataHolder();
+                // Artist Id
+                mData[i].mItemId = artist.mArtistId;
+                // Artist names (line one)
+                mData[i].mLineOne = artist.mArtistName;
+                // Number of albums (line two)
+                mData[i].mLineTwo = MusicUtils.makeLabel(getContext(),
+                        R.plurals.Nalbums, artist.mAlbumNumber);
+                // Number of songs (line three)
+                mData[i].mLineThree = MusicUtils.makeLabel(getContext(),
+                        R.plurals.Nsongs, artist.mSongNumber);
+            }
         }
     }
 
@@ -171,56 +145,29 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
      * @param artist The {@link ImageView} holding the aritst image
      * @param position The position of the artist to play.
      */
-    private void playArtist(final ImageView artist, final int position) {
+    private void initArtistPlayOnClick(final ImageView artist, final int position) {
         artist.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(final View v) {
                 final long id = getItem(position).mArtistId;
                 final long[] list = MusicUtils.getSongListForArtist(getContext(), id);
-                MusicUtils.playAll(getContext(), list, 0, false);
+                MusicUtils.playAll(list, 0, false);
             }
         });
     }
 
-    /**
-     * Method that unloads and clears the items in the adapter
-     */
-    public void unload() {
-        clear();
-        mData = null;
-    }
-
-    /**
-     * @param pause True to temporarily pause the disk cache, false otherwise.
-     */
-    public void setPauseDiskCache(final boolean pause) {
-        if (mImageFetcher != null) {
-            mImageFetcher.setPauseDiskCache(pause);
+    @Override
+    public long getItemId(int position) {
+        try {
+            return getItem(position).mArtistId;
+        } catch (Throwable t) {
+            return -1;
         }
     }
 
-    /**
-     * @param artist The key used to find the cached artist to remove
-     */
-    public void removeFromCache(final Artist artist) {
-        if (mImageFetcher != null) {
-            mImageFetcher.removeFromCache(artist.mArtistName);
-        }
-    }
-
-    /**
-     * Flushes the disk cache.
-     */
-    public void flush() {
-        mImageFetcher.flush();
-    }
-
-    /**
-     * @param extra True to load line three and the background image, false
-     *            otherwise.
-     */
-    public void setLoadExtraData(final boolean extra) {
-        mLoadExtraData = extra;
+    @Override
+    public int getOffset() {
+        return 0;
     }
 }

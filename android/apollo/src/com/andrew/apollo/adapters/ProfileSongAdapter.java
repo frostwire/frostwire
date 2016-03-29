@@ -12,26 +12,15 @@
 package com.andrew.apollo.adapters;
 
 import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.model.Song;
-import com.andrew.apollo.ui.MusicHolder;
-import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
-import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
-import com.andrew.apollo.ui.fragments.profile.FavoriteFragment;
-import com.andrew.apollo.ui.fragments.profile.GenreSongFragment;
-import com.andrew.apollo.ui.fragments.profile.LastAddedFragment;
-import com.andrew.apollo.ui.fragments.profile.PlaylistSongFragment;
-import com.andrew.apollo.utils.Lists;
+import com.andrew.apollo.ui.MusicViewHolder;
+import com.andrew.apollo.ui.fragments.profile.*;
 import com.andrew.apollo.utils.MusicUtils;
-
-import java.util.List;
+import com.frostwire.android.R;
 
 /**
  * This {@link ArrayAdapter} is used to display the songs for a particular
@@ -40,8 +29,11 @@ import java.util.List;
  * {@link GenreSongFragment},{@link FavoriteFragment},{@link LastAddedFragment}.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron@gmail.com)
  */
-public class ProfileSongAdapter extends ArrayAdapter<Song> {
+public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
+
+    //public static final Logger LOGGER = Logger.getLogger(ProfileSongAdapter.class);
 
     /**
      * Default display setting: title/album
@@ -59,17 +51,7 @@ public class ProfileSongAdapter extends ArrayAdapter<Song> {
     public static final int DISPLAY_ALBUM_SETTING = 2;
 
     /**
-     * The header view
-     */
-    private static final int ITEM_VIEW_TYPE_HEADER = 0;
-
-    /**
-     * * The data in the list.
-     */
-    private static final int ITEM_VIEW_TYPE_MUSIC = 1;
-
-    /**
-     * Number of views (ImageView, TextView, header)
+     * Number of views (1.ImageView, 2.TextView, 3. header)
      */
     private static final int VIEW_TYPE_COUNT = 3;
 
@@ -84,11 +66,6 @@ public class ProfileSongAdapter extends ArrayAdapter<Song> {
     private final View mHeader;
 
     /**
-     * The resource Id of the layout to inflate
-     */
-    private final int mLayoutId;
-
-    /**
      * Display setting for the second line in a song fragment
      */
     private final int mDisplaySetting;
@@ -99,11 +76,6 @@ public class ProfileSongAdapter extends ArrayAdapter<Song> {
     private final String SEPARATOR_STRING = " - ";
 
     /**
-     * Used to set the size of the data in the adapter
-     */
-    private List<Song> mCount = Lists.newArrayList();
-
-    /**
      * Constructor of <code>ProfileSongAdapter</code>
      * 
      * @param context The {@link Context} to use
@@ -111,13 +83,11 @@ public class ProfileSongAdapter extends ArrayAdapter<Song> {
      * @param setting defines the content of the second line
      */
     public ProfileSongAdapter(final Context context, final int layoutId, final int setting) {
-        super(context, 0);
+        super(context, layoutId, 0);
         // Used to create the custom layout
         mInflater = LayoutInflater.from(context);
         // Cache the header
         mHeader = mInflater.inflate(R.layout.faux_carousel, null);
-        // Get the layout Id
-        mLayoutId = layoutId;
         // Know what to put in line two
         mDisplaySetting = setting;
 
@@ -139,26 +109,26 @@ public class ProfileSongAdapter extends ArrayAdapter<Song> {
      */
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
-
         // Return a faux header at position 0
         if (position == 0) {
             return mHeader;
         }
 
         // Recycle MusicHolder's items
-        MusicHolder holder;
+        MusicViewHolder holder;
+
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
+            holder = new MusicViewHolder(convertView);
             // Hide the third line of text
             holder.mLineThree.get().setVisibility(View.GONE);
             convertView.setTag(holder);
         } else {
-            holder = (MusicHolder)convertView.getTag();
+            holder = (MusicViewHolder) convertView.getTag();
         }
 
         // Retrieve the album
-        final Song song = getItem(position - 1);
+        final Song song = getItem(position - 1);//getOffset());
 
         // Set each track name (line one)
         holder.mLineOne.get().setText(song.mSongName);
@@ -194,35 +164,8 @@ public class ProfileSongAdapter extends ArrayAdapter<Song> {
                 holder.mLineTwo.get().setText(song.mAlbumName);
                 break;
         }
+
         return convertView;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getCount() {
-        final int size = mCount.size();
-        return size == 0 ? 0 : size + 1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getItemId(final int position) {
-        if (position == 0) {
-            return -1;
-        }
-        return position - 1;
     }
 
     /**
@@ -244,18 +187,9 @@ public class ProfileSongAdapter extends ArrayAdapter<Song> {
         return ITEM_VIEW_TYPE_MUSIC;
     }
 
-    /**
-     * Method that unloads and clears the items in the adapter
-     */
-    public void unload() {
-        mCount.clear();
-        clear();
-    }
 
-    /**
-     * @param data The {@link List} used to return the count for the adapter.
-     */
-    public void setCount(final List<Song> data) {
-        mCount = data;
+    @Override
+    public long getItemId(final int position) {
+        return position-1;
     }
 }

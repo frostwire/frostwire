@@ -183,13 +183,13 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
             final View child = getChildAt(0);
 
             // Add 1 dip of separation between the tabs
-            final int seperatorPixels = (int)(TypedValue.applyDimension(
+            final int separatorPixels = (int)(TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()) + 0.5f);
 
             if (mEnableSwipe) {
                 child.measure(
                         MeasureSpec.makeMeasureSpec(TAB_COUNT * tabWidth + (TAB_COUNT - 1)
-                                * seperatorPixels, MeasureSpec.EXACTLY),
+                                * separatorPixels, MeasureSpec.EXACTLY),
                         MeasureSpec.makeMeasureSpec(tabHeight, MeasureSpec.EXACTLY));
             } else {
                 child.measure(MeasureSpec.makeMeasureSpec(screenWidth, MeasureSpec.EXACTLY),
@@ -523,13 +523,13 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
      * carousel.
      */
     public interface Listener {
-        public void onTouchDown();
+        void onTouchDown();
 
-        public void onTouchUp();
+        void onTouchUp();
 
-        public void onScrollChanged(int l, int t, int oldl, int oldt);
+        void onScrollChanged(int l, int t, int oldl, int oldt);
 
-        public void onTabSelected(int position);
+        void onTabSelected(int position);
     }
 
 }

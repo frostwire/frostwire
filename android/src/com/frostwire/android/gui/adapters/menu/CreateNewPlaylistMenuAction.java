@@ -40,7 +40,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
     private final long[] fileDescriptors;
 
     public CreateNewPlaylistMenuAction(Context context, long[] fileDescriptors) {
-        super(context, getIconResourceId(context), R.string.new_playlist);
+        super(context, getIconResourceId(context), R.string.new_empty_playlist);
         this.fileDescriptors = fileDescriptors;
     }
 
@@ -53,7 +53,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
     private void showCreateNewPlaylistDialog() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
 
-        dialogBuilder.setTitle(R.string.new_playlist);
+        dialogBuilder.setTitle(R.string.new_empty_playlist);
 
         final LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);

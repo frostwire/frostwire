@@ -12,17 +12,16 @@
 package com.andrew.apollo.adapters;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-
 import com.andrew.apollo.model.Song;
-import com.andrew.apollo.ui.MusicHolder;
-import com.andrew.apollo.ui.MusicHolder.DataHolder;
+import com.andrew.apollo.ui.MusicViewHolder;
+import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.QueueFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.Ref;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the songs on a user's
@@ -31,33 +30,15 @@ import com.andrew.apollo.utils.MusicUtils;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class SongAdapter extends ArrayAdapter<Song> {
+public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFragmentAdapter.Cacheable {
 
     /**
      * Number of views (TextView)
      */
     private static final int VIEW_TYPE_COUNT = 1;
 
-    /**
-     * The resource Id of the layout to inflate
-     */
-    private final int mLayoutId;
-
-    /**
-     * Used to cache the song info
-     */
-    private DataHolder[] mData;
-
-    /**
-     * Constructor of <code>SongAdapter</code>
-     * 
-     * @param context The {@link Context} to use.
-     * @param layoutId The resource Id of the view to inflate.
-     */
-    public SongAdapter(final Context context, final int layoutId) {
-        super(context, 0);
-        // Get the layout Id
-        mLayoutId = layoutId;
+    public SongAdapter(Context context, int mLayoutId) {
+        super(context, mLayoutId, 0);
     }
 
     /**
@@ -65,28 +46,18 @@ public class SongAdapter extends ArrayAdapter<Song> {
      */
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
-        // Recycle ViewHolder's items
-        MusicHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicHolder(convertView);
-            // Hide the third line of text
+        convertView = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
+        MusicViewHolder holder = (MusicViewHolder) convertView.getTag();
+        if (holder != null && Ref.alive(holder.mLineThree)) {
             holder.mLineThree.get().setVisibility(View.GONE);
-            convertView.setTag(holder);
-        } else {
-            holder = (MusicHolder)convertView.getTag();
         }
-
-        // Retrieve the data holder
         final DataHolder dataHolder = mData[position];
-
         // Set each song name (line one)
         holder.mLineOne.get().setText(dataHolder.mLineOne);
         // Set the song duration (line one, right)
         holder.mLineOneRight.get().setText(dataHolder.mLineOneRight);
         // Set the artist name (line two)
         holder.mLineTwo.get().setText(dataHolder.mLineTwo);
-
         if (MusicUtils.getCurrentAudioId() == dataHolder.mItemId) {
             holder.mLineOne.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
             holder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
@@ -96,16 +67,7 @@ public class SongAdapter extends ArrayAdapter<Song> {
             holder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
             holder.mLineTwo.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
         }
-
         return convertView;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasStableIds() {
-        return true;
     }
 
     /**
@@ -127,6 +89,10 @@ public class SongAdapter extends ArrayAdapter<Song> {
             // Build the song
             final Song song = getItem(i);
 
+            if (song == null) {
+                continue;
+            }
+
             // Build the data holder
             mData[i] = new DataHolder();
             // Song Id
@@ -140,12 +106,17 @@ public class SongAdapter extends ArrayAdapter<Song> {
         }
     }
 
-    /**
-     * Method that unloads and clears the items in the adapter
-     */
-    public void unload() {
-        clear();
-        mData = null;
+    @Override
+    public long getItemId(int position) {
+        final Song song = getItem(position);
+        if (song == null) {
+            return -1;
+        }
+        return song.mSongId;
     }
 
+    @Override
+    public int getOffset() {
+        return 0;
+    }
 }

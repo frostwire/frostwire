@@ -14,29 +14,12 @@ package com.andrew.apollo.loaders;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.andrew.apollo.model.Song;
-import com.andrew.apollo.utils.Lists;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Used to return the current playlist or queue.
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class QueueLoader extends WrappedAsyncTaskLoader<List<Song>> {
-
-    /**
-     * The result
-     */
-    private final ArrayList<Song> mSongList = Lists.newArrayList();
-
-    /**
-     * The {@link Cursor} used to run the query.
-     */
-    private NowPlayingCursor mCursor;
-
+public class QueueLoader extends SongLoader {
     /**
      * Constructor of <code>QueueLoader</code>
      * 
@@ -47,56 +30,14 @@ public class QueueLoader extends WrappedAsyncTaskLoader<List<Song>> {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<Song> loadInBackground() {
-        // Create the Cursor
-        mCursor = new NowPlayingCursor(getContext());
-        // Gather the data
-        if (mCursor != null && mCursor.moveToFirst()) {
-            do {
-                // Copy the song Id
-                final long id = mCursor.getLong(0);
-
-                // Copy the song name
-                final String songName = mCursor.getString(1);
-
-                // Copy the artist name
-                final String artist = mCursor.getString(2);
-
-                // Copy the album name
-                final String album = mCursor.getString(3);
-
-                // Copy the duration
-                final long duration = mCursor.getLong(4);
-
-                // Convert the duration into seconds
-                final int durationInSecs = (int) duration / 1000;
-
-                // Create a new song
-                final Song song = new Song(id, songName, artist, album, durationInSecs);
-
-                // Add everything up
-                mSongList.add(song);
-            } while (mCursor.moveToNext());
-        }
-        // Close the cursor
-        if (mCursor != null) {
-            mCursor.close();
-            mCursor = null;
-        }
-        return mSongList;
-    }
-
-    /**
      * Creates the {@link Cursor} used to run the query.
      * 
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the song query.
      */
-    public static final Cursor makeQueueCursor(final Context context) {
-        final Cursor cursor = new NowPlayingCursor(context);
-        return cursor;
+    public Cursor makeCursor(final Context context) {
+        return makeQueueCursor(context);
     }
+
+    public static Cursor makeQueueCursor(final Context context) { return new NowPlayingCursor(context); }
 }

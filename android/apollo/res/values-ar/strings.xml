@@ -57,7 +57,7 @@
   <string name="playlist_favorite">المفضلة</string>
   <string name="playlist_favorites">المفضلة</string>
   <string name="playlist_last_added">أخر ما .أضاف</string>
-  <string name="new_playlist">قائمة تشغيل جديدة</string>
+  <string name="new_empty_playlist">قائمة تشغيل جديدة</string>
   <string name="save">حفظ</string>
   <string name="cancel">الغاء</string>
   <string name="overwrite">استبدال</string>

@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Вибране</string>
   <string name="playlist_favorites">Улюблені</string>
   <string name="playlist_last_added">Востаннє додано</string>
-  <string name="new_playlist">Новий</string>
+  <string name="new_empty_playlist">Новий</string>
   <string name="save">Зберегти</string>
   <string name="cancel">Скасувати</string>
   <string name="overwrite">Перезаписати</string>

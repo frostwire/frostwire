@@ -17,9 +17,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.appwidgets.RecentWidgetService;
+import com.andrew.apollo.utils.Ref;
+import com.frostwire.android.R;
 
 import java.lang.ref.WeakReference;
 
@@ -29,7 +29,8 @@ import java.lang.ref.WeakReference;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class MusicHolder {
+public class MusicViewHolder {
+    public WeakReference<View> mConvertView;
 
     /**
      * This is the overlay ontop of the background artist, playlist, or genre
@@ -77,38 +78,64 @@ public class MusicHolder {
 
     /**
      * Constructor of <code>ViewHolder</code>
-     * 
-     * @param context The {@link Context} to use.
      */
-    public MusicHolder(final View view) {
+    public MusicViewHolder(final View view) {
         super();
+        mConvertView = new WeakReference<>(view);
+
         // Initialize mOverlay
-        mOverlay = new WeakReference<RelativeLayout>(
-                (RelativeLayout)view.findViewById(R.id.image_background));
+        mOverlay = new WeakReference<>((RelativeLayout)view.findViewById(R.id.image_background));
 
         // Initialize mBackground
-        mBackground = new WeakReference<ImageView>(
-                null);//(ImageView)view.findViewById(R.id.list_item_background));
+        mBackground = new WeakReference<>((ImageView)view.findViewById(R.id.list_item_background));
 
         // Initialize mImage
-        mImage = new WeakReference<ImageView>((ImageView)view.findViewById(R.id.image));
+        mImage = new WeakReference<>((ImageView)view.findViewById(R.id.image));
 
         // Initialize mLineOne
-        mLineOne = new WeakReference<TextView>((TextView)view.findViewById(R.id.line_one));
+        mLineOne = new WeakReference<>((TextView)view.findViewById(R.id.line_one));
 
         // Initialize mLineOneRight
-        mLineOneRight = new WeakReference<TextView>(
-                (TextView)view.findViewById(R.id.line_one_right));
+        mLineOneRight = new WeakReference<>((TextView)view.findViewById(R.id.line_one_right));
 
         // Initialize mLineTwo
-        mLineTwo = new WeakReference<TextView>((TextView)view.findViewById(R.id.line_two));
+        mLineTwo = new WeakReference<>((TextView)view.findViewById(R.id.line_two));
 
         // Initialize mLineThree
-        mLineThree = new WeakReference<TextView>((TextView)view.findViewById(R.id.line_three));
+        mLineThree = new WeakReference<>((TextView)view.findViewById(R.id.line_three));
+    }
+
+    public void reset() {
+        // Release mBackground's reference
+        if (Ref.alive(mBackground)) {
+            mBackground.get().setImageDrawable(null);
+            mBackground.get().setImageBitmap(null);
+        }
+
+        // Release mImage's reference
+        if (Ref.alive(mImage)) {
+            mImage.get().setImageDrawable(null);
+            mImage.get().setImageBitmap(null);
+        }
+
+        // Release mLineOne's reference
+        if (Ref.alive(mLineOne)) {
+            mLineOne.get().setText(null);
+        }
+
+        // Release mLineTwo's reference
+        if (Ref.alive(mLineTwo)) {
+            mLineTwo.get().setText(null);
+        }
+
+        // Release mLineThree's reference
+        if (Ref.alive(mLineThree)) {
+            mLineThree.get().setText(null);
+        }
     }
 
     /**
-     * @param view The {@link View} used to initialize content
+     * The {@link View} used to initialize content
      */
     public final static class DataHolder {
 

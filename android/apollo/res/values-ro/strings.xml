@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Favorit</string>
   <string name="playlist_favorites">Favorite</string>
   <string name="playlist_last_added">Ultimele adăugate</string>
-  <string name="new_playlist">Playlist nou</string>
+  <string name="new_empty_playlist">Playlist nou</string>
   <string name="save">Salvare</string>
   <string name="cancel">Anulare</string>
   <string name="overwrite">Suprascrie</string>

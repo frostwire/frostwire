@@ -57,7 +57,7 @@
   <string name="playlist_favorite">Lemmik</string>
   <string name="playlist_favorites">Lemmikud</string>
   <string name="playlist_last_added">Viimati lisatud</string>
-  <string name="new_playlist">Uus esitusloend</string>
+  <string name="new_empty_playlist">Uus esitusloend</string>
   <string name="save">Salvesta</string>
   <string name="cancel">Tühista</string>
   <string name="overwrite">Kirjuta üle</string>

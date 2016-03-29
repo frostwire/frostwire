@@ -24,6 +24,7 @@ import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
+import com.frostwire.logging.Logger;
 
 /**
  * A collection of helpers designed to get and set various preferences across
@@ -33,8 +34,10 @@ import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
  */
 public final class PreferenceUtils {
 
+    public static final Logger LOGGER = Logger.getLogger(PreferenceUtils.class);
+
     /* Default start page (Artist page) */
-    public static final int DEFFAULT_PAGE = 0;
+    public static final int DEFAULT_PAGE = 0;
 
     /* Saves the last page the pager was on in {@link MusicBrowserPhoneFragment} */
     public static final String START_PAGE = "start_page";
@@ -65,6 +68,12 @@ public final class PreferenceUtils {
 
     // Sets the type of layout to use for the recent list
     public static final String RECENT_LAYOUT = "recent_layout";
+
+    public static final String SIMPLE_LAYOUT = "simple";
+
+    public static final String DETAILED_LAYOUT = "detailed";
+
+    public static final String GRID_LAYOUT = "grid";
 
     // Key used to download images only on Wi-Fi
     public static final String ONLY_ON_WIFI = "only_on_wifi";
@@ -127,7 +136,7 @@ public final class PreferenceUtils {
      * @return The page to start on when the app is opened.
      */
     public final int getStartPage() {
-        return mPreferences.getInt(START_PAGE, DEFFAULT_PAGE);
+        return mPreferences.getInt(START_PAGE, DEFAULT_PAGE);
     }
 
     /**
@@ -357,33 +366,30 @@ public final class PreferenceUtils {
     }
 
     /**
-     * @param context The {@link Context} to use.
      * @param which Which list to check.
      * @return True if the layout type is the simple layout, false otherwise.
      */
-    public boolean isSimpleLayout(final String which, final Context context) {
+    public boolean isSimpleLayout(final String which) {
         final String simple = "simple";
         final String defaultValue = "grid";
         return mPreferences.getString(which, defaultValue).equals(simple);
     }
 
     /**
-     * @param context The {@link Context} to use.
      * @param which Which list to check.
      * @return True if the layout type is the simple layout, false otherwise.
      */
-    public boolean isDetailedLayout(final String which, final Context context) {
+    public boolean isDetailedLayout(final String which) {
         final String detailed = "detailed";
         final String defaultValue = "grid";
         return mPreferences.getString(which, defaultValue).equals(detailed);
     }
 
     /**
-     * @param context The {@link Context} to use.
      * @param which Which list to check.
      * @return True if the layout type is the simple layout, false otherwise.
      */
-    public boolean isGridLayout(final String which, final Context context) {
+    public boolean isGridLayout(final String which) {
         final String grid = "grid";
         final String defaultValue = "simple";
         return mPreferences.getString(which, defaultValue).equals(grid);
