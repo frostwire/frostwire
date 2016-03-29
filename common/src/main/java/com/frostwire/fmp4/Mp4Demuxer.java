@@ -94,7 +94,7 @@ public final class Mp4Demuxer {
         final LinkedList<SampleToChunkBox.Entry> stscList = new LinkedList<>();
         final LinkedList<ChunkOffsetBox.Entry> stcoList = new LinkedList<>();
 
-        IsoMedia.read(in, fIn.length(), null, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(in, fIn.length(), null, buf, new IsoMedia.OnBoxListener() {
 
             TrackExtendsBox trex;
             TrackRunBox trun;
@@ -226,7 +226,7 @@ public final class Mp4Demuxer {
 
                 return true;
             }
-        }, buf);
+        });
 
         // remove other tracks
         MovieBox moov = Box.findFirst(boxes, Box.moov);
@@ -314,12 +314,12 @@ public final class Mp4Demuxer {
         mdat.length(fOut.length() - len);
 
         fOut.seek(0);
-        IsoMedia.write(out, boxes, new IsoMedia.OnBoxListener() {
+        IsoMedia.write(out, boxes, buf, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 return true;
             }
-        }, buf);
+        });
     }
 
     private static void trackSimple(int id, Mp4Tags tags, RandomAccessFile fIn, RandomAccessFile fOut, final DemuxerListener l, final ByteBuffer buf) throws IOException {
@@ -329,7 +329,7 @@ public final class Mp4Demuxer {
 
         final LinkedList<Box> boxes = new LinkedList<>();
 
-        IsoMedia.read(in, fIn.length(), null, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(in, fIn.length(), null, buf, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 notifyCount(l, in.count(), out.count());
@@ -338,7 +338,7 @@ public final class Mp4Demuxer {
                 }
                 return b.type != Box.mdat;
             }
-        }, buf);
+        });
 
         MovieBox moov = Box.findFirst(boxes, Box.moov);
         TrackBox trak = null;
@@ -413,13 +413,13 @@ public final class Mp4Demuxer {
             offset += chunkSize[i];
         }
 
-        IsoMedia.write(out, boxes, new IsoMedia.OnBoxListener() {
+        IsoMedia.write(out, boxes, buf, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 notifyCount(l, in.count(), out.count());
                 return true;
             }
-        }, buf);
+        });
 
         for (int i = 0; i < stco.entry_count; i++) {
             int pos = (int) in.count();

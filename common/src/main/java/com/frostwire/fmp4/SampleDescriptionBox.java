@@ -72,7 +72,7 @@ public final class SampleDescriptionBox extends FullBox {
 
             long length = e.length();
             if (r < length) {
-                IsoMedia.read(ch, length - r, e, IsoMedia.OnBoxListener.ALL, buf);
+                IsoMedia.read(ch, length - r, e, buf, IsoMedia.OnBoxListener.ALL);
             }
 
             entries[i] = e;
@@ -99,7 +99,7 @@ public final class SampleDescriptionBox extends FullBox {
 
             b.write(ch, buf);
 
-            IsoMedia.write(ch, b.boxes, IsoMedia.OnBoxListener.ALL, buf);
+            IsoMedia.write(ch, b.boxes, buf, IsoMedia.OnBoxListener.ALL);
         }
     }
 

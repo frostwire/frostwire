@@ -34,7 +34,7 @@ public final class IsoMedia {
     private IsoMedia() {
     }
 
-    public static boolean read(InputChannel ch, long len, Box p, OnBoxListener l, ByteBuffer buf) throws IOException {
+    public static boolean read(InputChannel ch, long len, Box p, ByteBuffer buf, OnBoxListener l) throws IOException {
         long n = ch.count();
         do {
             IO.read(ch, 8, buf);
@@ -88,7 +88,7 @@ public final class IsoMedia {
             long length = b.length();
             if (r < length) {
                 if (type != Box.mdat) {
-                    if (!read(ch, length - r, b, l, buf)) {
+                    if (!read(ch, length - r, b, buf, l)) {
                         return false;
                     }
                 } else {
@@ -107,7 +107,7 @@ public final class IsoMedia {
     public static void read(InputChannel ch, OnBoxListener l) throws IOException {
         try {
             ByteBuffer buf = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
-            read(ch, -1, null, l, buf);
+            read(ch, -1, null, buf, l);
         } catch (EOFException e) {
             // ignore, it's the end
         }
@@ -120,7 +120,7 @@ public final class IsoMedia {
         final LinkedList<Box> boxes = new LinkedList<>();
 
         try {
-            read(ch, -1, null, new OnBoxListener() {
+            read(ch, -1, null, buf, new OnBoxListener() {
                 @Override
                 public boolean onBox(Box b) {
                     if (b.parent == null) {
@@ -129,7 +129,7 @@ public final class IsoMedia {
 
                     return b.type != Box.mdat;
                 }
-            }, buf);
+            });
         } catch (EOFException e) {
             // ignore, it's the end
         }
@@ -144,7 +144,7 @@ public final class IsoMedia {
         return head(in, buf);
     }
 
-    public static boolean write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l, ByteBuffer buf) throws IOException {
+    public static boolean write(OutputChannel ch, LinkedList<Box> boxes, ByteBuffer buf, OnBoxListener l) throws IOException {
         buf.clear();
 
         for (Box b : boxes) {
@@ -174,7 +174,7 @@ public final class IsoMedia {
             }
 
             if (b.boxes != null) {
-                if (!write(ch, b.boxes, l, buf)) {
+                if (!write(ch, b.boxes, buf, l)) {
                     return false;
                 }
             }
@@ -190,7 +190,7 @@ public final class IsoMedia {
 
     public static void write(OutputChannel ch, LinkedList<Box> boxes, OnBoxListener l) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
-        write(ch, boxes, l, buf);
+        write(ch, boxes, buf, l);
     }
 
     static void write(OutputChannel ch, int count, int size, BoxEntry[] entries, ByteBuffer buf) throws IOException {

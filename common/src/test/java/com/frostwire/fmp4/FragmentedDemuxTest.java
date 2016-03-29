@@ -55,7 +55,7 @@ public class FragmentedDemuxTest {
         final int mdatOffset = 3 * 1024 * 1024;
         IO.skip(chOut, mdatOffset, buf);
 
-        IsoMedia.read(chIn, fIn.length(), null, new IsoMedia.OnBoxListener() {
+        IsoMedia.read(chIn, fIn.length(), null, buf, new IsoMedia.OnBoxListener() {
 
             TrackExtendsBox trex;
             TrackRunBox lastTrun;
@@ -178,7 +178,7 @@ public class FragmentedDemuxTest {
 
                 return true;
             }
-        }, buf);
+        });
 
         out.close();
 
@@ -226,12 +226,12 @@ public class FragmentedDemuxTest {
 
         out = new RandomAccessFile(fOut, "rw");
         final OutputChannel chOut1 = new OutputChannel(out.getChannel());
-        IsoMedia.write(chOut1, boxes, new IsoMedia.OnBoxListener() {
+        IsoMedia.write(chOut1, boxes, buf, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
                 return true;
             }
-        }, buf);
+        });
         out.close();
     }
 
