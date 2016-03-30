@@ -117,7 +117,6 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
                           String listDataInJSON,
                           SelectionMode selectionMode) {
         Bundle bundle = new Bundle();
-        bundle.putInt(BUNDLE_KEY_DIALOG_ICON, dialogIcon);
         bundle.putString(BUNDLE_KEY_DIALOG_TITLE, dialogTitle);
         bundle.putString(BUNDLE_KEY_DIALOG_TEXT, dialogText);
         bundle.putString(BUNDLE_KEY_LIST_DATA, listDataInJSON);
@@ -135,17 +134,11 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         this.dlg = dlg;
         Bundle bundle = getArguments();
-        int dialogIcon = bundle.getInt(BUNDLE_KEY_DIALOG_ICON, -1);
-        if (dialogIcon > 0) {
-            dlg.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, dialogIcon);
-        }
 
         String title = bundle.getString(BUNDLE_KEY_DIALOG_TITLE);
-        dlg.setTitle(title);
 
-        dialogText = bundle.getString(BUNDLE_KEY_DIALOG_TEXT);
-        TextView confirmTextView = findView(dlg, R.id.dialog_confirm_list_text);
-        confirmTextView.setText(dialogText);
+        TextView dialogTitle = findView(dlg, R.id.dialog_confirm_list_title);
+        dialogTitle.setText(title);
 
         initListViewAndAdapter(bundle);
         initSelectAllCheckbox();
@@ -369,9 +362,9 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
                                  numCheckedTextView != null;
 
         if (summaryLayout != null) {
-            summaryLayout.setVisibility(summaryVisible ? View.VISIBLE : View.GONE);
+            summaryLayout.setVisibility(summaryVisible ? View.VISIBLE : View.VISIBLE);
             numCheckedTextView.setText(selected + " " + getString(R.string.selected));
-            numCheckedTextView.setVisibility(summaryVisible ? View.VISIBLE : View.GONE);
+            numCheckedTextView.setVisibility(summaryVisible ? View.VISIBLE : View.VISIBLE);
 
             final TextView sumCheckedTextView = findView(dlg, R.id.dialog_confirm_list_sum_checked_textview);
             if (sumCheckedTextView != null) {
