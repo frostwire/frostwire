@@ -38,11 +38,25 @@ public final class Mp4Info {
 
         inf.majorBrand = Box.M4A_;
         inf.compatibleBrands = new int[]{Box.M4A_, Box.mp42, Box.isom, Box.zero};
-        inf.title = title;
-        inf.author = author;
-        inf.album = album;
-        inf.jpg = jpg;
+        inf.fill(title, author, album, jpg);
 
         return inf;
+    }
+
+    public static Mp4Info avc(String title, String author, String album, byte[] jpg) {
+        Mp4Info inf = new Mp4Info();
+
+        inf.majorBrand = Box.MP4_;
+        inf.compatibleBrands = new int[]{Box.iso6, Box.avc1, Box.mp41, Box.zero};
+        inf.fill(title, author, album, jpg);
+
+        return inf;
+    }
+
+    private void fill(String title, String author, String album, byte[] jpg) {
+        this.title = title;
+        this.author = author;
+        this.album = album;
+        this.jpg = jpg;
     }
 }
