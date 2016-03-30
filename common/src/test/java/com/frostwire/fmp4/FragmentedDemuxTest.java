@@ -266,4 +266,20 @@ public class FragmentedDemuxTest {
 
         Mp4Demuxer.audio(fIn, fOut, tags);
     }
+
+    @Test
+    public void testFragmented4() throws IOException {
+        File fIn1 = new File("/Users/aldenml/Downloads/video_frag.mp4");
+        File fIn2 = new File("/Users/aldenml/Downloads/audio_frag.mp4");
+        File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
+
+        Mp4Tags tags = new Mp4Tags();
+        tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
+        tags.title = "ti";
+        tags.author = "au";
+        tags.source = "sr";
+        tags.jpg = null;
+
+        Mp4Demuxer.muxFragments(fIn1, fIn2, fOut, tags, null);
+    }
 }

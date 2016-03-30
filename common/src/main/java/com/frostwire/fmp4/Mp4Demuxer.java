@@ -17,6 +17,7 @@
 
 package com.frostwire.fmp4;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -505,5 +506,113 @@ public final class Mp4Demuxer {
     public interface DemuxerListener {
 
         void onCount(long readCount, long writeCount);
+    }
+
+    public static void muxFragments(File video, File audio, File output, Mp4Tags tags, DemuxerListener l) throws IOException {
+        RandomAccessFile v_in = new RandomAccessFile(video, "r");
+        RandomAccessFile a_in = new RandomAccessFile(audio, "r");
+        RandomAccessFile out = new RandomAccessFile(output, "rw");
+
+        try {
+            ByteBuffer buf = ByteBuffer.allocate(100 * 1024);
+            muxFragments(new RandomAccessFile[]{v_in, a_in}, out, buf);
+
+        } finally {
+            IO.close(v_in);
+            IO.close(a_in);
+            IO.close(out);
+        }
+    }
+
+    public static void muxFragments(RandomAccessFile[] fInputs, RandomAccessFile fOut, ByteBuffer buf) throws IOException {
+        int numInput = fInputs.length;
+        InputChannel[] in = new InputChannel[numInput];
+        FragmentCtx[] ctx = new FragmentCtx[numInput];
+        for (int i = 0; i < numInput; i++) {
+            in[i] = new InputChannel(fInputs[i].getChannel());
+            ctx[i] = new FragmentCtx();
+        }
+        OutputChannel out = new OutputChannel(fOut.getChannel());
+
+        for (int i = 0; i < numInput; i++) {
+            MovieBox moov = readUntil(in[i], Box.moov, buf);
+            ctx[i].moov = moov;
+        }
+
+        boolean readChunk;
+
+        do {
+
+            readChunk = false;
+
+            for (int i = 0; i < numInput; i++) {
+                if (in[i].count() >= fInputs[i].length()) {
+                    continue;
+                }
+                MovieFragmentBox moof = readUntil(in[i], Box.moof, buf);
+                ctx[i].moof = moof;
+
+                MediaDataBox mdat = readUntil(in[i], Box.mdat, buf);
+                ctx[i].mdat = mdat;
+
+                IO.copy(in[i], out, mdat.length(), buf);
+
+                readChunk = true;
+            }
+        } while (readChunk);
+    }
+
+    private static final class FragmentCtx {
+
+        MovieBox moov;
+        MovieFragmentBox moof;
+        MediaDataBox mdat;
+    }
+
+    private static <T extends Box> T readNext(final InputChannel ch, final ByteBuffer buf) throws IOException {
+        IO.read(ch, 8, buf);
+        int size = buf.getInt();
+        int type = buf.getInt();
+
+        Long largesize = null;
+        if (size == 1) {
+            IO.read(ch, 8, buf);
+            largesize = buf.getLong();
+        }
+
+        byte[] usertype = null;
+        if (type == Box.uuid) {
+            usertype = new byte[16];
+            IO.read(ch, 16, buf);
+            buf.get(usertype);
+        }
+
+        Box b = Box.empty(type);
+        b.size = size;
+        b.largesize = largesize;
+        b.usertype = usertype;
+
+        long r = ch.count();
+        b.read(ch, buf);
+        r = ch.count() - r;
+
+        long length = b.length();
+        if (r < length) {
+            if (type != Box.mdat) {
+                IsoMedia.read(ch, length - r, b, buf, null);
+            }
+        }
+
+        return (T) b;
+    }
+
+    private static <T extends Box> T readUntil(final InputChannel ch, int type, final ByteBuffer buf) throws IOException {
+        Box b = null;
+        try {
+            while ((b = readNext(ch, buf)).type != type) ;
+        } catch (EOFException e) {
+            // ignore
+        }
+        return (T) b;
     }
 }

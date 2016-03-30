@@ -177,7 +177,7 @@ public final class IsoMedia {
          * @param b
          * @return true if you want to stop
          */
-        boolean onBox(Box b);
+        boolean onBox(Box b) throws IOException;
 
         OnBoxListener ALL = new OnBoxListener() {
             @Override
