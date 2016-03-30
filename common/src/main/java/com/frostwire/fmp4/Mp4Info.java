@@ -21,8 +21,9 @@ package com.frostwire.fmp4;
  * @author gubatron
  * @author aldenml
  */
-public final class Mp4Tags {
+public final class Mp4Info {
 
+    public int majorBrand;
     public int[] compatibleBrands;
     public String title;
     public String author;

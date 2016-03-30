@@ -94,8 +94,8 @@ public class ContainerBox extends Box {
     private static HashMap<Integer, int[]> buildMapping() {
         HashMap<Integer, int[]> map = new HashMap<>();
 
-        map.put(moov, new int[]{mvhd, trak, mvex, ipmc, udta});
-        map.put(trak, new int[]{tkhd, tref, edts, mdia, udta});
+        map.put(moov, new int[]{mvhd, trak, mvex, ipmc, udta, meta});
+        map.put(trak, new int[]{tkhd, tref, edts, mdia, udta, meta});
         map.put(edts, new int[]{elst});
         map.put(mdia, new int[]{mdhd, hdlr, minf});
         map.put(minf, new int[]{vmhd, smhd, hmhd, nmhd, dinf, stbl});
@@ -105,8 +105,8 @@ public class ContainerBox extends Box {
         map.put(moof, new int[]{mfhd, traf});
         map.put(traf, new int[]{tfhd, trun, sdtp, sbgp, subs});
         map.put(mfra, new int[]{tfra, mfro});
-        map.put(udta, new int[]{cprt});
-        map.put(meta, new int[]{hdlr, dinf, ipmc, iloc, ipro, iinf, xml_, bxml, pitm});
+        map.put(udta, new int[]{cprt, meta});
+        map.put(meta, new int[]{hdlr, dinf, ipmc, iloc, ipro, iinf, xml_, bxml, pitm, ilst});
         map.put(ipro, new int[]{sinf});
         map.put(sinf, new int[]{frma, imif, schm, schi});
         map.put(ilst, new int[]{Cnam, CART, aART, Calb, Cgen, gnre, Cday, trkn, stik, covr});
