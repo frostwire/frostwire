@@ -451,10 +451,11 @@ public final class Mp4Demuxer {
         RandomAccessFile a_in = new RandomAccessFile(audio, "r");
         RandomAccessFile out = new RandomAccessFile(output, "rw");
 
+        out.setLength(0);
+
         try {
             ByteBuffer buf = ByteBuffer.allocate(100 * 1024);
             muxFragments(new RandomAccessFile[]{v_in, a_in}, out, inf, buf, l);
-
         } finally {
             IO.close(v_in);
             IO.close(a_in);
@@ -474,7 +475,9 @@ public final class Mp4Demuxer {
         OutputChannel out = new OutputChannel(output.getChannel());
 
         for (int i = 0; i < n; i++) {
-            ctxs[i].moov = readUntil(ins[i], Box.moov, buf);
+            FragmentCtx ctx = ctxs[i];
+            ctx.moov = readUntil(ins[i], Box.moov, buf);
+            ctx.trex = ctx.moov.findFirst(Box.trex);
         }
 
         long mdatOffset = 0;
@@ -504,21 +507,20 @@ public final class Mp4Demuxer {
             }
 
             long readCount = 0;
+
             for (int i = 0; i < n; i++) {
                 InputChannel in = ins[i];
                 FragmentCtx ctx = ctxs[i];
-
-                if (in.count() >= ctx.len) {
-                    continue;
-                }
 
                 processChunk(ctx, mdatOffset + out.count());
 
                 IO.copy(in, out, ctx.mdat.length(), buf);
 
                 readCount += in.count();
-                notifyCount(l, readCount);
             }
+
+            notifyCount(l, readCount);
+
         } while (readChunk);
 
         LinkedList<Box> boxes = new LinkedList<>();
@@ -621,7 +623,6 @@ public final class Mp4Demuxer {
     }
 
     private static void processChunk(FragmentCtx ctx, long offset) {
-        TrackExtendsBox trex = ctx.moov.findFirst(Box.trex);
         TrackFragmentHeaderBox tfhd = ctx.moof.findFirst(Box.tfhd);
         TrackRunBox trun = ctx.moof.findFirst(Box.trun);
 
@@ -657,7 +658,7 @@ public final class Mp4Demuxer {
                 } else {
                     TimeToSampleBox.Entry e = new TimeToSampleBox.Entry();
                     e.sample_count = 1;
-                    e.sample_delta = trex.default_sample_duration;
+                    e.sample_delta = ctx.trex.default_sample_duration;
                     ctx.sttsList.add(e);
                 }
             }
@@ -689,7 +690,7 @@ public final class Mp4Demuxer {
                     if (tfhd.defaultSampleFlagsPresent()) {
                         sampleFlags = tfhd.default_sample_flags;
                     } else {
-                        sampleFlags = trex.default_sample_flags;
+                        sampleFlags = ctx.trex.default_sample_flags;
                     }
                 }
             }
@@ -756,7 +757,7 @@ public final class Mp4Demuxer {
         return trak;
     }
 
-    private static UserDataBox createUdta(Mp4Info tags) {
+    private static UserDataBox createUdta(Mp4Info inf) {
         UserDataBox udta = new UserDataBox();
 
         MetaBox meta = new MetaBox();
@@ -769,27 +770,25 @@ public final class Mp4Demuxer {
         AppleItemListBox ilst = new AppleItemListBox();
         meta.boxes.add(ilst);
 
-        if (tags.title != null) {
+        if (inf.title != null) {
             AppleNameBox cnam = new AppleNameBox();
-            cnam.value(tags.title);
+            cnam.value(inf.title);
             ilst.boxes.add(cnam);
         }
 
-        if (tags.author != null) {
+        if (inf.author != null) {
             AppleArtistBox cART = new AppleArtistBox();
-            cART.value(tags.author);
+            cART.value(inf.author);
             ilst.boxes.add(cART);
-        }
 
-        if (tags.title != null || tags.author != null) {
-            AppleArtist2Box aART = new AppleArtist2Box();
-            aART.value(tags.title + " " + tags.author);
+            AppleAlbumArtistBox aART = new AppleAlbumArtistBox();
+            aART.value(inf.author);
             ilst.boxes.add(aART);
         }
 
-        if (tags.title != null || tags.author != null || tags.source != null) {
+        if (inf.album != null) {
             AppleAlbumBox calb = new AppleAlbumBox();
-            calb.value(tags.title + " " + tags.author + " via " + tags.source);
+            calb.value(inf.album);
             ilst.boxes.add(calb);
         }
 
@@ -798,9 +797,9 @@ public final class Mp4Demuxer {
         ilst.boxes.add(stik);
 
         //moov/udta/meta/ilst/covr/data
-        if (tags.jpg != null) {
+        if (inf.jpg != null) {
             AppleCoverBox covr = new AppleCoverBox();
-            covr.setJpg(tags.jpg);
+            covr.setJpg(inf.jpg);
             ilst.boxes.add(covr);
         }
 
@@ -833,6 +832,7 @@ public final class Mp4Demuxer {
         final LinkedList<ChunkOffsetBox.Entry> stcoList;
 
         MovieBox moov;
+        TrackExtendsBox trex;
         MovieFragmentBox moof;
         MediaDataBox mdat;
 

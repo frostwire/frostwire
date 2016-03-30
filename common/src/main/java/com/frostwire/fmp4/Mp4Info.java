@@ -27,6 +27,6 @@ public final class Mp4Info {
     public int[] compatibleBrands;
     public String title;
     public String author;
-    public String source;
+    public String album;
     public byte[] jpg;
 }

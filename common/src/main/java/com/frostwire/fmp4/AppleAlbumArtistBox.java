@@ -21,9 +21,9 @@ package com.frostwire.fmp4;
  * @author gubatron
  * @author aldenml
  */
-public final class AppleArtist2Box extends AppleUtf8Box {
+public final class AppleAlbumArtistBox extends AppleUtf8Box {
 
-    AppleArtist2Box() {
+    AppleAlbumArtistBox() {
         super(aART);
     }
 }

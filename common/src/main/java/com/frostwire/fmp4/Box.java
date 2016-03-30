@@ -493,7 +493,7 @@ public class Box {
         map.put(aART, new BoxLambda() {
             @Override
             public Box empty() {
-                return new AppleArtist2Box();
+                return new AppleAlbumArtistBox();
             }
         });
         map.put(Calb, new BoxLambda() {

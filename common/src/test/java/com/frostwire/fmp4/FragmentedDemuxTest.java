@@ -246,7 +246,7 @@ public class FragmentedDemuxTest {
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
         tags.title = "ti";
         tags.author = "au";
-        tags.source = "sr";
+        tags.album = "sr";
         tags.jpg = null;
 
         Mp4Demuxer.track(1, tags, in, out);
@@ -261,7 +261,7 @@ public class FragmentedDemuxTest {
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
         tags.title = "ti";
         tags.author = "au";
-        tags.source = "sr";
+        tags.album = "sr";
         tags.jpg = null;
 
         Mp4Demuxer.audio(fIn, fOut, tags);
@@ -277,7 +277,7 @@ public class FragmentedDemuxTest {
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
         tags.title = "ti";
         tags.author = "au";
-        tags.source = "sr";
+        tags.album = "sr";
         tags.jpg = null;
 
         Mp4Demuxer.muxFragments(fIn1, fIn2, fOut, tags, null);
