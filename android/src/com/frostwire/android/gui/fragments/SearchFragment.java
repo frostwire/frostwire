@@ -20,6 +20,7 @@ package com.frostwire.android.gui.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -356,6 +357,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             if (sr instanceof FileSearchResult) {
                 try {
                     NewTransferDialog dlg = NewTransferDialog.newInstance((FileSearchResult) sr, false);
+                    dlg.setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
                     dlg.show(getFragmentManager());
                 } catch (IllegalStateException e) {
                     // android.app.FragmentManagerImpl.checkStateLoss:1323 -> java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState

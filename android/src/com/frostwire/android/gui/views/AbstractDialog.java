@@ -25,6 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
+
+import com.frostwire.android.R;
 import com.frostwire.util.Ref;
 
 import java.io.Serializable;
@@ -62,7 +64,7 @@ public abstract class AbstractDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dlg = super.onCreateDialog(savedInstanceState);
-        dlg.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+        dlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(dlg, layoutResId);
         initComponents(dlg, savedInstanceState);
         return dlg;

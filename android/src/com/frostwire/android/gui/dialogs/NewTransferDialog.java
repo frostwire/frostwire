@@ -18,9 +18,6 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import java.io.Serializable;
-import java.lang.ref.WeakReference;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -38,6 +35,9 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.util.Ref;
+
+import java.io.Serializable;
+import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
@@ -75,19 +75,22 @@ public class NewTransferDialog extends AbstractDialog {
 
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+
         Bundle args = getArguments();
 
         SearchResultData data = (SearchResultData) args.getSerializable(SEARCH_RESULT_DATA_KEY);
         boolean hideCheckShow = args.getBoolean(HIDE_CHECK_SHOW_KEY);
 
-        dlg.setTitle(R.string.confirm_download);
+        dlg.setContentView(R.layout.dialog_new_transfer);
+
+        TextView dialogTitle = findView(dlg, R.id.dialog_new_transfer_title);
+        dialogTitle.setText(R.string.confirm_download);
 
         Context ctx = dlg.getContext();
 
         String sizeStr = data.getSize() > 0 ? UIUtils.getBytesInHuman(data.getSize()) : ctx.getString(R.string.size_unknown);
 
         TextView textQuestion = findView(dlg, R.id.dialog_new_transfer_text);
-
         textQuestion.setText(dlg.getContext().getString(R.string.dialog_new_transfer_text_text, data.getDisplayName(), sizeStr));
 
         DialogListener yes = new DialogListener(this, true);
