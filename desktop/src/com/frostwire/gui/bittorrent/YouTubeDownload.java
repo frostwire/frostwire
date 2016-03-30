@@ -20,6 +20,8 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.fmp4.Mp4Demuxer;
+import com.frostwire.fmp4.Mp4Info;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
@@ -399,7 +401,7 @@ public class YouTubeDownload implements BTDownload {
                 }
             } else if (downloadType == DownloadType.DEMUX) {
                 try {
-                    new MP4Muxer().demuxAudio(tempAudio.getAbsolutePath(), completeFile.getAbsolutePath(), buildMetadata(), null);
+                    Mp4Demuxer.audio(tempAudio.getAbsoluteFile(), completeFile.getAbsoluteFile(), buildMp4Info(true), null);
 
                     if (!completeFile.exists()) {
                         state = TransferState.ERROR_MOVING_INCOMPLETE;
@@ -513,6 +515,25 @@ public class YouTubeDownload implements BTDownload {
         byte[] jpg = jpgUrl != null ? HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(jpgUrl) : null;
 
         return new MP4Metadata(title, author, source, jpg);
+    }
+
+    private Mp4Info buildMp4Info(boolean audio) {
+        String title = sr.getDisplayName();
+        String author = sr.getDetailsUrl();
+        String source = "YouTube.com";
+
+        String jpgUrl = sr.getVideo() != null ? sr.getVideo().thumbnails.normal : null;
+        if (jpgUrl == null && sr.getAudio() != null) {
+            jpgUrl = sr.getAudio() != null ? sr.getAudio().thumbnails.normal : null;
+        }
+
+        byte[] jpg = jpgUrl != null ? HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(jpgUrl) : null;
+
+        if (audio) {
+            return Mp4Info.audio(title, author, source, jpg);
+        } else {
+            return null;
+        }
     }
 
     @Override
