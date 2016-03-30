@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -441,12 +441,22 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
 
         seeds.setText(context.get().getString(R.string.seeds_n, download.getSeeds()));
         peers.setText(context.get().getString(R.string.peers_n, download.getPeers()));
+        seeds.setVisibility(View.VISIBLE);
+        peers.setVisibility(View.VISIBLE);
+
 
         title.setText(download.getDisplayName());
         progress.setProgress(download.getProgress());
         title.setCompoundDrawables(null, null, null, null);
 
-        status.setText(TRANSFER_STATE_STRING_MAP.get(download.getStatus()));
+        final String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getStatus());
+        status.setText(downloadStatus);
+
+        if (NetworkManager.instance().isInternetDown()) {
+            status.setText(downloadStatus + " (" + view.getResources().getText(R.string.check_internet_connection) + ")");
+            seeds.setText("");
+            peers.setText("");
+        }
 
         speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
         size.setText(UIUtils.getBytesInHuman(download.getSize()));
@@ -492,7 +502,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         title.setText(download.getDisplayName());
         title.setCompoundDrawables(null, null, null, null);
         progress.setProgress(download.getProgress());
-        status.setText(getStatusFromResId(download.getStatus()));
+        String downloadStatus = getStatusFromResId(download.getStatus());
+        status.setText(downloadStatus);
         speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
         size.setText(UIUtils.getBytesInHuman(download.getSize()));
 

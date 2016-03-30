@@ -23,6 +23,7 @@ import android.util.Log;
 import com.frostwire.android.LollipopFileSystem;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
@@ -56,8 +57,9 @@ public class HttpDownload implements DownloadTransfer {
     static final int STATUS_CANCELLED = 4;
     static final int STATUS_WAITING = 5;
     static final int STATUS_UNCOMPRESSING = 6;
-    static final int STATUS_SAVE_DIR_ERROR = 7;
+    static final int STATUS_ERROR_SAVE_DIR = 7;
     static final int STATUS_ERROR_DISK_FULL = 8;
+    static final int STATUS_ERROR_NO_INTERNET = 9;
 
     private static final int SPEED_AVERAGE_CALCULATION_INTERVAL_MILLISECONDS = 1000;
 
@@ -87,12 +89,12 @@ public class HttpDownload implements DownloadTransfer {
         this.status = STATUS_DOWNLOADING;
 
         if (!Platforms.temp().isDirectory() && !Platforms.temp().mkdirs()) {
-            this.status = STATUS_SAVE_DIR_ERROR;
+            this.status = STATUS_ERROR_SAVE_DIR;
         }
 
         FileSystem fs = Platforms.fileSystem();
         if (savePath == null || !fs.isDirectory(savePath) && !fs.mkdirs(savePath)) {
-            this.status = STATUS_SAVE_DIR_ERROR;
+            this.status = STATUS_ERROR_SAVE_DIR;
         }
 
         if (TransferManager.isCurrentMountAlmostFull()) {
@@ -172,10 +174,17 @@ public class HttpDownload implements DownloadTransfer {
 
     public boolean isComplete() {
         if (bytesReceived > 0) {
-            return (bytesReceived == link.getSize() && status == STATUS_COMPLETE) || status == STATUS_COMPLETE || status == STATUS_ERROR;
+            return (bytesReceived == link.getSize() && status == STATUS_COMPLETE) || status == STATUS_COMPLETE || isErrored();
         } else {
             return false;
         }
+    }
+
+    public boolean isErrored() {
+        return status == STATUS_ERROR ||
+               status == STATUS_ERROR_DISK_FULL ||
+               status == STATUS_ERROR_NO_INTERNET ||
+               status == STATUS_ERROR_SAVE_DIR;
     }
 
     public boolean isDownloading() {
@@ -218,7 +227,7 @@ public class HttpDownload implements DownloadTransfer {
     }
 
     public void start(final boolean resume) {
-        if (status == STATUS_SAVE_DIR_ERROR || status == STATUS_ERROR_DISK_FULL || status == STATUS_ERROR) {
+        if (isErrored()) {
             return;
         }
 
@@ -249,11 +258,14 @@ public class HttpDownload implements DownloadTransfer {
             case STATUS_ERROR:
                 resId = R.string.peer_http_download_status_error;
                 break;
-            case STATUS_SAVE_DIR_ERROR:
+            case STATUS_ERROR_SAVE_DIR:
                 resId = R.string.http_download_status_save_dir_error;
                 break;
             case STATUS_ERROR_DISK_FULL:
                 resId = R.string.error_no_space_left_on_device;
+                break;
+            case STATUS_ERROR_NO_INTERNET:
+                resId = R.string.error_no_internet_connection;
                 break;
             case STATUS_CANCELLED:
                 resId = R.string.peer_http_download_status_cancelled;
@@ -379,6 +391,10 @@ public class HttpDownload implements DownloadTransfer {
 
             if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
                 status = STATUS_ERROR_DISK_FULL;
+            }
+
+            if (NetworkManager.instance().isInternetDown()) {
+                status = STATUS_ERROR_NO_INTERNET;
             }
 
             cleanup();
