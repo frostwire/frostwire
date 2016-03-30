@@ -420,7 +420,7 @@ public class YouTubeDownload implements BTDownload {
                     start(sr.getAudio(), tempAudio);
                 } else if (tempVideo.exists() && tempAudio.exists()) {
                     try {
-                        new MP4Muxer().mux(tempVideo.getAbsolutePath(), tempAudio.getAbsolutePath(), completeFile.getAbsolutePath(), buildMetadata());
+                        Mp4Demuxer.muxFragments(tempVideo.getAbsoluteFile(), tempAudio.getAbsoluteFile(), completeFile.getAbsoluteFile(), buildMp4Info(false), null);
 
                         if (!completeFile.exists()) {
                             state = TransferState.ERROR_MOVING_INCOMPLETE;
@@ -532,7 +532,7 @@ public class YouTubeDownload implements BTDownload {
         if (audio) {
             return Mp4Info.audio(title, author, source, jpg);
         } else {
-            return null;
+            return Mp4Info.avc(title, author, source, jpg);
         }
     }
 
