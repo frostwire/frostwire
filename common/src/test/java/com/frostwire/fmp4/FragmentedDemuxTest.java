@@ -254,8 +254,8 @@ public class FragmentedDemuxTest {
 
     @Test
     public void testFragmented3() throws IOException {
-        File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
-        File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
+        File fIn = new File("/Users/aldenml/Downloads/video_frag.mp4");
+        File fOut = new File("/Users/aldenml/Downloads/test_out_ref.mp4");
 
         Mp4Tags tags = new Mp4Tags();
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};

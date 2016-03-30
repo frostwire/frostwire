@@ -33,9 +33,14 @@ public class Box {
     public static final int vide = Bits.make4cc("vide");
     public static final int hint = Bits.make4cc("hint");
     public static final int data = Bits.make4cc("data");
+    public static final int MP4_ = Bits.make4cc("MP4 ");
     public static final int M4A_ = Bits.make4cc("M4A ");
+    public static final int dash = Bits.make4cc("dash");
+    public static final int mp41 = Bits.make4cc("mp41");
     public static final int mp42 = Bits.make4cc("mp42");
     public static final int isom = Bits.make4cc("isom");
+    public static final int iso6 = Bits.make4cc("iso6");
+    public static final int avc1 = Bits.make4cc("avc1");
     public static final int zero = Bits.make4cc("\0\0\0\0");
 
     public static final int mdat = Bits.make4cc("mdat");

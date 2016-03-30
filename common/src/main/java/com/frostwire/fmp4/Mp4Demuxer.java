@@ -515,7 +515,7 @@ public final class Mp4Demuxer {
 
         try {
             ByteBuffer buf = ByteBuffer.allocate(100 * 1024);
-            muxFragments(new RandomAccessFile[]{v_in, a_in}, out, buf);
+            muxFragments(new RandomAccessFile[]{v_in, a_in}, out, tags, buf);
 
         } finally {
             IO.close(v_in);
@@ -524,7 +524,7 @@ public final class Mp4Demuxer {
         }
     }
 
-    public static void muxFragments(RandomAccessFile[] fInputs, RandomAccessFile fOut, ByteBuffer buf) throws IOException {
+    public static void muxFragments(RandomAccessFile[] fInputs, RandomAccessFile fOut, Mp4Tags tags, ByteBuffer buf) throws IOException {
         int numInput = fInputs.length;
         InputChannel[] in = new InputChannel[numInput];
         FragmentCtx[] ctx = new FragmentCtx[numInput];
@@ -533,6 +533,9 @@ public final class Mp4Demuxer {
             ctx[i] = new FragmentCtx();
         }
         OutputChannel out = new OutputChannel(fOut.getChannel());
+
+        long mdatOffset = 5 * 1024 * 1024;
+        fOut.seek(mdatOffset);
 
         for (int i = 0; i < numInput; i++) {
             MovieBox moov = readUntil(in[i], Box.moov, buf);
@@ -555,18 +558,224 @@ public final class Mp4Demuxer {
                 MediaDataBox mdat = readUntil(in[i], Box.mdat, buf);
                 ctx[i].mdat = mdat;
 
+                processChunk(ctx[i], mdatOffset + out.count());
+
                 IO.copy(in[i], out, mdat.length(), buf);
 
                 readChunk = true;
             }
         } while (readChunk);
+
+        LinkedList<Box> boxes = new LinkedList<>();
+
+        FileTypeBox ftyp = new FileTypeBox();
+        ftyp.major_brand = Box.MP4_;
+        ftyp.minor_version = 0;
+        ftyp.compatible_brands = new int[]{com.frostwire.fmp4.Box.iso6, com.frostwire.fmp4.Box.avc1, com.frostwire.fmp4.Box.mp41, com.frostwire.fmp4.Box.zero};
+        boxes.add(ftyp);
+
+        MovieBox moov = new MovieBox();
+        moov.boxes.add(ctx[0].moov.findFirst(Box.mvhd));
+
+        for (int i = 0; i < numInput; i++) {
+            TrackBox trak = createTrak(i + 1, ctx[i]);
+            moov.boxes.add(trak);
+        }
+
+        boxes.add(moov);
+
+        // add tags
+        if (tags != null) {
+            if (tags.compatibleBrands != null) {
+                //FileTypeBox ftyp = Box.findFirst(boxes, Box.ftyp);
+                //ftyp.compatible_brands = tags.compatibleBrands;
+            }
+            // remove old udta boxes
+            for (UserDataBox b : moov.<UserDataBox>find(Box.udta)) {
+                moov.boxes.remove(b);
+            }
+            UserDataBox udta = createUdta(tags);
+            moov.boxes.add(udta);
+        }
+
+        MediaDataBox mdat = new MediaDataBox();
+        mdat.length(0);
+        boxes.add(mdat);
+
+        long len = ContainerBox.length(boxes); // this update the boxes
+        if (len > mdatOffset) {
+            throw new IOException("Movie header bigger than mdat offset");
+        }
+        mdat.length(fOut.length() - len);
+
+        fOut.seek(0);
+        IsoMedia.write(out, boxes, buf, IsoMedia.OnBoxListener.ALL);
+    }
+
+    private static void processChunk(FragmentCtx ctx, long offset) {
+        TrackExtendsBox trex = ctx.moov.findFirst(Box.trex);
+        TrackFragmentHeaderBox tfhd = ctx.moof.findFirst(Box.tfhd);
+        TrackRunBox trun = ctx.moof.findFirst(Box.trun);
+
+        SampleToChunkBox.Entry stscEntry = new SampleToChunkBox.Entry();
+        stscEntry.first_chunk = ctx.chunkNumber;
+        stscEntry.samples_per_chunk = trun.sample_count;
+        stscEntry.sample_description_index = 1;
+        ctx.stscList.add(stscEntry);
+
+        ChunkOffsetBox.Entry stcoEntry = new ChunkOffsetBox.Entry();
+        stcoEntry.chunk_offset = (int) offset;
+        ctx.stcoList.add(stcoEntry);
+
+        boolean first = true;
+        for (TrackRunBox.Entry entry : trun.entries) {
+            if (trun.sampleDurationPresent()) {
+                if (ctx.sttsList.isEmpty() ||
+                        ctx.sttsList.get(ctx.sttsList.size() - 1).sample_delta != entry.sample_duration) {
+                    TimeToSampleBox.Entry e = new TimeToSampleBox.Entry();
+                    e.sample_count = 1;
+                    e.sample_delta = entry.sample_duration;
+                    ctx.sttsList.add(e);
+                } else {
+                    TimeToSampleBox.Entry e = ctx.sttsList.get(ctx.sttsList.size() - 1);
+                    e.sample_count += 1;
+                }
+            } else {
+                if (tfhd.defaultSampleDurationPresent()) {
+                    TimeToSampleBox.Entry e = new TimeToSampleBox.Entry();
+                    e.sample_count = 1;
+                    e.sample_delta = tfhd.default_sample_duration;
+                    ctx.sttsList.add(e);
+                } else {
+                    TimeToSampleBox.Entry e = new TimeToSampleBox.Entry();
+                    e.sample_count = 1;
+                    e.sample_delta = trex.default_sample_duration;
+                    ctx.sttsList.add(e);
+                }
+            }
+
+            if (trun.sampleCompositionTimeOffsetsPresent()) {
+                if (ctx.cttsList.isEmpty() ||
+                        ctx.cttsList.get(ctx.cttsList.size() - 1).sample_offset != entry.sample_composition_time_offset) {
+                    CompositionOffsetBox.Entry e = new CompositionOffsetBox.Entry();
+                    e.sample_count = 1;
+                    e.sample_offset = entry.sample_composition_time_offset;
+                    ctx.cttsList.add(e);
+                } else {
+                    CompositionOffsetBox.Entry e = ctx.cttsList.get(ctx.cttsList.size() - 1);
+                    e.sample_count += 1;
+                }
+            }
+
+            SampleSizeBox.Entry stszEntry = new SampleSizeBox.Entry();
+            stszEntry.entry_size = entry.sample_size;
+            ctx.stszList.add(stszEntry);
+
+            int sampleFlags;
+            if (trun.sampleFlagsPresent()) {
+                sampleFlags = entry.sample_flags;
+            } else {
+                if (first && trun.firstSampleFlagsPresent()) {
+                    sampleFlags = trun.first_sample_flags;
+                } else {
+                    if (tfhd.defaultSampleFlagsPresent()) {
+                        sampleFlags = tfhd.default_sample_flags;
+                    } else {
+                        sampleFlags = trex.default_sample_flags;
+                    }
+                }
+            }
+
+            // is difference sample
+            if (((sampleFlags & 0x00010000) >> 16) > 0) {
+                // iframe
+                SyncSampleBox.Entry e = new SyncSampleBox.Entry();
+                e.sample_number = ctx.sampleNumber;
+                ctx.stssList.add(e);
+            }
+            ctx.sampleNumber++;
+            first = false;
+        }
+        ctx.chunkNumber++;
+    }
+
+    private static TrackBox createTrak(int id, FragmentCtx ctx) {
+        // recreate sample tables
+        SampleTableBox stbl = ctx.moov.findFirst(Box.stbl);
+        TimeToSampleBox stts = stbl.findFirst(Box.stts);
+        if (stts != null) {
+            stts.entry_count = ctx.sttsList.size();
+            stts.entries = ctx.sttsList.toArray(new TimeToSampleBox.Entry[0]);
+        }
+        CompositionOffsetBox ctts = stbl.findFirst(Box.ctts);
+        if (ctts != null) {
+            ctts.entry_count = ctx.cttsList.size();
+            ctts.entries = ctx.cttsList.toArray(new CompositionOffsetBox.Entry[0]);
+        }
+        SyncSampleBox stss = stbl.findFirst(Box.stss);
+        if (stss != null) {
+            stss.entry_count = ctx.stssList.size();
+            stss.entries = ctx.stssList.toArray(new SyncSampleBox.Entry[0]);
+        }
+        SampleSizeBox stsz = stbl.findFirst(Box.stsz);
+        if (stsz != null) {
+            stsz.sample_size = 0;
+            stsz.sample_count = ctx.stszList.size();
+            stsz.entries = ctx.stszList.toArray(new SampleSizeBox.Entry[0]);
+        }
+        SampleToChunkBox stsc = stbl.findFirst(Box.stsc);
+        if (stsc != null) {
+            stsc.entry_count = ctx.stscList.size();
+            stsc.entries = ctx.stscList.toArray(new SampleToChunkBox.Entry[0]);
+        }
+        ChunkOffsetBox stco = stbl.findFirst(Box.stco);
+        if (stco != null) {
+            stco.entry_count = ctx.stcoList.size();
+            stco.entries = ctx.stcoList.toArray(new ChunkOffsetBox.Entry[0]);
+        }
+
+        TrackBox trak = ctx.moov.findFirst(Box.trak);
+
+        // some fixes
+        TrackHeaderBox tkhd = trak.findFirst(Box.tkhd);
+        tkhd.trackId(id);
+        tkhd.enabled(true);
+        tkhd.inMovie(true);
+        tkhd.inPreview(true);
+        tkhd.inPoster(true);
+        MediaHeaderBox mdhd = trak.findFirst(Box.mdhd);
+        mdhd.language("eng");
+
+        return trak;
     }
 
     private static final class FragmentCtx {
 
+        public FragmentCtx() {
+            sttsList = new LinkedList<>();
+            cttsList = new LinkedList<>();
+            stssList = new LinkedList<>();
+            stszList = new LinkedList<>();
+            stscList = new LinkedList<>();
+            stcoList = new LinkedList<>();
+
+            sampleNumber = 1;
+            chunkNumber = 1;
+        }
+
         MovieBox moov;
         MovieFragmentBox moof;
         MediaDataBox mdat;
+
+        LinkedList<TimeToSampleBox.Entry> sttsList;
+        LinkedList<CompositionOffsetBox.Entry> cttsList;
+        LinkedList<SyncSampleBox.Entry> stssList;
+        LinkedList<SampleSizeBox.Entry> stszList;
+        LinkedList<SampleToChunkBox.Entry> stscList;
+        LinkedList<ChunkOffsetBox.Entry> stcoList;
+
+        int sampleNumber;
+        int chunkNumber;
     }
 
     private static <T extends Box> T readNext(final InputChannel ch, final ByteBuffer buf) throws IOException {
