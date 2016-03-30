@@ -24,8 +24,8 @@
 	<!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
 	<!-- Plus  android:versionCode="9050xyz" (always commit like this, plus!)-->
 	<!-- Basic android:versionCode="9010xyz" (don't commit like this) -->
-	<!-- Plus version example  for 1.7.2 build 242  -> 9050194 -->
-	<!-- Basic version example for 1.7.2 build 242  -> 9010195 -->
+	<!-- Plus version example  for 1.7.2 build 242  -> 9050242 -->
+	<!-- Basic version example for 1.7.2 build 242  -> 9010242 -->
 	<!-- Don't go nuts, max version number will be: 2,147,483,647 -->
 
 	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="23" />

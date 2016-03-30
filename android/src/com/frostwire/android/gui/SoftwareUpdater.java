@@ -303,7 +303,7 @@ public final class SoftwareUpdater {
 
     private boolean isFrostWireOld(int myBuild, String latestBuild) {
         if (Constants.IS_BASIC_DEBUG) {
-            myBuild += 900000;
+            myBuild += 40000;
         }
         LOG.info("isFrostWireOld(myBuild=" + myBuild + ", latestBuild=" + latestBuild + ")");
         boolean result;
