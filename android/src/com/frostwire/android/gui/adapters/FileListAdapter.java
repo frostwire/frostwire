@@ -140,7 +140,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 items.add(new RenameFileMenuAction(context, this, fd));
             }
 
-            if (fd.mime.equals(Constants.MIME_TYPE_BITTORRENT) && numChecked <= 1) {
+            if (fd.mime != null && fd.mime.equals(Constants.MIME_TYPE_BITTORRENT) && numChecked <= 1) {
                 items.add(new CopyToClipboardMenuAction(context,
                         R.drawable.contextmenu_icon_magnet,
                         R.string.transfers_context_menu_copy_magnet,
