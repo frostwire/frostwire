@@ -153,11 +153,11 @@ android {
     productFlavors {
         basic {
             applicationId 'com.frostwire.android'
-            versionCode 8100000 + project.ext.versionCode
+            versionCode 9010000 + project.ext.versionCode
         }
         plus1 {
             applicationId 'com.frostwire.android'
-            versionCode 9000000 + project.ext.versionCode
+            versionCode 9050000 + project.ext.versionCode
         }
     }
 
