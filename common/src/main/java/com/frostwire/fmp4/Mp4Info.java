@@ -23,10 +23,26 @@ package com.frostwire.fmp4;
  */
 public final class Mp4Info {
 
+    Mp4Info() {
+    }
+
     public int majorBrand;
     public int[] compatibleBrands;
     public String title;
     public String author;
     public String album;
     public byte[] jpg;
+
+    public static Mp4Info audio(String title, String author, String album, byte[] jpg) {
+        Mp4Info inf = new Mp4Info();
+
+        inf.majorBrand = Box.M4A_;
+        inf.compatibleBrands = new int[]{Box.M4A_, Box.mp42, Box.isom, Box.zero};
+        inf.title = title;
+        inf.author = author;
+        inf.album = album;
+        inf.jpg = jpg;
+
+        return inf;
+    }
 }
