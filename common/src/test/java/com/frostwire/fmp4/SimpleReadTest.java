@@ -36,7 +36,7 @@ public class SimpleReadTest {
 
     @Test
     public void testRead() throws IOException {
-        File f = new File("/Users/aldenml/Downloads/test_out.mp4");
+        File f = new File("/Users/aldenml/Downloads/year.mp4");
         RandomAccessFile in = new RandomAccessFile(f, "r");
         InputChannel ch = new InputChannel(in.getChannel());
 

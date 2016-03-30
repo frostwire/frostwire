@@ -229,6 +229,10 @@ public final class Mp4Demuxer {
                 InputChannel in = ins[i];
                 FragmentCtx ctx = ctxs[i];
 
+                if (in.count() >= ctx.len) {
+                    continue;
+                }
+
                 processChunk(ctx, mdatOffset + out.count());
 
                 IO.copy(in, out, ctx.mdat.length(), buf);

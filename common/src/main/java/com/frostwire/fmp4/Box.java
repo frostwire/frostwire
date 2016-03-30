@@ -532,6 +532,12 @@ public class Box {
                 return new AppleGenreIDBox();
             }
         });
+        map.put(Cday, new BoxLambda() {
+            @Override
+            public Box empty() {
+                return new AppleYearBox();
+            }
+        });
         map.put(free, new BoxLambda() {
             @Override
             public Box empty() {
