@@ -31,18 +31,18 @@ import java.util.ListIterator;
  */
 public final class Mp4Demuxer {
 
-    public static void track(int id, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out, DemuxerListener l) throws IOException {
+    public static void track(int id, Mp4Info tags, RandomAccessFile in, RandomAccessFile out, DemuxerListener l) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(100 * 1024);
         LinkedList<Box> head = IsoFile.head(in, buf);
         boolean fragments = Box.findFirst(head, Box.mvex) != null;
         track(id, fragments, head, tags, in, out, l, buf);
     }
 
-    public static void track(int id, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out) throws IOException {
+    public static void track(int id, Mp4Info tags, RandomAccessFile in, RandomAccessFile out) throws IOException {
         track(id, tags, in, out, null);
     }
 
-    public static void audio(File input, File output, Mp4Tags tags, DemuxerListener l) throws IOException {
+    public static void audio(File input, File output, Mp4Info tags, DemuxerListener l) throws IOException {
         RandomAccessFile in = new RandomAccessFile(input, "r");
         RandomAccessFile out = new RandomAccessFile(output, "rw");
 
@@ -64,11 +64,11 @@ public final class Mp4Demuxer {
         }
     }
 
-    public static void audio(File input, File output, Mp4Tags tags) throws IOException {
+    public static void audio(File input, File output, Mp4Info tags) throws IOException {
         audio(input, output, tags, null);
     }
 
-    private static void track(int id, boolean fragments, LinkedList<Box> head, Mp4Tags tags, RandomAccessFile in, RandomAccessFile out, final DemuxerListener l, final ByteBuffer buf) throws IOException {
+    private static void track(int id, boolean fragments, LinkedList<Box> head, Mp4Info tags, RandomAccessFile in, RandomAccessFile out, final DemuxerListener l, final ByteBuffer buf) throws IOException {
         out.setLength(0);
 
         if (fragments) {
@@ -78,7 +78,7 @@ public final class Mp4Demuxer {
         }
     }
 
-    private static void trackFragments(int id, LinkedList<Box> head, Mp4Tags tags, RandomAccessFile fIn, RandomAccessFile fOut, final DemuxerListener l, final ByteBuffer buf) throws IOException {
+    private static void trackFragments(int id, LinkedList<Box> head, Mp4Info tags, RandomAccessFile fIn, RandomAccessFile fOut, final DemuxerListener l, final ByteBuffer buf) throws IOException {
         final int trackId = id;
         final int mdatOffset = calcMdatOffset(head, fIn.length(), tags);
         fOut.seek(mdatOffset);
@@ -106,7 +106,7 @@ public final class Mp4Demuxer {
 
             @Override
             public boolean onBox(Box b) {
-                notifyCount(l, in.count(), out.count());
+                notifyCount(l, in.count());
                 if (b.parent == null && b.type != Box.mdat && b.type != Box.moof) {
                     boxes.add(b);
                 }
@@ -220,7 +220,7 @@ public final class Mp4Demuxer {
 
                 try {
                     IO.copy(in, out, mdat.length(), buf);
-                    notifyCount(l, in.count(), out.count());
+                    notifyCount(l, in.count());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -323,7 +323,7 @@ public final class Mp4Demuxer {
         });
     }
 
-    private static void trackSimple(int id, Mp4Tags tags, RandomAccessFile fIn, RandomAccessFile fOut, final DemuxerListener l, final ByteBuffer buf) throws IOException {
+    private static void trackSimple(int id, Mp4Info tags, RandomAccessFile fIn, RandomAccessFile fOut, final DemuxerListener l, final ByteBuffer buf) throws IOException {
         int trackId = id;
         final InputChannel in = new InputChannel(fIn.getChannel());
         final OutputChannel out = new OutputChannel(fOut.getChannel());
@@ -333,7 +333,7 @@ public final class Mp4Demuxer {
         IsoMedia.read(in, fIn.length(), null, buf, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
-                notifyCount(l, in.count(), out.count());
+                notifyCount(l, in.count());
                 if (b.parent == null) {
                     boxes.add(b);
                 }
@@ -417,7 +417,7 @@ public final class Mp4Demuxer {
         IsoMedia.write(out, boxes, buf, new IsoMedia.OnBoxListener() {
             @Override
             public boolean onBox(Box b) {
-                notifyCount(l, in.count(), out.count());
+                notifyCount(l, in.count());
                 return true;
             }
         });
@@ -427,14 +427,14 @@ public final class Mp4Demuxer {
 
             int skp = chunkOffsetOrg[i] - pos;
             IO.skip(in, skp, buf);
-            notifyCount(l, in.count(), out.count());
+            notifyCount(l, in.count());
 
             IO.copy(in, out, chunkSize[i], buf);
-            notifyCount(l, in.count(), out.count());
+            notifyCount(l, in.count());
         }
     }
 
-    private static int calcMdatOffset(LinkedList<Box> head, long length, Mp4Tags tags) throws IOException {
+    private static int calcMdatOffset(LinkedList<Box> head, long length, Mp4Info tags) throws IOException {
         MovieFragmentBox moof = Box.findFirst(head, Box.moof);
         MediaDataBox mdat = Box.findFirst(head, Box.mdat);
 
@@ -446,76 +446,14 @@ public final class Mp4Demuxer {
         return len;
     }
 
-    private static UserDataBox createUdta(Mp4Tags tags) {
-        //"/moov/udta/meta/ilst/covr/data"
-        UserDataBox udta = new UserDataBox();
-
-        MetaBox meta = new MetaBox();
-        udta.boxes.add(meta);
-
-        HandlerBox hdlr = new HandlerBox();
-        hdlr.handler_type = Bits.make4cc("mdir");
-        meta.boxes.add(hdlr);
-
-        AppleItemListBox ilst = new AppleItemListBox();
-        meta.boxes.add(ilst);
-
-        if (tags.title != null) {
-            AppleNameBox cnam = new AppleNameBox();
-            cnam.value(tags.title);
-            ilst.boxes.add(cnam);
-        }
-
-        if (tags.author != null) {
-            AppleArtistBox cART = new AppleArtistBox();
-            cART.value(tags.author);
-            ilst.boxes.add(cART);
-        }
-
-        if (tags.title != null || tags.author != null) {
-            AppleArtist2Box aART = new AppleArtist2Box();
-            aART.value(tags.title + " " + tags.author);
-            ilst.boxes.add(aART);
-        }
-
-        if (tags.title != null || tags.author != null || tags.source != null) {
-            AppleAlbumBox calb = new AppleAlbumBox();
-            calb.value(tags.title + " " + tags.author + " via " + tags.source);
-            ilst.boxes.add(calb);
-        }
-
-        AppleMediaTypeBox stik = new AppleMediaTypeBox();
-        stik.value(1);
-        ilst.boxes.add(stik);
-
-        if (tags.jpg != null) {
-            AppleCoverBox covr = new AppleCoverBox();
-            covr.setJpg(tags.jpg);
-            ilst.boxes.add(covr);
-        }
-
-        return udta;
-    }
-
-    private static void notifyCount(DemuxerListener l, long readCount, long writeCount) {
-        if (l != null) {
-            l.onCount(readCount, writeCount);
-        }
-    }
-
-    public interface DemuxerListener {
-
-        void onCount(long readCount, long writeCount);
-    }
-
-    public static void muxFragments(File video, File audio, File output, Mp4Tags tags, DemuxerListener l) throws IOException {
+    public static void muxFragments(File video, File audio, File output, Mp4Info inf, DemuxerListener l) throws IOException {
         RandomAccessFile v_in = new RandomAccessFile(video, "r");
         RandomAccessFile a_in = new RandomAccessFile(audio, "r");
         RandomAccessFile out = new RandomAccessFile(output, "rw");
 
         try {
             ByteBuffer buf = ByteBuffer.allocate(100 * 1024);
-            muxFragments(new RandomAccessFile[]{v_in, a_in}, out, tags, buf);
+            muxFragments(new RandomAccessFile[]{v_in, a_in}, out, inf, buf, l);
 
         } finally {
             IO.close(v_in);
@@ -524,79 +462,83 @@ public final class Mp4Demuxer {
         }
     }
 
-    public static void muxFragments(RandomAccessFile[] fInputs, RandomAccessFile fOut, Mp4Tags tags, ByteBuffer buf) throws IOException {
-        int numInput = fInputs.length;
-        InputChannel[] in = new InputChannel[numInput];
-        FragmentCtx[] ctx = new FragmentCtx[numInput];
-        for (int i = 0; i < numInput; i++) {
-            in[i] = new InputChannel(fInputs[i].getChannel());
-            ctx[i] = new FragmentCtx();
+    public static void muxFragments(RandomAccessFile[] inputs, RandomAccessFile output, Mp4Info inf, ByteBuffer buf, DemuxerListener l) throws IOException {
+        int n = inputs.length;
+        InputChannel[] ins = new InputChannel[n];
+        FragmentCtx[] ctxs = new FragmentCtx[n];
+        for (int i = 0; i < n; i++) {
+            RandomAccessFile input = inputs[i];
+            ins[i] = new InputChannel(input.getChannel());
+            ctxs[i] = new FragmentCtx(input.length());
         }
-        OutputChannel out = new OutputChannel(fOut.getChannel());
+        OutputChannel out = new OutputChannel(output.getChannel());
 
-        long mdatOffset = 5 * 1024 * 1024;
-        fOut.seek(mdatOffset);
-
-        for (int i = 0; i < numInput; i++) {
-            MovieBox moov = readUntil(in[i], Box.moov, buf);
-            ctx[i].moov = moov;
+        for (int i = 0; i < n; i++) {
+            ctxs[i].moov = readUntil(ins[i], Box.moov, buf);
         }
 
+        long mdatOffset = 0;
         boolean readChunk;
 
         do {
 
             readChunk = false;
 
-            for (int i = 0; i < numInput; i++) {
-                if (in[i].count() >= fInputs[i].length()) {
+            for (int i = 0; i < n; i++) {
+                InputChannel in = ins[i];
+                FragmentCtx ctx = ctxs[i];
+
+                if (in.count() >= ctx.len) {
                     continue;
                 }
-                MovieFragmentBox moof = readUntil(in[i], Box.moof, buf);
-                ctx[i].moof = moof;
-
-                MediaDataBox mdat = readUntil(in[i], Box.mdat, buf);
-                ctx[i].mdat = mdat;
-
-                processChunk(ctx[i], mdatOffset + out.count());
-
-                IO.copy(in[i], out, mdat.length(), buf);
 
                 readChunk = true;
+
+                ctx.moof = readUntil(in, Box.moof, buf);
+                ctx.mdat = readUntil(in, Box.mdat, buf);
+            }
+
+            if (mdatOffset == 0) {
+                mdatOffset = calcMdatOffset(ctxs, inf);
+                output.seek(mdatOffset);
+            }
+
+            long readCount = 0;
+            for (int i = 0; i < n; i++) {
+                InputChannel in = ins[i];
+                FragmentCtx ctx = ctxs[i];
+
+                if (in.count() >= ctx.len) {
+                    continue;
+                }
+
+                processChunk(ctx, mdatOffset + out.count());
+
+                IO.copy(in, out, ctx.mdat.length(), buf);
+
+                readCount += in.count();
+                notifyCount(l, readCount);
             }
         } while (readChunk);
 
         LinkedList<Box> boxes = new LinkedList<>();
 
         FileTypeBox ftyp = new FileTypeBox();
-        ftyp.major_brand = Box.MP4_;
+        ftyp.major_brand = inf.majorBrand;
         ftyp.minor_version = 0;
-        ftyp.compatible_brands = new int[]{com.frostwire.fmp4.Box.iso6, com.frostwire.fmp4.Box.avc1, com.frostwire.fmp4.Box.mp41, com.frostwire.fmp4.Box.zero};
+        ftyp.compatible_brands = inf.compatibleBrands;
         boxes.add(ftyp);
 
         MovieBox moov = new MovieBox();
-        moov.boxes.add(ctx[0].moov.findFirst(Box.mvhd));
-
-        for (int i = 0; i < numInput; i++) {
-            TrackBox trak = createTrak(i + 1, ctx[i]);
+        moov.boxes.add(ctxs[0].moov.findFirst(Box.mvhd));
+        for (int i = 0; i < n; i++) {
+            TrackBox trak = createTrak(i + 1, ctxs[i]);
             moov.boxes.add(trak);
         }
-
         boxes.add(moov);
 
-        // add tags
-        if (tags != null) {
-            if (tags.compatibleBrands != null) {
-                //FileTypeBox ftyp = Box.findFirst(boxes, Box.ftyp);
-                //ftyp.compatible_brands = tags.compatibleBrands;
-            }
-            // remove old udta boxes
-            for (UserDataBox b : moov.<UserDataBox>find(Box.udta)) {
-                moov.boxes.remove(b);
-            }
-            UserDataBox udta = createUdta(tags);
-            moov.boxes.add(udta);
-        }
+        UserDataBox udta = createUdta(inf);
+        moov.boxes.add(udta);
 
         MediaDataBox mdat = new MediaDataBox();
         mdat.length(0);
@@ -606,10 +548,76 @@ public final class Mp4Demuxer {
         if (len > mdatOffset) {
             throw new IOException("Movie header bigger than mdat offset");
         }
-        mdat.length(fOut.length() - len);
+        mdat.length(output.length() - len);
 
-        fOut.seek(0);
+        output.seek(0);
         IsoMedia.write(out, boxes, buf, IsoMedia.OnBoxListener.ALL);
+    }
+
+    private static <T extends Box> T readNext(final InputChannel ch, final ByteBuffer buf) throws IOException {
+        IO.read(ch, 8, buf);
+        int size = buf.getInt();
+        int type = buf.getInt();
+
+        Long largesize = null;
+        if (size == 1) {
+            IO.read(ch, 8, buf);
+            largesize = buf.getLong();
+        }
+
+        byte[] usertype = null;
+        if (type == Box.uuid) {
+            usertype = new byte[16];
+            IO.read(ch, 16, buf);
+            buf.get(usertype);
+        }
+
+        Box b = Box.empty(type);
+        b.size = size;
+        b.largesize = largesize;
+        b.usertype = usertype;
+
+        long r = ch.count();
+        b.read(ch, buf);
+        r = ch.count() - r;
+
+        long length = b.length();
+        if (r < length) {
+            if (type != Box.mdat) {
+                IsoMedia.read(ch, length - r, b, buf, null);
+            }
+        }
+
+        return (T) b;
+    }
+
+    private static <T extends Box> T readUntil(final InputChannel ch, int type, final ByteBuffer buf) throws IOException {
+        Box b = null;
+        try {
+            while ((b = readNext(ch, buf)).type != type) ;
+        } catch (EOFException e) {
+            // ignore
+        }
+        return (T) b;
+    }
+
+    private static int calcMdatOffset(FragmentCtx[] ctxs, Mp4Info inf) throws IOException {
+        int len = 0;
+
+        for (int i = 0; i < ctxs.length; i++) {
+            FragmentCtx ctx = ctxs[i];
+            MovieFragmentBox moof = ctx.moof;
+            MediaDataBox mdat = ctx.mdat;
+
+            int n = (int) (ctx.len / mdat.size);
+            len += n * moof.size * 4;
+        }
+
+
+        len += 100000; // header extra room
+        len += inf.jpg != null ? inf.jpg.length : 0;
+
+        return len;
     }
 
     private static void processChunk(FragmentCtx ctx, long offset) {
@@ -700,7 +708,6 @@ public final class Mp4Demuxer {
     }
 
     private static TrackBox createTrak(int id, FragmentCtx ctx) {
-        // recreate sample tables
         SampleTableBox stbl = ctx.moov.findFirst(Box.stbl);
         TimeToSampleBox stts = stbl.findFirst(Box.stts);
         if (stts != null) {
@@ -749,9 +756,62 @@ public final class Mp4Demuxer {
         return trak;
     }
 
+    private static UserDataBox createUdta(Mp4Info tags) {
+        UserDataBox udta = new UserDataBox();
+
+        MetaBox meta = new MetaBox();
+        udta.boxes.add(meta);
+
+        HandlerBox hdlr = new HandlerBox();
+        hdlr.handler_type = Bits.make4cc("mdir");
+        meta.boxes.add(hdlr);
+
+        AppleItemListBox ilst = new AppleItemListBox();
+        meta.boxes.add(ilst);
+
+        if (tags.title != null) {
+            AppleNameBox cnam = new AppleNameBox();
+            cnam.value(tags.title);
+            ilst.boxes.add(cnam);
+        }
+
+        if (tags.author != null) {
+            AppleArtistBox cART = new AppleArtistBox();
+            cART.value(tags.author);
+            ilst.boxes.add(cART);
+        }
+
+        if (tags.title != null || tags.author != null) {
+            AppleArtist2Box aART = new AppleArtist2Box();
+            aART.value(tags.title + " " + tags.author);
+            ilst.boxes.add(aART);
+        }
+
+        if (tags.title != null || tags.author != null || tags.source != null) {
+            AppleAlbumBox calb = new AppleAlbumBox();
+            calb.value(tags.title + " " + tags.author + " via " + tags.source);
+            ilst.boxes.add(calb);
+        }
+
+        AppleMediaTypeBox stik = new AppleMediaTypeBox();
+        stik.value(1);
+        ilst.boxes.add(stik);
+
+        //moov/udta/meta/ilst/covr/data
+        if (tags.jpg != null) {
+            AppleCoverBox covr = new AppleCoverBox();
+            covr.setJpg(tags.jpg);
+            ilst.boxes.add(covr);
+        }
+
+        return udta;
+    }
+
     private static final class FragmentCtx {
 
-        public FragmentCtx() {
+        public FragmentCtx(long len) {
+            this.len = len;
+
             sttsList = new LinkedList<>();
             cttsList = new LinkedList<>();
             stssList = new LinkedList<>();
@@ -763,65 +823,31 @@ public final class Mp4Demuxer {
             chunkNumber = 1;
         }
 
+        final long len;
+
+        final LinkedList<TimeToSampleBox.Entry> sttsList;
+        final LinkedList<CompositionOffsetBox.Entry> cttsList;
+        final LinkedList<SyncSampleBox.Entry> stssList;
+        final LinkedList<SampleSizeBox.Entry> stszList;
+        final LinkedList<SampleToChunkBox.Entry> stscList;
+        final LinkedList<ChunkOffsetBox.Entry> stcoList;
+
         MovieBox moov;
         MovieFragmentBox moof;
         MediaDataBox mdat;
-
-        LinkedList<TimeToSampleBox.Entry> sttsList;
-        LinkedList<CompositionOffsetBox.Entry> cttsList;
-        LinkedList<SyncSampleBox.Entry> stssList;
-        LinkedList<SampleSizeBox.Entry> stszList;
-        LinkedList<SampleToChunkBox.Entry> stscList;
-        LinkedList<ChunkOffsetBox.Entry> stcoList;
 
         int sampleNumber;
         int chunkNumber;
     }
 
-    private static <T extends Box> T readNext(final InputChannel ch, final ByteBuffer buf) throws IOException {
-        IO.read(ch, 8, buf);
-        int size = buf.getInt();
-        int type = buf.getInt();
-
-        Long largesize = null;
-        if (size == 1) {
-            IO.read(ch, 8, buf);
-            largesize = buf.getLong();
+    private static void notifyCount(DemuxerListener l, long count) {
+        if (l != null) {
+            l.onRead(count);
         }
-
-        byte[] usertype = null;
-        if (type == Box.uuid) {
-            usertype = new byte[16];
-            IO.read(ch, 16, buf);
-            buf.get(usertype);
-        }
-
-        Box b = Box.empty(type);
-        b.size = size;
-        b.largesize = largesize;
-        b.usertype = usertype;
-
-        long r = ch.count();
-        b.read(ch, buf);
-        r = ch.count() - r;
-
-        long length = b.length();
-        if (r < length) {
-            if (type != Box.mdat) {
-                IsoMedia.read(ch, length - r, b, buf, null);
-            }
-        }
-
-        return (T) b;
     }
 
-    private static <T extends Box> T readUntil(final InputChannel ch, int type, final ByteBuffer buf) throws IOException {
-        Box b = null;
-        try {
-            while ((b = readNext(ch, buf)).type != type) ;
-        } catch (EOFException e) {
-            // ignore
-        }
-        return (T) b;
+    public interface DemuxerListener {
+
+        void onRead(long count);
     }
 }

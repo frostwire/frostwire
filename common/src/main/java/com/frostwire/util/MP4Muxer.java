@@ -19,7 +19,7 @@
 package com.frostwire.util;
 
 import com.frostwire.fmp4.Mp4Demuxer;
-import com.frostwire.fmp4.Mp4Tags;
+import com.frostwire.fmp4.Mp4Info;
 import com.frostwire.mp4.*;
 import org.apache.commons.io.IOUtils;
 
@@ -110,10 +110,10 @@ public final class MP4Muxer {
 
     public void demuxAudio(String video, String output, final MP4Metadata mt, Mp4Demuxer.DemuxerListener l) throws IOException {
         try {
-            Mp4Tags tags = null;
+            Mp4Info tags = null;
 
             if (mt != null) {
-                tags = new Mp4Tags();
+                tags = new Mp4Info();
                 tags.compatibleBrands = new int[]{com.frostwire.fmp4.Box.M4A_, com.frostwire.fmp4.Box.mp42, com.frostwire.fmp4.Box.isom, com.frostwire.fmp4.Box.zero};
                 tags.title = mt.title;
                 tags.author = mt.author;

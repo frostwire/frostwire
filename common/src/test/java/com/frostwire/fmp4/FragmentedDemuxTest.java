@@ -242,7 +242,7 @@ public class FragmentedDemuxTest {
         RandomAccessFile in = new RandomAccessFile(fIn, "r");
         RandomAccessFile out = new RandomAccessFile(fOut, "rw");
 
-        Mp4Tags tags = new Mp4Tags();
+        Mp4Info tags = new Mp4Info();
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
         tags.title = "ti";
         tags.author = "au";
@@ -257,7 +257,7 @@ public class FragmentedDemuxTest {
         File fIn = new File("/Users/aldenml/Downloads/video_frag.mp4");
         File fOut = new File("/Users/aldenml/Downloads/test_out_ref.mp4");
 
-        Mp4Tags tags = new Mp4Tags();
+        Mp4Info tags = new Mp4Info();
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
         tags.title = "ti";
         tags.author = "au";
@@ -273,7 +273,7 @@ public class FragmentedDemuxTest {
         File fIn2 = new File("/Users/aldenml/Downloads/audio_frag.mp4");
         File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
 
-        Mp4Tags tags = new Mp4Tags();
+        Mp4Info tags = new Mp4Info();
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
         tags.title = "ti";
         tags.author = "au";

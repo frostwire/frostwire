@@ -36,7 +36,7 @@ public class SimpleDemuxTest {
         File fIn = new File("/Users/aldenml/Downloads/test_raw.m4a");
         File fOut = new File("/Users/aldenml/Downloads/test_out.mp4");
 
-        Mp4Tags tags = new Mp4Tags();
+        Mp4Info tags = new Mp4Info();
         tags.compatibleBrands = new int[]{Bits.make4cc("M4A "), Bits.make4cc("mp42"), Bits.make4cc("isom"), Bits.make4cc("\0\0\0\0")};
         tags.title = "ti";
         tags.author = "au";
