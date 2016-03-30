@@ -43,6 +43,6 @@ public class SimpleDemuxTest {
         tags.album = "sr";
         tags.jpg = null;
 
-        Mp4Demuxer.audio(fIn, fOut, tags);
+        Mp4Demuxer.audio(fIn, fOut, tags, null);
     }
 }
