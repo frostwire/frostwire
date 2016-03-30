@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,8 +65,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private final ImageLoader thumbnailLoader;
     private final DownloadButtonClickListener downloadButtonClickListener;
     private final FileListFilter fileListFilter;
+    private OnDeleteFilesListener onDeleteFilesListener;
 
-    public FileListAdapter(Context context, List<FileDescriptor> files, byte fileType) {
+    protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType, OnDeleteFilesListener onDeleteFilesListener) {
         super(context, getViewItemId(fileType), convertFiles(files));
 
         setShowMenuOnClick(true);
@@ -76,8 +77,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         this.fileType = fileType;
         this.thumbnailLoader = ImageLoader.getInstance(context);
-
         this.downloadButtonClickListener = new DownloadButtonClickListener();
+        this.onDeleteFilesListener = onDeleteFilesListener;
 
         checkSDStatus();
     }
@@ -99,7 +100,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     protected MenuAdapter getMenuAdapter(View view) {
         Context context = getContext();
 
-        List<MenuAction> items = new ArrayList<MenuAction>();
+        List<MenuAction> items = new ArrayList<>();
 
         // due to long click generic handle
         FileDescriptor fd = null;
@@ -139,7 +140,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 items.add(new RenameFileMenuAction(context, this, fd));
             }
 
-            if (fd.mime == Constants.MIME_TYPE_BITTORRENT && numChecked <= 1) {
+            if (fd.mime.equals(Constants.MIME_TYPE_BITTORRENT) && numChecked <= 1) {
                 items.add(new CopyToClipboardMenuAction(context,
                         R.drawable.contextmenu_icon_magnet,
                         R.string.transfers_context_menu_copy_magnet,
@@ -167,7 +168,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS) {
             items.add(new SendFileMenuAction(context, fd));
-            items.add(new DeleteFileMenuAction(context, this, list));
+            items.add(new DeleteFileMenuAction(context, this, list, onDeleteFilesListener));
         }
 
         return new MenuAdapter(context, fd.title, items);
@@ -470,6 +471,10 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
 
         return false;
+    }
+
+    public void setOnDeleteFilesListener(OnDeleteFilesListener onDeleteFilesListener) {
+        this.onDeleteFilesListener = onDeleteFilesListener;
     }
 
     private static final class MagnetUriBuilder {

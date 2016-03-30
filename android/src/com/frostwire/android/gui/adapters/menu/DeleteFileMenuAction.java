@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(TM). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.FileListAdapter;
+import com.frostwire.android.gui.adapters.OnDeleteFilesListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 
@@ -42,12 +43,13 @@ public class DeleteFileMenuAction extends MenuAction {
 
     private final FileListAdapter adapter;
     private final List<FileDescriptor> files;
+    private final OnDeleteFilesListener onDeleteFilesListener;
 
-    public DeleteFileMenuAction(Context context, FileListAdapter adapter, List<FileDescriptor> files) {
+    public DeleteFileMenuAction(Context context, FileListAdapter adapter, List<FileDescriptor> files, OnDeleteFilesListener onDeleteFilesListener) {
         super(context, R.drawable.contextmenu_icon_trash, files.size() > 1 ? R.string.delete_file_menu_action_count : R.string.delete_file_menu_action, files.size());
-
         this.adapter = adapter;
         this.files = files;
+        this.onDeleteFilesListener = onDeleteFilesListener;
     }
 
     @Override
@@ -71,6 +73,13 @@ public class DeleteFileMenuAction extends MenuAction {
             protected Void doInBackground(Void... params) {
                 Librarian.instance().deleteFiles(adapter.getFileType(), new ArrayList<FileDescriptor>(files), getContext());
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                if (onDeleteFilesListener != null) {
+                    onDeleteFilesListener.onDeleteFiles(files);
+                }
             }
         }.execute();
     }

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Finger;
 import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.FileListAdapter;
+import com.frostwire.android.gui.adapters.OnDeleteFilesListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.BrowsePeerSearchBarView;
@@ -57,7 +58,7 @@ import java.util.Set;
  * @author gubatron
  * @author aldenml
  */
-public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment {
+public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment, OnDeleteFilesListener {
     private static final Logger LOG = Logger.getLogger(BrowsePeerFragment.class);
     private static final int LOADER_FILES_ID = 0;
     private final BroadcastReceiver broadcastReceiver;
@@ -318,22 +319,16 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     private void updateHeader() {
-        if (finger == null) {
-            if (peer == null) {
-                LOG.warn("Something wrong, finger  and peer are null");
-                return;
-            } else {
-
-                finger = peer.finger();
-            }
+        if (peer == null) {
+            LOG.warn("Something wrong, finger  and peer are null");
+            return;
         }
 
+        finger = peer.finger();
+
         if (header != null) {
-
             byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
-
             int numTotal = 0;
-
             switch (fileType) {
                 case Constants.FILE_TYPE_TORRENTS:
                     numTotal = finger.numTotalTorrentFiles;
@@ -390,7 +385,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
             @SuppressWarnings("unchecked")
             List<FileDescriptor> items = (List<FileDescriptor>) data[1];
-            adapter = new FileListAdapter(getActivity(), items, fileType) {
+            adapter = new FileListAdapter(getActivity(), items, fileType, this) {
 
                 @Override
                 protected void onItemChecked(CompoundButton v, boolean isChecked) {
@@ -408,6 +403,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 }
             };
             adapter.setCheckboxesVisibility(true);
+            adapter.setOnDeleteFilesListener(this);
             restorePreviouslyChecked();
             restorePreviousFilter();
             list.setAdapter(adapter);
@@ -425,6 +421,11 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private int getSavedListViewVisiblePosition(byte fileType) {
         //will return 0 if not found.
         return ConfigurationManager.instance().getInt(Constants.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION + fileType);
+    }
+
+    @Override
+    public void onDeleteFiles(List<FileDescriptor> files) {
+        updateHeader();
     }
 
     private final class LocalBroadcastReceiver extends BroadcastReceiver {
