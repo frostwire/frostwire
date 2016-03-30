@@ -20,6 +20,8 @@ package com.frostwire.gui.library;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.fmp4.Mp4Demuxer;
+import com.frostwire.fmp4.Mp4Info;
 import com.frostwire.gui.bittorrent.*;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
@@ -983,12 +985,13 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
                 try {
                     System.out.println("Demuxing file " + file.getAbsolutePath());
 
-                    String mp4 = file.getAbsolutePath();
-                    String m4a = new File(file.getParentFile(), FilenameUtils.getBaseName(mp4) + ".m4a").getAbsolutePath();
+                    File mp4 = file.getAbsoluteFile();
+                    File m4a = new File(file.getParentFile(), FilenameUtils.getBaseName(mp4.getName()) + ".m4a").getAbsoluteFile();
                     try {
-                        new MP4Muxer().demuxAudio(mp4, m4a, null, null);
-                        demuxedFiles.add(new File(m4a));
-                        updateDemuxingStatus(new File(m4a), files.size(), true);
+                        Mp4Info inf = Mp4Info.audio(null, null, null, null);
+                        Mp4Demuxer.audio(mp4, m4a, inf, null);
+                        demuxedFiles.add(m4a);
+                        updateDemuxingStatus(m4a, files.size(), true);
                     } catch (Throwable e) {
                         updateDemuxingStatus(file, files.size(), false);
                     }
