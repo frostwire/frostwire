@@ -2,6 +2,7 @@ FrostWire 1.7.2 - MARCH/29/2016
  - Improved connection status display on Transfers screen.
  - Faster mp4 -> m4a demuxing with FrostWire's own mp4 demuxing implementation.
  - Demuxer progress is reported in the user interface.
+ - My Files file count is updated when files are deleted.
  - Updated libraries: gson v2.6.2, okhttp v2.7.5, rxjava v1.1.1,
    android support v4.23.2.0
  - New jlibtorrent 1.1.0.22.
