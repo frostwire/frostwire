@@ -25,6 +25,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.fmp4.Mp4Demuxer;
+import com.frostwire.fmp4.Mp4Info;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
@@ -32,8 +33,6 @@ import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.MP4Muxer;
-import com.frostwire.util.MP4Muxer.MP4Metadata;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListener;
 import org.apache.commons.io.FileUtils;
@@ -88,7 +87,6 @@ public final class YouTubeDownload implements DownloadTransfer {
     private long totalReceivedSinceLastSpeedStamp;
 
     private long demuxerReadCount;
-    private long demuxerWriteCount;
 
     YouTubeDownload(TransferManager manager, YouTubeCrawledSearchResult sr) {
         this.manager = manager;
@@ -519,11 +517,10 @@ public final class YouTubeDownload implements DownloadTransfer {
             } else if (downloadType == DownloadType.DEMUX) {
                 try {
                     status = STATUS_DEMUXING;
-                    new MP4Muxer().demuxAudio(tempAudio.getAbsolutePath(), completeFile.getAbsolutePath(), buildMetadata(), new Mp4Demuxer.DemuxerListener() {
+                    Mp4Demuxer.audio(tempAudio.getAbsoluteFile(), completeFile.getAbsoluteFile(), buildMp4Info(true), new Mp4Demuxer.DemuxerListener() {
                         @Override
-                        public void onCount(long readCount, long writeCount) {
+                        public void onRead(long readCount) {
                             demuxerReadCount = readCount;
-                            demuxerWriteCount = writeCount;
                         }
                     });
 
@@ -542,7 +539,7 @@ public final class YouTubeDownload implements DownloadTransfer {
                 } else if (tempVideo.exists() && tempAudio.exists()) {
                     try {
                         status = STATUS_DEMUXING;
-                        new MP4Muxer().mux(tempVideo.getAbsolutePath(), tempAudio.getAbsolutePath(), completeFile.getAbsolutePath(), buildMetadata());
+                        Mp4Demuxer.muxFragments(tempVideo.getAbsoluteFile(), tempAudio.getAbsoluteFile(), completeFile.getAbsoluteFile(), buildMp4Info(false), null);
 
                         if (!completeFile.exists()) {
                             //error(null);
@@ -601,7 +598,7 @@ public final class YouTubeDownload implements DownloadTransfer {
         return sr.getFilename().equals(((YouTubeDownload) obj).sr.getFilename());
     }
 
-    private MP4Metadata buildMetadata() {
+    private Mp4Info buildMp4Info(boolean audio) {
         String title = sr.getDisplayName();
         String author = sr.getSource();
         String source = "YouTube.com";
@@ -622,6 +619,10 @@ public final class YouTubeDownload implements DownloadTransfer {
 
         byte[] jpg = jpgUrl != null ? HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(jpgUrl) : null;
 
-        return new MP4Metadata(title, author, source, jpg);
+        if (audio) {
+            return Mp4Info.audio(title, author, source, jpg);
+        } else {
+            return Mp4Info.avc(title, author, source, jpg);
+        }
     }
 }

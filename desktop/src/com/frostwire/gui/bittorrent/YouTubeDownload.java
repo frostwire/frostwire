@@ -27,8 +27,6 @@ import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.MP4Muxer;
-import com.frostwire.util.MP4Muxer.MP4Metadata;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListener;
 import com.limegroup.gnutella.gui.iTunesMediator;
@@ -500,21 +498,6 @@ public class YouTubeDownload implements BTDownload {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof YouTubeDownload && sr.getDownloadUrl().equals(((YouTubeDownload) obj).sr.getDownloadUrl());
-    }
-
-    private MP4Metadata buildMetadata() {
-        String title = sr.getDisplayName();
-        String author = sr.getDetailsUrl();
-        String source = "YouTube.com";
-
-        String jpgUrl = sr.getVideo() != null ? sr.getVideo().thumbnails.normal : null;
-        if (jpgUrl == null && sr.getAudio() != null) {
-            jpgUrl = sr.getAudio() != null ? sr.getAudio().thumbnails.normal : null;
-        }
-
-        byte[] jpg = jpgUrl != null ? HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(jpgUrl) : null;
-
-        return new MP4Metadata(title, author, source, jpg);
     }
 
     private Mp4Info buildMp4Info(boolean audio) {
