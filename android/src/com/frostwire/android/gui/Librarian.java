@@ -159,7 +159,7 @@ public final class Librarian {
         List<Integer> ids = new ArrayList<>(fds.size());
         final int audioMediaType = MediaType.getAudioMediaType().getId();
         for (FileDescriptor fd : fds) {
-            if (new File(fd.filePath).delete()) {
+            if (Platforms.fileSystem().delete(new File(fd.filePath))) {
                 ids.add(fd.id);
                 if (context != null && fileType == fd.fileType && fileType == audioMediaType) {
                     MusicUtils.removeSongFromAllPlaylists(context, fd.id);
