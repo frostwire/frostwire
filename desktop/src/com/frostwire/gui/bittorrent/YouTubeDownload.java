@@ -20,6 +20,8 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.mp4.Box;
+import com.frostwire.mp4.IsoFile;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
 import com.frostwire.gui.player.MediaPlayer;
@@ -34,10 +36,14 @@ import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.iTunesSettings;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.limewire.util.OSUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -376,9 +382,26 @@ public class YouTubeDownload implements BTDownload {
             }
         }
 
+        private void removeUdta(File mp4) throws IOException {
+            RandomAccessFile f = new RandomAccessFile(mp4, "rw");
+            try {
+                IsoFile.free(f, Box.udta, ByteBuffer.allocate(100 * 1024));
+            } finally {
+                IOUtils.closeQuietly(f);
+            }
+        }
+
         @Override
         public void onComplete(HttpClient client) {
             if (downloadType == DownloadType.VIDEO) {
+                try {
+                    removeUdta(tempVideo);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    state = TransferState.ERROR_MOVING_INCOMPLETE;
+                    cleanupIncomplete();
+                    return;
+                }
                 boolean renameTo = tempVideo.renameTo(completeFile);
 
                 if (!renameTo) {
