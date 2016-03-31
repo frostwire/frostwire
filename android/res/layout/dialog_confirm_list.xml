@@ -18,42 +18,34 @@
 */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/default_dialog_background"
     android:orientation="vertical"
-    android:padding="0dp"
     android:scrollbars="vertical">
 
     <TextView
-        android:id="@+id/dialog_confirm_list_text"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="this is a parameter"
-        android:textSize="18sp" />
-
-    <View
+        android:id="@+id/dialog_confirm_list_title"
+        style="@style/DefaultDialogTheme.TitleBar"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/basic_blue_highlight"></View>
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ffe4e9ec"
-        android:orientation="horizontal"
-        android:paddingBottom="2dp"
-        android:paddingRight="5dp"
-        android:paddingTop="2dp"><!-- TODO for @marcelinkaaa Use theme colors. -->
+        android:orientation="horizontal">
 
         <CheckBox
             android:id="@+id/dialog_confirm_list_select_all_checkbox"
-            android:layout_width="wrap_content"
+            style="@style/DefaultDialogTheme.SmallTextMedium"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
+            android:background="@color/basic_gray_medium"
+            android:checked="true"
             android:gravity="left|center_vertical"
-            android:text="@string/select_all"
-            android:visibility="visible" />
+            android:padding="5dp"
+            android:text="@string/select_all" />
     </LinearLayout>
 
     <com.frostwire.android.gui.views.ListView
@@ -61,7 +53,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/body_background_gray_light"
         android:fastScrollEnabled="true" />
 
     <!-- summary of what was selected, only visible for selection mode in [multiple choice, no-choice] -->
@@ -78,25 +69,24 @@
         <!-- the number of selected items -->
         <TextView
             android:id="@+id/dialog_confirm_list_num_checked_textview"
+            style="@style/DefaultDialogTheme.SmallTextMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight=".5"
-            android:textSize="@dimen/text_small"
-            android:textStyle="bold" />
+            android:layout_weight=".5" />
 
         <!-- selection sum, e.g. for files, this would be the number of total bytes -->
         <TextView
             android:id="@+id/dialog_confirm_list_sum_checked_textview"
+            style="@style/DefaultDialogTheme.SmallText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight=".5"
-            android:gravity="right"
-            android:textSize="@dimen/text_small" />
+            android:gravity="right" />
     </LinearLayout>
 
     <!-- buttons -->
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/basic_gray_medium"
         android:orientation="horizontal"
@@ -106,24 +96,22 @@
 
         <Button
             android:id="@+id/dialog_confirm_list_button_no"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:background="@color/app_light_background"
             android:minLines="1"
-            android:text="@android:string/no"
-            android:textSize="15sp" />
+            android:text="@android:string/no" />
 
         <Button
             android:id="@+id/dialog_confirm_list_button_yes"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="1dp"
             android:layout_weight="0.5"
             android:background="@color/app_light_background"
             android:minLines="1"
-            android:text="@android:string/yes"
-            android:textSize="15sp" />
+            android:text="@android:string/yes" />
     </LinearLayout>
 
 </LinearLayout>

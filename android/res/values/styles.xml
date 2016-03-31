@@ -481,8 +481,8 @@
 
     <!-- Default Dialog -->
     <style name="DefaultDialogTheme">
-        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
-        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+        <!--<item name="android:windowMinWidthMajor">@dimen/dialog_min_width_major</item>-->
+        <!--<item name="android:windowMinWidthMinor">@dimen/dialog_min_width_minor</item>-->
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:headerDividersEnabled">false</item>
@@ -500,10 +500,16 @@
     </style>
     <style name="DefaultDialogTheme.SmallText">
         <item name="android:textSize">@dimen/text_small</item>
-        <item name="android:textColor">@color/frostwire_gray_explanation_text_dark</item>
+        <item name="android:textColor">@color/app_text_secondary</item>
         <item name="android:padding">3dp</item>
     </style>
     <style name="DefaultDialogTheme.Buttons">
         <item name="android:textSize">@dimen/text_large</item>
+    </style>
+    <style name="DefaultDialogTheme.SmallTextMedium">
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textColor">@color/app_text_secondary</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
  </resources>
