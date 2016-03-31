@@ -124,7 +124,7 @@ class MP4Parser extends AbstractTagParser {
     }
 
     private String getBitRate(LinkedList<Box> boxes) {
-        return ""; // deep research of atoms per codec
+        return ""; // TODO: deep research of atoms per codec
     }
 
     private <T extends AppleUtf8Box> String getBoxValue(AppleItemListBox ilst, int type) {

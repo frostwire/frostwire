@@ -525,7 +525,7 @@ public class YouTubeDownload implements BTDownload {
 
     private Mp4Info buildMp4Info(boolean audio) {
         String title = sr.getDisplayName();
-        String author = sr.getDetailsUrl();
+        String author = sr.getAuthor();
         String source = "YouTube.com";
 
         String jpgUrl = sr.getVideo() != null ? sr.getVideo().thumbnails.normal : null;
