@@ -21,20 +21,22 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 
-import com.frostwire.mp4.*;
+import com.frostwire.fmp4.*;
+import com.frostwire.mp4.AppleTrackNumberBox;
 import org.apache.commons.io.IOUtils;
 
 import com.frostwire.logging.Logger;
 
 /**
- * 
  * @author aldenml
- *
  */
 class MP4Parser extends AbstractTagParser {
 
@@ -49,34 +51,23 @@ class MP4Parser extends AbstractTagParser {
         TagsData data = null;
 
         try {
-            BoxParser parser = new PropertyBoxParserImpl() {
-                @Override
-                public Box parseBox(DataSource byteChannel, Container parent) throws IOException {
-                    Box box = super.parseBox(byteChannel, parent);
-
-                    if (box instanceof AbstractBox) {
-                        ((AbstractBox) box).parseDetails();
-                    }
-
-                    return box;
-                }
-            };
-            IsoFile iso = new IsoFile(new FileDataSourceImpl(file), parser);
+            RandomAccessFile iso = new RandomAccessFile(file, "r");
+            LinkedList<Box> boxes = IsoFile.head(iso, ByteBuffer.allocate(100 * 1024));
 
             try {
 
-                int duration = getDuration(iso);
-                String bitrate = getBitRate(iso);
+                int duration = getDuration(boxes);
+                String bitrate = getBitRate(boxes);
 
-                AppleItemListBox ilst = (AppleItemListBox) Path.getPath(iso.getMovieBox(), "/moov/udta/meta/ilst");
-                
-                String title = getBoxValue(ilst, AppleNameBox.class);
-                String artist = getBoxValue(ilst, AppleArtistBox.class);
-                String album = getBoxValue(ilst, AppleAlbumBox.class);
-                String comment = getBoxValue(ilst, AppleCommentBox.class);
+                AppleItemListBox ilst = Box.findFirst(boxes, Box.ilst);
+
+                String title = getBoxValue(ilst, Box.Cnam);
+                String artist = getBoxValue(ilst, Box.CART);
+                String album = getBoxValue(ilst, Box.Calb);
+                String comment = getBoxValue(ilst, Box.Ccmt);
                 String genre = getGenre(ilst);
-                String track = getTrackNumberValue(ilst);
-                String year = getBoxValue(ilst, AppleRecordingYear2Box.class);
+                String track = ""; //getTrackNumberValue(ilst);
+                String year = "";// getBoxValue(ilst, AppleRecordingYear2Box.class);
 
                 data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year);
 
@@ -100,29 +91,17 @@ class MP4Parser extends AbstractTagParser {
         BufferedImage image = null;
 
         try {
-            BoxParser parser = new PropertyBoxParserImpl() {
-                @Override
-                public Box parseBox(DataSource byteChannel, Container parent) throws IOException {
-                    Box box = super.parseBox(byteChannel, parent);
-
-                    if (box instanceof AbstractBox) {
-                        ((AbstractBox) box).parseDetails();
-                    }
-
-                    return box;
-                }
-            };
-            IsoFile iso = new IsoFile(new FileDataSourceImpl(file), parser);
+            RandomAccessFile iso = new RandomAccessFile(file, "r");
+            LinkedList<Box> boxes = IsoFile.head(iso, ByteBuffer.allocate(100 * 1024));
 
             try {
 
-                AppleCoverBox data = (AppleCoverBox) Path.getPath(iso.getMovieBox(), "/moov/udta/meta/ilst/covr");
-                data.parseDetails();
+                AppleCoverBox data = Box.findFirst(boxes, Box.covr);
                 if (data != null) {
-                    byte[] imageData = data.getCoverData();
-                    if (data.getDataType() == 13) { // jpg
+                    byte[] imageData = data.value();
+                    if (data.dataType() == 13) { // jpg
                         image = imageFromData(imageData);
-                    } else if (data.getDataType() == 14) { // png
+                    } else if (data.dataType() == 14) { // png
                         try {
                             image = ImageIO.read(new ByteArrayInputStream(imageData, 0, imageData.length));
                         } catch (IIOException e) {
@@ -140,209 +119,201 @@ class MP4Parser extends AbstractTagParser {
         return image;
     }
 
-    private int getDuration(IsoFile iso) {
-        MovieHeaderBox mvhd = iso.getMovieBox().getMovieHeaderBox();
-        return (int) (mvhd.getDuration() / mvhd.getTimescale());
+    private int getDuration(LinkedList<Box> boxes) {
+        MovieHeaderBox mvhd = Box.findFirst(boxes, Box.mvhd);
+        return (int) (mvhd.duration() / mvhd.timescale());
     }
 
-    private String getBitRate(IsoFile iso) {
+    private String getBitRate(LinkedList<Box> boxes) {
         return ""; // deep research of atoms per codec
     }
 
-    private <T extends Utf8AppleDataBox> String getBoxValue(AppleItemListBox ilst, Class<T> clazz) {
-        String value = "";
-        List<T> boxes = ilst.getBoxes(clazz);
-        if (boxes != null && !boxes.isEmpty()) {
-            value = boxes.get(0).getValue();
-        }
-        return value;
+    private <T extends AppleUtf8Box> String getBoxValue(AppleItemListBox ilst, int type) {
+        T b = ilst.findFirst(type);
+        return b != null ? b.value() : "";
     }
-    
-    private String getTrackNumberValue(AppleItemListBox ilst) {
-        String value = "";
-        List<AppleTrackNumberBox> boxes = ilst.getBoxes(AppleTrackNumberBox.class);
-        if (boxes != null && !boxes.isEmpty()) {
-            value = String.valueOf(boxes.get(0).getA());
-        }
-        return value;
-    }
-    
-    private <T extends AppleVariableSignedIntegerBox> long getBoxLongValue(AppleItemListBox ilst, Class<T> clazz) {
-        long value = -1;
-        List<T> boxes = ilst.getBoxes(clazz);
-        if (boxes != null && !boxes.isEmpty()) {
-            value = boxes.get(0).getValue();
-        }
-        return value;
+
+//    private String getTrackNumberValue(AppleItemListBox ilst) {
+//        String value = "";
+//        List<AppleTrackNumberBox> boxes = ilst.find(AppleTrackNumberBox.class);
+//        if (boxes != null && !boxes.isEmpty()) {
+//            value = String.valueOf(boxes.get(0).getA());
+//        }
+//        return value;
+//    }
+
+    private <T extends AppleIntegerBox> long getBoxLongValue(AppleItemListBox ilst, int type) {
+        AppleIntegerBox b = ilst.findFirst(type);
+        return b != null ? b.value() : -1;
     }
 
     private String getGenre(AppleItemListBox ilst) {
         String value = null;
-        
-        long valueId = getBoxLongValue(ilst, AppleGenreIDBox.class);
-        
+
+        long valueId = getBoxLongValue(ilst, Box.gnre);
+
         if (0 <= valueId && valueId < ID3_GENRES.length) {
-            value = ID3_GENRES[(int)valueId];
+            value = ID3_GENRES[(int) valueId];
         }
-        
+
         if (value == null || value.equals("")) {
-            value = getBoxValue(ilst, AppleGenreBox.class);
+            value = getBoxValue(ilst, Box.Cgen);
         }
         return value;
     }
-    
+
     private static final String[] ID3_GENRES = {
-        // ID3v1 Genres
-        "Blues",
-        "Classic Rock",
-        "Country",
-        "Dance",
-        "Disco",
-        "Funk",
-        "Grunge",
-        "Hip-Hop",
-        "Jazz",
-        "Metal",
-        "New Age",
-        "Oldies",
-        "Other",
-        "Pop",
-        "R&B",
-        "Rap",
-        "Reggae",
-        "Rock",
-        "Techno",
-        "Industrial",
-        "Alternative",
-        "Ska",
-        "Death Metal",
-        "Pranks",
-        "Soundtrack",
-        "Euro-Techno",
-        "Ambient",
-        "Trip-Hop",
-        "Vocal",
-        "Jazz+Funk",
-        "Fusion",
-        "Trance",
-        "Classical",
-        "Instrumental",
-        "Acid",
-        "House",
-        "Game",
-        "Sound Clip",
-        "Gospel",
-        "Noise",
-        "AlternRock",
-        "Bass",
-        "Soul",
-        "Punk",
-        "Space",
-        "Meditative",
-        "Instrumental Pop",
-        "Instrumental Rock",
-        "Ethnic",
-        "Gothic",
-        "Darkwave",
-        "Techno-Industrial",
-        "Electronic",
-        "Pop-Folk",
-        "Eurodance",
-        "Dream",
-        "Southern Rock",
-        "Comedy",
-        "Cult",
-        "Gangsta",
-        "Top 40",
-        "Christian Rap",
-        "Pop/Funk",
-        "Jungle",
-        "Native American",
-        "Cabaret",
-        "New Wave",
-        "Psychadelic",
-        "Rave",
-        "Showtunes",
-        "Trailer",
-        "Lo-Fi",
-        "Tribal",
-        "Acid Punk",
-        "Acid Jazz",
-        "Polka",
-        "Retro",
-        "Musical",
-        "Rock & Roll",
-        "Hard Rock",
-        // The following genres are Winamp extensions
-        "Folk",
-        "Folk-Rock",
-        "National Folk",
-        "Swing",
-        "Fast Fusion",
-        "Bebob",
-        "Latin",
-        "Revival",
-        "Celtic",
-        "Bluegrass",
-        "Avantgarde",
-        "Gothic Rock",
-        "Progressive Rock",
-        "Psychedelic Rock",
-        "Symphonic Rock",
-        "Slow Rock",
-        "Big Band",
-        "Chorus",
-        "Easy Listening",
-        "Acoustic",
-        "Humour",
-        "Speech",
-        "Chanson",
-        "Opera",
-        "Chamber Music",
-        "Sonata",
-        "Symphony",
-        "Booty Bass",
-        "Primus",
-        "Porn Groove",
-        "Satire",
-        "Slow Jam",
-        "Club",
-        "Tango",
-        "Samba",
-        "Folklore",
-        "Ballad",
-        "Power Ballad",
-        "Rhythmic Soul",
-        "Freestyle",
-        "Duet",
-        "Punk Rock",
-        "Drum Solo",
-        "A capella",
-        "Euro-House",
-        "Dance Hall",
-        // The following ones seem to be fairly widely supported as well
-        "Goa",
-        "Drum & Bass",
-        "Club-House",
-        "Hardcore",
-        "Terror",
-        "Indie",
-        "Britpop",
-        null,
-        "Polsk Punk",
-        "Beat",
-        "Christian Gangsta",
-        "Heavy Metal",
-        "Black Metal",
-        "Crossover",
-        "Contemporary Christian",
-        "Christian Rock",
-        "Merengue",
-        "Salsa",
-        "Thrash Metal",
-        "Anime",
-        "JPop",
-        "Synthpop",
-        // 148 and up don't seem to have been defined yet.
+            // ID3v1 Genres
+            "Blues",
+            "Classic Rock",
+            "Country",
+            "Dance",
+            "Disco",
+            "Funk",
+            "Grunge",
+            "Hip-Hop",
+            "Jazz",
+            "Metal",
+            "New Age",
+            "Oldies",
+            "Other",
+            "Pop",
+            "R&B",
+            "Rap",
+            "Reggae",
+            "Rock",
+            "Techno",
+            "Industrial",
+            "Alternative",
+            "Ska",
+            "Death Metal",
+            "Pranks",
+            "Soundtrack",
+            "Euro-Techno",
+            "Ambient",
+            "Trip-Hop",
+            "Vocal",
+            "Jazz+Funk",
+            "Fusion",
+            "Trance",
+            "Classical",
+            "Instrumental",
+            "Acid",
+            "House",
+            "Game",
+            "Sound Clip",
+            "Gospel",
+            "Noise",
+            "AlternRock",
+            "Bass",
+            "Soul",
+            "Punk",
+            "Space",
+            "Meditative",
+            "Instrumental Pop",
+            "Instrumental Rock",
+            "Ethnic",
+            "Gothic",
+            "Darkwave",
+            "Techno-Industrial",
+            "Electronic",
+            "Pop-Folk",
+            "Eurodance",
+            "Dream",
+            "Southern Rock",
+            "Comedy",
+            "Cult",
+            "Gangsta",
+            "Top 40",
+            "Christian Rap",
+            "Pop/Funk",
+            "Jungle",
+            "Native American",
+            "Cabaret",
+            "New Wave",
+            "Psychadelic",
+            "Rave",
+            "Showtunes",
+            "Trailer",
+            "Lo-Fi",
+            "Tribal",
+            "Acid Punk",
+            "Acid Jazz",
+            "Polka",
+            "Retro",
+            "Musical",
+            "Rock & Roll",
+            "Hard Rock",
+            // The following genres are Winamp extensions
+            "Folk",
+            "Folk-Rock",
+            "National Folk",
+            "Swing",
+            "Fast Fusion",
+            "Bebob",
+            "Latin",
+            "Revival",
+            "Celtic",
+            "Bluegrass",
+            "Avantgarde",
+            "Gothic Rock",
+            "Progressive Rock",
+            "Psychedelic Rock",
+            "Symphonic Rock",
+            "Slow Rock",
+            "Big Band",
+            "Chorus",
+            "Easy Listening",
+            "Acoustic",
+            "Humour",
+            "Speech",
+            "Chanson",
+            "Opera",
+            "Chamber Music",
+            "Sonata",
+            "Symphony",
+            "Booty Bass",
+            "Primus",
+            "Porn Groove",
+            "Satire",
+            "Slow Jam",
+            "Club",
+            "Tango",
+            "Samba",
+            "Folklore",
+            "Ballad",
+            "Power Ballad",
+            "Rhythmic Soul",
+            "Freestyle",
+            "Duet",
+            "Punk Rock",
+            "Drum Solo",
+            "A capella",
+            "Euro-House",
+            "Dance Hall",
+            // The following ones seem to be fairly widely supported as well
+            "Goa",
+            "Drum & Bass",
+            "Club-House",
+            "Hardcore",
+            "Terror",
+            "Indie",
+            "Britpop",
+            null,
+            "Polsk Punk",
+            "Beat",
+            "Christian Gangsta",
+            "Heavy Metal",
+            "Black Metal",
+            "Crossover",
+            "Contemporary Christian",
+            "Christian Rock",
+            "Merengue",
+            "Salsa",
+            "Thrash Metal",
+            "Anime",
+            "JPop",
+            "Synthpop",
+            // 148 and up don't seem to have been defined yet.
     };
 }
