@@ -34,7 +34,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
     private static final int DEFAULT_CRAWL_TIMEOUT = 10000; // 10 seconds.
     private static final int FAILED_CRAWL_URL_CACHE_LIFETIME = 600000; // 10 minutes.
-    private static final int DEFAULT_MAGNET_DOWNLOAD_TIMEOUT = 20000; // 20 seconds.
+    private static final int DEFAULT_MAGNET_DOWNLOAD_TIMEOUT_SECS = 20; // 20 seconds.
 
     private static CrawlCache cache = null;
     private static MagnetDownloader magnetDownloader = null;
@@ -153,7 +153,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
     protected byte[] fetchMagnet(String magnet) {
         if (magnetDownloader != null) {
-            return magnetDownloader.download(magnet, DEFAULT_MAGNET_DOWNLOAD_TIMEOUT);
+            return magnetDownloader.download(magnet, DEFAULT_MAGNET_DOWNLOAD_TIMEOUT_SECS);
         } else {
             LOG.warn("Magnet downloader not set, download not supported: " + magnet);
             return null;
