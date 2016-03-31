@@ -30,7 +30,6 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 
 import com.frostwire.fmp4.*;
-import com.frostwire.mp4.AppleTrackNumberBox;
 import org.apache.commons.io.IOUtils;
 
 import com.frostwire.logging.Logger;

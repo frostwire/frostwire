@@ -20,12 +20,10 @@ package com.frostwire.gui.player;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
+import com.frostwire.fmp4.*;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.mplayer.MPlayer;
-import com.frostwire.mp4.*;
-import com.frostwire.mp4.Box;
-import com.frostwire.mp4.Container;
 import com.frostwire.mplayer.IcyInfoListener;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.frostwire.mplayer.PositionListener;
@@ -43,11 +41,14 @@ import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
+import javax.swing.Box;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.lang.Math;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.List;
 import java.util.Queue;
@@ -286,22 +287,12 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
 
     private long getDurationFromM4A(File f) {
         try {
-            BoxParser parser = new PropertyBoxParserImpl() {
-                @Override
-                public Box parseBox(DataSource byteChannel, Container parent) throws IOException {
-                    Box box = super.parseBox(byteChannel, parent);
-
-                    if (box instanceof AbstractBox) {
-                        ((AbstractBox) box).parseDetails();
-                    }
-
-                    return box;
-                }
-            };
-            IsoFile isoFile = new IsoFile(new FileDataSourceImpl(f), parser);
+            RandomAccessFile isoFile = new RandomAccessFile(f, "r");
+            LinkedList<com.frostwire.fmp4.Box> boxes = IsoFile.head(isoFile, ByteBuffer.allocate(100 * 1024));
 
             try {
-                return isoFile.getMovieBox().getMovieHeaderBox().getDuration() / isoFile.getMovieBox().getMovieHeaderBox().getTimescale();
+                MovieHeaderBox mvhd = com.frostwire.fmp4.Box.findFirst(boxes, com.frostwire.fmp4.Box.mvhd);
+                return mvhd.duration() / mvhd.timescale();
             } finally {
                 IOUtils.closeQuietly(isoFile);
             }
