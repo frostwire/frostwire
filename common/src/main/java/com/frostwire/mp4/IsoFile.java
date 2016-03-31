@@ -74,4 +74,47 @@ public final class IsoFile {
 
         return n.get();
     }
+
+    /**
+     * This method replace the boxes with type {@code type} with a
+     * free space box only in the header.
+     *
+     * @param in
+     * @param type
+     * @param buf
+     * @throws IOException
+     */
+    public static void free(RandomAccessFile in, final int type, final ByteBuffer buf) throws IOException {
+        in.seek(0);
+
+        final InputChannel ch = new InputChannel(in.getChannel());
+        final LinkedList<Box> boxes = new LinkedList<>();
+
+        IsoMedia.read(ch, buf, new IsoMedia.OnBoxListener() {
+            @Override
+            public boolean onBox(Box b) throws IOException {
+                if (b.parent == null) {
+                    boxes.add(b);
+                }
+
+                if (b.type == type) {
+                    if (b.parent != null) {
+                        b.parent.boxes.remove(b);
+                        b.parent.boxes.add(FreeSpaceBox.free(b.length()));
+                        IO.skip(ch, b.length(), buf);
+                    }
+                }
+
+                return b.type != Box.mdat;
+            }
+        });
+
+        in.seek(0);
+
+        OutputChannel out = new OutputChannel(in.getChannel());
+
+        IsoMedia.write(out, boxes, buf, IsoMedia.OnBoxListener.ALL);
+
+        in.seek(0);
+    }
 }
