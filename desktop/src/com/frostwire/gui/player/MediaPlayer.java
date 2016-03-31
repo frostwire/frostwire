@@ -20,7 +20,7 @@ package com.frostwire.gui.player;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
-import com.frostwire.fmp4.*;
+import com.frostwire.mp4.*;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.mplayer.MPlayer;
@@ -288,10 +288,10 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     private long getDurationFromM4A(File f) {
         try {
             RandomAccessFile isoFile = new RandomAccessFile(f, "r");
-            LinkedList<com.frostwire.fmp4.Box> boxes = IsoFile.head(isoFile, ByteBuffer.allocate(100 * 1024));
+            LinkedList<com.frostwire.mp4.Box> boxes = IsoFile.head(isoFile, ByteBuffer.allocate(100 * 1024));
 
             try {
-                MovieHeaderBox mvhd = com.frostwire.fmp4.Box.findFirst(boxes, com.frostwire.fmp4.Box.mvhd);
+                MovieHeaderBox mvhd = com.frostwire.mp4.Box.findFirst(boxes, com.frostwire.mp4.Box.mvhd);
                 return mvhd.duration() / mvhd.timescale();
             } finally {
                 IOUtils.closeQuietly(isoFile);

@@ -29,7 +29,7 @@ import java.util.List;
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 
-import com.frostwire.fmp4.*;
+import com.frostwire.mp4.*;
 import org.apache.commons.io.IOUtils;
 
 import com.frostwire.logging.Logger;

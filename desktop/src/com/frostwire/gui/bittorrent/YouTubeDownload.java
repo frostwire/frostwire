@@ -20,8 +20,8 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.fmp4.Mp4Demuxer;
-import com.frostwire.fmp4.Mp4Info;
+import com.frostwire.mp4.Mp4Demuxer;
+import com.frostwire.mp4.Mp4Info;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
