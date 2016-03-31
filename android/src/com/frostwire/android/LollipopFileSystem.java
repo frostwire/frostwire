@@ -28,6 +28,7 @@ import android.os.storage.StorageManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
 import android.util.LruCache;
+import com.frostwire.android.core.Constants;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.*;
 import com.frostwire.platform.FileFilter;
@@ -624,12 +625,7 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     private static String combineRoot(String baseFolder) {
-        SystemPaths paths = Platforms.get().systemPaths();
-        File data = paths.data();
-        String root = null;
-        if (data.getParentFile() != null) {
-            root = data.getParentFile().getAbsolutePath();
-        }
+        String root = Platforms.appSettings().string(Constants.PREF_KEY_STORAGE_PATH)        ;
 
         return root != null && root.startsWith(baseFolder) ? root : baseFolder;
     }
