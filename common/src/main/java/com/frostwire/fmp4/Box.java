@@ -200,7 +200,7 @@ public class Box {
         return Bits.make4cc(type);
     }
 
-    static <T extends Box> LinkedList<T> find(LinkedList<Box> boxes, int type) {
+    public static <T extends Box> LinkedList<T> find(LinkedList<Box> boxes, int type) {
         LinkedList<T> l = new LinkedList<>();
 
         for (Box b : boxes) {
@@ -223,7 +223,7 @@ public class Box {
         return l;
     }
 
-    static <T extends Box> T findFirst(LinkedList<Box> boxes, int type) {
+    public static <T extends Box> T findFirst(LinkedList<Box> boxes, int type) {
         T r = null;
 
         for (Box b : boxes) {

@@ -47,6 +47,22 @@ public final class MovieHeaderBox extends FullBox {
         pre_defined = new int[6];
     }
 
+    public int timescale() {
+        return timescale;
+    }
+
+    public void timescale(int value) {
+        timescale = value;
+    }
+
+    public long duration() {
+        return duration;
+    }
+
+    public void duration(long value) {
+        duration = value;
+    }
+
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);

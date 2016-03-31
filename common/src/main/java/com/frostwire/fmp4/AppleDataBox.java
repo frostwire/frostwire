@@ -37,6 +37,14 @@ public class AppleDataBox extends Box {
         data4cc = data;
     }
 
+    public final int dataType() {
+        return dataType;
+    }
+
+    public final void dataType(int value) {
+        dataType = value;
+    }
+
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         IO.read(ch, 16, buf);
