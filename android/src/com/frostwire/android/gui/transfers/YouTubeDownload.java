@@ -24,6 +24,8 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.mp4.Box;
+import com.frostwire.mp4.IsoFile;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
 import com.frostwire.logging.Logger;
@@ -32,14 +34,18 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -504,9 +510,24 @@ public final class YouTubeDownload implements DownloadTransfer {
             }
         }
 
+        private void removeUdta(File mp4) throws IOException {
+            RandomAccessFile f = new RandomAccessFile(mp4, "rw");
+            try {
+                IsoFile.free(f, Box.udta, ByteBuffer.allocate(100 * 1024));
+            } finally {
+                IOUtils.closeQuietly(f);
+            }
+        }
+
         @Override
         public void onComplete(HttpClient client) {
             if (downloadType == DownloadType.VIDEO) {
+                try {
+                    removeUdta(tempVideo);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    error(e);
+                }
                 try {
                     FileUtils.moveFile(tempVideo, completeFile);
                     complete();
