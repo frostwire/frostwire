@@ -9,7 +9,7 @@ frostwire (6.2.3) stable; urgency=high
   * jlibtorrent: fix unhandled exception in DHT when receiving a DHT packet over IPv6
   * Dropped rxjava library. KISS.
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 22 Mar 2016 19:12:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Tue, 30 Mar 2016 10:02:20 -0500
 
 frostwire (6.2.2) stable; urgency=high
   * YT search fixes.
