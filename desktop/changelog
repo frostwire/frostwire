@@ -2,6 +2,7 @@ frostwire (6.2.3) stable; urgency=high
   * New share action in Library. Create, seed and share DHT-based torrent
     in a single click.
   * New jlibtorrent 1.1.0.22.
+  * Fix preparing YT m4a's author field.
   * jlibtorrent: fix issue in checking outgoing interfaces
   * jlibtorrent: optimize enumeration of network interfaces on windows
   * jlibtorrent: improve reliability of binding listen sockets
@@ -9,7 +10,7 @@ frostwire (6.2.3) stable; urgency=high
   * jlibtorrent: fix unhandled exception in DHT when receiving a DHT packet over IPv6
   * Dropped rxjava library. KISS.
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 30 Mar 2016 10:02:20 -0500
+ -- FrostWire Team <contact@frostwire.com>  Tue, 31 Mar 2016 12:06:20 -0500
 
 frostwire (6.2.2) stable; urgency=high
   * YT search fixes.
