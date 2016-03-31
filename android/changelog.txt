@@ -1,4 +1,4 @@
-FrostWire 1.7.2 - MARCH/29/2016
+FrostWire 1.7.2 - MARCH/30/2016
  - Improved connection status display on Transfers screen.
  - Faster mp4 -> m4a demuxing with FrostWire's own mp4 demuxing implementation.
  - Demuxer progress is reported in the user interface.
@@ -7,7 +7,9 @@ FrostWire 1.7.2 - MARCH/29/2016
    android support v4.23.2.0
  - New jlibtorrent 1.1.0.22.
  - Music player bug fixes and major code cleanup.
- - New song hand picker soundcloud playlist downloading confirmation dialog.
+ - Song hand picker soundcloud playlist downloading confirmation dialog.
+ - Enhancement: Shows descriptive error on transfers when Internet connection is lost.
+ - Clears errored cloud transfers that were not considered completed.
  - jlibtorrent: fix issue in checking outgoing interfaces
  - jlibtorrent: optimize enumeration of network interfaces on windows
  - jlibtorrent: improve reliability of binding listen sockets
