@@ -232,6 +232,18 @@ public class YouTubeCrawledSearchResult extends AbstractCrawledSearchResult impl
         return getBestThumbnailUrl(video != null ? video : audio);
     }
 
+    public String getAuthor() {
+        if (getVideo() != null) {
+            return getVideo().user;
+        }
+
+        if (getAudio() != null) {
+            return getAudio().user;
+        }
+
+        return "";
+    }
+
     private String getBestThumbnailUrl(LinkInfo linfo) {
         String thumbnailUrl = null;
         if (linfo != null && linfo.thumbnails != null) {
