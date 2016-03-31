@@ -17,8 +17,6 @@
 
 package com.frostwire.fmp4;
 
-import com.frostwire.mp4.Container;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
