@@ -39,4 +39,7 @@
     <dimen name="text_large">18.0sp</dimen>
     <dimen name="text_x_large">20.0sp</dimen>
     <dimen name="text_xx_large">24.0sp</dimen>
+
+    <dimen name="dialog_min_width_major">200dp</dimen>
+    <dimen name="dialog_min_width_minor">300dp</dimen>
 </resources>
