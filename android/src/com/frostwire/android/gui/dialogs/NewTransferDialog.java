@@ -56,7 +56,7 @@ public class NewTransferDialog extends AbstractDialog {
     private CheckBox checkShow;
 
     public NewTransferDialog() {
-        super(TAG, R.layout.dialog_new_transfer);
+        super(TAG, R.layout.dialog_default_checkbox);
     }
 
     public static WeakReference<FileSearchResult> srRef;
@@ -81,28 +81,33 @@ public class NewTransferDialog extends AbstractDialog {
         SearchResultData data = (SearchResultData) args.getSerializable(SEARCH_RESULT_DATA_KEY);
         boolean hideCheckShow = args.getBoolean(HIDE_CHECK_SHOW_KEY);
 
-        dlg.setContentView(R.layout.dialog_new_transfer);
+        dlg.setContentView(R.layout.dialog_default_checkbox);
 
-        TextView dialogTitle = findView(dlg, R.id.dialog_new_transfer_title);
+        TextView dialogTitle = findView(dlg, R.id.dialog_default_checkbox_title);
         dialogTitle.setText(R.string.confirm_download);
+
+        TextView dialogText = findView(dlg, R.id.dialog_default_checkbox_text);
+        dialogText.setText(R.string.dialog_new_transfer_text_text);
 
         Context ctx = dlg.getContext();
 
         String sizeStr = data.getSize() > 0 ? UIUtils.getBytesInHuman(data.getSize()) : ctx.getString(R.string.size_unknown);
 
-        TextView textQuestion = findView(dlg, R.id.dialog_new_transfer_text);
+        TextView textQuestion = findView(dlg, R.id.dialog_default_checkbox_text);
         textQuestion.setText(dlg.getContext().getString(R.string.dialog_new_transfer_text_text, data.getDisplayName(), sizeStr));
 
         DialogListener yes = new DialogListener(this, true);
         DialogListener no = new DialogListener(this, false);
 
-        buttonYes = findView(dlg, R.id.dialog_new_transfer_button_yes);
+        buttonYes = findView(dlg, R.id.dialog_default_checkbox_button_yes);
+        buttonYes.setText(android.R.string.yes);
         buttonYes.setOnClickListener(yes);
 
-        buttonNo = findView(dlg, R.id.dialog_new_transfer_button_no);
+        buttonNo = findView(dlg, R.id.dialog_default_checkbox_button_no);
+        buttonNo.setText(android.R.string.no);
         buttonNo.setOnClickListener(no);
 
-        checkShow = findView(dlg, R.id.dialog_new_transfer_check_show);
+        checkShow = findView(dlg, R.id.dialog_default_checkbox_show);
         checkShow.setChecked(ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG));
         checkShow.setOnCheckedChangeListener(yes);
 
