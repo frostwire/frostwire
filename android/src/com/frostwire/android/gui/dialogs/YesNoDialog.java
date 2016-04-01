@@ -18,13 +18,8 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -32,9 +27,6 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.ClickAdapter;
-import com.frostwire.search.FileSearchResult;
-
-import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
@@ -55,21 +47,6 @@ public class YesNoDialog extends AbstractDialog {
     public YesNoDialog() {
         super(TAG, R.layout.dialog_default);
     }
-
-//    @Override
-//    public Dialog onCreateDialog(Bundle savedInstanceState) {
-//    Bundle args = getArguments();
-//
-//    id = args.getString(ID_KEY);
-//
-//    int titleId = args.getInt(TITLE_KEY);
-//    int messageId = args.getInt(MESSAGE_KEY);
-//
-//    Context ctx = getActivity();
-//
-//    ButtonListener bListener = new ButtonListener(this);
-//
-//    return new AlertDialog.Builder(ctx).setMessage(messageId).setTitle(titleId).setPositiveButton(android.R.string.yes, bListener).setNegativeButton(android.R.string.no, bListener).create(); }
 
     public static YesNoDialog newInstance(String id, int titleId, int messageId) {
         YesNoDialog f = new YesNoDialog();
@@ -99,8 +76,6 @@ public class YesNoDialog extends AbstractDialog {
 
         TextView defaultDialogText = findView(dlg, R.id.dialog_default_text);
         defaultDialogText.setText(messageId);
-
-        //TODO: make sure the button is active on both minimize and shut down dialogs
 
         ButtonListener yesButtonListener = new ButtonListener(this, BUTTON_POSITIVE);
         ButtonListener noButtonListener = new ButtonListener(this, BUTTON_NEGATIVE);
