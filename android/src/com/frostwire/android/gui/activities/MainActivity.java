@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
@@ -516,11 +517,13 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void showLastBackDialog() {
         YesNoDialog dlg = YesNoDialog.newInstance(LAST_BACK_DIALOG_ID, R.string.minimize_frostwire, R.string.are_you_sure_you_wanna_leave);
+        dlg.setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
         dlg.show(getFragmentManager()); //see onDialogClick
     }
 
     private void showShutdownDialog() {
         YesNoDialog dlg = YesNoDialog.newInstance(SHUTDOWN_DIALOG_ID, R.string.app_shutdown_dlg_title, R.string.app_shutdown_dlg_message);
+        dlg.setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
         dlg.show(getFragmentManager()); //see onDialogClick
     }
 
