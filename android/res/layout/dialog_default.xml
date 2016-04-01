@@ -26,16 +26,15 @@
     android:background="@drawable/default_dialog_background">
 
     <TextView
-        android:id="@+id/dialog_new_transfer_title"
+        android:id="@+id/dialog_default_title"
         style="@style/DefaultDialogTheme.TitleBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <TextView
-        android:id="@+id/dialog_new_transfer_text"
+        android:id="@+id/dialog_default_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/dialog_new_transfer_text_text"
         android:padding="15dp" />
 
     <LinearLayout
@@ -48,31 +47,18 @@
         android:background="@color/basic_gray_medium">
 
         <Button
-            android:id="@+id/dialog_new_transfer_button_no"
+            android:id="@+id/dialog_default_button_no"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:background="@color/app_light_background"
-            android:minLines="1"
-            android:text="@android:string/no" />
+            android:background="@color/app_light_background"/>
 
         <Button
-            android:id="@+id/dialog_new_transfer_button_yes"
+            android:id="@+id/dialog_default_button_yes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="1dp"
             android:layout_weight="0.5"
-            android:background="@color/app_light_background"
-            android:minLines="1"
-            android:text="@android:string/yes" />
+            android:background="@color/app_light_background"/>
     </LinearLayout>
-
-    <CheckBox
-        android:id="@+id/dialog_new_transfer_check_show"
-        style="@style/DefaultDialogTheme.SmallText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:checked="true"
-        android:text="@string/dialog_new_transfer_check_text" />
-
 </LinearLayout>

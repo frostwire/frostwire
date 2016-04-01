@@ -490,6 +490,7 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:textSize">@dimen/text_large</item>
+        <item name="android:buttonStyle">@style/DefaultDialogTheme.Buttons</item>
     </style>
     <style name="DefaultDialogTheme.TitleBar">
         <item name="android:background">@drawable/default_dialog_title_background</item>
@@ -505,6 +506,10 @@
     </style>
     <style name="DefaultDialogTheme.Buttons">
         <item name="android:textSize">@dimen/text_large</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">15dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minLines">1</item>
     </style>
     <style name="DefaultDialogTheme.SmallTextMedium">
         <item name="android:textSize">@dimen/text_small</item>
