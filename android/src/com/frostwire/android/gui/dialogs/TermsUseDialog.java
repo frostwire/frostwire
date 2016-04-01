@@ -18,16 +18,13 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.apache.commons.io.IOUtils;
-
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -35,26 +32,23 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.ClickAdapter;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class TermsUseDialog extends AbstractDialog {
 
     public static final String TAG = "terms_use_dialog";
+    private Button buttonNo;
+    private Button buttonYes;
 
     public TermsUseDialog() {
-        super(TAG, 0);
-    }
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Context ctx = getActivity();
-
-        ButtonListener click = new ButtonListener(this);
-
-        return new AlertDialog.Builder(ctx).setTitle(R.string.tos_title).setMessage(readText(ctx)).setPositiveButton(R.string.tos_accept, click).setNegativeButton(R.string.tos_refuse, click).create();
+        super(TAG, R.layout.dialog_default_scroll);
     }
 
     @Override
@@ -72,6 +66,27 @@ public class TermsUseDialog extends AbstractDialog {
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         dlg.setCanceledOnTouchOutside(true);
+        dlg.setContentView(R.layout.dialog_default_scroll);
+
+        Context ctx = getActivity();
+
+        TextView defaultDialogTitle = findView(dlg, R.id.dialog_default_scroll_title);
+        defaultDialogTitle.setText(R.string.tos_title);
+
+        TextView defaultDialogText = findView(dlg, R.id.dialog_default_scroll_text);
+        defaultDialogText.setText(readText(ctx));
+
+        ButtonListener yesButtonListener = new ButtonListener(this, BUTTON_POSITIVE);
+        ButtonListener noButtonListener = new ButtonListener(this, BUTTON_NEGATIVE);
+
+
+        buttonYes = findView(dlg, R.id.dialog_default_scroll_button_yes);
+        buttonYes.setText(R.string.tos_accept);
+        buttonYes.setOnClickListener(yesButtonListener);
+
+        buttonNo = findView(dlg, R.id.dialog_default_scroll_button_no);
+        buttonNo.setText(R.string.tos_refuse);
+        buttonNo.setOnClickListener(noButtonListener);
     }
 
     private static String readText(Context context) {
@@ -90,19 +105,24 @@ public class TermsUseDialog extends AbstractDialog {
     }
 
     private static final class ButtonListener extends ClickAdapter<TermsUseDialog> {
+        private int which;
 
-        public ButtonListener(TermsUseDialog owner) {
+        public ButtonListener(TermsUseDialog owner, int which) {
             super(owner);
+            this.which = which;
         }
 
         @Override
-        public void onClick(TermsUseDialog owner, DialogInterface dialog, int which) {
-            if (which == BUTTON_POSITIVE) {
+        public void onClick(TermsUseDialog owner, View v) {
+            super.onClick(owner, v);
+            if (this.which == BUTTON_POSITIVE) {
                 ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED, true);
                 owner.performDialogClick(which);
             } else {
                 exit();
             }
         }
+
+
     }
 }

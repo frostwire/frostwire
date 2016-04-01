@@ -504,6 +504,9 @@
         <item name="android:textColor">@color/app_text_secondary</item>
         <item name="android:padding">3dp</item>
     </style>
+    <style name="DefaultDialogTheme.LongText">
+        <item name="android:textSize">@dimen/text_medium</item>
+    </style>
     <style name="DefaultDialogTheme.Buttons">
         <item name="android:textSize">@dimen/text_large</item>
         <item name="android:paddingTop">15dp</item>

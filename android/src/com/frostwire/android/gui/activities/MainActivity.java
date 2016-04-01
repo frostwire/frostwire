@@ -338,6 +338,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             }
         } else {
             TermsUseDialog dlg = new TermsUseDialog();
+            dlg.setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
             dlg.show(getFragmentManager());
         }
 
