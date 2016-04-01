@@ -46,6 +46,7 @@
 	<uses-permission android:name="android.permission.GET_TASKS" />
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 	<uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="com.android.vending.BILLING" />
 
 	<application android:name="com.frostwire.android.gui.MainApplication"
 		android:allowBackup="true" android:icon="@mipmap/ic_launcher"
