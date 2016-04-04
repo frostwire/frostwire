@@ -384,17 +384,17 @@ public class PartialFilesDialog extends JDialog {
 
         public TorrentTableModel(TorrentInfo torrent) {
             _torrent = torrent;
-            _fileInfos = new TorrentFileInfo[torrent.getNumFiles()];
-            FileStorage fs = torrent.getFiles();
+            _fileInfos = new TorrentFileInfo[torrent.numFiles()];
+            FileStorage fs = torrent.files();
             for (int i = 0; i < _fileInfos.length; i++) {
-                _fileInfos[i] = new TorrentFileInfo(fs.getFilePath(i), fs.getFileSize(i), true);
+                _fileInfos[i] = new TorrentFileInfo(fs.filePath(i), fs.fileSize(i), true);
             }
 
         }
 
         @Override
         public int getRowCount() {
-            return _torrent.getNumFiles();
+            return _torrent.numFiles();
         }
 
         @Override

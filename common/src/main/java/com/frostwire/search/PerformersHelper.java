@@ -81,16 +81,16 @@ public final class PerformersHelper {
 
         TorrentInfo ti = TorrentInfo.bdecode(data);
 
-        int numFiles = ti.getNumFiles();
-        FileStorage fs = ti.getFiles();
+        int numFiles = ti.numFiles();
+        FileStorage fs = ti.files();
 
         for (int i = 0; !performer.isStopped() && i < numFiles; i++) {
             // TODO: Check for the hidden attribute
-            if (fs.isPadFileAt(i)) {
+            if (fs.padFileAt(i)) {
                 continue;
             }
 
-            list.add(new TorrentCrawledSearchResult(sr, ti, i, fs.getFilePath(i), fs.getFileSize(i)));
+            list.add(new TorrentCrawledSearchResult(sr, ti, i, fs.filePath(i), fs.fileSize(i)));
         }
 
         if (detectAlbums) {

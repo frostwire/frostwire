@@ -347,7 +347,7 @@ public final class BTEngine {
             if (th != null) {
                 priorities = th.getFilePriorities();
             } else {
-                priorities = Priority.array(Priority.IGNORE, ti.getNumFiles());
+                priorities = Priority.array(Priority.IGNORE, ti.numFiles());
             }
 
             for (int i = 0; i < selection.length; i++) {
@@ -383,7 +383,7 @@ public final class BTEngine {
             if (torrentHandleExists) {
                 priorities = th.getFilePriorities();
             } else {
-                priorities = Priority.array(Priority.IGNORE, ti.getNumFiles());
+                priorities = Priority.array(Priority.IGNORE, ti.numFiles());
             }
 
             for (int i = 0; i < selection.length; i++) {
@@ -424,7 +424,7 @@ public final class BTEngine {
                 download(ti, saveDir, priorities, null);
             }
         } else {
-            Priority[] priorities = Priority.array(Priority.IGNORE, ti.getNumFiles());
+            Priority[] priorities = Priority.array(Priority.IGNORE, ti.numFiles());
             priorities[fileIndex] = Priority.NORMAL;
             download(ti, saveDir, priorities, null);
         }
@@ -720,7 +720,7 @@ public final class BTEngine {
         if (th != null) {
             // found a download with the same hash, just adjust the priorities if needed
             if (priorities != null) {
-                if (ti.getNumFiles() != priorities.length) {
+                if (ti.numFiles() != priorities.length) {
                     throw new IllegalArgumentException("The priorities length should be equals to the number of files");
                 }
 
@@ -729,7 +729,7 @@ public final class BTEngine {
                 th.resume();
             } else {
                 // did they just add the entire torrent (therefore not selecting any priorities)
-                final Priority[] wholeTorrentPriorities = Priority.array(Priority.NORMAL, ti.getNumFiles());
+                final Priority[] wholeTorrentPriorities = Priority.array(Priority.NORMAL, ti.numFiles());
                 th.prioritizeFiles(wholeTorrentPriorities);
                 fireDownloadUpdate(th);
                 th.resume();

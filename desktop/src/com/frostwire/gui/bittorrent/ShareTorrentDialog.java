@@ -97,7 +97,7 @@ public class ShareTorrentDialog extends JDialog {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         c.insets = new Insets(20, 10, 10, 10);
-        boolean folderTorrent = torrent.getNumFiles() > 1;
+        boolean folderTorrent = torrent.numFiles() > 1;
         JLabel _introLabel = new JLabel(folderTorrent ? String.format(
                 I18n.tr("Use the following text to share the \"%s\" folder"),
                 torrent_name) : String.format(I18n.tr(

@@ -220,11 +220,11 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     }
 
     private boolean[] calculateSelection(TorrentInfo ti, String path) {
-        boolean[] selection = new boolean[ti.getNumFiles()];
+        boolean[] selection = new boolean[ti.numFiles()];
 
-        FileStorage fs = ti.getFiles();
+        FileStorage fs = ti.files();
         for (int i = 0; i < selection.length; i++) {
-            String filePath = fs.getFilePath(i);
+            String filePath = fs.filePath(i);
             if (path.endsWith(filePath) || filePath.endsWith(path)) {
                 selection[i] = true;
             }

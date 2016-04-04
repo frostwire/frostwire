@@ -110,7 +110,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             }
         }
 
-        return count != 1 ? th.getName() : FilenameUtils.getName(th.getTorrentInfo().getFiles().getFilePath(index));
+        return count != 1 ? th.getName() : FilenameUtils.getName(th.getTorrentInfo().files().filePath(index));
     }
 
     public long getSize() {
@@ -277,7 +277,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
             TorrentInfo ti = th.getTorrentInfo();
             if (ti != null && ti.getSwig() != null) {
-                return new File(savePath.getAbsolutePath(), ti.getNumFiles() > 1 ? th.getName() : ti.getFiles().getFilePath(0));
+                return new File(savePath.getAbsolutePath(), ti.numFiles() > 1 ? th.getName() : ti.files().filePath(0));
             }
         } catch (Throwable e) {
             LOG.warn("Could not retrieve download content save path", e);
@@ -435,7 +435,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     public void pieceFinished(PieceFinishedAlert alert) {
         try {
             if (piecesTracker != null) {
-                piecesTracker.setComplete(alert.getPieceIndex(), true);
+                piecesTracker.setComplete(alert.pieceIndex(), true);
             }
         } catch (Throwable e) {
             LOG.warn("Error handling piece finished logic", e);
@@ -490,7 +490,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         Set<String> urls = new HashSet<>(trackers.size());
 
         for (AnnounceEntry e : trackers) {
-            urls.add(e.getUrl());
+            urls.add(e.url());
         }
 
         return urls;
@@ -503,7 +503,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             list.add(new AnnounceEntry(url));
         }
 
-        th.replaceTrackers(list);
+        // this will change back to list
+        th.replaceTrackers(list.toArray(new AnnounceEntry[0]));
         th.saveResumeData();
     }
 
@@ -514,20 +515,20 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         if (th.isValid()) {
 
             TorrentInfo ti = th.getTorrentInfo();
-            FileStorage fs = ti.getFiles();
+            FileStorage fs = ti.files();
 
             if (ti != null && ti.isValid()) {
 
-                int numFiles = ti.getNumFiles();
+                int numFiles = ti.numFiles();
 
                 for (int i = 0; i < numFiles; i++) {
-                    BTDownloadItem item = new BTDownloadItem(th, i, fs.getFilePath(i), fs.getFileSize(i), piecesTracker);
+                    BTDownloadItem item = new BTDownloadItem(th, i, fs.filePath(i), fs.fileSize(i), piecesTracker);
 
                     items.add(item);
                 }
 
                 if (piecesTracker != null) {
-                    int numPieces = ti.getNumPieces();
+                    int numPieces = ti.numPieces();
 
                     // perform piece complete check
                     for (int i = 0; i < numPieces; i++) {
@@ -557,14 +558,14 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
 
             TorrentInfo ti = th.getTorrentInfo();
-            FileStorage fs = ti.getFiles();
+            FileStorage fs = ti.files();
             String prefix = savePath.getAbsolutePath();
 
             long createdTime = created.getTime();
 
             for (int i = 0; i < progress.length; i++) {
-                String fePath = fs.getFilePath(i);
-                long feSize = fs.getFileSize(i);
+                String fePath = fs.filePath(i);
+                long feSize = fs.fileSize(i);
 
                 if (progress[i] < feSize) {
                     // lets see if indeed the file is incomplete

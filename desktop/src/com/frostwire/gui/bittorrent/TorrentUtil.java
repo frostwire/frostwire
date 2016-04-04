@@ -136,7 +136,7 @@ public final class TorrentUtil {
 
         final List<AnnounceEntry> trackers = torrent.trackers();
         for (AnnounceEntry tracker : trackers) {
-            final String url = tracker.getUrl();
+            final String url = tracker.url();
             sb.append("&tr=");
             sb.append(UrlUtils.encode(url));
         }

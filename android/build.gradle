@@ -20,7 +20,7 @@
 // this won't work for windows users, who will either have to have this in true, or just
 // copy frostwire-jlibtorrent if they need to hack frostwire-jlibtorrent while coding.
 def useJlibtorrentFromMaven = true
-def JLIBTORRENT_VERSION='1.1.0.22'
+def JLIBTORRENT_VERSION='1.1.0.23'
 
 if (!useJlibtorrentFromMaven && !new File("frostwire-jlibtorrent").exists()) {
     def path = new File("frostwire-jlibtorrent").getAbsolutePath()
