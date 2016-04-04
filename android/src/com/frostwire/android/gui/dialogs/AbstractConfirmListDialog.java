@@ -362,9 +362,9 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
                                  numCheckedTextView != null;
 
         if (summaryLayout != null) {
-            summaryLayout.setVisibility(summaryVisible ? View.VISIBLE : View.VISIBLE);
+            summaryLayout.setVisibility(View.VISIBLE);
             numCheckedTextView.setText(selected + " " + getString(R.string.selected));
-            numCheckedTextView.setVisibility(summaryVisible ? View.VISIBLE : View.VISIBLE);
+            numCheckedTextView.setVisibility(View.VISIBLE);
 
             final TextView sumCheckedTextView = findView(dlg, R.id.dialog_confirm_list_sum_checked_textview);
             if (sumCheckedTextView != null) {
