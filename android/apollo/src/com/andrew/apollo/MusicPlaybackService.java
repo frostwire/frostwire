@@ -840,7 +840,7 @@ public class MusicPlaybackService extends Service {
                     getTrackName(), getAlbumId(), getAlbumArt(), isPlaying());
         } else if (mAnyActivityInForeground) {
             mNotificationHelper.killNotification();
-            if(!isPlaying()){
+            if (!isPlaying()) {
                 updateRemoteControlClient(PLAYSTATE_STOPPED);
             }
         }
@@ -1444,13 +1444,12 @@ public class MusicPlaybackService extends Service {
     private void updateRemoteControlClient(final String what) {
 
         int playState;
-        if(isPlaying()){
+        if (isPlaying()) {
             playState = RemoteControlClient.PLAYSTATE_PLAYING;
-        }else{
-            if(what.equals(PLAYSTATE_STOPPED)){
+        } else {
+            playState = RemoteControlClient.PLAYSTATE_PAUSED;
+            if (what.equals(PLAYSTATE_STOPPED)) {
                 playState = RemoteControlClient.PLAYSTATE_STOPPED;
-            }else{
-                playState = RemoteControlClient.PLAYSTATE_PAUSED;
             }
         }
 
@@ -2151,9 +2150,9 @@ public class MusicPlaybackService extends Service {
                 mPlayer.pause();
                 scheduleDelayedShutdown();
                 mIsSupposedToBePlaying = false;
-                if(mAnyActivityInForeground){
+                if (mAnyActivityInForeground) {
                     updateRemoteControlClient(PLAYSTATE_STOPPED);
-                }else{
+                } else {
                     notifyChange(PLAYSTATE_CHANGED);
                 }
             }
