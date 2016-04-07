@@ -106,7 +106,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             headerStatus.setTextColor(Color.RED);
             // Current Status VPN client price
             vpnMoneyBack.setText(R.string.vpn_money_back);
-            vpnPrice.setText(R.string.vpn_price);
+            vpnPrice.setText(getString(R.string.vpn_price,Constants.EXPRESSVPN_STARTING_USD_PRICE));
             // Current Status Text
             String VPNHtmlText = getString(R.string.unprotected_connections_visibility_bullet_html);
             Spanned VPNTextAsSpanned = Html.fromHtml(VPNHtmlText);

@@ -548,14 +548,14 @@
     <string name="activity_VPN">Conexión</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Una conexión desprotegida significa que todo lo que haces en línea (incluyendo <b>búsquedas, mensajería, y descargas</b>) podrían ser monitoreadas por cualquiera en tu red e incluso por tu proveedor de Internet.<br><br>Recomendamos usar ExpressVPN para encriptar tu conexión y <b>proteger tu privacidad</b>.]]></string>
     <string name="vpn_client_feature_2">Velocidad de descarga ilimitada</string>
-    <string name="vpn_price">desde $8.32 dólares mensuales</string>
+    <string name="vpn_price">desde $%1$.2f dólares mensuales</string>
     <string name="connection_header_title">Estado de conexión:</string>
     <string name="check_internet_connection">Comprobar conexión de Internet</string>
     <string name="vpn_on_toast_notification">Estás conectado a un VPN.</string>
     <string name="learn_more">Conoce más</string>
     <string name="vpn_client_feature_4">Atención al cliente 24/7</string>
     <string name="vpn_client_feature_1">Encripción nivel militar</string>
-    <string name="vpn_client_feature_3">Navegación privada y sin registro</string>
+    <string name="vpn_client_feature_3">Navegación privada y sin registros</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent apagado (Ahorrar datos encendido)"</string>
     <string name="get_vpn_client">Obtén ExpressVPN</string>
     <string name="error_no_internet_connection">Error: Comprueba tu conexión a Internet</string>

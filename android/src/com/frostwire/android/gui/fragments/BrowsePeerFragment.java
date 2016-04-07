@@ -439,7 +439,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
 
             if (action.equals(Constants.ACTION_FILE_ADDED_OR_REMOVED)) {
-                LOG.info("ACTION_FILE_ADDED_OR_REMOVED received!");
                 updateHeader();
             }
         }

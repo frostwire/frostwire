@@ -562,7 +562,7 @@
     <string name="protect_my_privacy">Protect my privacy</string>
     <string name="get_express_VPN">Get ExpressVPN</string>
     <string name="vpn_money_back">30-day money-back guarantee</string>
-    <string name="vpn_price">from $8.32 per month</string>
+    <string name="vpn_price">from $%1$.2f per month</string>
     <string name="vpn_what_you_get_with">What do you get with </string>
     <string name="vpn_client">ExpressVPN</string>
     <string name="get_vpn_client">Get ExpressVPN</string>
