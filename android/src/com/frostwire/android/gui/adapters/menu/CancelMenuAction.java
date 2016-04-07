@@ -21,6 +21,7 @@ package com.frostwire.android.gui.adapters.menu;
 import android.content.Context;
 import android.content.DialogInterface;
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.*;
 import com.frostwire.android.gui.util.UIUtils;
@@ -72,6 +73,7 @@ public class CancelMenuAction extends MenuAction {
                         } else {
                             transfer.cancel();
                         }
+                        UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
                         UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);
                     }
                 };
