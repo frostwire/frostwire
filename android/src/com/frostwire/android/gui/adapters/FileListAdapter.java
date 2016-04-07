@@ -22,6 +22,8 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
 import android.view.View;
@@ -65,9 +67,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private final ImageLoader thumbnailLoader;
     private final DownloadButtonClickListener downloadButtonClickListener;
     private final FileListFilter fileListFilter;
-    private OnDeleteFilesListener onDeleteFilesListener;
 
-    protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType, OnDeleteFilesListener onDeleteFilesListener) {
+    protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType) {
         super(context, getViewItemId(fileType), convertFiles(files));
 
         setShowMenuOnClick(true);
@@ -78,7 +79,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         this.fileType = fileType;
         this.thumbnailLoader = ImageLoader.getInstance(context);
         this.downloadButtonClickListener = new DownloadButtonClickListener();
-        this.onDeleteFilesListener = onDeleteFilesListener;
 
         checkSDStatus();
     }
@@ -98,6 +98,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     @Override
     protected MenuAdapter getMenuAdapter(View view) {
+        Handler h = new Handler(Looper.getMainLooper());
+        h.sendEmptyMessage(5011105);
+
         Context context = getContext();
 
         List<MenuAction> items = new ArrayList<>();
@@ -168,7 +171,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS) {
             items.add(new SendFileMenuAction(context, fd));
-            items.add(new DeleteFileMenuAction(context, this, list, onDeleteFilesListener));
+            items.add(new DeleteFileMenuAction(context, this, list));
         }
 
         return new MenuAdapter(context, fd.title, items);
@@ -406,7 +409,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private void checkSDStatus() {
         Map<String, Boolean> sds = new HashMap<>();
 
-        String privateSubpath = "Android" + File.separator + "data";
+        String privateSubPath = "Android" + File.separator + "data";
 
         File[] externalDirs = SystemUtils.getExternalFilesDirs(getContext());
         for (int i = 1; i < externalDirs.length; i++) {
@@ -416,8 +419,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
             sds.put(absolutePath, isSecondaryExternalStorageMounted);
 
-            if (absolutePath.contains(privateSubpath)) {
-                String prefix = absolutePath.substring(0, absolutePath.indexOf(privateSubpath) - 1);
+            if (absolutePath.contains(privateSubPath)) {
+                String prefix = absolutePath.substring(0, absolutePath.indexOf(privateSubPath) - 1);
                 sds.put(prefix, isSecondaryExternalStorageMounted);
             }
         }
@@ -471,10 +474,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
 
         return false;
-    }
-
-    public void setOnDeleteFilesListener(OnDeleteFilesListener onDeleteFilesListener) {
-        this.onDeleteFilesListener = onDeleteFilesListener;
     }
 
     private static final class MagnetUriBuilder {

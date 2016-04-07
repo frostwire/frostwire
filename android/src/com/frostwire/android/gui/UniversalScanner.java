@@ -48,6 +48,9 @@ public final class UniversalScanner {
 
     public UniversalScanner(Context context) {
         this.context = context;
+        if (context == null) {
+            LOG.warn("UniversalScanner has no `context` object to scan() with.");
+        }
     }
 
     public void scan(final String filePath) {
@@ -135,8 +138,6 @@ public final class UniversalScanner {
      * inside the secondary external storage path, therefore, all attempts
      * to use MediaScannerConnection to scan a media file fail. Therefore we
      * have this method to insert the file's metadata manually on the content provider.
-     *
-     * @param path
      */
     private void scanPrivateFile(Uri oldUri, String filePath, MediaType mt) {
         try {

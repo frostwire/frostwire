@@ -134,8 +134,10 @@ public final class Constants {
     public static final String ACTION_SETTINGS_SELECT_STORAGE = "com.frostwire.android.ACTION_SETTINGS_SELECT_STORAGE";
     public static final String ACTION_SETTINGS_OPEN_TORRENT_SETTINGS = "com.frostwire.android.ACTION_SETTINGS_OPEN_TORRENT_SETTINGS";
     public static final String ACTION_NOTIFY_SDCARD_MOUNTED = "com.frostwire.android.ACTION_NOTIFY_SDCARD_MOUNTED";
+    public static final String ACTION_FILE_ADDED_OR_REMOVED = "com.frostwire.android.ACTION_FILE_ADDED_OR_REMOVED";
     public static final String EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION = "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION";
     public static final String EXTRA_DOWNLOAD_COMPLETE_PATH = "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_PATH";
+
 
     public static final String BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION = "com.frostwire.android.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION.";
 

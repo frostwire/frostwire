@@ -36,9 +36,9 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Finger;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.FileListAdapter;
-import com.frostwire.android.gui.adapters.OnDeleteFilesListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.BrowsePeerSearchBarView;
@@ -58,7 +58,7 @@ import java.util.Set;
  * @author gubatron
  * @author aldenml
  */
-public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment, OnDeleteFilesListener {
+public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment {
     private static final Logger LOG = Logger.getLogger(BrowsePeerFragment.class);
     private static final int LOADER_FILES_ID = 0;
     private final BroadcastReceiver broadcastReceiver;
@@ -66,7 +66,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private com.frostwire.android.gui.views.ListView list;
     private FileListAdapter adapter;
     private Peer peer;
-    private Finger finger;
     private View header;
     private long lastAdapterRefresh;
     private String previousFilter;
@@ -93,7 +92,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         setRetainInstance(true);
     }
 
@@ -133,6 +131,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             restorePreviousFilter();
             browseFilesButtonClick(adapter.getFileType());
         }
+        updateHeader();
     }
 
     private void restorePreviouslyChecked() {
@@ -174,6 +173,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         filter.addAction(Constants.ACTION_MEDIA_PLAYER_PLAY);
         filter.addAction(Constants.ACTION_MEDIA_PLAYER_PAUSED);
         filter.addAction(Constants.ACTION_MEDIA_PLAYER_STOPPED);
+        filter.addAction(Constants.ACTION_FILE_ADDED_OR_REMOVED);
         filter.addAction(MusicPlaybackService.META_CHANGED);
         filter.addAction(MusicPlaybackService.PLAYSTATE_CHANGED);
         getActivity().registerReceiver(broadcastReceiver, filter);
@@ -320,11 +320,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private void updateHeader() {
         if (peer == null) {
-            LOG.warn("Something wrong, finger  and peer are null");
+            LOG.warn("Something wrong. peer is null");
             return;
         }
 
-        finger = peer.finger();
+        Librarian.instance().invalidateCountCache();
+        Finger finger = peer.finger();
 
         if (header != null) {
             byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
@@ -385,7 +386,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
             @SuppressWarnings("unchecked")
             List<FileDescriptor> items = (List<FileDescriptor>) data[1];
-            adapter = new FileListAdapter(getActivity(), items, fileType, this) {
+            adapter = new FileListAdapter(getActivity(), items, fileType) {
 
                 @Override
                 protected void onItemChecked(CompoundButton v, boolean isChecked) {
@@ -403,7 +404,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 }
             };
             adapter.setCheckboxesVisibility(true);
-            adapter.setOnDeleteFilesListener(this);
             restorePreviouslyChecked();
             restorePreviousFilter();
             list.setAdapter(adapter);
@@ -423,11 +423,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         return ConfigurationManager.instance().getInt(Constants.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION + fileType);
     }
 
-    @Override
-    public void onDeleteFiles(List<FileDescriptor> files) {
-        updateHeader();
-    }
-
     private final class LocalBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -442,10 +437,15 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     adapter.notifyDataSetChanged();
                 }
             }
+
+            if (action.equals(Constants.ACTION_FILE_ADDED_OR_REMOVED)) {
+                LOG.info("ACTION_FILE_ADDED_OR_REMOVED received!");
+                updateHeader();
+            }
         }
     }
 
-    public void refreshSelection() {
+    private void refreshSelection() {
         if (adapter != null) {
             lastAdapterRefresh = SystemClock.elapsedRealtime();
             browseFilesButtonClick(adapter.getFileType());

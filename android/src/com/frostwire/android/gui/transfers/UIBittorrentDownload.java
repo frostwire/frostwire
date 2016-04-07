@@ -29,6 +29,7 @@ import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTDownloadListener;
@@ -208,6 +209,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
                 }
             }
         }
+        UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
     }
 
     @Override

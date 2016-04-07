@@ -17,15 +17,11 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-
-import android.view.View;
-import android.widget.ArrayAdapter;
 import com.andrew.apollo.Config;
-import com.andrew.apollo.model.Song;
-import com.frostwire.android.R;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.R;
 
 /**
  * Alert dialog used to delete tracks.
@@ -37,7 +33,7 @@ import com.andrew.apollo.utils.MusicUtils;
 public class DeleteDialog extends DialogFragment {
 
     public interface DeleteDialogCallback {
-        public void onDelete(long[] id);
+        void onDelete(long[] id);
     }
 
     /**
@@ -127,4 +123,6 @@ public class DeleteDialog extends DialogFragment {
                     }
                 }).create();
     }
+
+
 }

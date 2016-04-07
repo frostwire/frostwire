@@ -18,8 +18,6 @@
 
 package com.frostwire.android.gui.services;
 
-import java.io.File;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,14 +27,16 @@ import android.net.NetworkInfo.DetailedState;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.UniversalScanner;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
+
+import java.io.File;
 
 /**
  * Receives and controls messages from the external world. Depending on the
@@ -159,8 +159,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         try {
             String path = intent.getDataString().replace("file://", "");
             if (!SystemUtils.isPrimaryExternalPath(new File(path))) {
-                Intent i = new Intent(Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
-                context.sendBroadcast(i);
+                UIUtils.broadcastAction(context, Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
 
                 if (SystemUtils.hasKitKatOrNewer()) {
                     final File privateDir = new File(path + File.separator + "Android" + File.separator + "data" + File.separator + context.getPackageName() + File.separator + "files" + File.separator + "FrostWire");

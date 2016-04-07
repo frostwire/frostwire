@@ -40,6 +40,7 @@ import com.andrew.apollo.provider.FavoritesStore.FavoriteColumns;
 import com.andrew.apollo.provider.RecentStore;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
 import org.apache.commons.lang3.ArrayUtils;
@@ -879,11 +880,11 @@ public final class MusicUtils {
                     projection, null, null, null);
 
             if (cursor != null) {
-                cursor.moveToFirst();
-                do {
-                    result.add(new Playlist(cursor.getLong(0), cursor.getString(1)));
-                } while (cursor.moveToNext());
-
+                if (cursor.moveToFirst()) {
+                    do {
+                        result.add(new Playlist(cursor.getLong(0), cursor.getString(1)));
+                    } while (cursor.moveToNext());
+                }
                 cursor.close();
             }
         } catch (Throwable e) {
@@ -1499,6 +1500,7 @@ public final class MusicUtils {
                 }
             }
             c.close();
+            UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
         }
 
         if (showNotification) {

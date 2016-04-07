@@ -30,8 +30,10 @@ import android.support.v4.provider.DocumentFile;
 import android.util.LruCache;
 import com.frostwire.android.core.Constants;
 import com.frostwire.logging.Logger;
-import com.frostwire.platform.*;
+import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.FileFilter;
+import com.frostwire.platform.FileSystem;
+import com.frostwire.platform.Platforms;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 

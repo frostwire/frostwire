@@ -18,21 +18,19 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.AsyncTask;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.FileListAdapter;
-import com.frostwire.android.gui.adapters.OnDeleteFilesListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -43,13 +41,11 @@ public class DeleteFileMenuAction extends MenuAction {
 
     private final FileListAdapter adapter;
     private final List<FileDescriptor> files;
-    private final OnDeleteFilesListener onDeleteFilesListener;
 
-    public DeleteFileMenuAction(Context context, FileListAdapter adapter, List<FileDescriptor> files, OnDeleteFilesListener onDeleteFilesListener) {
+    public DeleteFileMenuAction(Context context, FileListAdapter adapter, List<FileDescriptor> files) {
         super(context, R.drawable.contextmenu_icon_trash, files.size() > 1 ? R.string.delete_file_menu_action_count : R.string.delete_file_menu_action, files.size());
         this.adapter = adapter;
         this.files = files;
-        this.onDeleteFilesListener = onDeleteFilesListener;
     }
 
     @Override
@@ -61,7 +57,7 @@ public class DeleteFileMenuAction extends MenuAction {
         });
     }
 
-    public void deleteFiles() {
+    private void deleteFiles() {
         int size = files.size();
         for (int i = 0; i < size; i++) {
             FileDescriptor fd = files.get(i);
@@ -71,15 +67,8 @@ public class DeleteFileMenuAction extends MenuAction {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                Librarian.instance().deleteFiles(adapter.getFileType(), new ArrayList<FileDescriptor>(files), getContext());
+                Librarian.instance().deleteFiles(adapter.getFileType(), new ArrayList<>(files), getContext());
                 return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                if (onDeleteFilesListener != null) {
-                    onDeleteFilesListener.onDeleteFiles(files);
-                }
             }
         }.execute();
     }

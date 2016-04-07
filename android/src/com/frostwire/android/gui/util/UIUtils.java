@@ -442,4 +442,11 @@ public final class UIUtils {
 
         socialLinksDialog.show();
     }
+
+    public static void broadcastAction(Context ctx, String actionCode) {
+        if (ctx == null || actionCode == null) {
+            return;
+        }
+        ctx.sendBroadcast(new Intent(actionCode));
+    }
 }

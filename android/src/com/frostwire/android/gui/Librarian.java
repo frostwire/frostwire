@@ -37,6 +37,7 @@ import com.frostwire.android.core.player.PlaylistItem;
 import com.frostwire.android.core.providers.TableFetcher;
 import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.transfers.Transfers;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.StringUtils;
@@ -177,28 +178,37 @@ public final class Librarian {
             Log.e(TAG, "Failed to delete files from media store", e);
         }
         invalidateCountCache(fileType);
+        UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
     }
 
     public void scan(File file) {
         scan(file, Transfers.getIgnorableFiles());
+        if (context == null) {
+            Log.w(TAG, "Librarian has no `context` object to scan() with.");
+            return;
+        }
+        UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
     }
 
     public void scan(Uri uri) {
+        if (context == null) {
+            Log.w(TAG, "Librarian has no `context` object to scan() with.");
+            return;
+        }
         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         intent.setData(uri);
         context.sendBroadcast(intent);
+        UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
     }
 
     public Finger finger() {
         Finger finger = new Finger();
-
         finger.numTotalAudioFiles = getNumFiles(Constants.FILE_TYPE_AUDIO);
         finger.numTotalVideoFiles = getNumFiles(Constants.FILE_TYPE_VIDEOS);
         finger.numTotalPictureFiles = getNumFiles(Constants.FILE_TYPE_PICTURES);
         finger.numTotalDocumentFiles = getNumFiles(Constants.FILE_TYPE_DOCUMENTS);
         finger.numTotalTorrentFiles = getNumFiles(Constants.FILE_TYPE_TORRENTS);
         finger.numTotalRingtoneFiles = getNumFiles(Constants.FILE_TYPE_RINGTONES);
-
         return finger;
     }
 
@@ -379,7 +389,6 @@ public final class Librarian {
             if (ignorableFiles.contains(file)) {
                 return;
             }
-
             new UniversalScanner(context).scan(file.getAbsolutePath());
         } else if (file.isDirectory() && file.canRead()) {
             Collection<File> flattenedFiles = getAllFolderFiles(file, null);
