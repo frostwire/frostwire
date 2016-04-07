@@ -1,3 +1,6 @@
+FrostWire 1.7.3 - APR/06/2016
+ - Spanish Translation Update
+
 FrostWire 1.7.2 - APR/05/2016
  - Instant demuxing. New (insanely) fast mp4 demuxer library by FrostWire.
  - Demuxer progress is reported in the user interface.
@@ -15,7 +18,6 @@ FrostWire 1.7.2 - APR/05/2016
  - jlibtorrent: support SNI in https web seeds and trackers
  - jlibtorrent: fix unhandled exception in DHT when receiving a DHT packet over IPv6
  - Dropped rxjava library. KISS.
- - Spanish Translation Update
 
 FrostWire 1.7.1 - FEBRUARY/24/2016
  - New "Experimental Features" option available. In order to move at a
