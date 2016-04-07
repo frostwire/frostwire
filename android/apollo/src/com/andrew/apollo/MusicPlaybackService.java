@@ -70,6 +70,11 @@ public class MusicPlaybackService extends Service {
     public static final String PLAYSTATE_CHANGED = "com.andrew.apollo.playstatechanged";
 
     /**
+     * Indicates has been stopped
+     */
+    public static final String PLAYSTATE_STOPPED = "com.andrew.apollo.playstatestopped";
+
+    /**
      * Indicates that music playback position within
      * a title was changed
      */
@@ -613,6 +618,7 @@ public class MusicPlaybackService extends Service {
         reloadQueue();
         notifyChange(QUEUE_CHANGED);
         notifyChange(META_CHANGED);
+        updateNotification();
     }
 
     /**
@@ -774,6 +780,7 @@ public class MusicPlaybackService extends Service {
         if (D) Log.d(TAG, "Nothing is playing anymore, releasing notification");
         mNotificationHelper.killNotification();
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
+        updateRemoteControlClient(PLAYSTATE_STOPPED);
 
         if (!mServiceInUse) {
             saveQueue(true);
@@ -833,6 +840,9 @@ public class MusicPlaybackService extends Service {
                     getTrackName(), getAlbumId(), getAlbumArt(), isPlaying());
         } else if (mAnyActivityInForeground) {
             mNotificationHelper.killNotification();
+            if(!isPlaying()){
+                updateRemoteControlClient(PLAYSTATE_STOPPED);
+            }
         }
     }
 
@@ -942,6 +952,7 @@ public class MusicPlaybackService extends Service {
         if (goToIdle) {
             scheduleDelayedShutdown();
             mIsSupposedToBePlaying = false;
+            updateRemoteControlClient(PLAYSTATE_STOPPED);
         } else {
             stopForeground(false);
         }
@@ -1431,15 +1442,23 @@ public class MusicPlaybackService extends Service {
      * @param what The broadcast
      */
     private void updateRemoteControlClient(final String what) {
-        int playState = mIsSupposedToBePlaying
-                ? RemoteControlClient.PLAYSTATE_PLAYING
-                : RemoteControlClient.PLAYSTATE_PAUSED;
+
+        int playState;
+        if(isPlaying()){
+            playState = RemoteControlClient.PLAYSTATE_PLAYING;
+        }else{
+            if(what.equals(PLAYSTATE_STOPPED)){
+                playState = RemoteControlClient.PLAYSTATE_STOPPED;
+            }else{
+                playState = RemoteControlClient.PLAYSTATE_PAUSED;
+            }
+        }
 
         if (ApolloUtils.hasJellyBeanMR2()
                 && (what.equals(PLAYSTATE_CHANGED) || what.equals(POSITION_CHANGED))) {
             //mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
             mRemoteControlClient.setPlaybackState(playState);
-        } else if (what.equals(PLAYSTATE_CHANGED)) {
+        } else if (what.equals(PLAYSTATE_CHANGED) || what.equals(PLAYSTATE_STOPPED)) {
             mRemoteControlClient.setPlaybackState(playState);
         } else if (what.equals(META_CHANGED) || what.equals(QUEUE_CHANGED)) {
             Bitmap albumArt = getAlbumArt();
@@ -2132,7 +2151,11 @@ public class MusicPlaybackService extends Service {
                 mPlayer.pause();
                 scheduleDelayedShutdown();
                 mIsSupposedToBePlaying = false;
-                notifyChange(PLAYSTATE_CHANGED);
+                if(mAnyActivityInForeground){
+                    updateRemoteControlClient(PLAYSTATE_STOPPED);
+                }else{
+                    notifyChange(PLAYSTATE_CHANGED);
+                }
             }
         }
     }
