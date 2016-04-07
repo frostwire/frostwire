@@ -1,5 +1,7 @@
 FrostWire 1.7.3 - APR/06/2016
  - Spanish Translation Update
+ - Fixes issue where player lock image would remain after playback was stopped.
+   Thanks @X-NicON.
 
 FrostWire 1.7.2 - APR/05/2016
  - Instant demuxing. New (insanely) fast mp4 demuxer library by FrostWire.
