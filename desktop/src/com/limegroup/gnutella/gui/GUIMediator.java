@@ -1492,7 +1492,12 @@ public final class GUIMediator {
         try {
             String displayName = URLEncoder.encode(sr.getDisplayName(), "UTF-8");
             String source = URLEncoder.encode(sr.getSource(), "UTF-8");
-            String detailsUrl = URLEncoder.encode(sr.getDetailsUrl(), "UTF-8");
+
+            String preliminaryDetailsUrl = sr.getDetailsUrl();
+            if (preliminaryDetailsUrl.contains("&")) {
+                preliminaryDetailsUrl = preliminaryDetailsUrl.substring(0, preliminaryDetailsUrl.indexOf('&'));
+            }
+            String detailsUrl = URLEncoder.encode(preliminaryDetailsUrl, "UTF-8");
             String previewUrl = String.format("http://www.frostwire-preview.com/?type=yt&displayName=%s&source=%s&detailsUrl=%s", displayName, source, detailsUrl);
             openURL(previewUrl);
         } catch (UnsupportedEncodingException e) {
