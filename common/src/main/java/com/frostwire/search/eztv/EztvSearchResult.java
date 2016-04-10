@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ import java.util.Map;
  * @author gubatron
  * @author aldenml
  */
-public class EztvSearchResult extends AbstractTorrentSearchResult {
+class EztvSearchResult extends AbstractTorrentSearchResult {
 
     private final static long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2 << 39, 2 << 49};
 
@@ -60,9 +60,9 @@ public class EztvSearchResult extends AbstractTorrentSearchResult {
     private long creationTime;
     private int seeds;
 
-    public EztvSearchResult(String detailsUrl, SearchMatcher matcher) {
+    EztvSearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-        this.displayName = HtmlManipulator.replaceHtmlEntities(matcher.group("displayname"));
+        this.displayName = HtmlManipulator.replaceHtmlEntities(matcher.group("displayname")).trim();
         this.torrentUrl = matcher.group("torrenturl");
         this.filename = parseFileName(FilenameUtils.getName(torrentUrl));
         this.infoHash = matcher.group("infohash");
@@ -122,7 +122,7 @@ public class EztvSearchResult extends AbstractTorrentSearchResult {
             if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
                 decodedFileName = URLDecoder.decode(urlEncodedFileName, "UTF-8");
             }
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException ignored) {
         }
         return decodedFileName;
     }
@@ -152,7 +152,7 @@ public class EztvSearchResult extends AbstractTorrentSearchResult {
             dateString = dateString.replaceAll("(st|nd|rd|th)", "");
             SimpleDateFormat myFormat = new SimpleDateFormat("d MMM yyyy", Locale.US);
             result = myFormat.parse(dateString).getTime();
-        } catch (Throwable t) {
+        } catch (Throwable ignored) {
         }
         return result;
     }
