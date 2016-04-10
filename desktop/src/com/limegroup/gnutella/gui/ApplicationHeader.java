@@ -90,7 +90,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     private SearchField librarySearchField;
     private final JPanel searchPanels;
 
-    public ApplicationHeader(Map<Tabs, Tab> tabs) {
+    ApplicationHeader(Map<Tabs, Tab> tabs) {
         setMinimumSize(new Dimension(1000, 54));
         setLayout(new MigLayout("ins 0, ay 50%, filly,", "[][][grow][][]"));
 
@@ -229,26 +229,21 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                     GUIMediator.instance().setWindow(lameFinalT);
                 }
                 
-                public void prepareSearchTabAsSearchTrigger(final Tabs lameFinalT) {
-                    boolean performInternetSearch = false;
+                void prepareSearchTabAsSearchTrigger(final Tabs lameFinalT) {
                     String query = null;
                     if (lameFinalT == Tabs.SEARCH) {
                         if (!cloudSearchField.getText().isEmpty()) {
-                            performInternetSearch = true;
                             query = cloudSearchField.getText();
                         } else if (cloudSearchField.getText().isEmpty() && !librarySearchField.getText().isEmpty()) {
                             //they want internet search while on the library
-                            performInternetSearch = true;
                             query = librarySearchField.getText();
                             librarySearchField.setText("");
                             cloudSearchField.setText(query);
                         }
 
                         if (query != null) {
-                            if (performInternetSearch) {
-                                UXStats.instance().log(UXAction.SEARCH_STARTED_SEARCH_TAB_BUTTON);
-                                cloudSearchField.getActionListeners()[0].actionPerformed(null);
-                            }
+                            UXStats.instance().log(UXAction.SEARCH_STARTED_SEARCH_TAB_BUTTON);
+                            cloudSearchField.getActionListeners()[0].actionPerformed(null);
                         }
                     }
                 }
@@ -273,7 +268,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
      * the AbstractButton that has the Tab object as a client property named "tab" 
      * @see MainFrame#setSelectedTab(Tabs)
      */
-    public void selectTab(Tab t) {
+    void selectTab(Tab t) {
         Component[] components = getComponents();
         JPanel buttonContainer = (JPanel) components[1];
         Component[] buttons = buttonContainer.getComponents();
@@ -337,7 +332,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         return button;
     }
 
-    public void showSearchField(Tab t) {
+    void showSearchField(Tab t) {
         cloudSearchField.setText("");
         librarySearchField.setText("");
         CardLayout cl = (CardLayout) (searchPanels.getLayout());
@@ -403,14 +398,14 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                     }
                     try {
                         sleep(ANIMATION_INTERVAL);
-                    } catch (InterruptedException e) {
+                    } catch (Throwable ignored) {
                     }
                     now = System.currentTimeMillis();
                 }
                 switchButtonImage(false);
             }
 
-            public void switchButtonImage(final boolean state) {
+            void switchButtonImage(final boolean state) {
                 updateButtonAnimationLastChange = System.currentTimeMillis();
                 GUIMediator.safeInvokeLater(new Runnable() {
                     public void run() {
@@ -436,7 +431,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         return "ApplicationHeaderUI";
     }
 
-    public void requestSearchFocusImmediately() {
+    private void requestSearchFocusImmediately() {
         if (cloudSearchField != null) {
             cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
             cloudSearchField.setText(CLOUD_SEARCH_FIELD_HINT_TEXT);
@@ -461,7 +456,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         });
     }
     
-    public void startSearch(String query) {
+    void startSearch(String query) {
         cloudSearchField.setText(query);
         cloudSearchField.getActionListeners()[0].actionPerformed(null);
     }
@@ -535,11 +530,11 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         public void actionPerformed(ActionEvent event) {
             SearchSettings.MAX_QUERY_LENGTH.revertToDefault();
 
-            //Truncate if you have too much text for a gnutella search
+            //Truncate if you have too much text for a Gnutella search
             if (cloudSearchField.getText().length() > SearchSettings.MAX_QUERY_LENGTH.getValue()) {
                 try {
                     cloudSearchField.setText(cloudSearchField.getText(0, SearchSettings.MAX_QUERY_LENGTH.getValue()));
-                } catch (BadLocationException e) {
+                } catch (BadLocationException ignored) {
                 }
             }
 
