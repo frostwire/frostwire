@@ -102,7 +102,7 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine MONOVA = new SearchEngine(MONOVA_ID, "Monova", SearchEnginesSettings.MONOVA_SEARCH_ENABLED, "www.monova.org") {
+    public static final SearchEngine MONOVA = new SearchEngine(MONOVA_ID, "Monova", SearchEnginesSettings.MONOVA_SEARCH_ENABLED, "monova.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new MonovaSearchPerformer(MONOVA.getDomainName(), token, keywords, DEFAULT_TIMEOUT);

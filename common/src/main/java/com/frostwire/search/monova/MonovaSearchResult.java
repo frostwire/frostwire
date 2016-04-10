@@ -18,14 +18,16 @@
 
 package com.frostwire.search.monova;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.io.FilenameUtils;
-
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
+import org.apache.commons.io.FilenameUtils;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * 
@@ -121,27 +123,15 @@ public class MonovaSearchResult extends AbstractTorrentSearchResult {
         }
     }
 
-    private long parseCreationTime(String addedWhenString) {
-
-        String[] arr = addedWhenString.trim().split(" ");
-        int unit = Integer.parseInt(arr[0]);
-        
-        String period = arr[1];
-        long periodMultiplierInDays = 0;
-        
-        if (period.startsWith("day")) {
-            periodMultiplierInDays = 1;
-        } else if (period.startsWith("month")) {
-            periodMultiplierInDays = 30;
-        } else if (period.startsWith("year")) {
-            periodMultiplierInDays = 365;
+    private long parseCreationTime(String dateString) {
+        //Apr 10, 2016 06:21:20
+        SimpleDateFormat date = new SimpleDateFormat("MMM d, yyyy HH:mm:ss", Locale.US);
+        long result = System.currentTimeMillis();
+        try {
+            result = date.parse(dateString).getTime();
+        } catch (ParseException e) {
         }
-        
-        long daysBackInTimeInMillis = unit * periodMultiplierInDays * 86400000l;
-        long now = System.currentTimeMillis();
-        long dateInThePast = now - daysBackInTimeInMillis;
-        
-        return dateInThePast;
+        return result;
     }
 
     @Override

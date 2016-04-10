@@ -431,7 +431,7 @@ public final class SearchManager {
     public static final SearchEngine MONOVA = new SearchEngine("Monova", AppSettings.SEARCH_MONOVA_ENABLED, false) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
-            return new MonovaSearchPerformer("www.monova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+            return new MonovaSearchPerformer("monova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 

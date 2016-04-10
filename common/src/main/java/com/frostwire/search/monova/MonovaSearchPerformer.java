@@ -35,16 +35,15 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
     private static final String REGEX = "(?is)<a href=\"//%s/torrent/(?<itemid>[0-9]*?)/(?<filename>.*?).html";
     private static final String HTML_REGEX = "(?is).*?" +
             // filename
-            "<li class=\"active\">(?<filename>.*?)</li>.*?" +
+            "<div class=\"col-md-11.*?<h4>\\n(?<filename>.*?) </h4>.*?"+
             // creationtime
-            "<span>Added:</span>(?<creationtime>.*?)ago.*?" +
+            "<td>Added:</td>\\n<td>(?<creationtime>.*?)</td>.*?"+
             // seeds
-            "<span>Status:</span>(?<seeds>\\d+) seeders.*?" +
+            "<td>(?<seeds>\\d+) seeders.*?" +
             // infohash
-            "<span>Hash:</span>(?<infohash>[A-Fa-f0-9]{40}).*?</div>.*?" +
+            "<td>Hash:</td>\\n<td>(?<infohash>[A-Fa-f0-9]{40})</td>.*?" +
             // size
-            "<span>Total size:</span>(?<size>.*?)</div>.*?" +
-            "";
+            "<td>Total size:</td>\\n<td>(?<size>.*?)</td>.*?";
 
     public MonovaSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, String.format(REGEX, domainName), HTML_REGEX);
@@ -52,7 +51,7 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://" + getDomainName() + "/search.php?verified=1&sort=1&page=1&term=" + encodedKeywords;
+        return "http://" + getDomainName() + "/search?verified=1&sort=1&page=1&term=" + encodedKeywords;
     }
 
     @Override
@@ -62,12 +61,12 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
 
     @Override
     protected int preliminaryHtmlPrefixOffset(String page) {
-        return page.indexOf("<th class=\"torrent_name\">Torrent Name</th>");
+        return page.indexOf("<div class=\"nav-wrapper\">");
     }
 
     @Override
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
-        String fileName = matcher.group("filename").replace("&amp;", "&");
+        String fileName = matcher.group("filename").replace("&amp;", "&").replace("\n","");
         return new MonovaTempSearchResult(getDomainName(), matcher.group("itemid"), fileName);
     }
 
@@ -83,7 +82,7 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
         return candidate;
     }
 
-    /**
+     /**
      public static void main(String[] args) throws Throwable {
 
      for (int i=1; i <= 2; i++) {
@@ -100,12 +99,12 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
      System.out.println("group filename: [" + matcher.group("filename") + "]");
      System.out.println("group creationtime: [" + matcher.group("creationtime") + "]");
      System.out.println("group seeds: [" + matcher.group("seeds") + "]");
-     System.out.println("group size: [" + matcher.group("size") + "]");
      System.out.println("group infohash: [" + matcher.group("infohash") + "]");
+     System.out.println("group size: [" + matcher.group("size") + "]");
      System.out.println("\n========================");
      }
      System.out.println("");
      }
      }
-     */
+      */
 }
