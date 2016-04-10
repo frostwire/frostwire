@@ -1,3 +1,8 @@
+frostwire (6.2.4) stable; urgency=high
+  * Fixes Monova.org search.
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, Apr 10 2016 03:24:50 -0500
+
 frostwire (6.2.3) stable; urgency=high
   * New share action in Library. Create, seed and share DHT-based torrent
     in a single click.
