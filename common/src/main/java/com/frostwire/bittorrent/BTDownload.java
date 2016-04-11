@@ -45,11 +45,11 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private static final long SAVE_RESUME_RESOLUTION_MILLIS = 10000;
 
     private static final int[] ALERT_TYPES = {
-            AlertType.TORRENT_FINISHED.getSwig(),
-            AlertType.TORRENT_REMOVED.getSwig(),
-            AlertType.TORRENT_CHECKED.getSwig(),
-            AlertType.SAVE_RESUME_DATA.getSwig(),
-            AlertType.PIECE_FINISHED.getSwig()};
+            AlertType.TORRENT_FINISHED.swig(),
+            AlertType.TORRENT_REMOVED.swig(),
+            AlertType.TORRENT_CHECKED.swig(),
+            AlertType.SAVE_RESUME_DATA.swig(),
+            AlertType.PIECE_FINISHED.swig()};
 
     private static final String EXTRA_DATA_KEY = "extra_data";
     private static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
@@ -503,8 +503,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             list.add(new AnnounceEntry(url));
         }
 
-        // this will change back to list
-        th.replaceTrackers(list.toArray(new AnnounceEntry[0]));
+        th.replaceTrackers(list);
         th.saveResumeData();
     }
 

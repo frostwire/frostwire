@@ -43,14 +43,14 @@ public final class BTEngine {
 
     private static final Logger LOG = Logger.getLogger(BTEngine.class);
 
-    private static final int[] INNER_LISTENER_TYPES = new int[]{TORRENT_ADDED.getSwig(),
-            PIECE_FINISHED.getSwig(),
-            PORTMAP.getSwig(),
-            PORTMAP_ERROR.getSwig(),
-            DHT_STATS.getSwig(),
-            STORAGE_MOVED.getSwig(),
-            LISTEN_SUCCEEDED.getSwig(),
-            LISTEN_FAILED.getSwig()
+    private static final int[] INNER_LISTENER_TYPES = new int[]{TORRENT_ADDED.swig(),
+            PIECE_FINISHED.swig(),
+            PORTMAP.swig(),
+            PORTMAP_ERROR.swig(),
+            DHT_STATS.swig(),
+            STORAGE_MOVED.swig(),
+            LISTEN_SUCCEEDED.swig(),
+            LISTEN_FAILED.swig()
     };
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
@@ -234,7 +234,7 @@ public final class BTEngine {
         ctx.dataDir = dataDir; // this will be removed when we start using platform
 
         try {
-            torrent_handle_vector v = session.getSwig().get_torrents();
+            torrent_handle_vector v = session.swig().get_torrents();
             long size = v.size();
 
             String path = dataDir.getAbsolutePath();
@@ -622,12 +622,12 @@ public final class BTEngine {
     private void logListenSucceeded(ListenSucceededAlert alert) {
         TcpEndpoint endp = alert.getEndpoint();
         String addr = endp.address().swig().to_string();
-        String s = "endpoint: " + addr + ":" + endp.port() + " type:" + alert.getSwig().getSock_type();
+        String s = "endpoint: " + addr + ":" + endp.port() + " type:" + alert.swig().getSock_type();
         LOG.info("Listen succeeded on " + s);
     }
 
     private void logListenFailed(ListenFailedAlert alert) {
-        String s = "endpoint: " + alert.listenInterface() + " type:" + alert.getSwig().getSock_type();
+        String s = "endpoint: " + alert.listenInterface() + " type:" + alert.swig().getSock_type();
         LOG.info("Listen failed on " + s);
     }
 
@@ -785,7 +785,7 @@ public final class BTEngine {
         @Override
         public void alert(Alert<?> alert) {
 
-            AlertType type = alert.getType();
+            AlertType type = alert.type();
 
             switch (type) {
                 case TORRENT_ADDED:
