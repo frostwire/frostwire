@@ -324,6 +324,11 @@ public final class Librarian {
      */
     private List<FileDescriptor> getFiles(int offset, int pageSize, TableFetcher fetcher, String where, String[] whereArgs) {
         List<FileDescriptor> result = new ArrayList<>();
+
+        if (fetcher == null) {
+            return result;
+        }
+
         Cursor c = null;
         try {
             ContentResolver cr = context.getContentResolver();

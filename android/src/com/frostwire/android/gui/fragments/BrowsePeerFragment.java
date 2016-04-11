@@ -97,7 +97,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     @Override
     public Loader<Object> onCreateLoader(int id, Bundle args) {
-        if (id == LOADER_FILES_ID) {
+        if (id == LOADER_FILES_ID && args != null) {
             return createLoaderFiles(args.getByte("fileType"));
         }
         return null;
@@ -439,7 +439,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
 
             if (action.equals(Constants.ACTION_FILE_ADDED_OR_REMOVED)) {
-                updateHeader();
+                reloadFiles(Constants.FILE_TYPE_APPLICATIONS);
+                reloadFiles(Constants.FILE_TYPE_RINGTONES);
+                reloadFiles(Constants.FILE_TYPE_TORRENTS);
+                reloadFiles(Constants.FILE_TYPE_PICTURES);
+                reloadFiles(Constants.FILE_TYPE_VIDEOS);
+                reloadFiles(Constants.FILE_TYPE_AUDIO);
             }
         }
     }
