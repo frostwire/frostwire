@@ -203,8 +203,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
      * <p/>
      * If you want to have the folder where the torrent's data files are located you
      * want to use getContentSavePath().
-     *
-     * @return
      */
     @Override
     public File getSavePath() {
@@ -497,7 +495,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public void trackers(Set<String> trackers) {
-        List<AnnounceEntry> list = new ArrayList<AnnounceEntry>(trackers.size());
+        List<AnnounceEntry> list = new ArrayList<>(trackers.size());
 
         for (String url : trackers) {
             list.add(new AnnounceEntry(url));
@@ -509,15 +507,13 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public List<TransferItem> getItems() {
-        ArrayList<TransferItem> items = new ArrayList<TransferItem>();
+        ArrayList<TransferItem> items = new ArrayList<>();
 
         if (th.isValid()) {
 
             TorrentInfo ti = th.getTorrentInfo();
-            FileStorage fs = ti.files();
-
             if (ti != null && ti.isValid()) {
-
+                FileStorage fs = ti.files();
                 int numFiles = ti.numFiles();
 
                 for (int i = 0; i < numFiles; i++) {
@@ -547,7 +543,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public Set<File> getIncompleteFiles() {
-        Set<File> s = new HashSet<File>();
+        Set<File> s = new HashSet<>();
 
         try {
             if (!th.isValid()) {
@@ -625,7 +621,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     private Map<String, String> createExtra() {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
 
         try {
             String infoHash = getInfoHash();
