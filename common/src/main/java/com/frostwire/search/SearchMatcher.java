@@ -38,7 +38,7 @@ public final class SearchMatcher {
         return new SearchMatcher(matcher);
     }
     
-    private SearchMatcher(Matcher matcher) {
+    public SearchMatcher(Matcher matcher) {
         this.matcher = matcher;
     }
     
@@ -55,6 +55,9 @@ public final class SearchMatcher {
     }
     
     private String copy(String str) {
+        if (str == null) {
+            return null;
+        }
         return new String(str.toCharArray());
     }
 }
