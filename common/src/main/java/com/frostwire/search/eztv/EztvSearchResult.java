@@ -62,10 +62,33 @@ class EztvSearchResult extends AbstractTorrentSearchResult {
 
     EztvSearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-        this.displayName = HtmlManipulator.replaceHtmlEntities(matcher.group("displayname")).trim();
-        this.torrentUrl = matcher.group("torrenturl");
+        String dispName = null;
+        if (matcher.group("displayname") != null) {
+            dispName = matcher.group("displayname");
+        } else if (matcher.group("displayname2") != null) {
+            dispName = matcher.group("displayname2");
+        } else if (matcher.group("displaynamefallback") != null) {
+            dispName = matcher.group("displaynamefallback");
+        }
+        this.displayName = HtmlManipulator.replaceHtmlEntities(dispName).trim();
+
+        if (matcher.group("torrenturl") != null) {
+            this.torrentUrl = matcher.group("torrenturl");
+        } else if (matcher.group("magneturl") != null) {
+            this.torrentUrl = matcher.group("magneturl");
+        }
+
         this.filename = parseFileName(FilenameUtils.getName(torrentUrl));
-        this.infoHash = matcher.group("infohash");
+
+        this.infoHash = null;
+        try {
+            if (matcher.group("infohash") != null) {
+                this.infoHash = matcher.group("infohash");
+            } else if (torrentUrl.startsWith("magnet:?xt=urn:btih:")) {
+                this.infoHash = torrentUrl.substring(20, 52);
+            }
+        } catch (Throwable ignored) {}
+
         this.seeds = -1;
         this.creationTime = parseCreationTime(matcher.group("creationtime"));
         this.size = parseSize(matcher.group("filesize"));

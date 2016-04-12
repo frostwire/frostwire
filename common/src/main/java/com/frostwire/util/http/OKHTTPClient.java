@@ -88,6 +88,7 @@ public class OKHTTPClient extends AbstractHttpClient {
         try {
             result = getSyncResponse(okHttpClient, builder).body().string();
         } catch (IOException ioe) {
+            ioe.printStackTrace();
             throw ioe;
         } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
