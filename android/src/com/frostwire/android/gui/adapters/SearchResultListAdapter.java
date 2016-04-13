@@ -58,7 +58,7 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public class SearchResultListAdapter extends AbstractListAdapter<SearchResult> {
+public abstract class SearchResultListAdapter extends AbstractListAdapter<SearchResult> {
 
     private static final int NO_FILE_TYPE = -1;
 
@@ -69,7 +69,7 @@ public class SearchResultListAdapter extends AbstractListAdapter<SearchResult> {
 
     private ImageLoader thumbLoader;
 
-    public SearchResultListAdapter(Context context) {
+    protected SearchResultListAdapter(Context context) {
         super(context, R.layout.view_bittorrent_search_result_list_item);
         this.linkListener = new OnLinkClickListener();
         this.previewClickListener = new PreviewClickListener(context, this);
@@ -108,14 +108,14 @@ public class SearchResultListAdapter extends AbstractListAdapter<SearchResult> {
         populateThumbnail(view, sr);
     }
 
-    protected void maybeMarkTitleOpened(View view, SearchResult sr) {
+    private void maybeMarkTitleOpened(View view, SearchResult sr) {
         int clickedColor = getContext().getResources().getColor(R.color.browse_peer_listview_item_inactive_foreground);
         int unclickedColor = getContext().getResources().getColor(R.color.basic_blue);
         TextView title = findView(view, R.id.view_bittorrent_search_result_list_item_title);
         title.setTextColor(LocalSearchEngine.instance().hasBeenOpened(sr) ? clickedColor : unclickedColor);
     }
 
-    protected void populateFilePart(View view, FileSearchResult sr) {
+    private void populateFilePart(View view, FileSearchResult sr) {
         ImageView fileTypeIcon = findView(view, R.id.view_bittorrent_search_result_list_item_filetype_icon);
         fileTypeIcon.setImageResource(getFileTypeIconId());
 
@@ -163,12 +163,12 @@ public class SearchResultListAdapter extends AbstractListAdapter<SearchResult> {
         }
     }
 
-    protected void populateYouTubePart(View view, YouTubeCrawledSearchResult sr) {
+    private void populateYouTubePart(View view, YouTubeCrawledSearchResult sr) {
         TextView extra = findView(view, R.id.view_bittorrent_search_result_list_item_text_extra);
         extra.setText(FilenameUtils.getExtension(sr.getFilename()));
     }
 
-    protected void populateTorrentPart(View view, TorrentSearchResult sr) {
+    private void populateTorrentPart(View view, TorrentSearchResult sr) {
         TextView seeds = findView(view, R.id.view_bittorrent_search_result_list_item_text_seeds);
         if (sr.getSeeds() > 0) {
             seeds.setText(getContext().getResources().getQuantityString(R.plurals.count_seeds_source, sr.getSeeds(), sr.getSeeds()));
@@ -183,8 +183,7 @@ public class SearchResultListAdapter extends AbstractListAdapter<SearchResult> {
         searchResultClicked(sr);
     }
 
-    protected void searchResultClicked(SearchResult sr) {
-    }
+    abstract protected void searchResultClicked(SearchResult sr);
 
     private void filter() {
         this.visualList = filter(list).filtered;
@@ -208,10 +207,7 @@ public class SearchResultListAdapter extends AbstractListAdapter<SearchResult> {
     }
 
     private boolean accept(SearchResult sr, MediaType mt) {
-        if (sr instanceof FileSearchResult) {
-            return mt != null && mt.getId() == fileType;
-        }
-        return false;
+        return sr instanceof FileSearchResult && mt != null && mt.getId() == fileType;
     }
 
     private int getFileTypeIconId() {
@@ -281,13 +277,17 @@ public class SearchResultListAdapter extends AbstractListAdapter<SearchResult> {
     private static final class PreviewClickListener extends ClickAdapter<Context> {
         final WeakReference<SearchResultListAdapter> adapterRef;
 
-        public PreviewClickListener(Context ctx, SearchResultListAdapter adapter) {
+        PreviewClickListener(Context ctx, SearchResultListAdapter adapter) {
             super(ctx);
             adapterRef = Ref.weak(adapter);
         }
 
         @Override
         public void onClick(Context ctx, View v) {
+            if (v == null) {
+                return;
+            }
+
             StreamableSearchResult sr = (StreamableSearchResult) v.getTag();
 
             if (sr != null) {
