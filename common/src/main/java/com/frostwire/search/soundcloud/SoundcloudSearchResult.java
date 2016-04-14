@@ -119,7 +119,9 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     }
 
     private long buildSize(SoundcloudItem item) {
-        return ((item.download_url != null) ? item.original_content_size : (int) (0.30 * ((float) item.original_content_size)));
+        int x = item.duration / 1000;
+        int y = 128;
+        return (x * y) / 8;
     }
 
     private String buildSource(SoundcloudItem item) {
