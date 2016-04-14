@@ -119,7 +119,8 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     }
 
     private long buildSize(SoundcloudItem item) {
-        int x = item.duration / 1000;
+        // not bit optimized for clarity, compiler will do it
+        int x = item.duration;
         int y = 128;
         return (x * y) / 8;
     }
