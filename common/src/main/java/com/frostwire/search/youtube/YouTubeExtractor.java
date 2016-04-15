@@ -140,7 +140,9 @@ public final class YouTubeExtractor {
             HashMap<String, String> m2 = new HashMap<>();
             for (int j = 0; j < t0.length; j++) {
                 String[] t1 = t0[j].split("=");
-                m2.put(t1[0], t1[1]);
+                if (t1.length == 2) {
+                    m2.put(t1[0], t1[1]);
+                }
             }
             int fmt = Integer.parseInt(m2.get("itag"));
             Format format = FORMATS.get(fmt);
