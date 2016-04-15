@@ -1,9 +1,19 @@
 frostwire (6.2.4) stable; urgency=high
   * Fixes Monova search.
   * Fixes EZTV search.
+  * Fixes YouTube search.
   * Fixes bug opening certain YT preview URLs.
+  * New jlibtorrent 1.1.0.24 with SSL security updates and libtorrent 1.1 release.
+  * jlibtorrent: multithreaded disk i/o and hashing.
+  * jlibtorrent: more efficient alert allocation.
+  * jlibtorrent: experimental support for mutable torrents (BEP 38).
+  * jlibtorrent: 5x faster torrent bcoder/bdecoder.
+  * jlibtorrent: improved shutdown.
+  * jlibtorrent: SSL over uTP supported.
+  * jlibtorrent: countless scalability updates, seed tens of thousands of torrents,
+    if not hundreds of thousands of torrents in a single jlibtorrent instance.
 	
- -- FrostWire Team <contact@frostwire.com>  Sun, Apr 10 2016 12:03:40 -0500
+ -- FrostWire Team <contact@frostwire.com>  Fri, Apr 15 2016 16:20:00 -0500
 
 frostwire (6.2.3) stable; urgency=high
   * New share action in Library. Create, seed and share DHT-based torrent

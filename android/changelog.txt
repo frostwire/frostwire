@@ -13,6 +13,8 @@ FrostWire 1.7.3 - APR/15/2016
  - jlibtorrent: countless scalability updates, seed tens of thousands of torrents,
    if not hundreds of thousands of torrents in a single jlibtorrent instance.
  - YouTube search fixed.
+ - Monova search fixed.
+ - EZTV search fixed.
  - Crash on search fixed.
 
 FrostWire 1.7.2 - APR/05/2016
