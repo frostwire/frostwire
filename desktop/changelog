@@ -3,17 +3,19 @@ frostwire (6.2.4) stable; urgency=high
   * Fixes EZTV search.
   * Fixes YouTube search.
   * Fixes bug opening certain YT preview URLs.
-  * New jlibtorrent 1.1.0.24 with SSL security updates and libtorrent 1.1 release.
+  * New jlibtorrent 1.1.0.24 with SSL security updates
+    and libtorrent 1.1 release.
   * jlibtorrent: multithreaded disk i/o and hashing.
   * jlibtorrent: more efficient alert allocation.
   * jlibtorrent: experimental support for mutable torrents (BEP 38).
   * jlibtorrent: 5x faster torrent bcoder/bdecoder.
   * jlibtorrent: improved shutdown.
   * jlibtorrent: SSL over uTP supported.
-  * jlibtorrent: countless scalability updates, seed tens of thousands of torrents,
-    if not hundreds of thousands of torrents in a single jlibtorrent instance.
-	
- -- FrostWire Team <contact@frostwire.com>  Fri, Apr 15 2016 16:20:00 -0500
+  * jlibtorrent: countless scalability updates, seed tens of thousands of
+    torrents, if not hundreds of thousands of torrents in a single jlibtorrent
+    instance.
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 15 Apr 2016 16:20:00 -0500
 
 frostwire (6.2.3) stable; urgency=high
   * New share action in Library. Create, seed and share DHT-based torrent
@@ -24,7 +26,8 @@ frostwire (6.2.3) stable; urgency=high
   * jlibtorrent: optimize enumeration of network interfaces on windows
   * jlibtorrent: improve reliability of binding listen sockets
   * jlibtorrent: support SNI in https web seeds and trackers
-  * jlibtorrent: fix unhandled exception in DHT when receiving a DHT packet over IPv6
+  * jlibtorrent: fix unhandled exception in DHT when receiving a DHT packet
+    over IPv6
   * Dropped rxjava library. KISS.
 
  -- FrostWire Team <contact@frostwire.com>  Tue, 31 Mar 2016 12:06:20 -0500
@@ -36,7 +39,7 @@ frostwire (6.2.2) stable; urgency=high
   * Portuguese translation update. Thanks Alejandro.
 
  -- FrostWire Team <contact@frostwire.com>  Fri, 12 Feb 2016 07:56:40 -0500
- 
+
 frostwire (6.2.1) stable; urgency=high
   * Fixes issue where a corrupted .torrent inside the libtorrent folder
     would make FrostWire crash on startup.
@@ -1592,3 +1595,4 @@ frostwire (4.13.1) stable; urgency=low
   keep going
 
  -- FrostWire Team <contact@frostwire.com>  Tue, 22 Jun 2007 00:00:00 -0500
+
