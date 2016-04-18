@@ -68,20 +68,23 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
                 String url = getCrawlUrl(obj);
 
-                byte[] failed = cacheGet("failed:" + url);
-                if (failed != null) {
-                    long failedWhen = array2long(failed);
-                    if ((System.currentTimeMillis() - failedWhen) < FAILED_CRAWL_URL_CACHE_LIFETIME) {
-                        //if the failed request is still fresh we stop
-                        LOG.info("CrawlPagedWebSearchPerformer::crawl() - hit failed cache url");
-                        onResults(Collections.EMPTY_LIST);
-                        return;
-                    } else {
-                        cacheRemove("failed:" + url);
-                    }
-                }
-
                 if (url != null) {
+
+                    // this block is an early check for failed in cache, quick return
+                    byte[] failed = cacheGet("failed:" + url);
+                    if (failed != null) {
+                        long failedWhen = array2long(failed);
+                        if ((System.currentTimeMillis() - failedWhen) < FAILED_CRAWL_URL_CACHE_LIFETIME) {
+                            //if the failed request is still fresh we stop
+                            LOG.info("CrawlPagedWebSearchPerformer::crawl() - hit failed cache url");
+                            onResults(Collections.EMPTY_LIST);
+                            return;
+                        } else {
+                            cacheRemove("failed:" + url);
+                        }
+                    }
+
+
                     byte[] data = cacheGet(url);
 
                     if (sr instanceof TorrentSearchResult) {

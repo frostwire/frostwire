@@ -44,7 +44,7 @@ final class YouTubeSig {
         Matcher m = Pattern.compile("\\.sig\\|\\|([$a-zA-Z0-9]+)\\(").matcher(jscode);
         m.find();
         String funcname = m.group(1);
-        this.fn = new JsFunction<String>(jscode, funcname);
+        this.fn = new JsFunction<>(jscode, funcname);
     }
 
     public String calc(String sig) {
