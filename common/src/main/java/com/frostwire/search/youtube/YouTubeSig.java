@@ -18,10 +18,9 @@
 
 package com.frostwire.search.youtube;
 
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.youtube.jd.JsFunction;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author gubatron
