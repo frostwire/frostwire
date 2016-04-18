@@ -110,7 +110,6 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
 
     private void updatePlayButton() {
         final boolean playable = dl.canPreview();
-        Thread.currentThread().yield();
         labelPlay.setIcon((isDlBeingPlayed()) ? GUIMediator.getThemeImage("speaker") : (playable) ? play_solid : play_transparent);
     }
 
