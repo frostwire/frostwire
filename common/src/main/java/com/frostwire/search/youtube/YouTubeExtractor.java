@@ -84,6 +84,9 @@ public final class YouTubeExtractor {
             String videoId = getVideoID(videoUrl);
             String channelName = br.getRegex("feature=watch\"[^>]+dir=\"ltr[^>]+>(.*?)</a>(\\s+)?<span class=\"yt-user").getMatch(0);
             String userName = br.getRegex("temprop=\"url\" href=\"http://(www\\.)?youtube\\.com/user/([^<>\"]*?)\"").getMatch(1);
+            if (userName == null) { // look in internal json
+                userName = br.getRegex("\",\"author\":\"([^<>\"]*?)\",\"").getMatch(0);
+            }
 
             ThumbnailLinks thumbnailLinks = createThumbnailLink(videoId);
 
