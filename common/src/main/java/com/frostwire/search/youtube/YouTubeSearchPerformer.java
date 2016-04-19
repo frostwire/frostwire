@@ -44,7 +44,7 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
     private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title[ ]*\"><a href=\"(?<link>/watch.*?)\".*? title=\"(?<title>.*?)\".*? Duration: (?<duration>.*?)\\.</span>.*?(by |byline\">)<a href=\"/user/(?<user>.*?)\"";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
-    private static final int MAX_RESULTS = 15;
+    private static final int MAX_RESULTS = 20;
 
     // regex for secondary playlist
     private static final Pattern TITLE_SECONDARY_PATTERN = Pattern.compile("(?is)<h2 class=\"watch-card-title\"><a .*\">(?<title>.*?)</a></h2>");
@@ -61,7 +61,7 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
 
     @Override
     protected List<? extends SearchResult> crawlResult(YouTubeSearchResult sr, byte[] data) throws Exception {
-        List<YouTubeCrawledSearchResult> list = new LinkedList<YouTubeCrawledSearchResult>();
+        List<YouTubeCrawledSearchResult> list = new LinkedList<>();
 
         String detailsUrl = sr.getDetailsUrl();
         List<LinkInfo> infos = new YouTubeExtractor().extract(detailsUrl, false);

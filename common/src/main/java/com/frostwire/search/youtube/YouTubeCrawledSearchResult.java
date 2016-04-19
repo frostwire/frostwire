@@ -39,6 +39,7 @@ public class YouTubeCrawledSearchResult extends AbstractCrawledSearchResult impl
     private final long creationTime;
     private final long size;
     private final String downloadUrl;
+    private final String source;
 
     YouTubeCrawledSearchResult(YouTubeSearchResult sr, LinkInfo video, LinkInfo audio) {
         super(sr);
@@ -51,6 +52,7 @@ public class YouTubeCrawledSearchResult extends AbstractCrawledSearchResult impl
         this.creationTime = audio != null ? audio.date.getTime() : video.date.getTime();
         this.size = buildSize((int) sr.getSize(), video, audio);
         this.downloadUrl = buildDownloadUrl(video, audio);
+        this.source = "YouTube - " + (audio != null ? audio.user : video.user);
     }
 
     public LinkInfo getVideo() {
@@ -84,6 +86,11 @@ public class YouTubeCrawledSearchResult extends AbstractCrawledSearchResult impl
     @Override
     public String getDownloadUrl() {
         return downloadUrl;
+    }
+
+    @Override
+    public String getSource() {
+        return source;
     }
 
     private String buildFilename(LinkInfo video, LinkInfo audio) {
