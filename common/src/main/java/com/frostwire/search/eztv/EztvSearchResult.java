@@ -27,30 +27,13 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 class EztvSearchResult extends AbstractTorrentSearchResult {
-
-    private final static long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2 << 39, 2 << 49};
-
-    private static final Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
-
-    static {
-        UNIT_TO_BYTE_MULTIPLIERS_MAP = new HashMap<String, Integer>();
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("B", 0);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("KB", 1);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("MB", 2);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("GB", 3);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("TB", 4);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("PB", 5);
-    }
-
     private String filename;
     private String displayName;
     private String detailsUrl;
@@ -148,25 +131,6 @@ class EztvSearchResult extends AbstractTorrentSearchResult {
         } catch (UnsupportedEncodingException ignored) {
         }
         return decodedFileName;
-    }
-
-    private long parseSize(String group) {
-        String[] size = group.trim().split(" ");
-        String amount = size[0].trim();
-        String unit = size[1].trim();
-
-        long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
-
-        //fractional size
-        if (amount.indexOf(".") > 0) {
-            float floatAmount = Float.parseFloat(amount);
-            return (long) (floatAmount * multiplier);
-        }
-        //integer based size
-        else {
-            int intAmount = Integer.parseInt(amount);
-            return (long) (intAmount * multiplier);
-        }
     }
 
     private long parseCreationTime(String dateString) {

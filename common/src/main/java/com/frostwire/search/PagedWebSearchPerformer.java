@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,7 @@ import java.util.List;
  * @author aldenml
  */
 public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
-
     private static final Logger LOG = Logger.getLogger(PagedWebSearchPerformer.class);
-
     private final int pages;
 
     public PagedWebSearchPerformer(String domainName, long token, String keywords, int timeout, int pages) {

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,39 +19,19 @@
 package com.frostwire.search.btjunkie;
 
 import com.frostwire.regex.Pattern;
-import com.frostwire.search.CrawlRegexSearchPerformer;
-import com.frostwire.search.PerformersHelper;
-import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.SearchResult;
+import com.frostwire.search.*;
+import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieSearchResult> {
     private static final int MAX_PAGES = 2;
     private static final int MAX_SEARCH_RESULTS = 20;
-
     private static Pattern YEAR_MONTH_DATE_PATTERN = Pattern.compile("([\\d]{4})-([\\d]{2})-([\\d]{2})");
     private static final String HTML_REGEX = "(?is)<tr>.*?<td data-href=\"(?<detailsUrl>.*?)\" class=\"type_td\">.*?<a class=\"p2\" title=\"View details for [\\d]+ - (?<title>.*?)\" href=\".*?\"><h2>.*?<td data-href=\"(?<magnet>.*?)\" class=\"magnet_td\">.*?<td class=\"size_td\">(?<size>.*?)</td>.*?<td class=\"date_td\">(?<date>.*?)</td>.*?<td class=\"seed_td\">(?<seeds>.*?)</td>.*?</tr>";
     private static final Pattern PATTERN = Pattern.compile(HTML_REGEX);
-
-    private final static long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2 << 39, 2 << 49};
-
-    private static final Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
-
     private static final Pattern SIZE_PATTERN = Pattern.compile("([\\d+\\.]+) ([BKMGTP]+)");
-
-    static {
-        UNIT_TO_BYTE_MULTIPLIERS_MAP = new HashMap<String, Integer>();
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("B", 0);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("KB", 1);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("MB", 2);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("GB", 3);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("TB", 4);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("PB", 5);
-    }
 
     public BtjunkieSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, MAX_PAGES, MAX_SEARCH_RESULTS);
@@ -71,7 +51,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
     public BtjunkieSearchResult fromMatcher(SearchMatcher matcher) {
         final String domainName = getDomainName();
 
-        BtjunkieSearchResult sr = new BtjunkieSearchResult(
+        return new BtjunkieSearchResult(
                 domainName,
                 parseDisplayUrl(domainName, matcher.group("detailsUrl")),
                 parseFileName(matcher.group("title")),
@@ -81,8 +61,6 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
                 parseSize(matcher.group("size")),
                 parseDate(matcher.group("date")),
                 parseSeeds(matcher.group("seeds")));
-
-        return sr;
     }
 
     private String parseDisplayUrl(String domainName, String detailsUrl) {
@@ -138,7 +116,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
             String amount = matcher.group(1);
             String unit = matcher.group(2);
 
-            long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
+            long multiplier = AbstractTorrentSearchResult.BYTE_MULTIPLIERS[AbstractTorrentSearchResult.UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
 
             //fractional size
             if (amount.indexOf(".") > 0) {

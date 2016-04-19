@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@
 package com.frostwire.android.gui.transfers;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.logging.Logger;
-import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
@@ -242,7 +242,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
             }
 
             try {
-                byte[] data = null;
+                byte[] data;
                 String uri = info.getTorrentUrl();
                 String referrer = info.getReferrerUrl();
                 if (uri.startsWith("http")) {
