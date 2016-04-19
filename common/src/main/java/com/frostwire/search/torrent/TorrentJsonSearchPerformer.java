@@ -36,7 +36,7 @@ public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJson
 
     private final Comparator<T> itemComparator;
 
-    public TorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
+    private TorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
         super(domainName, token, keywords, timeout, pages, numCrawls);
         
         this.itemComparator = new Comparator<T>() {
@@ -53,7 +53,7 @@ public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJson
 
     @Override
     protected final List<? extends SearchResult> searchPage(String page) {
-        List<SearchResult> result = new LinkedList<SearchResult>();
+        List<SearchResult> result = new LinkedList<>();
 
         List<T> items = parseJson(page);
 

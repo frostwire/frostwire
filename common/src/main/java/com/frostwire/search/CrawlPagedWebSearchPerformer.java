@@ -22,7 +22,9 @@ import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentSearchResult;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gubatron
@@ -40,6 +42,16 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
     private static MagnetDownloader magnetDownloader = null;
 
     private int numCrawls;
+
+    protected static final Map<String, Integer> UNIT_TO_BYTES;
+    static {
+        UNIT_TO_BYTES = new HashMap<>();
+        UNIT_TO_BYTES.put("bytes", 1);
+        UNIT_TO_BYTES.put("B", 1);
+        UNIT_TO_BYTES.put("KB", 1024);
+        UNIT_TO_BYTES.put("MB", 1024 * 1024);
+        UNIT_TO_BYTES.put("GB", 1024 * 1024 * 1024);
+    }
 
     public CrawlPagedWebSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
         super(domainName, token, keywords, timeout, pages);
@@ -154,7 +166,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
     protected abstract List<? extends SearchResult> crawlResult(T sr, byte[] data) throws Exception;
 
-    protected byte[] fetchMagnet(String magnet) {
+    private byte[] fetchMagnet(String magnet) {
         if (magnetDownloader != null) {
             return magnetDownloader.download(magnet, DEFAULT_MAGNET_DOWNLOAD_TIMEOUT_SECS);
         } else {
@@ -235,10 +247,10 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
             return dstInit;
         }
         if ((nBytes - 1) * 8 + dstPos >= 64) {
-            throw new IllegalArgumentException("(nBytes-1)*8+dstPos is greather or equal to than 64");
+            throw new IllegalArgumentException("(nBytes-1)*8+dstPos is greater or equal to than 64");
         }
         long out = dstInit;
-        int shift = 0;
+        int shift;
         for (int i = 0; i < nBytes; i++) {
             shift = i * 8 + dstPos;
             final long bits = (0xffL & src[i + srcPos]) << shift;
@@ -254,9 +266,9 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
             return dst;
         }
         if ((nBytes - 1) * 8 + srcPos >= 64) {
-            throw new IllegalArgumentException("(nBytes-1)*8+srcPos is greather or equal to than 64");
+            throw new IllegalArgumentException("(nBytes-1)*8+srcPos is greater or equal to than 64");
         }
-        int shift = 0;
+        int shift;
         for (int i = 0; i < nBytes; i++) {
             shift = i * 8 + srcPos;
             dst[dstPos + i] = (byte) (0xff & (src >> shift));

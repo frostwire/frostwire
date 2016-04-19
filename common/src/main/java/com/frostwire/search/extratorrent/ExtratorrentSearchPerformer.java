@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,19 @@
 package com.frostwire.search.extratorrent;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.search.*;
+import com.frostwire.regex.Pattern;
+import com.frostwire.search.AlbumCluster;
+import com.frostwire.search.ScrapedTorrentFileSearchResult;
+import com.frostwire.search.SearchMatcher;
+import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.JsonUtils;
-import com.frostwire.regex.Pattern;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -35,18 +40,6 @@ import java.util.*;
 public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<ExtratorrentItem, ExtratorrentSearchResult> {
 
     private static final Logger LOG = Logger.getLogger(ExtratorrentSearchPerformer.class);
-
-    private static final Map<String, Integer> UNIT_TO_BYTES;
-
-    static {
-        UNIT_TO_BYTES = new HashMap<String, Integer>();
-        UNIT_TO_BYTES.put("bytes", 1);
-        UNIT_TO_BYTES.put("B", 1);
-        UNIT_TO_BYTES.put("KB", 1024);
-        UNIT_TO_BYTES.put("MB", 1024 * 1024);
-        UNIT_TO_BYTES.put("GB", 1024 * 1024 * 1024);
-    }
-
     private static final String FILES_REGEX = "(?is)<tr>.*?<td.*?<img.*?<img.*?<td colspan.*?nowrap=\"nowrap\">(?<filename>[^<>]*?)&nbsp;<font.*?>\\((?<size>.*?)&nbsp;(?<unit>.*?)\\)</font>.*?</td></tr>";
     private static final Pattern FILES_PATTERN = Pattern.compile(FILES_REGEX);
 
@@ -71,15 +64,15 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
 
     @Override
     protected List<? extends SearchResult> crawlResult(TorrentCrawlableSearchResult sr, byte[] data) throws Exception {
-        return crawlResult(sr, data, false);
+        return crawlResult(sr, false);
     }
 
-    protected List<? extends SearchResult> crawlResult(TorrentCrawlableSearchResult sr, byte[] data, boolean detectAlbums) throws Exception {
+    protected List<? extends SearchResult> crawlResult(TorrentCrawlableSearchResult sr, boolean detectAlbums) throws Exception {
         if (!(sr instanceof ExtratorrentSearchResult)) {
             return Collections.emptyList();
         }
 
-        LinkedList<ScrapedTorrentFileSearchResult> result = new LinkedList<ScrapedTorrentFileSearchResult>();
+        LinkedList<ScrapedTorrentFileSearchResult> result = new LinkedList<>();
 
         ExtratorrentSearchResult esr = (ExtratorrentSearchResult) sr;
         String torrentFilesUrl = esr.getDetailsUrl().replace("/torrent/", "/torrent_files/");
@@ -102,7 +95,7 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
                     size = -1;
                 }
 
-                result.add(new ScrapedTorrentFileSearchResult<ExtratorrentSearchResult>(esr, filename, (long) size));
+                result.add(new ScrapedTorrentFileSearchResult<>(esr, filename, (long) size));
 
             } catch (Throwable e) {
                 LOG.warn("Error creating single file search result", e);
@@ -110,7 +103,7 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
         }
 
         if (detectAlbums) {
-            LinkedList<SearchResult> temp = new LinkedList<SearchResult>();
+            LinkedList<SearchResult> temp = new LinkedList<>();
             temp.addAll(result);
             temp.addAll(new AlbumCluster().detect(sr, result));
             return temp;

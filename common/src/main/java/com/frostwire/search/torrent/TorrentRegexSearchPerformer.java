@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 package com.frostwire.search.torrent;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.search.*;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
+import com.frostwire.search.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,9 +37,9 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
     private final Pattern htmlDetailPagePattern;
     private final static Logger LOG = Logger.getLogger(TorrentRegexSearchPerformer.class);
 
-    public TorrentRegexSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls, int regexMaxResults, String preliminarSearchResultsRegex, String htmlDetailPagePatternRegex) {
+    public TorrentRegexSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls, int regexMaxResults, String preliminarySearchResultsRegex, String htmlDetailPagePatternRegex) {
         super(domainName, token, keywords, timeout, pages, numCrawls, regexMaxResults);
-        this.preliminarySearchResultsPattern = Pattern.compile(preliminarSearchResultsRegex);
+        this.preliminarySearchResultsPattern = Pattern.compile(preliminarySearchResultsRegex);
         this.htmlDetailPagePattern = Pattern.compile(htmlDetailPagePatternRegex);
     }
 
@@ -50,7 +50,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
 
     @Override
     protected String getCrawlUrl(CrawlableSearchResult sr) {
-        String crawlUrl = null;
+        String crawlUrl;
 
         if (sr instanceof TorrentCrawlableSearchResult) {
             crawlUrl = ((TorrentCrawlableSearchResult) sr).getTorrentUrl();
@@ -67,7 +67,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
     }
 
     protected List<? extends SearchResult> crawlResult(CrawlableSearchResult sr, byte[] data, boolean detectAlbums) throws Exception {
-        List<SearchResult> list = new LinkedList<SearchResult>();
+        List<SearchResult> list = new LinkedList<>();
 
         if (data == null) {
             return list;

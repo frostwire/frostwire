@@ -40,17 +40,6 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
     private boolean isScrapingFile = false;
     private static final Pattern FILE_SCRAPE_PATTERN = Pattern.compile(SCRAPE_REGEX);
 
-    private static final Map<String, Integer> UNIT_TO_BYTES;
-
-    static {
-        UNIT_TO_BYTES = new HashMap<String, Integer>();
-        UNIT_TO_BYTES.put("bytes", 1);
-        UNIT_TO_BYTES.put("B", 1);
-        UNIT_TO_BYTES.put("KB", 1024);
-        UNIT_TO_BYTES.put("MB", 1024 * 1024);
-        UNIT_TO_BYTES.put("GB", 1024 * 1024 * 1024);
-    }
-
     public BitSnoopSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
     }

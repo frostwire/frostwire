@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package com.frostwire.search.kat;
 
 import com.frostwire.logging.Logger;
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
@@ -26,9 +27,11 @@ import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.JsonUtils;
-import com.frostwire.regex.Pattern;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -37,17 +40,6 @@ import java.util.*;
 public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATSearchResult> {
 
     private static final Logger LOG = Logger.getLogger(KATSearchPerformer.class);
-
-    private static final Map<String, Integer> UNIT_TO_BYTES;
-
-    static {
-        UNIT_TO_BYTES = new HashMap<String, Integer>();
-        UNIT_TO_BYTES.put("bytes", 1);
-        UNIT_TO_BYTES.put("B", 1);
-        UNIT_TO_BYTES.put("KB", 1024);
-        UNIT_TO_BYTES.put("MB", 1024 * 1024);
-        UNIT_TO_BYTES.put("GB", 1024 * 1024 * 1024);
-    }
 
     private static final String FILES_REGEX = "(?is)<tr.*?<td class=\"torFileName\" title=\".*?\">(?<filename>.*?)</td>.*?<td class=\"torFileSize\">(?<size>.*?) <span>(?<unit>.*?)</span></td>.*?</tr>";
     private static final Pattern FILES_PATTERN = Pattern.compile(FILES_REGEX);
@@ -79,7 +71,7 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
             return Collections.emptyList();
         }
 
-        List<ScrapedTorrentFileSearchResult> result = new LinkedList<ScrapedTorrentFileSearchResult>();
+        List<ScrapedTorrentFileSearchResult> result = new LinkedList<>();
 
         KATSearchResult ksr = (KATSearchResult) sr;
         String page = fetch("http://" + getDomainName() + "/torrents/getfiles/" + ksr.getHash() + "/?all=1");
@@ -100,7 +92,7 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
                     size = -1;
                 }
 
-                result.add(new ScrapedTorrentFileSearchResult<KATSearchResult>(ksr, filename, (long) size, "https://torcache.net/", null));
+                result.add(new ScrapedTorrentFileSearchResult<>(ksr, filename, (long) size, "https://torcache.net/", null));
 
             } catch (Throwable e) {
                 LOG.warn("Error creating single file search result", e);
