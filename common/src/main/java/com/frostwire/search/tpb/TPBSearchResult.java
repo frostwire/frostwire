@@ -18,17 +18,16 @@
 
 package com.frostwire.search.tpb;
 
+import com.frostwire.search.SearchMatcher;
+import com.frostwire.search.torrent.AbstractTorrentSearchResult;
+import com.frostwire.util.HtmlManipulator;
+import org.apache.commons.io.FilenameUtils;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.io.FilenameUtils;
-
-import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.AbstractTorrentSearchResult;
-import com.frostwire.util.HtmlManipulator;
 
 /**
  * 
@@ -140,23 +139,11 @@ public class TPBSearchResult extends AbstractTorrentSearchResult {
         return displayName;
     }
 
-    private long parseSize(String group) {
+    protected long parseSize(String group) {
         String[] size = group.split("&nbsp;");
         String amount = size[0].trim();
         String unit = size[1].trim();
-
-        long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
-
-        //fractional size
-        if (amount.indexOf(".") > 0) {
-            float floatAmount = Float.parseFloat(amount);
-            return (long) (floatAmount * multiplier);
-        }
-        //integer based size
-        else {
-            int intAmount = Integer.parseInt(amount);
-            return (long) (intAmount * multiplier);
-        }
+        return calculateSize(amount, unit);
     }
 
     private int parseSeeds(String group) {

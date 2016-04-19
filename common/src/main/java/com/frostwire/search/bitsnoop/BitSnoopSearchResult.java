@@ -110,29 +110,16 @@ public class BitSnoopSearchResult extends AbstractTorrentSearchResult {
         return decodedFileName + ".torrent";
     }
 
-    private long parseSize(String group) {
+    protected long parseSize(String group) {
         String[] size = group.trim().split(" ");
         String amount = size[0].trim();
         amount = amount.replaceAll(",", "");
         String unit = size[1].trim();
-
-        long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
-
-        //fractional size
-        if (amount.indexOf(".") > 0) {
-            float floatAmount = Float.parseFloat(amount);
-            return (long) (floatAmount * multiplier);
-        }
-        //integer based size
-        else {
-            int intAmount = Integer.parseInt(amount);
-            return (long) (intAmount * multiplier);
-        }
+        return calculateSize(amount, unit);
     }
 
     private int parseSeeds(String group) {
         try {
-
             if (group.indexOf("0 / 0") == -1) {
                 group = group.split("\"Seeders\">")[1];
                 group = group.split("</span>")[0];

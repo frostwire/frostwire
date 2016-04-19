@@ -133,7 +133,7 @@ public class YifySearchResult extends AbstractTorrentSearchResult {
         return torrentUrl;
     }
 
-    private long parseSize(String group) {
+    protected long parseSize(String group) {
         long result = 0;
         Matcher matcher = sizePattern.matcher(group);
         if (matcher.find()) {
@@ -141,7 +141,6 @@ public class YifySearchResult extends AbstractTorrentSearchResult {
             String unit = matcher.group(2);
 
             long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
-
             //fractional size
             if (amount.indexOf(".") > 0) {
                 float floatAmount = Float.parseFloat(amount);

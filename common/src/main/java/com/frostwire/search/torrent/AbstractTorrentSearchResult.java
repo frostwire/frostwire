@@ -65,9 +65,11 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
         String[] size = group.trim().split(" ");
         String amount = size[0].trim();
         String unit = size[1].trim();
+        return calculateSize(amount, unit);
+    }
 
+    protected long calculateSize(String amount, String unit) {
         long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
-
         //fractional size
         if (amount.indexOf(".") > 0) {
             float floatAmount = Float.parseFloat(amount);
@@ -76,7 +78,7 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
         //integer based size
         else {
             int intAmount = Integer.parseInt(amount);
-            return (long) (intAmount * multiplier);
+            return intAmount * multiplier;
         }
     }
 }
