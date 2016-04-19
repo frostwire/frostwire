@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,8 @@ package com.frostwire.search;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class CrawlRegexSearchPerformer<T extends CrawlableSearchResult> extends CrawlPagedWebSearchPerformer<T> implements RegexSearchPerformer<T> {
 
@@ -36,7 +34,7 @@ public abstract class CrawlRegexSearchPerformer<T extends CrawlableSearchResult>
     }
 
     @Override
-    protected final List<? extends SearchResult> searchPage(String page) {
+    protected List<? extends SearchResult> searchPage(String page) {
         String reducedPage = PerformersHelper.reduceHtml(page, preliminaryHtmlPrefixOffset(page), preliminaryHtmlSuffixOffset(page));
         return PerformersHelper.searchPageHelper(this, reducedPage, regexMaxResults);
     }

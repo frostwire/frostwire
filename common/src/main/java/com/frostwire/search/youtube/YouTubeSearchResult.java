@@ -102,4 +102,13 @@ public final class YouTubeSearchResult extends AbstractFileSearchResult implemen
     public String getThumbnailUrl() {
         return null;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof YouTubeSearchResult)) {
+            return false;
+        }
+
+        return videoUrl.equals(((YouTubeSearchResult) obj).videoUrl);
+    }
 }

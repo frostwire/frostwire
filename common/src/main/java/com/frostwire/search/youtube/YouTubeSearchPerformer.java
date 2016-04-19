@@ -18,6 +18,7 @@
 
 package com.frostwire.search.youtube;
 
+import com.frostwire.logging.Logger;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlRegexSearchPerformer;
 import com.frostwire.search.SearchMatcher;
@@ -38,10 +39,16 @@ import static com.frostwire.search.youtube.YouTubeUtils.isDash;
  */
 public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSearchResult> {
 
+    private static final Logger LOG = Logger.getLogger(YouTubeSearchPerformer.class);
+
     private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title[ ]*\"><a href=\"(?<link>/watch.*?)\".*? title=\"(?<title>.*?)\".*? Duration: (?<duration>.*?)\\.</span>.*?(by |byline\">)<a href=\"/user/(?<user>.*?)\"";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     private static final int MAX_RESULTS = 15;
+
+    // regex for secondary playlist
+    private static final Pattern TITLE_SECONDARY_PATTERN = Pattern.compile("(?is)<h2 class=\"watch-card-title\"><a .*\">(?<title>.*?)</a></h2>");
+    private static final Pattern LIST_SECONDARY_PATTERN = Pattern.compile("(?is)<a href=\"(?<link>/watch.*?)&.*?\" .*?>(?<title>.*?)</a></td><td class=\"watch-card-data-col\">(?<duration>.*?)</td></tr><tr");
 
     public YouTubeSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
@@ -118,6 +125,16 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
     }
 
     @Override
+    protected List<? extends SearchResult> searchPage(String page) {
+        LinkedList<SearchResult> r = new LinkedList<>();
+        r.addAll(super.searchPage(page));
+
+        performSecondaryContent(page, r);
+
+        return r;
+    }
+
+    @Override
     protected int preliminaryHtmlSuffixOffset(String page) {
         return page.indexOf("<div id=\"footer-container\"");
     }
@@ -135,5 +152,37 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
     @Override
     protected String fetchSearchPage(String url) throws IOException {
         return fetch(url, "PREF=hl=en&f4=4000000&f5=30&f1=50000000;", null);
+    }
+
+    // yes, mutable but private...performance and immutable from outside
+    private void performSecondaryContent(String page, LinkedList<SearchResult> r) {
+        try {
+            String s1 = "earch-secondary-col-contents\">";
+            String s2 = "<div id=\"ad_creative_1";
+            int i1 = page.indexOf(s1);
+            int i2 = page.indexOf(s2);
+            if (i1 > 0 && i2 > 0 && i1 < i2) {
+                page = page.substring(i1 + s1.length(), i2);
+
+                SearchMatcher mTitle = SearchMatcher.from(TITLE_SECONDARY_PATTERN.matcher(page));
+                if (mTitle.find()) {
+                    String user = mTitle.group("title");
+                    SearchMatcher mList = SearchMatcher.from(LIST_SECONDARY_PATTERN.matcher(page));
+
+                    while (mList.find()) {
+                        String link = mList.group("link");
+                        String title = HtmlManipulator.replaceHtmlEntities(mList.group("title"));
+                        String duration = mList.group("duration");
+
+                        YouTubeSearchResult sr = new YouTubeSearchResult(link, title, duration, user);
+                        if (!r.contains(sr)) {
+                            r.add(sr);
+                        }
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error parsing secondary content", e);
+        }
     }
 }
