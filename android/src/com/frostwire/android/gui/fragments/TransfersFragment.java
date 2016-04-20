@@ -41,6 +41,7 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
+import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.MenuDialog;
 import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
 import com.frostwire.android.gui.services.Engine;
@@ -635,7 +636,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                             addTransferUrlTextView.setText(text.trim());
                         } else if (text.startsWith("magnet")) {
                             addTransferUrlTextView.setText(text.trim());
-                            TransferManager.instance().downloadTorrent(text.trim());
+                            TransferManager.instance().downloadTorrent(text.trim(),
+                                    new HandpickedTorrentDownloadDialogOnFetch(getActivity(), getFragmentManager()));
                             UIUtils.showLongMessage(getActivity(), R.string.magnet_url_added);
                             clipboard.setPrimaryClip(ClipData.newPlainText("", ""));
                             toggleAddTransferControls();

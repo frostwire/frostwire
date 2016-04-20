@@ -37,6 +37,7 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.net.URI;
@@ -108,7 +109,7 @@ public final class TransferManager {
         return false;
     }
 
-    private boolean isDownloadingTorrentByUri(String uri) {
+    private boolean isAlreadyDownloadingTorrentByUri(String uri) {
         synchronized (alreadyDownloadingMonitor) {
             for (DownloadTransfer dt : httpDownloads) {
                 if (dt instanceof TorrentFetcherDownload) {
@@ -279,6 +280,10 @@ public final class TransferManager {
     }
 
     public BittorrentDownload downloadTorrent(String uri) {
+        return downloadTorrent(uri, null);
+    }
+
+    public BittorrentDownload downloadTorrent(String uri, TorrentFetcherListener fetcherListener) {
         String url = uri.trim();
         try {
             if (url.contains("urn%3Abtih%3A")) {
@@ -286,19 +291,33 @@ public final class TransferManager {
                 url = url.replace("urn%3Abtih%3A", "urn:btih:");
             }
 
+            if (isAlreadyDownloadingTorrentByUri(url)) {
+                return null;
+            }
+
             URI u = URI.create(url);
 
             BittorrentDownload download = null;
 
-            if (u.getScheme().equalsIgnoreCase("file")) {
-                BTEngine.getInstance().download(new File(u.getPath()), null);
-            } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("magnet")) {
-                if (!isDownloadingTorrentByUri(url)) {
-                    download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()));
-                    bittorrentDownloads.add(download);
+            if (fetcherListener == null) {
+                if (u.getScheme().equalsIgnoreCase("file")) {
+                    BTEngine.getInstance().download(new File(u.getPath()), null);
+                } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("magnet")) {
+                        download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()));
+                        bittorrentDownloads.add(download);
+                } else {
+                    download = new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
                 }
             } else {
-                download = new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
+                if (u.getScheme().equalsIgnoreCase("file")) {
+                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())));
+                } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("magnet")) {
+                    // this executes the listener method when it fetches the bytes.
+                    new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()), fetcherListener);
+                } else {
+                    return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
+                }
+                return null;
             }
 
             return download;

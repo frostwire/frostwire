@@ -50,6 +50,7 @@ import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.MainMenuAdapter;
 import com.frostwire.android.gui.adnetworks.Offers;
+import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.TermsUseDialog;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
@@ -310,7 +311,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         //go!
         final String uri = intent.getDataString();
         if (uri != null) {
-            TransferManager.instance().downloadTorrent(uri);
+            TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this, getFragmentManager()));
         } else {
             LOG.warn("MainActivity.onNewIntent(): Couldn't start torrent download from Intent's URI, intent.getDataString() -> null");
             LOG.warn("(maybe URI is coming in another property of the intent object - #fragmentation)");

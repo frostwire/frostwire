@@ -43,14 +43,19 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     private final TransferManager manager;
     private final TorrentDownloadInfo info;
     private final Date created;
+    private final TorrentFetcherListener fetcherListener;
 
     private TransferState state;
 
-    public TorrentFetcherDownload(TransferManager manager, TorrentDownloadInfo info) {
+    TorrentFetcherDownload(TransferManager manager, TorrentDownloadInfo info) {
+        this(manager, info, null);
+    }
+
+    public TorrentFetcherDownload(TransferManager manager, TorrentDownloadInfo info, TorrentFetcherListener listener) {
         this.manager = manager;
         this.info = info;
         this.created = new Date();
-
+        this.fetcherListener = listener;
         state = TransferState.DOWNLOADING_TORRENT;
 
         Thread t = new Thread(new FetcherRunnable(), "Torrent-Fetcher - " + info.getTorrentUrl());
@@ -58,7 +63,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         t.start();
     }
 
-    public String getTorrentUri() {
+    String getTorrentUri() {
         return info.getTorrentUrl();
     }
 
@@ -257,6 +262,14 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                 }
 
                 if (data != null) {
+
+                    // Don't download the torrent yourself, there's a listener waiting
+                    // for the .torrent, and it's up to this listener to start the transfer.
+                    if (fetcherListener!=null) {
+                        fetcherListener.onTorrentInfoFetched(data);
+                        return;
+                    }
+
                     try {
                         downloadTorrent(data);
                     } finally {
