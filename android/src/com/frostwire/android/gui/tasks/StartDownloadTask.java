@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,16 +18,18 @@
 
 package com.frostwire.android.gui.tasks;
 
+import android.app.Activity;
 import android.content.Context;
-
 import com.frostwire.android.R;
+import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.transfers.*;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ContextTask;
 import com.frostwire.logging.Logger;
+import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchResult;
-
-import java.util.List;
+import com.frostwire.search.torrent.TorrentCrawledSearchResult;
+import com.frostwire.search.torrent.TorrentSearchResult;
 
 /**
  * 
@@ -56,7 +58,14 @@ public class StartDownloadTask extends ContextTask<DownloadTransfer> {
     protected DownloadTransfer doInBackground() {
         DownloadTransfer transfer = null;
         try {
-            transfer = TransferManager.instance().download(sr);
+            if (sr instanceof TorrentSearchResult &&
+                !(sr instanceof ScrapedTorrentFileSearchResult) &&
+                !(sr instanceof TorrentCrawledSearchResult)) {
+               transfer = TransferManager.instance().downloadTorrent(((TorrentSearchResult) sr).getTorrentUrl(),
+                        new HandpickedTorrentDownloadDialogOnFetch((Activity) getContext()));
+            } else {
+                transfer = TransferManager.instance().download(sr);
+            }
         } catch (Throwable e) {
             LOG.warn("Error adding new download from result: " + sr, e);
             e.printStackTrace();

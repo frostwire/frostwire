@@ -18,11 +18,10 @@
 
 package com.frostwire.android.gui.views;
 
-import java.lang.ref.WeakReference;
-
 import android.content.Context;
-
 import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * 
@@ -37,6 +36,14 @@ public abstract class ContextTask<Result> extends AbstractTask<Result> {
     public ContextTask(Context ctx) {
         this.ctxRef = Ref.weak(ctx);
     }
+
+    public Context getContext() {
+        if (Ref.alive(ctxRef)) {
+            return ctxRef.get();
+        }
+        return null;
+    }
+
 
     @Override
     protected final void onPostExecute(Result result) {

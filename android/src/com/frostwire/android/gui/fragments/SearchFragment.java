@@ -207,7 +207,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
     private void startMagnetDownload(String magnet) {
         TransferManager.instance().downloadTorrent(magnet,
-                new HandpickedTorrentDownloadDialogOnFetch(getActivity(), getFragmentManager()));
+                new HandpickedTorrentDownloadDialogOnFetch(getActivity()));
     }
 
     private static String extractYTId(String ytUrl) {
@@ -375,7 +375,6 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         StartDownloadTask task = new StartDownloadTask(ctx, sr, message);
         Tasks.executeParallel(task);
         UIUtils.showTransfersOnDownloadStart(ctx);
-
         if (ctx instanceof Activity) {
             Offers.showInterstitialOfferIfNecessary((Activity) ctx);
         }
@@ -491,7 +490,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
         private final WeakReference<SearchFragment> fragment;
 
-        public LoadSlidesTask(SearchFragment fragment) {
+        LoadSlidesTask(SearchFragment fragment) {
             this.fragment = new WeakReference<>(fragment);
         }
 
@@ -548,7 +547,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         private final WeakReference<RichNotification> ratingReminderRef;
         private final ConfigurationManager CM;
 
-        public OnRateClickAdapter(final SearchFragment owner, final RichNotification ratingReminder, final ConfigurationManager CM) {
+        OnRateClickAdapter(final SearchFragment owner, final RichNotification ratingReminder, final ConfigurationManager CM) {
             super(owner);
             ratingReminderRef = Ref.weak(ratingReminder);
             this.CM = CM;
@@ -573,7 +572,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         private final WeakReference<RichNotification> ratingReminderRef;
         private final ConfigurationManager CM;
 
-        public OnFeedbackClickAdapter(SearchFragment owner, final RichNotification ratingReminder, final ConfigurationManager CM) {
+        OnFeedbackClickAdapter(SearchFragment owner, final RichNotification ratingReminder, final ConfigurationManager CM) {
             super(owner);
             ratingReminderRef = Ref.weak(ratingReminder);
             this.CM = CM;

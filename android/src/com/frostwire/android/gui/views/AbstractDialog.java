@@ -43,14 +43,8 @@ public abstract class AbstractDialog extends DialogFragment {
      * The identifier for the positive button.
      */
     public static final int BUTTON_POSITIVE = Dialog.BUTTON_POSITIVE;
-
-    /**
-     * The identifier for the negative button. 
-     */
-    public static final int BUTTON_NEGATIVE = Dialog.BUTTON_NEGATIVE;
-
     private final String tag;
-    protected final int layoutResId;
+    private final int layoutResId;
 
     private WeakReference<Activity> activityRef;
 
@@ -82,7 +76,7 @@ public abstract class AbstractDialog extends DialogFragment {
         performDialogClick(tag, which);
     }
 
-    protected void setContentView(Dialog dlg, int layoutResId) {
+    private void setContentView(Dialog dlg, int layoutResId) {
         dlg.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         dlg.setContentView(layoutResId);
     }

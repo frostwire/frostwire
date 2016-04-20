@@ -210,7 +210,6 @@ public class TorrentFetcherDownload implements BittorrentDownload {
 
     private void downloadTorrent(final byte[] data) {
         try {
-
             TorrentInfo ti = TorrentInfo.bdecode(data);
             boolean[] selection = null;
             if (info.getRelativePath() != null) {

@@ -311,7 +311,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         //go!
         final String uri = intent.getDataString();
         if (uri != null) {
-            TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this, getFragmentManager()));
+            TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this));
         } else {
             LOG.warn("MainActivity.onNewIntent(): Couldn't start torrent download from Intent's URI, intent.getDataString() -> null");
             LOG.warn("(maybe URI is coming in another property of the intent object - #fragmentation)");
@@ -790,7 +790,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private static final class MenuDrawerToggle extends ActionBarDrawerToggle {
         private final WeakReference<MainActivity> activityRef;
 
-        public MenuDrawerToggle(MainActivity activity, DrawerLayout drawerLayout) {
+        MenuDrawerToggle(MainActivity activity, DrawerLayout drawerLayout) {
             super(activity, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
 
             // aldenml: even if the parent class holds a strong reference, I decided to keep a weak one

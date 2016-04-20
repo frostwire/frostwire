@@ -1,3 +1,22 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011, 2014, FrostWire(TM). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
 package com.frostwire.android.gui.dialogs;
 
 import android.app.Activity;
@@ -11,16 +30,19 @@ import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by gubatron on 4/20/16.
- */
-public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherListener {
+ * Created on 4/20/16, in Denver, CO.
+ *
+ * @author gubatron
+ * @author aldenml
+ *
+ */public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherListener {
     private WeakReference<Context> contextRef;
     private WeakReference<FragmentManager> fragmentManagerRef;
     private static Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialogOnFetch.class);
 
-    public HandpickedTorrentDownloadDialogOnFetch(Activity activity, FragmentManager fragmentManager) {
+    public HandpickedTorrentDownloadDialogOnFetch(Activity activity) {
         contextRef = Ref.weak((Context) activity);
-        fragmentManagerRef = Ref.weak(fragmentManager);
+        fragmentManagerRef = Ref.weak(activity.getFragmentManager());
     }
 
     @Override

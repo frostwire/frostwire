@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2014, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(TM). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         AbstractListAdapter.OnItemCheckedListener {
 
     private static final String BUNDLE_KEY_DIALOG_ICON = "dialogIcon";
-    private static final String BUNDLE_KEY_CHECKED_OFFSETS = "checkedOffsets";
+    protected static final String BUNDLE_KEY_CHECKED_OFFSETS = "checkedOffsets";
     private static final String BUNDLE_KEY_DIALOG_TITLE = "title";
     private static final String BUNDLE_KEY_DIALOG_TEXT = "dialogText";
     private static final String BUNDLE_KEY_LIST_DATA = "listData";
@@ -195,6 +195,14 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
         selectAllCheckbox.setVisibility(View.VISIBLE);
         selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxOnCheckedChangeListener);
+    }
+
+    public void checkAll() {
+        if (adapter != null) {
+            adapter.checkAll();
+            updateSelectedCount();
+            updateSelectedInBundle();
+        }
     }
 
     public abstract ConfirmListDialogDefaultAdapter<T> createAdapter(Context context,

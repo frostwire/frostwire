@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.dialogs;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
@@ -44,10 +45,16 @@ import java.util.List;
  * @author aldenml
  *
  */
-public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<HandpickedTorrentDownloadDialog.TorrentFileEntry> {
+class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<HandpickedTorrentDownloadDialog.TorrentFileEntry> {
     private static Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialog.class);
-    private final TorrentInfo torrentInfo;
-    public HandpickedTorrentDownloadDialog(TorrentInfo tinfo) {
+    private TorrentInfo torrentInfo;
+    private static final String BUNDLE_KEY_TORRENT_INFO_DATA = "torrentInfoData";
+
+    public HandpickedTorrentDownloadDialog() {
+        super();
+    }
+
+    private HandpickedTorrentDownloadDialog(TorrentInfo tinfo) {
         super();
         this.torrentInfo = tinfo;
     }
@@ -65,14 +72,22 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         // this creates a bundle that gets passed to setArguments(). It's supposed to be ready
         // before the dialog is attached to the underlying activity, after we attach to it, then
         // we are able to use such Bundle to create our adapter.
+        final TorrentFileEntryList torrentInfoList = getTorrentInfoList(tinfo.files());
+        boolean[] allChecked = new boolean[torrentInfoList.list.size()];
+        for (int i=0; i < allChecked.length; i++) {
+            allChecked[i] = true;
+        }
+
         dlg.prepareArguments(R.drawable.download_icon,
-                "Which files should I download?", //TODO these strings into production ready resources.
-                "Pick one or more files of the files in the .torrent",
-                JsonUtils.toJson(getTorrentInfoList(tinfo.files())),
+                tinfo.getName(),
+                ctx.getString(R.string.pick_the_files_you_want_to_download_from_this_torrent),
+                JsonUtils.toJson(torrentInfoList),
                 SelectionMode.MULTIPLE_SELECTION);
+        dlg.getArguments().putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, allChecked);
         dlg.setOnYesListener(new OnStartDownloadsClickListener(ctx, dlg));
         return dlg;
     }
+
 
     private static TorrentFileEntryList getTorrentInfoList(FileStorage fileStorage) {
         TorrentFileEntryList entryList = new TorrentFileEntryList();
@@ -94,6 +109,12 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
     }
 
     @Override
+    void prepareArguments(int dialogIcon, String dialogTitle, String dialogText, String listDataInJSON, SelectionMode selectionMode) {
+        super.prepareArguments(dialogIcon, dialogTitle, dialogText, listDataInJSON, selectionMode);
+        onSaveInstanceState(getArguments());
+    }
+
+    @Override
     public List<TorrentFileEntry> deserializeData(String listDataInJSON) {
         final TorrentFileEntryList torrentFileEntryList = JsonUtils.toObject(listDataInJSON, TorrentFileEntryList.class);
         return torrentFileEntryList.list;
@@ -104,11 +125,31 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         return new HandpickedTorrentFileEntriesDialogAdapter(context, listData, selectionMode);
     }
 
-    TorrentInfo getTorrentInfo() {
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (outState!=null) {
+            outState.putByteArray(BUNDLE_KEY_TORRENT_INFO_DATA, torrentInfo.bencode());
+        }
+        super.onSaveInstanceState(outState); //saves the torrentInfo in bytes.
+    }
+
+    @Override
+    protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+        byte[] torrentInfoData;
+        if (this.torrentInfo == null &&
+            savedInstanceState != null &&
+            (torrentInfoData=savedInstanceState.getByteArray(BUNDLE_KEY_TORRENT_INFO_DATA))!=null) {
+            torrentInfo = TorrentInfo.bdecode(torrentInfoData);
+        }
+        super.initComponents(dlg, savedInstanceState);
+
+    }
+
+    private TorrentInfo getTorrentInfo() {
         return torrentInfo;
     }
 
-    static class TorrentFileEntryList {
+    private static class TorrentFileEntryList {
         final List<TorrentFileEntry> list = new ArrayList<>();
         public void add(TorrentFileEntry entry) {
             list.add(entry);
@@ -121,7 +162,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         private final String path;
         private final long size;
 
-        public TorrentFileEntry(int index, String name, String path, long size) {
+        TorrentFileEntry(int index, String name, String path, long size) {
             this.index = index;
             this.name = name;
             this.path = path;
@@ -145,7 +186,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         }
     }
 
-    class HandpickedTorrentFileEntriesDialogAdapter extends ConfirmListDialogDefaultAdapter<TorrentFileEntry> {
+    private class HandpickedTorrentFileEntriesDialogAdapter extends ConfirmListDialogDefaultAdapter<TorrentFileEntry> {
 
         HandpickedTorrentFileEntriesDialogAdapter(Context context,
                                                   List<TorrentFileEntry> list,
