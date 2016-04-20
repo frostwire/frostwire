@@ -64,9 +64,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
 
     @Override
     protected OnStartDownloadsClickListener createOnYesListener(final AbstractConfirmListDialog dlg) {
-        OnStartDownloadsClickListener listener = new OnStartDownloadsClickListener(getActivity(), dlg);
-        listener.setDialog(this);
-        return listener;
+        return new OnStartDownloadsClickListener(getActivity(), dlg);
     }
 
     private static class SoundcloudSearchResultList {

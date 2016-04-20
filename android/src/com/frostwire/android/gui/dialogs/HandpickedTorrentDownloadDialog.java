@@ -24,6 +24,7 @@ import android.view.View;
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.JsonUtils;
@@ -42,10 +43,11 @@ import java.util.List;
  *
  */
 public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<HandpickedTorrentDownloadDialog.TorrentFileEntry> {
-
-    public static final String TAG = "new_handpicked_transfer_dialog";
-
-
+    private final TorrentInfo torrentInfo;
+    public HandpickedTorrentDownloadDialog(TorrentInfo tinfo) {
+        super();
+        this.torrentInfo = tinfo;
+    }
 
     public static HandpickedTorrentDownloadDialog newInstance(
             Context ctx,
@@ -57,14 +59,13 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         //         - passing a file path
         //         - passing a byte[] to create the tinfo from.
 
-        HandpickedTorrentDownloadDialog dlg = new HandpickedTorrentDownloadDialog();
+        HandpickedTorrentDownloadDialog dlg = new HandpickedTorrentDownloadDialog(tinfo);
 
         // this creates a bundle that gets passed to setArguments(). It's supposed to be ready
         // before the dialog is attached to the underlying activity, after we attach to it, then
         // we are able to use such Bundle to create our adapter.
         dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(getTorrentInfoList(tinfo.files())),
                 SelectionMode.MULTIPLE_SELECTION);
-
         dlg.setOnYesListener(new OnStartDownloadsClickListener(ctx, dlg));
         return dlg;
     }
@@ -85,7 +86,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
 
     @Override
     protected View.OnClickListener createOnYesListener(AbstractConfirmListDialog dlg) {
-        return null;
+        return new OnStartDownloadsClickListener(getActivity(), dlg);
     }
 
     @Override
@@ -97,6 +98,10 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
     @Override
     public ConfirmListDialogDefaultAdapter<TorrentFileEntry> createAdapter(Context context, List<TorrentFileEntry> listData, SelectionMode selectionMode, Bundle bundle) {
         return new PrioritiesConfirmListDialogAdapter(context, listData, selectionMode);
+    }
+
+    TorrentInfo getTorrentInfo() {
+        return torrentInfo;
     }
 
     static class TorrentFileEntryList {
@@ -184,23 +189,40 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
                 final AbstractConfirmListDialog dlg = dlgRef.get();
 
                 final AbstractConfirmListDialog.SelectionMode selectionMode = dlg.getSelectionMode();
-                List<TorrentFileEntry> results = (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION) ?
+                List<TorrentFileEntry> checked = (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION) ?
                         (List<TorrentFileEntry>) dlg.getList() :
                         new ArrayList<TorrentFileEntry>();
 
-                if (results.isEmpty()) {
-                    results.addAll(dlg.getChecked());
+                if (checked.isEmpty()) {
+                    checked.addAll(dlg.getChecked());
                 }
 
-                if (!results.isEmpty()) {
-                    startDownloads(ctxRef.get(), results);
+                if (!checked.isEmpty()) {
+                    startDownload(ctxRef.get(), checked);
                     dlg.dismiss();
                 }
             }
         }
 
-        private void startDownloads(Context context, List<TorrentFileEntry> results) {
-            // TODO.
+        private void startDownload(Context context, List<TorrentFileEntry> results) {
+
+            if (context == null ||
+                !Ref.alive(dlgRef) ||
+                results == null ||
+                dlgRef.get().getList() == null ||
+                results.size() > dlgRef.get().getList().size()) {
+                return;
+            }
+
+            final HandpickedTorrentDownloadDialog theDialog = (HandpickedTorrentDownloadDialog) dlgRef.get();
+
+            boolean[] selection = new boolean[theDialog.getList().size()];
+            for (TorrentFileEntry selectedFileEntry : results) {
+                selection[selectedFileEntry.getIndex()] = true;
+            }
+            BTEngine.getInstance().download(theDialog.getTorrentInfo(),
+                    null,
+                    selection);
             UIUtils.showTransfersOnDownloadStart(context);
         }
     }
