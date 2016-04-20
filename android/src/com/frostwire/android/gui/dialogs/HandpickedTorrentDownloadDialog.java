@@ -45,7 +45,8 @@ import java.util.List;
  * @author aldenml
  *
  */
-class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<HandpickedTorrentDownloadDialog.TorrentFileEntry> {
+@SuppressWarnings("WeakerAccess") // We need the class to be public so that the dialog can be rotated (via Reflection)
+public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<HandpickedTorrentDownloadDialog.TorrentFileEntry> {
     private static Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialog.class);
     private TorrentInfo torrentInfo;
     private static final String BUNDLE_KEY_TORRENT_INFO_DATA = "torrentInfoData";
