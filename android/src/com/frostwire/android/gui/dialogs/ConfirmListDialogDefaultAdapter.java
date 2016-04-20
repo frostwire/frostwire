@@ -33,7 +33,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.logging.Logger;
-import com.frostwire.search.SearchResult;
 
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +90,7 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        SearchResult item = (SearchResult) getItem(position);
+        T item = (T) getItem(position);
         Context ctx = getContext();
 
         if (view == null && ctx != null) {
