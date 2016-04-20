@@ -69,6 +69,10 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
     }
 
     protected long calculateSize(String amount, String unit) {
+        if (amount == null || unit == null) {
+            return  -1;
+        }
+
         long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
         //fractional size
         if (amount.indexOf(".") > 0) {

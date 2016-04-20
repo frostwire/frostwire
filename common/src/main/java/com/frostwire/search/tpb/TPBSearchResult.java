@@ -35,23 +35,20 @@ import java.util.regex.Pattern;
  * @author aldenml
  *
  */
-public class TPBSearchResult extends AbstractTorrentSearchResult {
-
-    private final static long[] BYTE_MULTIPLIERS = new long[] { 1, 2 << 9, 2 << 19, 2 << 29, 2 << 39, 2 << 49 };
-
-    private static final Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
+class TPBSearchResult extends AbstractTorrentSearchResult {
+    private static final Map<String, String> UNIT_MAPPER;
     private static final Pattern COMMON_DATE_PATTERN;
     private static final Pattern OLDER_DATE_PATTERN;
     private static final Pattern DATE_TIME_PATTERN;
 
     static {
-        UNIT_TO_BYTE_MULTIPLIERS_MAP = new HashMap<String, Integer>();
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("B", 0);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("KiB", 1);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("MiB", 2);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("GiB", 3);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("TiB", 4);
-        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("PiB", 5);
+        UNIT_MAPPER = new HashMap<>();
+        UNIT_MAPPER.put("B", "B");
+        UNIT_MAPPER.put("KiB", "KB");
+        UNIT_MAPPER.put("MiB", "MB");
+        UNIT_MAPPER.put("GiB", "GB");
+        UNIT_MAPPER.put("TiB", "TB");
+        UNIT_MAPPER.put("PiB", "PB");
 
         COMMON_DATE_PATTERN = Pattern.compile("([\\d]{2})-([\\d]{2})");
         OLDER_DATE_PATTERN = Pattern.compile("([\\d]{2})-([\\d]{2})&nbsp;([\\d]{4})");
@@ -69,7 +66,7 @@ public class TPBSearchResult extends AbstractTorrentSearchResult {
     private final int seeds;
 
 
-    public TPBSearchResult(String domainName, SearchMatcher matcher) {
+    TPBSearchResult(String domainName, SearchMatcher matcher) {
         /*
          * Matcher groups cheatsheet
          * 1 -> Category (useless)
@@ -142,7 +139,7 @@ public class TPBSearchResult extends AbstractTorrentSearchResult {
     protected long parseSize(String group) {
         String[] size = group.split("&nbsp;");
         String amount = size[0].trim();
-        String unit = size[1].trim();
+        String unit = UNIT_MAPPER.get(size[1].trim());
         return calculateSize(amount, unit);
     }
 
