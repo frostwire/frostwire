@@ -28,7 +28,7 @@ public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherLis
 
     private void createHandpickedTorrentDownloadDialog(byte[] torrentInfoData) {
         if (!Ref.alive(contextRef) ||
-                !Ref.alive(fragmentManagerRef)) {
+            !Ref.alive(fragmentManagerRef)) {
             return;
         }
 
