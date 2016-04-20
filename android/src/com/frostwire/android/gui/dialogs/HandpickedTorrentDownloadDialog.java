@@ -21,6 +21,7 @@ package com.frostwire.android.gui.dialogs;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.util.UIUtils;
@@ -77,7 +78,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         TorrentFileEntryList entryList = new TorrentFileEntryList();
         if (fileStorage != null && fileStorage.numFiles() > 0) {
             int n = fileStorage.numFiles();
-            for (int i=0; i < n; n++) {
+            for (int i=0; i < n; i++) {
                 entryList.add(new TorrentFileEntry(i,
                         fileStorage.fileName(i),
                         fileStorage.filePath(i),
@@ -100,7 +101,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
 
     @Override
     public ConfirmListDialogDefaultAdapter<TorrentFileEntry> createAdapter(Context context, List<TorrentFileEntry> listData, SelectionMode selectionMode, Bundle bundle) {
-        return new PrioritiesConfirmListDialogAdapter(context, listData, selectionMode);
+        return new HandpickedTorrentFileEntriesDialogAdapter(context, listData, selectionMode);
     }
 
     TorrentInfo getTorrentInfo() {
@@ -144,11 +145,11 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         }
     }
 
-    class PrioritiesConfirmListDialogAdapter extends ConfirmListDialogDefaultAdapter<TorrentFileEntry> {
+    class HandpickedTorrentFileEntriesDialogAdapter extends ConfirmListDialogDefaultAdapter<TorrentFileEntry> {
 
-        PrioritiesConfirmListDialogAdapter(Context context,
-                                           List<TorrentFileEntry> list,
-                                           SelectionMode selectionMode) {
+        HandpickedTorrentFileEntriesDialogAdapter(Context context,
+                                                  List<TorrentFileEntry> list,
+                                                  SelectionMode selectionMode) {
             super(context, list, selectionMode);
         }
 
@@ -170,6 +171,11 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         @Override
         public int getItemThumbnailResourceId(TorrentFileEntry data) {
             return MediaType.getFileTypeIconId(FilenameUtils.getExtension(data.getPath()));
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+            return super.getView(position, view, parent);
         }
     }
 
