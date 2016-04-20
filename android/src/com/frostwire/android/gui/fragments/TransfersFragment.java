@@ -586,7 +586,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             if (url.startsWith("http") && (url.contains("soundcloud.com/") || url.contains("youtube.com/"))) {
                 startCloudTransfer(url);
             } else if (url.startsWith("http")) { //magnets are automatically started if found on the clipboard by autoPasteMagnetOrURL
-                TransferManager.instance().downloadTorrent(url.trim());
+                TransferManager.instance().downloadTorrent(url.trim(),
+                        new HandpickedTorrentDownloadDialogOnFetch(getActivity(), getFragmentManager()));
                 UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
             }
             addTransferUrlTextView.setText("");

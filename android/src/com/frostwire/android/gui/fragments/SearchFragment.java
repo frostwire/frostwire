@@ -37,10 +37,10 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
-import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter.FilteredSearchResults;
 import com.frostwire.android.gui.adnetworks.Offers;
+import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
@@ -206,14 +206,8 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     private void startMagnetDownload(String magnet) {
-        //go!
-        TransferManager.instance().downloadTorrent(magnet);
-
-        //Show me the transfer tab
-        Intent i = new Intent(getActivity(), MainActivity.class);
-        i.setAction(Constants.ACTION_SHOW_TRANSFERS);
-        i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivity(i);
+        TransferManager.instance().downloadTorrent(magnet,
+                new HandpickedTorrentDownloadDialogOnFetch(getActivity(), getFragmentManager()));
     }
 
     private static String extractYTId(String ytUrl) {

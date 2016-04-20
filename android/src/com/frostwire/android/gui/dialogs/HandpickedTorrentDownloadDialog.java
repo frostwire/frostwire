@@ -27,6 +27,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.logging.Logger;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Ref;
 import org.apache.commons.io.FilenameUtils;
@@ -43,6 +44,7 @@ import java.util.List;
  *
  */
 public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<HandpickedTorrentDownloadDialog.TorrentFileEntry> {
+    private static Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialog.class);
     private final TorrentInfo torrentInfo;
     public HandpickedTorrentDownloadDialog(TorrentInfo tinfo) {
         super();
@@ -51,8 +53,6 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
 
     public static HandpickedTorrentDownloadDialog newInstance(
             Context ctx,
-            String dialogTitle,
-            String dialogText,
             TorrentInfo tinfo) {
         //
         // ideas:  - pre-selected file(s) to just check the one(s)
@@ -64,7 +64,10 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         // this creates a bundle that gets passed to setArguments(). It's supposed to be ready
         // before the dialog is attached to the underlying activity, after we attach to it, then
         // we are able to use such Bundle to create our adapter.
-        dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(getTorrentInfoList(tinfo.files())),
+        dlg.prepareArguments(R.drawable.download_icon,
+                "Which files should I download?", //TODO these strings into production ready resources.
+                "Pick one or more files of the files in the .torrent",
+                JsonUtils.toJson(getTorrentInfoList(tinfo.files())),
                 SelectionMode.MULTIPLE_SELECTION);
         dlg.setOnYesListener(new OnStartDownloadsClickListener(ctx, dlg));
         return dlg;
@@ -198,19 +201,20 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
                 }
 
                 if (!checked.isEmpty()) {
-                    startDownload(ctxRef.get(), checked);
+                    LOG.info("about to startTorrentPartialDownload()");
+                    startTorrentPartialDownload(ctxRef.get(), checked);
                     dlg.dismiss();
                 }
             }
         }
 
-        private void startDownload(Context context, List<TorrentFileEntry> results) {
-
+        private void startTorrentPartialDownload(Context context, List<TorrentFileEntry> results) {
             if (context == null ||
                 !Ref.alive(dlgRef) ||
                 results == null ||
                 dlgRef.get().getList() == null ||
                 results.size() > dlgRef.get().getList().size()) {
+                LOG.warn("can't startTorrentPartialDownload()");
                 return;
             }
 

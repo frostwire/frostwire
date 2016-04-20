@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import com.frostwire.android.gui.transfers.TorrentFetcherListener;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -15,6 +16,7 @@ import java.lang.ref.WeakReference;
 public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherListener {
     private WeakReference<Context> contextRef;
     private WeakReference<FragmentManager> fragmentManagerRef;
+    private static Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialogOnFetch.class);
 
     public HandpickedTorrentDownloadDialogOnFetch(Activity activity, FragmentManager fragmentManager) {
         contextRef = Ref.weak((Context) activity);
@@ -28,17 +30,22 @@ public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherLis
 
     private void createHandpickedTorrentDownloadDialog(byte[] torrentInfoData) {
         if (!Ref.alive(contextRef) ||
-            !Ref.alive(fragmentManagerRef)) {
+            !Ref.alive(fragmentManagerRef) ||
+            torrentInfoData == null || torrentInfoData.length == 0) {
+            LOG.warn("Incomplete conditions to create HandpickedTorrentDownloadDialog.");
             return;
         }
 
-        HandpickedTorrentDownloadDialog dlg =
-                HandpickedTorrentDownloadDialog.newInstance(
-                        contextRef.get(),
-                        "some title",
-                        "some explanation",
-                        TorrentInfo.bdecode(torrentInfoData));
+        try {
+            LOG.info("createHandpickedTorrentDownloadDialog!");
+            HandpickedTorrentDownloadDialog dlg =
+                    HandpickedTorrentDownloadDialog.newInstance(
+                            contextRef.get(),
+                            TorrentInfo.bdecode(torrentInfoData));
 
-        dlg.show(fragmentManagerRef.get());
+            dlg.show(fragmentManagerRef.get());
+        } catch (Throwable t) {
+            LOG.warn("Could not create or show HandpickedTorrentDownloadDialog", t);
+        }
     }
 }
