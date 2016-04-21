@@ -305,8 +305,8 @@ public final class BTEngine {
             int sendBufferWatermark = sp.sendBufferWatermark();
             sp.setSendBufferWatermark(sendBufferWatermark / 2);
             sp.setCacheSize(256);
-            sp.setActiveDownloads(4);
-            sp.setActiveSeeds(4);
+            sp.activeDownloads(4);
+            sp.activeSeeds(4);
             sp.setMaxPeerlistSize(200);
             sp.setGuidedReadCache(true);
             sp.setTickInterval(1000);
@@ -314,8 +314,8 @@ public final class BTEngine {
             sp.setSeedingOutgoingConnections(false);
             sp.setConnectionsLimit(200);
         } else {
-            sp.setActiveDownloads(10);
-            sp.setActiveSeeds(10);
+            sp.activeDownloads(10);
+            sp.activeSeeds(10);
         }
 
         session.applySettings(sp);
@@ -340,7 +340,7 @@ public final class BTEngine {
 
         Priority[] priorities = null;
 
-        TorrentHandle th = downloader.find(ti.getInfoHash());
+        TorrentHandle th = downloader.find(ti.infoHash());
         boolean exists = th != null;
 
         if (selection != null) {
@@ -376,7 +376,7 @@ public final class BTEngine {
 
         Priority[] priorities = null;
 
-        TorrentHandle th = downloader.find(ti.getInfoHash());
+        TorrentHandle th = downloader.find(ti.infoHash());
         boolean torrentHandleExists = th != null;
 
         if (selection != null) {
@@ -414,7 +414,7 @@ public final class BTEngine {
         TorrentInfo ti = sr.getTorrentInfo();
         int fileIndex = sr.getFileIndex();
 
-        TorrentHandle th = downloader.find(ti.getInfoHash());
+        TorrentHandle th = downloader.find(ti.infoHash());
         boolean exists = th != null;
 
         if (th != null) {
@@ -535,9 +535,9 @@ public final class BTEngine {
         File torrentFile;
 
         try {
-            String name = ti.getName();
+            String name = ti.name();
             if (name == null || name.length() == 0) {
-                name = ti.getInfoHash().toString();
+                name = ti.infoHash().toString();
             }
             name = escapeFilename(name);
 
@@ -561,7 +561,7 @@ public final class BTEngine {
             entry e = ti.toEntry().getSwig();
             e.dict().set(TORRENT_ORIG_PATH_KEY, new entry(torrent.getAbsolutePath()));
             byte[] arr = Vectors.byte_vector2bytes(e.bencode());
-            FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.getInfoHash().toString()), arr);
+            FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHash().toString()), arr);
         } catch (Throwable e) {
             LOG.warn("Error saving resume torrent", e);
         }
@@ -575,7 +575,7 @@ public final class BTEngine {
                     return;
                 }
             }
-            TorrentHandle th = session.findTorrent(alert.getHandle().getInfoHash());
+            TorrentHandle th = session.findTorrent(alert.handle().getInfoHash());
             if (th != null && th.isValid()) {
                 th.saveResumeData();
             }
@@ -598,7 +598,7 @@ public final class BTEngine {
 
     private void fireDownloadAdded(TorrentAlert<?> alert) {
         try {
-            TorrentHandle th = session.findTorrent(alert.getHandle().getInfoHash());
+            TorrentHandle th = session.findTorrent(alert.handle().getInfoHash());
             BTDownload dl = new BTDownload(this, th);
             if (listener != null) {
                 listener.downloadAdded(this, dl);
@@ -715,7 +715,7 @@ public final class BTEngine {
 
     public void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile) {
 
-        TorrentHandle th = session.findTorrent(ti.getInfoHash());
+        TorrentHandle th = session.findTorrent(ti.infoHash());
 
         if (th != null) {
             // found a download with the same hash, just adjust the priorities if needed
@@ -892,7 +892,7 @@ public final class BTEngine {
             return;
         }
         SettingsPack settingsPack = session.getSettingsPack();
-        settingsPack.setActiveDownloads(limit);
+        settingsPack.activeDownloads(limit);
         session.applySettings(settingsPack);
         saveSettings(settingsPack);
     }
@@ -909,7 +909,7 @@ public final class BTEngine {
             return;
         }
         SettingsPack settingsPack = session.getSettingsPack();
-        settingsPack.setActiveSeeds(limit);
+        settingsPack.activeSeeds(limit);
         session.applySettings(settingsPack);
         saveSettings(settingsPack);
     }

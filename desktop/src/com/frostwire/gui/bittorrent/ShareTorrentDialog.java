@@ -241,11 +241,11 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private void initTorrentName() {
-        torrent_name = torrent.getName();
+        torrent_name = torrent.name();
     }
 
     private void initInfoHash() {
-        info_hash = torrent.getInfoHash().toString();
+        info_hash = torrent.infoHash().toString();
     }
 
     private String getLink() {

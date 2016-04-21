@@ -81,7 +81,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         }
 
         dlg.prepareArguments(R.drawable.download_icon,
-                tinfo.getName(),
+                tinfo.name(),
                 ctx.getString(R.string.pick_the_files_you_want_to_download_from_this_torrent),
                 JsonUtils.toJson(torrentInfoList),
                 SelectionMode.MULTIPLE_SELECTION);

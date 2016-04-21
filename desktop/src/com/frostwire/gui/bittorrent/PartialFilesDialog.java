@@ -280,10 +280,10 @@ public class PartialFilesDialog extends JDialog {
     private void setupTitle() {
         GridBagConstraints c;
 
-        String title = _torrent.getName();
+        String title = _torrent.name();
         if (title == null) {
-            if (_torrent.getName() != null) {
-                title = StringUtils.getUTF8String(_torrent.getName().getBytes());
+            if (_torrent.name() != null) {
+                title = StringUtils.getUTF8String(_torrent.name().getBytes());
             } else {
                 title = _name.replace("_", " ").replace(".torrent", "").replace("&quot;", "\"");
             }

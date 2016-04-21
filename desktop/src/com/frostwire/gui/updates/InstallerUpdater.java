@@ -457,7 +457,7 @@ public class InstallerUpdater implements Runnable {
         buf.append(" Downloaded:");
         buf.append(stats.getTotalDone());
         buf.append(" Uploaded:");
-        buf.append(stats.getTotalUpload());
+        buf.append(stats.totalUpload());
         buf.append(" DSpeed:");
         buf.append(stats.getDownloadRate());
         buf.append(" USpeed:");

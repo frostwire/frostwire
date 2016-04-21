@@ -78,7 +78,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.created = new Date(th.getStatus().getAddedTime());
         TorrentInfo ti = th.getTorrentInfo();
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
-        this.parts = ti != null ? new File(savePath, "." + ti.getInfoHash() + ".parts") : null;
+        this.parts = ti != null ? new File(savePath, "." + ti.infoHash() + ".parts") : null;
 
         this.extra = createExtra();
         this.paymentOptions = loadPaymentOptions(ti);
@@ -115,7 +115,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     public long getSize() {
         TorrentInfo ti = th.getTorrentInfo();
-        return ti != null ? ti.getTotalSize() : 0;
+        return ti != null ? ti.totalSize() : 0;
     }
 
     public PaymentOptions getPaymentOptions() {
@@ -227,7 +227,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public long getBytesReceived() {
-        return th.getStatus().getTotalDownload();
+        return th.getStatus().totalDownload();
     }
 
     public long getTotalBytesReceived() {
@@ -235,7 +235,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public long getBytesSent() {
-        return th.getStatus().getTotalUpload();
+        return th.getStatus().totalUpload();
     }
 
     public long getTotalBytesSent() {
@@ -274,7 +274,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             }
 
             TorrentInfo ti = th.getTorrentInfo();
-            if (ti != null && ti.getSwig() != null) {
+            if (ti != null && ti.swig() != null) {
                 return new File(savePath.getAbsolutePath(), ti.numFiles() > 1 ? th.getName() : ti.files().filePath(0));
             }
         } catch (Throwable e) {
@@ -300,7 +300,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         }
 
         TorrentStatus status = th.getStatus();
-        long left = ti.getTotalSize() - status.getTotalDone();
+        long left = ti.totalSize() - status.getTotalDone();
         long rate = status.getDownloadPayloadRate();
 
         if (left <= 0) {

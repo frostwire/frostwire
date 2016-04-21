@@ -132,7 +132,7 @@ public final class TorrentUtil {
 
         //dn
         sb.append("dn=");
-        sb.append(UrlUtils.encode(torrent.getName()));
+        sb.append(UrlUtils.encode(torrent.name()));
 
         final List<AnnounceEntry> trackers = torrent.trackers();
         for (AnnounceEntry tracker : trackers) {

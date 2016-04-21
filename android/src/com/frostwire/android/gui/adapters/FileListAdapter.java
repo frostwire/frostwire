@@ -509,7 +509,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         public String toString() {
             if (this.torrentFilePath != null) {
                 try {
-                    return new TorrentInfo(new File(this.torrentFilePath)).getInfoHash().toString();
+                    return new TorrentInfo(new File(this.torrentFilePath)).infoHash().toString();
                 } catch (Throwable e) {
                     LOG.warn("Error trying to get infohash", e);
                 }
