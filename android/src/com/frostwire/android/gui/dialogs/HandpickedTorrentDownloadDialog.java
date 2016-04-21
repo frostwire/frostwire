@@ -37,6 +37,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created on 4/19/16.
@@ -218,6 +219,18 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         @Override
         public View getView(int position, View view, ViewGroup parent) {
             return super.getView(position, view, parent);
+        }
+
+        @Override
+        public String getCheckedSum() {
+            if (checked == null || checked.isEmpty()) {
+                return null;
+            }
+            long totalBytes = 0;
+            for (TorrentFileEntry entry : (Set<TorrentFileEntry>) checked) {
+                totalBytes += entry.getSize();
+            }
+            return UIUtils.getBytesInHuman(totalBytes);
         }
     }
 
