@@ -91,8 +91,8 @@
   <string name="accessibility_repeat_all">Repetir todas</string>
   <string name="accessibility_repeat_one">Repetir uma</string>
   <string name="pinned_to_home_screen"><xliff:g id="name">%s</xliff:g> foi colocada no ecrã inicial</string>
-  <string name="could_not_be_pinned_to_home_screen"><xliff:g xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" id="name">%s</xliff:g> não pode ser colocada no ecrã inicial</string>
-  <string name="set_as_ringtone">\'<xliff:g xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" id="name" example="Alarm Bell">%s</xliff:g>\' definida como toque</string>
+  <string name="could_not_be_pinned_to_home_screen"><xliff:g id="name">%s</xliff:g> não pode ser colocada no ecrã inicial</string>
+  <string name="set_as_ringtone">\'<xliff:g id="name" example="Alarm Bell">%s</xliff:g>\' definida como toque</string>
   <string name="theme_set"><xliff:g id="name">%s</xliff:g> definido como tema</string>
   <string name="settings_ui_category">Interface</string>
   <string name="settings_storage_category">Armazenamento</string>
