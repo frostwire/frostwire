@@ -1,6 +1,7 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +32,7 @@ import com.frostwire.android.gui.views.ClickAdapter;
 /**
  * @author gubatron
  * @author aldenml
- *
+ * @author marcelinkaaa
  */
 public class YesNoDialog extends AbstractDialog {
 
@@ -77,8 +78,8 @@ public class YesNoDialog extends AbstractDialog {
         TextView defaultDialogText = findView(dlg, R.id.dialog_default_text);
         defaultDialogText.setText(messageId);
 
-        ButtonListener yesButtonListener = new ButtonListener(this, BUTTON_POSITIVE);
-        ButtonListener noButtonListener = new ButtonListener(this, BUTTON_NEGATIVE);
+        ButtonListener yesButtonListener = new ButtonListener(this, Dialog.BUTTON_POSITIVE);
+        ButtonListener noButtonListener = new ButtonListener(this, Dialog.BUTTON_NEGATIVE);
 
         buttonYes = findView(dlg, R.id.dialog_default_button_yes);
         buttonYes.setText(android.R.string.yes);
@@ -105,7 +106,7 @@ public class YesNoDialog extends AbstractDialog {
         @Override
         public void onClick(YesNoDialog owner, View v) {
             super.onClick(owner, v);
-            if (this.which == BUTTON_POSITIVE) {
+            if (this.which == Dialog.BUTTON_POSITIVE) {
                 owner.performDialogClick(this.which);
             }
             owner.dismiss();

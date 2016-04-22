@@ -1,6 +1,7 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,13 +26,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.ClickAdapter;
-
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -40,6 +39,7 @@ import java.io.InputStream;
 /**
  * @author gubatron
  * @author aldenml
+ * @author marcelinkaaa
  */
 public class TermsUseDialog extends AbstractDialog {
 
@@ -76,8 +76,8 @@ public class TermsUseDialog extends AbstractDialog {
         TextView defaultDialogText = findView(dlg, R.id.dialog_default_scroll_text);
         defaultDialogText.setText(readText(ctx));
 
-        ButtonListener yesButtonListener = new ButtonListener(this, BUTTON_POSITIVE);
-        ButtonListener noButtonListener = new ButtonListener(this, BUTTON_NEGATIVE);
+        ButtonListener yesButtonListener = new ButtonListener(this, Dialog.BUTTON_POSITIVE);
+        ButtonListener noButtonListener = new ButtonListener(this, Dialog.BUTTON_NEGATIVE);
 
 
         buttonYes = findView(dlg, R.id.dialog_default_scroll_button_yes);
@@ -115,7 +115,7 @@ public class TermsUseDialog extends AbstractDialog {
         @Override
         public void onClick(TermsUseDialog owner, View v) {
             super.onClick(owner, v);
-            if (this.which == BUTTON_POSITIVE) {
+            if (this.which == Dialog.BUTTON_POSITIVE) {
                 ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED, true);
                 owner.performDialogClick(which);
             } else {

@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.tasks;
 
-import android.app.DialogFragment;
 import android.content.Context;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.MainActivity;
@@ -56,7 +55,6 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
 
         //AbstractConfirmListDialog
         ConfirmSoundcloudDownloadDialog dlg = ConfirmSoundcloudDownloadDialog.newInstance(ctx, title, text, results);
-        dlg.setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
         return dlg;
     }
 

@@ -1,6 +1,7 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
-
 import com.frostwire.android.R;
 import com.frostwire.util.Ref;
 
@@ -37,14 +37,13 @@ import java.util.List;
  * 
  * @author gubatron
  * @author aldenml
- * 
+ * @author marcelinkaaa
  */
 public abstract class AbstractDialog extends DialogFragment {
 
     /**
      * The identifier for the positive button.
      */
-    public static final int BUTTON_POSITIVE = Dialog.BUTTON_POSITIVE;
     private final String tag;
     private final int layoutResId;
 
@@ -53,6 +52,7 @@ public abstract class AbstractDialog extends DialogFragment {
     public AbstractDialog(String tag, int layoutResId) {
         this.tag = tag;
         this.layoutResId = layoutResId;
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -42,7 +41,7 @@ import java.lang.ref.WeakReference;
 /**
  * @author gubatron
  * @author aldenml
- *
+ * @author marcelinkaaa
  */
 public class NewTransferDialog extends AbstractDialog {
 
@@ -129,7 +128,7 @@ public class NewTransferDialog extends AbstractDialog {
         public void onClick(NewTransferDialog owner, View v) {
             if (positive) {
                 // see SearchFragment::OnDialogClickListener::onDialogClick(tag,which)
-                owner.performDialogClick(BUTTON_POSITIVE);
+                owner.performDialogClick(Dialog.BUTTON_POSITIVE);
             }
             owner.dismiss();
         }

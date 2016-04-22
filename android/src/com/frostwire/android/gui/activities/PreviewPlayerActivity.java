@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -231,7 +232,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     @Override
     public void onDialogClick(String tag, int which) {
-        if (tag.equals(NewTransferDialog.TAG) && which == AbstractDialog.BUTTON_POSITIVE) {
+        if (tag.equals(NewTransferDialog.TAG) && which == Dialog.BUTTON_POSITIVE) {
             if (Ref.alive(NewTransferDialog.srRef)) {
                 releaseMediaPlayer();
                 Intent i = new Intent(this, MainActivity.class);

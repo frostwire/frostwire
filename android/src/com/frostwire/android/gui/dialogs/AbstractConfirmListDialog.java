@@ -1,5 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Jose Molina (@votaguz), Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2016, FrostWire(TM). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +26,6 @@ import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.*;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
@@ -48,13 +48,12 @@ import java.util.*;
  * @author aldenml
  * @author gubatron
  * @author votaguz
+ * @author marcelinkaaa
+ *
  */
-@SuppressWarnings("ALL")
 abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         AbstractListAdapter.OnItemCheckedListener {
-
-    private static final String BUNDLE_KEY_DIALOG_ICON = "dialogIcon";
-    protected static final String BUNDLE_KEY_CHECKED_OFFSETS = "checkedOffsets";
+    static final String BUNDLE_KEY_CHECKED_OFFSETS = "checkedOffsets";
     private static final String BUNDLE_KEY_DIALOG_TITLE = "title";
     private static final String BUNDLE_KEY_DIALOG_TEXT = "dialogText";
     private static final String BUNDLE_KEY_LIST_DATA = "listData";
@@ -188,14 +187,6 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
         selectAllCheckbox.setVisibility(View.VISIBLE);
         selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxOnCheckedChangeListener);
-    }
-
-    public void checkAll() {
-        if (adapter != null) {
-            adapter.checkAll();
-            updateSelectedCount();
-            updateSelectedInBundle();
-        }
     }
 
     public abstract ConfirmListDialogDefaultAdapter<T> createAdapter(Context context,
@@ -362,7 +353,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
                                  numCheckedTextView != null;
 
         if (summaryLayout != null) {
-            summaryLayout.setVisibility(View.VISIBLE);
+            summaryLayout.setVisibility(summaryVisible ? View.VISIBLE : View.GONE);
             numCheckedTextView.setText(selected + " " + getString(R.string.selected));
             numCheckedTextView.setVisibility(View.VISIBLE);
 

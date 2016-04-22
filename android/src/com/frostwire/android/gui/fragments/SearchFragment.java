@@ -20,7 +20,7 @@ package com.frostwire.android.gui.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DialogFragment;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -50,8 +50,8 @@ import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
+import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.PromotionsView.OnPromotionClickListener;
 import com.frostwire.android.gui.views.SearchInputView.OnSearchListener;
 import com.frostwire.frostclick.Slide;
@@ -344,7 +344,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
     @Override
     public void onDialogClick(String tag, int which) {
-        if (tag.equals(NewTransferDialog.TAG) && which == AbstractDialog.BUTTON_POSITIVE) {
+        if (tag.equals(NewTransferDialog.TAG) && which == Dialog.BUTTON_POSITIVE) {
             if (Ref.alive(NewTransferDialog.srRef)) {
                 startDownload(this.getActivity(), NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
                 LocalSearchEngine.instance().markOpened(NewTransferDialog.srRef.get(), adapter);
@@ -357,12 +357,11 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             if (sr instanceof FileSearchResult) {
                 try {
                     NewTransferDialog dlg = NewTransferDialog.newInstance((FileSearchResult) sr, false);
-                    dlg.setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
                     dlg.show(getFragmentManager());
                 } catch (IllegalStateException e) {
                     // android.app.FragmentManagerImpl.checkStateLoss:1323 -> java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
                     // just start the download then if the dialog crapped out.
-                    onDialogClick(NewTransferDialog.TAG, AbstractDialog.BUTTON_POSITIVE);
+                    onDialogClick(NewTransferDialog.TAG, Dialog.BUTTON_POSITIVE);
                 }
             }
         } else {

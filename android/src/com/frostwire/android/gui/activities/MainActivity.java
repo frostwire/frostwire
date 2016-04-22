@@ -18,11 +18,7 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.ActionBar;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.app.NotificationManager;
+import android.app.*;
 import android.content.*;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -338,7 +334,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             }
         } else {
             TermsUseDialog dlg = new TermsUseDialog();
-            dlg.setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
             dlg.show(getFragmentManager());
         }
 
@@ -518,20 +513,18 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void showLastBackDialog() {
         YesNoDialog dlg = YesNoDialog.newInstance(LAST_BACK_DIALOG_ID, R.string.minimize_frostwire, R.string.are_you_sure_you_wanna_leave);
-        dlg.setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
         dlg.show(getFragmentManager()); //see onDialogClick
     }
 
     private void showShutdownDialog() {
         YesNoDialog dlg = YesNoDialog.newInstance(SHUTDOWN_DIALOG_ID, R.string.app_shutdown_dlg_title, R.string.app_shutdown_dlg_message);
-        dlg.setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
         dlg.show(getFragmentManager()); //see onDialogClick
     }
 
     public void onDialogClick(String tag, int which) {
-        if (tag.equals(LAST_BACK_DIALOG_ID) && which == AbstractDialog.BUTTON_POSITIVE) {
+        if (tag.equals(LAST_BACK_DIALOG_ID) && which == Dialog.BUTTON_POSITIVE) {
             onLastDialogButtonPositive();
-        } else if (tag.equals(SHUTDOWN_DIALOG_ID) && which == AbstractDialog.BUTTON_POSITIVE) {
+        } else if (tag.equals(SHUTDOWN_DIALOG_ID) && which == Dialog.BUTTON_POSITIVE) {
             onShutdownDialogButtonPositive();
         } else if (tag.equals(TermsUseDialog.TAG)) {
             controller.startWizardActivity();
