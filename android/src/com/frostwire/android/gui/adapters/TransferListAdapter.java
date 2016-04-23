@@ -263,7 +263,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             title = download.getDisplayName();
 
             //If it's a torrent download with a single file, we should be able to open it.
-            if (download.isComplete()) {
+            if (download.isComplete() && download.getItems().size() > 0) {
                 TransferItem transferItem = download.getItems().get(0);
                 String path = transferItem.getFile().getAbsolutePath();
                 String mimeType = UIUtils.getMimeType(path);
@@ -271,7 +271,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             }
 
             if (!download.isComplete() || ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS)) {
-
                 if (download.isPausable() && !download.isPaused()) {
                     items.add(new PauseDownloadMenuAction(context.get(), download));
                 } else if (download.isResumable()) {

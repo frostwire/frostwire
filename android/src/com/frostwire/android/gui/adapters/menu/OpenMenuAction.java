@@ -19,7 +19,6 @@
 package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
@@ -30,7 +29,6 @@ import com.frostwire.android.gui.views.MenuAction;
  *
  */
 public class OpenMenuAction extends MenuAction {
-
     private final String path;
     private final String mime;
 
@@ -46,7 +44,6 @@ public class OpenMenuAction extends MenuAction {
         this.mime = mime;
     }
 
-    
     @Override
     protected void onClick(Context context) {
         UIUtils.openFile(context, path, mime);

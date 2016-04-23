@@ -211,6 +211,16 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public int getProgress() {
+        if (haveAllPieces()) {
+            return 100;
+        }
+
+        // TODO: Add logic to check completion logic for merkle based torrents.
+        if (th.getTorrentInfo().isMerkleTorrent()) {
+            //final ArrayList<Sha1Hash> sha1Hashes = th.getTorrentInfo().merkleTree();
+            //perform sha1Hash check
+        }
+
         float fp = th.getStatus().getProgress();
 
         if (Float.compare(fp, 1f) == 0) {
@@ -219,6 +229,16 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         int p = (int) (th.getStatus().getProgress() * 100);
         return Math.min(p, 100);
+    }
+
+    private boolean haveAllPieces() {
+        int numPieces = th.getStatus().getNumPieces();
+        for (int n=0; n < numPieces; n++) {
+            if (!th.havePiece(n)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -510,7 +530,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         ArrayList<TransferItem> items = new ArrayList<>();
 
         if (th.isValid()) {
-
             TorrentInfo ti = th.getTorrentInfo();
             if (ti != null && ti.isValid()) {
                 FileStorage fs = ti.files();
@@ -518,7 +537,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
                 for (int i = 0; i < numFiles; i++) {
                     BTDownloadItem item = new BTDownloadItem(th, i, fs.filePath(i), fs.fileSize(i), piecesTracker);
-
                     items.add(item);
                 }
 

@@ -127,6 +127,12 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         boolean showSingleOptions = showSingleOptions(checked, fd);
 
         if (showSingleOptions) {
+            items.add(new SeedAction(context, fd));
+        } else {
+            items.add(new SeedAction(context, checked));
+        }
+
+        if (showSingleOptions) {
             if (canOpenFile) {
                 items.add(new OpenMenuAction(context, fd.filePath, fd.mime));
             }

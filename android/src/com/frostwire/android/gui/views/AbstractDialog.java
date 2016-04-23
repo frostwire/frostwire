@@ -48,6 +48,7 @@ public abstract class AbstractDialog extends DialogFragment {
     private final int layoutResId;
 
     private WeakReference<Activity> activityRef;
+    private OnDialogClickListener onDialogClickListener;
 
     public AbstractDialog(String tag, int layoutResId) {
         this.tag = tag;
@@ -112,6 +113,11 @@ public abstract class AbstractDialog extends DialogFragment {
     }
 
     private void dispatchDialogClick(Activity activity, String tag, int which) {
+        if (onDialogClickListener != null) {
+            dispatchDialogClickSafe(onDialogClickListener, tag, which);
+            return;
+        }
+
         dispatchDialogClickSafe(activity, tag, which);
 
         if (activity instanceof AbstractActivity) {
@@ -127,6 +133,10 @@ public abstract class AbstractDialog extends DialogFragment {
         if (obj instanceof OnDialogClickListener) {
             ((OnDialogClickListener) obj).onDialogClick(tag, which);
         }
+    }
+
+    public void setOnDialogClickListener(OnDialogClickListener onDialogClickListener) {
+        this.onDialogClickListener = onDialogClickListener;
     }
 
     public interface OnDialogClickListener {
