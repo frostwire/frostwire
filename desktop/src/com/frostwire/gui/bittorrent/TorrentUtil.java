@@ -208,7 +208,7 @@ public final class TorrentUtil {
     public static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog, boolean dhtTrackedOnly) {
         try {
             file_storage fs = new file_storage();
-            libtorrent.add_files(fs, file.getAbsolutePath());
+            libtorrent.add_files_ex(fs, file.getAbsolutePath(), new add_files_listener() {}, 0);
             create_torrent torrentCreator = new create_torrent(fs);
 
             if (dhtTrackedOnly) {
@@ -225,7 +225,7 @@ public final class TorrentUtil {
             torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
             final File torrentFile = new File(SharingSettings.TORRENTS_DIR_SETTING.getValue(), file.getName() + ".torrent");
             final error_code ec = new error_code();
-            libtorrent.set_piece_hashes(torrentCreator,file.getParentFile().getAbsolutePath(), ec);
+            libtorrent.set_piece_hashes_ex(torrentCreator,file.getParentFile().getAbsolutePath(), new set_piece_hashes_listener() {}, ec);
             if (ec.value() != 0 && uiTorrentMakerListener != null) {
                 uiTorrentMakerListener.onCreateTorrentError(ec);
                 return;

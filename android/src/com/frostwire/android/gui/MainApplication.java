@@ -29,7 +29,7 @@ import com.frostwire.android.util.HttpResponseCache;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.DHT;
+import com.frostwire.jlibtorrent.Dht;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
 import com.frostwire.platform.SystemPaths;
@@ -124,7 +124,7 @@ public class MainApplication extends Application {
         BTEngine.getInstance().start();
 
         boolean enable_dht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-        DHT dht = new DHT(BTEngine.getInstance().getSession());
+        Dht dht = new Dht(BTEngine.getInstance().getSession());
         if (!enable_dht) {
             dht.stop();
         } else {

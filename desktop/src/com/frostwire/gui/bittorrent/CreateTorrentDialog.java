@@ -19,10 +19,7 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.swig.create_torrent;
-import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.file_storage;
-import com.frostwire.jlibtorrent.swig.libtorrent;
+import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.util.http.HttpClient;
@@ -571,7 +568,7 @@ public class CreateTorrentDialog extends JDialog {
         try {
             file_storage fs = new file_storage();
             reportCurrentTask(I18n.tr("Adding files..."));
-            libtorrent.add_files(fs, f.getPath());
+            libtorrent.add_files_ex(fs, f.getPath(), new add_files_listener() {}, 0);
 
             create_torrent torrent = new create_torrent(fs);
             torrent.set_priv(false);
@@ -589,7 +586,7 @@ public class CreateTorrentDialog extends JDialog {
                     reportCurrentTask(I18n.tr("Calculating piece hashes..."));
                     _saveDir = f.getParentFile();
                     error_code ec = new error_code();
-                    libtorrent.set_piece_hashes(torrent, _saveDir.getAbsolutePath(), ec);
+                    libtorrent.set_piece_hashes_ex(torrent, _saveDir.getAbsolutePath(), new set_piece_hashes_listener() {}, ec);
                     reportCurrentTask(I18n.tr("Generating torrent entry..."));
 
                     Entry entry = new Entry(torrent.generate());
