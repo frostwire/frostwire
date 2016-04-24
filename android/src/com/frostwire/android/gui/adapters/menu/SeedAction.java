@@ -28,7 +28,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
@@ -158,44 +157,40 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     private void buildTorrentAndSeedIt(final FileDescriptor fd) {
         // TODO: re-do this with new TorrentBuilder
-        Engine.instance().getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                File file = new File(fd.filePath);
-                File saveDir = file.getParentFile();
-                file_storage fs = new file_storage();
-                fs.add_file(file.getName(), file.length());
-                fs.set_name(file.getName());
-                create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
-                // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
-                // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
-                ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
-                ct.set_priv(false);
+        File file = new File(fd.filePath);
+        File saveDir = file.getParentFile();
+        file_storage fs = new file_storage();
+        fs.add_file(file.getName(), file.length());
+        fs.set_name(file.getName());
+        create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
+        // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
+        // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
+        ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
+        ct.set_priv(false);
 
-                final error_code ec = new error_code();
-                libtorrent.set_piece_hashes(ct, saveDir.getAbsolutePath(), ec);
+        final error_code ec = new error_code();
+        libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), null, ec);
 
-                final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
-                final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
+        final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
+        final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
 
-                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
+        // so the TorrentHandle object is created and added to the libtorrent session.
+        BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
 
-                final TorrentHandle torrentHandle =
-                        BTEngine.getInstance().getSession().findTorrent(tinfo.infoHash());
-                torrentHandle.saveResumeData();
-                torrentHandle.pause();
-                torrentHandle.setAutoManaged(true);
-                torrentHandle.forceDHTAnnounce();
-                torrentHandle.scrapeTracker();
+        final TorrentHandle torrentHandle =
+            BTEngine.getInstance().getSession().findTorrent(tinfo.infoHash());
+        torrentHandle.saveResumeData();
+        torrentHandle.pause();
+        torrentHandle.setAutoManaged(true);
+        torrentHandle.forceDHTAnnounce();
+        torrentHandle.scrapeTracker();
 
-                // so it will call fireDownloadUpdate(torrentHandle) -> UIBittorrentDownload.updateUI()
-                // which calculates the download items;
-                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
-                torrentHandle.forceReannounce();
-                torrentHandle.forceRecheck();
-            }
-        });
+        // so it will call fireDownloadUpdate(torrentHandle) -> UIBittorrentDownload.updateUI()
+        // which calculates the download items;
+        BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
 
+        torrentHandle.forceRecheck();
+        torrentHandle.forceReannounce();
     }
 
     private void onSeedingEnabled() {
