@@ -1,6 +1,9 @@
-FrostWire 1.7.4 - APR/21/2016
+FrostWire 1.7.4 - APR/24/2016
+ - New 'Seed' action available on 'My files'. Create and seed
+   a torrent of a file or many in one touch.
  - New handpicked file selection on .torrent downloads.
  - Search improvements and refactors.
+ - New jlibtorrent 1.1.0.26
 
 FrostWire 1.7.3 - APR/15/2016
  - Soundcloud search results include estimated file size.

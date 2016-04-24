@@ -47,7 +47,6 @@ import java.io.File;
 import java.util.List;
 
 /**
- * TODO: create Seed icon @marcelinkaaa
  * Created on 4/22/16.
  *
  * @author gubatron
@@ -168,8 +167,8 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 fs.add_file(file.getName(), file.length());
                 fs.set_name(file.getName());
                 create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
-                // commented out the merkle flag because torrent doesn't appear as "Seeding", piece count doesn't work
-                // as the algorithm probably doesn't make sense.
+                // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
+                // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
                 ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
                 ct.set_priv(false);
 
@@ -205,7 +204,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void enableSeeding() {
-        //PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS
         CM.setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, true);
         TransferManager.instance().resumeResumableTransfers();
     }
