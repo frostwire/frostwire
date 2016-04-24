@@ -629,7 +629,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 File file = engine.resumeDataFile(infoHash);
 
                 Entry e = alert.resumeData();
-                e.getSwig().dict().set(EXTRA_DATA_KEY, Entry.fromMap(extra).getSwig());
+                e.swig().dict().set(EXTRA_DATA_KEY, Entry.fromMap(extra).swig());
 
                 FileUtils.writeByteArrayToFile(file, e.bencode());
             }

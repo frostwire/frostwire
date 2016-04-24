@@ -169,7 +169,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         ct.set_priv(false);
 
         final error_code ec = new error_code();
-        libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), null, ec);
+        libtorrent.set_piece_hashes(ct, saveDir.getAbsolutePath(), ec);
 
         final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
         final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
@@ -178,7 +178,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
 
         final TorrentHandle torrentHandle =
-            BTEngine.getInstance().getSession().findTorrent(tinfo.infoHash());
+                BTEngine.getInstance().getSession().findTorrent(tinfo.infoHash());
         torrentHandle.saveResumeData();
         torrentHandle.pause();
         torrentHandle.setAutoManaged(true);
