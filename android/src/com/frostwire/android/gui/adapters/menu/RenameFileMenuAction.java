@@ -89,7 +89,7 @@ public class RenameFileMenuAction extends MenuAction {
         buttonYes.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View v) {
-                                             String newFileName = input.getText().toString();// + "." + ext;
+                                             String newFileName = input.getText().toString();
                                              if (isValidFileName(newFileName)) {
                                                  renameFile(newFileName);
                                                  adapter.notifyDataSetChanged();
