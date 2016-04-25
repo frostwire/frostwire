@@ -499,6 +499,9 @@
         <item name="android:padding">15dp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
+    <style name="DefaultDialogTheme.MainText">
+        <item name="android:textSize">@dimen/text_large</item>
+    </style>
     <style name="DefaultDialogTheme.SmallText">
         <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textColor">@color/app_text_secondary</item>
