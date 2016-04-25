@@ -79,6 +79,8 @@
     <string name="new_playlist_name_template">Playlist <xliff:g id="number">%d</xliff:g></string>
     <string name="create_playlist_prompt">Playlist name</string>
     <string name="delete_dialog_title">Delete <xliff:g id="item" example="album">%s</xliff:g>?</string>
+    <string name="delete_files_title">Delete files</string>
+    <string name="are_you_sure_delete_files_text">Are you sure you want to PERMANENTLY DELETE the selected files from your device?</string>
     <string name="cannot_be_undone">This cannot be undone</string>
     <string name="delete_warning">This will permanently delete the cached image entries</string>
     <string name="new_photo">Choose photo from Gallery</string>
