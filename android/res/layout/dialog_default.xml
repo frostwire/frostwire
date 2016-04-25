@@ -35,7 +35,10 @@
         android:id="@+id/dialog_default_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="15dp" />
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"

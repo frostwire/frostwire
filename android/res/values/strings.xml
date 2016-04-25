@@ -204,6 +204,7 @@
     <string name="share_finished_downloads">Share finished downloads on Wi-Fi</string>
     <string name="share_finished_downloads_summary">Finished downloads will be available to other FrostWire users on your Wi-Fi network.</string>
     <string name="are_you_sure_delete_files">Are you sure you want to PERMANENTLY DELETE the selected files from your device?</string>
+    <string name="delete_files">Delete files</string>
     <string name="searchable_activity_label">Searchable Activity</string>
     <string name="search_hint">Search Content</string>
     <string name="search_settings_description">Search for Torrents</string>
