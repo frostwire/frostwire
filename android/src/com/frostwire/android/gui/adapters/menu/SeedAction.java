@@ -170,14 +170,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 ct.set_priv(false);
 
                 final error_code ec = new error_code();
-                libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(),
-                        new set_piece_hashes_listener() {
-                            @Override
-                            public void progress(int i) {
-                                super.progress(i);
-                                LOG.info("progress(" + i + ")");
-                            }
-                        }, ec);
+                libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
 
                 final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
                 final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
