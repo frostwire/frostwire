@@ -79,7 +79,7 @@ public class DeleteFileMenuAction extends MenuAction {
         });
 
         Button buttonYes = (Button) newDeleteFilesDialog.findViewById(R.id.dialog_default_button_yes);
-        buttonYes.setText(android.R.string.ok);
+        buttonYes.setText(R.string.delete);
         buttonYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
