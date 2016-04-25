@@ -18,11 +18,14 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.TextView;
+
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.MenuAction;
@@ -34,8 +37,7 @@ import com.frostwire.android.gui.views.MenuAction;
  *
  * @author gubatron
  * @author aldenml
- *
-*/
+ */
 public class CreateNewPlaylistMenuAction extends MenuAction {
     private final long[] fileDescriptors;
 
@@ -46,40 +48,50 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
 
     @Override
     protected void onClick(Context context) {
-        //shows dialog to enter name of new playlist, on acceptance, creates playlist and ads the file descriptors.
         showCreateNewPlaylistDialog();
     }
 
     private void showCreateNewPlaylistDialog() {
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
 
-        dialogBuilder.setTitle(R.string.new_empty_playlist);
+        final Dialog newCreateNewPlaylistDialog = new Dialog(getContext(), R.style.DefaultDialogTheme);
+        newCreateNewPlaylistDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        newCreateNewPlaylistDialog.setContentView(R.layout.dialog_default_input);
 
-        final LinearLayout layout = new LinearLayout(getContext());
-        layout.setOrientation(LinearLayout.VERTICAL);
-        final EditText input = new EditText(getContext());
+        TextView title = (TextView) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_title);
+        title.setText(R.string.new_empty_playlist);
+
+        final EditText input = (EditText) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_text);
         input.setText("");
         input.setHint(R.string.create_playlist_prompt);
         input.selectAll();
-        layout.addView(input, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        dialogBuilder.setView(layout);
 
-        dialogBuilder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+        Button buttonNo = (Button) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_button_no);
+        buttonNo.setText(R.string.cancel);
+        buttonNo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(View v) {
+                newCreateNewPlaylistDialog.dismiss();
+            }
+        });
+
+        Button buttonYes = (Button) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_button_yes);
+        buttonYes.setText(android.R.string.ok);
+        buttonYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 String playlistName = input.getText().toString();
                 if (MusicUtils.getIdForPlaylist(getContext(), playlistName) != -1) {
                     playlistName += "+";
                     input.setText(playlistName);
-                    onClick(dialog, which);
+
                 } else {
                     onClickCreatePlaylistButton(playlistName);
+                    newCreateNewPlaylistDialog.dismiss();
                 }
             }
         });
 
-        dialogBuilder.setNegativeButton(R.string.cancel, null);
-        dialogBuilder.show();
+        newCreateNewPlaylistDialog.show();
     }
 
     private void onClickCreatePlaylistButton(CharSequence text) {
@@ -93,8 +105,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
 
     private static int getIconResourceId(Context context) {
         return context.getClass().getCanonicalName().contains("apollo") ?
-                R.drawable.contextmenu_icon_playlist_add_light:
+                R.drawable.contextmenu_icon_playlist_add_light :
                 R.drawable.contextmenu_icon_playlist_add_dark;
-
     }
 }
