@@ -568,7 +568,7 @@ public class CreateTorrentDialog extends JDialog {
         try {
             file_storage fs = new file_storage();
             reportCurrentTask(I18n.tr("Adding files..."));
-            libtorrent.add_files_ex(fs, f.getPath(), new add_files_listener() {}, 0);
+            libtorrent.add_files(fs, f.getPath());
 
             create_torrent torrent = new create_torrent(fs);
             torrent.set_priv(false);
@@ -586,7 +586,7 @@ public class CreateTorrentDialog extends JDialog {
                     reportCurrentTask(I18n.tr("Calculating piece hashes..."));
                     _saveDir = f.getParentFile();
                     error_code ec = new error_code();
-                    libtorrent.set_piece_hashes_ex(torrent, _saveDir.getAbsolutePath(), new set_piece_hashes_listener() {}, ec);
+                    libtorrent.set_piece_hashes(torrent, _saveDir.getAbsolutePath(), ec);
                     reportCurrentTask(I18n.tr("Generating torrent entry..."));
 
                     Entry entry = new Entry(torrent.generate());

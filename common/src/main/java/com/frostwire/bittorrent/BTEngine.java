@@ -558,7 +558,7 @@ public final class BTEngine {
     private void saveResumeTorrent(File torrent) {
         try {
             TorrentInfo ti = new TorrentInfo(torrent);
-            entry e = ti.toEntry().getSwig();
+            entry e = ti.toEntry().swig();
             e.dict().set(TORRENT_ORIG_PATH_KEY, new entry(torrent.getAbsolutePath()));
             byte[] arr = Vectors.byte_vector2bytes(e.bencode());
             FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHash().toString()), arr);
