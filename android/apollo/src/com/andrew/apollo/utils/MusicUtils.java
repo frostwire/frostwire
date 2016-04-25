@@ -548,7 +548,7 @@ public final class MusicUtils {
             if (cursor != null) {
                 final long[] mList = getSongListForCursor(cursor);
                 cursor.close();
-                if (mList == null) {
+                if (mList == null || mList.length == 0) {
                     return sEmptyList;
                 }
                 return mList;

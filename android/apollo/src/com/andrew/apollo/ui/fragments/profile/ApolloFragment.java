@@ -285,7 +285,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 case FragmentMenuItems.DELETE:
                     return onDelete(songList);
                 case FragmentMenuItems.MORE_BY_ARTIST:
-                    long[] tracks = MusicUtils.getSongListForArtist(getActivity(), mSelectedId);
+                    long artistId = MusicUtils.getIdForArtist(getContext(), mArtistName);
+                    long[] tracks = MusicUtils.getSongListForArtist(getActivity(), artistId);
                     NavUtils.openArtistProfile(getActivity(), mArtistName, tracks);
                     return true;
                 case FragmentMenuItems.REMOVE_FROM_PLAYLIST:
