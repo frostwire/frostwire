@@ -18,25 +18,27 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
+import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
-import org.apache.commons.io.FilenameUtils;
 
-import java.io.File;
-import java.io.IOException;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * @author gubatron
  * @author aldenml
- *
+ * @author marcelinkaaa
  */
 public class RenameFileMenuAction extends MenuAction {
 
@@ -51,27 +53,55 @@ public class RenameFileMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(final Context context) {
+    protected void onClick(Context context) {
+        showRenameFileDialog();
+    }
+
+    private void showRenameFileDialog() {
+
+        final Dialog newRenameFileDialog = new Dialog(getContext(), R.style.DefaultDialogTheme);
+        newRenameFileDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        newRenameFileDialog.setContentView(R.layout.dialog_default_input);
+
+        TextView title = (TextView) newRenameFileDialog.findViewById(R.id.dialog_default_input_title);
+        title.setText(R.string.rename);
+
         String filePath = fd.filePath;
 
         String name = FilenameUtils.getBaseName(filePath);
         final String ext = FilenameUtils.getExtension(filePath);
 
-        final EditText input = new EditText(context);
+        final EditText input = (EditText) newRenameFileDialog.findViewById(R.id.dialog_default_input_text);
         input.setText(name);
         input.selectAll();
 
-        UIUtils.showOkCancelDialog(context, input, R.string.rename, new OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String newFileName = input.getText().toString() + "." + ext;
-                if (isValidFileName(newFileName)) {
-                    renameFile(newFileName);
-                    adapter.notifyDataSetChanged();
-                } else {
-                    UIUtils.showLongMessage(context, R.string.invalid_filename);
-                }
+        Button buttonNo = (Button) newRenameFileDialog.findViewById(R.id.dialog_default_input_button_no);
+        buttonNo.setText(R.string.cancel);
+        buttonNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newRenameFileDialog.dismiss();
             }
         });
+
+        Button buttonYes = (Button) newRenameFileDialog.findViewById(R.id.dialog_default_input_button_yes);
+        buttonYes.setText(android.R.string.ok);
+        buttonYes.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View v) {
+                                             String newFileName = input.getText().toString();// + "." + ext;
+                                             if (isValidFileName(newFileName)) {
+                                                 renameFile(newFileName);
+                                                 adapter.notifyDataSetChanged();
+                                                 newRenameFileDialog.dismiss();
+                                             } else {
+                                                 UIUtils.showLongMessage(getContext(), R.string.invalid_filename);
+                                             }
+                                         }
+                                     }
+        );
+
+        newRenameFileDialog.show();
     }
 
     private boolean isValidFileName(String newFileName) {
