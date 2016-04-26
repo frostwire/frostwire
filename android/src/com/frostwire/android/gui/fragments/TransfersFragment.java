@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,8 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.*;
+import com.frostwire.android.gui.util.SwipeDetector;
+import com.frostwire.android.gui.util.SwipeListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
@@ -66,7 +68,7 @@ import java.util.*;
  * @author aldenml
  * 
  */
-public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener {
+public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener, SwipeListener {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
     private static final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
@@ -91,6 +93,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private final EngineService.CheckDHTUICallback onDHTCheckCallback;
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
+    private final SwipeDetector viewSwipeDetector;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -101,6 +104,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         this.onVPNStatusCallback = new OnVPNStatusCallback();
         this.onDHTCheckCallback = new OnCheckDHTCallback();
         vpnRichToastHandler = new Handler();
+        viewSwipeDetector = new SwipeDetector(this, 100);
     }
 
     @Override
@@ -149,7 +153,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onPause() {
         super.onPause();
-
         if (adapter != null) {
             adapter.dismissDialogs();
         }
@@ -210,6 +213,18 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (wasActiveBefore) {
             showVPNRichToast();
         }
+    }
+
+    @Override
+    public void onSwipeLeft() {
+        // if they swipe left, we move to the right (drag gesture)
+        selectStatusTabToThe(true);
+    }
+
+    @Override
+    public void onSwipeRight() {
+        // if they swipe right, we move to the left (drag gesture)
+        selectStatusTabToThe(false);
     }
 
     private class OnVPNStatusCallback implements EngineService.VpnStatusUICallback {
@@ -294,6 +309,25 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         return header;
     }
 
+    public void selectStatusTabToThe(boolean right) {
+        final TransferStatus[] allStatusesArray = TransferStatus.getAllStatusesArray();
+        int currentStatusIndex = -1;
+        for (int i=0; i < allStatusesArray.length; i++) {
+            if (selectedStatus == allStatusesArray[i]) {
+                currentStatusIndex = i;
+                break;
+            }
+        }
+        if (currentStatusIndex != -1) {
+            int increment = (right) ? 1 : -1;
+            currentStatusIndex = (currentStatusIndex + increment) % allStatusesArray.length;
+            if (currentStatusIndex < 0) {
+                currentStatusIndex = allStatusesArray.length - 1;
+            }
+            selectStatusTab(allStatusesArray[currentStatusIndex]);
+        }
+    }
+
     public void selectStatusTab(TransferStatus status) {
         selectedStatus = status;
         switch (selectedStatus) {
@@ -344,6 +378,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         buttonSelectCompleted.setOnClickListener(new ButtonTabListener(this, TransferStatus.COMPLETED));
 
         list = findView(v, R.id.fragment_transfers_list);
+        list.setOnTouchListener(viewSwipeDetector);
 
         textDHTPeers = findView(v, R.id.fragment_transfers_dht_peers);
         textDHTPeers.setVisibility(View.GONE);
@@ -727,7 +762,16 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     public enum TransferStatus {
-        ALL, DOWNLOADING, COMPLETED
+        ALL, DOWNLOADING, COMPLETED;
+
+        private static TransferStatus[] STATUS_ARRAY = new TransferStatus[] {
+                ALL,
+                DOWNLOADING,
+                COMPLETED };
+
+        public static TransferStatus[] getAllStatusesArray() {
+            return STATUS_ARRAY;
+        }
     }
 
     private static final class ButtonAddTransferListener extends ClickAdapter<TransfersFragment> {

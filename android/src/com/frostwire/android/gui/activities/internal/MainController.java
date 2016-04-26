@@ -29,12 +29,11 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.WizardActivity;
-import com.frostwire.android.gui.fragments.BrowsePeerFragment;
+import com.frostwire.android.gui.adnetworks.Offers;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.adnetworks.Offers;
 
 /**
  * 
@@ -110,7 +109,7 @@ public final class MainController {
     }
 
     private void handleSendSingleFile(Intent intent) {
-        Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (uri == null) {
             return;
         }
