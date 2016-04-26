@@ -59,6 +59,7 @@ import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.*;
+import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.HttpClientFactory;
@@ -353,7 +354,8 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     private void startTransfer(final SearchResult sr, final String toastMessage) {
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
+        if (!(sr instanceof AbstractTorrentSearchResult) &&
+            ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
             if (sr instanceof FileSearchResult) {
                 try {
                     NewTransferDialog dlg = NewTransferDialog.newInstance((FileSearchResult) sr, false);
