@@ -264,7 +264,7 @@ public final class TransferManager {
         engine.restoreDownloads();
     }
 
-    boolean remove(Transfer transfer) {
+    public boolean remove(Transfer transfer) {
         if (transfer instanceof BittorrentDownload) {
             return bittorrentDownloads.remove(transfer);
         } else if (transfer instanceof DownloadTransfer) {

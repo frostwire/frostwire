@@ -29,6 +29,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.Transfer;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
@@ -55,20 +56,27 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private final FileDescriptor fd;
     private final List<FileDescriptor> fds;
     private final ConfigurationManager CM;
+    private final Transfer transferToClear;
     private static String DLG_SEEDING_OFF_TAG = "DLG_SEEDING_OFF_TAG";
 
-    public SeedAction(Context context, FileDescriptor fd) {
-        super(context, R.drawable.contextmenu_icon_share, R.string.seed);
+    private SeedAction(Context context, FileDescriptor fd, List<FileDescriptor> fds, Transfer transferToClear) {
+        super(context, R.drawable.contextmenu_icon_play_transfer, R.string.seed);
         this.fd = fd;
-        fds = null;
+        this.fds = fds;
+        this.transferToClear = transferToClear;
         CM = ConfigurationManager.instance();
     }
 
+    public SeedAction(Context context, FileDescriptor fd) {
+        this(context, fd, null, null);
+    }
+
+    public SeedAction(Context context, FileDescriptor fd, Transfer transferToClear) {
+        this(context, fd, null, transferToClear);
+    }
+
     public SeedAction(Context context, List<FileDescriptor> checked) {
-        super(context, R.drawable.contextmenu_icon_share, R.string.seed);
-        fd = null;
-        fds = checked;
-        CM = ConfigurationManager.instance();
+        this(context, null, checked, null);
     }
 
     @Override
@@ -136,6 +144,10 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             seedFileDescriptor(fd);
         } else if (fds != null) {
             seedFileDescriptors();
+        }
+
+        if (transferToClear != null) {
+            TransferManager.instance().remove(transferToClear);
         }
     }
 

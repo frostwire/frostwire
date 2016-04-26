@@ -30,7 +30,9 @@ import android.widget.*;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.MediaType;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.adapters.menu.*;
 import com.frostwire.android.gui.services.Engine;
@@ -257,89 +259,102 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         Object tag = view.getTag();
         String title = "";
         List<MenuAction> items = new ArrayList<>();
-
         if (tag instanceof BittorrentDownload) {
-            BittorrentDownload download = (BittorrentDownload) tag;
-            title = download.getDisplayName();
+            title = populateBittorrentDownloadMenuActions((BittorrentDownload) tag, items);
+        } else if (tag instanceof DownloadTransfer) {
+            title = populateCloudDownloadMenuActions(tag, items);
+        }
+        return items.size() > 0 ? new MenuAdapter(context.get(), title, items) : null;
+    }
 
-            //If it's a torrent download with a single file, we should be able to open it.
-            if (download.isComplete() && download.getItems().size() > 0) {
-                TransferItem transferItem = download.getItems().get(0);
-                String path = transferItem.getFile().getAbsolutePath();
-                String mimeType = UIUtils.getMimeType(path);
-                items.add(new OpenMenuAction(context.get(), path, mimeType));
+    private String populateCloudDownloadMenuActions(Object tag, List<MenuAction> items) {
+        DownloadTransfer download = (DownloadTransfer) tag;
+        String title = download.getDisplayName();;
+        boolean errored = download.getStatus() != null && getStatusFromResId(download.getStatus()).contains("Error");
+        boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
+        if (finishedSuccessfully) {
+            final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
+            if (files != null && files.size() == 1) {
+                items.add(new SeedAction(context.get(), files.get(0),download));
             }
+            items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
+        }
+        items.add(new CancelMenuAction(context.get(), download, !finishedSuccessfully));
+        return title;
+    }
 
-            if (!download.isComplete() || ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS)) {
-                if (download.isPausable() && !download.isPaused()) {
-                    items.add(new PauseDownloadMenuAction(context.get(), download));
-                } else if (download.isResumable()) {
-                    boolean wifiIsUp = NetworkManager.instance().isDataWIFIUp();
-                    boolean bittorrentOnMobileData = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
-                    boolean bittorrentOff = Engine.instance().isStopped() || Engine.instance().isDisconnected();
+    private boolean isCloudDownload(Object tag) {
+        return tag instanceof HttpDownload || tag instanceof YouTubeDownload || tag instanceof SoundcloudDownload;
+    }
 
-                    if (wifiIsUp || bittorrentOnMobileData) {
-                        if (!download.isComplete() || bittorrentOff) {
-                            items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.resume_torrent_menu_action));
-                        } else {
-                            //let's see if we can seed...
-                            boolean seedTorrents = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
-                            boolean seedTorrentsOnWifiOnly = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
-                            if ((seedTorrents && seedTorrentsOnWifiOnly && wifiIsUp) || (seedTorrents && !seedTorrentsOnWifiOnly)) {
-                                items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.seed));
-                            }
+    private String populateBittorrentDownloadMenuActions(BittorrentDownload tag, List<MenuAction> items) {
+        String title;
+        BittorrentDownload download = tag;
+        title = download.getDisplayName();
+
+        //If it's a torrent download with a single file, we should be able to open it.
+        if (download.isComplete() && download.getItems().size() > 0) {
+            TransferItem transferItem = download.getItems().get(0);
+            String path = transferItem.getFile().getAbsolutePath();
+            String mimeType = UIUtils.getMimeType(path);
+            items.add(new OpenMenuAction(context.get(), path, mimeType));
+        }
+
+        if (!download.isComplete() || ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS)) {
+            if (download.isPausable() && !download.isPaused()) {
+                items.add(new PauseDownloadMenuAction(context.get(), download));
+            } else if (download.isResumable()) {
+                boolean wifiIsUp = NetworkManager.instance().isDataWIFIUp();
+                boolean bittorrentOnMobileData = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
+                boolean bittorrentOff = Engine.instance().isStopped() || Engine.instance().isDisconnected();
+
+                if (wifiIsUp || bittorrentOnMobileData) {
+                    if (!download.isComplete() || bittorrentOff) {
+                        items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.resume_torrent_menu_action));
+                    } else {
+                        //let's see if we can seed...
+                        boolean seedTorrents = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
+                        boolean seedTorrentsOnWifiOnly = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
+                        if ((seedTorrents && seedTorrentsOnWifiOnly && wifiIsUp) || (seedTorrents && !seedTorrentsOnWifiOnly)) {
+                            items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.seed));
                         }
                     }
                 }
             }
-
-            items.add(new CancelMenuAction(context.get(), download, !download.isComplete()));
-
-            items.add(new CopyToClipboardMenuAction(context.get(),
-                    R.drawable.contextmenu_icon_magnet,
-                    R.string.transfers_context_menu_copy_magnet,
-                    R.string.transfers_context_menu_copy_magnet_copied,
-                    download.makeMagnetUri()
-            ));
-
-            items.add(new CopyToClipboardMenuAction(context.get(),
-                    R.drawable.contextmenu_icon_copy,
-                    R.string.transfers_context_menu_copy_infohash,
-                    R.string.transfers_context_menu_copy_infohash_copied,
-                    download.getHash()
-            ));
-
-            if (download.isComplete()) {
-                // Remove Torrent and Data action.
-                items.add(new CancelMenuAction(context.get(), download, true, true));
-            }
-
-            if (download.hasPaymentOptions()) {
-                PaymentOptions po = download.getPaymentOptions();
-                if (po.bitcoin != null) {
-                    items.add(new SendBitcoinTipAction(context.get(), po));
-                }
-
-                if (po.paypalUrl != null) {
-                    items.add(new SendFiatTipAction(context.get(), po));
-                }
-            }
-        } else if (tag instanceof DownloadTransfer) {
-            DownloadTransfer download = (DownloadTransfer) tag;
-            title = download.getDisplayName();
-
-            boolean errored = download.getStatus() != null && getStatusFromResId(download.getStatus()).contains("Error");
-
-            boolean openMenu = !errored && download.isComplete() && (tag instanceof HttpDownload || tag instanceof YouTubeDownload || tag instanceof SoundcloudDownload);
-            if (openMenu) {
-                items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
-            }
-
-            items.add(new CancelMenuAction(context.get(), download, !openMenu));
-
         }
 
-        return items.size() > 0 ? new MenuAdapter(context.get(), title, items) : null;
+        items.add(new CancelMenuAction(context.get(), download, !download.isComplete()));
+
+        items.add(new CopyToClipboardMenuAction(context.get(),
+                R.drawable.contextmenu_icon_magnet,
+                R.string.transfers_context_menu_copy_magnet,
+                R.string.transfers_context_menu_copy_magnet_copied,
+                download.makeMagnetUri()
+        ));
+
+        items.add(new CopyToClipboardMenuAction(context.get(),
+                R.drawable.contextmenu_icon_copy,
+                R.string.transfers_context_menu_copy_infohash,
+                R.string.transfers_context_menu_copy_infohash_copied,
+                download.getHash()
+        ));
+
+        if (download.isComplete()) {
+            // Remove Torrent and Data action.
+            items.add(new CancelMenuAction(context.get(), download, true, true));
+        }
+
+        if (download.hasPaymentOptions()) {
+            PaymentOptions po = download.getPaymentOptions();
+            if (po.bitcoin != null) {
+                items.add(new SendBitcoinTipAction(context.get(), po));
+            }
+
+            if (po.paypalUrl != null) {
+                items.add(new SendFiatTipAction(context.get(), po));
+            }
+        }
+        return title;
     }
 
     private String extractMime(DownloadTransfer download) {
