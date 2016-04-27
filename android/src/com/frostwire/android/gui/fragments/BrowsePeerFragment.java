@@ -24,10 +24,12 @@ import android.content.*;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import com.andrew.apollo.MusicPlaybackService;
@@ -44,7 +46,6 @@ import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.BrowsePeerSearchBarView;
 import com.frostwire.android.gui.views.BrowsePeerSearchBarView.OnActionListener;
 import com.frostwire.android.gui.views.FileTypeRadioButtonSelectorFactory;
-import com.frostwire.android.gui.views.OverScrollListener;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
@@ -63,7 +64,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private static final int LOADER_FILES_ID = 0;
     private final BroadcastReceiver broadcastReceiver;
     private BrowsePeerSearchBarView filesBar;
-    private com.frostwire.android.gui.views.ListView list;
+    private SwipeRefreshLayout swipeRefresh;
+    private ListView list;
     private FileListAdapter adapter;
     private Peer peer;
     private View header;
@@ -115,6 +117,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         }
 
         updateHeader();
+        if (swipeRefresh != null) {
+            swipeRefresh.setRefreshing(false);
+        }
     }
 
     @Override
@@ -228,16 +233,19 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
         });
 
-        list = findView(v, R.id.fragment_browse_peer_list);
-        list.setOverScrollListener(new OverScrollListener() {
+        swipeRefresh = findView(v, R.id.fragment_browse_peer_swipe_refresh);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+            public void onRefresh() {
                 long now = SystemClock.elapsedRealtime();
-                if (scrollY < 0 && clampedY && (now - lastAdapterRefresh) > 5000) {
+                if ((now - lastAdapterRefresh) > 5000) {
                     refreshSelection();
+                } else {
+                    swipeRefresh.setRefreshing(false);
                 }
             }
         });
+        list = findView(v, R.id.fragment_browse_peer_list);
 
         initRadioButton(v, R.id.fragment_browse_peer_radio_torrents, Constants.FILE_TYPE_TORRENTS);
         initRadioButton(v, R.id.fragment_browse_peer_radio_documents, Constants.FILE_TYPE_DOCUMENTS);
