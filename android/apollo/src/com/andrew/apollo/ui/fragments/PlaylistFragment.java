@@ -13,25 +13,27 @@ package com.andrew.apollo.ui.fragments;
 
 import android.app.AlertDialog;
 import android.content.ContentUris;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
-import android.view.*;
+import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.Button;
+import android.widget.TextView;
+
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.PlaylistAdapter;
 import com.andrew.apollo.loaders.PlaylistLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.menu.RenamePlaylist;
 import com.andrew.apollo.model.Playlist;
-import com.andrew.apollo.ui.activities.BaseActivity;
 import com.andrew.apollo.ui.activities.ProfileActivity;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
@@ -42,10 +44,11 @@ import java.util.List;
 
 /**
  * This class is used to display all of the playlists on a user's device.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
+ * @author Marcelina Knitter (@marcelinkaaa)
  */
 public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> {
 
@@ -55,10 +58,10 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
 
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v,
-            final ContextMenuInfo menuInfo) {
+                                    final ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         // Get the position of the selected item
-        final AdapterContextMenuInfo info = (AdapterContextMenuInfo)menuInfo;
+        final AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
         final int mPosition = info.position;
 
         menu.clear();
@@ -130,7 +133,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
      */
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
-            final long id) {
+                            final long id) {
         final Bundle bundle = new Bundle();
         mItem = mAdapter.getItem(position);
         String playlistName;
@@ -168,27 +171,43 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
     }
 
     private AlertDialog buildDeleteDialog() {
-        return new AlertDialog.Builder(getActivity())
-                .setTitle(getString(R.string.delete_dialog_title, mItem.mPlaylistName))
-                .setPositiveButton(R.string.context_menu_delete, new OnClickListener() {
+        final AlertDialog apolloPlaylistDeleteDialog = new AlertDialog.Builder(getActivity()).create();
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View inflator = inflater.inflate(R.layout.dialog_default, null);
+        apolloPlaylistDeleteDialog.setView(inflator);
 
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        final Uri mUri = ContentUris.withAppendedId(
-                                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                                mItem.mPlaylistId);
-                        getActivity().getContentResolver().delete(mUri, null, null);
-                        MusicUtils.refresh();
-                        restartLoader(true);
-                        refresh();
-                    }
-                }).setNegativeButton(R.string.cancel, new OnClickListener() {
 
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        dialog.dismiss();
-                    }
-                }).setMessage(R.string.cannot_be_undone).create();
+        TextView dialogTitle = (TextView) inflator.findViewById(R.id.dialog_default_title);
+        dialogTitle.setText(getString(R.string.delete_dialog_title, mItem.mPlaylistName));
+
+        TextView text = (TextView) inflator.findViewById(R.id.dialog_default_text);
+        text.setText(R.string.are_you_sure_delete_files_text);
+
+        Button btnNegative = (Button) inflator.findViewById(R.id.dialog_default_button_no);
+        btnNegative.setText(R.string.cancel);
+        btnNegative.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                apolloPlaylistDeleteDialog.dismiss();
+            }
+        });
+
+        Button buttonYes = (Button) inflator.findViewById(R.id.dialog_default_button_yes);
+        buttonYes.setText(R.string.delete);
+        buttonYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Uri mUri = ContentUris.withAppendedId(
+                        MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                        mItem.mPlaylistId);
+                getActivity().getContentResolver().delete(mUri, null, null);
+                MusicUtils.refresh();
+                restartLoader(true);
+                refresh();
+                apolloPlaylistDeleteDialog.dismiss();
+            }
+        });
+        return apolloPlaylistDeleteDialog;
     }
-
 }
