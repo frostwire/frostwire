@@ -14,9 +14,8 @@ package com.andrew.apollo.menu;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.InputType;
@@ -27,6 +26,7 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -62,54 +62,36 @@ abstract class BasePlaylistDialog extends DialogFragment {
 
     private WeakReference<ApolloFragment> apolloFragmentRef;
 
-    /**
-     * {@inheritDoc}
-     */
+    @NonNull
     @Override
-    public Dialog onCreateDialog(final Bundle savedInstanceState) {
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        mPlaylistDialog = new AlertDialog.Builder(getActivity()).create();
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View view = inflater.inflate(R.layout.dialog_default_input, null);
+        mPlaylistDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mPlaylistDialog.setView(view);
 
-        mPlaylistDialog = new AlertDialog.Builder(getActivity()).create(); 
-        LayoutInflater inflater = LayoutInflater.from(getContext()); 
-        View inflator = inflater.inflate(R.layout.dialog_default_input, null); 
-        mPlaylistDialog.requestWindowFeature(Window.FEATURE_NO_TITLE); 
-        mPlaylistDialog.setView(inflator);  //
-        // TextView mDialogTitle = (TextView) inflator.findViewById(R.id.dialog_default_title); //
-        // mDialogTitle.setText("hello");
+        mPrompt = getString(R.string.create_playlist_prompt);
 
-//        // Initialize the alert dialog
-//        mPlaylistDialog = new AlertDialog.Builder(getActivity()).create();
+        TextView dialogTitle = (TextView) view.findViewById(R.id.dialog_default_input_title);
+        dialogTitle.setText(mPrompt);
+
         // Initialize the edit text
-        mPlaylist = new EditText(getActivity());
+        mPlaylist = (EditText) view.findViewById(R.id.dialog_default_input_text);
         // To show the "done" button on the soft keyboard
         mPlaylist.setSingleLine(true);
         // All caps
         mPlaylist.setInputType(mPlaylist.getInputType() | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
                 | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
         // Set the save button action
-        mPlaylistDialog.setButton(Dialog.BUTTON_POSITIVE, getString(R.string.save),
-                new OnClickListener() {
+        Button noButton = (Button) view.findViewById(R.id.dialog_default_input_button_no);
+        noButton.setText(R.string.cancel);
+        Button yesButton = (Button) view.findViewById(R.id.dialog_default_input_button_yes);
+        yesButton.setText(R.string.save);
 
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        onSaveClick();
-                        MusicUtils.refresh();
-                        dialog.dismiss();
-                        if (Ref.alive(apolloFragmentRef)) {
-                            getApolloFragment().refresh();
-                        }
-                    }
-                });
-        // Set the cancel button action
-        mPlaylistDialog.setButton(Dialog.BUTTON_NEGATIVE, getString(R.string.cancel),
-                new OnClickListener() {
-
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        closeKeyboard();
-                        MusicUtils.refresh();
-                        dialog.dismiss();
-                    }
-                });
+        noButton.setOnClickListener(new NegativeButtonOnClickListener(this, mPlaylistDialog));
+        yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, mPlaylistDialog, apolloFragmentRef));
 
         mPlaylist.post(new Runnable() {
 
@@ -125,13 +107,52 @@ abstract class BasePlaylistDialog extends DialogFragment {
         });
 
         initObjects(savedInstanceState);
-        mPlaylistDialog.setTitle(mPrompt);
-        mPlaylistDialog.setView(mPlaylist);
         mPlaylist.setText(mDefaultname);
         mPlaylist.setSelection(mDefaultname.length());
         mPlaylist.addTextChangedListener(mTextWatcher);
         mPlaylistDialog.show();
         return mPlaylistDialog;
+    }
+
+    private static class PositiveButtonOnClickListener implements View.OnClickListener {
+
+        private final Dialog dialog;
+        private final WeakReference<ApolloFragment> apolloFragmentRef;
+        private final BasePlaylistDialog basePlaylistDialog;
+
+        public PositiveButtonOnClickListener(BasePlaylistDialog basePlaylistDialog, Dialog dialog, WeakReference<ApolloFragment> apolloFragmentRef) {
+            this.basePlaylistDialog = basePlaylistDialog;
+            this.dialog = dialog;
+            this.apolloFragmentRef = apolloFragmentRef;
+        }
+
+        @Override
+        public void onClick(View v) {
+            basePlaylistDialog.onSaveClick();
+            MusicUtils.refresh();
+            dialog.dismiss();
+            if (Ref.alive(apolloFragmentRef)) {
+                basePlaylistDialog.getApolloFragment().refresh();
+            }
+        }
+    }
+
+    private static class NegativeButtonOnClickListener implements View.OnClickListener {
+
+        private final Dialog dialog;
+        private final BasePlaylistDialog basePlaylistDialog;
+
+        public NegativeButtonOnClickListener(BasePlaylistDialog basePlaylistDialog, Dialog dialog) {
+            this.basePlaylistDialog = basePlaylistDialog;
+            this.dialog = dialog;
+        }
+
+        @Override
+        public void onClick(View v) {
+            basePlaylistDialog.closeKeyboard();
+            MusicUtils.refresh();
+            dialog.dismiss();
+        }
     }
 
     /**

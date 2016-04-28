@@ -17,7 +17,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import com.andrew.apollo.adapters.PlaylistAdapter;
 import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
@@ -72,10 +71,7 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
                 : makePlaylistName();
         if (mDefaultname == null) {
             getDialog().dismiss();
-            return;
         }
-        final String promptFormat = getString(R.string.create_playlist_prompt);
-        mPrompt = String.format(promptFormat, mDefaultname);
     }
 
     @Override

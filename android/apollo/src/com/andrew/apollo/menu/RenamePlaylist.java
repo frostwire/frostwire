@@ -19,7 +19,6 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Audio;
 import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.android.R;
 
 /**
  * Alert dialog used to rename playlists.
@@ -63,10 +62,7 @@ public class RenamePlaylist extends BasePlaylistDialog {
                 : mOriginalName;
         if (mRenameId < 0 || mOriginalName == null || mDefaultname == null) {
             getDialog().dismiss();
-            return;
         }
-        final String promptFormat = getString(R.string.create_playlist_prompt);
-        mPrompt = String.format(promptFormat, mOriginalName, mDefaultname);
     }
 
     /**
