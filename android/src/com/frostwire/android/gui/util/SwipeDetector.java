@@ -22,9 +22,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import com.frostwire.logging.Logger;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Created on 4/26/16.
  *
@@ -37,7 +34,8 @@ public final class SwipeDetector implements
     private static Logger LOG = Logger.getLogger(SwipeDetector.class);
     private final SwipeListener swipeListener;
     private final float leftMargin;
-    private List<Float> xPositions = new LinkedList<>();
+    private float x1;
+    private float x2;
     private long lastTouch = System.currentTimeMillis();
 
     /**
@@ -62,15 +60,18 @@ public final class SwipeDetector implements
         long timeSinceLastEvent = System.currentTimeMillis() - lastTouch;
         lastTouch = System.currentTimeMillis();
         if (timeSinceLastEvent > 600) {
-            xPositions.clear();
+            x1 = -1;
+            x2 = -1;
         }
-        xPositions.add(event.getX());
-        final int lastIndex = xPositions.size() - 1;
-        if (lastIndex > 4) {
-            final float xFirst =  xPositions.get(0);
-            final float xLast = xPositions.get(lastIndex);
-            xPositions.clear();
-            float deltaX = xLast - xFirst;
+
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            x1 = event.getX();
+            x2 = -1;
+        } else if (event.getAction() == MotionEvent.ACTION_UP && x1 != -1) {
+            x2 = event.getX();
+            float deltaX = x2 - x1;
+            x1 = -1;
+            x2 = -1;
             int MIN_DISPLACEMENT = 100;
             if (Math.abs(deltaX) > MIN_DISPLACEMENT) {
                 if (deltaX > 0) {
