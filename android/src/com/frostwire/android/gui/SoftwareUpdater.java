@@ -50,7 +50,7 @@ import java.util.*;
  * @author aldenml
  */
 public final class SoftwareUpdater {
-
+    private boolean ALWAYS_SHOW_UPDATE_DIALOG = false;
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
 
     public interface ConfigurationUpdateListener {
@@ -156,7 +156,8 @@ public final class SoftwareUpdater {
 
             @Override
             protected void onPostExecute(Boolean result) {
-                if (result && !isCancelled()) {
+
+                if (ALWAYS_SHOW_UPDATE_DIALOG || (result && !isCancelled())) {
                     notifyUpdate(context);
                 }
 
@@ -241,7 +242,7 @@ public final class SoftwareUpdater {
             }
 
             if (update.a.equals(UPDATE_ACTION_OTA)) {
-                if (!getUpdateApk().exists()) {
+                if (!ALWAYS_SHOW_UPDATE_DIALOG && !getUpdateApk().exists()) {
                     LOG.info("notifyUpdate(): " + getUpdateApk().getAbsolutePath() + " not found. Aborting.");
                     return;
                 }
