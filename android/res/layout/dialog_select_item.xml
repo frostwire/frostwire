@@ -1,68 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-/*
- * Created by Marcelina Knitter (@marcelinkaaa), Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/* //device/apps/common/res/layout/select_dialog_item.xml
+**
+** Copyright 2006, The Android Open Source Project
+**
+** Licensed under the Apache License, Version 2.0 (the "License");
+** you may not use this file except in compliance with the License.
+** You may obtain a copy of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
+** limitations under the License.
+*/
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<!--
+    This layout file is used by the AlertDialog when displaying a list of items.
+    This layout file is inflated and used as the TextView to display individual
+    items.
+-->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog_select_item_text"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:scrollbars="vertical"
-    android:background="@drawable/default_dialog_background">
-
-    <TextView
-        android:id="@+id/dialog_default_title"
-        style="@style/DefaultDialogTheme.TitleBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/dialog_default_text"
-        style="@style/DefaultDialogTheme.MainText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="15dp"
-        android:paddingTop="10dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="10dp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="1dp"
-        android:paddingTop="1dp"
-        android:weightSum="1.0"
-        android:background="@color/basic_gray_medium">
-
-        <Button
-            android:id="@+id/dialog_default_button_no"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:background="@color/app_light_background"/>
-
-        <Button
-            android:id="@+id/dialog_default_button_yes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
-            android:layout_weight="0.5"
-            android:background="@color/app_light_background"/>
-    </LinearLayout>
-</LinearLayout>
+    style="@style/DefaultDialogTheme.MainText"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:gravity="center_vertical"
+    android:paddingLeft="14dp"
+    android:paddingRight="15dp"
+    android:ellipsize="marquee"
+    />

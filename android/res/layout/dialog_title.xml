@@ -26,43 +26,10 @@
     android:background="@drawable/default_dialog_background">
 
     <TextView
-        android:id="@+id/dialog_default_title"
+        android:id="@+id/dialog_title_title"
         style="@style/DefaultDialogTheme.TitleBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <!--<include layout="@layout/dialog_select_item"></include>-->
 
-    <TextView
-        android:id="@+id/dialog_default_text"
-        style="@style/DefaultDialogTheme.MainText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="15dp"
-        android:paddingTop="10dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="10dp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="1dp"
-        android:paddingTop="1dp"
-        android:weightSum="1.0"
-        android:background="@color/basic_gray_medium">
-
-        <Button
-            android:id="@+id/dialog_default_button_no"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:background="@color/app_light_background"/>
-
-        <Button
-            android:id="@+id/dialog_default_button_yes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
-            android:layout_weight="0.5"
-            android:background="@color/app_light_background"/>
-    </LinearLayout>
 </LinearLayout>
