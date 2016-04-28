@@ -420,7 +420,7 @@ public final class YouTubeExtractor {
         return links;
     }
 
-    private String getVideoID(String URL) {
+    static String getVideoID(String URL) {
         String vuid = new Regex(URL, "v=([A-Za-z0-9\\-_]+)").getMatch(0);
         if (vuid == null) {
             vuid = new Regex(URL, "(v|embed)/([A-Za-z0-9\\-_]+)").getMatch(1);
