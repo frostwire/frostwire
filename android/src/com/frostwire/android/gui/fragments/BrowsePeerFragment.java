@@ -25,6 +25,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,6 +42,8 @@ import com.frostwire.android.gui.Finger;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.FileListAdapter;
+import com.frostwire.android.gui.util.SwipeDetector;
+import com.frostwire.android.gui.util.SwipeListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.BrowsePeerSearchBarView;
@@ -51,21 +54,20 @@ import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment {
+public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment, SwipeListener {
     private static final Logger LOG = Logger.getLogger(BrowsePeerFragment.class);
     private static final int LOADER_FILES_ID = 0;
     private final BroadcastReceiver broadcastReceiver;
     private BrowsePeerSearchBarView filesBar;
     private SwipeRefreshLayout swipeRefresh;
     private ListView list;
+    private final SwipeDetector viewSwipeDetector;
     private FileListAdapter adapter;
     private Peer peer;
     private View header;
@@ -85,10 +87,30 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             UXAction.LIBRARY_BROWSE_FILE_TYPE_TORRENTS
     };
 
+    private final SparseArray<Byte> toTheRightOf = new SparseArray<>(6);
+    private final SparseArray<Byte> toTheLeftOf = new SparseArray<>(6);
+    private final Map<Byte, RadioButton> radioButtonFileTypeMap;
+
     public BrowsePeerFragment() {
         super(R.layout.fragment_browse_peer);
         broadcastReceiver = new LocalBroadcastReceiver();
         this.peer = new Peer();
+        viewSwipeDetector = new SwipeDetector(this, 100);
+        toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_RINGTONES);   //0x00 - Audio -> Ringtones
+        toTheRightOf.put(Constants.FILE_TYPE_PICTURES,Constants.FILE_TYPE_DOCUMENTS); //0x01 - Pictures -> Documents
+        toTheRightOf.put(Constants.FILE_TYPE_VIDEOS,Constants.FILE_TYPE_PICTURES);    //0x02 - Videos -> Pictures
+        toTheRightOf.put(Constants.FILE_TYPE_DOCUMENTS,Constants.FILE_TYPE_TORRENTS); //0x03 - Documents -> Torrents
+        toTheRightOf.put(Constants.FILE_TYPE_RINGTONES,Constants.FILE_TYPE_VIDEOS);   //0x05 - Ringtones -> Videos
+        toTheRightOf.put(Constants.FILE_TYPE_TORRENTS,Constants.FILE_TYPE_AUDIO);     //0x06 - Torrents -> Audio
+
+        toTheLeftOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_TORRENTS);     //0x00 - Audio <- Torrents
+        toTheLeftOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_VIDEOS);    //0x01 - Pictures <- Video
+        toTheLeftOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_RINGTONES);   //0x02 - Videos <- Ringtones
+        toTheLeftOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_PICTURES); //0x03 - Documents <- Pictures
+        toTheLeftOf.put(Constants.FILE_TYPE_RINGTONES, Constants.FILE_TYPE_AUDIO);    //0x05 - Ringtones <- Audio
+        toTheLeftOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_DOCUMENTS); //0x06 - Torrents <- Documents
+
+        radioButtonFileTypeMap = new HashMap<>();  // see initRadioButton(...)
     }
 
     @Override
@@ -246,42 +268,30 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
         });
         list = findView(v, R.id.fragment_browse_peer_list);
+        list.setOnTouchListener(viewSwipeDetector);
 
-        initRadioButton(v, R.id.fragment_browse_peer_radio_torrents, Constants.FILE_TYPE_TORRENTS);
-        initRadioButton(v, R.id.fragment_browse_peer_radio_documents, Constants.FILE_TYPE_DOCUMENTS);
-        initRadioButton(v, R.id.fragment_browse_peer_radio_pictures, Constants.FILE_TYPE_PICTURES);
-        initRadioButton(v, R.id.fragment_browse_peer_radio_videos, Constants.FILE_TYPE_VIDEOS);
-        initRadioButton(v, R.id.fragment_browse_peer_radio_ringtones, Constants.FILE_TYPE_RINGTONES);
         initRadioButton(v, R.id.fragment_browse_peer_radio_audio, Constants.FILE_TYPE_AUDIO);
+        initRadioButton(v, R.id.fragment_browse_peer_radio_ringtones, Constants.FILE_TYPE_RINGTONES);
+        initRadioButton(v, R.id.fragment_browse_peer_radio_videos, Constants.FILE_TYPE_VIDEOS);
+        initRadioButton(v, R.id.fragment_browse_peer_radio_pictures, Constants.FILE_TYPE_PICTURES);
+        initRadioButton(v, R.id.fragment_browse_peer_radio_documents, Constants.FILE_TYPE_DOCUMENTS);
+        initRadioButton(v, R.id.fragment_browse_peer_radio_torrents, Constants.FILE_TYPE_TORRENTS);
     }
 
     private RadioButton initRadioButton(View v, int viewId, final byte fileType) {
-        final RadioButton button = findView(v, viewId);
-        final Resources r = button.getResources();
-        final FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory =
+        RadioButton button = findView(v, viewId);
+        Resources r = button.getResources();
+        FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory =
                 new FileTypeRadioButtonSelectorFactory(fileType,
                         r,
                         FileTypeRadioButtonSelectorFactory.RadioButtonContainerType.BROWSE);
         fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
-
-        button.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (button.isChecked()) {
-                    browseFilesButtonClick(fileType);
-                }
-                fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
-            }
-        });
-
-        button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
-            }
-        });
-
+        button.setClickable(true);
+        RadioButtonListener rbListener = new RadioButtonListener(button, fileType, fileTypeRadioButtonSelectorFactory);
+        button.setOnClickListener(rbListener);
+        button.setOnCheckedChangeListener(rbListener);
         button.setChecked(fileType == Constants.FILE_TYPE_AUDIO);
+        radioButtonFileTypeMap.put(fileType,button);
         return button;
     }
 
@@ -429,6 +439,69 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private int getSavedListViewVisiblePosition(byte fileType) {
         //will return 0 if not found.
         return ConfigurationManager.instance().getInt(Constants.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION + fileType);
+    }
+
+    private RadioButton getRadioButton(byte fileType) {
+        return radioButtonFileTypeMap.get(fileType);
+    }
+
+    @Override
+    public void onSwipeLeft() {
+        // move to the right
+        switchToThe(true);
+    }
+
+    @Override
+    public void onSwipeRight() {
+        // move to the left
+        switchToThe(false);
+    }
+
+    private void switchToThe(boolean right) {
+        if (adapter == null) {
+            return;
+        }
+        final byte currentFileType = adapter.getFileType();
+        final byte nextFileType = (right) ? toTheRightOf.get(currentFileType) : toTheLeftOf.get(currentFileType);
+        changeSelectedRadioButton(currentFileType, nextFileType);
+    }
+
+    private void changeSelectedRadioButton(byte currentFileType, byte nextFileType) {
+        // browseFilesButtonClick(currentFileType) isn't enough, it won't update the radio button background.
+        RadioButton currentButton = getRadioButton(currentFileType);
+        RadioButton nextButton = getRadioButton(nextFileType);
+        if (nextButton != null) {
+            currentButton.setChecked(false);
+            nextButton.setChecked(true);
+            nextButton.callOnClick();
+        }
+    }
+
+    private final class RadioButtonListener implements OnClickListener, CompoundButton.OnCheckedChangeListener {
+        private final RadioButton button;
+        private final byte fileType;
+        private final FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory;
+
+        RadioButtonListener(RadioButton button,
+                            byte fileType,
+                            FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory) {
+            this.button = button;
+            this.fileType = fileType;
+            this.fileTypeRadioButtonSelectorFactory = fileTypeRadioButtonSelectorFactory;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (button.isChecked()) {
+                browseFilesButtonClick(fileType);
+            }
+            fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
+        }
     }
 
     private final class LocalBroadcastReceiver extends BroadcastReceiver {

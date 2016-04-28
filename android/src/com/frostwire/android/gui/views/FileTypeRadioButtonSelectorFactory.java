@@ -72,26 +72,34 @@ public final class FileTypeRadioButtonSelectorFactory {
         BitmapDrawable iconDrawable = button.isChecked() ? iconOn : iconOff;
 
         if (getContainerType() == RadioButtonContainerType.SEARCH) {
-            // things are a bit different for the radio buttons on the search screen.
-            button.setBackgroundDrawable(layerDrawable);
-
-            if (button.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                // android:drawableTop
-                button.setPadding(0, 0, 0, 25);
-                button.setCompoundDrawablesWithIntrinsicBounds(null, iconDrawable, null, null);
-                button.setCompoundDrawablePadding(-15);
-            } else {
-                // android:drawableLeft
-                button.setPadding(40, 0, 0, 0);
-                button.setCompoundDrawablesWithIntrinsicBounds(iconDrawable, null, null, null);
-                button.setCompoundDrawablePadding(-10);
-            }
+            updateSearchRadioButtonBackground(button, layerDrawable, iconDrawable);
         } else if (getContainerType() == RadioButtonContainerType.BROWSE) {
-            // only the background drawable will align to the center.
-            // if we use button.setButtonDrawable it will not center the drawable as it will
-            button.setPadding(0, 5, 0, -25);
+            updateBrowseRadioButtonBackground(button, iconDrawable);
+        }
+    }
+
+    private void updateBrowseRadioButtonBackground(RadioButton button, BitmapDrawable iconDrawable) {
+        // only the background drawable will align to the center.
+        // if we use button.setButtonDrawable it will not center the drawable as it will
+        button.setPadding(0, 5, 0, -25);
+        button.setCompoundDrawablesWithIntrinsicBounds(null, iconDrawable, null, null);
+        button.setCompoundDrawablePadding(0);
+    }
+
+    private void updateSearchRadioButtonBackground(RadioButton button, LayerDrawable layerDrawable, BitmapDrawable iconDrawable) {
+        // things are a bit different for the radio buttons on the search screen.
+        button.setBackgroundDrawable(layerDrawable);
+
+        if (button.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            // android:drawableTop
+            button.setPadding(0, 0, 0, 25);
             button.setCompoundDrawablesWithIntrinsicBounds(null, iconDrawable, null, null);
-            button.setCompoundDrawablePadding(0);
+            button.setCompoundDrawablePadding(-15);
+        } else {
+            // android:drawableLeft
+            button.setPadding(40, 0, 0, 0);
+            button.setCompoundDrawablesWithIntrinsicBounds(iconDrawable, null, null, null);
+            button.setCompoundDrawablePadding(-10);
         }
     }
 
