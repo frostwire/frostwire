@@ -21,6 +21,9 @@ import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -64,8 +67,17 @@ abstract class BasePlaylistDialog extends DialogFragment {
      */
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
-        // Initialize the alert dialog
-        mPlaylistDialog = new AlertDialog.Builder(getActivity()).create();
+
+        mPlaylistDialog = new AlertDialog.Builder(getActivity()).create(); 
+        LayoutInflater inflater = LayoutInflater.from(getContext()); 
+        View inflator = inflater.inflate(R.layout.dialog_default_input, null); 
+        mPlaylistDialog.requestWindowFeature(Window.FEATURE_NO_TITLE); 
+        mPlaylistDialog.setView(inflator);  //
+        // TextView mDialogTitle = (TextView) inflator.findViewById(R.id.dialog_default_title); //
+        // mDialogTitle.setText("hello");
+
+//        // Initialize the alert dialog
+//        mPlaylistDialog = new AlertDialog.Builder(getActivity()).create();
         // Initialize the edit text
         mPlaylist = new EditText(getActivity());
         // To show the "done" button on the soft keyboard
