@@ -51,7 +51,7 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
     private static final Pattern LIST_SECONDARY_PATTERN = Pattern.compile("(?is)\"><a href=\"(?<link>/watch.*?)&.*?\" .*?\">(?<title>.*?)</a></td><td class=\"watch-card-data-col\">(?<duration>.*?)</td></tr><tr");
 
     public YouTubeSearchPerformer(String domainName, long token, String keywords, int timeout) {
-        super(domainName, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
+        super(domainName, token, keywords, timeout, 2, MAX_RESULTS, MAX_RESULTS);
     }
 
     @Override
