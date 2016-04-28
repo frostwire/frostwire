@@ -34,6 +34,7 @@ public final class YouTubeSearchResult extends AbstractFileSearchResult implemen
     private final String videoUrl;
     private final String source;
     private final long size;
+    private final String thumbnailUrl;
 
     YouTubeSearchResult(String link, String title, String duration, String user) {
         this.filename = title + ".youtube";
@@ -45,6 +46,8 @@ public final class YouTubeSearchResult extends AbstractFileSearchResult implemen
         this.videoUrl = "https://www.youtube.com/" + link;
         this.source = "YouTube - " + user;
         this.size = buildSize(duration);
+
+        this.thumbnailUrl = "http://img.youtube.com/vi/" + YouTubeExtractor.getVideoID(videoUrl) + "/hqdefault.jpg";
     }
 
     @Override
@@ -83,24 +86,12 @@ public final class YouTubeSearchResult extends AbstractFileSearchResult implemen
     }
 
     private long buildSize(String duration) {
-        try {
-            if (!duration.contains(":")) {
-                return Integer.parseInt(duration);
-            }
-
-            String[] arr = duration.split(":");
-            int m = Integer.parseInt(arr[0]);
-            int s = Integer.parseInt(arr[1]);
-
-            return m * 60 + s;
-        } catch (Throwable t) {
-            return UNKNOWN_SIZE;
-        }
+        return UNKNOWN_SIZE;
     }
 
     @Override
     public String getThumbnailUrl() {
-        return null;
+        return thumbnailUrl;
     }
 
     @Override
