@@ -35,7 +35,6 @@ public final class SwipeDetector implements
     private final SwipeListener swipeListener;
     private final float leftMargin;
     private float x1;
-    private float x2;
     private long lastTouch = System.currentTimeMillis();
 
     /**
@@ -48,6 +47,7 @@ public final class SwipeDetector implements
         this.leftMargin = leftMargin;
     }
 
+    @SuppressWarnings("unused")
     public SwipeDetector(SwipeListener swipeListener) {
         this(swipeListener, 0);
     }
@@ -59,19 +59,17 @@ public final class SwipeDetector implements
         }
         long timeSinceLastEvent = System.currentTimeMillis() - lastTouch;
         lastTouch = System.currentTimeMillis();
+        float x2;
         if (timeSinceLastEvent > 600) {
             x1 = -1;
-            x2 = -1;
         }
 
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             x1 = event.getX();
-            x2 = -1;
         } else if (event.getAction() == MotionEvent.ACTION_UP && x1 != -1) {
             x2 = event.getX();
             float deltaX = x2 - x1;
             x1 = -1;
-            x2 = -1;
             int MIN_DISPLACEMENT = 100;
             if (Math.abs(deltaX) > MIN_DISPLACEMENT) {
                 if (deltaX > 0) {
