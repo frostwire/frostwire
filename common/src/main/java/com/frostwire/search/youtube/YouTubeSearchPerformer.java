@@ -61,7 +61,7 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
 
     @Override
     protected List<? extends SearchResult> crawlResult(YouTubeSearchResult sr, byte[] data) throws Exception {
-        List<YouTubeCrawledSearchResult> list = new LinkedList<>();
+        List<SearchResult> list = new LinkedList();
 
         String detailsUrl = sr.getDetailsUrl();
         List<LinkInfo> infos = new YouTubeExtractor().extract(detailsUrl, false);
@@ -106,7 +106,11 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
             }
         }
 
-        return list;
+        YouTubePackageSearchResult packagedResult = new YouTubePackageSearchResult(sr, list);
+        List<SearchResult> results = new LinkedList();
+        results.add(packagedResult);
+        results.addAll(list);
+        return results;
     }
 
     @Override
@@ -145,7 +149,6 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
         String title = HtmlManipulator.replaceHtmlEntities(matcher.group("title"));
         String duration = matcher.group("duration");
         String user = matcher.group("user");
-
         return new YouTubeSearchResult(link, title, duration, user);
     }
 
@@ -173,7 +176,6 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
                         String link = mList.group("link");
                         String title = HtmlManipulator.replaceHtmlEntities(mList.group("title"));
                         String duration = mList.group("duration");
-
                         YouTubeSearchResult sr = new YouTubeSearchResult(link, title, duration, user);
                         if (!r.contains(sr)) {
                             r.add(sr);
