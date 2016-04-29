@@ -38,6 +38,7 @@ public class InMobiAdNetwork implements AdNetwork {
 
     public void initialize(final Activity activity) {
         if (!enabled()) {
+            LOG.info("InMobi initialize(): aborted. not enabled.");
             return;
         }
 
@@ -47,12 +48,12 @@ public class InMobiAdNetwork implements AdNetwork {
                 public void run() {
                     try {
                         // this initialize call is very expensive, this is why we should be invoked in a thread.
-                        //LOG.info("InMobi.initialize()...");
+                        LOG.info("InMobi.initialize()...");
                         com.inmobi.commons.InMobi.initialize(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
                         //InMobi.setLogLevel(InMobi.LOG_LEVEL.DEBUG);
-                        //LOG.info("InMobi.initialized.");
+                        LOG.info("InMobi.initialized.");
                         started = true;
-                        //LOG.info("Load InmobiInterstitial.");
+                        LOG.info("Load InmobiInterstitial.");
                         loadNewInterstitial(activity);
                     } catch (Throwable t) {
                         t.printStackTrace();

@@ -53,14 +53,13 @@ public class Offers {
             adNetwork.initialize(activity);
         }
 
-//        AD_NETWORKS = new LinkedList();
-//        AD_NETWORKS.add(IN_MOBI);
-//        IN_MOBI.initialize(activity);
-
-//        AD_NETWORKS = new LinkedList();
+//        AD_NETWORKS = new LinkedList<>();
 //        AD_NETWORKS.add(APP_LOVIN);
 //        APP_LOVIN.initialize(activity);
 
+//        AD_NETWORKS = new LinkedList<>();
+//        AD_NETWORKS.add(IN_MOBI);
+//        IN_MOBI.initialize(activity);
     }
 
     public static void stopAdNetworks(Context context) {
