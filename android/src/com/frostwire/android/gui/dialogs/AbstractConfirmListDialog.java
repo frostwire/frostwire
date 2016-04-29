@@ -31,7 +31,9 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.logging.Logger;
+import com.frostwire.search.FileSearchResult;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -97,7 +99,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
     /** rebuilds list of objects from json and does listView.setAdapter(YourAdapter(theObjectList)) */
     abstract public List<T> deserializeData(String listDataInJSON);
 
-    public AbstractConfirmListDialog() {
+    public AbstractConfirmListDialog()  {
         super(TAG, R.layout.dialog_confirm_list);
     }
 
@@ -137,7 +139,9 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         String title = bundle.getString(BUNDLE_KEY_DIALOG_TITLE);
 
         TextView dialogTitle = findView(dlg, R.id.dialog_confirm_list_title);
-        dialogTitle.setText(title);
+        dialogTitle.setText(R.string.confirm_download);
+        TextView dialogText = findView(dlg, R.id.dialog_confirm_list_text);
+        dialogText.setText(title);
 
         initListViewAndAdapter(bundle);
         initSelectAllCheckbox();
@@ -422,4 +426,5 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             }
         }
     }
+
 }

@@ -30,10 +30,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <TextView
+        android:id="@+id/dialog_confirm_list_text"
+        style="@style/DefaultDialogTheme.MainText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="10dp" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/imageView"
+        android:background="@color/basic_gray_dark" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@color/basic_grey_light">
 
         <CheckBox
             android:id="@+id/dialog_confirm_list_select_all_checkbox"
@@ -41,12 +58,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
-            android:background="@color/basic_gray_medium"
             android:checked="true"
             android:gravity="left|center_vertical"
             android:padding="5dp"
             android:text="@string/select_all" />
+
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/imageView1"
+        android:background="@color/basic_gray_dark" />
 
     <ListView
         android:id="@+id/dialog_confirm_list_listview"
@@ -56,6 +79,7 @@
         android:fastScrollEnabled="true" />
 
     <!-- summary of what was selected, only visible for selection mode in [multiple choice, no-choice] -->
+
     <LinearLayout
         android:id="@+id/dialog_confirm_list_selection_summary"
         android:layout_width="match_parent"
