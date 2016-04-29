@@ -34,8 +34,7 @@ public final class SwipeDetector implements
     private static Logger LOG = Logger.getLogger(SwipeDetector.class);
     private final SwipeListener swipeListener;
     private final float leftMargin;
-    private float x1;
-    private long lastTouch = System.currentTimeMillis();
+    private long lastSwipeTimestamp = System.currentTimeMillis();
 
     /**
      * @param swipeListener - The object that will act on swipe left or right.
@@ -54,31 +53,36 @@ public final class SwipeDetector implements
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (leftMargin > 0 && event.getX() < leftMargin) {
+        if ((System.currentTimeMillis() - lastSwipeTimestamp) < 450) {
             return false;
         }
-        long timeSinceLastEvent = System.currentTimeMillis() - lastTouch;
-        lastTouch = System.currentTimeMillis();
-        float x2;
-        if (timeSinceLastEvent > 600) {
-            x1 = -1;
+
+        if (leftMargin > 0 &&
+            event.getAction() == MotionEvent.ACTION_DOWN &&
+            event.getX() < leftMargin) {
+            return false;
         }
 
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            x1 = event.getX();
-        } else if (event.getAction() == MotionEvent.ACTION_UP && x1 != -1) {
-            x2 = event.getX();
-            float deltaX = x2 - x1;
-            x1 = -1;
-            int MIN_DISPLACEMENT = 100;
-            if (Math.abs(deltaX) > MIN_DISPLACEMENT) {
-                if (deltaX > 0) {
-                    swipeListener.onSwipeRight();
-                } else {
-                    swipeListener.onSwipeLeft();
-                }
-                return true;
+        int historySize = event.getHistorySize();
+        if (event.getAction() == MotionEvent.ACTION_MOVE && historySize > 1) {
+            float x1 = event.getHistoricalX(0,0);
+            float y1 = event.getHistoricalY(0,0);
+            float x2 = event.getHistoricalX(0,historySize-1);
+            float y2 = event.getHistoricalY(0,historySize-1);
+            float deltaX = x2-x1;
+            float deltaY = Math.abs(y2-y1);
+            if (deltaY > Math.abs(deltaX)) {
+                return false;
             }
+            if (Math.abs(deltaX) <= 10) {
+                return false;
+            }
+            if (deltaX > 0) {
+                swipeListener.onSwipeRight();
+            } else {
+                swipeListener.onSwipeLeft();
+            }
+            lastSwipeTimestamp = System.currentTimeMillis();
         }
         return false;
     }

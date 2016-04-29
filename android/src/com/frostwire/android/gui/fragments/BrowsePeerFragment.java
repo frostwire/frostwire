@@ -95,7 +95,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         super(R.layout.fragment_browse_peer);
         broadcastReceiver = new LocalBroadcastReceiver();
         this.peer = new Peer();
-        viewSwipeDetector = new SwipeDetector(this, 100);
+        viewSwipeDetector = new SwipeDetector(this, 50);
         toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_RINGTONES);   //0x00 - Audio -> Ringtones
         toTheRightOf.put(Constants.FILE_TYPE_PICTURES,Constants.FILE_TYPE_DOCUMENTS); //0x01 - Pictures -> Documents
         toTheRightOf.put(Constants.FILE_TYPE_VIDEOS,Constants.FILE_TYPE_PICTURES);    //0x02 - Videos -> Pictures

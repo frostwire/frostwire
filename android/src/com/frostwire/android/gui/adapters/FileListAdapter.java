@@ -70,7 +70,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType) {
         super(context, getViewItemId(fileType), convertFiles(files));
-
         setShowMenuOnClick(true);
 
         fileListFilter = new FileListFilter();
@@ -486,7 +485,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         private final String torrentFilePath;
 
-        public MagnetUriBuilder(String torrentFilePath) {
+        MagnetUriBuilder(String torrentFilePath) {
             this.torrentFilePath = torrentFilePath;
         }
 
@@ -507,7 +506,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         private final String torrentFilePath;
 
-        public InfoHashBuilder(String torrentFilePath) {
+        InfoHashBuilder(String torrentFilePath) {
             this.torrentFilePath = torrentFilePath;
         }
 
@@ -563,17 +562,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     public static class FileDescriptorItem {
 
         public FileDescriptor fd;
-        public boolean inSD;
-        public boolean mounted;
+        boolean inSD;
+        boolean mounted;
         public boolean exists;
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof FileDescriptorItem)) {
-                return false;
-            }
-
-            return fd.equals(((FileDescriptorItem) o).fd);
+            return o instanceof FileDescriptorItem && fd.equals(((FileDescriptorItem) o).fd);
         }
 
         @Override
