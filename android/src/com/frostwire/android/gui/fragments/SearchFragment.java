@@ -62,6 +62,7 @@ import com.frostwire.search.*;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.search.youtube.YouTubeSearchResult;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Ref;
@@ -354,9 +355,9 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     private void startTransfer(final SearchResult sr, final String toastMessage) {
-        if (!(sr instanceof AbstractTorrentSearchResult) &&
+        if (!(sr instanceof AbstractTorrentSearchResult || sr instanceof TorrentPromotionSearchResult) &&
             ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
-            if (sr instanceof FileSearchResult) {
+            if (sr instanceof FileSearchResult && !(sr instanceof YouTubeSearchResult)) {
                 try {
                     NewTransferDialog dlg = NewTransferDialog.newInstance((FileSearchResult) sr, false);
                     dlg.show(getFragmentManager());
@@ -365,6 +366,8 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                     // just start the download then if the dialog crapped out.
                     onDialogClick(NewTransferDialog.TAG, Dialog.BUTTON_POSITIVE);
                 }
+            } else if (sr instanceof YouTubeSearchResult) {
+                startDownload(getActivity(), sr, toastMessage);
             }
         } else {
             if (isVisible()) {

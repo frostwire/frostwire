@@ -26,14 +26,16 @@ import org.apache.commons.io.FilenameUtils;
  * @author gubatron
  * @author aldenml
  */
-public final class YouTubeSearchResult extends AbstractFileSearchResult implements CrawlableSearchResult {
+public class YouTubeSearchResult extends AbstractFileSearchResult implements CrawlableSearchResult {
 
     private final String filename;
     private final String displayName;
     private final long creationTime;
     private final String videoUrl;
     private final String source;
+    private final String user;
     private final long size;
+    private final String thumbnailUrl;
 
     YouTubeSearchResult(String link, String title, String duration, String user) {
         this.filename = title + ".youtube";
@@ -43,8 +45,28 @@ public final class YouTubeSearchResult extends AbstractFileSearchResult implemen
             link = link.substring(1);
         }
         this.videoUrl = "https://www.youtube.com/" + link;
+        this.user = user;
         this.source = "YouTube - " + user;
         this.size = buildSize(duration);
+
+        this.thumbnailUrl = "http://img.youtube.com/vi/" + YouTubeExtractor.getVideoID(videoUrl) + "/hqdefault.jpg";
+    }
+
+    private long buildSize(String duration) {
+        try {
+            if (!duration.contains(":")) {
+                return Integer.parseInt(duration);
+            }
+
+            String[] arr = duration.split(":");
+            int m = Integer.parseInt(arr[0]);
+            int s = Integer.parseInt(arr[1]);
+
+            return m * 60 + s;
+        } catch (Throwable t) {
+            return UNKNOWN_SIZE;
+        }
+
     }
 
     @Override
@@ -72,6 +94,10 @@ public final class YouTubeSearchResult extends AbstractFileSearchResult implemen
         return source;
     }
 
+    public String getUser() {
+        return user;
+    }
+
     @Override
     public String getDetailsUrl() {
         return videoUrl;
@@ -79,28 +105,12 @@ public final class YouTubeSearchResult extends AbstractFileSearchResult implemen
 
     @Override
     public boolean isComplete() {
-        return true;
-    }
-
-    private long buildSize(String duration) {
-        try {
-            if (!duration.contains(":")) {
-                return Integer.parseInt(duration);
-            }
-
-            String[] arr = duration.split(":");
-            int m = Integer.parseInt(arr[0]);
-            int s = Integer.parseInt(arr[1]);
-
-            return m * 60 + s;
-        } catch (Throwable t) {
-            return UNKNOWN_SIZE;
-        }
+        return false;
     }
 
     @Override
     public String getThumbnailUrl() {
-        return null;
+        return thumbnailUrl;
     }
 
     @Override

@@ -45,6 +45,7 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledStreamableSearchResult;
+import com.frostwire.search.youtube.YouTubePackageSearchResult;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -129,7 +130,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         if (sr.getSize() > 0) {
             fileSize.setText(UIUtils.getBytesInHuman(sr.getSize()));
         } else {
-            fileSize.setText("");
+            fileSize.setText("...");
         }
 
         TextView extra = findView(view, R.id.view_bittorrent_search_result_list_item_text_extra);
@@ -154,7 +155,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         }
 
         fileTypeIcon.setOnClickListener(previewClickListener);
-        if (sr instanceof SoundcloudSearchResult || sr instanceof YouTubeCrawledStreamableSearchResult) {
+        if (isAudio(sr) || sr instanceof YouTubePackageSearchResult) {
             fileTypeIcon.setTag(sr);
             fileTypeIcon.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.PREVIEW);
         } else {
@@ -195,7 +196,16 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         ArrayList<SearchResult> l = new ArrayList<>();
         for (SearchResult sr : results) {
             MediaType mt;
-            mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(((FileSearchResult) sr).getFilename()));
+            String extension = FilenameUtils.getExtension(((FileSearchResult) sr).getFilename());
+
+            mt = MediaType.getMediaTypeForExtension(extension);
+
+            if ("youtube".equals(extension)) {
+                mt = MediaType.getVideoMediaType();
+            } else if (mt != null && mt.equals(MediaType.getVideoMediaType()) && sr instanceof YouTubeCrawledSearchResult) {
+                mt = null;
+            }
+
 
             if (accept(sr, mt)) {
                 l.add(sr);
@@ -208,6 +218,19 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     private boolean accept(SearchResult sr, MediaType mt) {
         return sr instanceof FileSearchResult && mt != null && mt.getId() == fileType;
+    }
+
+    private static boolean isAudio(SearchResult sr) {
+        if (sr instanceof SoundcloudSearchResult) {
+            return true;
+        }
+
+        if (sr instanceof YouTubeCrawledStreamableSearchResult) {
+            YouTubeCrawledStreamableSearchResult ytsr = (YouTubeCrawledStreamableSearchResult) sr;
+            return ytsr.getVideo() == null;
+        }
+
+        return false;
     }
 
     private int getFileTypeIconId() {
@@ -304,21 +327,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             }
         }
 
-        private boolean isAudio(StreamableSearchResult sr) {
-            if (sr instanceof SoundcloudSearchResult) {
-                return true;
-            }
-
-            if (sr instanceof YouTubeCrawledStreamableSearchResult) {
-                YouTubeCrawledStreamableSearchResult ytsr = (YouTubeCrawledStreamableSearchResult) sr;
-                return ytsr.getVideo() == null;
-            }
-
-            return false;
-        }
-
         private boolean hasVideo(StreamableSearchResult sr) {
-            return sr instanceof YouTubeCrawledStreamableSearchResult;
+            return sr instanceof YouTubePackageSearchResult;
         }
     }
 }
