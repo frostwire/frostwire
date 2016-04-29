@@ -381,9 +381,6 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         StartDownloadTask task = new StartDownloadTask(ctx, sr, message);
         Tasks.executeParallel(task);
         UIUtils.showTransfersOnDownloadStart(ctx);
-        if (ctx instanceof Activity) {
-            Offers.showInterstitialOfferIfNecessary((Activity) ctx);
-        }
     }
 
     private void showRatingsReminder(View v) {

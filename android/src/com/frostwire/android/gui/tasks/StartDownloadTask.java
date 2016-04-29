@@ -21,6 +21,7 @@ package com.frostwire.android.gui.tasks;
 import android.app.Activity;
 import android.content.Context;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.adnetworks.Offers;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.transfers.*;
 import com.frostwire.android.gui.util.UIUtils;
@@ -76,6 +77,10 @@ public class StartDownloadTask extends ContextTask<DownloadTransfer> {
     @Override
     protected void onPostExecute(Context ctx, DownloadTransfer transfer) {
         if (transfer != null) {
+            if (ctx instanceof Activity) {
+                Offers.showInterstitialOfferIfNecessary((Activity) ctx);
+            }
+
             if (!(transfer instanceof InvalidTransfer)) {
                 TransferManager tm = TransferManager.instance();
                 if (tm.isBittorrentDownloadAndMobileDataSavingsOn(transfer)) {
