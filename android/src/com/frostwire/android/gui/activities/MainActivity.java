@@ -281,7 +281,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void openTorrentUrl(Intent intent) {
         //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
         /**
-         * TODO: Ask @aldenml the best way to plug in NewTransferDialog.
          * I've refactored this dialog so that it is forced (no matter if the setting
          * to not show it again has been used) and when that happens the checkbox is hidden.
          *

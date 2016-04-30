@@ -82,6 +82,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
             allChecked[i] = true;
         }
 
+        dlg.onAttach((Activity) ctx);
         dlg.prepareArguments(R.drawable.download_icon,
                 tinfo.name(),
                 ctx.getString(R.string.pick_the_files_you_want_to_download_from_this_torrent),
@@ -146,7 +147,6 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
             torrentInfo = TorrentInfo.bdecode(torrentInfoData);
         }
         super.initComponents(dlg, savedInstanceState);
-
     }
 
     private TorrentInfo getTorrentInfo() {

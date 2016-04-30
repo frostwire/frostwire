@@ -19,11 +19,12 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import android.app.Activity;
 import android.app.Dialog;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -31,6 +32,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.logging.Logger;
+import com.frostwire.util.Ref;
 
 import java.util.*;
 
@@ -54,6 +56,7 @@ import java.util.*;
 abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         AbstractListAdapter.OnItemCheckedListener {
     static final String BUNDLE_KEY_CHECKED_OFFSETS = "checkedOffsets";
+    private static final Logger LOG = Logger.getLogger(AbstractConfirmListDialog.class);
     private static final String BUNDLE_KEY_DIALOG_TITLE = "title";
     private static final String BUNDLE_KEY_DIALOG_TEXT = "dialogText";
     private static final String BUNDLE_KEY_LIST_DATA = "listData";
@@ -102,8 +105,19 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void show(FragmentManager manager) {
+        final FragmentManager fManager = manager;
+        if (Ref.alive(activityRef)) {
+            Handler h = new Handler(activityRef.get().getMainLooper());
+            h.post(new Runnable() {
+                @Override
+                public void run() {
+                    AbstractConfirmListDialog.super.show(fManager);
+                }
+            });
+        } else {
+            LOG.warn("Dialog had no context to post runnable to.");
+        }
     }
 
     SelectionMode getSelectionMode() {
@@ -267,10 +281,6 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         onYesListener = listener;
     }
 
-    public OnClickListener getOnYesListener() {
-        return onYesListener;
-    }
-
     public Set<T> getChecked() {
         Set<T> result = new HashSet<>();
         if (adapter != null) {
@@ -316,7 +326,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         return result;
     }
 
-    int getLastSelected() {
+    private int getLastSelected() {
         return adapter.getLastSelectedRadioButtonIndex();
     }
 

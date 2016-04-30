@@ -47,7 +47,7 @@ public abstract class AbstractDialog extends DialogFragment {
     private final String tag;
     private final int layoutResId;
 
-    private WeakReference<Activity> activityRef;
+    protected WeakReference<Activity> activityRef;
     private OnDialogClickListener onDialogClickListener;
 
     public AbstractDialog(String tag, int layoutResId) {
@@ -71,7 +71,7 @@ public abstract class AbstractDialog extends DialogFragment {
         return dlg;
     }
 
-    public final void show(FragmentManager manager) {
+    public void show(FragmentManager manager) {
         super.show(manager, tag);
     }
 

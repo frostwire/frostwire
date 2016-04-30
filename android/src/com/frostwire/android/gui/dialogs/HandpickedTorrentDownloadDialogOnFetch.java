@@ -60,7 +60,7 @@ import java.lang.ref.WeakReference;
 
         try {
             LOG.info("createHandpickedTorrentDownloadDialog!");
-            HandpickedTorrentDownloadDialog dlg =
+            final HandpickedTorrentDownloadDialog dlg =
                     HandpickedTorrentDownloadDialog.newInstance(
                             contextRef.get(),
                             TorrentInfo.bdecode(torrentInfoData));
