@@ -24,14 +24,15 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
-import com.inmobi.monetization.IMInterstitial;
+import com.inmobi.ads.InMobiInterstitial;
+import com.inmobi.sdk.InMobiSdk;
 
 import java.lang.ref.WeakReference;
 
 public class InMobiAdNetwork implements AdNetwork {
     private static final Logger LOG = Logger.getLogger(InMobiAdNetwork.class);
     private InMobiListener inmobiListener;
-    private IMInterstitial inmobiInterstitial;
+    private InMobiInterstitial inmobiInterstitial;
     private boolean started = false;
 
     public InMobiAdNetwork() {}
@@ -49,7 +50,7 @@ public class InMobiAdNetwork implements AdNetwork {
                     try {
                         // this initialize call is very expensive, this is why we should be invoked in a thread.
                         LOG.info("InMobi.initialize()...");
-                        com.inmobi.commons.InMobi.initialize(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
+                        InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
                         //InMobi.setLogLevel(InMobi.LOG_LEVEL.DEBUG);
                         LOG.info("InMobi.initialized.");
                         started = true;
@@ -90,7 +91,7 @@ public class InMobiAdNetwork implements AdNetwork {
         inmobiListener.shutdownAppAfter(shutdownActivityAfterwards);
         inmobiListener.dismissActivityAfterwards(dismissActivityAfterward);
 
-        if (inmobiInterstitial.getState().equals(IMInterstitial.State.READY)) {
+        if (inmobiInterstitial.isReady()) {
             try {
                 inmobiInterstitial.show();
 
@@ -123,10 +124,11 @@ public class InMobiAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 try {
-                    inmobiInterstitial = new IMInterstitial(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
+                    // TODO: to @gubatron, find the placement id
+                    long placement_id = 1;
+                    inmobiInterstitial = new InMobiInterstitial(activity, placement_id, inmobiListener);
                     inmobiListener = new InMobiListener(activity);
-                    inmobiInterstitial.setIMInterstitialListener(inmobiListener);
-                    inmobiInterstitial.loadInterstitial();
+                    inmobiInterstitial.load();;
                 } catch (Throwable t) {
                     // don't crash, keep going.
                     // possible android.util.AndroidRuntimeException: android.content.pm.PackageManager$NameNotFoundException: com.google.android.webview

@@ -47,6 +47,7 @@
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 	<uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="com.android.vending.BILLING" />
+	<uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
 	<application android:name="com.frostwire.android.gui.MainApplication"
 		android:allowBackup="true" android:icon="@mipmap/ic_launcher"
@@ -283,17 +284,19 @@
 		<!-- end of mobile core -->
 
 		<!-- InMobi -->
-		<activity android:name="com.inmobi.androidsdk.IMBrowserActivity"
+		<activity android:name="com.inmobi.rendering.InMobiAdActivity"
 				  android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize"
 				  android:theme="@android:style/Theme.Translucent.NoTitleBar"
 				  android:hardwareAccelerated="true" />
 
 		<receiver
-				android:name="com.inmobi.commons.analytics.androidsdk.IMAdTrackerReceiver"
+				android:name="com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver"
 				android:enabled="true"
 				android:exported="true" >
 			<intent-filter>
-				<action android:name="com.android.vending.INSTALL_REFERRER" />                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />                <action android:name="com.inmobi.share.id" />
+				<action android:name="com.android.vending.INSTALL_REFERRER" />
+				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+				<action android:name="com.inmobi.share.id" />
 			</intent-filter>
 		</receiver>
 

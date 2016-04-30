@@ -24,16 +24,14 @@ import android.app.Activity;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
-import com.inmobi.monetization.IMErrorCode;
-import com.inmobi.monetization.IMInterstitial;
-import com.inmobi.monetization.IMInterstitialListener;
+import com.inmobi.ads.InMobiAdRequestStatus;
+import com.inmobi.ads.InMobiInterstitial;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-public class InMobiListener implements InterstitialListener, IMInterstitialListener {
-    private final Logger LOG = Logger.getLogger(IMInterstitialListener.class);
+public class InMobiListener implements InterstitialListener, InMobiInterstitial.InterstitialAdListener {
+    private final Logger LOG = Logger.getLogger(InMobiInterstitial.InterstitialAdListener.class);
     private final WeakReference<Activity> activityRef;
     private boolean shutdownAfterDismiss = false;
     private boolean finishAfterDismiss = false;
@@ -44,7 +42,7 @@ public class InMobiListener implements InterstitialListener, IMInterstitialListe
     }
 
     @Override
-    public void onDismissInterstitialScreen(IMInterstitial imInterstitial) {
+    public void onAdDismissed(InMobiInterstitial imInterstitial) {
         Activity callerActivity = Ref.alive(activityRef) ? activityRef.get() : null;
 
         if (shutdownAfterDismiss) {
@@ -68,29 +66,34 @@ public class InMobiListener implements InterstitialListener, IMInterstitialListe
             }
         }
 
-        imInterstitial.loadInterstitial();
+        imInterstitial.load();
     }
 
     @Override
-    public void onInterstitialFailed(IMInterstitial imInterstitial, IMErrorCode imErrorCode) {
+    public void onAdLoadFailed(InMobiInterstitial imInterstitial, InMobiAdRequestStatus imErrorCode) {
         ready = false;
     }
 
     @Override
-    public void onInterstitialLoaded(IMInterstitial imInterstitial) {
+    public void onAdLoadSucceeded(InMobiInterstitial imInterstitial) {
         ready = true;
     }
 
     @Override
-    public void onShowInterstitialScreen(IMInterstitial imInterstitial) {
+    public void onAdDisplayed(InMobiInterstitial imInterstitial) {
     }
 
     @Override
-    public void onInterstitialInteraction(IMInterstitial imInterstitial, Map<String, String> map) {
+    public void onAdInteraction(InMobiInterstitial imInterstitial, Map<Object, Object> map) {
     }
 
     @Override
-    public void onLeaveApplication(IMInterstitial imInterstitial) {
+    public void onUserLeftApplication(InMobiInterstitial imInterstitial) {
+    }
+
+    @Override
+    public void onAdRewardActionCompleted(InMobiInterstitial inMobiInterstitial, Map<Object, Object> map) {
+
     }
 
     @Override
