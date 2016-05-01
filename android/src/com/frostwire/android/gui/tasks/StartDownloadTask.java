@@ -23,6 +23,7 @@ import android.content.Context;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adnetworks.Offers;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
+import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
 import com.frostwire.android.gui.transfers.*;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ContextTask;
@@ -31,6 +32,7 @@ import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.search.youtube.YouTubePackageSearchResult;
 
 /**
  * 
@@ -62,9 +64,13 @@ public class StartDownloadTask extends ContextTask<DownloadTransfer> {
             if (sr instanceof TorrentSearchResult &&
                 !(sr instanceof ScrapedTorrentFileSearchResult) &&
                 !(sr instanceof TorrentCrawledSearchResult)) {
-               transfer = TransferManager.instance().downloadTorrent(((TorrentSearchResult) sr).getTorrentUrl(),
+                transfer = TransferManager.instance().downloadTorrent(((TorrentSearchResult) sr).getTorrentUrl(),
                         new HandpickedTorrentDownloadDialogOnFetch((Activity) getContext()));
-            } else {
+            } else if (sr instanceof YouTubePackageSearchResult) {
+                YouTubeDownloadDialog ytDownloadDlg = YouTubeDownloadDialog.newInstance(getContext(), (YouTubePackageSearchResult) sr);
+                ytDownloadDlg.show(((Activity) getContext()).getFragmentManager());
+            }
+            else {
                 transfer = TransferManager.instance().download(sr);
             }
         } catch (Throwable e) {

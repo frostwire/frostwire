@@ -23,7 +23,6 @@ import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.StreamableSearchResult;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -151,7 +150,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     private long buildDate(String str) {
         try {
             return new SimpleDateFormat(DATE_FORMAT, Locale.US).parse(str).getTime();
-        } catch (ParseException e) {
+        } catch (Throwable e) {
             return System.currentTimeMillis();
         }
     }

@@ -64,7 +64,6 @@ import java.lang.ref.WeakReference;
                     HandpickedTorrentDownloadDialog.newInstance(
                             contextRef.get(),
                             TorrentInfo.bdecode(torrentInfoData));
-
             dlg.show(fragmentManagerRef.get());
         } catch (Throwable t) {
             LOG.warn("Could not create or show HandpickedTorrentDownloadDialog", t);

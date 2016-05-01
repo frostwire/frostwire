@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Jose Molina (@votaguz), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2016, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,12 +56,12 @@ import java.util.*;
 abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         AbstractListAdapter.OnItemCheckedListener {
     static final String BUNDLE_KEY_CHECKED_OFFSETS = "checkedOffsets";
+    static final String BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX = "lastSelectedRadioButtonIndex";
     private static final Logger LOG = Logger.getLogger(AbstractConfirmListDialog.class);
     private static final String BUNDLE_KEY_DIALOG_TITLE = "title";
     private static final String BUNDLE_KEY_DIALOG_TEXT = "dialogText";
     private static final String BUNDLE_KEY_LIST_DATA = "listData";
     private static final String BUNDLE_KEY_SELECTION_MODE = "selectionMode";
-    private static final String BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX = "lastSelectedRadioButtonIndex";
 
     /**
      * TODOS: 1. Add an optional text filter control that will be connected to the adapter.
@@ -132,7 +132,10 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         Bundle bundle = new Bundle();
         bundle.putString(BUNDLE_KEY_DIALOG_TITLE, dialogTitle);
         bundle.putString(BUNDLE_KEY_DIALOG_TEXT, dialogText);
-        bundle.putString(BUNDLE_KEY_LIST_DATA, listDataInJSON);
+
+        if (listDataInJSON != null) {
+            bundle.putString(BUNDLE_KEY_LIST_DATA, listDataInJSON);
+        }
         bundle.putInt(BUNDLE_KEY_SELECTION_MODE, selectionMode.ordinal());
         this.selectionMode = selectionMode;
 
@@ -326,7 +329,11 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         return result;
     }
 
-    private int getLastSelected() {
+    public T getSelectedItem() {
+        return (T) adapter.getSelectedItem();
+    }
+
+    private int getLastSelectedIndex() {
         return adapter.getLastSelectedRadioButtonIndex();
     }
 
@@ -336,7 +343,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
                 arguments.putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, getSelected());
             } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
-                arguments.putInt(BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX, getLastSelected());
+                arguments.putInt(BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX, getLastSelectedIndex());
             }
         }
     }
@@ -423,7 +430,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
                 View selectedView = listView.getChildAt(adapter.getLastSelectedRadioButtonIndex());
 
                 if (selectedView == null) {
-                    selectedView = adapter.getView(getLastSelected(),null,listView);
+                    selectedView = adapter.getView(getLastSelectedIndex(),null,listView);
                 }
 
                 if (selectedView != null) {

@@ -40,7 +40,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter.FilteredSearchResults;
-import com.frostwire.android.gui.adnetworks.Offers;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.services.Engine;
@@ -49,7 +48,6 @@ import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.PromotionsView.OnPromotionClickListener;
@@ -380,7 +378,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     public static void startDownload(Context ctx, SearchResult sr, String message) {
         StartDownloadTask task = new StartDownloadTask(ctx, sr, message);
         Tasks.executeParallel(task);
-        UIUtils.showTransfersOnDownloadStart(ctx);
+        //UIUtils.showTransfersOnDownloadStart(ctx);
     }
 
     private void showRatingsReminder(View v) {

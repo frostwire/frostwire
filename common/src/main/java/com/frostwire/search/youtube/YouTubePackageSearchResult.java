@@ -68,4 +68,8 @@ public class YouTubePackageSearchResult extends YouTubeSearchResult implements S
     public String getStreamUrl() {
         return streamUrl;
     }
+
+    public List<SearchResult> children() {
+        return children;
+    }
 }

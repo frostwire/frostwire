@@ -1,10 +1,12 @@
 package com.frostwire.android.gui.dialogs;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.tasks.StartDownloadTask;
+import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
@@ -30,6 +32,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
         // this creates a bundle that gets passed to setArguments(). It's supposed to be ready
         // before the dialog is attached to the underlying activity, after we attach to it, then
         // we are able to use such Bundle to create our adapter.
+        dlg.onAttach((Activity) ctx);
         dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(srList),
                 SelectionMode.MULTIPLE_SELECTION);
 
@@ -41,7 +44,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
         if (srs != null && !srs.isEmpty()) {
             for (SearchResult sr : srs) {
                 StartDownloadTask task = new StartDownloadTask(ctx, sr);
-                task.execute();
+                Tasks.executeParallel(task);
             }
             UIUtils.showTransfersOnDownloadStart(ctx);
         }
