@@ -28,6 +28,8 @@ import com.frostwire.android.gui.adnetworks.Offers;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledStreamableSearchResult;
@@ -49,6 +51,7 @@ import java.util.List;
 public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResult> {
     private static Logger LOG = Logger.getLogger(YouTubeDownloadDialog.class);
     private static WeakReference<YouTubePackageSearchResult> youTubePackageSearchResultWeakReference;
+    private static Pattern FORMAT_PATTERN = Pattern.compile(".*(H26.*|VP8.*|AAC.*)");
 
     public YouTubeDownloadDialog() {
         super();
@@ -103,7 +106,6 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
     }
 
     private class YouTubeEntriesDialogAdapter extends ConfirmListDialogDefaultAdapter<SearchResult> {
-
         YouTubeEntriesDialogAdapter(Context context,
                                     List<SearchResult> list) {
             super(context, list, SelectionMode.SINGLE_SELECTION);
@@ -111,7 +113,13 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
 
         @Override
         public CharSequence getItemTitle(SearchResult data) {
-            return data.getDisplayName();
+            String s = data.getDisplayName().replaceAll("_", " ");
+            final Matcher matcher = FORMAT_PATTERN.matcher(s);
+            if (matcher.find()) {
+                final String quality = matcher.group(1);
+                s = s.replace(quality,"(" + quality + ")");
+            }
+            return s;
         }
 
         @Override

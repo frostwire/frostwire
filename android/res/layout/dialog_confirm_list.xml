@@ -72,7 +72,7 @@
             style="@style/DefaultDialogTheme.SmallTextMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight=".5" />
+            android:layout_weight=".5"/>
 
         <!-- selection sum, e.g. for files, this would be the number of total bytes -->
         <TextView

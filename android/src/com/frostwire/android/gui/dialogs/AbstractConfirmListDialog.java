@@ -238,9 +238,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
         if (adapter != null) {
             listView.setAdapter(adapter);
-            if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
-                updateSelectedCount();
-            }
+            updateSelectedCount();
             adapter.setOnItemCheckedListener(this);
         }
     }
@@ -348,8 +346,13 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         }
     }
 
+    /**
+     * If the selection mode is single selection mode it will hide the summary layout.
+     */
     private void updateSelectedCount() {
-        if (adapter == null || selectionMode != SelectionMode.MULTIPLE_SELECTION) {
+        if (adapter == null || selectionMode == SelectionMode.SINGLE_SELECTION) {
+            final LinearLayout summaryLayout = findView(dlg, R.id.dialog_confirm_list_selection_summary);
+            summaryLayout.setVisibility(View.GONE );
             return;
         }
 
