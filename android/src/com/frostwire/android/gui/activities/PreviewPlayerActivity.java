@@ -37,12 +37,14 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
+import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.FileSearchResult;
+import com.frostwire.search.youtube.YouTubePackageSearchResult;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -197,8 +199,15 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     private void onDownloadButtonClick() {
         if (Ref.alive(srRef)) {
-            NewTransferDialog dlg = NewTransferDialog.newInstance(srRef.get(), false);
-            dlg.show(getFragmentManager());
+            final FileSearchResult fileSearchResult = srRef.get();
+            if (fileSearchResult instanceof YouTubePackageSearchResult) {
+                releaseMediaPlayer();
+                YouTubeDownloadDialog ytDownloadDlg = YouTubeDownloadDialog.newInstance(this, (YouTubePackageSearchResult) fileSearchResult);
+                ytDownloadDlg.show(getFragmentManager());
+            }  else {
+                NewTransferDialog dlg = NewTransferDialog.newInstance(fileSearchResult, false);
+                dlg.show(getFragmentManager());
+            }
         } else {
             finish();
         }
