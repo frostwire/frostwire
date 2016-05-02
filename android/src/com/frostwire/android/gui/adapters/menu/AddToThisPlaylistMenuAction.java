@@ -53,8 +53,6 @@ public class AddToThisPlaylistMenuAction extends MenuAction {
     }
 
     private static int getIconResourceId(Context context) {
-        return context.getClass().getCanonicalName().contains("apollo") ?
-                R.drawable.contextmenu_icon_add_to_existing_playlist_light:
-                R.drawable.contextmenu_icon_add_to_existing_playlist_dark;
+        return  R.drawable.contextmenu_icon_playlist_add_dark;
     }
 }
