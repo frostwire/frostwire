@@ -44,6 +44,7 @@ public class RenameFileMenuAction extends MenuAction {
 
     private final FileDescriptor fd;
     private final FileListAdapter adapter;
+    EditText input;
 
     public RenameFileMenuAction(Context context, FileListAdapter adapter, FileDescriptor fd) {
         super(context, R.drawable.contextmenu_icon_rename, R.string.rename);
@@ -71,35 +72,17 @@ public class RenameFileMenuAction extends MenuAction {
         String name = FilenameUtils.getBaseName(filePath);
         final String ext = FilenameUtils.getExtension(filePath);
 
-        final EditText input = (EditText) newRenameFileDialog.findViewById(R.id.dialog_default_input_text);
+        input = (EditText) newRenameFileDialog.findViewById(R.id.dialog_default_input_text);
         input.setText(name);
         input.selectAll();
 
-        Button buttonNo = (Button) newRenameFileDialog.findViewById(R.id.dialog_default_input_button_no);
-        buttonNo.setText(R.string.cancel);
-        buttonNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                newRenameFileDialog.dismiss();
-            }
-        });
+        Button noButton = (Button) newRenameFileDialog.findViewById(R.id.dialog_default_input_button_no);
+        noButton.setText(R.string.cancel);
+        Button yesButton = (Button) newRenameFileDialog.findViewById(R.id.dialog_default_input_button_yes);
+        yesButton.setText(android.R.string.ok);
 
-        Button buttonYes = (Button) newRenameFileDialog.findViewById(R.id.dialog_default_input_button_yes);
-        buttonYes.setText(android.R.string.ok);
-        buttonYes.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View v) {
-                                             String newFileName = input.getText().toString();
-                                             if (isValidFileName(newFileName)) {
-                                                 renameFile(newFileName);
-                                                 adapter.notifyDataSetChanged();
-                                                 newRenameFileDialog.dismiss();
-                                             } else {
-                                                 UIUtils.showLongMessage(getContext(), R.string.invalid_filename);
-                                             }
-                                         }
-                                     }
-        );
+        noButton.setOnClickListener(new NegativeButtonOnClickListener(this, newRenameFileDialog));
+        yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, newRenameFileDialog));
 
         newRenameFileDialog.show();
     }
@@ -117,5 +100,42 @@ public class RenameFileMenuAction extends MenuAction {
     private void renameFile(String newFileName) {
         fd.filePath = Librarian.instance().renameFile(fd, newFileName);
         fd.title = FilenameUtils.getBaseName(newFileName);
+    }
+
+    private class NegativeButtonOnClickListener implements View.OnClickListener {
+        final private Dialog newRenameFileDialog;
+        final private RenameFileMenuAction renameFileMenuAction;
+
+        public NegativeButtonOnClickListener(RenameFileMenuAction renameFileMenuAction, Dialog newRenameFileDialog) {
+            this.newRenameFileDialog = newRenameFileDialog;
+            this.renameFileMenuAction = renameFileMenuAction;
+        }
+
+        @Override
+        public void onClick(View view) {
+            newRenameFileDialog.dismiss();
+        }
+    }
+
+    private class PositiveButtonOnClickListener implements View.OnClickListener {
+        final private Dialog newRenameFileDialog;
+        final private RenameFileMenuAction renameFileMenuAction;
+
+        public PositiveButtonOnClickListener(RenameFileMenuAction renameFileMenuAction, Dialog newRenameFileDialog) {
+            this.newRenameFileDialog = newRenameFileDialog;
+            this.renameFileMenuAction = renameFileMenuAction;
+        }
+
+        @Override
+        public void onClick(View view) {
+            String newFileName = input.getText().toString();
+            if (isValidFileName(newFileName)) {
+                renameFile(newFileName);
+                adapter.notifyDataSetChanged();
+                newRenameFileDialog.dismiss();
+            } else {
+                UIUtils.showLongMessage(getContext(), R.string.invalid_filename);
+            }
+        }
     }
 }
