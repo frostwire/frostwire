@@ -41,6 +41,9 @@ import com.frostwire.android.gui.views.MenuAction;
 public class CreateNewPlaylistMenuAction extends MenuAction {
     private final long[] fileDescriptors;
 
+    /* Dialog's default input text */
+    EditText input;
+
     public CreateNewPlaylistMenuAction(Context context, long[] fileDescriptors) {
         super(context, getIconResourceId(context), R.string.new_empty_playlist);
         this.fileDescriptors = fileDescriptors;
@@ -60,36 +63,34 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
         TextView title = (TextView) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_title);
         title.setText(R.string.new_empty_playlist);
 
-        final EditText input = (EditText) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_text);
+        input = (EditText) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_text);
         input.setText("");
         input.setHint(R.string.create_playlist_prompt);
         input.selectAll();
 
-        Button buttonNo = (Button) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_button_no);
-        buttonNo.setText(R.string.cancel);
-        buttonNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                newCreateNewPlaylistDialog.dismiss();
-            }
-        });
+        Button noButton = (Button) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_button_no);
+        noButton.setText(R.string.cancel);
+        Button yesButton = (Button) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_button_yes);
+        yesButton.setText(android.R.string.ok);
 
-        Button buttonYes = (Button) newCreateNewPlaylistDialog.findViewById(R.id.dialog_default_input_button_yes);
-        buttonYes.setText(android.R.string.ok);
-        buttonYes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String playlistName = input.getText().toString();
-                if (MusicUtils.getIdForPlaylist(getContext(), playlistName) != -1) {
-                    playlistName += "+";
-                    input.setText(playlistName);
+        noButton.setOnClickListener(new NegativeButtonOnClickListener(this, newCreateNewPlaylistDialog));
+        yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, newCreateNewPlaylistDialog));
 
-                } else {
-                    onClickCreatePlaylistButton(playlistName);
-                    newCreateNewPlaylistDialog.dismiss();
-                }
-            }
-        });
+
+//        buttonYes.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String playlistName = input.getText().toString();
+//                if (MusicUtils.getIdForPlaylist(getContext(), playlistName) != -1) {
+//                    playlistName += "+";
+//                    input.setText(playlistName);
+//
+//                } else {
+//                    onClickCreatePlaylistButton(playlistName);
+//                    newCreateNewPlaylistDialog.dismiss();
+//                }
+//            }
+//        });
 
         newCreateNewPlaylistDialog.show();
     }
@@ -107,5 +108,44 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
         return context.getClass().getCanonicalName().contains("apollo") ?
                 R.drawable.contextmenu_icon_playlist_add_light :
                 R.drawable.contextmenu_icon_playlist_add_dark;
+    }
+
+    private class NegativeButtonOnClickListener implements View.OnClickListener {
+        private final Dialog newCreateNewPlaylistDialog;
+        private final CreateNewPlaylistMenuAction createNewPlaylistMenuAction;
+
+        public NegativeButtonOnClickListener(CreateNewPlaylistMenuAction createNewPlaylistMenuAction, Dialog newCreateNewPlaylistDialog) {
+            this.newCreateNewPlaylistDialog = newCreateNewPlaylistDialog;
+            this.createNewPlaylistMenuAction = createNewPlaylistMenuAction;
+        }
+
+        @Override
+        public void onClick(View view) {
+            newCreateNewPlaylistDialog.dismiss();
+        }
+    }
+
+    private class PositiveButtonOnClickListener implements View.OnClickListener {
+        private final Dialog newCreateNewPlaylistDialog;
+        private final CreateNewPlaylistMenuAction createNewPlaylistMenuAction;
+
+
+        public PositiveButtonOnClickListener(CreateNewPlaylistMenuAction createNewPlaylistMenuAction, Dialog newCreateNewPlaylistDialog) {
+            this.newCreateNewPlaylistDialog = newCreateNewPlaylistDialog;
+            this.createNewPlaylistMenuAction = createNewPlaylistMenuAction;
+        }
+
+        @Override
+        public void onClick(View view) {
+            String playlistName = input.getText().toString();
+            if (MusicUtils.getIdForPlaylist(getContext(), playlistName) != -1) {
+                playlistName += "+";
+                input.setText(playlistName);
+
+            } else {
+                onClickCreatePlaylistButton(playlistName);
+                newCreateNewPlaylistDialog.dismiss();
+            }
+        }
     }
 }
