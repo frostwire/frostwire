@@ -69,24 +69,14 @@ public class DeleteFileMenuAction extends MenuAction {
         TextView text = (TextView) newDeleteFilesDialog.findViewById(R.id.dialog_default_text);
         text.setText(R.string.are_you_sure_delete_files);
 
-        Button buttonNo = (Button) newDeleteFilesDialog.findViewById(R.id.dialog_default_button_no);
-        buttonNo.setText(R.string.cancel);
-        buttonNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                newDeleteFilesDialog.dismiss();
-            }
-        });
+        Button noButton = (Button) newDeleteFilesDialog.findViewById(R.id.dialog_default_button_no);
+        noButton.setText(R.string.cancel);
+        Button yesButton = (Button) newDeleteFilesDialog.findViewById(R.id.dialog_default_button_yes);
+        yesButton.setText(R.string.delete);
 
-        Button buttonYes = (Button) newDeleteFilesDialog.findViewById(R.id.dialog_default_button_yes);
-        buttonYes.setText(R.string.delete);
-        buttonYes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteFiles();
-                newDeleteFilesDialog.dismiss();
-            }
-        });
+        noButton.setOnClickListener(new NegativeButtonOnClickListener(this, newDeleteFilesDialog));
+        yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, newDeleteFilesDialog));
+
 
         newDeleteFilesDialog.show();
     }
@@ -106,5 +96,36 @@ public class DeleteFileMenuAction extends MenuAction {
                 return null;
             }
         }.execute();
+    }
+
+    private class NegativeButtonOnClickListener implements View.OnClickListener {
+        private final DeleteFileMenuAction deleteFileMenuAction;
+        private final Dialog newDeleteFilesDialog;
+
+        public NegativeButtonOnClickListener(DeleteFileMenuAction deleteFileMenuAction, Dialog newDeleteFilesDialog) {
+            this.deleteFileMenuAction = deleteFileMenuAction;
+            this.newDeleteFilesDialog = newDeleteFilesDialog;
+        }
+
+        @Override
+        public void onClick(View view) {
+            newDeleteFilesDialog.dismiss();
+        }
+    }
+
+    private class PositiveButtonOnClickListener implements View.OnClickListener {
+        private final DeleteFileMenuAction deleteFileMenuAction;
+        private final Dialog newDeleteFilesDialog;
+
+        public PositiveButtonOnClickListener(DeleteFileMenuAction deleteFileMenuAction, Dialog newDeleteFilesDialog) {
+            this.deleteFileMenuAction = deleteFileMenuAction;
+            this.newDeleteFilesDialog = newDeleteFilesDialog;
+        }
+
+        @Override
+        public void onClick(View view) {
+            deleteFiles();
+            newDeleteFilesDialog.dismiss();
+        }
     }
 }
