@@ -100,37 +100,61 @@ public class DeleteDialog extends DialogFragment {
         TextView text = (TextView) inflator.findViewById(R.id.dialog_default_text);
         text.setText(R.string.are_you_sure_delete_files_text);
 
-        Button buttonNo = (Button) inflator.findViewById(R.id.dialog_default_button_no);
-        buttonNo.setText(R.string.cancel);
-        buttonNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
+        Button noButton = (Button) inflator.findViewById(R.id.dialog_default_button_no);
+        noButton.setText(R.string.cancel);
 
-        Button buttonYes = (Button) inflator.findViewById(R.id.dialog_default_button_yes);
-        buttonYes.setText(R.string.delete);
-        buttonYes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Remove the items from the image cache
-                mFetcher.removeFromCache(key);
-                // Delete the selected item(s)
-                MusicUtils.deleteTracks(getActivity(), mItemList);
+        Button yesButton = (Button) inflator.findViewById(R.id.dialog_default_button_yes);
+        yesButton.setText(R.string.delete);
 
-                if (getActivity() instanceof DeleteDialogCallback) {
-                    ((DeleteDialogCallback) getActivity()).onDelete(mItemList);
-                }
-
-                if (onDeleteCallback != null) {
-                    onDeleteCallback.onDelete(mItemList);
-                }
-
-                dismiss();
-            }
-        });
+        noButton.setOnClickListener(new NegativeButtonOnClickListener(this, apolloDeleteFilesDialog));
+        yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, apolloDeleteFilesDialog));
 
         return apolloDeleteFilesDialog.create();
     }
+
+    private class NegativeButtonOnClickListener implements View.OnClickListener {
+        private final DeleteDialog deleteDialog;
+        private final AlertDialog.Builder apolloDeleteFilesDialog;
+
+        public NegativeButtonOnClickListener(DeleteDialog deleteDialog, AlertDialog.Builder apolloDeleteFilesDialog) {
+            this.deleteDialog = deleteDialog;
+            this.apolloDeleteFilesDialog = apolloDeleteFilesDialog;
+        }
+
+        @Override
+        public void onClick(View view) {
+            dismiss();
+        }
+    }
+
+    private class PositiveButtonOnClickListener implements View.OnClickListener {
+        private final DeleteDialog deleteDialog;
+        private final AlertDialog.Builder apolloDeleteFilesDialog;
+        final Bundle arguments = getArguments();
+        final String key = arguments.getString("cachekey");
+
+        public PositiveButtonOnClickListener(DeleteDialog deleteDialog, AlertDialog.Builder apolloDeleteFilesDialog) {
+            this.deleteDialog = deleteDialog;
+            this.apolloDeleteFilesDialog = apolloDeleteFilesDialog;
+        }
+
+        @Override
+        public void onClick(View view) {
+            // Remove the items from the image cache
+            mFetcher.removeFromCache(key);
+            // Delete the selected item(s)
+            MusicUtils.deleteTracks(getActivity(), mItemList);
+
+            if (getActivity() instanceof DeleteDialogCallback) {
+                ((DeleteDialogCallback) getActivity()).onDelete(mItemList);
+            }
+
+            if (onDeleteCallback != null) {
+                onDeleteCallback.onDelete(mItemList);
+            }
+
+            dismiss();
+        }
+    }
 }
+
