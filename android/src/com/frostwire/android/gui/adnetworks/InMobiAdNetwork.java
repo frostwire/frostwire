@@ -34,6 +34,7 @@ public class InMobiAdNetwork implements AdNetwork {
     private InMobiListener inmobiListener;
     private InMobiInterstitial inmobiInterstitial;
     private boolean started = false;
+    private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150l;
 
     public InMobiAdNetwork() {}
 
@@ -51,7 +52,7 @@ public class InMobiAdNetwork implements AdNetwork {
                         // this initialize call is very expensive, this is why we should be invoked in a thread.
                         LOG.info("InMobi.initialize()...");
                         InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
-                        //InMobi.setLogLevel(InMobi.LOG_LEVEL.DEBUG);
+                        //InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
                         LOG.info("InMobi.initialized.");
                         started = true;
                         LOG.info("Load InmobiInterstitial.");
@@ -124,10 +125,8 @@ public class InMobiAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 try {
-                    // TODO: to @gubatron, find the placement id
-                    long placement_id = 1;
-                    inmobiInterstitial = new InMobiInterstitial(activity, placement_id, inmobiListener);
                     inmobiListener = new InMobiListener(activity);
+                    inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
                     inmobiInterstitial.load();;
                 } catch (Throwable t) {
                     // don't crash, keep going.
