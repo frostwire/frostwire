@@ -34,6 +34,7 @@ public class InMobiAdNetwork implements AdNetwork {
     private InMobiListener inmobiListener;
     private InMobiInterstitial inmobiInterstitial;
     private boolean started = false;
+    private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150l;
 
     public InMobiAdNetwork() {}
 
@@ -124,9 +125,7 @@ public class InMobiAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 try {
-                    // TODO: to @gubatron, find the placement id
-                    long placement_id = 1;
-                    inmobiInterstitial = new InMobiInterstitial(activity, placement_id, inmobiListener);
+                    inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
                     inmobiListener = new InMobiListener(activity);
                     inmobiInterstitial.load();;
                 } catch (Throwable t) {
