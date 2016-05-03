@@ -456,6 +456,7 @@ public class YouTubeDownload implements BTDownload {
             if (completeFile.exists()) {
                 if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
                     BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
+                    // TODO: Rich DHT announcement.
                 }
 
                 if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(completeFile)) {
