@@ -1,7 +1,8 @@
 frostwire (6.2.4) stable; urgency=high
+  * Cloud transfers are automatically seeded if seeding is on.	
   * New jlibtorrent 1.1.0.28
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 28 Apr 2016 10:39:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Tue, 3 May 2016 14:38:00 -0500
 
 frostwire (6.2.4) stable; urgency=high
   * Fixes Monova search.
