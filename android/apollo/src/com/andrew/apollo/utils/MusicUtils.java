@@ -1305,7 +1305,8 @@ public final class MusicUtils {
      */
     public static void makePlaylistMenu(final Context context, final int groupId,
             final SubMenu subMenu, final boolean showFavorites) {
-        subMenu.clear();
+//        subMenu.clear();
+        subMenu.clearHeader();
         if (showFavorites) {
             subMenu.add(groupId, FragmentMenuItems.ADD_TO_FAVORITES, Menu.NONE,
                     R.string.add_to_favorites);
