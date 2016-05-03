@@ -93,6 +93,9 @@ android {
 
     defaultConfig {
         versionName project.ext.versionName
+        
+        //Added by muckachina for espresso
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -124,6 +127,14 @@ android {
             }
         }
 
+    //Added by muckachina for espresso - Setting the root of instrumented tests - configured by Alden 
+    androidTest {
+        java {
+            srcDir 'tests/espresso'
+        }
+    
+    }
+    
         plus1.res.srcDirs = ['res-plus1']
     }
 
@@ -167,6 +178,15 @@ android {
     }
 }
 
+//Added by muckachina for espresso
+def SUPPORT_ANNOTATIONS_VERSION = "23.3.0"
+
+configurations.all {
+    resolutionStrategy {
+        force "com.android.support:support-annotations:${SUPPORT_ANNOTATIONS_VERSION}"
+    }
+}
+
 dependencies {
     compile 'com.android.support:support-v4:23.2.1'
     compile 'com.google.android.gms:play-services-ads:8.4.0'
@@ -180,6 +200,22 @@ dependencies {
     compile 'com.frostwire:jlibtorrent-android-x86:' + JLIBTORRENT_VERSION
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    
+    //Added by muckachina for espresso - Test dependencies 
+    def TEST_RUNNER_VERSION = "0.4.1"
+    def ESPRESSO_VERSION = "2.2.1"
+    //----- Instrumentation tests dependencies -----
+    androidTestCompile "com.android.support:support-annotations:${SUPPORT_ANNOTATIONS_VERSION}"
+    androidTestCompile "com.android.support.test:runner:${TEST_RUNNER_VERSION}"
+    androidTestCompile "com.android.support.test:rules:${TEST_RUNNER_VERSION}"
+    androidTestCompile "com.android.support.test.espresso:espresso-core:${ESPRESSO_VERSION}"
+    androidTestCompile("com.android.support.test.espresso:espresso-contrib:${ESPRESSO_VERSION}") {
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
+    
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
