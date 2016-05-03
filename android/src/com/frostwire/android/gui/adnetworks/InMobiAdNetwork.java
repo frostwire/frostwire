@@ -52,7 +52,7 @@ public class InMobiAdNetwork implements AdNetwork {
                         // this initialize call is very expensive, this is why we should be invoked in a thread.
                         LOG.info("InMobi.initialize()...");
                         InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
-                        //InMobi.setLogLevel(InMobi.LOG_LEVEL.DEBUG);
+                        //InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
                         LOG.info("InMobi.initialized.");
                         started = true;
                         LOG.info("Load InmobiInterstitial.");
@@ -125,8 +125,8 @@ public class InMobiAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 try {
-                    inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
                     inmobiListener = new InMobiListener(activity);
+                    inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
                     inmobiInterstitial.load();;
                 } catch (Throwable t) {
                     // don't crash, keep going.
