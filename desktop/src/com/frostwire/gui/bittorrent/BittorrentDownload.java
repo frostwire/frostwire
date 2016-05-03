@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -493,16 +493,16 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
             }
 
             if (dl instanceof BittorrentDownload &&
-                    dl.getState().equals(TransferState.SEEDING) &&
-                    !showShareTorrentDialog) {
+                dl.getState().equals(TransferState.SEEDING) &&
+                !showShareTorrentDialog) {
                 dl.pause();
                 // sorry Dijkstra.
                 return;
             }
 
             if (dl instanceof BittorrentDownload &&
-                    TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[]{dl}) &&
-                    showShareTorrentDialog) {
+                TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[]{dl}) &&
+                showShareTorrentDialog) {
                 new ShareTorrentDialog(((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
             } else if (dl instanceof SoundcloudDownload || dl instanceof YouTubeDownload || dl instanceof HttpDownload) {
                 if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {

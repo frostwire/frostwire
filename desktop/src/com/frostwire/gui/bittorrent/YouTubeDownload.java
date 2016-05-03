@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,13 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.mp4.Box;
 import com.frostwire.mp4.IsoFile;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
-import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
+import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.http.HttpClient;
@@ -40,7 +40,6 @@ import org.apache.commons.io.IOUtils;
 import org.limewire.util.OSUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -88,14 +87,14 @@ public class YouTubeDownload implements BTDownload {
 
         String filename = sr.getFilename();
 
-        completeFile = buildFile(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), filename);
+        completeFile = org.limewire.util.FileUtils.buildFile(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), filename);
         tempVideo = buildTempFile(FilenameUtils.getBaseName(filename), "m4v");
         tempAudio = buildTempFile(FilenameUtils.getBaseName(filename), "m4a");
 
         bytesReceived = 0;
         dateCreated = new Date();
 
-        httpClientListener = new HttpDownloadListenerImpl();
+        httpClientListener = new HttpDownloadListenerImpl(this);
 
         httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
         httpClient.setListener(httpClientListener);
@@ -316,22 +315,6 @@ public class YouTubeDownload implements BTDownload {
         cleanupFile(completeFile);
     }
 
-    /**
-     * files are saved with (1), (2),... if there's one with the same name already.
-     */
-    private static File buildFile(File savePath, String name) {
-        String baseName = FilenameUtils.getBaseName(name);
-        String ext = FilenameUtils.getExtension(name);
-
-        File f = new File(savePath, name);
-        int i = 1;
-        while (f.exists() && i < Integer.MAX_VALUE) {
-            f = new File(savePath, baseName + " (" + i + ")." + ext);
-            i++;
-        }
-        return f;
-    }
-
     private static File getIncompleteFolder() {
         File incompleteFolder = new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue().getParentFile(), "Incomplete");
         if (!incompleteFolder.exists()) {
@@ -367,6 +350,12 @@ public class YouTubeDownload implements BTDownload {
     }
 
     private final class HttpDownloadListenerImpl implements HttpClientListener {
+        private final YouTubeDownload dl;
+
+        public HttpDownloadListenerImpl(YouTubeDownload youTubeDownload) {
+            dl = youTubeDownload;
+        }
+
         @Override
         public void onError(HttpClient client, Throwable e) {
             state = TransferState.ERROR;
@@ -465,6 +454,10 @@ public class YouTubeDownload implements BTDownload {
             }
 
             if (completeFile.exists()) {
+                if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
+                    BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
+                }
+
                 if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(completeFile)) {
                     if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
                         iTunesMediator.instance().scanForSongs(completeFile);
