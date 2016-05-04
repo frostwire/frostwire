@@ -72,7 +72,11 @@ public final class AndroidPlatform extends AbstractPlatform {
         }
 
         if (NetworkManager.instance().isDataWIFIUp()) {
-            return NetworkType.MOBILE;
+            return NetworkType.WIFI;
+        }
+
+        if (NetworkManager.instance().isDataWiMAXUp()) {
+            return NetworkType.WIMAX;
         }
 
         return NetworkType.NONE;
