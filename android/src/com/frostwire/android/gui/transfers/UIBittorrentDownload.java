@@ -34,6 +34,7 @@ import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTDownloadListener;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Ref;

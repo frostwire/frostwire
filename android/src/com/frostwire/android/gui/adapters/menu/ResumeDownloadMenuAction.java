@@ -22,10 +22,10 @@ import android.content.Context;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.NetworkManager;
-import com.frostwire.android.gui.transfers.BittorrentDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 

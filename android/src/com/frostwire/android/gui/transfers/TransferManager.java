@@ -37,6 +37,7 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 import org.apache.commons.io.FileUtils;
 

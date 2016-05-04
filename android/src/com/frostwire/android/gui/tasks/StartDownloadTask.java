@@ -33,6 +33,7 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubePackageSearchResult;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 
 /**

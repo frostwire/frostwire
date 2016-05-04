@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.transfers;
 
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 
