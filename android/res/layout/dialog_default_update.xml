@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/default_dialog_background"
     android:orientation="vertical"
-    android:scrollbars="vertical">
+    android:scrollbars="vertical"
+    android:background="@drawable/default_dialog_background">
 
     <TextView
         android:id="@+id/dialog_default_update_title"
@@ -30,41 +30,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <ScrollView
-        android:id="@+id/dialog_default_update_scrollview"
+    <TextView
+        android:id="@+id/dialog_default_update_text"
+        style="@style/DefaultDialogTheme.MainText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/dialog_default_update_title">
-    <LinearLayout
-        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="10dp" />
+
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/dialog_default_update_text"
-            style="@style/DefaultDialogTheme.LongText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="15dp" />
-        <include layout="@layout/dialog_update_bullet"></include>
-    </LinearLayout>
-    </ScrollView>
+        android:layout_height="match_parent"
+        android:id="@+id/dialog_default_update_list_view"></ListView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/basic_gray_medium"
         android:orientation="horizontal"
         android:paddingBottom="1dp"
         android:paddingTop="1dp"
-        android:weightSum="1.0">
+        android:weightSum="1.0"
+        android:background="@color/basic_gray_medium">
 
         <Button
             android:id="@+id/dialog_default_update_button_no"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:background="@color/app_light_background" />
+            android:background="@color/app_light_background"/>
 
         <Button
             android:id="@+id/dialog_default_update_button_yes"
@@ -72,7 +67,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="1dp"
             android:layout_weight="0.5"
-            android:background="@color/app_light_background" />
+            android:background="@color/app_light_background"/>
     </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

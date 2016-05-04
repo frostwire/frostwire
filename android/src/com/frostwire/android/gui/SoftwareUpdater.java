@@ -25,16 +25,21 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
@@ -52,6 +57,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -263,7 +270,6 @@ public final class SoftwareUpdater {
                 LOG.info("notifyUpdate(): showing update dialog.");
                 String message = StringUtils.getLocaleString(update.updateMessages, context.getString(R.string.update_message));
 
-                //TODO: need to connect the bullet points to the TextView
                 final Dialog newSoftwareUpdaterDialog = new Dialog(context, R.style.DefaultDialogTheme);
                 newSoftwareUpdaterDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 newSoftwareUpdaterDialog.setContentView(R.layout.dialog_default_update);
@@ -274,8 +280,20 @@ public final class SoftwareUpdater {
                 TextView text = (TextView) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_text);
                 text.setText(message);
 
-                TextView list = (TextView) newSoftwareUpdaterDialog.findViewById(R.id.dialog_update_bullets_checked_text_view);
-//                list.setText();
+                //TODO: need to properly connect the bullet points to the TextView. 
+                final ListView listview = (ListView) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_list_view);
+                String[] values = new String[] {String.valueOf(update.changelog)};
+
+                final ArrayList<String> list = new ArrayList<String>();
+                for (int i = 0; i < values.length; ++i) {
+                    list.add(i, String.valueOf(Html.fromHtml("&#8226; " + values[i])));
+                }
+
+                final ArrayAdapter adapter = new ArrayAdapter(context,
+                        R.layout.dialog_update_bullet,
+                        R.id.dialog_update_bullets_checked_text_view,
+                        values);
+                listview.setAdapter(adapter);
 
 
                 // Set the save button action
@@ -284,11 +302,19 @@ public final class SoftwareUpdater {
 
                 Button yesButton = (Button) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_button_yes);
                 yesButton.setText(android.R.string.ok);
+                yesButton.setOnClickListener(new View.OnClickListener() {
+                                                 @Override
+                                                 public void onClick(View v) {
+                                                     Engine.instance().stopServices(false);
+                                                     UIUtils.openFile(context, getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE);
+                                                 }
+                                             }
+                );
 
-
-                //TODO: need to connect the positive button
                 noButton.setOnClickListener(new NegativeButtonOnClickListener(this, newSoftwareUpdaterDialog));
-//                yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, newSoftwareUpdaterDialog));
+
+                //TODO: need to create PositiveOnClickListener
+//                yesButton.setOnClickListener(new PositiveButtonOnClickListener(context, newSoftwareUpdaterDialog));
 
 
                 newSoftwareUpdaterDialog.show();
@@ -324,6 +350,31 @@ public final class SoftwareUpdater {
         }
     }
 
+
+    private class StableArrayAdapter extends ArrayAdapter<String> {
+
+        HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
+
+        public StableArrayAdapter(Context context, int textViewResourceId,
+                                  List<String> objects) {
+            super(context, textViewResourceId, objects);
+            for (int i = 0; i < objects.size(); ++i) {
+                mIdMap.put(objects.get(i), i);
+            }
+        }
+
+        @Override
+        public long getItemId(int position) {
+            String item = getItem(position);
+            return mIdMap.get(item);
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return true;
+        }
+
+    }
     /**
      * @param md5 - Expected MD5 hash as a string.
      * @return true if the latest apk was downloaded and md5 verified.
@@ -553,6 +604,6 @@ public final class SoftwareUpdater {
 //            UIUtils.openFile(context, getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE);
 //            newSoftwareUpdaterDialog.dismiss();
 //        }
-
+//
 //    }
 }
