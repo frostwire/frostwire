@@ -359,7 +359,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     }
 
     public String makeMagnetUri() {
-        return dl.makeMagnetUri();
+        return dl.magnetUri();
     }
 
     public TorrentInfo getTorrentInfo() {

@@ -32,9 +32,13 @@ public interface BittorrentDownload extends Transfer {
 
     String getHash();
 
-    String getPeers();
+    public int getConnectedPeers();
 
-    String getSeeds();
+    public int getTotalPeers();
+
+    public int getConnectedSeeds();
+
+    public int getTotalSeeds();
 
     boolean isSeeding();
 

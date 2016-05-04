@@ -121,6 +121,26 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return info.getHash();
     }
 
+    @Override
+    public int getConnectedPeers() {
+        return 0;
+    }
+
+    @Override
+    public int getTotalPeers() {
+        return 0;
+    }
+
+    @Override
+    public int getConnectedSeeds() {
+        return 0;
+    }
+
+    @Override
+    public int getTotalSeeds() {
+        return 0;
+    }
+
     public String makeMagnetUri() {
         return info.makeMagnetUri();
     }

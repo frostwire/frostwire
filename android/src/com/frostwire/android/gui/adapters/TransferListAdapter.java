@@ -457,8 +457,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
 
         ImageButton buttonPlay = findView(view, R.id.view_transfer_list_item_button_play);
 
-        seeds.setText(context.get().getString(R.string.seeds_n, download.getSeeds()));
-        peers.setText(context.get().getString(R.string.peers_n, download.getPeers()));
+        seeds.setText(context.get().getString(R.string.seeds_n, formatSeeds(download)));
+        peers.setText(context.get().getString(R.string.peers_n, formatPeers(download)));
         seeds.setVisibility(View.VISIBLE);
         peers.setVisibility(View.VISIBLE);
 
@@ -492,6 +492,34 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         } else {
             buttonPlay.setVisibility(View.GONE);
         }
+    }
+
+    private static String formatPeers(BittorrentDownload dl) {
+        int connectedPeers = dl.getConnectedPeers();
+        int peers = dl.getTotalPeers();
+
+        String tmp = connectedPeers > peers ? "%1" : "%1 " + "/" + " %2";
+
+        tmp = tmp.replaceAll("%1", String.valueOf(connectedPeers));
+        tmp = tmp.replaceAll("%2", String.valueOf(peers));
+
+        return tmp;
+    }
+
+    private static String formatSeeds(BittorrentDownload dl) {
+        int connectedSeeds = dl.getConnectedSeeds();
+        int seeds = dl.getTotalSeeds();
+
+        String tmp = connectedSeeds > seeds ? "%1" : "%1 " + "/" + " %2";
+
+        tmp = tmp.replaceAll("%1", String.valueOf(connectedSeeds));
+        String param2 = "?";
+        if (seeds != -1) {
+            param2 = String.valueOf(seeds);
+        }
+        tmp = tmp.replaceAll("%2", param2);
+
+        return tmp;
     }
 
     private void setPaymentOptionDrawable(BittorrentDownload download, TextView title) {

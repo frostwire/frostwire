@@ -98,33 +98,23 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public String getPeers() {
-        int connectedPeers = dl.getConnectedPeers();
-        int peers = dl.getTotalPeers();
-
-        String tmp = connectedPeers > peers ? "%1" : "%1 " + "/" + " %2";
-
-        tmp = tmp.replaceAll("%1", String.valueOf(connectedPeers));
-        tmp = tmp.replaceAll("%2", String.valueOf(peers));
-
-        return tmp;
+    public int getConnectedPeers() {
+        return dl.getConnectedPeers();
     }
 
     @Override
-    public String getSeeds() {
-        int connectedSeeds = dl.getConnectedSeeds();
-        int seeds = dl.getTotalSeeds();
+    public int getTotalPeers() {
+        return dl.getTotalPeers();
+    }
 
-        String tmp = connectedSeeds > seeds ? "%1" : "%1 " + "/" + " %2";
+    @Override
+    public int getConnectedSeeds() {
+        return dl.getConnectedSeeds();
+    }
 
-        tmp = tmp.replaceAll("%1", String.valueOf(connectedSeeds));
-        String param2 = "?";
-        if (seeds != -1) {
-            param2 = String.valueOf(seeds);
-        }
-        tmp = tmp.replaceAll("%2", param2);
-
-        return tmp;
+    @Override
+    public int getTotalSeeds() {
+        return dl.getTotalSeeds();
     }
 
     @Override

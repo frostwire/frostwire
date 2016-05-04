@@ -114,13 +114,23 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public String getPeers() {
-        return null;
+    public int getConnectedPeers() {
+        return 0;
     }
 
     @Override
-    public String getSeeds() {
-        return null;
+    public int getTotalPeers() {
+        return 0;
+    }
+
+    @Override
+    public int getConnectedSeeds() {
+        return 0;
+    }
+
+    @Override
+    public int getTotalSeeds() {
+        return 0;
     }
 
     @Override
