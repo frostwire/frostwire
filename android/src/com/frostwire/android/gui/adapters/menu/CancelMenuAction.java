@@ -91,6 +91,7 @@ public class CancelMenuAction extends MenuAction {
 
     private class NegativeButtonOnClickListener implements View.OnClickListener {
         private final Dialog newCancelMenuActionDialog;
+        @SuppressWarnings("unused")
         private final CancelMenuAction cancelMenuAction;
 
         NegativeButtonOnClickListener(CancelMenuAction cancelMenuAction, Dialog newCancelMenuActionDialog) {
@@ -106,6 +107,7 @@ public class CancelMenuAction extends MenuAction {
 
     private class PositiveButtonOnClickListener implements View.OnClickListener {
         private final Dialog newCancelMenuActionDialog;
+        @SuppressWarnings("unused")
         private final CancelMenuAction cancelMenuAction;
 
         PositiveButtonOnClickListener(CancelMenuAction cancelMenuAction, Dialog newCancelMenuActionDialog) {
