@@ -176,11 +176,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public void cancel(boolean deleteData) {
-        cancel(null, false, deleteData);
+    public void remove(boolean deleteData) {
+        remove(null, false, deleteData);
     }
 
-    public void cancel(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {
+    public void remove(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {
         manager.remove(this);
 
         if (contextRef != null && Ref.alive(contextRef) && deleteData && isComplete()) {
@@ -216,7 +216,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public TransferState getStatus() {
+    public TransferState getState() {
         if (noSpaceAvailableInCurrentMount) {
             return TransferState.ERROR_DISK_FULL;
         }
@@ -240,7 +240,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public Date getDateCreated() {
+    public Date getCreated() {
         return dl.getCreated();
     }
 
@@ -280,12 +280,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public void cancel() {
-        cancel(false);
-    }
-
-    @Override
-    public String getDetailsUrl() {
+    public String getName() {
         return null;
     }
 

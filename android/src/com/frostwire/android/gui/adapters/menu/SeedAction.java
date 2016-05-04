@@ -29,7 +29,6 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.transfers.Transfer;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
@@ -40,6 +39,7 @@ import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.logging.Logger;
+import com.frostwire.transfers.Transfer;
 
 import java.io.File;
 import java.util.List;

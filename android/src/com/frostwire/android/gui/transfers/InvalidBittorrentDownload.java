@@ -80,7 +80,7 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public TransferState getStatus() {
+    public TransferState getState() {
         return TransferState.UNKNOWN;
     }
 
@@ -95,16 +95,12 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public Date getDateCreated() {
+    public Date getCreated() {
         return null;
     }
 
     public boolean isComplete() {
         return false;
-    }
-
-    @Override
-    public void cancel() {
     }
 
     @Override
@@ -176,11 +172,11 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public void cancel(boolean deleteData) {
+    public void remove(boolean deleteData) {
     }
 
     @Override
-    public String getDetailsUrl() {
+    public String getName() {
         return null;
     }
 

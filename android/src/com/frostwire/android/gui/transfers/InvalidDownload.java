@@ -39,7 +39,7 @@ public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
     }
 
     @Override
-    public TransferState getStatus() {
+    public TransferState getState() {
         return TransferState.UNKNOWN;
     }
 
@@ -54,7 +54,7 @@ public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
     }
 
     @Override
-    public Date getDateCreated() {
+    public Date getCreated() {
         return null;
     }
 
@@ -99,10 +99,6 @@ public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
     }
 
     @Override
-    public void cancel() {
-    }
-
-    @Override
     public int getReasonResId() {
         return R.string.download_type_not_supported;
     }
@@ -112,11 +108,12 @@ public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
         return null;
     }
 
-    public void cancel(boolean deleteData) {
+    @Override
+    public void remove(boolean deleteData) {
     }
     
     @Override
-    public String getDetailsUrl() {
+    public String getName() {
         return null;
     }
 

@@ -55,6 +55,7 @@ import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
 import com.frostwire.logging.Logger;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
@@ -753,7 +754,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private static final class TransferComparator implements Comparator<Transfer> {
         public int compare(Transfer lhs, Transfer rhs) {
             try {
-                return -lhs.getDateCreated().compareTo(rhs.getDateCreated());
+                return -lhs.getCreated().compareTo(rhs.getCreated());
             } catch (Throwable e) {
                 // ignore, not really super important
             }

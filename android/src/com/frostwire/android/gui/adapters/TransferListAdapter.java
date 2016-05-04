@@ -46,6 +46,7 @@ import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.WebSearchPerformer;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import org.apache.commons.io.FilenameUtils;
@@ -273,7 +274,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     private String populateCloudDownloadMenuActions(Object tag, List<MenuAction> items) {
         DownloadTransfer download = (DownloadTransfer) tag;
         String title = download.getDisplayName();
-        boolean errored = download.getStatus().name().contains("ERROR");
+        boolean errored = download.getState().name().contains("ERROR");
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
@@ -466,7 +467,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         progress.setProgress(download.getProgress());
         title.setCompoundDrawables(null, null, null, null);
 
-        final String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getStatus());
+        final String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getState());
         status.setText(downloadStatus);
 
         if (NetworkManager.instance().isInternetDown()) {
@@ -519,7 +520,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         title.setText(download.getDisplayName());
         title.setCompoundDrawables(null, null, null, null);
         progress.setProgress(download.getProgress());
-        String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getStatus());
+        String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getState());
         status.setText(downloadStatus);
         speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
         size.setText(UIUtils.getBytesInHuman(download.getSize()));
@@ -578,7 +579,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         title.setText(download.getDisplayName());
         title.setCompoundDrawables(null, null, null, null);
         progress.setProgress(download.getProgress());
-        status.setText(TRANSFER_STATE_STRING_MAP.get(download.getStatus()));
+        status.setText(TRANSFER_STATE_STRING_MAP.get(download.getState()));
         speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
         size.setText(UIUtils.getBytesInHuman(download.getSize()));
 
@@ -595,7 +596,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         if (download instanceof YouTubeDownload) {
             YouTubeDownload yt = (YouTubeDownload) download;
             if (yt.isDemuxing()) {
-                status.setText(TRANSFER_STATE_STRING_MAP.get(download.getStatus()) + " (" + yt.getDemuxingProgress() + "%)");
+                status.setText(TRANSFER_STATE_STRING_MAP.get(download.getState()) + " (" + yt.getDemuxingProgress() + "%)");
             }
         }
     }

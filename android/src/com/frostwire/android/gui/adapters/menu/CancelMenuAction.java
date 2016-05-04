@@ -26,6 +26,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.*;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -67,11 +68,11 @@ public class CancelMenuAction extends MenuAction {
                     @Override
                     public void run() {
                         if (transfer instanceof UIBittorrentDownload) {
-                            ((UIBittorrentDownload) transfer).cancel(Ref.weak(context), deleteTorrent, deleteData);
+                            ((UIBittorrentDownload) transfer).remove(Ref.weak(context), deleteTorrent, deleteData);
                         } else if (transfer instanceof DownloadTransfer) {
-                            ((DownloadTransfer) transfer).cancel(deleteData);
+                            transfer.remove(deleteData);
                         } else {
-                            transfer.cancel();
+                            transfer.remove(false);
                         }
                         UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
                         UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);

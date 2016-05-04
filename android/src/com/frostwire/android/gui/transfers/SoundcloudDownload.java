@@ -66,8 +66,8 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
     }
 
     @Override
-    public TransferState getStatus() {
-        return delegate != null ? delegate.getStatus() : TransferState.UNKNOWN;
+    public TransferState getState() {
+        return delegate != null ? delegate.getState() : TransferState.UNKNOWN;
     }
 
     @Override
@@ -84,8 +84,8 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
     }
 
     @Override
-    public Date getDateCreated() {
-        return delegate != null ? delegate.getDateCreated() : new Date();
+    public Date getCreated() {
+        return delegate != null ? delegate.getCreated() : new Date();
     }
 
     @Override
@@ -124,22 +124,14 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
     }
 
     @Override
-    public void cancel() {
-        if (delegate != null) {
-            delegate.cancel();
-        }
-        manager.remove(this);
-    }
-
-    @Override
     public boolean isDownloading() {
         return delegate != null ? delegate.isDownloading() : false;
     }
 
     @Override
-    public void cancel(boolean deleteData) {
+    public void remove(boolean deleteData) {
         if (delegate != null) {
-            delegate.cancel(deleteData);
+            delegate.remove(deleteData);
         }
         manager.remove(this);
     }

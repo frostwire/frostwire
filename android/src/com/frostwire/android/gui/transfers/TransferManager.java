@@ -37,6 +37,7 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
+import com.frostwire.transfers.Transfer;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -100,7 +101,7 @@ public final class TransferManager {
         synchronized (alreadyDownloadingMonitor) {
             for (DownloadTransfer dt : httpDownloads) {
                 if (dt.isDownloading()) {
-                    if (dt.getDetailsUrl() != null && dt.getDetailsUrl().equals(detailsUrl)) {
+                    if (dt.getName() != null && dt.getName().equals(detailsUrl)) {
                         return true;
                     }
                 }
@@ -156,10 +157,10 @@ public final class TransferManager {
                 if (transfer instanceof BittorrentDownload) {
                     BittorrentDownload bd = (BittorrentDownload) transfer;
                     if (bd.isResumable()) {
-                        bd.cancel();
+                        bd.remove(false);
                     }
                 } else {
-                    transfer.cancel();
+                    transfer.remove(false);
                 }
             }
         }
@@ -425,7 +426,7 @@ public final class TransferManager {
                     bt.resume();
                 }
             } else if (t instanceof HttpDownload) {
-                if (t.getDetailsUrl().contains("archive.org")) {
+                if (t.getName().contains("archive.org")) {
                     if (!t.isComplete() && !((HttpDownload) t).isDownloading()) {
                         ((HttpDownload) t).start(true);
                     }
@@ -442,7 +443,7 @@ public final class TransferManager {
         transfers.addAll(httpDownloads);
         for (Transfer t : transfers) {
             if (t instanceof DownloadTransfer && !t.isComplete() && ((DownloadTransfer)t).isDownloading()) {
-                t.cancel();
+                t.remove(false);
             }
         }
     }

@@ -18,6 +18,8 @@
 
 package com.frostwire.android.gui.transfers;
 
+import com.frostwire.transfers.Transfer;
+
 import java.io.File;
 
 /**
@@ -30,8 +32,6 @@ public interface DownloadTransfer extends Transfer {
     File getSavePath();
     
     boolean isDownloading();
-    
-    void cancel(boolean deleteData);
 
     File previewFile();
 }

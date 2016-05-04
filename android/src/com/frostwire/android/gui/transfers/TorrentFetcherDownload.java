@@ -71,7 +71,8 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return info.getDisplayName();
     }
 
-    public TransferState getStatus() {
+    @Override
+    public TransferState getState() {
         return state;
     }
 
@@ -83,7 +84,8 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return info.getSize();
     }
 
-    public Date getDateCreated() {
+    @Override
+    public Date getCreated() {
         return created;
     }
 
@@ -160,12 +162,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     }
 
     @Override
-    public void cancel() {
-        cancel(false);
-    }
-
-    @Override
-    public void cancel(boolean deleteData) {
+    public void remove(boolean deleteData) {
         state = TransferState.CANCELED;
         manager.remove(this);
     }
@@ -187,7 +184,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     }
 
     @Override
-    public String getDetailsUrl() {
+    public String getName() {
         return info.getDetailsUrl();
     }
 
@@ -272,7 +269,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                     try {
                         downloadTorrent(data);
                     } finally {
-                        cancel();
+                        remove(false);
                     }
                 } else {
                     state = TransferState.ERROR;

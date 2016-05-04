@@ -119,7 +119,8 @@ public class HttpDownload implements DownloadTransfer {
         return link.getDisplayName();
     }
 
-    public TransferState getStatus() {
+    @Override
+    public TransferState getState() {
         return getStatusState(status);
     }
 
@@ -143,8 +144,8 @@ public class HttpDownload implements DownloadTransfer {
         throw new RuntimeException(this.getClass().getSimpleName() + ".setSize(long s) Not implemented!");
     }
 
-
-    public Date getDateCreated() {
+    @Override
+    public Date getCreated() {
         return dateCreated;
     }
 
@@ -200,11 +201,12 @@ public class HttpDownload implements DownloadTransfer {
         return savePath;
     }
 
-    public void cancel() {
-        cancel(false);
+    public void remove() {
+        remove(false);
     }
 
-    public void cancel(boolean deleteData) {
+    @Override
+    public void remove(boolean deleteData) {
         if (status != STATUS_COMPLETE) {
             status = STATUS_CANCELLED;
         }
@@ -470,7 +472,7 @@ public class HttpDownload implements DownloadTransfer {
     }
 
     @Override
-    public String getDetailsUrl() {
+    public String getName() {
         return link.getUrl();
     }
 }

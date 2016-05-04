@@ -171,7 +171,8 @@ public final class YouTubeDownload implements DownloadTransfer {
         return sr.getDisplayName();
     }
 
-    public TransferState getStatus() {
+    @Override
+    public TransferState getState() {
         return getStatusState(status);
     }
 
@@ -207,7 +208,8 @@ public final class YouTubeDownload implements DownloadTransfer {
         return size;
     }
 
-    public Date getDateCreated() {
+    @Override
+    public Date getCreated() {
         return dateCreated;
     }
 
@@ -264,11 +266,8 @@ public final class YouTubeDownload implements DownloadTransfer {
         return completeFile;
     }
 
-    public void cancel() {
-        cancel(false);
-    }
-
-    public void cancel(boolean deleteData) {
+    @Override
+    public void remove(boolean deleteData) {
         if (status != STATUS_COMPLETE) {
             status = STATUS_CANCELLED;
         }
@@ -487,7 +486,7 @@ public final class YouTubeDownload implements DownloadTransfer {
     }
 
     @Override
-    public String getDetailsUrl() {
+    public String getName() {
         return sr.getDetailsUrl();
     }
 
