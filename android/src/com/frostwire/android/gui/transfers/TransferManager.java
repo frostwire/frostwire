@@ -54,7 +54,7 @@ public final class TransferManager {
 
     private static final Logger LOG = Logger.getLogger(TransferManager.class);
 
-    private final List<DownloadTransfer> httpDownloads;
+    private final List<Transfer> httpDownloads;
     private final List<BittorrentDownload> bittorrentDownloads;
 
     private int downloadsToReview;
@@ -75,8 +75,8 @@ public final class TransferManager {
     private TransferManager() {
         registerPreferencesChangeListener();
 
-        this.httpDownloads = new CopyOnWriteArrayList<DownloadTransfer>();
-        this.bittorrentDownloads = new CopyOnWriteArrayList<BittorrentDownload>();
+        this.httpDownloads = new CopyOnWriteArrayList<>();
+        this.bittorrentDownloads = new CopyOnWriteArrayList<>();
 
         this.downloadsToReview = 0;
 
@@ -99,7 +99,7 @@ public final class TransferManager {
 
     private boolean alreadyDownloading(String detailsUrl) {
         synchronized (alreadyDownloadingMonitor) {
-            for (DownloadTransfer dt : httpDownloads) {
+            for (Transfer dt : httpDownloads) {
                 if (dt.isDownloading()) {
                     if (dt.getName() != null && dt.getName().equals(detailsUrl)) {
                         return true;
@@ -112,7 +112,7 @@ public final class TransferManager {
 
     private boolean isAlreadyDownloadingTorrentByUri(String uri) {
         synchronized (alreadyDownloadingMonitor) {
-            for (DownloadTransfer dt : httpDownloads) {
+            for (Transfer dt : httpDownloads) {
                 if (dt instanceof TorrentFetcherDownload) {
                     String torrentUri = ((TorrentFetcherDownload) dt).getTorrentUri();
                     if (torrentUri != null && torrentUri.equals(uri)) {
@@ -124,8 +124,8 @@ public final class TransferManager {
         return false;
     }
 
-    public DownloadTransfer download(SearchResult sr) {
-        DownloadTransfer transfer = null;
+    public Transfer download(SearchResult sr) {
+        Transfer transfer = null;
 
         if (isBittorrentSearchResultAndMobileDataSavingsOn(sr)) {
             return new InvalidBittorrentDownload(R.string.torrent_transfer_aborted_on_mobile_data);
@@ -173,7 +173,7 @@ public final class TransferManager {
                 count++;
             }
         }
-        for (DownloadTransfer d : httpDownloads) {
+        for (Transfer d : httpDownloads) {
             if (!d.isComplete() && d.isDownloading()) {
                 count++;
             }
@@ -194,7 +194,7 @@ public final class TransferManager {
     public long getDownloadsBandwidth() {
         long torrentDownloadsBandwidth = BTEngine.getInstance().getDownloadRate();
         long peerDownloadsBandwidth = 0;
-        for (DownloadTransfer d : httpDownloads) {
+        for (Transfer d : httpDownloads) {
             peerDownloadsBandwidth += d.getDownloadSpeed();
         }
         return torrentDownloadsBandwidth + peerDownloadsBandwidth;
@@ -268,7 +268,7 @@ public final class TransferManager {
     public boolean remove(Transfer transfer) {
         if (transfer instanceof BittorrentDownload) {
             return bittorrentDownloads.remove(transfer);
-        } else if (transfer instanceof DownloadTransfer) {
+        } else if (transfer instanceof Transfer) {
             return httpDownloads.remove(transfer);
         }
         return false;
@@ -364,7 +364,7 @@ public final class TransferManager {
         return download;
     }
 
-    private DownloadTransfer newYouTubeDownload(YouTubeCrawledSearchResult sr) {
+    private Transfer newYouTubeDownload(YouTubeCrawledSearchResult sr) {
         YouTubeDownload download = new YouTubeDownload(this, sr);
 
         httpDownloads.add(download);
@@ -373,7 +373,7 @@ public final class TransferManager {
         return download;
     }
 
-    private DownloadTransfer newSoundcloudDownload(SoundcloudSearchResult sr) {
+    private Transfer newSoundcloudDownload(SoundcloudSearchResult sr) {
         SoundcloudDownload download = new SoundcloudDownload(this, sr);
 
         httpDownloads.add(download);
@@ -382,7 +382,7 @@ public final class TransferManager {
         return download;
     }
 
-    private DownloadTransfer newHttpDownload(HttpSearchResult sr) {
+    private Transfer newHttpDownload(HttpSearchResult sr) {
         HttpDownload download = new HttpDownload(this, new HttpSearchResultDownloadLink(sr));
 
         httpDownloads.add(download);
@@ -391,7 +391,7 @@ public final class TransferManager {
         return download;
     }
 
-    public boolean isBittorrentDownload(DownloadTransfer transfer) {
+    public boolean isBittorrentDownload(Transfer transfer) {
         return transfer instanceof UIBittorrentDownload || transfer instanceof TorrentFetcherDownload;
     }
 
@@ -404,11 +404,11 @@ public final class TransferManager {
         return sr instanceof TorrentSearchResult && isMobileAndDataSavingsOn();
     }
 
-    public boolean isBittorrentDownloadAndMobileDataSavingsOn(DownloadTransfer transfer) {
+    public boolean isBittorrentDownloadAndMobileDataSavingsOn(Transfer transfer) {
         return isBittorrentDownload(transfer) && isMobileAndDataSavingsOn();
     }
 
-    public boolean isBittorrentDownloadAndMobileDataSavingsOff(DownloadTransfer transfer) {
+    public boolean isBittorrentDownloadAndMobileDataSavingsOff(Transfer transfer) {
         return isBittorrentDownload(transfer) && isMobileAndDataSavingsOn();
     }
 
@@ -439,10 +439,10 @@ public final class TransferManager {
      * Stops all HttpDownloads (Cloud and Wi-Fi)
      */
     public void stopHttpTransfers() {
-        List<Transfer> transfers = new ArrayList<Transfer>();
+        List<Transfer> transfers = new ArrayList<>();
         transfers.addAll(httpDownloads);
         for (Transfer t : transfers) {
-            if (t instanceof DownloadTransfer && !t.isComplete() && ((DownloadTransfer)t).isDownloading()) {
+            if (t instanceof Transfer && !t.isComplete() && ((Transfer)t).isDownloading()) {
                 t.remove(false);
             }
         }

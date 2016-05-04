@@ -200,6 +200,11 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     @Override
+    public File previewFile() {
+        return null;
+    }
+
+    @Override
     public int getProgress() {
         // TODO: Add logic to check completion logic for merkle based torrents.
         if (th.getTorrentInfo().isMerkleTorrent()) {
@@ -244,6 +249,11 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     public long getUploadSpeed() {
         return ((isFinished() && !isSeeding()) || isPaused()) ? 0 : th.getStatus().getUploadPayloadRate();
+    }
+
+    @Override
+    public boolean isDownloading() {
+        return getDownloadSpeed() > 0;
     }
 
     public int getConnectedPeers() {

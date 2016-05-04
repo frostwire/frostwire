@@ -27,6 +27,7 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
@@ -48,7 +49,7 @@ import java.util.Map;
  * @author gubatron
  * @author aldenml
  */
-public class HttpDownload implements DownloadTransfer {
+public class HttpDownload implements Transfer {
 
     private static final String TAG = "FW.HttpDownload";
 

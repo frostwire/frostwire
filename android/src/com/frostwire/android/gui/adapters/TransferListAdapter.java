@@ -265,14 +265,14 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         List<MenuAction> items = new ArrayList<>();
         if (tag instanceof BittorrentDownload) {
             title = populateBittorrentDownloadMenuActions((BittorrentDownload) tag, items);
-        } else if (tag instanceof DownloadTransfer) {
+        } else if (tag instanceof Transfer) {
             title = populateCloudDownloadMenuActions(tag, items);
         }
         return items.size() > 0 ? new MenuAdapter(context.get(), title, items) : null;
     }
 
     private String populateCloudDownloadMenuActions(Object tag, List<MenuAction> items) {
-        DownloadTransfer download = (DownloadTransfer) tag;
+        Transfer download = (Transfer) tag;
         String title = download.getDisplayName();
         boolean errored = download.getState().name().contains("ERROR");
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
@@ -361,7 +361,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         return title;
     }
 
-    private String extractMime(DownloadTransfer download) {
+    private String extractMime(Transfer download) {
         return UIUtils.getMimeType(download.getSavePath().getAbsolutePath());
     }
 
@@ -398,8 +398,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                     TransferItem transferItem = bItem.getItems().get(0);
                     path = transferItem.getFile().getAbsolutePath();
                 }
-            } else if (item instanceof DownloadTransfer) {
-                DownloadTransfer transferItem = (DownloadTransfer) item;
+            } else if (item instanceof Transfer) {
+                Transfer transferItem = (Transfer) item;
                 if (transferItem.getSavePath() != null) {
                     path = transferItem.getSavePath().getAbsolutePath();
                 }
@@ -564,7 +564,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    private void populateCloudDownload(View view, DownloadTransfer download) {
+    private void populateCloudDownload(View view, Transfer download) {
         TextView title = findView(view, R.id.view_transfer_list_item_title);
         ProgressBar progress = findView(view, R.id.view_transfer_list_item_progress);
         TextView status = findView(view, R.id.view_transfer_list_item_status);

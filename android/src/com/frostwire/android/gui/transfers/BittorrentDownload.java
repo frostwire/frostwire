@@ -19,13 +19,14 @@
 package com.frostwire.android.gui.transfers;
 
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.transfers.Transfer;
 
 /**
  * @author gubatron
  * @author aldenml
  *
  */
-public interface BittorrentDownload extends DownloadTransfer {
+public interface BittorrentDownload extends Transfer {
 
     String makeMagnetUri();
 

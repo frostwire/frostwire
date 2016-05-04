@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.transfers;
 
 import com.frostwire.search.SearchResult;
+import com.frostwire.transfers.Transfer;
 
 import java.io.File;
 
@@ -26,7 +27,7 @@ import java.io.File;
  * @author gubatron
  * @author aldenml
  */
-public abstract class TemporaryDownloadTransfer<T extends SearchResult> implements DownloadTransfer {
+public abstract class TemporaryDownloadTransfer<T extends SearchResult> implements Transfer {
 
     protected File savePath;
     protected HttpDownload delegate;

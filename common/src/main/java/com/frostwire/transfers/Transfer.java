@@ -34,6 +34,8 @@ public interface Transfer {
 
     public File getSavePath();
 
+    File previewFile();
+
     public long getSize();
 
     public Date getCreated();
@@ -47,6 +49,11 @@ public interface Transfer {
     public long getDownloadSpeed();
 
     public long getUploadSpeed();
+
+    boolean isDownloading();
+
+    // TODO: add this method in the future
+    //boolean isUploading();
 
     public long getETA();
 

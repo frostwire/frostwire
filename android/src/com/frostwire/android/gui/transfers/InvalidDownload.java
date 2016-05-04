@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.frostwire.android.R;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 
@@ -31,7 +32,7 @@ import com.frostwire.transfers.TransferState;
  * @author aldenml
  *
  */
-public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
+public class InvalidDownload implements Transfer, InvalidTransfer {
 
     @Override
     public String getDisplayName() {

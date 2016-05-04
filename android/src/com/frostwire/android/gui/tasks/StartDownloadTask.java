@@ -33,6 +33,7 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubePackageSearchResult;
+import com.frostwire.transfers.Transfer;
 
 /**
  * 
@@ -40,7 +41,7 @@ import com.frostwire.search.youtube.YouTubePackageSearchResult;
  * @author aldenml
  * 
  */
-public class StartDownloadTask extends ContextTask<DownloadTransfer> {
+public class StartDownloadTask extends ContextTask<Transfer> {
 
     private static final Logger LOG = Logger.getLogger(StartDownloadTask.class);
 
@@ -58,8 +59,8 @@ public class StartDownloadTask extends ContextTask<DownloadTransfer> {
     }
 
     @Override
-    protected DownloadTransfer doInBackground() {
-        DownloadTransfer transfer = null;
+    protected Transfer doInBackground() {
+        Transfer transfer = null;
         try {
             if (sr instanceof TorrentSearchResult &&
                 !(sr instanceof ScrapedTorrentFileSearchResult) &&
@@ -81,7 +82,7 @@ public class StartDownloadTask extends ContextTask<DownloadTransfer> {
     }
 
     @Override
-    protected void onPostExecute(Context ctx, DownloadTransfer transfer) {
+    protected void onPostExecute(Context ctx, Transfer transfer) {
         if (transfer != null) {
             if (ctx instanceof Activity) {
                 Offers.showInterstitialOfferIfNecessary((Activity) ctx);

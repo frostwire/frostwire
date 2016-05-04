@@ -33,6 +33,7 @@ import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
@@ -55,7 +56,7 @@ import java.util.Map;
  * @author gubatron
  * @author aldenml
  */
-public final class YouTubeDownload implements DownloadTransfer {
+public final class YouTubeDownload implements Transfer {
 
     private static final Logger LOGGER = Logger.getLogger(YouTubeDownload.class);
 

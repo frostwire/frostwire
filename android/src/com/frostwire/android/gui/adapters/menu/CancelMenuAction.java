@@ -69,7 +69,7 @@ public class CancelMenuAction extends MenuAction {
                     public void run() {
                         if (transfer instanceof UIBittorrentDownload) {
                             ((UIBittorrentDownload) transfer).remove(Ref.weak(context), deleteTorrent, deleteData);
-                        } else if (transfer instanceof DownloadTransfer) {
+                        } else if (transfer instanceof Transfer) {
                             transfer.remove(deleteData);
                         } else {
                             transfer.remove(false);
