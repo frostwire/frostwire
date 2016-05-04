@@ -25,8 +25,13 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -57,15 +62,6 @@ public class HttpDownload implements Transfer {
     public HttpDownload(Info info, File saveDir, File tempDir) {
         this.info = info;
 
-        String filename = cleanupFilename(info.filename());
-        this.savePath = new File(saveDir, filename);
-        this.tempPath = new File(tempDir, filename);
-        this.created = new Date();
-
-        this.stat = new SpeedStat();
-        this.state = TransferState.QUEUED;
-        this.complete = false;
-
         FileSystem fs = Platforms.fileSystem();
         if (!fs.isDirectory(saveDir) && !fs.mkdirs(saveDir)) {
             complete(TransferState.ERROR_SAVE_DIR);
@@ -73,6 +69,15 @@ public class HttpDownload implements Transfer {
         if (!fs.isDirectory(tempDir) && !fs.mkdirs(tempDir)) {
             complete(TransferState.ERROR_TEMP_DIR);
         }
+
+        String filename = cleanupFilename(info.filename());
+        this.savePath = buildFile(fs, saveDir, filename);
+        this.tempPath = buildFile(fs, tempDir, filename);
+        this.created = new Date();
+
+        this.stat = new SpeedStat();
+        this.state = TransferState.QUEUED;
+        this.complete = false;
     }
 
     @Override
@@ -88,6 +93,10 @@ public class HttpDownload implements Transfer {
     @Override
     public File getSavePath() {
         return savePath;
+    }
+
+    public File tempPath() {
+        return tempPath;
     }
 
     @Override
@@ -253,6 +262,46 @@ public class HttpDownload implements Transfer {
                 complete(TransferState.ERROR_NO_INTERNET);
             }
         }
+    }
+
+    static void simpleHTTP(String url, OutputStream out, int timeout) throws Throwable {
+        URL u = new URL(url);
+        URLConnection con = u.openConnection();
+        con.setConnectTimeout(timeout);
+        con.setReadTimeout(timeout);
+        InputStream in = con.getInputStream();
+        try {
+
+            byte[] b = new byte[1024];
+            int n = 0;
+            while ((n = in.read(b, 0, b.length)) != -1) {
+                out.write(b, 0, n);
+            }
+        } finally {
+            try {
+                out.close();
+            } catch (Throwable e) {
+                // ignore
+            }
+            try {
+                in.close();
+            } catch (Throwable e) {
+                // ignore
+            }
+        }
+    }
+
+    static File buildFile(FileSystem fs, File saveDir, String name) {
+        String baseName = FilenameUtils.getBaseName(name);
+        String ext = FilenameUtils.getExtension(name);
+
+        File f = new File(saveDir, name);
+        int i = 1;
+        while (fs.exists(f) && i < 30) {
+            f = new File(saveDir, baseName + " (" + i + ")." + ext);
+            i++;
+        }
+        return f;
     }
 
     private static String cleanupFilename(String filename) {
