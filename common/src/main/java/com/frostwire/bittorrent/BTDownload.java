@@ -134,16 +134,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         return th.getStatus().isFinished();
     }
 
-    @Override
-    public boolean isDownloading() {
-        return getDownloadSpeed() > 0;
-    }
-
-    @Override
-    public boolean isUploading() {
-        return getUploadSpeed() > 0;
-    }
-
     public TransferState getState() {
         if (!engine.isStarted()) {
             return TransferState.STOPPED;

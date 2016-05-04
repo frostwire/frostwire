@@ -172,7 +172,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public boolean isDownloading() {
-        return dl.isDownloading();
+        return dl.getDownloadSpeed() > 0;
     }
 
     @Override
