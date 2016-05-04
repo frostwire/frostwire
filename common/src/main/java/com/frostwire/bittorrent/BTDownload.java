@@ -201,10 +201,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public int getProgress() {
-        if (haveAllPieces()) {
-            return 100;
-        }
-
         // TODO: Add logic to check completion logic for merkle based torrents.
         if (th.getTorrentInfo().isMerkleTorrent()) {
             //final ArrayList<Sha1Hash> sha1Hashes = th.getTorrentInfo().merkleTree();
@@ -219,16 +215,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         int p = (int) (th.getStatus().getProgress() * 100);
         return Math.min(p, 100);
-    }
-
-    private boolean haveAllPieces() {
-        int numPieces = th.getStatus().getNumPieces();
-        for (int n=0; n < numPieces; n++) {
-            if (!th.havePiece(n)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
