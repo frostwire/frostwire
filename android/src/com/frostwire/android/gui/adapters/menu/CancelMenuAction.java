@@ -122,7 +122,6 @@ public class CancelMenuAction extends MenuAction {
 
         @Override
         public void onClick(View view) {
-            // TODO: Is this the correct way to handle context? Check up wanted!
 
             Thread t = new Thread("Delete files - " + transfer.getDisplayName()) {
                 @Override
