@@ -28,6 +28,15 @@ public interface BittorrentDownload extends Transfer {
 
     public String getInfoHash();
 
+    /**
+     * Generates a magnet URI using the current information in
+     * the torrent. If the underlying torrent handle is invalid,
+     * null is returned.
+     *
+     * @return
+     */
+    String magnetUri();
+
     public int getConnectedPeers();
 
     public int getTotalPeers();

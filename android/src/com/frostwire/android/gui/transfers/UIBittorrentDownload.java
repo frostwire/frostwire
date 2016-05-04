@@ -89,7 +89,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public String makeMagnetUri() {
-        return dl.makeMagnetUri();
+        return dl.magnetUri();
     }
 
     @Override

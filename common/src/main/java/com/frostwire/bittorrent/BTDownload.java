@@ -458,7 +458,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         return false;
     }
 
-    public String makeMagnetUri() {
+    @Override
+    public String magnetUri() {
         return th.makeMagnetUri();
     }
 
