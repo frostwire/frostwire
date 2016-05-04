@@ -507,6 +507,7 @@
     <string name="file_descriptor_sd_mounted">This file was deleted from the SD card, or the SD card you have inserted is a different one.</string>
     <string name="file_descriptor_sd_unmounted">This file belongs to an SD card, please insert it on your device.</string>
     <string name="help_translate_frostwire">Help translate FrostWire</string>
+    <string name="queued">Queued</string>
     <string name="queued_for_checking">Queued for checking</string>
     <string name="checking_ellipsis">Checking&#8230;</string>
     <string name="downloading_metadata">Downloading metadata</string>
@@ -519,6 +520,7 @@
     <string name="app_shutdown_dlg_message">This will shutdown all transfers and background services. Are you sure?</string>
     <string name="error_not_enough_peers">Try again, not enough peers</string>
     <string name="http_download_status_save_dir_error">Save directory does not exist or can\'t be created</string>
+    <string name="http_download_status_temp_dir_error">Temporary directory does not exist or can\'t be created</string>
     <string name="my_music">My Music</string>
     <string name="support">Support</string>
     <string name="wifi_sharing_settings">Wi-Fi Sharing Settings</string>

@@ -87,6 +87,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
 
     private void initTransferStateStringMap() {
         Context c = context.get();
+        TRANSFER_STATE_STRING_MAP.put(TransferState.QUEUED, c.getString(R.string.queued));
         TRANSFER_STATE_STRING_MAP.put(TransferState.QUEUED_FOR_CHECKING, c.getString(R.string.queued_for_checking));
         TRANSFER_STATE_STRING_MAP.put(TransferState.CHECKING, c.getString(R.string.checking_ellipsis));
         TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_METADATA, c.getString(R.string.downloading_metadata));
@@ -103,6 +104,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_NOT_ENOUGH_PEERS, c.getString(R.string.error_not_enough_peers));
         TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_NO_INTERNET, c.getString(R.string.error_no_internet_connection));
         TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_SAVE_DIR, c.getString(R.string.http_download_status_save_dir_error));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_TEMP_DIR, c.getString(R.string.http_download_status_temp_dir_error));
         TRANSFER_STATE_STRING_MAP.put(TransferState.STOPPED, c.getString(R.string.azureus_manager_item_stopped));
         TRANSFER_STATE_STRING_MAP.put(TransferState.PAUSING, c.getString(R.string.pausing));
         TRANSFER_STATE_STRING_MAP.put(TransferState.CANCELING, c.getString(R.string.canceling));

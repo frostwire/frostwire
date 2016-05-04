@@ -24,6 +24,7 @@ package com.frostwire.transfers;
  */
 public enum TransferState {
 
+    QUEUED,
     QUEUED_FOR_CHECKING,
     CHECKING,
     DOWNLOADING_METADATA,
@@ -40,6 +41,7 @@ public enum TransferState {
     ERROR_NOT_ENOUGH_PEERS,
     ERROR_NO_INTERNET,
     ERROR_SAVE_DIR,
+    ERROR_TEMP_DIR,
     STOPPED,
     PAUSING,
     CANCELING,
