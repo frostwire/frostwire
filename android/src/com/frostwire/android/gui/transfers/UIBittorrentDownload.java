@@ -128,11 +128,6 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public boolean isResumable() {
-        return dl.isPaused();
-    }
-
-    @Override
     public boolean isPausable() {
         return !dl.isPaused();
     }

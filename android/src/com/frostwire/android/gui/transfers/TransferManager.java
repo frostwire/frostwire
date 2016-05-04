@@ -156,7 +156,7 @@ public final class TransferManager {
             if (transfer != null && transfer.isComplete()) {
                 if (transfer instanceof BittorrentDownload) {
                     BittorrentDownload bd = (BittorrentDownload) transfer;
-                    if (bd.isResumable()) {
+                    if (bd.isPaused()) {
                         bd.remove(false);
                     }
                 } else {
@@ -422,7 +422,7 @@ public final class TransferManager {
         for (Transfer t : transfers) {
             if (t instanceof BittorrentDownload) {
                 BittorrentDownload bt = (BittorrentDownload) t;
-                if (bt.isResumable()) {
+                if (bt.isPaused()) {
                     bt.resume();
                 }
             } else if (t instanceof HttpDownload) {

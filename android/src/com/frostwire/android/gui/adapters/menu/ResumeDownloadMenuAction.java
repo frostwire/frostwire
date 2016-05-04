@@ -49,7 +49,7 @@ public final class ResumeDownloadMenuAction extends MenuAction {
             UIUtils.showLongMessage(context, R.string.cant_resume_torrent_transfers);
         } else {
             if (NetworkManager.instance().isDataUp()) {
-                if (download.isResumable()) {
+                if (download.isPaused()) {
                     download.resume();
                     UXStats.instance().log(UXAction.DOWNLOAD_RESUME);
                 }
