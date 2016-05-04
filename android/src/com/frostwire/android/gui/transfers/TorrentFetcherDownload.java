@@ -97,6 +97,11 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return null;
     }
 
+    @Override
+    public File getContentSavePath() {
+        return null;
+    }
+
     public long getBytesReceived() {
         return 0;
     }
@@ -117,7 +122,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return 0;
     }
 
-    public String getHash() {
+    public String getInfoHash() {
         return info.getHash();
     }
 
@@ -141,7 +146,8 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return 0;
     }
 
-    public String makeMagnetUri() {
+    @Override
+    public String magnetUri() {
         return info.makeMagnetUri();
     }
 
@@ -152,14 +158,6 @@ public class TorrentFetcherDownload implements BittorrentDownload {
 
     public String getSeeds() {
         return "";
-    }
-
-    public boolean isResumable() {
-        return false;
-    }
-
-    public boolean isPausable() {
-        return false;
     }
 
     public boolean isComplete() {
@@ -182,9 +180,19 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     }
 
     @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
     public void remove(boolean deleteData) {
         state = TransferState.CANCELED;
         manager.remove(this);
+    }
+
+    @Override
+    public void remove(boolean deleteTorrent, boolean deleteData) {
+        remove(deleteData);
     }
 
     public void pause() {

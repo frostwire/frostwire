@@ -249,7 +249,7 @@ public final class TransferManager {
                             BittorrentDownload download = bittorrentDownloads.get(i);
                             if (download instanceof UIBittorrentDownload) {
                                 UIBittorrentDownload bt = (UIBittorrentDownload) download;
-                                if (bt.getHash().equals(dl.getInfoHash())) {
+                                if (bt.getInfoHash().equals(dl.getInfoHash())) {
                                     bt.updateUI(dl);
                                     break;
                                 }

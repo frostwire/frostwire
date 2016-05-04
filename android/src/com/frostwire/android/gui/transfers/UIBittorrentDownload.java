@@ -88,12 +88,12 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public String makeMagnetUri() {
+    public String magnetUri() {
         return dl.magnetUri();
     }
 
     @Override
-    public String getHash() {
+    public String getInfoHash() {
         return dl.getInfoHash();
     }
 
@@ -127,6 +127,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         return dl.isPaused();
     }
 
+    @Override
+    public boolean isFinished() {
+        return dl.isFinished();
+    }
+
     public boolean hasPaymentOptions() {
         return this.dl.getPaymentOptions() != null && !this.dl.getPaymentOptions().isEmpty();
     }
@@ -151,6 +156,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
+    public File getContentSavePath() {
+        return dl.getContentSavePath();
+    }
+
+    @Override
     public boolean isDownloading() {
         return dl.getDownloadSpeed() > 0;
     }
@@ -158,6 +168,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     @Override
     public void remove(boolean deleteData) {
         remove(null, false, deleteData);
+    }
+
+    @Override
+    public void remove(boolean deleteTorrent, boolean deleteData) {
+        remove(null, deleteTorrent, deleteData);
     }
 
     public void remove(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {

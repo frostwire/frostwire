@@ -333,14 +333,14 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 R.drawable.contextmenu_icon_magnet,
                 R.string.transfers_context_menu_copy_magnet,
                 R.string.transfers_context_menu_copy_magnet_copied,
-                download.makeMagnetUri()
+                download.magnetUri()
         ));
 
         items.add(new CopyToClipboardMenuAction(context.get(),
                 R.drawable.contextmenu_icon_copy,
                 R.string.transfers_context_menu_copy_infohash,
                 R.string.transfers_context_menu_copy_infohash_copied,
-                download.getHash()
+                download.getInfoHash()
         ));
 
         if (download.isComplete()) {

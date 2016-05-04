@@ -26,11 +26,11 @@ import com.frostwire.transfers.Transfer;
  * @author aldenml
  *
  */
-public interface BittorrentDownload extends Transfer {
+public interface BittorrentDownload extends com.frostwire.transfers.BittorrentDownload {
 
-    String makeMagnetUri();
+    String magnetUri();
 
-    String getHash();
+    String getInfoHash();
 
     public int getConnectedPeers();
 

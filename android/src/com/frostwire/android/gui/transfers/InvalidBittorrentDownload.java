@@ -50,6 +50,11 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
+    public File getContentSavePath() {
+        return null;
+    }
+
+    @Override
     public long getBytesReceived() {
         return 0;
     }
@@ -104,12 +109,12 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public String makeMagnetUri() {
+    public String magnetUri() {
         return null;
     }
 
     @Override
-    public String getHash() {
+    public String getInfoHash() {
         return null;
     }
 
@@ -149,6 +154,11 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
     public void pause() {
     }
 
@@ -163,6 +173,10 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
 
     @Override
     public void remove(boolean deleteData) {
+    }
+
+    @Override
+    public void remove(boolean deleteTorrent, boolean deleteData) {
     }
 
     @Override
