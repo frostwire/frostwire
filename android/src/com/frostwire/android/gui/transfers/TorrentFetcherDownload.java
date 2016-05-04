@@ -194,16 +194,6 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     }
 
     @Override
-    public boolean hasPaymentOptions() {
-        return false;
-    }
-
-    @Override
-    public PaymentOptions getPaymentOptions() {
-        return null;
-    }
-
-    @Override
     public String getName() {
         return info.getDetailsUrl();
     }

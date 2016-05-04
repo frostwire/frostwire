@@ -348,14 +348,17 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             items.add(new CancelMenuAction(context.get(), download, true, true));
         }
 
-        if (download.hasPaymentOptions()) {
-            PaymentOptions po = download.getPaymentOptions();
-            if (po.bitcoin != null) {
-                items.add(new SendBitcoinTipAction(context.get(), po));
-            }
+        if (download instanceof UIBittorrentDownload) {
+            UIBittorrentDownload uidl = (UIBittorrentDownload) download;
+            if (uidl.hasPaymentOptions()) {
+                PaymentOptions po = uidl.getPaymentOptions();
+                if (po.bitcoin != null) {
+                    items.add(new SendBitcoinTipAction(context.get(), po));
+                }
 
-            if (po.paypalUrl != null) {
-                items.add(new SendFiatTipAction(context.get(), po));
+                if (po.paypalUrl != null) {
+                    items.add(new SendFiatTipAction(context.get(), po));
+                }
             }
         }
         return title;
@@ -479,8 +482,11 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
         size.setText(UIUtils.getBytesInHuman(download.getSize()));
 
-        if (download.hasPaymentOptions()) {
-            setPaymentOptionDrawable(download, title);
+        if (download instanceof UIBittorrentDownload) {
+            UIBittorrentDownload uidl = (UIBittorrentDownload) download;
+            if (uidl.hasPaymentOptions()) {
+                setPaymentOptionDrawable(uidl, title);
+            }
         }
 
         List<TransferItem> items = download.getItems();
@@ -522,7 +528,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         return tmp;
     }
 
-    private void setPaymentOptionDrawable(BittorrentDownload download, TextView title) {
+    private void setPaymentOptionDrawable(UIBittorrentDownload download, TextView title) {
         final PaymentOptions paymentOptions = download.getPaymentOptions();
         final Resources r = context.get().getResources();
         Drawable tipDrawable = (paymentOptions.bitcoin != null) ? r.getDrawable(R.drawable.contextmenu_icon_donation_bitcoin) : r.getDrawable(R.drawable.contextmenu_icon_donation_fiat);

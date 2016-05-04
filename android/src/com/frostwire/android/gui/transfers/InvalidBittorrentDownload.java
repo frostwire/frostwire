@@ -157,16 +157,6 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public boolean hasPaymentOptions() {
-        return false;
-    }
-
-    @Override
-    public PaymentOptions getPaymentOptions() {
-        return null;
-    }
-
-    @Override
     public List<TransferItem> getItems() {
         return Collections.emptyList();
     }

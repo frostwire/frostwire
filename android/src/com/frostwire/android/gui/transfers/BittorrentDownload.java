@@ -47,8 +47,4 @@ public interface BittorrentDownload extends Transfer {
     void pause();
 
     void resume();
-
-    boolean hasPaymentOptions();
-
-    PaymentOptions getPaymentOptions();
 }
