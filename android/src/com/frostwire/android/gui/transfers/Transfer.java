@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.transfers;
 
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.transfers.TransferState;
 
 import java.util.Date;
 import java.util.List;
@@ -32,7 +33,7 @@ public interface Transfer {
 
     String getDisplayName();
 
-    String getStatus();
+    TransferState getStatus();
 
     int getProgress();
 

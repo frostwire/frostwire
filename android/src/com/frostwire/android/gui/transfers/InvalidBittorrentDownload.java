@@ -20,6 +20,7 @@ package com.frostwire.android.gui.transfers;
 
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.transfers.TransferState;
 
 import java.io.File;
 import java.util.Collections;
@@ -79,8 +80,8 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public String getStatus() {
-        return null;
+    public TransferState getStatus() {
+        return TransferState.UNKNOWN;
     }
 
     @Override

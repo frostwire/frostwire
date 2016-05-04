@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.frostwire.android.R;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.transfers.TransferState;
 
 /**
  * @author gubatron
@@ -38,8 +39,8 @@ public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
     }
 
     @Override
-    public String getStatus() {
-        return null;
+    public TransferState getStatus() {
+        return TransferState.UNKNOWN;
     }
 
     @Override

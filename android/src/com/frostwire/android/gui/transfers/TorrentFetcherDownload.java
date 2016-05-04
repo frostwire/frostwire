@@ -71,8 +71,8 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return info.getDisplayName();
     }
 
-    public String getStatus() {
-        return state.name();
+    public TransferState getStatus() {
+        return state;
     }
 
     public int getProgress() {

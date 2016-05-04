@@ -31,6 +31,7 @@ import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.transfers.TransferState;
 import com.frostwire.util.http.HttpClient;
 import org.apache.commons.io.FileUtils;
 
@@ -65,8 +66,8 @@ public class SoundcloudDownload extends TemporaryDownloadTransfer<SoundcloudSear
     }
 
     @Override
-    public String getStatus() {
-        return delegate != null ? delegate.getStatus() : "";
+    public TransferState getStatus() {
+        return delegate != null ? delegate.getStatus() : TransferState.UNKNOWN;
     }
 
     @Override

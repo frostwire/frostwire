@@ -216,11 +216,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public String getStatus() {
+    public TransferState getStatus() {
         if (noSpaceAvailableInCurrentMount) {
-            return TransferState.ERROR_DISK_FULL.toString();
+            return TransferState.ERROR_DISK_FULL;
         }
-        return dl.getState().toString();
+        return dl.getState();
     }
 
     @Override

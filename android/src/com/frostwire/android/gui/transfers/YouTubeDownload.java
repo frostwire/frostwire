@@ -171,8 +171,8 @@ public final class YouTubeDownload implements DownloadTransfer {
         return sr.getDisplayName();
     }
 
-    public String getStatus() {
-        return getStatusString(status);
+    public TransferState getStatus() {
+        return getStatusState(status);
     }
 
     public boolean isDemuxing() {
@@ -324,41 +324,41 @@ public final class YouTubeDownload implements DownloadTransfer {
         });
     }
 
-    private String getStatusString(int status) {
-        int resId;
+    private TransferState getStatusState(int status) {
+        TransferState state;
         switch (status) {
             case STATUS_DOWNLOADING:
-                resId = R.string.peer_http_download_status_downloading;
+                state = TransferState.DOWNLOADING;
                 break;
             case STATUS_COMPLETE:
-                resId = R.string.peer_http_download_status_complete;
+                state = TransferState.COMPLETE;
                 break;
             case STATUS_ERROR:
-                resId = R.string.peer_http_download_status_error;
+                state = TransferState.ERROR;
                 break;
             case STATUS_ERROR_SAVE_DIR:
-                resId = R.string.http_download_status_save_dir_error;
+                state = TransferState.ERROR_SAVE_DIR;
                 break;
             case STATUS_ERROR_DISK_FULL:
-                resId = R.string.error_no_space_left_on_device;
+                state = TransferState.ERROR_DISK_FULL;
                 break;
             case STATUS_ERROR_NO_INTERNET:
-                resId = R.string.error_no_internet_connection;
+                state = TransferState.ERROR_NO_INTERNET;
                 break;
             case STATUS_CANCELLED:
-                resId = R.string.peer_http_download_status_cancelled;
+                state = TransferState.CANCELED;
                 break;
             case STATUS_WAITING:
-                resId = R.string.peer_http_download_status_waiting;
+                state = TransferState.WAITING;
                 break;
             case STATUS_DEMUXING:
-                resId = R.string.transfer_status_demuxing;
+                state = TransferState.DEMUXING;
                 break;
             default:
-                resId = R.string.peer_http_download_status_unknown;
+                state = TransferState.UNKNOWN;
                 break;
         }
-        return String.valueOf(resId);
+        return state;
     }
 
     private void updateAverageDownloadSpeed() {

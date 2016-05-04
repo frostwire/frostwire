@@ -38,6 +38,8 @@ public enum TransferState {
     ERROR_HASH_MD5,
     ERROR_SIGNATURE,
     ERROR_NOT_ENOUGH_PEERS,
+    ERROR_NO_INTERNET,
+    ERROR_SAVE_DIR,
     STOPPED,
     PAUSING,
     CANCELING,
