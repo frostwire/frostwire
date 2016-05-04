@@ -18,6 +18,7 @@
 
 package com.frostwire.transfers;
 
+import com.frostwire.logging.Logger;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
@@ -38,8 +39,11 @@ import java.util.concurrent.ExecutorService;
  */
 public class HttpDownload implements Transfer {
 
+    private static final Logger LOG = Logger.getLogger(HttpDownload.class);
+
     // is 20 concurrent downloads enough?
     private static final ExecutorService THREAD_POOL = ThreadPool.newThreadPool("HttpDownload", 20, true);
+
     private final Info info;
 
     private final File savePath;
@@ -198,6 +202,12 @@ public class HttpDownload implements Transfer {
         });
     }
 
+    protected void onBeforeMove() {
+    }
+
+    protected void onAfterMove() {
+    }
+
     private void complete(TransferState state) {
         this.state = state;
         complete = true;
@@ -207,18 +217,22 @@ public class HttpDownload implements Transfer {
                 @Override
                 public void run() {
                     try {
+                        onBeforeMove();
+
                         FileSystem fs = Platforms.fileSystem();
                         if (fs.copy(tempPath, savePath)) {
-                            if (fs.delete(tempPath)) {
-                                // success
-                            } else {
-                                // partial error
+
+                            onAfterMove();
+
+                            if (!fs.delete(tempPath)) {
+                                LOG.warn("Error deleting temporary file");
                             }
                         } else {
-                            // error
+                            HttpDownload.this.state = TransferState.ERROR_MOVING_INCOMPLETE;
                         }
                     } catch (Throwable e) {
-                        // error
+                        LOG.error("General error in the complete phase", e);
+                        HttpDownload.this.state = TransferState.ERROR;
                     }
                 }
             });
