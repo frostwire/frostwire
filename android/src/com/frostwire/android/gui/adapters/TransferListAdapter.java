@@ -305,9 +305,9 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         }
 
         if (!download.isComplete() || ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS)) {
-            if (download.isPausable() && !download.isPaused()) {
+            if (!download.isPaused()) {
                 items.add(new PauseDownloadMenuAction(context.get(), download));
-            } else if (download.isPaused()) {
+            } else {
                 boolean wifiIsUp = NetworkManager.instance().isDataWIFIUp();
                 boolean bittorrentOnMobileData = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
                 boolean bittorrentOff = Engine.instance().isStopped() || Engine.instance().isDisconnected();

@@ -36,8 +36,6 @@ public interface BittorrentDownload extends Transfer {
 
     String getSeeds();
 
-    boolean isPausable();
-
     boolean isSeeding();
 
     boolean isPaused();

@@ -124,11 +124,6 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public boolean isPausable() {
-        return false;
-    }
-
-    @Override
     public boolean isDownloading() {
         return false;
     }
