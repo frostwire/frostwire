@@ -43,11 +43,10 @@ public class CancelMenuAction extends MenuAction {
     private final Transfer transfer;
     private final boolean deleteData;
     private final boolean deleteTorrent;
-    private Context context;
+
 
     public CancelMenuAction(Context context, Transfer transfer, boolean deleteData) {
         super(context, R.drawable.contextmenu_icon_stop_transfer, (deleteData) ? R.string.cancel_delete_menu_action : (transfer.isComplete()) ? R.string.clear_complete : R.string.cancel_menu_action);
-        this.context = context;
         this.transfer = transfer;
         this.deleteData = deleteData;
         this.deleteTorrent = deleteData;
@@ -55,7 +54,6 @@ public class CancelMenuAction extends MenuAction {
 
     public CancelMenuAction(Context context, BittorrentDownload transfer, boolean deleteTorrent, boolean deleteData) {
         super(context, R.drawable.contextmenu_icon_stop_transfer, R.string.remove_torrent_and_data);
-        this.context = context;
         this.transfer = transfer;
         this.deleteTorrent = deleteTorrent;
         this.deleteData = deleteData;
@@ -121,13 +119,13 @@ public class CancelMenuAction extends MenuAction {
                 @Override
                 public void run() {
                     if (transfer instanceof UIBittorrentDownload) {
-                        ((UIBittorrentDownload) transfer).remove(Ref.weak(context), deleteTorrent, deleteData);
+                        ((UIBittorrentDownload) transfer).remove(Ref.weak(getContext()), deleteTorrent, deleteData);
                     } else if (transfer instanceof Transfer) {
                         transfer.remove(deleteData);
                     } else {
                         transfer.remove(false);
                     }
-                    UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
+                    UIUtils.broadcastAction(getContext(), Constants.ACTION_FILE_ADDED_OR_REMOVED);
                     UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);
                 }
             };
