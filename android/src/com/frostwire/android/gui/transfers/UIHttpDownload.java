@@ -23,17 +23,14 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.search.HttpSearchResult;
-import com.frostwire.search.soundcloud.SoundcloudSearchResult;
-import com.frostwire.transfers.*;
+import com.frostwire.transfers.HttpDownload;
 import org.apache.commons.io.FilenameUtils;
-
-import java.io.File;
 
 /**
  * @author aldenml
  * @author gubatron
  */
-public class UIHttpDownload extends com.frostwire.transfers.HttpDownload {
+public class UIHttpDownload extends HttpDownload {
 
     private final TransferManager manager;
 

@@ -82,16 +82,19 @@ public class YouTubeDownload extends BaseHttpDownload {
     }
 
     @Override
-    protected boolean onBeforeFinishing() {
+    protected void onHttpComplete() throws Throwable {
+        boolean callSuper = true;
         if (downloadType == DownloadType.DASH) {
             FileSystem fs = Platforms.fileSystem();
             if (fs.exists(tempVideo) && !fs.exists(tempAudio)) {
                 start(sr.getAudio().link, tempAudio, false);
-                return false;
+                callSuper = false;
             }
         }
 
-        return false;
+        if (callSuper) {
+            super.onHttpComplete();
+        }
     }
 
     @Override

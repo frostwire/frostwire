@@ -46,9 +46,9 @@ public class SoundcloudDownload extends HttpDownload {
     }
 
     @Override
-    protected boolean onBeforeFinishing() {
+    protected void onFinishing() {
         downloadAndUpdateCoverArt(sr, tempPath);
-        return false;
+        super.onFinishing();
     }
 
     private static void downloadAndUpdateCoverArt(SoundcloudSearchResult sr, File file) {

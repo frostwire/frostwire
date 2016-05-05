@@ -273,8 +273,8 @@ public abstract class BaseHttpDownload implements Transfer {
         }
     }
 
-    protected boolean onBeforeFinishing() throws Throwable {
-        return false;
+    protected void onHttpComplete() throws Throwable {
+        finish();
     }
 
     protected void onFinishing() throws Throwable {
@@ -353,9 +353,7 @@ public abstract class BaseHttpDownload implements Transfer {
         @Override
         public void onComplete(HttpClient client) {
             try {
-                if (!onBeforeFinishing()) {
-                    finish();
-                }
+                onHttpComplete();
             } catch (Throwable e) {
                 error(e);
             }
