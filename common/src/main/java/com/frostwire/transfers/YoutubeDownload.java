@@ -119,6 +119,15 @@ public class YoutubeDownload extends BaseHttpDownload {
                 Mp4Demuxer.muxFragments(tempVideo.getAbsoluteFile(), tempAudio.getAbsoluteFile(), tempPath.getAbsoluteFile(), buildMp4Info(false), null);
 
                 moveAndComplete(tempPath, savePath);
+
+                FileSystem fs = Platforms.fileSystem();
+                if (!fs.delete(tempVideo)) {
+                    LOG.warn("Error deleting temporary video file: " + tempVideo);
+                }
+                if (!fs.delete(tempAudio)) {
+                    LOG.warn("Error deleting temporary audio file: " + tempAudio);
+                }
+
             } else {
                 complete(TransferState.ERROR);
             }
