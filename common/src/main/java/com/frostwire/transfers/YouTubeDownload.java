@@ -40,9 +40,9 @@ import java.nio.ByteBuffer;
  * @author gubatron
  * @author aldenml
  */
-public class YoutubeDownload extends BaseHttpDownload {
+public class YouTubeDownload extends BaseHttpDownload {
 
-    private static final Logger LOG = Logger.getLogger(YoutubeDownload.class);
+    private static final Logger LOG = Logger.getLogger(YouTubeDownload.class);
 
     private final YouTubeCrawledSearchResult sr;
     private final DownloadType downloadType;
@@ -52,7 +52,7 @@ public class YoutubeDownload extends BaseHttpDownload {
 
     private long demuxerReadCount;
 
-    public YoutubeDownload(YouTubeCrawledSearchResult sr) {
+    public YouTubeDownload(YouTubeCrawledSearchResult sr) {
         super(convert(sr));
         this.sr = sr;
         this.downloadType = buildDownloadType(sr);

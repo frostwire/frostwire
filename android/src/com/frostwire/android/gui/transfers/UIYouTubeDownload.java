@@ -22,13 +22,13 @@ import android.net.Uri;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
-import com.frostwire.transfers.YoutubeDownload;
+import com.frostwire.transfers.YouTubeDownload;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class UIYouTubeDownload extends YoutubeDownload {
+public final class UIYouTubeDownload extends YouTubeDownload {
 
     private final TransferManager manager;
 
