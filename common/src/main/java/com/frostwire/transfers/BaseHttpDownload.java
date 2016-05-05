@@ -150,7 +150,7 @@ public abstract class BaseHttpDownload implements Transfer {
 
     @Override
     public int getProgress() {
-        return !complete ? stat.progress(info.size()) : 0;
+        return !complete ? stat.progress(info.size()) : 100;
     }
 
     @Override

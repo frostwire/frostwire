@@ -48,6 +48,7 @@ import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.WebSearchPerformer;
 import com.frostwire.transfers.*;
+import com.frostwire.transfers.YouTubeDownload;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -630,8 +631,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         // hack to fill the demuxing state
         if (download instanceof YouTubeDownload) {
             YouTubeDownload yt = (YouTubeDownload) download;
-            if (yt.isDemuxing()) {
-                status.setText(TRANSFER_STATE_STRING_MAP.get(download.getState()) + " (" + yt.getDemuxingProgress() + "%)");
+            if (yt.getState() == TransferState.DEMUXING) {
+                status.setText(TRANSFER_STATE_STRING_MAP.get(download.getState()) + " (" + yt.demuxingProgress() + "%)");
             }
         }
     }

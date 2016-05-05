@@ -38,6 +38,13 @@ public final class UIYouTubeDownload extends YouTubeDownload {
     }
 
     @Override
+    public void remove(boolean deleteData) {
+        super.remove(deleteData);
+
+        manager.remove(this);
+    }
+
+    @Override
     protected void onComplete() throws Throwable {
         manager.incrementDownloadsToReview();
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);

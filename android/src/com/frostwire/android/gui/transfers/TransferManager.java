@@ -40,6 +40,7 @@ import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.YouTubeDownload;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -367,7 +368,7 @@ public final class TransferManager {
     }
 
     private Transfer newYouTubeDownload(YouTubeCrawledSearchResult sr) {
-        YouTubeDownload download = new YouTubeDownload(this, sr);
+        YouTubeDownload download = new UIYouTubeDownload(this, sr);
 
         httpDownloads.add(download);
         download.start();

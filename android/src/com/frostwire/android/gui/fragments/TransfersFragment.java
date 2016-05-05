@@ -58,6 +58,7 @@ import com.frostwire.logging.Logger;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
