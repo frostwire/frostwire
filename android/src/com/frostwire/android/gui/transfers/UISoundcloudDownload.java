@@ -23,6 +23,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
+import com.frostwire.transfers.SoundcloudDownload;
 
 import java.io.File;
 
@@ -30,7 +31,7 @@ import java.io.File;
  * @author aldenml
  * @author gubatron
  */
-public class UISoundcloudDownload extends com.frostwire.transfers.SoundcloudDownload {
+public class UISoundcloudDownload extends SoundcloudDownload {
 
     private final TransferManager manager;
 

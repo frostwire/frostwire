@@ -38,6 +38,7 @@ import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
 import org.apache.commons.io.FileUtils;
 
@@ -300,8 +301,8 @@ public final class TransferManager {
             URI u = URI.create(url);
 
             if (!u.getScheme().equalsIgnoreCase("file") &&
-                !u.getScheme().equalsIgnoreCase("http") &&
-                !u.getScheme().equalsIgnoreCase("magnet")) {
+                    !u.getScheme().equalsIgnoreCase("http") &&
+                    !u.getScheme().equalsIgnoreCase("magnet")) {
                 return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
             }
 
@@ -311,8 +312,8 @@ public final class TransferManager {
                 if (u.getScheme().equalsIgnoreCase("file")) {
                     BTEngine.getInstance().download(new File(u.getPath()), null);
                 } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("magnet")) {
-                        download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()));
-                        bittorrentDownloads.add(download);
+                    download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()));
+                    bittorrentDownloads.add(download);
                 }
             } else {
                 if (u.getScheme().equalsIgnoreCase("file")) {
@@ -375,10 +376,10 @@ public final class TransferManager {
     }
 
     private Transfer newSoundcloudDownload(SoundcloudSearchResult sr) {
-        SoundcloudDownload download = new SoundcloudDownload(this, sr);
+        SoundcloudDownload download = new UISoundcloudDownload(this, sr);
 
         httpDownloads.add(download);
-        download.start();
+        download.start(false);
 
         return download;
     }
@@ -443,7 +444,7 @@ public final class TransferManager {
         List<Transfer> transfers = new ArrayList<>();
         transfers.addAll(httpDownloads);
         for (Transfer t : transfers) {
-            if (t instanceof Transfer && !t.isComplete() && ((Transfer)t).isDownloading()) {
+            if (t instanceof Transfer && !t.isComplete() && ((Transfer) t).isDownloading()) {
                 t.remove(false);
             }
         }

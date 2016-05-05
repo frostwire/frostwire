@@ -27,6 +27,7 @@ import com.frostwire.android.gui.transfers.*;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
