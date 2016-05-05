@@ -41,11 +41,6 @@ public class UISoundcloudDownload extends SoundcloudDownload {
     }
 
     @Override
-    public File previewFile() {
-        return isComplete() ? getSavePath() : null;
-    }
-
-    @Override
     public void remove(boolean deleteData) {
         super.remove(deleteData);
 

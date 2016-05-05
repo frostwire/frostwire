@@ -101,7 +101,7 @@ public class HttpDownload implements Transfer {
 
     @Override
     public File previewFile() {
-        return null;
+        return isComplete() ? savePath : null;
     }
 
     @Override
@@ -146,22 +146,7 @@ public class HttpDownload implements Transfer {
 
     @Override
     public long getETA() {
-        if (complete) {
-            return 0;
-        }
-
-        long left = info.size() - stat.totalBytes();
-        long rate = stat.averageSpeed();
-
-        if (left <= 0) {
-            return 0;
-        }
-
-        if (rate <= 0) {
-            return -1;
-        }
-
-        return left / rate;
+        return !complete ? stat.eta(info.size()) : 0;
     }
 
     @Override
@@ -304,7 +289,7 @@ public class HttpDownload implements Transfer {
         return f;
     }
 
-    private static String cleanupFilename(String filename) {
+    static String cleanupFilename(String filename) {
         filename = filename.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
         // put here more replaces if necessary
         return filename;

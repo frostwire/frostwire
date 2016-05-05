@@ -54,4 +54,31 @@ final class SpeedStat {
             lastTotalBytes = totalBytes;
         }
     }
+
+    public long eta(long size) {
+        return eta(size, totalBytes, averageSpeed);
+    }
+
+    public int progress(long size) {
+        return progress(size, totalBytes);
+    }
+
+    static long eta(long size, long total, long speed) {
+        long left = size - total;
+        long rate = speed;
+
+        if (left <= 0) {
+            return 0;
+        }
+
+        if (rate <= 0) {
+            return -1;
+        }
+
+        return left / rate;
+    }
+
+    static int progress(long size, long total) {
+        return size > 0 ? (int) ((total * 100) / size) : 0;
+    }
 }
