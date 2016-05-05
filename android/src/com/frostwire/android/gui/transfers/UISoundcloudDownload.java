@@ -54,8 +54,8 @@ public class UISoundcloudDownload extends SoundcloudDownload {
 
     @Override
     protected void onAfterMove() {
-        String hash = String.valueOf(getDisplayName().hashCode());
-        Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath(), hash);
+        manager.incrementDownloadsToReview();
+        Engine.instance().notifyDownloadFinished(getDisplayName(), getSavePath());
         Librarian.instance().scan(Uri.fromFile(getSavePath().getAbsoluteFile()));
     }
 }
