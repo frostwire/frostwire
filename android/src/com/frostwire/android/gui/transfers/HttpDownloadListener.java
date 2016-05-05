@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.transfers;
 
+import com.frostwire.transfers.HttpDownload;
 import com.frostwire.util.http.HttpClient;
 
 import java.util.List;

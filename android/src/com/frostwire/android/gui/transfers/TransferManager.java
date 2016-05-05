@@ -37,10 +37,7 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
-import com.frostwire.transfers.BittorrentDownload;
-import com.frostwire.transfers.SoundcloudDownload;
-import com.frostwire.transfers.Transfer;
-import com.frostwire.transfers.YouTubeDownload;
+import com.frostwire.transfers.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -359,7 +356,7 @@ public final class TransferManager {
     }
 
     private HttpDownload newHttpDownload(HttpSlideSearchResult sr) {
-        HttpDownload download = new HttpDownload(this, sr.getDownloadLink());
+        HttpDownload download = new UIHttpDownload(this, sr.slide());
 
         httpDownloads.add(download);
         download.start();
@@ -386,7 +383,7 @@ public final class TransferManager {
     }
 
     private Transfer newHttpDownload(HttpSearchResult sr) {
-        HttpDownload download = new HttpDownload(this, new HttpSearchResultDownloadLink(sr));
+        HttpDownload download = new UIHttpDownload(this, sr);
 
         httpDownloads.add(download);
         download.start();
@@ -429,11 +426,12 @@ public final class TransferManager {
                     bt.resume();
                 }
             } else if (t instanceof HttpDownload) {
-                if (t.getName().contains("archive.org")) {
+                // TODO: review this feature taking care of the SD limitations
+                /*if (t.getName().contains("archive.org")) {
                     if (!t.isComplete() && !((HttpDownload) t).isDownloading()) {
                         ((HttpDownload) t).start(true);
                     }
-                }
+                }*/
             }
         }
     }

@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.transfers;
 
 import com.frostwire.search.SearchResult;
+import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.Transfer;
 
 import java.io.File;

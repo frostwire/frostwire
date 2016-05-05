@@ -37,7 +37,6 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.adapters.menu.*;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.*;
-import com.frostwire.android.gui.transfers.HttpDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.android.gui.views.MenuAction;

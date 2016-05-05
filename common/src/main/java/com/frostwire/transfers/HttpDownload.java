@@ -28,6 +28,10 @@ public class HttpDownload extends BaseHttpDownload {
         super(info);
     }
 
+    public void start() {
+        super.start(info.url(), tempPath, false);
+    }
+
     @Override
     protected void onFinishing() {
         moveAndComplete(tempPath, savePath);
