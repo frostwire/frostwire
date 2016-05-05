@@ -58,12 +58,12 @@ import java.util.List;
 
 public final class SearchResultMediator extends AbstractTableMediator<TableRowFilteredModel, SearchResultDataLine, UISearchResult> {
 
-    protected static final String SEARCH_TABLE = "SEARCH_TABLE";
+    private static final String SEARCH_TABLE = "SEARCH_TABLE";
 
     /**
      * The TableSettings that all ResultPanels will use.
      */
-    static final TableSettings SEARCH_SETTINGS = new TableSettings("SEARCH_TABLE");
+    private static final TableSettings SEARCH_SETTINGS = new TableSettings("SEARCH_TABLE");
 
     /**
      * The search info of this class.
@@ -80,7 +80,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     /**
      * The CompositeFilter for this ResultPanel.
      */
-    CompositeFilter FILTER;
+    private CompositeFilter FILTER;
 
     /**
      * The download listener.
@@ -103,7 +103,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
     ActionListener STOP_SEARCH_LISTENER;
 
-    protected Box SOUTH_PANEL;
+    private Box SOUTH_PANEL;
 
     private SchemaBox schemaBox;
     private SearchOptionsPanel searchOptionsPanel;
@@ -174,7 +174,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     /**
      * Setup the data model 
      */
-    protected void setupDataModel() {
+    private void setupDataModel() {
         DATA_MODEL = new TableRowFilteredModel(FILTER);
     }
 
@@ -312,7 +312,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         return createPopupMenu(getAllSelectedLines());
     }
 
-    protected JPopupMenu createPopupMenu(SearchResultDataLine[] lines) {
+    JPopupMenu createPopupMenu(SearchResultDataLine[] lines) {
         //  do not return a menu if right-clicking on the dummy panel
         if (!isKillable())
             return null;
@@ -332,6 +332,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
             menu.add(createSearchAgainMenu(lines[0]));
         } else {
+            SeasonalContentSearchSuggestion.attemptToAddSeasonalContentSearchSuggestion(null, menu, searchTokens);
             menu.add(new SkinMenuItem(new RepeatSearchAction()));
             menu.add(new JSeparator(JSeparator.HORIZONTAL));
             menu.add(new SkinMenuItem(new CloseTabAction()));
@@ -346,7 +347,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     /**
      * Returns a menu with a 'repeat search' and 'repeat search no clear' action.
      */
-    protected final JMenu createSearchAgainMenu(SearchResultDataLine line) {
+    private JMenu createSearchAgainMenu(SearchResultDataLine line) {
         JMenu menu = new SkinMenu(I18n.tr("Search More"));
         menu.add(new SkinMenuItem(new RepeatSearchAction()));
 
@@ -359,6 +360,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         String keywords = QueryUtils.createQueryString(line.getFilename());
         SearchInformation info = SearchInformation.createKeywordSearch(keywords, null, MediaType.getAnyTypeMediaType());
         if (SearchMediator.validateInfo(info) == SearchMediator.QUERY_VALID) {
+            SeasonalContentSearchSuggestion.attemptToAddSeasonalContentSearchSuggestion(menu, null, searchTokens);
             menu.add(new SkinMenuItem(new SearchAction(info, I18n.tr("Search for Keywords: {0}"))));
         }
 
@@ -415,7 +417,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         DOWNLOAD_LISTENER.actionPerformed(null);
     }
     
-    public void selectSchemaBoxByMediaType(NamedMediaType type) {
+    void selectSchemaBoxByMediaType(NamedMediaType type) {
         schemaBox.selectMediaType(type);
     }
 
@@ -450,7 +452,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     /**
      * Determines if this can be removed.
      */
-    boolean isKillable() {
+    private boolean isKillable() {
         // the dummy panel has a null filter, and is the only one not killable
         return FILTER != null;
     }
@@ -516,11 +518,11 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * @return <tt>true</tt> if the repeat search feature is currently
      *  enabled, otherwise <tt>false</tt>
      */
-    boolean isRepeatSearchEnabled() {
+    private boolean isRepeatSearchEnabled() {
         return FILTER != null;
     }
 
-    void repeatSearch() {
+    private void repeatSearch() {
         clearTable();
         resetFilters();
         schemaBox.resetCounters();
@@ -531,7 +533,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         setButtonEnabled(SearchButtons.STOP_SEARCH_BUTTON_INDEX, !isStopped());
     }
 
-    void resetFilters() {
+    private void resetFilters() {
         FILTER.reset();
         DATA_MODEL.setJunkFilter(null);
     }
@@ -548,11 +550,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     /** Returns the search token this is responsible for. */
     long getToken() {
         return token;
-    }
-
-    /** Returns the media type this is responsible for. */
-    MediaType getMediaType() {
-        return SEARCH_INFO.getMediaType();
     }
 
     /**
@@ -605,13 +602,13 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     private void setupRealTable() {
         SearchTableColumns columns = DATA_MODEL.getColumns();
         LimeTableColumn countColumn = columns.getColumn(SearchTableColumns.COUNT_IDX);
-        if (SETTINGS.REAL_TIME_SORT.getValue() && TABLE.isColumnVisible(countColumn.getId())) {
+        if (countColumn != null && SETTINGS.REAL_TIME_SORT.getValue() && TABLE.isColumnVisible(countColumn.getId())) {
             DATA_MODEL.sort(SearchTableColumns.COUNT_IDX); // ascending
             DATA_MODEL.sort(SearchTableColumns.COUNT_IDX); // descending
         }
     }
 
-    protected void setupMainPanelBase() {
+    private void setupMainPanelBase() {
         if (SearchSettings.ENABLE_SPAM_FILTER.getValue() && MAIN_PANEL != null) {
             MAIN_PANEL.add(createSchemaBox());
             MAIN_PANEL.add(getScrolledTablePane());
@@ -792,13 +789,9 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     private final class RepeatSearchAction extends AbstractAction {
-
-        /**
-         * 
-         */
         private static final long serialVersionUID = -209446182720400951L;
 
-        public RepeatSearchAction() {
+        RepeatSearchAction() {
             putValue(Action.NAME, SearchMediator.REPEAT_SEARCH_STRING);
             setEnabled(isRepeatSearchEnabled());
         }
@@ -809,7 +802,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     private final class CloseTabAction extends AbstractAction {
-        public CloseTabAction() {
+        CloseTabAction() {
             putValue(Action.NAME, SearchMediator.CLOSE_TAB_STRING);
         }
 
@@ -820,7 +813,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     private final class CloseAllTabsAction extends AbstractAction {
-        public CloseAllTabsAction() {
+        CloseAllTabsAction() {
             putValue(Action.NAME, SearchMediator.CLOSE_ALL_TABS);
             setEnabled(SearchMediator.getSearchResultDisplayer().tabCount() > 0);
         }
@@ -833,7 +826,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     private final class CloseOtherTabsAction extends AbstractAction {
-        public CloseOtherTabsAction() {
+        CloseOtherTabsAction() {
             putValue(Action.NAME, SearchMediator.CLOSE_OTHER_TABS_STRING);
             setEnabled(SearchMediator.getSearchResultDisplayer().tabCount() > 1);
         }
@@ -845,7 +838,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     private final class CloseTabsToTheRight extends AbstractAction {
-        public CloseTabsToTheRight() {
+        CloseTabsToTheRight() {
             putValue(Action.NAME, SearchMediator.CLOSE_TABS_TO_THE_RIGHT);
             final SearchResultDisplayer searchResultDisplayer = SearchMediator.getSearchResultDisplayer();
             setEnabled(searchResultDisplayer.currentTabIndex() < (searchResultDisplayer.tabCount()-1));
@@ -871,12 +864,12 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         return searchTokens;
     }
 
-    public void updateFiltersPanel() {
+    void updateFiltersPanel() {
         schemaBox.applyFilters();
         searchOptionsPanel.updateFiltersPanel();
     }
 
-    public void resetFiltersPanel() {
+    void resetFiltersPanel() {
         schemaBox.applyFilters();
         searchOptionsPanel.resetFilters();
         searchOptionsPanel.updateFiltersPanel();
