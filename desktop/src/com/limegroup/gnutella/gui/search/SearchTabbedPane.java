@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,20 +18,13 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
-
+import com.limegroup.gnutella.gui.GUIMediator;
 import net.miginfocom.swing.MigLayout;
 
-import com.limegroup.gnutella.gui.GUIMediator;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * 
@@ -41,7 +34,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
  */
 final class SearchTabbedPane extends JTabbedPane {
 
-    public SearchTabbedPane() {
+    SearchTabbedPane() {
     }
 
     @Override
@@ -60,14 +53,14 @@ final class SearchTabbedPane extends JTabbedPane {
         }
     }
 
-    public void setProgressActiveAt(int index, boolean active) {
+    void setProgressActiveAt(int index, boolean active) {
         Component c = getTabComponentAt(index);
         if (c instanceof SearchTabHeader) {
             ((SearchTabHeader) c).setProgressActive(active);
         }
     }
     
-    public void switchToTabByOffset(int offset) {
+    void switchToTabByOffset(int offset) {
       int oldIndex = (getSelectedIndex()<0) ? 0 : getSelectedIndex();
       int newIndex = (oldIndex+offset) % getTabCount();
       //java's modulo will return negative numbers... damn you Gosling.
@@ -83,7 +76,7 @@ final class SearchTabbedPane extends JTabbedPane {
         private final JButton buttonClose;
         private final JLabel labelText;
 
-        public SearchTabHeader(Component component, String text) {
+        SearchTabHeader(Component component, String text) {
             this.component = component;
 
             setLayout(new MigLayout("insets 0, gap 0"));
@@ -106,7 +99,7 @@ final class SearchTabbedPane extends JTabbedPane {
             labelText.setText(title);
         }
 
-        public void setProgressActive(boolean active) {
+        void setProgressActive(boolean active) {
             if (active) {
                 labelText.setIcon(GUIMediator.getThemeImage("indeterminate_small_progress"));
             } else {
@@ -114,9 +107,9 @@ final class SearchTabbedPane extends JTabbedPane {
             }
         }
 
-        public class CloseActionHandler implements ActionListener {
+        class CloseActionHandler implements ActionListener {
 
-            public CloseActionHandler() {
+            CloseActionHandler() {
             }
 
             public void actionPerformed(ActionEvent evt) {
