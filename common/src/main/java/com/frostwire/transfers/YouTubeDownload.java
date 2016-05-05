@@ -112,6 +112,11 @@ public class YouTubeDownload extends BaseHttpDownload {
             });
             moveAndComplete(tempPath, savePath);
 
+            FileSystem fs = Platforms.fileSystem();
+            if (!fs.delete(tempAudio)) {
+                LOG.warn("Error deleting temporary audio file: " + tempAudio);
+            }
+
         } else if (downloadType == DownloadType.DASH) {
             // intentionally not using FileSystem here
             if (tempVideo.exists() && tempAudio.exists()) {
