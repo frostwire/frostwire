@@ -18,17 +18,11 @@
 
 package com.frostwire.transfers;
 
-import com.frostwire.logging.Logger;
-import com.frostwire.platform.FileSystem;
-import com.frostwire.platform.Platforms;
-
 /**
  * @author gubatron
  * @author aldenml
  */
 public class HttpDownload extends BaseHttpDownload {
-
-    private static final Logger LOG = Logger.getLogger(HttpDownload.class);
 
     public HttpDownload(Info info) {
         super(info);
@@ -36,26 +30,6 @@ public class HttpDownload extends BaseHttpDownload {
 
     @Override
     protected void onFinishing() {
-        onBeforeMove();
-
-        FileSystem fs = Platforms.fileSystem();
-        if (fs.copy(tempPath(), getSavePath())) {
-
-            onAfterMove();
-
-            if (!fs.delete(tempPath())) {
-                LOG.warn("Error deleting temporary file");
-            }
-
-            complete(TransferState.COMPLETE);
-        } else {
-            complete(TransferState.ERROR_MOVING_INCOMPLETE);
-        }
-    }
-
-    protected void onBeforeMove() {
-    }
-
-    protected void onAfterMove() {
+        moveAndComplete(tempPath, savePath);
     }
 }

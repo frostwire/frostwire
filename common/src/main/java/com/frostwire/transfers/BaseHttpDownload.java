@@ -49,15 +49,15 @@ public abstract class BaseHttpDownload implements Transfer {
     // is 20 concurrent downloads enough?
     private static final ExecutorService THREAD_POOL = ThreadPool.newThreadPool("HttpDownload", 20, true);
 
-    private final Info info;
+    protected final Info info;
 
-    private final File savePath;
-    private final File tempPath;
-    private final Date created;
+    protected final File savePath;
+    protected final File tempPath;
+    protected final Date created;
 
-    private TransferState state;
-    private SpeedStat stat;
-    private boolean complete;
+    protected TransferState state;
+    protected SpeedStat stat;
+    protected boolean complete;
 
     protected BaseHttpDownload(Info info) {
         this.info = info;
@@ -96,10 +96,6 @@ public abstract class BaseHttpDownload implements Transfer {
     @Override
     public File getSavePath() {
         return savePath;
-    }
-
-    public File tempPath() {
-        return tempPath;
     }
 
     @Override
@@ -169,12 +165,25 @@ public abstract class BaseHttpDownload implements Transfer {
 
     @Override
     public void remove(boolean deleteData) {
-        if (!complete) {
-            complete(state = TransferState.CANCELED);
+        if (complete) {
+            return;
+        }
+
+        complete(state = TransferState.CANCELED);
+
+        FileSystem fs = Platforms.fileSystem();
+
+        if (fs.delete(tempPath)) {
+            LOG.warn("Error deleting temporary file: " + tempPath);
+        }
+        if (deleteData) {
+            if (fs.delete(savePath)) {
+                LOG.warn("Error deleting download data file: " + savePath);
+            }
         }
     }
 
-    protected void start(final File temp, final boolean resume) {
+    protected void start(final String url, final File temp, final boolean resume) {
         if (complete) {
             return;
         }
@@ -187,10 +196,9 @@ public abstract class BaseHttpDownload implements Transfer {
                     }
 
                     state = TransferState.DOWNLOADING;
-                    String uri = info.url();
                     HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
                     client.setListener(new DownloadListener());
-                    client.save(uri, temp, resume);
+                    client.save(url, temp, resume);
                 } catch (Throwable e) {
                     error(e);
                 }
@@ -200,7 +208,16 @@ public abstract class BaseHttpDownload implements Transfer {
 
     protected final void complete(TransferState state) {
         this.state = state;
-        complete = true;
+        if (!complete) {
+            complete = true;
+            if (state == TransferState.COMPLETE) {
+                try {
+                    onComplete();
+                } catch (Throwable e) {
+                    error(e);
+                }
+            }
+        }
     }
 
     protected final void finish() {
@@ -227,9 +244,8 @@ public abstract class BaseHttpDownload implements Transfer {
 
     protected final void error(Throwable e) {
         if (state != TransferState.CANCELED) {
-            LOG.error("General error in download", e);
-
             complete(TransferState.ERROR);
+            LOG.error("General error in download", e);
 
             if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
                 complete(TransferState.ERROR_DISK_FULL);
@@ -243,11 +259,28 @@ public abstract class BaseHttpDownload implements Transfer {
         }
     }
 
-    protected boolean onBeforeFinishing() {
+    protected void moveAndComplete(File src, File dst) {
+        FileSystem fs = Platforms.fileSystem();
+        if (fs.copy(src, dst)) {
+
+            if (!fs.delete(src)) {
+                LOG.warn("Error deleting source file while moving: " + src);
+            }
+
+            complete(TransferState.COMPLETE);
+        } else {
+            complete(TransferState.ERROR_MOVING_INCOMPLETE);
+        }
+    }
+
+    protected boolean onBeforeFinishing() throws Throwable {
         return false;
     }
 
-    protected void onFinishing() {
+    protected void onFinishing() throws Throwable {
+    }
+
+    protected void onComplete() throws Throwable {
     }
 
     static void simpleHTTP(String url, OutputStream out, int timeout) throws Throwable {
@@ -319,8 +352,12 @@ public abstract class BaseHttpDownload implements Transfer {
 
         @Override
         public void onComplete(HttpClient client) {
-            if (!onBeforeFinishing()) {
-                finish();
+            try {
+                if (!onBeforeFinishing()) {
+                    finish();
+                }
+            } catch (Throwable e) {
+                error(e);
             }
         }
     }
