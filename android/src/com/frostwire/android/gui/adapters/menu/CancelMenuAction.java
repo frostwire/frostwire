@@ -23,6 +23,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
