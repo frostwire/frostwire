@@ -379,7 +379,7 @@ public final class TransferManager {
         SoundcloudDownload download = new UISoundcloudDownload(this, sr);
 
         httpDownloads.add(download);
-        download.start(false);
+        download.start();
 
         return download;
     }

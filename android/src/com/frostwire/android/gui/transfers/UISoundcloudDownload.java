@@ -36,7 +36,7 @@ public class UISoundcloudDownload extends SoundcloudDownload {
     private final TransferManager manager;
 
     public UISoundcloudDownload(TransferManager manager, SoundcloudSearchResult sr) {
-        super(sr, Platforms.data(), Platforms.temp());
+        super(sr);
         this.manager = manager;
     }
 

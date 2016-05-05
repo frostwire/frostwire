@@ -85,7 +85,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
 
     private void initTransferStateStringMap() {
         Context c = context.get();
-        TRANSFER_STATE_STRING_MAP.put(TransferState.QUEUED, c.getString(R.string.queued));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.FINISHING, c.getString(R.string.finishing));
         TRANSFER_STATE_STRING_MAP.put(TransferState.QUEUED_FOR_CHECKING, c.getString(R.string.queued_for_checking));
         TRANSFER_STATE_STRING_MAP.put(TransferState.CHECKING, c.getString(R.string.checking_ellipsis));
         TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_METADATA, c.getString(R.string.downloading_metadata));

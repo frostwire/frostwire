@@ -40,9 +40,13 @@ public class SoundcloudDownload extends HttpDownload {
 
     private final SoundcloudSearchResult sr;
 
-    public SoundcloudDownload(SoundcloudSearchResult sr, File saveDir, File tempDir) {
-        super(convert(sr), saveDir, tempDir);
+    public SoundcloudDownload(SoundcloudSearchResult sr) {
+        super(convert(sr));
         this.sr = sr;
+    }
+
+    public void start() {
+        super.start(tempPath(), false);
     }
 
     @Override

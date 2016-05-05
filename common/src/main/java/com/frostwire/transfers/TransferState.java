@@ -24,7 +24,7 @@ package com.frostwire.transfers;
  */
 public enum TransferState {
 
-    QUEUED,
+    FINISHING,
     QUEUED_FOR_CHECKING,
     CHECKING,
     DOWNLOADING_METADATA,
