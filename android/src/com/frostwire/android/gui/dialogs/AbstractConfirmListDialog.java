@@ -444,5 +444,4 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             }
         }
     }
-
 }
