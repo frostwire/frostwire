@@ -18,13 +18,21 @@
 
 package com.frostwire.android.gui;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.text.Html;
 import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -50,8 +58,8 @@ import java.util.*;
  * @author aldenml
  */
 public final class SoftwareUpdater {
-    private boolean ALWAYS_SHOW_UPDATE_DIALOG = false;
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
+    private final boolean ALWAYS_SHOW_UPDATE_DIALOG = false;
 
     public interface ConfigurationUpdateListener {
         void onConfigurationUpdate();
@@ -67,7 +75,6 @@ public final class SoftwareUpdater {
     private boolean oldVersion;
     private String latestVersion;
     private Update update;
-
     private long updateTimestamp;
 
     private final Set<ConfigurationUpdateListener> configurationUpdateListeners;
@@ -87,13 +94,13 @@ public final class SoftwareUpdater {
         this.configurationUpdateListeners = new HashSet<>();
     }
 
-    public boolean isOldVersion() {
-        return oldVersion;
-    }
-
-    public String getLatestVersion() {
-        return latestVersion;
-    }
+//    public boolean isOldVersion() {
+//        return oldVersion;
+//    }
+//
+//    public String getLatestVersion() {
+//        return latestVersion;
+//    }
 
     public void checkForUpdate(final Context context) {
         long now = System.currentTimeMillis();
@@ -226,8 +233,7 @@ public final class SoftwareUpdater {
     public void addConfigurationUpdateListener(ConfigurationUpdateListener listener) {
         try {
             configurationUpdateListeners.add(listener);
-        } catch (Throwable t) {
-
+        } catch (Throwable ignored) {
         }
     }
 
@@ -250,20 +256,37 @@ public final class SoftwareUpdater {
                 LOG.info("notifyUpdate(): showing update dialog.");
                 String message = StringUtils.getLocaleString(update.updateMessages, context.getString(R.string.update_message));
 
-                UIUtils.showYesNoDialog(context,
-                        R.drawable.app_icon,
-                        message,
-                        R.string.update_title,
-                        update.changelog,
-                        new OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Engine.instance().stopServices(false);
-                                UIUtils.openFile(context, getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE);
-                            }
-                        },
-                        null, // negative listener
-                        null  // bullet's listener
-                );
+                final Dialog newSoftwareUpdaterDialog = new Dialog(context, R.style.DefaultDialogTheme);
+                newSoftwareUpdaterDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                newSoftwareUpdaterDialog.setContentView(R.layout.dialog_default_update);
+
+                TextView title = (TextView) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_title);
+                title.setText(R.string.update_title);
+
+                TextView text = (TextView) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_text);
+                text.setText(message);
+
+                final ListView listview = (ListView) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_list_view);
+                String[] values = new String[update.changelog.size()];
+                for (int i=0; i < values.length; i++) {
+                    values[i] = String.valueOf(Html.fromHtml("&#8226; " + update.changelog.get(i)));
+                }
+
+                final ArrayAdapter adapter = new ArrayAdapter(context,
+                        R.layout.dialog_update_bullet,
+                        R.id.dialog_update_bullets_checked_text_view,
+                        values);
+                listview.setAdapter(adapter);
+
+                // Set the save button action
+                Button noButton = (Button) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_button_no);
+                noButton.setText(R.string.cancel);
+
+                Button yesButton = (Button) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_button_yes);
+                yesButton.setText(android.R.string.ok);
+                yesButton.setOnClickListener(new PositiveButtonOnClickListener(context, newSoftwareUpdaterDialog));
+                noButton.setOnClickListener(new NegativeButtonOnClickListener(newSoftwareUpdaterDialog));
+                newSoftwareUpdaterDialog.show();
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
 
                 String message = StringUtils.getLocaleString(update.marketMessages, context.getString(R.string.update_message));
@@ -409,7 +432,7 @@ public final class SoftwareUpdater {
         for (ConfigurationUpdateListener listener : configurationUpdateListeners) {
             try {
                 listener.onConfigurationUpdate();
-            } catch (Throwable t) {
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -423,7 +446,7 @@ public final class SoftwareUpdater {
         /**
          * version code: Plus = 9000000 + manifest:versionCode; Basic = 8000000 + manifest:versionCode
          */
-        public String vc;
+        String vc;
 
         /**
          * .apk download URL
@@ -447,33 +470,63 @@ public final class SoftwareUpdater {
          */
         public String a;
 
-        public List<String> changelog;
+        List<String> changelog;
 
-        public Map<String, String> updateMessages;
-        public Map<String, String> marketMessages;
+        Map<String, String> updateMessages;
+        Map<String, String> marketMessages;
         public Config config;
     }
 
     @SuppressWarnings("CanBeFinal")
     private static class Config {
-        public int supportThreshold = 100;
-        public Map<String, Boolean> activeSearchEngines;
-        public boolean mobileCore = false;
-        public boolean appLovin = false;
-        public boolean inmobi = false;
-        public int interstitialOffersTransferStarts = 5;
-        public int interstitialTransferOffersTimeoutInMinutes = 15;
+        int supportThreshold = 100;
+        Map<String, Boolean> activeSearchEngines;
+        boolean mobileCore = false;
+        boolean appLovin = false;
+        boolean inmobi = false;
+        int interstitialOffersTransferStarts = 5;
+        int interstitialTransferOffersTimeoutInMinutes = 15;
 
         // ux stats
-        public boolean uxEnabled = false;
-        public int uxPeriod = 3600;
-        public int uxMinEntries = 10;
-        public int uxMaxEntries = 10000;
+        boolean uxEnabled = false;
+        int uxPeriod = 3600;
+        int uxMinEntries = 10;
+        int uxMaxEntries = 10000;
     }
 
     public void removeConfigurationUpdateListener(Object slideMenuFragment) {
         if (configurationUpdateListeners.size() > 0) {
             configurationUpdateListeners.remove(slideMenuFragment);
+        }
+    }
+
+    private class PositiveButtonOnClickListener implements View.OnClickListener {
+        private final Context context;
+        private final Dialog newSoftwareUpdaterDialog;
+
+        PositiveButtonOnClickListener(Context context, Dialog newSoftwareUpdaterDialog) {
+            this.context = context;
+            this.newSoftwareUpdaterDialog = newSoftwareUpdaterDialog;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Engine.instance().stopServices(false);
+            UIUtils.openFile(context, getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE);
+            newSoftwareUpdaterDialog.dismiss();
+        }
+    }
+
+    private class NegativeButtonOnClickListener implements View.OnClickListener {
+        private final Dialog newSoftwareUpdaterDialog;
+
+        NegativeButtonOnClickListener(Dialog newSoftwareUpdaterDialog) {
+            this.newSoftwareUpdaterDialog = newSoftwareUpdaterDialog;
+        }
+
+        @Override
+        public void onClick(View v) {
+            newSoftwareUpdaterDialog.dismiss();
         }
     }
 }
