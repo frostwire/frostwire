@@ -410,7 +410,6 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             updateSelectedCount();
         }
         updateSelectedInBundle();
-        scrollToSelectedRadioButton();
     }
 
     private void scrollToSelectedRadioButton() {
