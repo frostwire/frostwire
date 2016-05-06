@@ -31,10 +31,10 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
-import com.frostwire.android.gui.UniversalScanner;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.platform.Platforms;
 
 import java.io.File;
 
@@ -168,7 +168,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
 
                             @Override
                             public void run() {
-                                new UniversalScanner(context).scanDir(privateDir);
+                                Platforms.fileSystem().scan(privateDir);
                             }
                         });
 

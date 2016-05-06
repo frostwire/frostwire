@@ -21,7 +21,7 @@ package com.frostwire.android;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
@@ -29,6 +29,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
 import android.util.LruCache;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.FileFilter;
@@ -41,6 +42,7 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -213,11 +215,31 @@ public final class LollipopFileSystem implements FileSystem {
     @Override
     public void scan(File file) {
         try {
-            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            intent.setData(Uri.fromFile(file));
-            app.sendBroadcast(intent);
+            final List<String> paths = new LinkedList<>();
+            if (file.isDirectory()) {
+                walk(file, new FileFilter() {
+                    @Override
+                    public boolean accept(File file) {
+                        return true;
+                    }
+
+                    @Override
+                    public void file(File file) {
+                        if (!file.isDirectory()) {
+                            paths.add(file.getAbsolutePath());
+                        }
+                    }
+                });
+            } else {
+                paths.add(file.getPath());
+            }
+
+            if (paths.size() > 0) {
+                MediaScannerConnection.scanFile(app, paths.toArray(new String[0]), null, null);
+                UIUtils.broadcastAction(app, Constants.ACTION_FILE_ADDED_OR_REMOVED);
+            }
         } catch (Throwable e) {
-            LOG.error("Unable to trigger scan of file: " + file, e);
+            LOG.error("Error scanning file/directory: " + file, e);
         }
     }
 
@@ -627,7 +649,7 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     private static String combineRoot(String baseFolder) {
-        String root = Platforms.appSettings().string(Constants.PREF_KEY_STORAGE_PATH)        ;
+        String root = Platforms.appSettings().string(Constants.PREF_KEY_STORAGE_PATH);
 
         return root != null && root.startsWith(baseFolder) ? root : baseFolder;
     }

@@ -34,6 +34,7 @@ import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTDownloadListener;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
@@ -299,7 +300,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             TransferManager.instance().incrementDownloadsToReview();
             File saveLocation = getSavePath().getAbsoluteFile();
             Engine.instance().notifyDownloadFinished(getDisplayName(), saveLocation, dl.getInfoHash());
-            Librarian.instance().scan(saveLocation);
+            Platforms.fileSystem().scan(saveLocation);
         }
 
         private void pauseSeedingIfNecessary(BTDownload dl) {

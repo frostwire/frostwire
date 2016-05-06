@@ -267,6 +267,8 @@ public abstract class BaseHttpDownload implements Transfer {
                 LOG.warn("Error deleting source file while moving: " + src);
             }
 
+            fs.scan(dst);
+
             complete(TransferState.COMPLETE);
         } else {
             complete(TransferState.ERROR_MOVING_INCOMPLETE);

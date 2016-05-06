@@ -48,6 +48,5 @@ public class UISoundcloudDownload extends SoundcloudDownload {
     protected void onComplete() {
         manager.incrementDownloadsToReview();
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);
-        Librarian.instance().scan(Uri.fromFile(savePath));
     }
 }

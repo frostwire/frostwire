@@ -48,7 +48,6 @@ public final class UIYouTubeDownload extends YouTubeDownload {
     protected void onComplete() throws Throwable {
         manager.incrementDownloadsToReview();
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);
-        Librarian.instance().scan(Uri.fromFile(savePath));
     }
 
     @Override

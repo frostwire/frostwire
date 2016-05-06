@@ -23,6 +23,7 @@ import android.os.Build;
 import android.support.v4.provider.DocumentFile;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.jlibtorrent.swig.posix_stat;
@@ -95,7 +96,12 @@ public final class AndroidPlatform extends AbstractPlatform {
             LibTorrent.setPosixWrapper(new PosixCalls(lfs));
             fs = lfs;
         } else {
-            fs = new DefaultFileSystem();
+            fs = new DefaultFileSystem() {
+                @Override
+                public void scan(File file) {
+                    Librarian.instance().scan(file);
+                }
+            };
         }
 
         return fs;
