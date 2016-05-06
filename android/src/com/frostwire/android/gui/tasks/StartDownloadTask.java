@@ -24,7 +24,9 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.adnetworks.Offers;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
-import com.frostwire.android.gui.transfers.*;
+import com.frostwire.android.gui.transfers.ExistingDownload;
+import com.frostwire.android.gui.transfers.InvalidTransfer;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ContextTask;
 import com.frostwire.logging.Logger;
@@ -73,6 +75,7 @@ public class StartDownloadTask extends ContextTask<Transfer> {
                 ytDownloadDlg.show(((Activity) getContext()).getFragmentManager());
             }
             else {
+                UIUtils.showTransfersOnDownloadStart(getContext());
                 transfer = TransferManager.instance().download(sr);
             }
         } catch (Throwable e) {

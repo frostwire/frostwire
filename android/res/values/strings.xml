@@ -598,4 +598,5 @@
     <string name="wifi_network_unavailable">Wifi Network Unavailable</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">According to your settings I can\'t start seeding unless you are on Wi-Fi. The file will be ready for seeding automatically when you get back to an internet enabled Wi-Fi network.</string>
     <string name="the_file_could_not_be_seeded">The file could not be seeded. Enable seeding on settings.</string>
+    <string name="fetching_torrent_ellipsis">Fetching torrent…</string>
 </resources>

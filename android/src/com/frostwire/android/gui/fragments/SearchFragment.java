@@ -48,6 +48,7 @@ import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.PromotionsView.OnPromotionClickListener;
@@ -376,9 +377,11 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     public static void startDownload(Context ctx, SearchResult sr, String message) {
+        if (sr instanceof AbstractTorrentSearchResult) {
+            UIUtils.showShortMessage(ctx, R.string.fetching_torrent_ellipsis);
+        }
         StartDownloadTask task = new StartDownloadTask(ctx, sr, message);
         Tasks.executeParallel(task);
-        //UIUtils.showTransfersOnDownloadStart(ctx);
     }
 
     private void showRatingsReminder(View v) {
