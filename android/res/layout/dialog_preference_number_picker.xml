@@ -27,7 +27,8 @@
         android:id="@+id/dialog_preference_number_title"
         style="@style/DefaultDialogTheme.TitleBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="@string/dummy_title"/>
 
     <NumberPicker
         android:id="@+id/dialog_preference_number_picker"
@@ -48,6 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
+            android:clickable="true"
             android:background="@color/app_light_background"/>
 
         <Button
@@ -56,6 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="1dp"
             android:layout_weight="0.5"
+            android:clickable="true"
             android:background="@color/app_light_background"/>
     </LinearLayout>
 </LinearLayout>
