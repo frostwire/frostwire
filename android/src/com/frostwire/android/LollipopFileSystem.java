@@ -661,7 +661,7 @@ public final class LollipopFileSystem implements FileSystem {
         OutputStream outStream = null;
         try {
             inStream = context.getContentResolver().openInputStream(source.getUri());
-            outStream = context.getContentResolver().openOutputStream(target.getUri());
+            outStream = openOutputStream(context, target);
 
             byte[] buffer = new byte[16384]; // MAGIC_NUMBER
             int bytesRead;
@@ -684,7 +684,7 @@ public final class LollipopFileSystem implements FileSystem {
         OutputStream outStream = null;
         try {
             inStream = new ByteArrayInputStream(data);
-            outStream = context.getContentResolver().openOutputStream(f.getUri());
+            outStream = openOutputStream(context, f);
 
             byte[] buffer = new byte[16384]; // MAGIC_NUMBER
             int bytesRead;
@@ -700,5 +700,13 @@ public final class LollipopFileSystem implements FileSystem {
         }
 
         return true;
+    }
+
+    private static OutputStream openOutputStream(Context context, DocumentFile f) throws IOException {
+        ContentResolver cr = context.getContentResolver();
+        ParcelFileDescriptor pfd = cr.openFileDescriptor(f.getUri(), "w");
+        int fd = pfd.detachFd(); // this trick the internal system to trigger the media scanner on nothing
+        pfd = ParcelFileDescriptor.adoptFd(fd);
+        return new ParcelFileDescriptor.AutoCloseOutputStream(pfd);
     }
 }
