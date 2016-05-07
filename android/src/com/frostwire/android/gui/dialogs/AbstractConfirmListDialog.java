@@ -150,7 +150,6 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         this.dlg = dlg;
         Bundle bundle = getArguments();
-
         String title = bundle.getString(BUNDLE_KEY_DIALOG_TITLE);
 
         TextView dialogTitle = findView(dlg, R.id.dialog_confirm_list_title);
@@ -206,6 +205,14 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
         selectAllCheckbox.setVisibility(View.VISIBLE);
         selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxOnCheckedChangeListener);
+    }
+
+    public String getDialogTitle() {
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            return bundle.getString(BUNDLE_KEY_DIALOG_TITLE);
+        }
+        return null;
     }
 
     public abstract ConfirmListDialogDefaultAdapter<T> createAdapter(Context context,
