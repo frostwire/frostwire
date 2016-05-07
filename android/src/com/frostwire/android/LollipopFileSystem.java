@@ -238,6 +238,13 @@ public final class LollipopFileSystem implements FileSystem {
                 MediaScannerConnection.scanFile(app, paths.toArray(new String[0]), null, null);
                 UIUtils.broadcastAction(app, Constants.ACTION_FILE_ADDED_OR_REMOVED);
             }
+
+            if (paths.size() == 1) { // scan parent to test
+                File f = new File(paths.get(0));
+                String p = f.getParent();
+                LOG.info("About to scan parent: " + p);
+                MediaScannerConnection.scanFile(app, new String[]{p}, null, null);
+            }
         } catch (Throwable e) {
             LOG.error("Error scanning file/directory: " + file, e);
         }
