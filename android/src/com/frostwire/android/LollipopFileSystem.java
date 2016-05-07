@@ -238,13 +238,6 @@ public final class LollipopFileSystem implements FileSystem {
                 MediaScannerConnection.scanFile(app, paths.toArray(new String[0]), null, null);
                 UIUtils.broadcastAction(app, Constants.ACTION_FILE_ADDED_OR_REMOVED);
             }
-
-            if (paths.size() == 1) { // scan parent to test
-                File f = new File(paths.get(0));
-                String p = f.getParent();
-                LOG.info("About to scan parent: " + p);
-                MediaScannerConnection.scanFile(app, new String[]{p}, null, null);
-            }
         } catch (Throwable e) {
             LOG.error("Error scanning file/directory: " + file, e);
         }
@@ -665,7 +658,7 @@ public final class LollipopFileSystem implements FileSystem {
 
     private static boolean copy(Context context, DocumentFile source, DocumentFile target) {
         InputStream inStream = null;
-        OutputStream outStream = null;
+        SyncOutputStream outStream = null;
         try {
             inStream = context.getContentResolver().openInputStream(source.getUri());
             outStream = openOutputStream(context, target);
@@ -675,6 +668,9 @@ public final class LollipopFileSystem implements FileSystem {
             while ((bytesRead = inStream.read(buffer)) != -1) {
                 outStream.write(buffer, 0, bytesRead);
             }
+
+            outStream.sync();
+
         } catch (Throwable e) {
             LOG.error("Error when copying file from " + source.getUri() + " to " + target.getUri(), e);
             return false;
@@ -688,7 +684,7 @@ public final class LollipopFileSystem implements FileSystem {
 
     private static boolean write(Context context, DocumentFile f, byte[] data) {
         InputStream inStream = null;
-        OutputStream outStream = null;
+        SyncOutputStream outStream = null;
         try {
             inStream = new ByteArrayInputStream(data);
             outStream = openOutputStream(context, f);
@@ -698,6 +694,9 @@ public final class LollipopFileSystem implements FileSystem {
             while ((bytesRead = inStream.read(buffer)) != -1) {
                 outStream.write(buffer, 0, bytesRead);
             }
+
+            outStream.sync();
+
         } catch (Throwable e) {
             LOG.error("Error when writing bytes to " + f.getUri(), e);
             return false;
@@ -709,11 +708,25 @@ public final class LollipopFileSystem implements FileSystem {
         return true;
     }
 
-    private static OutputStream openOutputStream(Context context, DocumentFile f) throws IOException {
+    private static SyncOutputStream openOutputStream(Context context, DocumentFile f) throws IOException {
         ContentResolver cr = context.getContentResolver();
         ParcelFileDescriptor pfd = cr.openFileDescriptor(f.getUri(), "w");
         int fd = pfd.detachFd(); // this trick the internal system to trigger the media scanner on nothing
         pfd = ParcelFileDescriptor.adoptFd(fd);
-        return new ParcelFileDescriptor.AutoCloseOutputStream(pfd);
+        return new SyncOutputStream(pfd);
+    }
+
+    private static final class SyncOutputStream extends ParcelFileDescriptor.AutoCloseOutputStream {
+
+        private final ParcelFileDescriptor fd;
+
+        public SyncOutputStream(ParcelFileDescriptor fd) {
+            super(fd);
+            this.fd = fd;
+        }
+
+        public void sync() throws SyncFailedException {
+            fd.getFileDescriptor().sync();
+        }
     }
 }
