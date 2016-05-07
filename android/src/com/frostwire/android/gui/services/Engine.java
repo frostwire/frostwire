@@ -267,29 +267,13 @@ public final class Engine implements IEngineService {
     private void registerStatusReceiver(Context context) {
         receiver = new EngineBroadcastReceiver();
 
-        IntentFilter wifiFilter = new IntentFilter();
-
-        wifiFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        wifiFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        wifiFilter.addAction(WifiManager.NETWORK_IDS_CHANGED_ACTION);
-
         IntentFilter fileFilter = new IntentFilter();
 
-        fileFilter.addAction(Intent.ACTION_MEDIA_BAD_REMOVAL);
         fileFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
-        fileFilter.addAction(Intent.ACTION_MEDIA_CHECKING);
         fileFilter.addAction(Intent.ACTION_MEDIA_EJECT);
         fileFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-        fileFilter.addAction(Intent.ACTION_MEDIA_NOFS);
-        fileFilter.addAction(Intent.ACTION_MEDIA_REMOVED);
         fileFilter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
-        fileFilter.addAction(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        fileFilter.addAction(Intent.ACTION_MEDIA_SCANNER_STARTED);
-        fileFilter.addAction(Intent.ACTION_MEDIA_SHARED);
-        fileFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTABLE);
         fileFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
-        fileFilter.addAction(Intent.ACTION_UMS_CONNECTED);
-        fileFilter.addAction(Intent.ACTION_UMS_DISCONNECTED);
         fileFilter.addDataScheme("file");
 
         IntentFilter connectivityFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -297,7 +281,6 @@ public final class Engine implements IEngineService {
 
         IntentFilter telephonyFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 
-        context.registerReceiver(receiver, wifiFilter);
         context.registerReceiver(receiver, fileFilter);
         context.registerReceiver(receiver, connectivityFilter);
         context.registerReceiver(receiver, audioFilter);
