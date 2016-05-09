@@ -38,7 +38,10 @@ import com.frostwire.platform.Platforms;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -661,7 +664,7 @@ public final class LollipopFileSystem implements FileSystem {
         SyncOutputStream outStream = null;
         try {
             inStream = context.getContentResolver().openInputStream(source.getUri());
-            outStream = openOutputStream(context, target);
+            outStream = openOutputStream(context, target, source.length());
 
             byte[] buffer = new byte[16384]; // MAGIC_NUMBER
             int bytesRead;
@@ -687,7 +690,7 @@ public final class LollipopFileSystem implements FileSystem {
         SyncOutputStream outStream = null;
         try {
             inStream = new ByteArrayInputStream(data);
-            outStream = openOutputStream(context, f);
+            outStream = openOutputStream(context, f, data.length);
 
             byte[] buffer = new byte[16384]; // MAGIC_NUMBER
             int bytesRead;
@@ -708,25 +711,27 @@ public final class LollipopFileSystem implements FileSystem {
         return true;
     }
 
-    private static SyncOutputStream openOutputStream(Context context, DocumentFile f) throws IOException {
+    private static SyncOutputStream openOutputStream(Context context, DocumentFile f, long size) throws IOException {
         ContentResolver cr = context.getContentResolver();
-        ParcelFileDescriptor pfd = cr.openFileDescriptor(f.getUri(), "w");
+        ParcelFileDescriptor pfd = cr.openFileDescriptor(f.getUri(), "rw");
+
         int fd = pfd.detachFd(); // this trick the internal system to trigger the media scanner on nothing
         pfd = ParcelFileDescriptor.adoptFd(fd);
-        return new SyncOutputStream(pfd);
+
+        return new SyncOutputStream(pfd, size);
     }
 
     private static final class SyncOutputStream extends ParcelFileDescriptor.AutoCloseOutputStream {
 
-        private final ParcelFileDescriptor fd;
-
-        public SyncOutputStream(ParcelFileDescriptor fd) {
+        public SyncOutputStream(ParcelFileDescriptor fd, long size) throws IOException {
             super(fd);
-            this.fd = fd;
+
+            getChannel().truncate(size);
         }
 
-        public void sync() throws SyncFailedException {
-            fd.getFileDescriptor().sync();
+        public void sync() throws IOException {
+            getFD().sync();
+            getChannel().force(true);
         }
     }
 }
