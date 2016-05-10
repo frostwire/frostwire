@@ -189,6 +189,7 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             }
         });
+        searchProgress.setOnTouchListener(viewSwipeDetector);
 
         list = findView(view, R.id.fragment_search_list);
         list.setOnTouchListener(viewSwipeDetector);

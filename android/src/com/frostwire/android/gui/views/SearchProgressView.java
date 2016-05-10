@@ -159,6 +159,15 @@ public class SearchProgressView extends LinearLayout {
         }
     }
 
+    @Override
+    public void setOnTouchListener(OnTouchListener l) {
+        final int childCount = getChildCount();
+        for (int i=0; i < childCount; i++) {
+            getChildAt(i).setOnTouchListener(l);
+        }
+        super.setOnTouchListener(l);
+    }
+
     public void setCurrentQueryReporter(CurrentQueryReporter currentQueryReporter) {
         this.currentQueryReporter = currentQueryReporter;
     }
