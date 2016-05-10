@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
@@ -40,7 +39,7 @@ import java.util.List;
  * @author aldenml
  * @author marcelinkaaa
  */
-public class DeleteFileMenuAction extends MenuAction {
+public final class DeleteFileMenuAction extends MenuAction {
 
     private final FileListAdapter adapter;
     private final List<FileDescriptor> files;
@@ -74,13 +73,11 @@ public class DeleteFileMenuAction extends MenuAction {
         Button yesButton = (Button) newDeleteFilesDialog.findViewById(R.id.dialog_default_button_yes);
         yesButton.setText(R.string.delete);
 
-        noButton.setOnClickListener(new NegativeButtonOnClickListener(this, newDeleteFilesDialog));
-        yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, newDeleteFilesDialog));
-
+        noButton.setOnClickListener(new ButtonOnClickListener(newDeleteFilesDialog, false));
+        yesButton.setOnClickListener(new ButtonOnClickListener(newDeleteFilesDialog, true));
 
         newDeleteFilesDialog.show();
     }
-
 
     private void deleteFiles() {
         int size = files.size();
@@ -98,33 +95,21 @@ public class DeleteFileMenuAction extends MenuAction {
         }.execute();
     }
 
-    private class NegativeButtonOnClickListener implements View.OnClickListener {
-        private final DeleteFileMenuAction deleteFileMenuAction;
-        private final Dialog newDeleteFilesDialog;
+    private final class ButtonOnClickListener implements View.OnClickListener {
 
-        public NegativeButtonOnClickListener(DeleteFileMenuAction deleteFileMenuAction, Dialog newDeleteFilesDialog) {
-            this.deleteFileMenuAction = deleteFileMenuAction;
+        private final Dialog newDeleteFilesDialog;
+        private final boolean delete;
+
+        public ButtonOnClickListener(Dialog newDeleteFilesDialog, boolean delete) {
             this.newDeleteFilesDialog = newDeleteFilesDialog;
+            this.delete = delete;
         }
 
         @Override
         public void onClick(View view) {
-            newDeleteFilesDialog.dismiss();
-        }
-    }
-
-    private class PositiveButtonOnClickListener implements View.OnClickListener {
-        private final DeleteFileMenuAction deleteFileMenuAction;
-        private final Dialog newDeleteFilesDialog;
-
-        public PositiveButtonOnClickListener(DeleteFileMenuAction deleteFileMenuAction, Dialog newDeleteFilesDialog) {
-            this.deleteFileMenuAction = deleteFileMenuAction;
-            this.newDeleteFilesDialog = newDeleteFilesDialog;
-        }
-
-        @Override
-        public void onClick(View view) {
-            deleteFiles();
+            if (delete) {
+                deleteFiles();
+            }
             newDeleteFilesDialog.dismiss();
         }
     }
