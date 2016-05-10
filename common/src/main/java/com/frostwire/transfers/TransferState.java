@@ -54,5 +54,6 @@ public enum TransferState {
     UNKNOWN,
     ERROR_DISK_FULL,
     REDIRECTING,
-    STREAMING
+    STREAMING,
+    SCANNING
 }

@@ -508,6 +508,7 @@
     <string name="file_descriptor_sd_unmounted">This file belongs to an SD card, please insert it on your device.</string>
     <string name="help_translate_frostwire">Help translate FrostWire</string>
     <string name="finishing">Finishing</string>
+    <string name="scanning">Finishing - Scanning</string>
     <string name="queued_for_checking">Queued for checking</string>
     <string name="checking_ellipsis">Checking&#8230;</string>
     <string name="downloading_metadata">Downloading metadata</string>
