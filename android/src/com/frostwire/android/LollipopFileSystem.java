@@ -168,6 +168,45 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     @Override
+    public File[] listFiles(File file, FileFilter filter) {
+        try {
+            File[] files = file.listFiles(filter);
+            if (files != null) {
+                return files;
+            }
+        } catch (Throwable e) {
+            // ignore, try with SAF
+        }
+
+        LOG.warn("Using SAF for listFiles, could be a costly operation");
+
+        DocumentFile f = getDirectory(app, file, false);
+        if (f == null) {
+            return null; // does not exists
+        }
+
+        DocumentFile[] files = f.listFiles();
+        if (filter != null && files != null) {
+            List<File> result = new ArrayList<>(files.length);
+            for (int i = 0; i < files.length; i++) {
+                Uri uri = files[i].getUri();
+                String path = getDocumentPath(uri);
+                if (path == null) {
+                    continue;
+                }
+                File child = new File(path);
+                if (filter.accept(child)) {
+                    result.add(child);
+                }
+            }
+
+            return result.toArray(new File[0]);
+        }
+
+        return new File[0];
+    }
+
+    @Override
     public boolean copy(File src, File dest) {
         try {
             FileUtils.copyFile(src, dest);
@@ -215,7 +254,7 @@ public final class LollipopFileSystem implements FileSystem {
     public void scan(File file) {
         try {
             final List<String> paths = new LinkedList<>();
-            if (file.isDirectory()) {
+            if (isDirectory(file)) {
                 walk(file, new FileFilter() {
                     @Override
                     public boolean accept(File file) {
@@ -244,16 +283,19 @@ public final class LollipopFileSystem implements FileSystem {
 
     @Override
     public void walk(File file, FileFilter filter) {
-        LOG.warn("Visiting file trees is not well supported in external SD card");
-        DefaultFileSystem.walkFiles(file, filter);
+        DefaultFileSystem.walkFiles(this, file, filter);
     }
 
     public Uri getDocumentUri(File file) {
         return getDocumentUri(app, file);
     }
 
-    public String getPath(Uri treeUri) {
-        return getPath(app, treeUri);
+    public String getTreePath(Uri treeUri) {
+        return getPath(app, treeUri, true);
+    }
+
+    public String getDocumentPath(Uri treeUri) {
+        return getPath(app, treeUri, false);
     }
 
     public DocumentFile getDocument(File file) {
@@ -467,7 +509,7 @@ public final class LollipopFileSystem implements FileSystem {
         return Uri.parse(uri);
     }
 
-    private static String getPath(Context context, Uri treeUri) {
+    private static String getPath(Context context, Uri treeUri, boolean tree) {
         if (treeUri == null) {
             return null;
         }
@@ -482,7 +524,7 @@ public final class LollipopFileSystem implements FileSystem {
             volumePath = volumePath.substring(0, volumePath.length() - 1);
         }
 
-        String documentPath = getDocumentPathFromTreeUri(treeUri);
+        String documentPath = getDocumentPathFromTreeUri(treeUri, tree);
         if (documentPath.endsWith(File.separator)) {
             documentPath = documentPath.substring(0, documentPath.length() - 1);
         }
@@ -629,8 +671,8 @@ public final class LollipopFileSystem implements FileSystem {
         }
     }
 
-    private static String getDocumentPathFromTreeUri(final Uri treeUri) {
-        final String docId = getTreeDocumentId(treeUri);
+    private static String getDocumentPathFromTreeUri(final Uri treeUri, boolean tree) {
+        final String docId = tree ? getTreeDocumentId(treeUri) : getDocumentDocumentId(treeUri);
         final String[] split = docId.split(":");
         if ((split.length >= 2) && (split[1] != null)) {
             return split[1];
@@ -643,6 +685,14 @@ public final class LollipopFileSystem implements FileSystem {
         final List<String> paths = documentUri.getPathSegments();
         if (paths.size() >= 2 && "tree".equals(paths.get(0))) {
             return paths.get(1);
+        }
+        throw new IllegalArgumentException("Invalid URI: " + documentUri);
+    }
+
+    private static String getDocumentDocumentId(Uri documentUri) {
+        final List<String> paths = documentUri.getPathSegments();
+        if (paths.size() >= 4 && "document".equals(paths.get(2))) {
+            return paths.get(3);
         }
         throw new IllegalArgumentException("Invalid URI: " + documentUri);
     }
