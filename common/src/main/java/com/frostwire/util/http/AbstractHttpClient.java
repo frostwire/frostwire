@@ -67,11 +67,7 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public void onData(byte[] b, int i, int n) {
         if (getListener() != null) {
-            try {
-                getListener().onData(this, b, 0, n);
-            } catch (Exception e) {
-                LOG.warn(e.getMessage(), e);
-            }
+            getListener().onData(this, b, 0, n);
         }
     }
 
