@@ -110,6 +110,10 @@ public class DefaultFileSystem implements FileSystem {
 
     @Override
     public void walk(File file, FileFilter filter) {
+        walkFiles(file, filter);
+    }
+
+    public static void walkFiles(File file, FileFilter filter) {
         File[] arr = file.listFiles(filter);
         if (arr == null) {
             return;
