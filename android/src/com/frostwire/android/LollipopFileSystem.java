@@ -771,8 +771,16 @@ public final class LollipopFileSystem implements FileSystem {
 
         @Override
         public void close() throws IOException {
-            getFD().sync();
+            sync();
             super.close();
+        }
+
+        private void sync() {
+            try {
+                getFD().sync();
+            } catch (Throwable e) {
+                // ignore
+            }
         }
     }
 }
