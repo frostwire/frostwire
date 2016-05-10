@@ -21,7 +21,6 @@ package com.frostwire.android;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
@@ -226,16 +225,16 @@ public final class LollipopFileSystem implements FileSystem {
                     @Override
                     public void file(File file) {
                         if (!file.isDirectory()) {
-                            paths.add(file.getAbsolutePath());
+                            paths.add(file.getPath());
                         }
                     }
                 });
             } else {
-                paths.add(file.getPath());
+                paths.add(file.getPath()); // in case we are in a SD and it's an actual file
             }
 
             if (paths.size() > 0) {
-                MediaScannerConnection.scanFile(app, paths.toArray(new String[0]), null, null);
+                MediaScanner.scanFiles(app, paths);
                 UIUtils.broadcastAction(app, Constants.ACTION_FILE_ADDED_OR_REMOVED);
             }
         } catch (Throwable e) {
@@ -245,8 +244,8 @@ public final class LollipopFileSystem implements FileSystem {
 
     @Override
     public void walk(File file, FileFilter filter) {
-        LOG.warn("Visiting file trees are not supported in external SD card");
-        new DefaultFileSystem().walk(file, filter);
+        LOG.warn("Visiting file trees is not well supported in external SD card");
+        DefaultFileSystem.walkFiles(file, filter);
     }
 
     public Uri getDocumentUri(File file) {
