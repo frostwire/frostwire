@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -48,6 +49,8 @@ import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.SwipeDetector;
+import com.frostwire.android.gui.util.SwipeListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
@@ -78,7 +81,11 @@ import java.util.regex.Pattern;
  * @author gubatron
  * @author aldenml
  */
-public final class SearchFragment extends AbstractFragment implements MainFragment, OnDialogClickListener, SearchProgressView.CurrentQueryReporter {
+public final class SearchFragment extends AbstractFragment implements
+        MainFragment,
+        OnDialogClickListener,
+        SearchProgressView.CurrentQueryReporter,
+        SwipeListener {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
     private SearchResultListAdapter adapter;
     private List<Slide> slides;
@@ -88,15 +95,29 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     private PromotionsView promotions;
     private SearchProgressView searchProgress;
     private ListView list;
-
+    private final SwipeDetector viewSwipeDetector;
     private String currentQuery;
-
     private final FileTypeCounter fileTypeCounter;
+    private final SparseArray<Byte> toTheRightOf = new SparseArray<>(6);
+    private final SparseArray<Byte> toTheLeftOf = new SparseArray<>(6);
 
     public SearchFragment() {
         super(R.layout.fragment_search);
         fileTypeCounter = new FileTypeCounter();
         currentQuery = null;
+        viewSwipeDetector = new SwipeDetector(this, 50);
+        toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS);
+        toTheRightOf.put(Constants.FILE_TYPE_VIDEOS,Constants.FILE_TYPE_PICTURES);
+        toTheRightOf.put(Constants.FILE_TYPE_PICTURES,Constants.FILE_TYPE_APPLICATIONS);
+        toTheRightOf.put(Constants.FILE_TYPE_APPLICATIONS,Constants.FILE_TYPE_DOCUMENTS);
+        toTheRightOf.put(Constants.FILE_TYPE_DOCUMENTS,Constants.FILE_TYPE_TORRENTS);
+        toTheRightOf.put(Constants.FILE_TYPE_TORRENTS,Constants.FILE_TYPE_AUDIO);
+        toTheLeftOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_TORRENTS);
+        toTheLeftOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_AUDIO);
+        toTheLeftOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_VIDEOS);
+        toTheLeftOf.put(Constants.FILE_TYPE_APPLICATIONS, Constants.FILE_TYPE_PICTURES);
+        toTheLeftOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_APPLICATIONS);
+        toTheLeftOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_DOCUMENTS);
     }
 
     @Override
@@ -202,6 +223,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         });
 
         list = findView(view, R.id.fragment_search_list);
+        list.setOnTouchListener(viewSwipeDetector);
 
         showSearchView(view);
         showRatingsReminder(view);
@@ -488,6 +510,28 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     @Override
     public String getCurrentQuery() {
         return currentQuery;
+    }
+
+    @Override
+    public void onSwipeLeft() {
+        // move to the right
+        switchToThe(true);
+    }
+
+    @Override
+    public void onSwipeRight() {
+        // move to the left
+        switchToThe(false);
+    }
+
+    private void switchToThe(boolean right) {
+        if (adapter == null) {
+            return;
+        }
+        adapter.getFileType();
+        final byte currentFileType = (byte) adapter.getFileType();
+        final byte nextFileType = (right) ? toTheRightOf.get(currentFileType) : toTheLeftOf.get(currentFileType);
+        searchInput.performClickOnRadioButton(nextFileType);
     }
 
     private static class LoadSlidesTask extends AsyncTask<Void, Void, List<Slide>> {
