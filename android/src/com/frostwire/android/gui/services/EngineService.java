@@ -46,6 +46,7 @@ import com.frostwire.jlibtorrent.Session;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
+import com.squareup.okhttp.ConnectionPool;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -110,6 +111,8 @@ public class EngineService extends Service implements IEngineService {
         BTEngine.getInstance().stop();
         ImageLoader.getInstance(this).shutdown();
 
+        stopOkHttp();
+
         new Thread("shutdown-halt") {
             @Override
             public void run() {
@@ -121,6 +124,16 @@ public class EngineService extends Service implements IEngineService {
                 Process.killProcess(Process.myPid());
             }
         }.start();
+    }
+
+    // what a bad design to properly shutdown the framework threads!
+    // TODO: deal with potentially active connections
+    private void stopOkHttp() {
+        ConnectionPool pool = ConnectionPool.getDefault();
+        pool.evictAll();
+        synchronized (pool) {
+            pool.notifyAll();
+        }
     }
 
     public CoreMediaPlayer getMediaPlayer() {
