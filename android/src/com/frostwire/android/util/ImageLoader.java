@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
@@ -40,6 +41,7 @@ import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 
 /**
  * @author gubatron
@@ -62,11 +64,15 @@ public final class ImageLoader {
 
     private static final String ARTIST_AUTHORITY = "artist";
 
+    private static final String METADATA_AUTHORITY = "metadata";
+
     public static final Uri APPLICATION_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + APPLICATION_AUTHORITY);
 
     public static final Uri ALBUM_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ALBUM_AUTHORITY);
 
     public static final Uri ARTIST_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ARTIST_AUTHORITY);
+
+    private static final Uri METADATA_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + METADATA_AUTHORITY);
 
     private final ImageCache cache;
     private final Picasso picasso;
@@ -126,6 +132,10 @@ public final class ImageLoader {
 
     public static Uri getArtistArtUri(String artistName) {
         return Uri.withAppendedPath(ImageLoader.ARTIST_THUMBNAILS_URI, artistName);
+    }
+
+    public static Uri getMetadataArtUri(Uri uri) {
+        return Uri.withAppendedPath(ImageLoader.METADATA_THUMBNAILS_URI, Uri.encode(uri.toString()));
     }
 
     private ImageLoader(Context context) {
@@ -188,9 +198,11 @@ public final class ImageLoader {
     private static final class ImageRequestHandler extends RequestHandler {
 
         private final Context context;
+        private final HashSet<String> failed;
 
         public ImageRequestHandler(Context context) {
             this.context = context;
+            this.failed = new HashSet<>();
         }
 
         @Override
@@ -212,6 +224,8 @@ public final class ImageLoader {
                 return loadAlbum(data.uri);
             } else if (ARTIST_AUTHORITY.equals(authority)) {
                 return loadFirstArtistAlbum(data.uri);
+            } else if (METADATA_AUTHORITY.equals(authority)) {
+                return extractMetadata(data.uri);
             }
             return null;
         }
@@ -283,6 +297,39 @@ public final class ImageLoader {
             }
 
             return id;
+        }
+
+        private Result extractMetadata(Uri uri) throws IOException {
+            String seg = Uri.decode(uri.getLastPathSegment());
+            if (failed.contains(seg)) {
+                return null;
+            }
+            uri = Uri.parse(seg);
+
+            Bitmap bitmap = null;
+            MediaMetadataRetriever retriever = null;
+            try {
+                LOG.warn("Using MediaMetadataRetriever (costly operation) for uri: " + uri);
+                retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(context, uri);
+                byte[] picture = retriever.getEmbeddedPicture();
+                if (picture != null) {
+                    bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+                }
+            } catch (Throwable e) {
+                LOG.error("Error extracting album art", e);
+            } finally {
+                if (retriever != null) {
+                    retriever.release();
+                }
+            }
+
+            if (bitmap != null) {
+                return new Result(bitmap, Picasso.LoadedFrom.DISK);
+            } else {
+                failed.add(seg);
+                return null;
+            }
         }
     }
 }
