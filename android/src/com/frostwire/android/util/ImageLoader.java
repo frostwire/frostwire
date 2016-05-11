@@ -33,11 +33,8 @@ import android.provider.MediaStore;
 import android.widget.ImageView;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.logging.Logger;
-import com.squareup.picasso.Picasso;
+import com.squareup.picasso.*;
 import com.squareup.picasso.Picasso.Builder;
-import com.squareup.picasso.Request;
-import com.squareup.picasso.RequestHandler;
-import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,6 +106,7 @@ public final class ImageLoader {
             Cursor cursor = context.getContentResolver().query(albumUri, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART}, null, null, null);
 
             try {
+                LOG.info("Using album_art path for uri: " + albumUri);
                 if (cursor.moveToFirst()) {
                     String albumArt = cursor.getString(0);
                     if (albumArt != null) {
@@ -157,6 +155,17 @@ public final class ImageLoader {
     public void load(Uri uri, ImageView target, int targetWidth, int targetHeight) {
         if (!shutdown) {
             picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target);
+        }
+    }
+
+    public void load(final Uri uri, final Uri uriRetry, final ImageView target, final int targetWidth, final int targetHeight) {
+        if (!shutdown) {
+            picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new Callback.EmptyCallback() {
+                @Override
+                public void onError() {
+                    load(uriRetry, target, targetWidth, targetHeight);
+                }
+            });
         }
     }
 
@@ -309,7 +318,7 @@ public final class ImageLoader {
             Bitmap bitmap = null;
             MediaMetadataRetriever retriever = null;
             try {
-                LOG.warn("Using MediaMetadataRetriever (costly operation) for uri: " + uri);
+                LOG.info("Using MediaMetadataRetriever (costly operation) for uri: " + uri);
                 retriever = new MediaMetadataRetriever();
                 retriever.setDataSource(context, uri);
                 byte[] picture = retriever.getEmbeddedPicture();

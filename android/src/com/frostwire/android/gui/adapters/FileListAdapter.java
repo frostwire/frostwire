@@ -24,6 +24,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
 import android.view.View;
@@ -247,10 +248,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
             if (fd.fileType == Constants.FILE_TYPE_AUDIO) {
                 Uri uri = ContentUris.withAppendedId(ImageLoader.ALBUM_THUMBNAILS_URI, fd.albumId);
-                thumbnailLoader.load(uri, fileThumbnail, 96, 96);
+                Uri uriRetry = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, fd.id);
+                uriRetry = ImageLoader.getMetadataArtUri(uriRetry);
+                thumbnailLoader.load(uri, uriRetry, fileThumbnail, 96, 96);
             } else if (fd.fileType == Constants.FILE_TYPE_VIDEOS) {
                 Uri uri = ContentUris.withAppendedId(Video.Media.EXTERNAL_CONTENT_URI, fd.id);
-                thumbnailLoader.load(uri, fileThumbnail, 96, 96);
+                Uri uriRetry = ImageLoader.getMetadataArtUri(uri);
+                thumbnailLoader.load(uri, uriRetry, fileThumbnail, 96, 96);
             } else if (fd.fileType == Constants.FILE_TYPE_PICTURES) {
                 Uri uri = ContentUris.withAppendedId(Images.Media.EXTERNAL_CONTENT_URI, fd.id);
                 thumbnailLoader.load(uri, fileThumbnail, 96, 96);
