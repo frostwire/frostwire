@@ -57,7 +57,6 @@ import java.util.concurrent.ExecutorService;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class EngineService extends Service implements IEngineService {
 
@@ -88,7 +87,7 @@ public class EngineService extends Service implements IEngineService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
-        if (intent==null) {
+        if (intent == null) {
             return 0;
         }
         LOG.info("FrostWire's EngineService started by this intent:");
@@ -189,7 +188,7 @@ public class EngineService extends Service implements IEngineService {
                                                          int uploads,
                                                          String sUp) {
         if (!Ref.alive(contextRef) || !Ref.alive(viewRef) ||
-            !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
+                !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
             return;
         }
         final Context context = contextRef.get();
@@ -202,7 +201,7 @@ public class EngineService extends Service implements IEngineService {
         PendingIntent showFrostWireIntent = PendingIntent.getActivity(context,
                 0,
                 new Intent(context,
-                           MainActivity.class).
+                        MainActivity.class).
                         setAction(Constants.ACTION_SHOW_TRANSFERS).
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
                 0);
@@ -389,10 +388,12 @@ public class EngineService extends Service implements IEngineService {
         long mediumPause = 150;
         long longPause = 180;
 
-        return new long[] { 0, shortVibration, longPause, shortVibration, shortPause, shortVibration, shortPause, shortVibration, mediumPause, mediumVibration };
+        return new long[]{0, shortVibration, longPause, shortVibration, shortPause, shortVibration, shortPause, shortVibration, mediumPause, mediumVibration};
     }
 
-    /** takes 0ms (135052 ns) - checks diretory, and reads corresponding file to create NetworkInterface object. */
+    /**
+     * takes 0ms (135052 ns) - checks diretory, and reads corresponding file to create NetworkInterface object.
+     */
     private static boolean isTunnelUp() {
         NetworkInterface tun0 = null;
         try {
