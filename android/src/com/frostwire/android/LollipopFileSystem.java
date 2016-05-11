@@ -286,10 +286,6 @@ public final class LollipopFileSystem implements FileSystem {
         DefaultFileSystem.walkFiles(this, file, filter);
     }
 
-    public Uri getDocumentUri(File file) {
-        return getDocumentUri(app, file);
-    }
-
     public String getTreePath(Uri treeUri) {
         return getPath(app, treeUri, true);
     }
