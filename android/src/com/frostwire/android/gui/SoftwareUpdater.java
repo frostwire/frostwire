@@ -44,7 +44,6 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
-import com.frostwire.uxstats.FlurryStats;
 import com.frostwire.uxstats.UXStats;
 import com.frostwire.uxstats.UXStatsConf;
 
@@ -425,7 +424,6 @@ public final class SoftwareUpdater {
 
             UXStatsConf uxStatsContext = new UXStatsConf(url, os, fwversion, fwbuild, period, minEntries, maxEntries);
             UXStats.instance().setContext(uxStatsContext);
-            UXStats.instance().add3rdPartyAPI(new FlurryStats(activityContext));
         }
     }
 
