@@ -22,8 +22,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
@@ -39,6 +41,7 @@ import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.logging.Logger;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 
 import java.io.File;
@@ -55,28 +58,37 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private static final Logger LOG = Logger.getLogger(SeedAction.class);
     private final FileDescriptor fd;
     private final List<FileDescriptor> fds;
-    private final ConfigurationManager CM;
+    private final BittorrentDownload btDownload;
     private final Transfer transferToClear;
     private static String DLG_SEEDING_OFF_TAG = "DLG_SEEDING_OFF_TAG";
+    private static String DLG_TURN_BITTORRENT_BACK_ON = "DLG_TURN_BITTORRENT_BACK_ON";
 
-    private SeedAction(Context context, FileDescriptor fd, List<FileDescriptor> fds, Transfer transferToClear) {
+    private SeedAction(Context context,
+                       FileDescriptor fd,
+                       List<FileDescriptor> fds,
+                       BittorrentDownload existingBittorrentDownload,
+                       Transfer transferToClear) {
         super(context, R.drawable.contextmenu_icon_play_transfer, R.string.seed);
         this.fd = fd;
         this.fds = fds;
+        this.btDownload = existingBittorrentDownload;
         this.transferToClear = transferToClear;
-        CM = ConfigurationManager.instance();
     }
 
     public SeedAction(Context context, FileDescriptor fd) {
-        this(context, fd, null, null);
+        this(context, fd, null, null, null);
     }
 
     public SeedAction(Context context, FileDescriptor fd, Transfer transferToClear) {
-        this(context, fd, null, transferToClear);
+        this(context, fd, null, null, transferToClear);
     }
 
     public SeedAction(Context context, List<FileDescriptor> checked) {
-        this(context, null, checked, null);
+        this(context, null, checked, null, null);
+    }
+
+    public SeedAction(Context context, BittorrentDownload download) {
+        this(context, null, null, download,null);
     }
 
     @Override
@@ -92,6 +104,12 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         // Note: Let's try Merkle torrents to keep them small and use less
         // storage on the android device.
 
+        // if BitTorrent is turned off
+        if (TransferManager.instance().isBittorrentDisconnected()) {
+            showBittorrentDisconnectedDialog();
+            return;
+        }
+
         // in case user seeds only on wifi and there's no wifi, we let them know what will occur.
         if (seedingOnlyOnWifiButNoWifi()) {
             showNoWifiInformationDialog();
@@ -99,7 +117,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
         // 1. If Seeding is turned off let's ask the user if they want to
         //    turn seeding on, or else cancel this.
-        if (!isSeedingEnabled()) {
+        if (!TransferManager.instance().isSeedingEnabled()) {
             showSeedingDialog();
         } else {
             seedEm();
@@ -112,6 +130,15 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         builder.setTitle(R.string.wifi_network_unavailable);
         builder.setMessage(R.string.according_to_settings_i_cant_seed_unless_wifi);
         builder.create().show();
+    }
+
+    private void showBittorrentDisconnectedDialog() {
+        YesNoDialog dlg = YesNoDialog.newInstance(
+            DLG_TURN_BITTORRENT_BACK_ON,
+             R.string.bittorrent_off,
+             R.string.bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you);
+        dlg.setOnDialogClickListener(this);
+        dlg.show(((Activity) getContext()).getFragmentManager());
     }
 
     private void showSeedingDialog() {
@@ -128,15 +155,24 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         if (tag.equals(DLG_SEEDING_OFF_TAG)) {
             if (which == Dialog.BUTTON_NEGATIVE) {
                 UIUtils.showLongMessage(getContext(),
-                        R.string.the_file_could_not_be_seeded);
+                        R.string.the_file_could_not_be_seeded_enable_seeding);
             } else if (which == Dialog.BUTTON_POSITIVE) {
                 onSeedingEnabled();
+            }
+        }
+
+        if (tag.equals(DLG_TURN_BITTORRENT_BACK_ON)) {
+            if (which == Dialog.BUTTON_NEGATIVE) {
+                UIUtils.showLongMessage(getContext(),
+                        R.string.the_file_could_not_be_seeded_bittorrent_will_remain_disconnected);
+            } else if (which == Dialog.BUTTON_POSITIVE) {
+                onBittorrentConnect();
             }
         }
     }
 
     private boolean seedingOnlyOnWifiButNoWifi() {
-        return isSeedingEnabled() && isSeedingEnabledOnlyForWifi() && !NetworkManager.instance().isDataWIFIUp();
+        return TransferManager.instance().isSeedingEnabled() && TransferManager.instance().isSeedingEnabledOnlyForWifi() && !NetworkManager.instance().isDataWIFIUp();
     }
 
     private void seedEm() {
@@ -144,6 +180,8 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             seedFileDescriptor(fd);
         } else if (fds != null) {
             seedFileDescriptors();
+        } else if (btDownload != null) {
+            seedBTDownload();
         }
 
         if (transferToClear != null) {
@@ -163,6 +201,10 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         for (FileDescriptor f : fds) {
             seedFileDescriptor(f);
         }
+    }
+
+    private void seedBTDownload() {
+        btDownload.resume();
     }
 
     private void buildTorrentAndSeedIt(final FileDescriptor fd) {
@@ -195,7 +237,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 torrentHandle.saveResumeData();
                 torrentHandle.pause();
                 torrentHandle.setAutoManaged(true);
-                torrentHandle.forceDHTAnnounce();
+                torrentHandle.forceDHTAnnounce(); // TODO: only do this when dht bootstrap signal is received.
                 torrentHandle.scrapeTracker();
 
                 // so it will call fireDownloadUpdate(torrentHandle) -> UIBittorrentDownload.updateUI()
@@ -209,20 +251,29 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void onSeedingEnabled() {
-        enableSeeding();
+        TransferManager.instance().enableSeeding();
         seedEm();
     }
 
-    private void enableSeeding() {
-        CM.setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, true);
-        TransferManager.instance().resumeResumableTransfers();
-    }
+    private void onBittorrentConnect() {
+        Engine.instance().getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                Engine.instance().startServices();
+                while (!Engine.instance().isStarted()) {
+                    SystemClock.sleep(1000);
+                }
+                final Looper mainLooper = getContext().getMainLooper();
+                Handler h = new Handler(mainLooper);
+                h.post(new Runnable() {
+                    @Override
+                    public void run() {
+                         onClick(getContext());
+                    }
+                });
+            }
+        });
 
-    private boolean isSeedingEnabled() {
-        return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
-    }
 
-    private boolean isSeedingEnabledOnlyForWifi() {
-        return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
     }
 }

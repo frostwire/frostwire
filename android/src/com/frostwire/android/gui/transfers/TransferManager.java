@@ -56,14 +56,11 @@ public final class TransferManager {
 
     private final List<Transfer> httpDownloads;
     private final List<BittorrentDownload> bittorrentDownloads;
-
     private int downloadsToReview;
-
     private int startedTransfers = 0;
-
     private final Object alreadyDownloadingMonitor = new Object();
-
     private volatile static TransferManager instance;
+    private final ConfigurationManager CM;
 
     public static TransferManager instance() {
         if (instance == null) {
@@ -74,12 +71,10 @@ public final class TransferManager {
 
     private TransferManager() {
         registerPreferencesChangeListener();
-
+        CM = ConfigurationManager.instance();
         this.httpDownloads = new CopyOnWriteArrayList<>();
         this.bittorrentDownloads = new CopyOnWriteArrayList<>();
-
         this.downloadsToReview = 0;
-
         loadTorrents();
     }
 
@@ -416,6 +411,19 @@ public final class TransferManager {
 
     public boolean isBittorrentDisconnected() {
         return Engine.instance().isStopped() || Engine.instance().isStopping() || Engine.instance().isDisconnected();
+    }
+
+    public void enableSeeding() {
+        CM.setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, true);
+        TransferManager.instance().resumeResumableTransfers();
+    }
+
+    public boolean isSeedingEnabled() {
+        return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
+    }
+
+    public boolean isSeedingEnabledOnlyForWifi() {
+        return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
     }
 
     public void resumeResumableTransfers() {

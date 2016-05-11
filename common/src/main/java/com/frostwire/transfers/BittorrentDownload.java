@@ -26,7 +26,7 @@ import java.io.File;
  */
 public interface BittorrentDownload extends Transfer {
 
-    public String getInfoHash();
+    String getInfoHash();
 
     /**
      * Generates a magnet URI using the current information in
@@ -37,13 +37,13 @@ public interface BittorrentDownload extends Transfer {
      */
     String magnetUri();
 
-    public int getConnectedPeers();
+    int getConnectedPeers();
 
-    public int getTotalPeers();
+    int getTotalPeers();
 
-    public int getConnectedSeeds();
+    int getConnectedSeeds();
 
-    public int getTotalSeeds();
+    int getTotalSeeds();
 
     /**
      * For multi files torrents, returns the folder containing the files (savePath/torrentName)
@@ -51,17 +51,17 @@ public interface BittorrentDownload extends Transfer {
      *
      * @return
      */
-    public File getContentSavePath();
+    File getContentSavePath();
 
-    public boolean isPaused();
+    boolean isPaused();
 
-    public boolean isSeeding();
+    boolean isSeeding();
 
-    public boolean isFinished();
+    boolean isFinished();
 
-    public void pause();
+    void pause();
 
-    public void resume();
+    void resume();
 
     void remove(boolean deleteTorrent, boolean deleteData);
 }

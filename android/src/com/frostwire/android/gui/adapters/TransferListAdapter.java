@@ -306,6 +306,12 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             items.add(new OpenMenuAction(context.get(), path, mimeType));
         }
 
+//        LOG.info("download.isComplete(): " + download.isComplete());
+//        LOG.info("download.isDownloading(): " + download.isDownloading());
+//        LOG.info("download.isFinished(): " + download.isFinished());
+//        LOG.info("download.isPaused(): " + download.isPaused());
+//        LOG.info("download.isSeeding(): " + download.isSeeding());
+
         if (!download.isComplete() || ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS)) {
             if (!download.isPaused()) {
                 items.add(new PauseDownloadMenuAction(context.get(), download));
@@ -315,18 +321,15 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 boolean bittorrentOff = Engine.instance().isStopped() || Engine.instance().isDisconnected();
 
                 if (wifiIsUp || bittorrentOnMobileData) {
-                    if (!download.isComplete() || bittorrentOff) {
+                    if (!download.isComplete() && !bittorrentOff) {
                         items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.resume_torrent_menu_action));
-                    } else {
-                        //let's see if we can seed...
-                        boolean seedTorrents = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
-                        boolean seedTorrentsOnWifiOnly = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
-                        if ((seedTorrents && seedTorrentsOnWifiOnly && wifiIsUp) || (seedTorrents && !seedTorrentsOnWifiOnly)) {
-                            items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.seed));
-                        }
                     }
                 }
             }
+        }
+
+        if ((download.isFinished() || download.isSeeding()) && (download.isPaused()) ) {
+            items.add(new SeedAction(context.get(), download));
         }
 
         items.add(new CancelMenuAction(context.get(), download, !download.isComplete()));
