@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.adnetworks.Offers;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
@@ -275,7 +276,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
             }
         }
 
-        private void startTorrentPartialDownload(Context context, List<TorrentFileEntry> results) {
+        private void startTorrentPartialDownload(final Context context, List<TorrentFileEntry> results) {
             if (context == null ||
                 !Ref.alive(dlgRef) ||
                 results == null ||
@@ -287,14 +288,21 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
 
             final HandpickedTorrentDownloadDialog theDialog = (HandpickedTorrentDownloadDialog) dlgRef.get();
 
-            boolean[] selection = new boolean[theDialog.getList().size()];
+            final boolean[] selection = new boolean[theDialog.getList().size()];
             for (TorrentFileEntry selectedFileEntry : results) {
                 selection[selectedFileEntry.getIndex()] = true;
             }
-            BTEngine.getInstance().download(theDialog.getTorrentInfo(),
-                    null,
-                    selection);
-            UIUtils.showTransfersOnDownloadStart(context);
+
+            Engine.instance().getThreadPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    BTEngine.getInstance().download(theDialog.getTorrentInfo(),
+                            null,
+                            selection);
+                    UIUtils.showTransfersOnDownloadStart(context);
+                }
+            });
+
         }
     }
 }
