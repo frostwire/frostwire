@@ -94,7 +94,7 @@ public final class ImageLoader {
      * @param albumId
      * @return
      */
-    public static Bitmap getAlbumArt(Context context, String albumId) {
+    private static Bitmap getAlbumArt(Context context, String albumId) {
         Bitmap bitmap = null;
 
         try {
