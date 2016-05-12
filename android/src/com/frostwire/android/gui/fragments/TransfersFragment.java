@@ -64,10 +64,8 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener, SwipeListener {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
@@ -125,13 +123,13 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void onDestroy() {
         super.onDestroy();
     }
-    
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         subscription = TimerService.subscribe(this, 2);
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -170,8 +168,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
 
         //  format strings
-        String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth()/1024);
-        String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth()/1024);
+        String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
+        String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
 
         // number of uploads (seeding) and downloads
         int downloads = TransferManager.instance().getActiveDownloads();
@@ -253,7 +251,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
         @Override
         public void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
-            if (textDHTPeers==null || !TransfersFragment.this.isAdded()) {
+            if (textDHTPeers == null || !TransfersFragment.this.isAdded()) {
                 return;
             }
 
@@ -313,7 +311,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void selectStatusTabToThe(boolean right) {
         final TransferStatus[] allStatusesArray = TransferStatus.getAllStatusesArray();
         int currentStatusIndex = -1;
-        for (int i=0; i < allStatusesArray.length; i++) {
+        for (int i = 0; i < allStatusesArray.length; i++) {
             if (selectedStatus == allStatusesArray[i]) {
                 currentStatusIndex = i;
                 break;
@@ -332,15 +330,15 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void selectStatusTab(TransferStatus status) {
         selectedStatus = status;
         switch (selectedStatus) {
-        case ALL:
-            buttonSelectAll.performClick();
-            break;
-        case DOWNLOADING:
-            buttonSelectDownloading.performClick();
-            break;
-        case COMPLETED:
-            buttonSelectCompleted.performClick();
-            break;
+            case ALL:
+                buttonSelectAll.performClick();
+                break;
+            case DOWNLOADING:
+                buttonSelectDownloading.performClick();
+                break;
+            case COMPLETED:
+                buttonSelectCompleted.performClick();
+                break;
         }
     }
 
@@ -367,8 +365,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     @Override
     protected void initComponents(View v) {
-	    initStorageRelatedRichNotifications(v);
-    	
+        initStorageRelatedRichNotifications(v);
+
         buttonSelectAll = findView(v, R.id.fragment_transfers_button_select_all);
         buttonSelectAll.setOnClickListener(new ButtonTabListener(this, TransferStatus.ALL));
 
@@ -409,16 +407,16 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                                 Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
                                 Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                i.putExtra("from","transfers");
+                i.putExtra("from", "transfers");
                 startActivity(i);
             }
         });
     }
 
-	public void initStorageRelatedRichNotifications(View v) {
-	    if (v == null) {
-	        v = getView();
-	    }
+    public void initStorageRelatedRichNotifications(View v) {
+        if (v == null) {
+            v = getView();
+        }
         RichNotification sdCardNotification = findView(v, R.id.fragment_transfers_sd_card_notification);
         sdCardNotification.setVisibility(View.GONE);
 
@@ -434,20 +432,20 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 sdCardNotification.setOnClickListener(new SDCardNotificationListener(this));
             }
         }
-		
-		//if you do have an SD Card mounted and you're using internal memory, we'll let you know
-		//that you now can use the SD Card. We'll keep this for a few releases.
+
+        //if you do have an SD Card mounted and you're using internal memory, we'll let you know
+        //that you now can use the SD Card. We'll keep this for a few releases.
         File sdCardDir = getBiggestSDCardDir(getActivity());
-		if (sdCardDir != null && com.frostwire.android.util.SystemUtils.isSecondaryExternalStorageMounted(sdCardDir) &&
-			!isUsingSDCardPrivateStorage() &&
-			!internalMemoryNotification.wasDismissed()) {
-			String bytesAvailableInHuman = UIUtils.getBytesInHuman(com.frostwire.android.util.SystemUtils.getAvailableStorageSize(sdCardDir));
-			String internalMemoryNotificationDescription = getString(R.string.saving_to_internal_memory_description, bytesAvailableInHuman);
-			internalMemoryNotification.setDescription(internalMemoryNotificationDescription);
-			internalMemoryNotification.setVisibility(View.VISIBLE);
-			internalMemoryNotification.setOnClickListener(new SDCardNotificationListener(this));
-		}
-	}
+        if (sdCardDir != null && com.frostwire.android.util.SystemUtils.isSecondaryExternalStorageMounted(sdCardDir) &&
+                !isUsingSDCardPrivateStorage() &&
+                !internalMemoryNotification.wasDismissed()) {
+            String bytesAvailableInHuman = UIUtils.getBytesInHuman(com.frostwire.android.util.SystemUtils.getAvailableStorageSize(sdCardDir));
+            String internalMemoryNotificationDescription = getString(R.string.saving_to_internal_memory_description, bytesAvailableInHuman);
+            internalMemoryNotification.setDescription(internalMemoryNotificationDescription);
+            internalMemoryNotification.setVisibility(View.VISIBLE);
+            internalMemoryNotification.setOnClickListener(new SDCardNotificationListener(this));
+        }
+    }
 
     private void setupAdapter() {
         List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
@@ -460,24 +458,24 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         Iterator<Transfer> it;
 
         switch (status) { // replace this filter by a more functional style
-        case DOWNLOADING:
-            it = transfers.iterator();
-            while (it.hasNext()) {
-                if (it.next().isComplete()) {
-                    it.remove();
+            case DOWNLOADING:
+                it = transfers.iterator();
+                while (it.hasNext()) {
+                    if (it.next().isComplete()) {
+                        it.remove();
+                    }
                 }
-            }
-            return transfers;
-        case COMPLETED:
-            it = transfers.iterator();
-            while (it.hasNext()) {
-                if (!it.next().isComplete()) {
-                    it.remove();
+                return transfers;
+            case COMPLETED:
+                it = transfers.iterator();
+                while (it.hasNext()) {
+                    if (!it.next().isComplete()) {
+                        it.remove();
+                    }
                 }
-            }
-            return transfers;
-        default:
-            return transfers;
+                return transfers;
+            default:
+                return transfers;
         }
     }
 
@@ -491,25 +489,25 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void onDialogClick(String tag, int which) {
         if (tag.equals(TRANSFERS_DIALOG_ID)) {
             switch (which) {
-            case CLEAR_MENU_DIALOG_ID:
-                TransferManager.instance().clearComplete();
-                break;
-            case PAUSE_MENU_DIALOG_ID:
-                TransferManager.instance().stopHttpTransfers();
-                TransferManager.instance().pauseTorrents();
-                break;
-            case RESUME_MENU_DIALOG_ID:
-                boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
-                if (bittorrentDisconnected){
-                    UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
-                } else {
-                    if (NetworkManager.instance().isDataUp()) {
-                        TransferManager.instance().resumeResumableTransfers();
+                case CLEAR_MENU_DIALOG_ID:
+                    TransferManager.instance().clearComplete();
+                    break;
+                case PAUSE_MENU_DIALOG_ID:
+                    TransferManager.instance().stopHttpTransfers();
+                    TransferManager.instance().pauseTorrents();
+                    break;
+                case RESUME_MENU_DIALOG_ID:
+                    boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
+                    if (bittorrentDisconnected) {
+                        UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
                     } else {
-                        UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
+                        if (NetworkManager.instance().isDataUp()) {
+                            TransferManager.instance().resumeResumableTransfers();
+                        } else {
+                            UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
+                        }
                     }
-                }
-                break;
+                    break;
             }
             setupAdapter();
         }
@@ -634,7 +632,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private void startCloudTransfer(String text) {
         if (text.contains("soundcloud.com/")) {
-            new DownloadSoundcloudFromUrlTask(getActivity(),text.trim()).execute();
+            new DownloadSoundcloudFromUrlTask(getActivity(), text.trim()).execute();
         } else if (text.contains("youtube.com/")) {
             startYouTubeSearchFromUrl(text.trim());
         } else {
@@ -765,10 +763,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public enum TransferStatus {
         ALL, DOWNLOADING, COMPLETED;
 
-        private static TransferStatus[] STATUS_ARRAY = new TransferStatus[] {
+        private static TransferStatus[] STATUS_ARRAY = new TransferStatus[]{
                 ALL,
                 DOWNLOADING,
-                COMPLETED };
+                COMPLETED};
 
         public static TransferStatus[] getAllStatusesArray() {
             return STATUS_ARRAY;
@@ -851,18 +849,18 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             f.onTime();
         }
     }
-    
+
     private static final class SDCardNotificationListener extends ClickAdapter<TransfersFragment> {
 
-		SDCardNotificationListener(TransfersFragment owner) {
-			super(owner);
-		}
-    	
-		@Override
-		public void onClick(TransfersFragment owner, View v) {
-	        Intent i = new Intent(owner.getActivity(), SettingsActivity.class);
-	        i.setAction(Constants.ACTION_SETTINGS_SELECT_STORAGE);
-	        owner.getActivity().startActivity(i);
-		}
+        SDCardNotificationListener(TransfersFragment owner) {
+            super(owner);
+        }
+
+        @Override
+        public void onClick(TransfersFragment owner, View v) {
+            Intent i = new Intent(owner.getActivity(), SettingsActivity.class);
+            i.setAction(Constants.ACTION_SETTINGS_SELECT_STORAGE);
+            owner.getActivity().startActivity(i);
+        }
     }
 }
