@@ -53,7 +53,7 @@ public final class ThreadPool extends ThreadPoolExecutor {
     }
 
     public static ExecutorService newThreadPool(String name, int maxThreads, boolean daemon) {
-        ThreadPool pool = new ThreadPool(name, maxThreads, new LinkedBlockingQueue<Runnable>(), daemon);
+        ThreadPool pool = new ThreadPool(name, maxThreads, new SynchronousQueue<Runnable>(), daemon);
         return Executors.unconfigurableExecutorService(pool);
     }
 
