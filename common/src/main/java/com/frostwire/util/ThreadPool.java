@@ -52,6 +52,11 @@ public final class ThreadPool extends ThreadPoolExecutor {
         t.setName(name + "-thread-" + threadNumber.getAndIncrement() + "-" + (threadName != null ? threadName : "@" + r.hashCode()));
     }
 
+    @Override
+    protected void afterExecute(Runnable r, Throwable t) {
+        Thread.currentThread().setName(name + "-thread-idle");
+    }
+
     public static ExecutorService newThreadPool(String name, int maxThreads, boolean daemon) {
         ThreadPool pool = new ThreadPool(name, maxThreads, new SynchronousQueue<Runnable>(), daemon);
         return Executors.unconfigurableExecutorService(pool);
