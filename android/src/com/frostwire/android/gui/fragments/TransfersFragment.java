@@ -54,6 +54,8 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
+import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.Session;
 import com.frostwire.logging.Logger;
 import com.frostwire.transfers.*;
 import com.frostwire.util.Ref;
@@ -89,7 +91,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private int androidNotificationUpdateTick;
     private static boolean isVPNactive;
     private final OnVPNStatusCallback onVPNStatusCallback;
-    private final EngineService.CheckDHTUICallback onDHTCheckCallback;
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
     private final SwipeDetector viewSwipeDetector;
@@ -103,7 +104,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         this.buttonMenuListener = new ButtonMenuListener(this);
         selectedStatus = TransferStatus.ALL;
         this.onVPNStatusCallback = new OnVPNStatusCallback();
-        this.onDHTCheckCallback = new OnCheckDHTCallback();
         vpnRichToastHandler = new Handler();
         viewSwipeDetector = new SwipeDetector(this, 100);
     }
@@ -186,7 +186,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         textUploads.setText(uploads + " @ " + sUp);
         updateVPNButtonIfStatusChanged(TransfersFragment.isVPNactive);
         EngineService.asyncCheckVPNStatus(getView(), onVPNStatusCallback);
-        EngineService.asyncCheckDHTPeers(getView(), onDHTCheckCallback);
     }
 
     private void updatePermanentStatusNotification(String sDown, String sUp, int downloads, int uploads) {
@@ -199,6 +198,27 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                     sDown,
                     uploads,
                     sUp);
+
+            checkDHTPeers();
+        }
+    }
+
+    private void checkDHTPeers() {
+        try {
+            BTEngine engine = BTEngine.getInstance();
+            final Session session = engine.getSession();
+            if (session != null && session.isDHTRunning()) {
+                session.postDHTStats();
+                final int totalDHTNodes = engine.getTotalDHTNodes();
+                if (totalDHTNodes > 0) {
+                    onCheckDHT(true, totalDHTNodes);
+
+                }
+            } else {
+                onCheckDHT(false, 0);
+            }
+        } catch (Throwable e) {
+            LOG.error("Error updating DHT status in transfers", e);
         }
     }
 
@@ -237,46 +257,42 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    private class OnCheckDHTCallback implements EngineService.CheckDHTUICallback {
-
-        @Override
-        public void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
-            if (textDHTPeers == null || !TransfersFragment.this.isAdded()) {
-                return;
-            }
-
-            textDHTPeers.setVisibility(View.VISIBLE);
-            showTorrentSettingsOnClick = true;
-
-            // No Internet
-            if (NetworkManager.instance().isInternetDown()) {
-                textDHTPeers.setText(R.string.check_internet_connection);
-                return;
-            }
-
-            // Saving Data on Mobile
-            if (TransferManager.instance().isMobileAndDataSavingsOn()) {
-                textDHTPeers.setText(R.string.bittorrent_off_data_saver_on);
-                return;
-            }
-
-            // BitTorrent Turned off
-            if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
-                // takes you to main settings screen so you can turn it back on.
-                showTorrentSettingsOnClick = false;
-                textDHTPeers.setText(R.string.bittorrent_off);
-                return;
-            }
-
-            // No DHT
-            if (!dhtEnabled) {
-                textDHTPeers.setVisibility(View.GONE);
-                return;
-            }
-
-            // DHT On.
-            textDHTPeers.setText(dhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
+    private void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
+        if (textDHTPeers == null || !TransfersFragment.this.isAdded()) {
+            return;
         }
+
+        textDHTPeers.setVisibility(View.VISIBLE);
+        showTorrentSettingsOnClick = true;
+
+        // No Internet
+        if (NetworkManager.instance().isInternetDown()) {
+            textDHTPeers.setText(R.string.check_internet_connection);
+            return;
+        }
+
+        // Saving Data on Mobile
+        if (TransferManager.instance().isMobileAndDataSavingsOn()) {
+            textDHTPeers.setText(R.string.bittorrent_off_data_saver_on);
+            return;
+        }
+
+        // BitTorrent Turned off
+        if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
+            // takes you to main settings screen so you can turn it back on.
+            showTorrentSettingsOnClick = false;
+            textDHTPeers.setText(R.string.bittorrent_off);
+            return;
+        }
+
+        // No DHT
+        if (!dhtEnabled) {
+            textDHTPeers.setVisibility(View.GONE);
+            return;
+        }
+
+        // DHT On.
+        textDHTPeers.setText(dhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
     }
 
     @Override
@@ -369,7 +385,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         list.setOnTouchListener(viewSwipeDetector);
 
         textDHTPeers = findView(v, R.id.fragment_transfers_dht_peers);
-        textDHTPeers.setVisibility(View.GONE);
+        textDHTPeers.setVisibility(View.INVISIBLE);
         textDHTPeers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -393,6 +409,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
         });
         initVPNStatusButton(v);
+        checkDHTPeers();
     }
 
     private void initVPNStatusButton(View v) {

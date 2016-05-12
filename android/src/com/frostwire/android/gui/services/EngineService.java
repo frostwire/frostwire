@@ -387,40 +387,6 @@ public class EngineService extends Service implements IEngineService {
         });
     }
 
-    public static void asyncCheckDHTPeers(final View view, final CheckDHTUICallback callback) {
-        threadPool.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    BTEngine engine = BTEngine.getInstance();
-                    final Session session = engine.getSession();
-                    if (session != null && session.isDHTRunning()) {
-                        session.postDHTStats();
-                        final int totalDHTNodes = engine.getTotalDHTNodes();
-                        if (totalDHTNodes != -1 && view != null) {
-                            view.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    callback.onCheckDHT(true, totalDHTNodes);
-                                }
-                            });
-
-                        }
-                    } else {
-                        view.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onCheckDHT(false, 0);
-                            }
-                        });
-                    }
-                } catch (Throwable ignored) {
-                }
-
-            }
-        });
-    }
-
     public class EngineServiceBinder extends Binder {
         public EngineService getService() {
             return EngineService.this;
@@ -430,11 +396,6 @@ public class EngineService extends Service implements IEngineService {
     public interface VpnStatusUICallback {
         // Code inside this method must be for UI changes, meant to be executed on UI Thread
         void onVpnStatus(final boolean vpnActive);
-    }
-
-    public interface CheckDHTUICallback {
-        // Code inside this method must be for UI changes, meant to be executed on UI Thread
-        void onCheckDHT(final boolean dhtEnabled, final int dhtPeers);
     }
 
     private int getNotificationIcon() {
