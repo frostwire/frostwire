@@ -47,7 +47,7 @@ import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
-import com.frostwire.android.gui.transfers.*;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.SwipeDetector;
 import com.frostwire.android.gui.util.SwipeListener;
 import com.frostwire.android.gui.util.UIUtils;
@@ -93,6 +93,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
     private final SwipeDetector viewSwipeDetector;
+
+    private boolean showTorrentSettingsOnClick;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -236,18 +238,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     private class OnCheckDHTCallback implements EngineService.CheckDHTUICallback {
-        private View.OnClickListener onTextDHTPeersClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(v.getContext(), SettingsActivity.class);
-                if (showTorrentSettingsOnClick) {
-                    i.setAction(Constants.ACTION_SETTINGS_OPEN_TORRENT_SETTINGS);
-                }
-                v.getContext().startActivity(i);
-            }
-        };
-
-        private boolean showTorrentSettingsOnClick;
 
         @Override
         public void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
@@ -256,7 +246,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
 
             textDHTPeers.setVisibility(View.VISIBLE);
-            textDHTPeers.setOnClickListener(onTextDHTPeersClickListener);
             showTorrentSettingsOnClick = true;
 
             // No Internet
@@ -381,6 +370,17 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
         textDHTPeers = findView(v, R.id.fragment_transfers_dht_peers);
         textDHTPeers.setVisibility(View.GONE);
+        textDHTPeers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context ctx = v.getContext();
+                Intent i = new Intent(ctx, SettingsActivity.class);
+                if (showTorrentSettingsOnClick) {
+                    i.setAction(Constants.ACTION_SETTINGS_OPEN_TORRENT_SETTINGS);
+                }
+                ctx.startActivity(i);
+            }
+        });
         textDownloads = findView(v, R.id.fragment_transfers_text_downloads);
         textUploads = findView(v, R.id.fragment_transfers_text_uploads);
 
