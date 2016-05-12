@@ -162,7 +162,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     public void shutdown() {
         Offers.stopAdNetworks(this);
-        UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
+        //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
         Engine.instance().shutdown();
     }
@@ -516,6 +516,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void showShutdownDialog() {
+        UXStats.instance().flush();
         YesNoDialog dlg = YesNoDialog.newInstance(SHUTDOWN_DIALOG_ID, R.string.app_shutdown_dlg_title, R.string.app_shutdown_dlg_message);
         dlg.show(getFragmentManager()); //see onDialogClick
     }
