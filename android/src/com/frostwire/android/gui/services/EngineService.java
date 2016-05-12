@@ -138,9 +138,17 @@ public class EngineService extends Service implements IEngineService {
     // TODO: deal with potentially active connections
     private void stopOkHttp() {
         ConnectionPool pool = ConnectionPool.getDefault();
-        pool.evictAll();
-        synchronized (pool) {
-            pool.notifyAll();
+        try {
+            pool.evictAll();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        try {
+            synchronized (pool) {
+                pool.notifyAll();
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
     }
 
