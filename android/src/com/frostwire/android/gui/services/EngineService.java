@@ -234,11 +234,6 @@ public class EngineService extends Service implements IEngineService {
 
         state = STATE_STARTED;
 
-        updatePermanentStatusNotification(new WeakReference<Context>(this),
-                null,
-                0, "0 " + UIUtils.GENERAL_UNIT_KBPSEC,
-                0, "0 " + UIUtils.GENERAL_UNIT_KBPSEC);
-
         Log.v(TAG, "Engine started");
     }
 
