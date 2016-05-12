@@ -120,6 +120,18 @@ public class EngineService extends Service implements IEngineService {
         ImageLoader.getInstance(this).shutdown();
 
         stopOkHttp();
+
+        new Thread("shutdown-halt") {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    // ignore
+                }
+                android.os.Process.killProcess(android.os.Process.myPid());
+            }
+        }.start();
     }
 
     // what a bad design to properly shutdown the framework threads!
