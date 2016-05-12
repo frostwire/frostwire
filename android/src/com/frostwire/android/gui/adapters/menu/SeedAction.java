@@ -25,6 +25,11 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
@@ -126,10 +131,22 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void showNoWifiInformationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.wifi_network_unavailable);
-        builder.setMessage(R.string.according_to_settings_i_cant_seed_unless_wifi);
-        builder.create().show();
+        final Dialog newNoWifiInformationDialog = new Dialog(getContext(), R.style.DefaultDialogTheme);
+        newNoWifiInformationDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        newNoWifiInformationDialog.setContentView(R.layout.dialog_default_info);
+
+        TextView title = (TextView) newNoWifiInformationDialog.findViewById(R.id.dialog_default_info_title);
+        title.setText(R.string.wifi_network_unavailable);
+
+        TextView text = (TextView) newNoWifiInformationDialog.findViewById(R.id.dialog_default_info_text);
+        text.setText(R.string.according_to_settings_i_cant_seed_unless_wifi);
+
+        Button okButton = (Button) newNoWifiInformationDialog.findViewById(R.id.dialog_default_info_button_ok);
+        okButton.setText(android.R.string.ok);
+
+        okButton.setOnClickListener(new OkButtonOnClickListener(this, newNoWifiInformationDialog));
+
+        newNoWifiInformationDialog.show();
     }
 
     private void showBittorrentDisconnectedDialog() {
@@ -275,5 +292,20 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         });
 
 
+    }
+
+    private class OkButtonOnClickListener implements View.OnClickListener {
+        private final Dialog newNoWifiInformationDialog;
+        private final SeedAction seedAction;
+
+        public OkButtonOnClickListener(SeedAction seedAction, Dialog newNoWifiInformationDialog) {
+            this.newNoWifiInformationDialog = newNoWifiInformationDialog;
+            this.seedAction = seedAction;
+        }
+
+        @Override
+        public void onClick(View view) {
+            newNoWifiInformationDialog.dismiss();
+        }
     }
 }
