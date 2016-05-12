@@ -22,15 +22,17 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.Process;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
+import com.andrew.apollo.MediaButtonIntentReceiver;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -46,6 +48,7 @@ import com.frostwire.jlibtorrent.Session;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
+import com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver;
 import com.squareup.okhttp.ConnectionPool;
 
 import java.io.File;
@@ -94,12 +97,17 @@ public class EngineService extends Service implements IEngineService {
         LOG.info("FrostWire's EngineService started by this intent:");
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
+
+        enableReceivers(true);
+
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         LOG.debug("EngineService onDestroy");
+
+        enableReceivers(false);
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
 
@@ -112,18 +120,6 @@ public class EngineService extends Service implements IEngineService {
         ImageLoader.getInstance(this).shutdown();
 
         stopOkHttp();
-
-        new Thread("shutdown-halt") {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    // ignore
-                }
-                Process.killProcess(Process.myPid());
-            }
-        }.start();
     }
 
     // what a bad design to properly shutdown the framework threads!
@@ -133,6 +129,38 @@ public class EngineService extends Service implements IEngineService {
         pool.evictAll();
         synchronized (pool) {
             pool.notifyAll();
+        }
+    }
+
+    private void enableReceivers(boolean enable) {
+        PackageManager pm = getPackageManager();
+
+        enableReceiver(pm, ImIdShareBroadCastReceiver.class, enable);
+        enableReceiver(pm, EngineBroadcastReceiver.class, enable);
+        enableReceiver(pm, MediaButtonIntentReceiver.class, enable);
+    }
+
+    private void enableReceiver(PackageManager pm, Class<?> clazz, boolean enable) {
+        int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+        ComponentName receiver = new ComponentName(this, clazz);
+
+        int currentState = pm.getComponentEnabledSetting(receiver);
+        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+            LOG.info("Receiver " + receiver + " was disabled");
+        } else {
+            LOG.info("Receiver " + receiver + " was enabled");
+        }
+
+        pm.setComponentEnabledSetting(receiver,
+                newState,
+                PackageManager.DONT_KILL_APP);
+
+        currentState = pm.getComponentEnabledSetting(receiver);
+        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+            LOG.info("Receiver " + receiver + " now is disabled");
+        } else {
+            LOG.info("Receiver " + receiver + " now is enabled");
         }
     }
 
