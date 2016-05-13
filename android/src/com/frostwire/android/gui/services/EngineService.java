@@ -38,13 +38,12 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.Session;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
@@ -53,9 +52,6 @@ import com.squareup.okhttp.ConnectionPool;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -366,7 +362,7 @@ public class EngineService extends Service implements IEngineService {
         threadPool.submit(new Runnable() {
             @Override
             public void run() {
-                isVPNactive = isTunnelUp();
+                isVPNactive = NetworkManager.isTunnelUp();
 
                 if (callback != null && view != null) {
                     // execute the UI update on the UI thread.
@@ -406,39 +402,5 @@ public class EngineService extends Service implements IEngineService {
         long longPause = 180;
 
         return new long[]{0, shortVibration, longPause, shortVibration, shortPause, shortVibration, shortPause, shortVibration, mediumPause, mediumVibration};
-    }
-
-    /**
-     * takes 0ms (135052 ns) - checks diretory, and reads corresponding file to create NetworkInterface object.
-     */
-    private static boolean isTunnelUp() {
-        NetworkInterface tun0 = null;
-        try {
-            tun0 = NetworkInterface.getByName("tun0");
-        } catch (SocketException e) {
-            LOG.error(e.getMessage(), e);
-            return isAnyNetworkInterfaceATunnel();
-        }
-        return tun0 != null;
-    }
-
-    /* takes between 15ms to 65ms up to 300ms, will use as fallback. */
-    private static boolean isAnyNetworkInterfaceATunnel() {
-        boolean result = false;
-        try {
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (networkInterfaces.hasMoreElements()) {
-                NetworkInterface iface = networkInterfaces.nextElement();
-                //LOG.info("isAnyNetworkInterfaceATunnel() -> " + iface.getDisplayName());
-                if (iface.getDisplayName().contains("tun")) {
-                    result = true;
-                    break;
-                }
-            }
-        } catch (Throwable e) {
-            LOG.error(e.getMessage(), e);
-        }
-
-        return result;
     }
 }
