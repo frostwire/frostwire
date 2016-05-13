@@ -189,24 +189,13 @@ public final class BTEngine {
 
             downloader = null;
 
-            stopRunning();
-            session.swig().delete();
+            session.abort();
             session = null;
 
             fireStopped();
 
         } finally {
             sync.unlock();
-        }
-    }
-
-    private void stopRunning() {
-        try {
-            Field f = session.getClass().getDeclaredField("running");
-            f.setAccessible(true);
-            f.set(session, false);
-        } catch (Throwable e) {
-            LOG.error("Error setting internal running field to false", e);
         }
     }
 
