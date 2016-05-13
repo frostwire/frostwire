@@ -281,7 +281,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         if (finishedSuccessfully) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
             if (files != null && files.size() == 1) {
-                items.add(new SeedAction(context.get(), files.get(0),download));
+                items.add(new SeedAction(context.get(), files.get(0), download));
             }
             items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
         }
@@ -328,7 +328,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             }
         }
 
-        if ((download.isFinished() || download.isSeeding()) && (download.isPaused()) ) {
+        if ((download.isFinished() || download.isSeeding()) && (download.isPaused())) {
             items.add(new SeedAction(context.get(), download));
         }
 
@@ -472,7 +472,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
 
 
         title.setText(download.getDisplayName());
-        progress.setProgress(download.getProgress());
+        setProgress(progress, download.getProgress());
         title.setCompoundDrawables(null, null, null, null);
 
         final String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getState());
@@ -537,7 +537,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         final PaymentOptions paymentOptions = download.getPaymentOptions();
         final Resources r = context.get().getResources();
         Drawable tipDrawable = (paymentOptions.bitcoin != null) ? r.getDrawable(R.drawable.contextmenu_icon_donation_bitcoin) : r.getDrawable(R.drawable.contextmenu_icon_donation_fiat);
-        if (tipDrawable  != null) {
+        if (tipDrawable != null) {
             final int iconHeightInPixels = r.getDimensionPixelSize(R.dimen.view_transfer_list_item_title_left_drawable);
             tipDrawable.setBounds(0, 0, iconHeightInPixels, iconHeightInPixels);
             title.setCompoundDrawables(tipDrawable, null, null, null);
@@ -558,7 +558,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         peers.setText("");
         title.setText(download.getDisplayName());
         title.setCompoundDrawables(null, null, null, null);
-        progress.setProgress(download.getProgress());
+        setProgress(progress, download.getProgress());
         String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getState());
         status.setText(downloadStatus);
         speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
@@ -583,7 +583,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
 
         icon.setImageResource(MediaType.getFileTypeIconId(FilenameUtils.getExtension(item.getFile().getAbsolutePath())));
         title.setText(item.getDisplayName());
-        progress.setProgress(item.getProgress());
+        setProgress(progress, item.getProgress());
         size.setText(UIUtils.getBytesInHuman(item.getSize()));
 
         buttonPlay.setTag(item);
@@ -617,7 +617,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         peers.setText("");
         title.setText(download.getDisplayName());
         title.setCompoundDrawables(null, null, null, null);
-        progress.setProgress(download.getProgress());
+        setProgress(progress, download.getProgress());
         status.setText(TRANSFER_STATE_STRING_MAP.get(download.getState()));
         speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
         size.setText(UIUtils.getBytesInHuman(download.getSize()));
@@ -651,6 +651,15 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             LOG.error("Failed to create the menu", e);
         }
         return false;
+    }
+
+    // at least one phone does not provide this trivial optimization
+    // TODO: move this for a more framework like place, like a Views (utils) class
+    private static void setProgress(ProgressBar v, int progress) {
+        int old = v.getProgress();
+        if (old != progress) {
+            v.setProgress(progress);
+        }
     }
 
     private final class ViewOnClickListener implements OnClickListener {
