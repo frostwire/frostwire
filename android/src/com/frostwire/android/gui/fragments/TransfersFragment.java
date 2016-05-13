@@ -269,7 +269,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
         // No DHT
         if (!dhtEnabled) {
-            textDHTPeers.setVisibility(View.GONE);
+            textDHTPeers.setVisibility(View.INVISIBLE);
             return;
         }
 

@@ -816,7 +816,7 @@ public final class BTEngine {
                     firewalled = true;
                     break;
                 case DHT_STATS:
-                    totalDHTNodes = ((DhtStatsAlert) alert).totalNodes();
+                    totalDHTNodes = (int) session.getStats().dhtNodes();
                     break;
                 case STORAGE_MOVED:
                     doResumeData((TorrentAlert<?>) alert, true);
