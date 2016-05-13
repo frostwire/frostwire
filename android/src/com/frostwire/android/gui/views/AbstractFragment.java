@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import android.view.ViewGroup;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class AbstractFragment extends Fragment {
 
@@ -52,15 +51,10 @@ public abstract class AbstractFragment extends Fragment {
     protected final <T extends View> T findView(View v, int id) {
         T result = null;
         if (v != null) {
-           result = (T) v.findViewById(id);
+            result = (T) v.findViewById(id);
         }
         return result;
     }
-
-    /** Executed when the fragment is shown, and others are hidden.
-     *  @see MainActivity.switchContent()
-     */
-    public abstract void onShow();
 
     protected abstract void initComponents(View rootView);
 }

@@ -210,6 +210,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             return 0;
         }
 
+        if (th.getTorrentInfo() == null) {
+            return 0;
+        }
+
         // TODO: Add logic to check completion logic for merkle based torrents.
         if (th.getTorrentInfo().isMerkleTorrent()) {
             //final ArrayList<Sha1Hash> sha1Hashes = th.getTorrentInfo().merkleTree();

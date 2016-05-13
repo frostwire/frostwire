@@ -120,8 +120,7 @@ public class AboutFragment extends Fragment implements MainFragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onShow() {
     }
 
     private String getAboutText() {

@@ -19,315 +19,321 @@
  */
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.frostwire.android" android:installLocation="auto"
-	android:versionCode="249" android:versionName="1.7.4">
-	<!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
-	<!-- Plus  android:versionCode="9050xyz" (always commit like this, plus!)-->
-	<!-- Basic android:versionCode="9010xyz" (don't commit like this) -->
-	<!-- Plus version example  for 1.7.2 build 242  -> 9050242 -->
-	<!-- Basic version example for 1.7.2 build 242  -> 9010242 -->
-	<!-- Don't go nuts, max version number will be: 2,147,483,647 -->
+          package="com.frostwire.android" android:installLocation="auto"
+          android:versionCode="249" android:versionName="1.7.4">
+    <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
+    <!-- Plus  android:versionCode="9050xyz" (always commit like this, plus!)-->
+    <!-- Basic android:versionCode="9010xyz" (don't commit like this) -->
+    <!-- Plus version example  for 1.7.2 build 242  -> 9050242 -->
+    <!-- Basic version example for 1.7.2 build 242  -> 9010242 -->
+    <!-- Don't go nuts, max version number will be: 2,147,483,647 -->
 
-	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="23" />
+    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="23"/>
 
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
-	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.SET_WALLPAPER" />
-	<uses-permission android:name="android.permission.VIBRATE" />
-	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-	<uses-permission android:name="android.permission.BROADCAST_STICKY" />
-	<uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-	<uses-permission android:name="android.permission.GET_TASKS" />
-	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-	<uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="com.android.vending.BILLING" />
-	<uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="com.android.vending.BILLING"/>
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"/>
 
-	<application android:name="com.frostwire.android.gui.MainApplication"
-		android:allowBackup="true" android:icon="@mipmap/ic_launcher"
-		android:label="@string/application_label" android:theme="@style/Theme.FrostWire">
+    <application android:name="com.frostwire.android.gui.MainApplication"
+                 android:allowBackup="true" android:icon="@mipmap/ic_launcher"
+                 android:label="@string/application_label" android:theme="@style/Theme.FrostWire">
 
         <meta-data android:name="com.google.android.gms.version"
-                   android:value="@integer/google_play_services_version" />
+                   android:value="@integer/google_play_services_version"/>
 
-		<!-- activities -->
+        <!-- activities -->
 
-		<activity android:name="com.frostwire.android.gui.activities.MainActivity"
-			android:label="@string/application_label"
-			android:protectionLevel="dangerous">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<action android:name="android.intent.action.MUSIC_PLAYER" />
+        <activity android:name="com.frostwire.android.gui.activities.MainActivity"
+                  android:label="@string/application_label"
+                  android:protectionLevel="dangerous">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MUSIC_PLAYER"/>
 
-				<category android:name="android.intent.category.LAUNCHER" />
-				<category android:name="android.intent.category.APP_MUSIC" />
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-
-			<!-- handle .torrent urls, files and magnets -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="*" android:pathPattern=".*\\.torrent" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="*" android:pathPattern=".*\\.torrent" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:mimeType="*/*" android:scheme="http" android:host="*" android:pathPattern=".*\\.torrent" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:mimeType="*/*" android:scheme="https" android:host="*" android:pathPattern=".*\\.torrent" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:mimeType="application/x-bittorrent" android:scheme="http" android:host="*" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:mimeType="application/x-bittorrent" android:scheme="https" android:host="*" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="magnet" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:mimeType="*/*" />
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.torrent" />
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\.torrent" />
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\.torrent" />
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\.torrent" />
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\..*\\.torrent" />
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="file" android:pathPattern=".*\\.torrent" />
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.APP_MUSIC"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
 
-			<!-- share a file sent by another app -->
-			<intent-filter>
-				<!--this might come back if we figure out DHT messaging -->
-				<!--<action android:name="android.intent.action.SEND" />-->
-
-				<category android:name="android.intent.category.DEFAULT" />
-
-				<data android:mimeType="*/*" />
-			</intent-filter>
-		</activity>
-		<activity android:name="com.frostwire.android.gui.activities.WizardActivity"
-			android:label="@string/application_label" android:screenOrientation="portrait" />
-		<activity android:name=".gui.activities.SettingsActivity"
-			android:label="@string/activity_preferences_name" android:theme="@style/Preferences" />
-		<activity android:name="com.frostwire.android.gui.activities.AboutActivity"
-				  android:label="@string/about" />
-		<activity android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
-				  android:label="@string/playing"
-                  android:configChanges="orientation|screenSize" />
-
-	    <activity
-			android:name="com.frostwire.android.gui.activities.NoBTCWalletAvailableActivity"
-			android:label="@string/install_bitcoin_wallet">
-		</activity>
-
-		<!-- Main activity -->
-		<activity
-			android:name="com.andrew.apollo.ui.activities.HomeActivity"
-			android:windowSoftInputMode="adjustPan">
-		</activity>
-		<!-- Now playing -->
-		<activity
-			android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
-			android:clearTaskOnLaunch="true"
-			android:launchMode="singleTask"
-			android:windowSoftInputMode="adjustPan">
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-
-				<data android:scheme="content" />
-				<data android:mimeType="audio/*" />
-				<data android:mimeType="application/ogg" />
-				<data android:mimeType="application/x-ogg" />
-				<data android:mimeType="application/itunes" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-
-				<data android:scheme="file" />
-				<data android:mimeType="audio/*" />
-				<data android:mimeType="application/ogg" />
-				<data android:mimeType="application/x-ogg" />
-				<data android:mimeType="application/itunes" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
-
-				<data android:scheme="http" />
-				<data android:mimeType="audio/*" />
-				<data android:mimeType="application/ogg" />
-				<data android:mimeType="application/x-ogg" />
-				<data android:mimeType="application/itunes" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-
-				<data android:mimeType="vnd.android.cursor.dir/playlist" />
-				<data android:mimeType="vnd.android.cursor.dir/albums" />
-				<data android:mimeType="vnd.android.cursor.dir/artists" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="com.frostwire.android.AUDIO_PLAYER" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.PICK" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.OPENABLE" />
-				<data android:mimeType="vnd.android.cursor.dir/audio"/>
-			</intent-filter>
-		</activity>
-		<!-- Profile phone Activity -->
-		<activity
-			android:name="com.andrew.apollo.ui.activities.ProfileActivity"
-			android:excludeFromRecents="true" />
-		<!-- Shortcut launcher Activity -->
-		<activity
-			android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
-			android:excludeFromRecents="true"
-			android:theme="@style/Theme.Transparent" >
-			<intent-filter>
-				<action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		<!-- Search interface -->
-		<activity
-			android:name="com.andrew.apollo.ui.activities.SearchActivity"
-			android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity">
-			<intent-filter>
-				<action android:name="android.intent.action.SEARCH" />
-				<action android:name="android.intent.action.MEDIA_SEARCH" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-
-			<meta-data
-				android:name="android.app.searchable"
-				android:resource="@xml/searchable" />
-		</activity>
-		<!-- VPN Status -->
-		<activity android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
-			      android:label="@string/activity_VPN"
-				  android:excludeFromRecents="true"
-				  android:noHistory="true"/>
-
-		<!-- mobile core -->
-		<!--
-		<activity
-				android:name="com.ironsource.mobilcore.InterstitialVideoActivity"
-				android:configChanges="keyboardHidden|orientation|screenSize"
-				android:keepScreenOn="true"/>
-
-		<service
-				android:name="com.ironsource.mobilcore.MobileCoreReport"
-				android:enabled="true"
-				android:exported="false">
-		</service>
-
-		<receiver
-				android:name="com.ironsource.mobilcore.InstallationTracker"
-				android:enabled="true">
-		</receiver>
-		-->
-		<!-- end of mobile core -->
-
-		<!-- InMobi -->
-		<activity android:name="com.inmobi.rendering.InMobiAdActivity"
-				  android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize"
-				  android:theme="@android:style/Theme.Translucent.NoTitleBar"
-				  android:hardwareAccelerated="true" />
-
-		<receiver
-				android:name="com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver"
-				android:enabled="true"
-				android:exported="true" >
-			<intent-filter>
-				<action android:name="com.android.vending.INSTALL_REFERRER" />
-				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-				<action android:name="com.inmobi.share.id" />
-			</intent-filter>
-		</receiver>
-
-		<!-- end of InMobi -->
-
-		<!-- AppLovin -->
-		<meta-data android:name="applovin.sdk.key"
-				   android:value="PDAf5nX3UvzDFSGe52hI1kez_GTHC4GcIQGOCpRghOuyr9axCGDD_sB-6kFJpWw5yBU8_wphJhd8rD32UHGT8R"  />
-
-		<activity android:name="com.applovin.adview.AppLovinInterstitialActivity" />
-		<activity android:name="com.applovin.adview.AppLovinConfirmationActivity" />
-		<meta-data android:name="applovin.sdk.verbose_logging" android:value="false" />
-		<!-- end of AppLovin -->
-
-		<!-- services -->
-
-		<service android:name="com.frostwire.android.gui.services.EngineService"
-			android:exported="false" />
-		<service android:name="com.andrew.apollo.MusicPlaybackService" android:protectionLevel="dangerous"/>
-
-		<receiver android:name="com.frostwire.android.gui.services.EngineBroadcastReceiver">
-			<intent-filter>
-				<action android:name="android.intent.action.BOOT_COMPLETED" />
-			</intent-filter>
-		</receiver>
-
-		<receiver android:name="com.andrew.apollo.MediaButtonIntentReceiver" >
+            <!-- handle .torrent urls, files and magnets -->
             <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="http" android:host="*" android:pathPattern=".*\\.torrent"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https" android:host="*" android:pathPattern=".*\\.torrent"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="*/*" android:scheme="http" android:host="*" android:pathPattern=".*\\.torrent"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="*/*" android:scheme="https" android:host="*"
+                      android:pathPattern=".*\\.torrent"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="application/x-bittorrent" android:scheme="http" android:host="*"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="application/x-bittorrent" android:scheme="https" android:host="*"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="magnet"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="*/*"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.torrent"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\.torrent"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\.torrent"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\.torrent"/>
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\..*\\.torrent"/>
+                <data android:scheme="file" android:host="*"
+                      android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
+                <data android:scheme="file" android:host="*"
+                      android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
+                <data android:scheme="file" android:host="*"
+                      android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
+                <data android:scheme="file" android:host="*"
+                      android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
+                <data android:scheme="file" android:host="*"
+                      android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="file" android:pathPattern=".*\\.torrent"/>
+            </intent-filter>
+
+            <!-- share a file sent by another app -->
+            <intent-filter>
+                <!--this might come back if we figure out DHT messaging -->
+                <!--<action android:name="android.intent.action.SEND" />-->
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="*/*"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.frostwire.android.gui.activities.WizardActivity"
+                  android:label="@string/application_label" android:screenOrientation="portrait"/>
+        <activity android:name=".gui.activities.SettingsActivity"
+                  android:label="@string/activity_preferences_name" android:theme="@style/Preferences"/>
+        <activity android:name="com.frostwire.android.gui.activities.AboutActivity"
+                  android:label="@string/about"/>
+        <activity android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
+                  android:label="@string/playing"
+                  android:configChanges="orientation|screenSize"/>
+
+        <activity
+                android:name="com.frostwire.android.gui.activities.NoBTCWalletAvailableActivity"
+                android:label="@string/install_bitcoin_wallet">
+        </activity>
+
+        <!-- Main activity -->
+        <activity
+                android:name="com.andrew.apollo.ui.activities.HomeActivity"
+                android:windowSoftInputMode="adjustPan">
+        </activity>
+        <!-- Now playing -->
+        <activity
+                android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
+                android:clearTaskOnLaunch="true"
+                android:launchMode="singleTask"
+                android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:scheme="content"/>
+                <data android:mimeType="audio/*"/>
+                <data android:mimeType="application/ogg"/>
+                <data android:mimeType="application/x-ogg"/>
+                <data android:mimeType="application/itunes"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:scheme="file"/>
+                <data android:mimeType="audio/*"/>
+                <data android:mimeType="application/ogg"/>
+                <data android:mimeType="application/x-ogg"/>
+                <data android:mimeType="application/itunes"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="http"/>
+                <data android:mimeType="audio/*"/>
+                <data android:mimeType="application/ogg"/>
+                <data android:mimeType="application/x-ogg"/>
+                <data android:mimeType="application/itunes"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="vnd.android.cursor.dir/playlist"/>
+                <data android:mimeType="vnd.android.cursor.dir/albums"/>
+                <data android:mimeType="vnd.android.cursor.dir/artists"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.frostwire.android.AUDIO_PLAYER"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PICK"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.OPENABLE"/>
+                <data android:mimeType="vnd.android.cursor.dir/audio"/>
+            </intent-filter>
+        </activity>
+        <!-- Profile phone Activity -->
+        <activity
+                android:name="com.andrew.apollo.ui.activities.ProfileActivity"
+                android:excludeFromRecents="true"/>
+        <!-- Shortcut launcher Activity -->
+        <activity
+                android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
+                android:excludeFromRecents="true"
+                android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <!-- Search interface -->
+        <activity
+                android:name="com.andrew.apollo.ui.activities.SearchActivity"
+                android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+                <action android:name="android.intent.action.MEDIA_SEARCH"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <meta-data
+                    android:name="android.app.searchable"
+                    android:resource="@xml/searchable"/>
+        </activity>
+        <!-- VPN Status -->
+        <activity android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
+                  android:label="@string/activity_VPN"
+                  android:excludeFromRecents="true"
+                  android:noHistory="true"/>
+
+        <!-- mobile core -->
+        <!--
+        <activity
+                android:name="com.ironsource.mobilcore.InterstitialVideoActivity"
+                android:configChanges="keyboardHidden|orientation|screenSize"
+                android:keepScreenOn="true"/>
+
+        <service
+                android:name="com.ironsource.mobilcore.MobileCoreReport"
+                android:enabled="true"
+                android:exported="false">
+        </service>
+
+        <receiver
+                android:name="com.ironsource.mobilcore.InstallationTracker"
+                android:enabled="true">
+        </receiver>
+        -->
+        <!-- end of mobile core -->
+
+        <!-- InMobi -->
+        <activity android:name="com.inmobi.rendering.InMobiAdActivity"
+                  android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize"
+                  android:theme="@android:style/Theme.Translucent.NoTitleBar"
+                  android:hardwareAccelerated="true"/>
+
+        <receiver
+                android:name="com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver"
+                android:enabled="true"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="com.inmobi.share.id"/>
             </intent-filter>
         </receiver>
-	</application>
+
+        <!-- end of InMobi -->
+
+        <!-- AppLovin -->
+        <meta-data android:name="applovin.sdk.key"
+                   android:value="PDAf5nX3UvzDFSGe52hI1kez_GTHC4GcIQGOCpRghOuyr9axCGDD_sB-6kFJpWw5yBU8_wphJhd8rD32UHGT8R"/>
+
+        <activity android:name="com.applovin.adview.AppLovinInterstitialActivity"/>
+        <activity android:name="com.applovin.adview.AppLovinConfirmationActivity"/>
+        <meta-data android:name="applovin.sdk.verbose_logging" android:value="false"/>
+        <!-- end of AppLovin -->
+
+        <!-- services -->
+
+        <service android:name="com.frostwire.android.gui.services.EngineService"
+                 android:exported="false"/>
+        <service android:name="com.andrew.apollo.MusicPlaybackService" android:protectionLevel="dangerous"/>
+
+        <receiver android:name="com.frostwire.android.gui.services.EngineBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="com.andrew.apollo.MediaButtonIntentReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
+                <action android:name="android.media.AUDIO_BECOMING_NOISY"/>
+            </intent-filter>
+        </receiver>
+    </application>
 </manifest>

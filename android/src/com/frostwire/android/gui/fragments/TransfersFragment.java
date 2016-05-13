@@ -46,13 +46,15 @@ import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
-import com.frostwire.android.gui.transfers.*;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.SwipeDetector;
 import com.frostwire.android.gui.util.SwipeListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
+import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.Session;
 import com.frostwire.logging.Logger;
 import com.frostwire.transfers.*;
 import com.frostwire.util.Ref;
@@ -63,10 +65,8 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener, SwipeListener {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
@@ -88,12 +88,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TransferStatus selectedStatus;
     private TimerSubscription subscription;
     private int androidNotificationUpdateTick;
-    private static boolean isVPNactive;
-    private final OnVPNStatusCallback onVPNStatusCallback;
-    private final EngineService.CheckDHTUICallback onDHTCheckCallback;
+    private boolean isVPNactive;
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
     private final SwipeDetector viewSwipeDetector;
+
+    private boolean showTorrentSettingsOnClick;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -101,8 +101,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         this.buttonAddTransferListener = new ButtonAddTransferListener(this);
         this.buttonMenuListener = new ButtonMenuListener(this);
         selectedStatus = TransferStatus.ALL;
-        this.onVPNStatusCallback = new OnVPNStatusCallback();
-        this.onDHTCheckCallback = new OnCheckDHTCallback();
         vpnRichToastHandler = new Handler();
         viewSwipeDetector = new SwipeDetector(this, 100);
     }
@@ -121,16 +119,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-    
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         subscription = TimerService.subscribe(this, 2);
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -169,8 +162,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
 
         //  format strings
-        String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth()/1024);
-        String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth()/1024);
+        String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
+        String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
 
         // number of uploads (seeding) and downloads
         int downloads = TransferManager.instance().getActiveDownloads();
@@ -183,9 +176,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private void updateStatusBar(String sDown, String sUp, int downloads, int uploads) {
         textDownloads.setText(downloads + " @ " + sDown);
         textUploads.setText(uploads + " @ " + sUp);
-        updateVPNButtonIfStatusChanged(TransfersFragment.isVPNactive);
-        EngineService.asyncCheckVPNStatus(getView(), onVPNStatusCallback);
-        EngineService.asyncCheckDHTPeers(getView(), onDHTCheckCallback);
+        updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
     }
 
     private void updatePermanentStatusNotification(String sDown, String sUp, int downloads, int uploads) {
@@ -193,18 +184,38 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             androidNotificationUpdateTick = 0;
             EngineService.updatePermanentStatusNotification(
                     new WeakReference<Context>(getActivity()),
-                    new WeakReference<>(getView()),
                     downloads,
                     sDown,
                     uploads,
                     sUp);
+
+            checkDHTPeers();
+        }
+    }
+
+    private void checkDHTPeers() {
+        try {
+            BTEngine engine = BTEngine.getInstance();
+            final Session session = engine.getSession();
+            if (session != null && session.isDHTRunning()) {
+                session.postDHTStats();
+                final int totalDHTNodes = engine.getTotalDHTNodes();
+                if (totalDHTNodes > 0) {
+                    onCheckDHT(true, totalDHTNodes);
+
+                }
+            } else {
+                onCheckDHT(false, 0);
+            }
+        } catch (Throwable e) {
+            LOG.error("Error updating DHT status in transfers", e);
         }
     }
 
     private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
-        boolean wasActiveBefore = TransfersFragment.isVPNactive && !vpnActive;
+        boolean wasActiveBefore = isVPNactive && !vpnActive;
 
-        TransfersFragment.isVPNactive = vpnActive;
+        isVPNactive = vpnActive;
         final ImageView view = findView(getView(), R.id.fragment_transfers_status_vpn_icon);
         if (view != null) {
             view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
@@ -227,68 +238,42 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         selectStatusTabToThe(false);
     }
 
-    private class OnVPNStatusCallback implements EngineService.VpnStatusUICallback {
-        @Override
-        public void onVpnStatus(final boolean vpnActive) {
-            if (TransfersFragment.this.isAdded()) {
-                TransfersFragment.this.updateVPNButtonIfStatusChanged(vpnActive);
-            }
+    private void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
+        if (textDHTPeers == null || !TransfersFragment.this.isAdded()) {
+            return;
         }
-    }
 
-    private class OnCheckDHTCallback implements EngineService.CheckDHTUICallback {
-        private View.OnClickListener onTextDHTPeersClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(v.getContext(), SettingsActivity.class);
-                if (showTorrentSettingsOnClick) {
-                    i.setAction(Constants.ACTION_SETTINGS_OPEN_TORRENT_SETTINGS);
-                }
-                v.getContext().startActivity(i);
-            }
-        };
+        textDHTPeers.setVisibility(View.VISIBLE);
+        showTorrentSettingsOnClick = true;
 
-        private boolean showTorrentSettingsOnClick;
-
-        @Override
-        public void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
-            if (textDHTPeers==null || !TransfersFragment.this.isAdded()) {
-                return;
-            }
-
-            textDHTPeers.setVisibility(View.VISIBLE);
-            textDHTPeers.setOnClickListener(onTextDHTPeersClickListener);
-            showTorrentSettingsOnClick = true;
-
-            // No Internet
-            if (NetworkManager.instance().isInternetDown()) {
-                textDHTPeers.setText(R.string.check_internet_connection);
-                return;
-            }
-
-            // Saving Data on Mobile
-            if (TransferManager.instance().isMobileAndDataSavingsOn()) {
-                textDHTPeers.setText(R.string.bittorrent_off_data_saver_on);
-                return;
-            }
-
-            // BitTorrent Turned off
-            if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
-                // takes you to main settings screen so you can turn it back on.
-                showTorrentSettingsOnClick = false;
-                textDHTPeers.setText(R.string.bittorrent_off);
-                return;
-            }
-
-            // No DHT
-            if (!dhtEnabled) {
-                textDHTPeers.setVisibility(View.GONE);
-                return;
-            }
-
-            // DHT On.
-            textDHTPeers.setText(dhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
+        // No Internet
+        if (NetworkManager.instance().isInternetDown()) {
+            textDHTPeers.setText(R.string.check_internet_connection);
+            return;
         }
+
+        // Saving Data on Mobile
+        if (TransferManager.instance().isMobileAndDataSavingsOn()) {
+            textDHTPeers.setText(R.string.bittorrent_off_data_saver_on);
+            return;
+        }
+
+        // BitTorrent Turned off
+        if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
+            // takes you to main settings screen so you can turn it back on.
+            showTorrentSettingsOnClick = false;
+            textDHTPeers.setText(R.string.bittorrent_off);
+            return;
+        }
+
+        // No DHT
+        if (!dhtEnabled) {
+            textDHTPeers.setVisibility(View.INVISIBLE);
+            return;
+        }
+
+        // DHT On.
+        textDHTPeers.setText(dhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
     }
 
     @Override
@@ -312,7 +297,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void selectStatusTabToThe(boolean right) {
         final TransferStatus[] allStatusesArray = TransferStatus.getAllStatusesArray();
         int currentStatusIndex = -1;
-        for (int i=0; i < allStatusesArray.length; i++) {
+        for (int i = 0; i < allStatusesArray.length; i++) {
             if (selectedStatus == allStatusesArray[i]) {
                 currentStatusIndex = i;
                 break;
@@ -331,15 +316,15 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void selectStatusTab(TransferStatus status) {
         selectedStatus = status;
         switch (selectedStatus) {
-        case ALL:
-            buttonSelectAll.performClick();
-            break;
-        case DOWNLOADING:
-            buttonSelectDownloading.performClick();
-            break;
-        case COMPLETED:
-            buttonSelectCompleted.performClick();
-            break;
+            case ALL:
+                buttonSelectAll.performClick();
+                break;
+            case DOWNLOADING:
+                buttonSelectDownloading.performClick();
+                break;
+            case COMPLETED:
+                buttonSelectCompleted.performClick();
+                break;
         }
     }
 
@@ -347,7 +332,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void onShow() {
         if (firstTimeShown) {
             firstTimeShown = false;
-            if (!TransfersFragment.isVPNactive) {
+            if (!NetworkManager.instance().isTunnelUp()) {
                 showVPNRichToast();
             }
         }
@@ -366,8 +351,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     @Override
     protected void initComponents(View v) {
-	    initStorageRelatedRichNotifications(v);
-    	
+        initStorageRelatedRichNotifications(v);
+
         buttonSelectAll = findView(v, R.id.fragment_transfers_button_select_all);
         buttonSelectAll.setOnClickListener(new ButtonTabListener(this, TransferStatus.ALL));
 
@@ -381,7 +366,18 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         list.setOnTouchListener(viewSwipeDetector);
 
         textDHTPeers = findView(v, R.id.fragment_transfers_dht_peers);
-        textDHTPeers.setVisibility(View.GONE);
+        textDHTPeers.setVisibility(View.INVISIBLE);
+        textDHTPeers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context ctx = v.getContext();
+                Intent i = new Intent(ctx, SettingsActivity.class);
+                if (showTorrentSettingsOnClick) {
+                    i.setAction(Constants.ACTION_SETTINGS_OPEN_TORRENT_SETTINGS);
+                }
+                ctx.startActivity(i);
+            }
+        });
         textDownloads = findView(v, R.id.fragment_transfers_text_downloads);
         textUploads = findView(v, R.id.fragment_transfers_text_uploads);
 
@@ -394,6 +390,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
         });
         initVPNStatusButton(v);
+        checkDHTPeers();
     }
 
     private void initVPNStatusButton(View v) {
@@ -401,23 +398,22 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         vpnStatusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getActivity(),
-                        VPNStatusDetailActivity.class).
-
-                        setAction(TransfersFragment.isVPNactive ?
-                                Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
-                                Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
+                Context ctx = v.getContext();
+                Intent i = new Intent(ctx, VPNStatusDetailActivity.class);
+                i.setAction(isVPNactive ?
+                        Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
+                        Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                i.putExtra("from","transfers");
-                startActivity(i);
+                i.putExtra("from", "transfers");
+                ctx.startActivity(i);
             }
         });
     }
 
-	public void initStorageRelatedRichNotifications(View v) {
-	    if (v == null) {
-	        v = getView();
-	    }
+    public void initStorageRelatedRichNotifications(View v) {
+        if (v == null) {
+            v = getView();
+        }
         RichNotification sdCardNotification = findView(v, R.id.fragment_transfers_sd_card_notification);
         sdCardNotification.setVisibility(View.GONE);
 
@@ -433,9 +429,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 sdCardNotification.setOnClickListener(new SDCardNotificationListener(this));
             }
         }
-		
-		//if you do have an SD Card mounted and you're using internal memory, we'll let you know
-		//that you now can use the SD Card. We'll keep this for a few releases.
+
+        //if you do have an SD Card mounted and you're using internal memory, we'll let you know
+        //that you now can use the SD Card. We'll keep this for a few releases.
         File sdCardDir = getBiggestSDCardDir(getActivity());
 		if (sdCardDir != null && com.frostwire.android.util.SystemUtils.isSecondaryExternalStorageMounted(sdCardDir) &&
 			!TransferManager.isUsingSDCardPrivateStorage() &&
@@ -459,24 +455,24 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         Iterator<Transfer> it;
 
         switch (status) { // replace this filter by a more functional style
-        case DOWNLOADING:
-            it = transfers.iterator();
-            while (it.hasNext()) {
-                if (it.next().isComplete()) {
-                    it.remove();
+            case DOWNLOADING:
+                it = transfers.iterator();
+                while (it.hasNext()) {
+                    if (it.next().isComplete()) {
+                        it.remove();
+                    }
                 }
-            }
-            return transfers;
-        case COMPLETED:
-            it = transfers.iterator();
-            while (it.hasNext()) {
-                if (!it.next().isComplete()) {
-                    it.remove();
+                return transfers;
+            case COMPLETED:
+                it = transfers.iterator();
+                while (it.hasNext()) {
+                    if (!it.next().isComplete()) {
+                        it.remove();
+                    }
                 }
-            }
-            return transfers;
-        default:
-            return transfers;
+                return transfers;
+            default:
+                return transfers;
         }
     }
 
@@ -490,25 +486,25 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void onDialogClick(String tag, int which) {
         if (tag.equals(TRANSFERS_DIALOG_ID)) {
             switch (which) {
-            case CLEAR_MENU_DIALOG_ID:
-                TransferManager.instance().clearComplete();
-                break;
-            case PAUSE_MENU_DIALOG_ID:
-                TransferManager.instance().stopHttpTransfers();
-                TransferManager.instance().pauseTorrents();
-                break;
-            case RESUME_MENU_DIALOG_ID:
-                boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
-                if (bittorrentDisconnected){
-                    UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
-                } else {
-                    if (NetworkManager.instance().isDataUp()) {
-                        TransferManager.instance().resumeResumableTransfers();
+                case CLEAR_MENU_DIALOG_ID:
+                    TransferManager.instance().clearComplete();
+                    break;
+                case PAUSE_MENU_DIALOG_ID:
+                    TransferManager.instance().stopHttpTransfers();
+                    TransferManager.instance().pauseTorrents();
+                    break;
+                case RESUME_MENU_DIALOG_ID:
+                    boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
+                    if (bittorrentDisconnected) {
+                        UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
                     } else {
-                        UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
+                        if (NetworkManager.instance().isDataUp()) {
+                            TransferManager.instance().resumeResumableTransfers();
+                        } else {
+                            UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
+                        }
                     }
-                }
-                break;
+                    break;
             }
             setupAdapter();
         }
@@ -633,7 +629,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private void startCloudTransfer(String text) {
         if (text.contains("soundcloud.com/")) {
-            new DownloadSoundcloudFromUrlTask(getActivity(),text.trim()).execute();
+            new DownloadSoundcloudFromUrlTask(getActivity(), text.trim()).execute();
         } else if (text.contains("youtube.com/")) {
             startYouTubeSearchFromUrl(text.trim());
         } else {
@@ -753,10 +749,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public enum TransferStatus {
         ALL, DOWNLOADING, COMPLETED;
 
-        private static TransferStatus[] STATUS_ARRAY = new TransferStatus[] {
+        private static TransferStatus[] STATUS_ARRAY = new TransferStatus[]{
                 ALL,
                 DOWNLOADING,
-                COMPLETED };
+                COMPLETED};
 
         public static TransferStatus[] getAllStatusesArray() {
             return STATUS_ARRAY;
@@ -839,18 +835,18 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             f.onTime();
         }
     }
-    
+
     private static final class SDCardNotificationListener extends ClickAdapter<TransfersFragment> {
 
-		SDCardNotificationListener(TransfersFragment owner) {
-			super(owner);
-		}
-    	
-		@Override
-		public void onClick(TransfersFragment owner, View v) {
-	        Intent i = new Intent(owner.getActivity(), SettingsActivity.class);
-	        i.setAction(Constants.ACTION_SETTINGS_SELECT_STORAGE);
-	        owner.getActivity().startActivity(i);
-		}
+        SDCardNotificationListener(TransfersFragment owner) {
+            super(owner);
+        }
+
+        @Override
+        public void onClick(TransfersFragment owner, View v) {
+            Intent i = new Intent(owner.getActivity(), SettingsActivity.class);
+            i.setAction(Constants.ACTION_SETTINGS_SELECT_STORAGE);
+            owner.getActivity().startActivity(i);
+        }
     }
 }

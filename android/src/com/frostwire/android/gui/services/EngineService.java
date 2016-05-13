@@ -22,15 +22,16 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.Process;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.View;
 import android.widget.RemoteViews;
+import com.andrew.apollo.MediaButtonIntentReceiver;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -38,21 +39,17 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.Session;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
+import com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver;
 import com.squareup.okhttp.ConnectionPool;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -65,7 +62,7 @@ public class EngineService extends Service implements IEngineService {
     private static final Logger LOG = Logger.getLogger(EngineService.class);
     private static final String TAG = "FW.EngineService";
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
-    private static boolean isVPNactive = false;
+
     private final IBinder binder;
     static final ExecutorService threadPool = ThreadPool.newThreadPool("Engine");
     // services in background
@@ -94,12 +91,17 @@ public class EngineService extends Service implements IEngineService {
         LOG.info("FrostWire's EngineService started by this intent:");
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
+
+        enableReceivers(true);
+
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         LOG.debug("EngineService onDestroy");
+
+        enableReceivers(false);
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
 
@@ -121,7 +123,7 @@ public class EngineService extends Service implements IEngineService {
                 } catch (InterruptedException e) {
                     // ignore
                 }
-                Process.killProcess(Process.myPid());
+                android.os.Process.killProcess(android.os.Process.myPid());
             }
         }.start();
     }
@@ -130,9 +132,49 @@ public class EngineService extends Service implements IEngineService {
     // TODO: deal with potentially active connections
     private void stopOkHttp() {
         ConnectionPool pool = ConnectionPool.getDefault();
-        pool.evictAll();
-        synchronized (pool) {
-            pool.notifyAll();
+        try {
+            pool.evictAll();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        try {
+            synchronized (pool) {
+                pool.notifyAll();
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void enableReceivers(boolean enable) {
+        PackageManager pm = getPackageManager();
+
+        enableReceiver(pm, ImIdShareBroadCastReceiver.class, enable);
+        enableReceiver(pm, EngineBroadcastReceiver.class, enable);
+        enableReceiver(pm, MediaButtonIntentReceiver.class, enable);
+    }
+
+    private void enableReceiver(PackageManager pm, Class<?> clazz, boolean enable) {
+        int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+        ComponentName receiver = new ComponentName(this, clazz);
+
+        int currentState = pm.getComponentEnabledSetting(receiver);
+        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+            LOG.info("Receiver " + receiver + " was disabled");
+        } else {
+            LOG.info("Receiver " + receiver + " was enabled");
+        }
+
+        pm.setComponentEnabledSetting(receiver,
+                newState,
+                PackageManager.DONT_KILL_APP);
+
+        currentState = pm.getComponentEnabledSetting(receiver);
+        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+            LOG.info("Receiver " + receiver + " now is disabled");
+        } else {
+            LOG.info("Receiver " + receiver + " now is enabled");
         }
     }
 
@@ -186,27 +228,19 @@ public class EngineService extends Service implements IEngineService {
 
         state = STATE_STARTED;
 
-        updatePermanentStatusNotification(new WeakReference<Context>(this),
-                null,
-                0, "0 " + UIUtils.GENERAL_UNIT_KBPSEC,
-                0, "0 " + UIUtils.GENERAL_UNIT_KBPSEC);
-
         Log.v(TAG, "Engine started");
     }
 
     public static void updatePermanentStatusNotification(WeakReference<Context> contextRef,
-                                                         WeakReference<View> viewRef,
                                                          int downloads,
                                                          String sDown,
                                                          int uploads,
                                                          String sUp) {
-        if (!Ref.alive(contextRef) || !Ref.alive(viewRef) ||
+        if (!Ref.alive(contextRef) ||
                 !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
             return;
         }
         final Context context = contextRef.get();
-        final View view = viewRef.get();
-        asyncCheckVPNStatus(view);
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
                 R.layout.view_permanent_status_notification);
@@ -315,78 +349,10 @@ public class EngineService extends Service implements IEngineService {
         stopSelf();
     }
 
-    public static void asyncCheckVPNStatus(View view) {
-        asyncCheckVPNStatus(view, null);
-    }
-
-    public static void asyncCheckVPNStatus(final View view, final VpnStatusUICallback callback) {
-        threadPool.submit(new Runnable() {
-            @Override
-            public void run() {
-                isVPNactive = isTunnelUp();
-
-                if (callback != null && view != null) {
-                    // execute the UI update on the UI thread.
-                    view.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onVpnStatus(isVPNactive);
-                        }
-                    });
-
-                }
-            }
-        });
-    }
-
-    public static void asyncCheckDHTPeers(final View view, final CheckDHTUICallback callback) {
-        threadPool.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    BTEngine engine = BTEngine.getInstance();
-                    final Session session = engine.getSession();
-                    if (session != null && session.isDHTRunning()) {
-                        session.postDHTStats();
-                        final int totalDHTNodes = engine.getTotalDHTNodes();
-                        if (totalDHTNodes != -1 && view != null) {
-                            view.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    callback.onCheckDHT(true, totalDHTNodes);
-                                }
-                            });
-
-                        }
-                    } else {
-                        view.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onCheckDHT(false, 0);
-                            }
-                        });
-                    }
-                } catch (Throwable ignored) {
-                }
-
-            }
-        });
-    }
-
     public class EngineServiceBinder extends Binder {
         public EngineService getService() {
             return EngineService.this;
         }
-    }
-
-    public interface VpnStatusUICallback {
-        // Code inside this method must be for UI changes, meant to be executed on UI Thread
-        void onVpnStatus(final boolean vpnActive);
-    }
-
-    public interface CheckDHTUICallback {
-        // Code inside this method must be for UI changes, meant to be executed on UI Thread
-        void onCheckDHT(final boolean dhtEnabled, final int dhtPeers);
     }
 
     private int getNotificationIcon() {
@@ -402,39 +368,5 @@ public class EngineService extends Service implements IEngineService {
         long longPause = 180;
 
         return new long[]{0, shortVibration, longPause, shortVibration, shortPause, shortVibration, shortPause, shortVibration, mediumPause, mediumVibration};
-    }
-
-    /**
-     * takes 0ms (135052 ns) - checks diretory, and reads corresponding file to create NetworkInterface object.
-     */
-    private static boolean isTunnelUp() {
-        NetworkInterface tun0 = null;
-        try {
-            tun0 = NetworkInterface.getByName("tun0");
-        } catch (SocketException e) {
-            LOG.error(e.getMessage(), e);
-            return isAnyNetworkInterfaceATunnel();
-        }
-        return tun0 != null;
-    }
-
-    /* takes between 15ms to 65ms up to 300ms, will use as fallback. */
-    private static boolean isAnyNetworkInterfaceATunnel() {
-        boolean result = false;
-        try {
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (networkInterfaces.hasMoreElements()) {
-                NetworkInterface iface = networkInterfaces.nextElement();
-                //LOG.info("isAnyNetworkInterfaceATunnel() -> " + iface.getDisplayName());
-                if (iface.getDisplayName().contains("tun")) {
-                    result = true;
-                    break;
-                }
-            }
-        } catch (Throwable e) {
-            LOG.error(e.getMessage(), e);
-        }
-
-        return result;
     }
 }
