@@ -692,8 +692,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         currentFragment = fragment;
         updateHeader(fragment);
 
-        if (currentFragment instanceof AbstractFragment) {
-            ((AbstractFragment) currentFragment).onShow();
+        if (currentFragment instanceof MainFragment) {
+            ((MainFragment) currentFragment).onShow();
         }
     }
 

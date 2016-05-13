@@ -120,11 +120,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         subscription = TimerService.subscribe(this, 2);
