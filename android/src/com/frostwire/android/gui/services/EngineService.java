@@ -30,7 +30,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.View;
 import android.widget.RemoteViews;
 import com.andrew.apollo.MediaButtonIntentReceiver;
 import com.frostwire.android.R;
@@ -63,7 +62,7 @@ public class EngineService extends Service implements IEngineService {
     private static final Logger LOG = Logger.getLogger(EngineService.class);
     private static final String TAG = "FW.EngineService";
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
-    private static boolean isVPNactive = false;
+
     private final IBinder binder;
     static final ExecutorService threadPool = ThreadPool.newThreadPool("Engine");
     // services in background
