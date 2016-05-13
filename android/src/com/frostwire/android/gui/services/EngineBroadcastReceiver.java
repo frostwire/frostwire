@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
 
 import java.io.File;
@@ -47,7 +48,7 @@ import java.io.File;
  */
 public class EngineBroadcastReceiver extends BroadcastReceiver {
 
-    private static final String TAG = "FW.EngineBroadcastReceiver";
+    private static final Logger LOG = Logger.getLogger(EngineBroadcastReceiver.class);
 
     public EngineBroadcastReceiver() {
     }
@@ -84,18 +85,18 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 }
             }
         } catch (Throwable e) {
-            Log.e(TAG, "Error processing broadcast message", e);
+            LOG.error("Error processing broadcast message", e);
         }
     }
 
     private void handleActionPhoneStateChanged(Intent intent) {
         String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
         String msg = "Phone state changed to " + state;
-        Log.v(TAG, msg);
+        LOG.info(msg);
     }
 
     private void handleDisconnectedNetwork(NetworkInfo networkInfo) {
-        Log.v(TAG, "Disconnected from network (" + networkInfo.getTypeName() + ")");
+        LOG.info("Disconnected from network (" + networkInfo.getTypeName() + ")");
         Engine.instance().getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
@@ -131,7 +132,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             // mobile up means only mobile data is up and wifi is down.
 
             if (!NetworkManager.instance().isDataMobileUp() || useTorrentsOnMobileData) {
-                Log.v(TAG, "Connected to " + networkInfo.getTypeName());
+                LOG.info("Connected to " + networkInfo.getTypeName());
                 if (Engine.instance().isDisconnected()) {
                     // avoid ANR error inside a broadcast receiver
                     Engine.instance().getThreadPool().execute(new Runnable() {
