@@ -39,6 +39,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.adapters.menu.*;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.util.ImageLoader;
@@ -126,10 +127,12 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         boolean showSingleOptions = showSingleOptions(checked, fd);
 
-        if (showSingleOptions) {
-            items.add(new SeedAction(context, fd));
-        } else {
-            items.add(new SeedAction(context, checked));
+        if (TransferManager.canSeedFromMyFilesTempHACK()) {
+            if (showSingleOptions) {
+                items.add(new SeedAction(context, fd));
+            } else {
+                items.add(new SeedAction(context, checked));
+            }
         }
 
         if (showSingleOptions) {

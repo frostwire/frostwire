@@ -25,7 +25,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -425,7 +424,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         RichNotification internalMemoryNotification = findView(v, R.id.fragment_transfers_internal_memory_notification);
         internalMemoryNotification.setVisibility(View.GONE);
 
-        if (isUsingSDCardPrivateStorage() && !sdCardNotification.wasDismissed()) {
+        if (TransferManager.isUsingSDCardPrivateStorage() && !sdCardNotification.wasDismissed()) {
             String currentPath = ConfigurationManager.instance().getStoragePath();
             boolean inPrivateFolder = currentPath.contains("Android/data");
 
@@ -439,7 +438,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 		//that you now can use the SD Card. We'll keep this for a few releases.
         File sdCardDir = getBiggestSDCardDir(getActivity());
 		if (sdCardDir != null && com.frostwire.android.util.SystemUtils.isSecondaryExternalStorageMounted(sdCardDir) &&
-			!isUsingSDCardPrivateStorage() &&
+			!TransferManager.isUsingSDCardPrivateStorage() &&
 			!internalMemoryNotification.wasDismissed()) {
 			String bytesAvailableInHuman = UIUtils.getBytesInHuman(com.frostwire.android.util.SystemUtils.getAvailableStorageSize(sdCardDir));
 			String internalMemoryNotificationDescription = getString(R.string.saving_to_internal_memory_description, bytesAvailableInHuman);
@@ -707,17 +706,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private void hideAddTransfersKeyboard() {
         InputMethodManager imm = (InputMethodManager) addTransferUrlTextView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(addTransferUrlTextView.getWindowToken(), 0);
-    }
-
-    /**
-     * Is it using the SD Card's private (non-persistent after uninstall) app folder to save
-     * downloaded files?
-     */
-    private static boolean isUsingSDCardPrivateStorage() {
-        String primaryPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String currentPath = ConfigurationManager.instance().getStoragePath();
-
-        return !primaryPath.equals(currentPath);
     }
 
     /**

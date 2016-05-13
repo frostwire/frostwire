@@ -20,6 +20,7 @@ package com.frostwire.android.gui.transfers;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Environment;
 import android.os.StatFs;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -76,6 +77,30 @@ public final class TransferManager {
         this.bittorrentDownloads = new CopyOnWriteArrayList<>();
         this.downloadsToReview = 0;
         loadTorrents();
+    }
+
+    /**
+     * TEMPORARY HACK.
+     * @return true if the save path is not the SD Card.
+     */
+    public static boolean canSeedFromMyFilesTempHACK() {
+        // TODO: Remove this hack when we can create .torrents from My Files
+        // by going through the ridiculous hoops Android has imposed to access
+        // the SD card. For now, let's make the feature available only to files
+        // on internal storage.
+
+        return !TransferManager.isUsingSDCardPrivateStorage();
+    }
+
+    /**
+     * Is it using the SD Card's private (non-persistent after uninstall) app folder to save
+     * downloaded files?
+     */
+    public static boolean isUsingSDCardPrivateStorage() {
+        String primaryPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String currentPath = ConfigurationManager.instance().getStoragePath();
+
+        return !primaryPath.equals(currentPath);
     }
 
     public List<Transfer> getTransfers() {

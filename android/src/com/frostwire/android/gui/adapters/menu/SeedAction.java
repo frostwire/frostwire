@@ -36,15 +36,15 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.TorrentHandle;
-import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.logging.Logger;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,6 +63,9 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private static String DLG_SEEDING_OFF_TAG = "DLG_SEEDING_OFF_TAG";
     private static String DLG_TURN_BITTORRENT_BACK_ON = "DLG_TURN_BITTORRENT_BACK_ON";
 
+    // TODO: Receive extra metadata that could be put/used in the torrent for
+    // enriched announcement.
+
     private SeedAction(Context context,
                        FileDescriptor fd,
                        List<FileDescriptor> fds,
@@ -75,18 +78,22 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         this.transferToClear = transferToClear;
     }
 
+    // Reminder: Currently disabled when using SD Card.
     public SeedAction(Context context, FileDescriptor fd) {
         this(context, fd, null, null, null);
     }
 
+    // Reminder: Currently disabled when using SD Card.
     public SeedAction(Context context, FileDescriptor fd, Transfer transferToClear) {
         this(context, fd, null, null, transferToClear);
     }
 
+    // Reminder: Currently disabled when using SD Card.
     public SeedAction(Context context, List<FileDescriptor> checked) {
         this(context, null, checked, null, null);
     }
 
+    // This one is not disabled as it's meant for existing torrent transfers.
     public SeedAction(Context context, BittorrentDownload download) {
         this(context, null, null, download,null);
     }
@@ -205,10 +212,16 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     private void seedBTDownload() {
         btDownload.resume();
+        final TorrentHandle torrentHandle = BTEngine.getInstance().getSession().findTorrent(new Sha1Hash(btDownload.getInfoHash()));
+        if (torrentHandle != null) {
+            forceDHTAnnounceIfNoPeers(torrentHandle, null);
+        } else {
+            LOG.warn("seedBTDownload() could not find torrentHandle for existing torrent.");
+        }
     }
 
     private void buildTorrentAndSeedIt(final FileDescriptor fd) {
-        // TODO: re-do this with new TorrentBuilder
+        // TODO: Do this so it works with SD Card support / New BS File storage api from Android.
         Engine.instance().getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
@@ -229,21 +242,39 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
                 final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
 
+                // IDEAS:
+                // 1. Add DHT router
+                //see http://github.com/bittorrent/bootstrap-dht
+                //tinfo.addNode("dht.frostwire.com",1234);
+
+                // 2. Create a CanonicalDHTAnnouncer which keeps track
+                // of nodes we could use for DHT-announcing-bootstrapping.
+                // Issue a GET_PEERS request on startup, and out of those
+                // peers do a tinfo.tinfo.addNode() of at least 5 DHT
+                // bootstraping nodes for this torrent. This way we don't
+                // have to way for a GET_PEERS_REPLY message to create the
+                // .torrent.
+
+                final Session session = BTEngine.getInstance().getSession();
+
                 // so the TorrentHandle object is created and added to the libtorrent session.
                 BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
 
                 final TorrentHandle torrentHandle =
-                        BTEngine.getInstance().getSession().findTorrent(tinfo.infoHash());
+                        session.findTorrent(tinfo.infoHash());
+
+                final DHTBootstrapListener dhtBootstrapListener = new DHTBootstrapListener(torrentHandle);
+                session.addListener(dhtBootstrapListener);
+
                 torrentHandle.saveResumeData();
                 torrentHandle.pause();
                 torrentHandle.setAutoManaged(true);
-                torrentHandle.forceDHTAnnounce(); // TODO: only do this when dht bootstrap signal is received.
                 torrentHandle.scrapeTracker();
 
                 // so it will call fireDownloadUpdate(torrentHandle) -> UIBittorrentDownload.updateUI()
                 // which calculates the download items;
                 BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
-
+                forceDHTAnnounceIfNoPeers(torrentHandle, dhtBootstrapListener);
                 torrentHandle.forceRecheck();
                 torrentHandle.forceReannounce();
             }
@@ -275,5 +306,74 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         });
 
 
+    }
+
+    /** TODO: Move this method somewhere more useful if it works.
+     *  It could be used for smarter re-announce logic after hearing
+     *  Arvid's advice. It could also be used to re-adjust the dht_announce_interval
+     *  interval to allow for more capacity (longer intervals if we already have peers) */
+    private static void forceDHTAnnounceIfNoPeers(final TorrentHandle torrentHandle, final AlertListener listener) {
+        final ArrayList<PeerInfo> peerInfos = torrentHandle.peerInfo();
+        final TorrentStatus status = torrentHandle.getStatus();
+        final ArrayList<Pair<String, Integer>> dhtNodes = torrentHandle.getTorrentInfo().nodes();
+        LOG.info("================================================");
+        LOG.info("list peers        : " + status.getListPeers());
+        LOG.info("DHT Nodes         : " + dhtNodes.size());
+        LOG.info("num connections   : " + status.getNumConnections());
+        LOG.info("connect candidates: " + status.getConnectCandidates());
+        LOG.info("announcing to DHT : " + status.announcingToDht());
+        LOG.info("announcing to LSD : " + status.announcingToLsd());
+        LOG.info("next announce in  : " + status.nextAnnounce() + " ms");
+        LOG.info("================================================\n");
+
+        if (peerInfos.size() == 0) {
+            LOG.info("had no peers");
+            LOG.info("forcing re-announcement.");
+            torrentHandle.forceDHTAnnounce();
+
+            //We'll check ourselves again after the interval and 1.5 minutes.
+            Engine.instance().getThreadPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    long sleepForAnnounceCheck = 30000;
+                    LOG.info("sleeping(sleepForAnnounceCheck = " + sleepForAnnounceCheck+")...");
+                    SystemClock.sleep(sleepForAnnounceCheck);
+                    forceDHTAnnounceIfNoPeers(torrentHandle, listener);
+                }
+            });
+        } else if (listener != null) {
+            // if we have peers, we can remove this DHT Bootstrap listener.
+            LOG.info("had peers removing listener.");
+            BTEngine.getInstance().getSession().removeListener(listener);
+        }
+    }
+
+    private static class DHTBootstrapListener implements AlertListener {
+        private static final Logger LOG = Logger.getLogger(DHTBootstrapListener.class);
+        private final TorrentHandle torrentHandle;
+        private final int[] types = new int[] { AlertType.DHT_BOOTSTRAP.swig() };
+
+        DHTBootstrapListener(TorrentHandle torrentHandle) {
+            this.torrentHandle = torrentHandle;
+        }
+
+        @Override
+        public int[] types() {
+            return types;
+        }
+
+        @Override
+        public void alert(Alert<?> alert) {
+            if (types[0] == alert.type().swig()) {
+                LOG.info("received DHT_BOOTSTRAP signal.");
+                DhtBootstrapAlert bootstrapAlert = (DhtBootstrapAlert) alert;
+                LOG.info("what: " + bootstrapAlert.what());
+                LOG.info("message: " + bootstrapAlert.message());
+
+                // IDEA: We could re-announce every torrent we already have if they didn't have peers.
+                // BTEngine.getInstance().getSession().getTorrents() : [<TorrentHandle>]
+                forceDHTAnnounceIfNoPeers(torrentHandle, this);
+            }
+        }
     }
 }

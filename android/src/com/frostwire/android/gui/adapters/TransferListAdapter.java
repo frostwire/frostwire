@@ -59,7 +59,6 @@ import java.util.*;
  * @author aldenml
  */
 public class TransferListAdapter extends BaseExpandableListAdapter {
-
     private static final Logger LOG = Logger.getLogger(TransferListAdapter.class);
     private final WeakReference<Context> context;
     private final OnClickListener viewOnClickListener;
@@ -280,7 +279,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
-            if (files != null && files.size() == 1) {
+            if (TransferManager.canSeedFromMyFilesTempHACK() && files != null && files.size() == 1) {
                 items.add(new SeedAction(context.get(), files.get(0),download));
             }
             items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
