@@ -89,8 +89,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TransferStatus selectedStatus;
     private TimerSubscription subscription;
     private int androidNotificationUpdateTick;
-    private static boolean isVPNactive;
-    private final OnVPNStatusCallback onVPNStatusCallback;
+    private boolean isVPNactive;
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
     private final SwipeDetector viewSwipeDetector;
@@ -103,7 +102,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         this.buttonAddTransferListener = new ButtonAddTransferListener(this);
         this.buttonMenuListener = new ButtonMenuListener(this);
         selectedStatus = TransferStatus.ALL;
-        this.onVPNStatusCallback = new OnVPNStatusCallback();
         vpnRichToastHandler = new Handler();
         viewSwipeDetector = new SwipeDetector(this, 100);
     }
@@ -184,8 +182,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private void updateStatusBar(String sDown, String sUp, int downloads, int uploads) {
         textDownloads.setText(downloads + " @ " + sDown);
         textUploads.setText(uploads + " @ " + sUp);
-        updateVPNButtonIfStatusChanged(TransfersFragment.isVPNactive);
-        EngineService.asyncCheckVPNStatus(getView(), onVPNStatusCallback);
+        updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
     }
 
     private void updatePermanentStatusNotification(String sDown, String sUp, int downloads, int uploads) {
@@ -193,7 +190,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             androidNotificationUpdateTick = 0;
             EngineService.updatePermanentStatusNotification(
                     new WeakReference<Context>(getActivity()),
-                    new WeakReference<>(getView()),
                     downloads,
                     sDown,
                     uploads,
@@ -223,9 +219,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
-        boolean wasActiveBefore = TransfersFragment.isVPNactive && !vpnActive;
+        boolean wasActiveBefore = isVPNactive && !vpnActive;
 
-        TransfersFragment.isVPNactive = vpnActive;
+        isVPNactive = vpnActive;
         final ImageView view = findView(getView(), R.id.fragment_transfers_status_vpn_icon);
         if (view != null) {
             view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
@@ -246,15 +242,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void onSwipeRight() {
         // if they swipe right, we move to the left (drag gesture)
         selectStatusTabToThe(false);
-    }
-
-    private class OnVPNStatusCallback implements EngineService.VpnStatusUICallback {
-        @Override
-        public void onVpnStatus(final boolean vpnActive) {
-            if (TransfersFragment.this.isAdded()) {
-                TransfersFragment.this.updateVPNButtonIfStatusChanged(vpnActive);
-            }
-        }
     }
 
     private void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
@@ -351,7 +338,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void onShow() {
         if (firstTimeShown) {
             firstTimeShown = false;
-            if (!TransfersFragment.isVPNactive) {
+            if (!NetworkManager.instance().isTunnelUp()) {
                 showVPNRichToast();
             }
         }
@@ -417,15 +404,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         vpnStatusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getActivity(),
-                        VPNStatusDetailActivity.class).
-
-                        setAction(TransfersFragment.isVPNactive ?
-                                Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
-                                Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
+                Context ctx = v.getContext();
+                Intent i = new Intent(ctx, VPNStatusDetailActivity.class);
+                i.setAction(isVPNactive ?
+                        Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
+                        Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 i.putExtra("from", "transfers");
-                startActivity(i);
+                ctx.startActivity(i);
             }
         });
     }

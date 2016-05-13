@@ -38,7 +38,6 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.util.ImageLoader;
@@ -234,18 +233,15 @@ public class EngineService extends Service implements IEngineService {
     }
 
     public static void updatePermanentStatusNotification(WeakReference<Context> contextRef,
-                                                         WeakReference<View> viewRef,
                                                          int downloads,
                                                          String sDown,
                                                          int uploads,
                                                          String sUp) {
-        if (!Ref.alive(contextRef) || !Ref.alive(viewRef) ||
+        if (!Ref.alive(contextRef) ||
                 !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
             return;
         }
         final Context context = contextRef.get();
-        final View view = viewRef.get();
-        asyncCheckVPNStatus(view);
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
                 R.layout.view_permanent_status_notification);
@@ -354,39 +350,10 @@ public class EngineService extends Service implements IEngineService {
         stopSelf();
     }
 
-    public static void asyncCheckVPNStatus(View view) {
-        asyncCheckVPNStatus(view, null);
-    }
-
-    public static void asyncCheckVPNStatus(final View view, final VpnStatusUICallback callback) {
-        threadPool.submit(new Runnable() {
-            @Override
-            public void run() {
-                isVPNactive = NetworkManager.instance().isTunnelUp();
-
-                if (callback != null && view != null) {
-                    // execute the UI update on the UI thread.
-                    view.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onVpnStatus(isVPNactive);
-                        }
-                    });
-
-                }
-            }
-        });
-    }
-
     public class EngineServiceBinder extends Binder {
         public EngineService getService() {
             return EngineService.this;
         }
-    }
-
-    public interface VpnStatusUICallback {
-        // Code inside this method must be for UI changes, meant to be executed on UI Thread
-        void onVpnStatus(final boolean vpnActive);
     }
 
     private int getNotificationIcon() {
