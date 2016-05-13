@@ -32,6 +32,8 @@ public final class NetworkManager {
 
     private final Application context;
 
+    private boolean tunnelUp;
+
     private static NetworkManager instance;
 
     public synchronized static void create(Application context) {
@@ -83,8 +85,13 @@ public final class NetworkManager {
         return (ConnectivityManager) context.getSystemService(Application.CONNECTIVITY_SERVICE);
     }
 
-    public static boolean isTunnelUp() {
-        return isValidInterfaceName("tun0");
+    public boolean isTunnelUp() {
+        return tunnelUp;
+    }
+
+    // eventually move this to the Platform framework
+    public void detectTunnel() {
+        tunnelUp = isValidInterfaceName("tun0");
     }
 
     private static boolean isValidInterfaceName(String interfaceName) {

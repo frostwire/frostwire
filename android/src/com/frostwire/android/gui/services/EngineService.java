@@ -362,7 +362,7 @@ public class EngineService extends Service implements IEngineService {
         threadPool.submit(new Runnable() {
             @Override
             public void run() {
-                isVPNactive = NetworkManager.isTunnelUp();
+                isVPNactive = NetworkManager.instance().isTunnelUp();
 
                 if (callback != null && view != null) {
                     // execute the UI update on the UI thread.

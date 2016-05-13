@@ -26,7 +26,6 @@ import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.Librarian;
@@ -76,17 +75,28 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             } else if (action.equals(Intent.ACTION_MEDIA_SCANNER_FINISHED)) {
                 Librarian.instance().syncMediaStore();
             } else if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-                NetworkInfo networkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+                NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 
                 if (networkInfo.getDetailedState() == DetailedState.DISCONNECTED) {
                     handleDisconnectedNetwork(networkInfo);
                 } else if (networkInfo.getDetailedState() == DetailedState.CONNECTED) {
                     handleConnectedNetwork(networkInfo);
                 }
+
+                handleVPNDetection();
             }
         } catch (Throwable e) {
             LOG.error("Error processing broadcast message", e);
         }
+    }
+
+    private void handleVPNDetection() {
+        Engine.instance().getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                NetworkManager.instance().detectTunnel();
+            }
+        });
     }
 
     private void handleActionPhoneStateChanged(Intent intent) {
