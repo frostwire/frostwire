@@ -322,7 +322,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     }
 
-<<<<<<< a82ca95e8badd1f92de6164911ac4dbcef5b8cf6
     /** TODO: Move this method somewhere more useful if it works.
      *  It could be used for smarter re-announce logic after hearing
      *  Arvid's advice. It could also be used to re-adjust the dht_announce_interval
