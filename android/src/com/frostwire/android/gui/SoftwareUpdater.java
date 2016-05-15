@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,10 +26,10 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -39,6 +40,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
@@ -59,7 +61,7 @@ import java.util.*;
  */
 public final class SoftwareUpdater {
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
-    private final boolean ALWAYS_SHOW_UPDATE_DIALOG = false;
+    private final boolean ALWAYS_SHOW_UPDATE_DIALOG = true; // debug flag.
 
     public interface ConfigurationUpdateListener {
         void onConfigurationUpdate();
@@ -237,7 +239,7 @@ public final class SoftwareUpdater {
         }
     }
 
-    private File getUpdateApk() {
+    private static File getUpdateApk() {
         return Platforms.get().systemPaths().update();
     }
 
@@ -254,39 +256,7 @@ public final class SoftwareUpdater {
                 }
 
                 LOG.info("notifyUpdate(): showing update dialog.");
-                String message = StringUtils.getLocaleString(update.updateMessages, context.getString(R.string.update_message));
-
-                final Dialog newSoftwareUpdaterDialog = new Dialog(context, R.style.DefaultDialogTheme);
-                newSoftwareUpdaterDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                newSoftwareUpdaterDialog.setContentView(R.layout.dialog_default_update);
-
-                TextView title = (TextView) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_title);
-                title.setText(R.string.update_title);
-
-                TextView text = (TextView) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_text);
-                text.setText(message);
-
-                final ListView listview = (ListView) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_list_view);
-                String[] values = new String[update.changelog.size()];
-                for (int i=0; i < values.length; i++) {
-                    values[i] = String.valueOf(Html.fromHtml("&#8226; " + update.changelog.get(i)));
-                }
-
-                final ArrayAdapter adapter = new ArrayAdapter(context,
-                        R.layout.dialog_update_bullet,
-                        R.id.dialog_update_bullets_checked_text_view,
-                        values);
-                listview.setAdapter(adapter);
-
-                // Set the save button action
-                Button noButton = (Button) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_button_no);
-                noButton.setText(R.string.cancel);
-
-                Button yesButton = (Button) newSoftwareUpdaterDialog.findViewById(R.id.dialog_default_update_button_yes);
-                yesButton.setText(android.R.string.ok);
-                yesButton.setOnClickListener(new PositiveButtonOnClickListener(context, newSoftwareUpdaterDialog));
-                noButton.setOnClickListener(new NegativeButtonOnClickListener(newSoftwareUpdaterDialog));
-                newSoftwareUpdaterDialog.show();
+                SoftwareUpdaterDialog.newInstance(update).show(((Activity) context).getFragmentManager());
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
 
                 String message = StringUtils.getLocaleString(update.marketMessages, context.getString(R.string.update_message));
@@ -499,7 +469,7 @@ public final class SoftwareUpdater {
         }
     }
 
-    private class PositiveButtonOnClickListener implements View.OnClickListener {
+    private static class PositiveButtonOnClickListener implements View.OnClickListener {
         private final Context context;
         private final Dialog newSoftwareUpdaterDialog;
 
@@ -516,7 +486,7 @@ public final class SoftwareUpdater {
         }
     }
 
-    private class NegativeButtonOnClickListener implements View.OnClickListener {
+    private static class NegativeButtonOnClickListener implements View.OnClickListener {
         private final Dialog newSoftwareUpdaterDialog;
 
         NegativeButtonOnClickListener(Dialog newSoftwareUpdaterDialog) {
@@ -526,6 +496,52 @@ public final class SoftwareUpdater {
         @Override
         public void onClick(View v) {
             newSoftwareUpdaterDialog.dismiss();
+        }
+    }
+
+    public static class SoftwareUpdaterDialog extends AbstractDialog {
+        private static String TAG = "SOFTWARE_UPDATER_DIALOG";
+        private static Update update;
+
+        public static SoftwareUpdaterDialog newInstance(Update update) {
+            SoftwareUpdaterDialog.update = update;
+            return new SoftwareUpdaterDialog();
+        }
+
+        public SoftwareUpdaterDialog() {
+            super(TAG, R.layout.dialog_default_update);
+        }
+
+        @Override
+        protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+            String message = StringUtils.getLocaleString(update.updateMessages, getString(R.string.update_message));
+
+            TextView title = findView(dlg, R.id.dialog_default_update_title);
+            title.setText(R.string.update_title);
+
+            TextView text = findView(dlg, R.id.dialog_default_update_text);
+            text.setText(message);
+
+            final ListView listview = findView(dlg, R.id.dialog_default_update_list_view);
+            String[] values = new String[update.changelog.size()];
+            for (int i=0; i < values.length; i++) {
+                values[i] = String.valueOf(Html.fromHtml("&#8226; " + update.changelog.get(i)));
+            }
+
+            final ArrayAdapter adapter = new ArrayAdapter(getActivity(),
+                    R.layout.dialog_update_bullet,
+                    R.id.dialog_update_bullets_checked_text_view,
+                    values);
+            listview.setAdapter(adapter);
+
+            // Set the save button action
+            Button noButton = findView(dlg, R.id.dialog_default_update_button_no);
+            noButton.setText(R.string.cancel);
+
+            Button yesButton = findView(dlg, R.id.dialog_default_update_button_yes);
+            yesButton.setText(android.R.string.ok);
+            yesButton.setOnClickListener(new PositiveButtonOnClickListener(getActivity(),dlg));
+            noButton.setOnClickListener(new NegativeButtonOnClickListener(dlg));
         }
     }
 }
