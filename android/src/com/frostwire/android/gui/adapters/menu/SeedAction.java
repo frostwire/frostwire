@@ -21,11 +21,11 @@ package com.frostwire.android.gui.adapters.menu;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import com.frostwire.android.R;
@@ -138,19 +138,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void showNoWifiInformationDialog() {
-        final Dialog newNoWifiInformationDialog = new Dialog(getContext(), R.style.DefaultDialogTheme);
-        newNoWifiInformationDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        newNoWifiInformationDialog.setContentView(R.layout.dialog_default_info);
-
-        TextView title = (TextView) newNoWifiInformationDialog.findViewById(R.id.dialog_default_info_title);
-        title.setText(R.string.wifi_network_unavailable);
-        TextView text = (TextView) newNoWifiInformationDialog.findViewById(R.id.dialog_default_info_text);
-        text.setText(R.string.according_to_settings_i_cant_seed_unless_wifi);
-
-        Button okButton = (Button) newNoWifiInformationDialog.findViewById(R.id.dialog_default_info_button_ok);
-        okButton.setText(android.R.string.ok);
-        okButton.setOnClickListener(new OkButtonOnClickListener(newNoWifiInformationDialog));
-        newNoWifiInformationDialog.show();
+        ShowNoWifiInformationDialog.newInstance().show(((Activity) getContext()).getFragmentManager());
     }
 
     private void showBittorrentDisconnectedDialog() {
@@ -391,7 +379,34 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         }
     }
 
-    private class OkButtonOnClickListener implements View.OnClickListener {
+    // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.
+    public static class ShowNoWifiInformationDialog extends AbstractDialog {
+        private final static String TAG = "SHOW_NO_WIFI_INFORMATION_DIALOG";
+
+        public static ShowNoWifiInformationDialog newInstance() {
+             return new ShowNoWifiInformationDialog();
+        }
+
+        // Important to keep this guy 'public', even if IntelliJ thinks you shouldn't.
+        // otherwise, the app crashes when you turn the screen and the dialog can't
+        public ShowNoWifiInformationDialog() {
+            super(TAG,R.layout.dialog_default_info);
+        }
+
+        @Override
+        protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+            TextView title = findView(dlg, R.id.dialog_default_info_title);
+            title.setText(R.string.wifi_network_unavailable);
+            TextView text = findView(dlg, R.id.dialog_default_info_text);
+            text.setText(R.string.according_to_settings_i_cant_seed_unless_wifi);
+
+            Button okButton = findView(dlg, R.id.dialog_default_info_button_ok);
+            okButton.setText(android.R.string.ok);
+            okButton.setOnClickListener(new OkButtonOnClickListener(dlg));
+        }
+    }
+
+    private static class OkButtonOnClickListener implements View.OnClickListener {
         private final Dialog newNoWifiInformationDialog;
 
         public OkButtonOnClickListener(Dialog newNoWifiInformationDialog) {
