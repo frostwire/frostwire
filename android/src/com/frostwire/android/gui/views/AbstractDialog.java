@@ -40,6 +40,20 @@ import java.util.List;
  * @author marcelinkaaa
  */
 public abstract class AbstractDialog extends DialogFragment {
+    protected static String getSuggestedTAG(Class clazz) {
+        StringBuilder sb = new StringBuilder();
+        char[] className = clazz.getSimpleName().toCharArray();
+        for (int i=0; i < className.length; i++) {
+            char c = className[i];
+            if (i==0) {
+                sb.append(Character.toUpperCase(c));
+            } else if (i > 0 && Character.isUpperCase(c)) {
+                sb.append('_');
+                sb.append(Character.toUpperCase(c));
+            }
+        }
+        return sb.toString();
+    }
 
     /**
      * The identifier for the positive button.
