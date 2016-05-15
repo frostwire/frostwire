@@ -61,7 +61,7 @@ import java.util.*;
  */
 public final class SoftwareUpdater {
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
-    private final boolean ALWAYS_SHOW_UPDATE_DIALOG = true; // debug flag.
+    private final boolean ALWAYS_SHOW_UPDATE_DIALOG = false; // debug flag.
 
     public interface ConfigurationUpdateListener {
         void onConfigurationUpdate();
