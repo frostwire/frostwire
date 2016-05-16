@@ -41,6 +41,7 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -54,6 +55,8 @@ public final class LollipopFileSystem implements FileSystem {
 
     private static final int CACHE_MAX_SIZE = 1000;
     private static final LruCache<String, DocumentFile> CACHE = new LruCache<>(CACHE_MAX_SIZE);
+
+    private static List<String> FIXED_SDCARD_PATHS = buildFixedSdCardPaths();
 
     private final Application app;
 
@@ -296,6 +299,10 @@ public final class LollipopFileSystem implements FileSystem {
 
     public DocumentFile getDocument(File file) {
         return getDocument(app, file);
+    }
+
+    public String getExtSdCardFolder(File file) {
+        return getExtSdCardFolder(app, file);
     }
 
     public int openFD(File file, String mode) {
@@ -580,11 +587,10 @@ public final class LollipopFileSystem implements FileSystem {
             }
         }
         // special hard coded paths for more security
-        if (!paths.contains("/storage/sdcard1")) {
-            paths.add("/storage/sdcard1");
-        }
-        if (!paths.contains("/storage/ext_sd")) {
-            paths.add("/storage/ext_sd");
+        for (String path : FIXED_SDCARD_PATHS) {
+            if (!paths.contains(path)) {
+                paths.add(path);
+            }
         }
 
         return paths.toArray(new String[0]);
@@ -757,6 +763,29 @@ public final class LollipopFileSystem implements FileSystem {
         pfd = ParcelFileDescriptor.adoptFd(fd);
 
         return new AutoSyncOutputStream(pfd);
+    }
+
+    private static List<String> buildFixedSdCardPaths() {
+        LinkedList<String> l = new LinkedList<>();
+
+        l.add("/storage/sdcard1"); // Motorola Xoom
+        l.add("/storage/extsdcard"); // Samsung SGS3
+        l.add("/storage/sdcard0/external_sdcard"); // user request
+        l.add("/mnt/extsdcard");
+        l.add("/mnt/sdcard/external_sd"); // Samsung galaxy family
+        l.add("/mnt/external_sd");
+        l.add("/mnt/media_rw/sdcard1"); // 4.4.2 on CyanogenMod S3
+        l.add("/removable/microsd"); // Asus transformer prime
+        l.add("/mnt/emmc");
+        l.add("/storage/external_SD"); // LG
+        l.add("/storage/ext_sd"); // HTC One Max
+        l.add("/storage/removable/sdcard1"); // Sony Xperia Z1
+        l.add("/data/sdext");
+        l.add("/data/sdext2");
+        l.add("/data/sdext3");
+        l.add("/data/sdext4");
+
+        return Collections.unmodifiableList(l);
     }
 
     private static final class AutoSyncOutputStream extends ParcelFileDescriptor.AutoCloseOutputStream {

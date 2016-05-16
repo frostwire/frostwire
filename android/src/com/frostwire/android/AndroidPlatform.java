@@ -88,6 +88,30 @@ public final class AndroidPlatform extends AbstractPlatform {
         return p.fileSystem() instanceof LollipopFileSystem;
     }
 
+    /**
+     * This method determines if the file {@code f} is protected by
+     * the SAF framework because it's in the real external SD card.
+     *
+     * @param f
+     * @return
+     */
+    public static boolean saf(File f) {
+        Platform p = Platforms.get();
+
+        if (!(p.fileSystem() instanceof LollipopFileSystem)) {
+            return false;
+        }
+
+        if (f.getPath().contains("/Android/data/com.frostwire.android/")) {
+            // private file, FUSE give us standard POSIX operations
+            return false;
+        }
+
+        LollipopFileSystem fs = (LollipopFileSystem) p.fileSystem();
+
+        return fs.getExtSdCardFolder(f) != null;
+    }
+
     private static FileSystem buildFileSystem(Application app) {
         FileSystem fs;
 
