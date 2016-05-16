@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.ClickAdapter;
@@ -35,9 +34,6 @@ import com.frostwire.android.gui.views.ClickAdapter;
  * @author marcelinkaaa
  */
 public class YesNoDialog extends AbstractDialog {
-
-    private static final String TAG = "yesno_dialog";
-
     private static final String ID_KEY = "id";
     private static final String TITLE_KEY = "title";
     private static final String MESSAGE_KEY = "message";
@@ -46,7 +42,7 @@ public class YesNoDialog extends AbstractDialog {
     private String id;
 
     public YesNoDialog() {
-        super(TAG, R.layout.dialog_default);
+        super(R.layout.dialog_default);
     }
 
     public static YesNoDialog newInstance(String id, int titleId, int messageId) {

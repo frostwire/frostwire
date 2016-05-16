@@ -500,7 +500,6 @@ public final class SoftwareUpdater {
     }
 
     public static class SoftwareUpdaterDialog extends AbstractDialog {
-        private static String TAG = "SOFTWARE_UPDATER_DIALOG";
         private static Update update;
 
         public static SoftwareUpdaterDialog newInstance(Update update) {
@@ -509,7 +508,7 @@ public final class SoftwareUpdater {
         }
 
         public SoftwareUpdaterDialog() {
-            super(TAG, R.layout.dialog_default_update);
+            super(R.layout.dialog_default_update);
         }
 
         @Override

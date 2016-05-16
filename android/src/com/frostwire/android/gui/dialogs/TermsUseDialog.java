@@ -43,7 +43,7 @@ import java.io.InputStream;
  */
 public class TermsUseDialog extends AbstractDialog {
 
-    public static final String TAG = "terms_use_dialog";
+    public static final String TAG = getSuggestedTAG(TermsUseDialog.class);
     private Button buttonNo;
     private Button buttonYes;
 

@@ -88,7 +88,7 @@ public class CancelMenuAction extends MenuAction {
         }
 
         public CancelMenuActionDialog() {
-            super(getSuggestedTAG(CancelMenuActionDialog.class), R.layout.dialog_default);
+            super(R.layout.dialog_default);
         }
 
         @Override

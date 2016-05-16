@@ -381,8 +381,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.
     public static class ShowNoWifiInformationDialog extends AbstractDialog {
-        private final static String TAG = "SHOW_NO_WIFI_INFORMATION_DIALOG";
-
         public static ShowNoWifiInformationDialog newInstance() {
              return new ShowNoWifiInformationDialog();
         }
@@ -390,7 +388,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         // Important to keep this guy 'public', even if IntelliJ thinks you shouldn't.
         // otherwise, the app crashes when you turn the screen and the dialog can't
         public ShowNoWifiInformationDialog() {
-            super(TAG,R.layout.dialog_default_info);
+            super(R.layout.dialog_default_info);
         }
 
         @Override

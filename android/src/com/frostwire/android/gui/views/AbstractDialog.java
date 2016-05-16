@@ -45,10 +45,10 @@ public abstract class AbstractDialog extends DialogFragment {
         char[] className = clazz.getSimpleName().toCharArray();
         for (int i=0; i < className.length; i++) {
             char c = className[i];
-            if (i==0) {
-                sb.append(Character.toUpperCase(c));
-            } else if (i > 0 && Character.isUpperCase(c)) {
+            if (i > 0 && Character.isUpperCase(c)) {
                 sb.append('_');
+                sb.append(Character.toUpperCase(c));
+            } else {
                 sb.append(Character.toUpperCase(c));
             }
         }
@@ -63,6 +63,12 @@ public abstract class AbstractDialog extends DialogFragment {
 
     protected WeakReference<Activity> activityRef;
     private OnDialogClickListener onDialogClickListener;
+
+    public AbstractDialog(int layoutResId) {
+        this.tag = getSuggestedTAG(getClass());
+        this.layoutResId =layoutResId;
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
+    }
 
     public AbstractDialog(String tag, int layoutResId) {
         this.tag = tag;
