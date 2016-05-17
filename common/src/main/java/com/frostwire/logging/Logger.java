@@ -39,6 +39,10 @@ public final class Logger {
         return new Logger(java.util.logging.Logger.getLogger(clazz.getName()));
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void info(String msg) {
         jul.logp(INFO, name, "", msg);
     }
