@@ -111,7 +111,9 @@ public final class GUIMediator {
     private boolean _remoteDownloadsAllowed;
 
     public enum Tabs {
-        SEARCH(I18n.tr("&Search")), LIBRARY(I18n.tr("&Library"));
+        SEARCH(I18n.tr("&Search")),
+        TRANSFERS(I18n.tr("&Transfers")),
+        LIBRARY(I18n.tr("&Library"));
 
         private Action navAction;
 

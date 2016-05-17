@@ -121,7 +121,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         searchPanels = createSearchPanel();
         add(searchPanels, "wmin 240px, wmax 370px, growprio 50, growx, gapright 10px, gapleft 5px");
 
-        //The Chat Tab is not a real Tab, it's a button, it's creation is done inside this method.
         addTabButtons(tabs);
 
         createUpdateButton();
