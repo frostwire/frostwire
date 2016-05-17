@@ -57,7 +57,7 @@ public class RenameFileMenuAction extends MenuAction {
 
     private void showRenameFileDialog() {
         RenameFileMenuActionDialog.renameAction = this;
-        new RenameFileMenuActionDialog(getFilePath()).show(((Activity) getContext()).getFragmentManager());
+        RenameFileMenuActionDialog.newInstance(getFilePath()).show(((Activity) getContext()).getFragmentManager());
     }
 
     private boolean isValidFileName(String newFileName) {
