@@ -76,6 +76,7 @@ public final class DeleteFileMenuAction extends MenuAction {
         });
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class DeleteFileMenuActionDialog extends AbstractDialog {
 
         private static DeleteFileMenuAction action;

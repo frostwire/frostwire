@@ -30,6 +30,7 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.logging.Logger;
 
 /**
  * Created by gubatron on 12/18/14.
@@ -40,6 +41,7 @@ import com.frostwire.android.gui.views.MenuAction;
  * @author aldenml
  */
 public class CreateNewPlaylistMenuAction extends MenuAction {
+    private static Logger LOG = Logger.getLogger(CreateNewPlaylistMenuAction.class);
     private final long[] fileDescriptors;
 
     public CreateNewPlaylistMenuAction(Context context, long[] fileDescriptors) {
