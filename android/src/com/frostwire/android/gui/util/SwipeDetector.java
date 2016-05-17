@@ -71,10 +71,10 @@ public final class SwipeDetector implements
             float y2 = event.getHistoricalY(0,historySize-1);
             float deltaX = x2-x1;
             float deltaY = Math.abs(y2-y1);
-            if (deltaY > Math.abs(deltaX)) {
+            if (deltaY > 10) {
                 return false;
             }
-            if (Math.abs(deltaX) <= 10) {
+            if (Math.abs(deltaX) <= 20) {
                 return false;
             }
             if (deltaX > 0) {
