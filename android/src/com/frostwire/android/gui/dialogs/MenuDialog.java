@@ -18,10 +18,6 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -30,11 +26,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.android.gui.views.ContextAdapter;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -42,9 +41,6 @@ import com.frostwire.android.gui.views.ContextAdapter;
  *
  */
 public final class MenuDialog extends AbstractDialog {
-
-    private static final String TAG = "menu_dialog";
-
     private static final String ID_KEY = "id";
     private static final String ITEMS_KEY = "items";
 
@@ -52,7 +48,7 @@ public final class MenuDialog extends AbstractDialog {
     private ArrayList<MenuItem> items;
 
     public MenuDialog() {
-        super(TAG, 0);
+        super(0);
     }
 
     @Override

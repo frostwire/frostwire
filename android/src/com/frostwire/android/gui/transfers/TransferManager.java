@@ -20,6 +20,7 @@ package com.frostwire.android.gui.transfers;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Environment;
 import android.os.StatFs;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -37,6 +38,7 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
+import com.frostwire.transfers.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -53,16 +55,13 @@ public final class TransferManager {
 
     private static final Logger LOG = Logger.getLogger(TransferManager.class);
 
-    private final List<DownloadTransfer> httpDownloads;
+    private final List<Transfer> httpDownloads;
     private final List<BittorrentDownload> bittorrentDownloads;
-
     private int downloadsToReview;
-
     private int startedTransfers = 0;
-
     private final Object alreadyDownloadingMonitor = new Object();
-
     private volatile static TransferManager instance;
+    private final ConfigurationManager CM;
 
     public static TransferManager instance() {
         if (instance == null) {
@@ -73,13 +72,35 @@ public final class TransferManager {
 
     private TransferManager() {
         registerPreferencesChangeListener();
-
-        this.httpDownloads = new CopyOnWriteArrayList<DownloadTransfer>();
-        this.bittorrentDownloads = new CopyOnWriteArrayList<BittorrentDownload>();
-
+        CM = ConfigurationManager.instance();
+        this.httpDownloads = new CopyOnWriteArrayList<>();
+        this.bittorrentDownloads = new CopyOnWriteArrayList<>();
         this.downloadsToReview = 0;
-
         loadTorrents();
+    }
+
+    /**
+     * TEMPORARY HACK.
+     * @return true if the save path is not the SD Card.
+     */
+    public static boolean canSeedFromMyFilesTempHACK() {
+        // TODO: Remove this hack when we can create .torrents from My Files
+        // by going through the ridiculous hoops Android has imposed to access
+        // the SD card. For now, let's make the feature available only to files
+        // on internal storage.
+
+        return !TransferManager.isUsingSDCardPrivateStorage();
+    }
+
+    /**
+     * Is it using the SD Card's private (non-persistent after uninstall) app folder to save
+     * downloaded files?
+     */
+    public static boolean isUsingSDCardPrivateStorage() {
+        String primaryPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String currentPath = ConfigurationManager.instance().getStoragePath();
+
+        return !primaryPath.equals(currentPath);
     }
 
     public List<Transfer> getTransfers() {
@@ -98,9 +119,9 @@ public final class TransferManager {
 
     private boolean alreadyDownloading(String detailsUrl) {
         synchronized (alreadyDownloadingMonitor) {
-            for (DownloadTransfer dt : httpDownloads) {
+            for (Transfer dt : httpDownloads) {
                 if (dt.isDownloading()) {
-                    if (dt.getDetailsUrl() != null && dt.getDetailsUrl().equals(detailsUrl)) {
+                    if (dt.getName() != null && dt.getName().equals(detailsUrl)) {
                         return true;
                     }
                 }
@@ -111,7 +132,7 @@ public final class TransferManager {
 
     private boolean isAlreadyDownloadingTorrentByUri(String uri) {
         synchronized (alreadyDownloadingMonitor) {
-            for (DownloadTransfer dt : httpDownloads) {
+            for (Transfer dt : httpDownloads) {
                 if (dt instanceof TorrentFetcherDownload) {
                     String torrentUri = ((TorrentFetcherDownload) dt).getTorrentUri();
                     if (torrentUri != null && torrentUri.equals(uri)) {
@@ -123,8 +144,8 @@ public final class TransferManager {
         return false;
     }
 
-    public DownloadTransfer download(SearchResult sr) {
-        DownloadTransfer transfer = null;
+    public Transfer download(SearchResult sr) {
+        Transfer transfer = null;
 
         if (isBittorrentSearchResultAndMobileDataSavingsOn(sr)) {
             return new InvalidBittorrentDownload(R.string.torrent_transfer_aborted_on_mobile_data);
@@ -155,11 +176,11 @@ public final class TransferManager {
             if (transfer != null && transfer.isComplete()) {
                 if (transfer instanceof BittorrentDownload) {
                     BittorrentDownload bd = (BittorrentDownload) transfer;
-                    if (bd.isResumable()) {
-                        bd.cancel();
+                    if (bd.isPaused()) {
+                        bd.remove(false);
                     }
                 } else {
-                    transfer.cancel();
+                    transfer.remove(false);
                 }
             }
         }
@@ -172,7 +193,7 @@ public final class TransferManager {
                 count++;
             }
         }
-        for (DownloadTransfer d : httpDownloads) {
+        for (Transfer d : httpDownloads) {
             if (!d.isComplete() && d.isDownloading()) {
                 count++;
             }
@@ -193,7 +214,7 @@ public final class TransferManager {
     public long getDownloadsBandwidth() {
         long torrentDownloadsBandwidth = BTEngine.getInstance().getDownloadRate();
         long peerDownloadsBandwidth = 0;
-        for (DownloadTransfer d : httpDownloads) {
+        for (Transfer d : httpDownloads) {
             peerDownloadsBandwidth += d.getDownloadSpeed();
         }
         return torrentDownloadsBandwidth + peerDownloadsBandwidth;
@@ -248,7 +269,7 @@ public final class TransferManager {
                             BittorrentDownload download = bittorrentDownloads.get(i);
                             if (download instanceof UIBittorrentDownload) {
                                 UIBittorrentDownload bt = (UIBittorrentDownload) download;
-                                if (bt.getHash().equals(dl.getInfoHash())) {
+                                if (bt.getInfoHash().equals(dl.getInfoHash())) {
                                     bt.updateUI(dl);
                                     break;
                                 }
@@ -267,7 +288,7 @@ public final class TransferManager {
     public boolean remove(Transfer transfer) {
         if (transfer instanceof BittorrentDownload) {
             return bittorrentDownloads.remove(transfer);
-        } else if (transfer instanceof DownloadTransfer) {
+        } else if (transfer instanceof Transfer) {
             return httpDownloads.remove(transfer);
         }
         return false;
@@ -299,7 +320,9 @@ public final class TransferManager {
 
             if (!u.getScheme().equalsIgnoreCase("file") &&
                 !u.getScheme().equalsIgnoreCase("http") &&
+                !u.getScheme().equalsIgnoreCase("https") &&
                 !u.getScheme().equalsIgnoreCase("magnet")) {
+                LOG.warn("Invalid URI scheme: " + u.toString());
                 return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
             }
 
@@ -308,14 +331,14 @@ public final class TransferManager {
             if (fetcherListener == null) {
                 if (u.getScheme().equalsIgnoreCase("file")) {
                     BTEngine.getInstance().download(new File(u.getPath()), null);
-                } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("magnet")) {
-                        download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()));
-                        bittorrentDownloads.add(download);
+                } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https") || u.getScheme().equalsIgnoreCase("magnet")) {
+                    download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()));
+                    bittorrentDownloads.add(download);
                 }
             } else {
                 if (u.getScheme().equalsIgnoreCase("file")) {
                     fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())));
-                } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("magnet")) {
+                } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https") || u.getScheme().equalsIgnoreCase("magnet")) {
                     // this executes the listener method when it fetches the bytes.
                     new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()), fetcherListener);
                 }
@@ -355,7 +378,7 @@ public final class TransferManager {
     }
 
     private HttpDownload newHttpDownload(HttpSlideSearchResult sr) {
-        HttpDownload download = new HttpDownload(this, sr.getDownloadLink());
+        HttpDownload download = new UIHttpDownload(this, sr.slide());
 
         httpDownloads.add(download);
         download.start();
@@ -363,8 +386,8 @@ public final class TransferManager {
         return download;
     }
 
-    private DownloadTransfer newYouTubeDownload(YouTubeCrawledSearchResult sr) {
-        YouTubeDownload download = new YouTubeDownload(this, sr);
+    private Transfer newYouTubeDownload(YouTubeCrawledSearchResult sr) {
+        YouTubeDownload download = new UIYouTubeDownload(this, sr);
 
         httpDownloads.add(download);
         download.start();
@@ -372,8 +395,8 @@ public final class TransferManager {
         return download;
     }
 
-    private DownloadTransfer newSoundcloudDownload(SoundcloudSearchResult sr) {
-        SoundcloudDownload download = new SoundcloudDownload(this, sr);
+    private Transfer newSoundcloudDownload(SoundcloudSearchResult sr) {
+        SoundcloudDownload download = new UISoundcloudDownload(this, sr);
 
         httpDownloads.add(download);
         download.start();
@@ -381,8 +404,8 @@ public final class TransferManager {
         return download;
     }
 
-    private DownloadTransfer newHttpDownload(HttpSearchResult sr) {
-        HttpDownload download = new HttpDownload(this, new HttpSearchResultDownloadLink(sr));
+    private Transfer newHttpDownload(HttpSearchResult sr) {
+        HttpDownload download = new UIHttpDownload(this, sr);
 
         httpDownloads.add(download);
         download.start();
@@ -390,7 +413,7 @@ public final class TransferManager {
         return download;
     }
 
-    public boolean isBittorrentDownload(DownloadTransfer transfer) {
+    public boolean isBittorrentDownload(Transfer transfer) {
         return transfer instanceof UIBittorrentDownload || transfer instanceof TorrentFetcherDownload;
     }
 
@@ -403,16 +426,29 @@ public final class TransferManager {
         return sr instanceof TorrentSearchResult && isMobileAndDataSavingsOn();
     }
 
-    public boolean isBittorrentDownloadAndMobileDataSavingsOn(DownloadTransfer transfer) {
+    public boolean isBittorrentDownloadAndMobileDataSavingsOn(Transfer transfer) {
         return isBittorrentDownload(transfer) && isMobileAndDataSavingsOn();
     }
 
-    public boolean isBittorrentDownloadAndMobileDataSavingsOff(DownloadTransfer transfer) {
+    public boolean isBittorrentDownloadAndMobileDataSavingsOff(Transfer transfer) {
         return isBittorrentDownload(transfer) && isMobileAndDataSavingsOn();
     }
 
     public boolean isBittorrentDisconnected() {
         return Engine.instance().isStopped() || Engine.instance().isStopping() || Engine.instance().isDisconnected();
+    }
+
+    public void enableSeeding() {
+        CM.setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, true);
+        TransferManager.instance().resumeResumableTransfers();
+    }
+
+    public boolean isSeedingEnabled() {
+        return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
+    }
+
+    public boolean isSeedingEnabledOnlyForWifi() {
+        return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
     }
 
     public void resumeResumableTransfers() {
@@ -421,15 +457,16 @@ public final class TransferManager {
         for (Transfer t : transfers) {
             if (t instanceof BittorrentDownload) {
                 BittorrentDownload bt = (BittorrentDownload) t;
-                if (bt.isResumable()) {
+                if (bt.isPaused()) {
                     bt.resume();
                 }
             } else if (t instanceof HttpDownload) {
-                if (t.getDetailsUrl().contains("archive.org")) {
+                // TODO: review this feature taking care of the SD limitations
+                /*if (t.getName().contains("archive.org")) {
                     if (!t.isComplete() && !((HttpDownload) t).isDownloading()) {
                         ((HttpDownload) t).start(true);
                     }
-                }
+                }*/
             }
         }
     }
@@ -438,11 +475,11 @@ public final class TransferManager {
      * Stops all HttpDownloads (Cloud and Wi-Fi)
      */
     public void stopHttpTransfers() {
-        List<Transfer> transfers = new ArrayList<Transfer>();
+        List<Transfer> transfers = new ArrayList<>();
         transfers.addAll(httpDownloads);
         for (Transfer t : transfers) {
-            if (t instanceof DownloadTransfer && !t.isComplete() && ((DownloadTransfer)t).isDownloading()) {
-                t.cancel();
+            if (t instanceof Transfer && !t.isComplete() && ((Transfer) t).isDownloading()) {
+                t.remove(false);
             }
         }
     }

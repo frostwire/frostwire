@@ -45,7 +45,7 @@ import java.lang.ref.WeakReference;
  */
 public class NewTransferDialog extends AbstractDialog {
 
-    public static final String TAG = "new_transfer_dialog";
+    public static final String TAG = getSuggestedTAG(NewTransferDialog.class);
 
     private static final String SEARCH_RESULT_DATA_KEY = "search_result_data";
     private static final String HIDE_CHECK_SHOW_KEY = "hide_check_show";
@@ -55,7 +55,7 @@ public class NewTransferDialog extends AbstractDialog {
     private CheckBox checkShow;
 
     public NewTransferDialog() {
-        super(TAG, R.layout.dialog_default_checkbox);
+        super(R.layout.dialog_default_checkbox);
     }
 
     public static WeakReference<FileSearchResult> srRef;

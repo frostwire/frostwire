@@ -46,8 +46,8 @@ import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.WebSearchPerformer;
-import com.frostwire.transfers.TransferItem;
-import com.frostwire.transfers.TransferState;
+import com.frostwire.transfers.*;
+import com.frostwire.transfers.YouTubeDownload;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -59,7 +59,6 @@ import java.util.*;
  * @author aldenml
  */
 public class TransferListAdapter extends BaseExpandableListAdapter {
-
     private static final Logger LOG = Logger.getLogger(TransferListAdapter.class);
     private final WeakReference<Context> context;
     private final OnClickListener viewOnClickListener;
@@ -71,7 +70,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
      */
     private final List<Dialog> dialogs;
     private List<Transfer> list;
-    private final Map<String, String> TRANSFER_STATE_STRING_MAP = new Hashtable<>();
+    private final Map<TransferState, String> TRANSFER_STATE_STRING_MAP = new HashMap<>();
 
     public TransferListAdapter(Context context, List<Transfer> list) {
         this.context = new WeakReference<>(context);
@@ -85,30 +84,36 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
 
     private void initTransferStateStringMap() {
         Context c = context.get();
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.QUEUED_FOR_CHECKING), c.getString(R.string.queued_for_checking));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.CHECKING), c.getString(R.string.checking_ellipsis));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.DOWNLOADING_METADATA), c.getString(R.string.downloading_metadata));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.DOWNLOADING_TORRENT), c.getString(R.string.torrent_fetcher_download_status_downloading_torrent));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.DOWNLOADING), c.getString(R.string.azureus_manager_item_downloading));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.FINISHED), c.getString(R.string.azureus_peer_manager_status_finished));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.SEEDING), c.getString(R.string.azureus_manager_item_seeding));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.ALLOCATING), c.getString(R.string.azureus_manager_item_allocating));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.PAUSED), c.getString(R.string.azureus_manager_item_paused));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.ERROR), c.getString(R.string.azureus_manager_item_error));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.ERROR_MOVING_INCOMPLETE), c.getString(R.string.error_moving_incomplete));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.ERROR_HASH_MD5), c.getString(R.string.error_wrong_md5_hash));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.ERROR_SIGNATURE), c.getString(R.string.error_wrong_signature));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.ERROR_NOT_ENOUGH_PEERS), c.getString(R.string.error_not_enough_peers));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.STOPPED), c.getString(R.string.azureus_manager_item_stopped));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.PAUSING), c.getString(R.string.pausing));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.CANCELING), c.getString(R.string.canceling));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.CANCELED), c.getString(R.string.torrent_fetcher_download_status_canceled));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.WAITING), c.getString(R.string.waiting));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.COMPLETE), c.getString(R.string.peer_http_download_status_complete));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.UPLOADING), c.getString(R.string.peer_http_upload_status_uploading));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.UNCOMPRESSING), c.getString(R.string.http_download_status_uncompressing));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.DEMUXING), c.getString(R.string.transfer_status_demuxing));
-        TRANSFER_STATE_STRING_MAP.put(String.valueOf(TransferState.ERROR_DISK_FULL), c.getString(R.string.error_no_space_left_on_device));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.FINISHING, c.getString(R.string.finishing));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.QUEUED_FOR_CHECKING, c.getString(R.string.queued_for_checking));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.CHECKING, c.getString(R.string.checking_ellipsis));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_METADATA, c.getString(R.string.downloading_metadata));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_TORRENT, c.getString(R.string.torrent_fetcher_download_status_downloading_torrent));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING, c.getString(R.string.azureus_manager_item_downloading));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.FINISHED, c.getString(R.string.azureus_peer_manager_status_finished));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.SEEDING, c.getString(R.string.azureus_manager_item_seeding));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ALLOCATING, c.getString(R.string.azureus_manager_item_allocating));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.PAUSED, c.getString(R.string.azureus_manager_item_paused));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR, c.getString(R.string.azureus_manager_item_error));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_MOVING_INCOMPLETE, c.getString(R.string.error_moving_incomplete));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_HASH_MD5, c.getString(R.string.error_wrong_md5_hash));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_SIGNATURE, c.getString(R.string.error_wrong_signature));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_NOT_ENOUGH_PEERS, c.getString(R.string.error_not_enough_peers));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_NO_INTERNET, c.getString(R.string.error_no_internet_connection));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_SAVE_DIR, c.getString(R.string.http_download_status_save_dir_error));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_TEMP_DIR, c.getString(R.string.http_download_status_temp_dir_error));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.STOPPED, c.getString(R.string.azureus_manager_item_stopped));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.PAUSING, c.getString(R.string.pausing));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.CANCELING, c.getString(R.string.canceling));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.CANCELED, c.getString(R.string.torrent_fetcher_download_status_canceled));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.WAITING, c.getString(R.string.waiting));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.COMPLETE, c.getString(R.string.peer_http_download_status_complete));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.UPLOADING, c.getString(R.string.peer_http_upload_status_uploading));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.UNCOMPRESSING, c.getString(R.string.http_download_status_uncompressing));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.DEMUXING, c.getString(R.string.transfer_status_demuxing));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_DISK_FULL, c.getString(R.string.error_no_space_left_on_device));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.SCANNING, c.getString(R.string.scanning));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.UNKNOWN, "");
     }
 
     @Override
@@ -261,20 +266,20 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         List<MenuAction> items = new ArrayList<>();
         if (tag instanceof BittorrentDownload) {
             title = populateBittorrentDownloadMenuActions((BittorrentDownload) tag, items);
-        } else if (tag instanceof DownloadTransfer) {
+        } else if (tag instanceof Transfer) {
             title = populateCloudDownloadMenuActions(tag, items);
         }
         return items.size() > 0 ? new MenuAdapter(context.get(), title, items) : null;
     }
 
     private String populateCloudDownloadMenuActions(Object tag, List<MenuAction> items) {
-        DownloadTransfer download = (DownloadTransfer) tag;
-        String title = download.getDisplayName();;
-        boolean errored = download.getStatus() != null && getStatusFromResId(download.getStatus()).contains("Error");
+        Transfer download = (Transfer) tag;
+        String title = download.getDisplayName();
+        boolean errored = download.getState().name().contains("ERROR");
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
-            if (files != null && files.size() == 1) {
+            if (TransferManager.canSeedFromMyFilesTempHACK() && files != null && files.size() == 1) {
                 items.add(new SeedAction(context.get(), files.get(0),download));
             }
             items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
@@ -300,27 +305,30 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             items.add(new OpenMenuAction(context.get(), path, mimeType));
         }
 
+//        LOG.info("download.isComplete(): " + download.isComplete());
+//        LOG.info("download.isDownloading(): " + download.isDownloading());
+//        LOG.info("download.isFinished(): " + download.isFinished());
+//        LOG.info("download.isPaused(): " + download.isPaused());
+//        LOG.info("download.isSeeding(): " + download.isSeeding());
+
         if (!download.isComplete() || ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS)) {
-            if (download.isPausable() && !download.isPaused()) {
+            if (!download.isPaused()) {
                 items.add(new PauseDownloadMenuAction(context.get(), download));
-            } else if (download.isResumable()) {
+            } else {
                 boolean wifiIsUp = NetworkManager.instance().isDataWIFIUp();
                 boolean bittorrentOnMobileData = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
                 boolean bittorrentOff = Engine.instance().isStopped() || Engine.instance().isDisconnected();
 
                 if (wifiIsUp || bittorrentOnMobileData) {
-                    if (!download.isComplete() || bittorrentOff) {
+                    if (!download.isComplete() && !bittorrentOff) {
                         items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.resume_torrent_menu_action));
-                    } else {
-                        //let's see if we can seed...
-                        boolean seedTorrents = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
-                        boolean seedTorrentsOnWifiOnly = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
-                        if ((seedTorrents && seedTorrentsOnWifiOnly && wifiIsUp) || (seedTorrents && !seedTorrentsOnWifiOnly)) {
-                            items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.seed));
-                        }
                     }
                 }
             }
+        }
+
+        if ((download.isFinished() || download.isSeeding()) && (download.isPaused())) {
+            items.add(new SeedAction(context.get(), download));
         }
 
         items.add(new CancelMenuAction(context.get(), download, !download.isComplete()));
@@ -329,14 +337,14 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 R.drawable.contextmenu_icon_magnet,
                 R.string.transfers_context_menu_copy_magnet,
                 R.string.transfers_context_menu_copy_magnet_copied,
-                download.makeMagnetUri()
+                download.magnetUri()
         ));
 
         items.add(new CopyToClipboardMenuAction(context.get(),
                 R.drawable.contextmenu_icon_copy,
                 R.string.transfers_context_menu_copy_infohash,
                 R.string.transfers_context_menu_copy_infohash_copied,
-                download.getHash()
+                download.getInfoHash()
         ));
 
         if (download.isComplete()) {
@@ -344,20 +352,23 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             items.add(new CancelMenuAction(context.get(), download, true, true));
         }
 
-        if (download.hasPaymentOptions()) {
-            PaymentOptions po = download.getPaymentOptions();
-            if (po.bitcoin != null) {
-                items.add(new SendBitcoinTipAction(context.get(), po));
-            }
+        if (download instanceof UIBittorrentDownload) {
+            UIBittorrentDownload uidl = (UIBittorrentDownload) download;
+            if (uidl.hasPaymentOptions()) {
+                PaymentOptions po = uidl.getPaymentOptions();
+                if (po.bitcoin != null) {
+                    items.add(new SendBitcoinTipAction(context.get(), po));
+                }
 
-            if (po.paypalUrl != null) {
-                items.add(new SendFiatTipAction(context.get(), po));
+                if (po.paypalUrl != null) {
+                    items.add(new SendFiatTipAction(context.get(), po));
+                }
             }
         }
         return title;
     }
 
-    private String extractMime(DownloadTransfer download) {
+    private String extractMime(Transfer download) {
         return UIUtils.getMimeType(download.getSavePath().getAbsolutePath());
     }
 
@@ -394,8 +405,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                     TransferItem transferItem = bItem.getItems().get(0);
                     path = transferItem.getFile().getAbsolutePath();
                 }
-            } else if (item instanceof DownloadTransfer) {
-                DownloadTransfer transferItem = (DownloadTransfer) item;
+            } else if (item instanceof Transfer) {
+                Transfer transferItem = (Transfer) item;
                 if (transferItem.getSavePath() != null) {
                     path = transferItem.getSavePath().getAbsolutePath();
                 }
@@ -453,17 +464,17 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
 
         ImageButton buttonPlay = findView(view, R.id.view_transfer_list_item_button_play);
 
-        seeds.setText(context.get().getString(R.string.seeds_n, download.getSeeds()));
-        peers.setText(context.get().getString(R.string.peers_n, download.getPeers()));
+        seeds.setText(context.get().getString(R.string.seeds_n, formatSeeds(download)));
+        peers.setText(context.get().getString(R.string.peers_n, formatPeers(download)));
         seeds.setVisibility(View.VISIBLE);
         peers.setVisibility(View.VISIBLE);
 
 
         title.setText(download.getDisplayName());
-        progress.setProgress(download.getProgress());
+        setProgress(progress, download.getProgress());
         title.setCompoundDrawables(null, null, null, null);
 
-        final String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getStatus());
+        final String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getState());
         status.setText(downloadStatus);
 
         if (NetworkManager.instance().isInternetDown()) {
@@ -475,8 +486,11 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
         size.setText(UIUtils.getBytesInHuman(download.getSize()));
 
-        if (download.hasPaymentOptions()) {
-            setPaymentOptionDrawable(download, title);
+        if (download instanceof UIBittorrentDownload) {
+            UIBittorrentDownload uidl = (UIBittorrentDownload) download;
+            if (uidl.hasPaymentOptions()) {
+                setPaymentOptionDrawable(uidl, title);
+            }
         }
 
         List<TransferItem> items = download.getItems();
@@ -490,11 +504,39 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    private void setPaymentOptionDrawable(BittorrentDownload download, TextView title) {
+    private static String formatPeers(BittorrentDownload dl) {
+        int connectedPeers = dl.getConnectedPeers();
+        int peers = dl.getTotalPeers();
+
+        String tmp = connectedPeers > peers ? "%1" : "%1 " + "/" + " %2";
+
+        tmp = tmp.replaceAll("%1", String.valueOf(connectedPeers));
+        tmp = tmp.replaceAll("%2", String.valueOf(peers));
+
+        return tmp;
+    }
+
+    private static String formatSeeds(BittorrentDownload dl) {
+        int connectedSeeds = dl.getConnectedSeeds();
+        int seeds = dl.getTotalSeeds();
+
+        String tmp = connectedSeeds > seeds ? "%1" : "%1 " + "/" + " %2";
+
+        tmp = tmp.replaceAll("%1", String.valueOf(connectedSeeds));
+        String param2 = "?";
+        if (seeds != -1) {
+            param2 = String.valueOf(seeds);
+        }
+        tmp = tmp.replaceAll("%2", param2);
+
+        return tmp;
+    }
+
+    private void setPaymentOptionDrawable(UIBittorrentDownload download, TextView title) {
         final PaymentOptions paymentOptions = download.getPaymentOptions();
         final Resources r = context.get().getResources();
         Drawable tipDrawable = (paymentOptions.bitcoin != null) ? r.getDrawable(R.drawable.contextmenu_icon_donation_bitcoin) : r.getDrawable(R.drawable.contextmenu_icon_donation_fiat);
-        if (tipDrawable  != null) {
+        if (tipDrawable != null) {
             final int iconHeightInPixels = r.getDimensionPixelSize(R.dimen.view_transfer_list_item_title_left_drawable);
             tipDrawable.setBounds(0, 0, iconHeightInPixels, iconHeightInPixels);
             title.setCompoundDrawables(tipDrawable, null, null, null);
@@ -515,8 +557,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         peers.setText("");
         title.setText(download.getDisplayName());
         title.setCompoundDrawables(null, null, null, null);
-        progress.setProgress(download.getProgress());
-        String downloadStatus = getStatusFromResId(download.getStatus());
+        setProgress(progress, download.getProgress());
+        String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getState());
         status.setText(downloadStatus);
         speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
         size.setText(UIUtils.getBytesInHuman(download.getSize()));
@@ -540,7 +582,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
 
         icon.setImageResource(MediaType.getFileTypeIconId(FilenameUtils.getExtension(item.getFile().getAbsolutePath())));
         title.setText(item.getDisplayName());
-        progress.setProgress(item.getProgress());
+        setProgress(progress, item.getProgress());
         size.setText(UIUtils.getBytesInHuman(item.getSize()));
 
         buttonPlay.setTag(item);
@@ -560,7 +602,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    private void populateCloudDownload(View view, DownloadTransfer download) {
+    private void populateCloudDownload(View view, Transfer download) {
         TextView title = findView(view, R.id.view_transfer_list_item_title);
         ProgressBar progress = findView(view, R.id.view_transfer_list_item_progress);
         TextView status = findView(view, R.id.view_transfer_list_item_status);
@@ -574,8 +616,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         peers.setText("");
         title.setText(download.getDisplayName());
         title.setCompoundDrawables(null, null, null, null);
-        progress.setProgress(download.getProgress());
-        status.setText(getStatusFromResId(download.getStatus()));
+        setProgress(progress, download.getProgress());
+        status.setText(TRANSFER_STATE_STRING_MAP.get(download.getState()));
         speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
         size.setText(UIUtils.getBytesInHuman(download.getSize()));
 
@@ -591,20 +633,10 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         // hack to fill the demuxing state
         if (download instanceof YouTubeDownload) {
             YouTubeDownload yt = (YouTubeDownload) download;
-            if (yt.isDemuxing()) {
-                status.setText(getStatusFromResId(download.getStatus()) + " (" + yt.getDemuxingProgress() + "%)");
+            if (yt.getState() == TransferState.DEMUXING) {
+                status.setText(TRANSFER_STATE_STRING_MAP.get(download.getState()) + " (" + yt.demuxingProgress() + "%)");
             }
         }
-    }
-
-    private String getStatusFromResId(String str) {
-        String s = "";
-        try {
-            s = context.get().getString(Integer.parseInt(str));
-        } catch (Throwable e) {
-            // ignore
-        }
-        return s;
     }
 
     private boolean showTransferItemMenu(View v) {
@@ -618,6 +650,15 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             LOG.error("Failed to create the menu", e);
         }
         return false;
+    }
+
+    // at least one phone does not provide this trivial optimization
+    // TODO: move this for a more framework like place, like a Views (utils) class
+    private static void setProgress(ProgressBar v, int progress) {
+        int old = v.getProgress();
+        if (old != progress) {
+            v.setProgress(progress);
+        }
     }
 
     private final class ViewOnClickListener implements OnClickListener {

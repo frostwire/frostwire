@@ -22,6 +22,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.*;
 import android.provider.MediaStore.MediaColumns;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.SubMenu;
@@ -115,6 +116,17 @@ public final class MusicUtils {
         if (mConnectionMap.isEmpty()) {
             mService = null;
         }
+    }
+
+    public static int deletePlaylist(FragmentActivity activity, long playlistId) {
+        if (activity.getContentResolver()==null) {
+            return 0;
+        }
+        final Uri mUri = ContentUris.withAppendedId(
+                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                playlistId);
+        int deleted = activity.getContentResolver().delete(mUri, null, null);
+        return deleted;
     }
 
     public static final class ServiceBinder implements ServiceConnection {
@@ -1305,7 +1317,8 @@ public final class MusicUtils {
      */
     public static void makePlaylistMenu(final Context context, final int groupId,
             final SubMenu subMenu, final boolean showFavorites) {
-        subMenu.clear();
+//        subMenu.clear();
+        subMenu.clearHeader();
         if (showFavorites) {
             subMenu.add(groupId, FragmentMenuItems.ADD_TO_FAVORITES, Menu.NONE,
                     R.string.add_to_favorites);

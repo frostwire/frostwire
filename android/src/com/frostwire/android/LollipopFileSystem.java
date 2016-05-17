@@ -21,7 +21,6 @@ package com.frostwire.android;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
@@ -29,6 +28,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
 import android.util.LruCache;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.FileFilter;
@@ -41,6 +41,8 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -53,6 +55,8 @@ public final class LollipopFileSystem implements FileSystem {
 
     private static final int CACHE_MAX_SIZE = 1000;
     private static final LruCache<String, DocumentFile> CACHE = new LruCache<>(CACHE_MAX_SIZE);
+
+    private static List<String> FIXED_SDCARD_PATHS = buildFixedSdCardPaths();
 
     private final Application app;
 
@@ -167,6 +171,45 @@ public final class LollipopFileSystem implements FileSystem {
     }
 
     @Override
+    public File[] listFiles(File file, FileFilter filter) {
+        try {
+            File[] files = file.listFiles(filter);
+            if (files != null) {
+                return files;
+            }
+        } catch (Throwable e) {
+            // ignore, try with SAF
+        }
+
+        LOG.warn("Using SAF for listFiles, could be a costly operation");
+
+        DocumentFile f = getDirectory(app, file, false);
+        if (f == null) {
+            return null; // does not exists
+        }
+
+        DocumentFile[] files = f.listFiles();
+        if (filter != null && files != null) {
+            List<File> result = new ArrayList<>(files.length);
+            for (int i = 0; i < files.length; i++) {
+                Uri uri = files[i].getUri();
+                String path = getDocumentPath(uri);
+                if (path == null) {
+                    continue;
+                }
+                File child = new File(path);
+                if (filter.accept(child)) {
+                    result.add(child);
+                }
+            }
+
+            return result.toArray(new File[0]);
+        }
+
+        return new File[0];
+    }
+
+    @Override
     public boolean copy(File src, File dest) {
         try {
             FileUtils.copyFile(src, dest);
@@ -213,30 +256,53 @@ public final class LollipopFileSystem implements FileSystem {
     @Override
     public void scan(File file) {
         try {
-            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            intent.setData(Uri.fromFile(file));
-            app.sendBroadcast(intent);
+            final List<String> paths = new LinkedList<>();
+            if (isDirectory(file)) {
+                walk(file, new FileFilter() {
+                    @Override
+                    public boolean accept(File file) {
+                        return true;
+                    }
+
+                    @Override
+                    public void file(File file) {
+                        if (!file.isDirectory()) {
+                            paths.add(file.getPath());
+                        }
+                    }
+                });
+            } else {
+                paths.add(file.getPath()); // in case we are in a SD and it's an actual file
+            }
+
+            if (paths.size() > 0) {
+                MediaScanner.scanFiles(app, paths);
+                UIUtils.broadcastAction(app, Constants.ACTION_FILE_ADDED_OR_REMOVED);
+            }
         } catch (Throwable e) {
-            LOG.error("Unable to trigger scan of file: " + file, e);
+            LOG.error("Error scanning file/directory: " + file, e);
         }
     }
 
     @Override
     public void walk(File file, FileFilter filter) {
-        LOG.warn("Visiting file trees are not supported in external SD card");
-        new DefaultFileSystem().walk(file, filter);
+        DefaultFileSystem.walkFiles(this, file, filter);
     }
 
-    public Uri getDocumentUri(File file) {
-        return getDocumentUri(app, file);
+    public String getTreePath(Uri treeUri) {
+        return getPath(app, treeUri, true);
     }
 
-    public String getPath(Uri treeUri) {
-        return getPath(app, treeUri);
+    public String getDocumentPath(Uri treeUri) {
+        return getPath(app, treeUri, false);
     }
 
     public DocumentFile getDocument(File file) {
         return getDocument(app, file);
+    }
+
+    public String getExtSdCardFolder(File file) {
+        return getExtSdCardFolder(app, file);
     }
 
     public int openFD(File file, String mode) {
@@ -446,7 +512,7 @@ public final class LollipopFileSystem implements FileSystem {
         return Uri.parse(uri);
     }
 
-    private static String getPath(Context context, Uri treeUri) {
+    private static String getPath(Context context, Uri treeUri, boolean tree) {
         if (treeUri == null) {
             return null;
         }
@@ -461,7 +527,7 @@ public final class LollipopFileSystem implements FileSystem {
             volumePath = volumePath.substring(0, volumePath.length() - 1);
         }
 
-        String documentPath = getDocumentPathFromTreeUri(treeUri);
+        String documentPath = getDocumentPathFromTreeUri(treeUri, tree);
         if (documentPath.endsWith(File.separator)) {
             documentPath = documentPath.substring(0, documentPath.length() - 1);
         }
@@ -521,11 +587,10 @@ public final class LollipopFileSystem implements FileSystem {
             }
         }
         // special hard coded paths for more security
-        if (!paths.contains("/storage/sdcard1")) {
-            paths.add("/storage/sdcard1");
-        }
-        if (!paths.contains("/storage/ext_sd")) {
-            paths.add("/storage/ext_sd");
+        for (String path : FIXED_SDCARD_PATHS) {
+            if (!paths.contains(path)) {
+                paths.add(path);
+            }
         }
 
         return paths.toArray(new String[0]);
@@ -608,8 +673,8 @@ public final class LollipopFileSystem implements FileSystem {
         }
     }
 
-    private static String getDocumentPathFromTreeUri(final Uri treeUri) {
-        final String docId = getTreeDocumentId(treeUri);
+    private static String getDocumentPathFromTreeUri(final Uri treeUri, boolean tree) {
+        final String docId = tree ? getTreeDocumentId(treeUri) : getDocumentDocumentId(treeUri);
         final String[] split = docId.split(":");
         if ((split.length >= 2) && (split[1] != null)) {
             return split[1];
@@ -626,8 +691,16 @@ public final class LollipopFileSystem implements FileSystem {
         throw new IllegalArgumentException("Invalid URI: " + documentUri);
     }
 
+    private static String getDocumentDocumentId(Uri documentUri) {
+        final List<String> paths = documentUri.getPathSegments();
+        if (paths.size() >= 4 && "document".equals(paths.get(2))) {
+            return paths.get(3);
+        }
+        throw new IllegalArgumentException("Invalid URI: " + documentUri);
+    }
+
     private static String combineRoot(String baseFolder) {
-        String root = Platforms.appSettings().string(Constants.PREF_KEY_STORAGE_PATH)        ;
+        String root = Platforms.appSettings().string(Constants.PREF_KEY_STORAGE_PATH);
 
         return root != null && root.startsWith(baseFolder) ? root : baseFolder;
     }
@@ -639,13 +712,14 @@ public final class LollipopFileSystem implements FileSystem {
         OutputStream outStream = null;
         try {
             inStream = context.getContentResolver().openInputStream(source.getUri());
-            outStream = context.getContentResolver().openOutputStream(target.getUri());
+            outStream = openOutputStream(context, target);
 
             byte[] buffer = new byte[16384]; // MAGIC_NUMBER
             int bytesRead;
             while ((bytesRead = inStream.read(buffer)) != -1) {
                 outStream.write(buffer, 0, bytesRead);
             }
+
         } catch (Throwable e) {
             LOG.error("Error when copying file from " + source.getUri() + " to " + target.getUri(), e);
             return false;
@@ -662,13 +736,14 @@ public final class LollipopFileSystem implements FileSystem {
         OutputStream outStream = null;
         try {
             inStream = new ByteArrayInputStream(data);
-            outStream = context.getContentResolver().openOutputStream(f.getUri());
+            outStream = openOutputStream(context, f);
 
             byte[] buffer = new byte[16384]; // MAGIC_NUMBER
             int bytesRead;
             while ((bytesRead = inStream.read(buffer)) != -1) {
                 outStream.write(buffer, 0, bytesRead);
             }
+
         } catch (Throwable e) {
             LOG.error("Error when writing bytes to " + f.getUri(), e);
             return false;
@@ -678,5 +753,59 @@ public final class LollipopFileSystem implements FileSystem {
         }
 
         return true;
+    }
+
+    private static OutputStream openOutputStream(Context context, DocumentFile f) throws IOException {
+        ContentResolver cr = context.getContentResolver();
+        ParcelFileDescriptor pfd = cr.openFileDescriptor(f.getUri(), "rw");
+
+        int fd = pfd.detachFd(); // this trick the internal system to trigger the media scanner on nothing
+        pfd = ParcelFileDescriptor.adoptFd(fd);
+
+        return new AutoSyncOutputStream(pfd);
+    }
+
+    private static List<String> buildFixedSdCardPaths() {
+        LinkedList<String> l = new LinkedList<>();
+
+        l.add("/storage/sdcard1"); // Motorola Xoom
+        l.add("/storage/extsdcard"); // Samsung SGS3
+        l.add("/storage/sdcard0/external_sdcard"); // user request
+        l.add("/mnt/extsdcard");
+        l.add("/mnt/sdcard/external_sd"); // Samsung galaxy family
+        l.add("/mnt/external_sd");
+        l.add("/mnt/media_rw/sdcard1"); // 4.4.2 on CyanogenMod S3
+        l.add("/removable/microsd"); // Asus transformer prime
+        l.add("/mnt/emmc");
+        l.add("/storage/external_SD"); // LG
+        l.add("/storage/ext_sd"); // HTC One Max
+        l.add("/storage/removable/sdcard1"); // Sony Xperia Z1
+        l.add("/data/sdext");
+        l.add("/data/sdext2");
+        l.add("/data/sdext3");
+        l.add("/data/sdext4");
+
+        return Collections.unmodifiableList(l);
+    }
+
+    private static final class AutoSyncOutputStream extends ParcelFileDescriptor.AutoCloseOutputStream {
+
+        public AutoSyncOutputStream(ParcelFileDescriptor fd) throws IOException {
+            super(fd);
+        }
+
+        @Override
+        public void close() throws IOException {
+            sync();
+            super.close();
+        }
+
+        private void sync() {
+            try {
+                getFD().sync();
+            } catch (Throwable e) {
+                // ignore
+            }
+        }
     }
 }

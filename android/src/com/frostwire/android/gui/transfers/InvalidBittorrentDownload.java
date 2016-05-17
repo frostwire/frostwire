@@ -19,7 +19,9 @@
 package com.frostwire.android.gui.transfers;
 
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.transfers.TransferState;
 
 import java.io.File;
 import java.util.Collections;
@@ -45,6 +47,11 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
 
     @Override
     public File getSavePath() {
+        return null;
+    }
+
+    @Override
+    public File getContentSavePath() {
         return null;
     }
 
@@ -79,8 +86,8 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public String getStatus() {
-        return null;
+    public TransferState getState() {
+        return TransferState.UNKNOWN;
     }
 
     @Override
@@ -94,7 +101,7 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public Date getDateCreated() {
+    public Date getCreated() {
         return null;
     }
 
@@ -103,37 +110,33 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public void cancel() {
-    }
-
-    @Override
-    public String makeMagnetUri() {
+    public String magnetUri() {
         return null;
     }
 
     @Override
-    public String getHash() {
+    public String getInfoHash() {
         return null;
     }
 
     @Override
-    public String getPeers() {
-        return null;
+    public int getConnectedPeers() {
+        return 0;
     }
 
     @Override
-    public String getSeeds() {
-        return null;
+    public int getTotalPeers() {
+        return 0;
     }
 
     @Override
-    public boolean isResumable() {
-        return false;
+    public int getConnectedSeeds() {
+        return 0;
     }
 
     @Override
-    public boolean isPausable() {
-        return false;
+    public int getTotalSeeds() {
+        return 0;
     }
 
     @Override
@@ -152,6 +155,11 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
     public void pause() {
     }
 
@@ -160,26 +168,20 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public boolean hasPaymentOptions() {
-        return false;
-    }
-
-    @Override
-    public PaymentOptions getPaymentOptions() {
-        return null;
-    }
-
-    @Override
     public List<TransferItem> getItems() {
         return Collections.emptyList();
     }
 
     @Override
-    public void cancel(boolean deleteData) {
+    public void remove(boolean deleteData) {
     }
 
     @Override
-    public String getDetailsUrl() {
+    public void remove(boolean deleteTorrent, boolean deleteData) {
+    }
+
+    @Override
+    public String getName() {
         return null;
     }
 

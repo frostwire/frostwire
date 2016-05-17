@@ -68,8 +68,8 @@ public class TorrentSeedingSettingComponent extends JPanel {
     }
 
     private void initOptionButtons() {
-        seedingRadioButton = new JRadioButton("<html>" + I18n.tr("<strong>Seed finished torrent downloads.</strong> BitTorrent users on the internet will be able<br/>to download file chunks of the data your torrents seed. (Recommended)") + "</html>");
-        notSeedingRadioButton = new JRadioButton("<html>" + I18n.tr("<strong>Don't seed finished torrent downloads.</strong> BitTorrent users on the internet may<br/>only download file chunks of that torrent from you while you're downloading its<br/>data files. <strong>Some trackers will penalize this Leeching behavior</strong>.") + "</html>");
+        seedingRadioButton = new JRadioButton("<html>" + I18n.tr("<strong>Seed finished downloads.</strong> BitTorrent users on the internet will be able<br/>to download file chunks of the data your torrents seed. (Recommended)") + "</html>");
+        notSeedingRadioButton = new JRadioButton("<html>" + I18n.tr("<strong>Don't seed finished downloads.</strong> BitTorrent users on the internet may<br/>only download file chunks of that torrent from you while you're downloading its<br/>data files. <strong>Some trackers will penalize this Leeching behavior</strong>.") + "</html>");
         radioGroup = new ButtonGroup();
         radioGroup.add(seedingRadioButton);
         radioGroup.add(notSeedingRadioButton);

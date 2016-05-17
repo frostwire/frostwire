@@ -162,7 +162,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     public void shutdown() {
         Offers.stopAdNetworks(this);
-        UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
+        //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
         Engine.instance().shutdown();
     }
@@ -280,23 +280,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void openTorrentUrl(Intent intent) {
         //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
-        /**
-         * I've refactored this dialog so that it is forced (no matter if the setting
-         * to not show it again has been used) and when that happens the checkbox is hidden.
-         *
-         * However that dialog requires some data about the download, data which is not
-         * obtained until we have instantiated the Torrent object.
-         *
-         * I'm thinking that we can either:
-         * a) Pass a parameter to the transfer manager, but this would probably
-         * not be cool since the transfer manager (I think) should work independently from
-         * the UI thread.
-         *
-         * b) Pass a "listener" to the transfer manager, once the transfer manager has the torrent
-         * it can notify us and wait for the user to decide whether or not to continue with the transfer
-         *
-         * c) Forget about showing that dialog, and just start the download, the user can cancel it.
-         */
 
         //Show me the transfer tab
         Intent i = new Intent(this, MainActivity.class);
@@ -516,6 +499,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void showShutdownDialog() {
+        UXStats.instance().flush();
         YesNoDialog dlg = YesNoDialog.newInstance(SHUTDOWN_DIALOG_ID, R.string.app_shutdown_dlg_title, R.string.app_shutdown_dlg_message);
         dlg.show(getFragmentManager()); //see onDialogClick
     }
@@ -691,8 +675,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         currentFragment = fragment;
         updateHeader(fragment);
 
-        if (currentFragment instanceof AbstractFragment) {
-            ((AbstractFragment) currentFragment).onShow();
+        if (currentFragment instanceof MainFragment) {
+            ((MainFragment) currentFragment).onShow();
         }
     }
 

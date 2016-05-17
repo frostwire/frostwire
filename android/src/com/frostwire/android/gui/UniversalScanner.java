@@ -40,7 +40,7 @@ import java.util.*;
  * @author gubatron
  * @author aldenml
  */
-public final class UniversalScanner {
+final class UniversalScanner {
 
     private static final Logger LOG = Logger.getLogger(UniversalScanner.class);
 

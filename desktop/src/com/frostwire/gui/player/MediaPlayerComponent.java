@@ -15,25 +15,6 @@
 
 package com.frostwire.gui.player;
 
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.event.*;
-import java.io.File;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import com.frostwire.logging.Logger;
-import net.miginfocom.swing.MigLayout;
-
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.gui.bittorrent.SendFileProgressDialog;
@@ -42,15 +23,23 @@ import com.frostwire.gui.library.LibraryUtils;
 import com.frostwire.gui.library.tags.TagsData;
 import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.theme.ThemeMediator;
+import com.frostwire.logging.Logger;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.DialogOption;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.MediaButton;
-import com.limegroup.gnutella.gui.RefreshListener;
+import com.limegroup.gnutella.gui.*;
+import net.miginfocom.swing.MigLayout;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class sets up JPanel with MediaPlayer on it, and takes care of GUI
@@ -1018,8 +1007,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                     iconUpName = "archive_off";
                     iconDownName = "archive_on";
                 }
-
-
 
                 //TODO: Add "isLocalFile || isPlaylistItem ||" on FrostWire 6.x when we have room for 3 buttons.
                 boolean mediaSourceButtonVisible = (currentMedia != null) && (isYT || isSC || isAR);

@@ -27,13 +27,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.*;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -48,10 +46,12 @@ import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.SwipeDetector;
+import com.frostwire.android.gui.util.SwipeListener;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.PromotionsView.OnPromotionClickListener;
-import com.frostwire.android.gui.views.SearchInputView.OnSearchListener;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
@@ -77,7 +77,11 @@ import java.util.regex.Pattern;
  * @author gubatron
  * @author aldenml
  */
-public final class SearchFragment extends AbstractFragment implements MainFragment, OnDialogClickListener, SearchProgressView.CurrentQueryReporter {
+public final class SearchFragment extends AbstractFragment implements
+        MainFragment,
+        OnDialogClickListener,
+        SearchProgressView.CurrentQueryReporter,
+        SwipeListener {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
     private SearchResultListAdapter adapter;
     private List<Slide> slides;
@@ -87,15 +91,29 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     private PromotionsView promotions;
     private SearchProgressView searchProgress;
     private ListView list;
-
+    private final SwipeDetector viewSwipeDetector;
     private String currentQuery;
-
     private final FileTypeCounter fileTypeCounter;
+    private final SparseArray<Byte> toTheRightOf = new SparseArray<>(6);
+    private final SparseArray<Byte> toTheLeftOf = new SparseArray<>(6);
 
     public SearchFragment() {
         super(R.layout.fragment_search);
         fileTypeCounter = new FileTypeCounter();
         currentQuery = null;
+        viewSwipeDetector = new SwipeDetector(this, 50);
+        toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS);
+        toTheRightOf.put(Constants.FILE_TYPE_VIDEOS,Constants.FILE_TYPE_PICTURES);
+        toTheRightOf.put(Constants.FILE_TYPE_PICTURES,Constants.FILE_TYPE_APPLICATIONS);
+        toTheRightOf.put(Constants.FILE_TYPE_APPLICATIONS,Constants.FILE_TYPE_DOCUMENTS);
+        toTheRightOf.put(Constants.FILE_TYPE_DOCUMENTS,Constants.FILE_TYPE_TORRENTS);
+        toTheRightOf.put(Constants.FILE_TYPE_TORRENTS,Constants.FILE_TYPE_AUDIO);
+        toTheLeftOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_TORRENTS);
+        toTheLeftOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_AUDIO);
+        toTheLeftOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_VIDEOS);
+        toTheLeftOf.put(Constants.FILE_TYPE_APPLICATIONS, Constants.FILE_TYPE_PICTURES);
+        toTheLeftOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_APPLICATIONS);
+        toTheLeftOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_DOCUMENTS);
     }
 
     @Override
@@ -144,35 +162,9 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
     @Override
     protected void initComponents(final View view) {
-
         searchInput = findView(view, R.id.fragment_search_input);
         searchInput.setShowKeyboardOnPaste(true);
-        searchInput.setOnSearchListener(new OnSearchListener() {
-            public void onSearch(View v, String query, int mediaTypeId) {
-                if (query.contains("://m.soundcloud.com/") || query.contains("://soundcloud.com/")) {
-                    cancelSearch();
-                    new DownloadSoundcloudFromUrlTask(getActivity(), query).execute();
-                    searchInput.setText("");
-                } else if (query.contains("youtube.com/")) {
-                    performYTSearch(query);
-                } else if (query.startsWith("magnet:?xt=urn:btih:")) {
-                    startMagnetDownload(query);
-                    currentQuery = null;
-                    searchInput.setText("");
-                } else {
-                    performSearch(query, mediaTypeId);
-                }
-            }
-
-            public void onMediaTypeSelected(View v, int mediaTypeId) {
-                adapter.setFileType(mediaTypeId);
-                showSearchView(view);
-            }
-
-            public void onClear(View v) {
-                cancelSearch();
-            }
-        });
+        searchInput.setOnSearchListener(new SearchInputOnSearchListener((LinearLayout) view, this));
 
         deepSearchProgress = findView(view, R.id.fragment_search_deepsearch_progress);
         deepSearchProgress.setVisibility(View.GONE);
@@ -185,10 +177,8 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             }
         });
 
-
         searchProgress = findView(view, R.id.fragment_search_search_progress);
         searchProgress.setCurrentQueryReporter(this);
-
         searchProgress.setCancelOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -199,8 +189,10 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                 }
             }
         });
+        searchProgress.setOnTouchListener(viewSwipeDetector);
 
         list = findView(view, R.id.fragment_search_list);
+        list.setOnTouchListener(viewSwipeDetector);
 
         showSearchView(view);
         showRatingsReminder(view);
@@ -333,7 +325,6 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     private void switchView(View v, int id) {
         if (v != null) {
             FrameLayout frameLayout = findView(v, R.id.fragment_search_framelayout);
-
             int childCount = frameLayout.getChildCount();
             for (int i = 0; i < childCount; i++) {
                 View childAt = frameLayout.getChildAt(i);
@@ -376,9 +367,11 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     public static void startDownload(Context ctx, SearchResult sr, String message) {
+        if (sr instanceof AbstractTorrentSearchResult) {
+            UIUtils.showShortMessage(ctx, R.string.fetching_torrent_ellipsis);
+        }
         StartDownloadTask task = new StartDownloadTask(ctx, sr, message);
         Tasks.executeParallel(task);
-        //UIUtils.showTransfersOnDownloadStart(ctx);
     }
 
     private void showRatingsReminder(View v) {
@@ -485,6 +478,62 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     @Override
     public String getCurrentQuery() {
         return currentQuery;
+    }
+
+    @Override
+    public void onSwipeLeft() {
+        // move to the right
+        switchToThe(true);
+    }
+
+    @Override
+    public void onSwipeRight() {
+        // move to the left
+        switchToThe(false);
+    }
+
+    private void switchToThe(boolean right) {
+        if (adapter == null) {
+            return;
+        }
+        adapter.getFileType();
+        final byte currentFileType = (byte) adapter.getFileType();
+        final byte nextFileType = (right) ? toTheRightOf.get(currentFileType) : toTheLeftOf.get(currentFileType);
+        searchInput.performClickOnRadioButton(nextFileType);
+    }
+
+    private static class SearchInputOnSearchListener implements SearchInputView.OnSearchListener {
+        private final LinearLayout parentView;
+        private final SearchFragment fragment;
+        SearchInputOnSearchListener(LinearLayout parentView, SearchFragment fragment) {
+            this.parentView = parentView;
+            this.fragment = fragment;
+        }
+
+        public void onSearch(View v, String query, int mediaTypeId) {
+            if (query.contains("://m.soundcloud.com/") || query.contains("://soundcloud.com/")) {
+                fragment.cancelSearch();
+                new DownloadSoundcloudFromUrlTask(fragment.getActivity(), query).execute();
+                fragment.searchInput.setText("");
+            } else if (query.contains("youtube.com/")) {
+                fragment.performYTSearch(query);
+            } else if (query.startsWith("magnet:?xt=urn:btih:")) {
+                fragment.startMagnetDownload(query);
+                fragment.currentQuery = null;
+                fragment.searchInput.setText("");
+            } else {
+                fragment.performSearch(query, mediaTypeId);
+            }
+        }
+
+        public void onMediaTypeSelected(View view, int mediaTypeId) {
+            fragment.adapter.setFileType(mediaTypeId);
+            fragment.showSearchView(parentView);
+        }
+
+        public void onClear(View v) {
+            fragment.cancelSearch();
+        }
     }
 
     private static class LoadSlidesTask extends AsyncTask<Void, Void, List<Slide>> {

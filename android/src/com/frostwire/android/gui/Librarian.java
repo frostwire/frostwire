@@ -190,17 +190,6 @@ public final class Librarian {
         UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
     }
 
-    public void scan(Uri uri) {
-        if (context == null) {
-            Log.w(TAG, "Librarian has no `context` object to scan() with.");
-            return;
-        }
-        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        intent.setData(uri);
-        context.sendBroadcast(intent);
-        UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
-    }
-
     public Finger finger() {
         Finger finger = new Finger();
         finger.numTotalAudioFiles = getNumFiles(Constants.FILE_TYPE_AUDIO);
@@ -266,7 +255,7 @@ public final class Librarian {
         syncMediaStore(Constants.FILE_TYPE_RINGTONES, ignorableFiles);
         syncMediaStore(Constants.FILE_TYPE_DOCUMENTS, ignorableFiles);
 
-        scan(Platforms.torrents());
+        Platforms.fileSystem().scan(Platforms.torrents());
     }
 
     private void syncMediaStore(byte fileType, Set<File> ignorableFiles) {
@@ -408,16 +397,16 @@ public final class Librarian {
         }
     }
 
-    /** Given a folder path it'll return all the files contained within it and it's subfolders
+    /**
+     * Given a folder path it'll return all the files contained within it and it's subfolders
      * as a flat set of Files.
-     *
+     * <p>
      * Non-recursive implementation, up to 20% faster in tests than recursive implementation. :)
      *
-     * @author gubatron
      * @param folder
      * @param extensions If you only need certain files filtered by their extensions, use this string array (without the "."). or set to null if you want all files. e.g. ["txt","jpg"] if you only want text files and jpegs.
-     *
      * @return The set of files.
+     * @author gubatron
      */
     private static Collection<File> getAllFolderFiles(File folder, String[] extensions) {
         Set<File> results = new HashSet<File>();

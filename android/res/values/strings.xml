@@ -204,6 +204,7 @@
     <string name="share_finished_downloads">Share finished downloads on Wi-Fi</string>
     <string name="share_finished_downloads_summary">Finished downloads will be available to other FrostWire users on your Wi-Fi network.</string>
     <string name="are_you_sure_delete_files">Are you sure you want to PERMANENTLY DELETE the selected files from your device?</string>
+    <string name="are_you_sure_delete_playlist">Are you sure you want to delete the %s playlist</string>
     <string name="delete_files">Delete files</string>
     <string name="searchable_activity_label">Searchable Activity</string>
     <string name="search_hint">Search Content</string>
@@ -507,6 +508,8 @@
     <string name="file_descriptor_sd_mounted">This file was deleted from the SD card, or the SD card you have inserted is a different one.</string>
     <string name="file_descriptor_sd_unmounted">This file belongs to an SD card, please insert it on your device.</string>
     <string name="help_translate_frostwire">Help translate FrostWire</string>
+    <string name="finishing">Finishing</string>
+    <string name="scanning">Finishing - Scanning</string>
     <string name="queued_for_checking">Queued for checking</string>
     <string name="checking_ellipsis">Checking&#8230;</string>
     <string name="downloading_metadata">Downloading metadata</string>
@@ -519,6 +522,7 @@
     <string name="app_shutdown_dlg_message">This will shutdown all transfers and background services. Are you sure?</string>
     <string name="error_not_enough_peers">Try again, not enough peers</string>
     <string name="http_download_status_save_dir_error">Save directory does not exist or can\'t be created</string>
+    <string name="http_download_status_temp_dir_error">Temporary directory does not exist or can\'t be created</string>
     <string name="my_music">My Music</string>
     <string name="support">Support</string>
     <string name="wifi_sharing_settings">Wi-Fi Sharing Settings</string>
@@ -592,8 +596,11 @@
     <string name="error_no_internet_connection">Error: Check Internet connection</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Pick the files you want to download from this torrent</string>
     <string name="enable_seeding">Enable Seeding</string>
+    <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent is disconnected. Would you like me to start it for you?</string>
     <string name="seeding_is_currently_disabled">Seeding is currently disabled in your settings. Would you like me to enable seeding for you to share this file?</string>
     <string name="wifi_network_unavailable">Wifi Network Unavailable</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">According to your settings I can\'t start seeding unless you are on Wi-Fi. The file will be ready for seeding automatically when you get back to an internet enabled Wi-Fi network.</string>
-    <string name="the_file_could_not_be_seeded">The file could not be seeded. Enable seeding on settings.</string>
+    <string name="the_file_could_not_be_seeded_enable_seeding">The file could not be seeded. Enable seeding on settings.</string>
+    <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">The file could not be seeded. BitTorrent will remain disconnected.</string>
+    <string name="fetching_torrent_ellipsis">Fetching torrent…</string>
 </resources>

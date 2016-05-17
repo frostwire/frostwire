@@ -30,6 +30,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -804,7 +805,7 @@ public final class BTEngine {
                     firewalled = true;
                     break;
                 case DHT_STATS:
-                    totalDHTNodes = ((DhtStatsAlert) alert).totalNodes();
+                    totalDHTNodes = (int) session.getStats().dhtNodes();
                     break;
                 case STORAGE_MOVED:
                     doResumeData((TorrentAlert<?>) alert, true);

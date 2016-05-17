@@ -134,16 +134,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         return th.getStatus().isFinished();
     }
 
-    @Override
-    public boolean isDownloading() {
-        return getDownloadSpeed() > 0;
-    }
-
-    @Override
-    public boolean isUploading() {
-        return getUploadSpeed() > 0;
-    }
-
     public TransferState getState() {
         if (!engine.isStarted()) {
             return TransferState.STOPPED;
@@ -210,9 +200,18 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     @Override
+    public File previewFile() {
+        return null;
+    }
+
+    @Override
     public int getProgress() {
-        if (haveAllPieces()) {
-            return 100;
+        if (th == null) {
+            return 0;
+        }
+
+        if (th.getTorrentInfo() == null) {
+            return 0;
         }
 
         // TODO: Add logic to check completion logic for merkle based torrents.
@@ -229,16 +228,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         int p = (int) (th.getStatus().getProgress() * 100);
         return Math.min(p, 100);
-    }
-
-    private boolean haveAllPieces() {
-        int numPieces = th.getStatus().getNumPieces();
-        for (int n=0; n < numPieces; n++) {
-            if (!th.havePiece(n)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
@@ -268,6 +257,11 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     public long getUploadSpeed() {
         return ((isFinished() && !isSeeding()) || isPaused()) ? 0 : th.getStatus().getUploadPayloadRate();
+    }
+
+    @Override
+    public boolean isDownloading() {
+        return getDownloadSpeed() > 0;
     }
 
     public int getConnectedPeers() {
@@ -472,7 +466,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         return false;
     }
 
-    public String makeMagnetUri() {
+    @Override
+    public String magnetUri() {
         return th.makeMagnetUri();
     }
 

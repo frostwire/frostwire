@@ -23,14 +23,16 @@ import java.util.Date;
 import java.util.List;
 
 import com.frostwire.android.R;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.transfers.TransferState;
 
 /**
  * @author gubatron
  * @author aldenml
  *
  */
-public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
+public class InvalidDownload implements Transfer, InvalidTransfer {
 
     @Override
     public String getDisplayName() {
@@ -38,8 +40,8 @@ public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
     }
 
     @Override
-    public String getStatus() {
-        return null;
+    public TransferState getState() {
+        return TransferState.UNKNOWN;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
     }
 
     @Override
-    public Date getDateCreated() {
+    public Date getCreated() {
         return null;
     }
 
@@ -98,10 +100,6 @@ public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
     }
 
     @Override
-    public void cancel() {
-    }
-
-    @Override
     public int getReasonResId() {
         return R.string.download_type_not_supported;
     }
@@ -111,11 +109,12 @@ public class InvalidDownload implements DownloadTransfer, InvalidTransfer {
         return null;
     }
 
-    public void cancel(boolean deleteData) {
+    @Override
+    public void remove(boolean deleteData) {
     }
     
     @Override
-    public String getDetailsUrl() {
+    public String getName() {
         return null;
     }
 

@@ -70,8 +70,8 @@ public class HttpSlideSearchResult extends AbstractFileSearchResult {
         return null;
     }
 
-    public HttpDownloadLink getDownloadLink() {
-        return new SlideDownloadLink(slide);
+    public Slide slide() {
+        return slide;
     }
 
     @Override

@@ -24,7 +24,9 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.adnetworks.Offers;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
-import com.frostwire.android.gui.transfers.*;
+import com.frostwire.android.gui.transfers.ExistingDownload;
+import com.frostwire.android.gui.transfers.InvalidTransfer;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ContextTask;
 import com.frostwire.logging.Logger;
@@ -33,6 +35,8 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubePackageSearchResult;
+import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.transfers.Transfer;
 
 /**
  * 
@@ -40,7 +44,7 @@ import com.frostwire.search.youtube.YouTubePackageSearchResult;
  * @author aldenml
  * 
  */
-public class StartDownloadTask extends ContextTask<DownloadTransfer> {
+public class StartDownloadTask extends ContextTask<Transfer> {
 
     private static final Logger LOG = Logger.getLogger(StartDownloadTask.class);
 
@@ -58,8 +62,8 @@ public class StartDownloadTask extends ContextTask<DownloadTransfer> {
     }
 
     @Override
-    protected DownloadTransfer doInBackground() {
-        DownloadTransfer transfer = null;
+    protected Transfer doInBackground() {
+        Transfer transfer = null;
         try {
             if (sr instanceof TorrentSearchResult &&
                 !(sr instanceof ScrapedTorrentFileSearchResult) &&
@@ -71,6 +75,7 @@ public class StartDownloadTask extends ContextTask<DownloadTransfer> {
                 ytDownloadDlg.show(((Activity) getContext()).getFragmentManager());
             }
             else {
+                UIUtils.showTransfersOnDownloadStart(getContext());
                 transfer = TransferManager.instance().download(sr);
             }
         } catch (Throwable e) {
@@ -81,7 +86,7 @@ public class StartDownloadTask extends ContextTask<DownloadTransfer> {
     }
 
     @Override
-    protected void onPostExecute(Context ctx, DownloadTransfer transfer) {
+    protected void onPostExecute(Context ctx, Transfer transfer) {
         if (transfer != null) {
             if (ctx instanceof Activity) {
                 Offers.showInterstitialOfferIfNecessary((Activity) ctx);

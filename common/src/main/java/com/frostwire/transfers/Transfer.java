@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ public interface Transfer {
 
     public File getSavePath();
 
+    File previewFile();
+
     public long getSize();
 
     public Date getCreated();
@@ -48,6 +50,11 @@ public interface Transfer {
 
     public long getUploadSpeed();
 
+    boolean isDownloading();
+
+    // TODO: add this method in the future
+    //boolean isUploading();
+
     public long getETA();
 
     /**
@@ -61,5 +68,5 @@ public interface Transfer {
 
     public List<TransferItem> getItems();
 
-    public void remove();
+    void remove(boolean deleteData);
 }

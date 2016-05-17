@@ -22,10 +22,10 @@ import android.content.Context;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.NetworkManager;
-import com.frostwire.android.gui.transfers.BittorrentDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
@@ -49,7 +49,7 @@ public final class ResumeDownloadMenuAction extends MenuAction {
             UIUtils.showLongMessage(context, R.string.cant_resume_torrent_transfers);
         } else {
             if (NetworkManager.instance().isDataUp()) {
-                if (download.isResumable()) {
+                if (download.isPaused()) {
                     download.resume();
                     UXStats.instance().log(UXAction.DOWNLOAD_RESUME);
                 }

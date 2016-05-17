@@ -40,6 +40,24 @@ import java.util.List;
  * @author marcelinkaaa
  */
 public abstract class AbstractDialog extends DialogFragment {
+    public AbstractDialog() {
+        this(R.layout.dialog_default_input);
+    }
+
+    protected static String getSuggestedTAG(Class clazz) {
+        StringBuilder sb = new StringBuilder();
+        char[] className = clazz.getSimpleName().toCharArray();
+        for (int i=0; i < className.length; i++) {
+            char c = className[i];
+            if (i > 0 && Character.isUpperCase(c)) {
+                sb.append('_');
+                sb.append(Character.toUpperCase(c));
+            } else {
+                sb.append(Character.toUpperCase(c));
+            }
+        }
+        return sb.toString();
+    }
 
     /**
      * The identifier for the positive button.
@@ -49,6 +67,12 @@ public abstract class AbstractDialog extends DialogFragment {
 
     protected WeakReference<Activity> activityRef;
     private OnDialogClickListener onDialogClickListener;
+
+    public AbstractDialog(int layoutResId) {
+        this.tag = getSuggestedTAG(getClass());
+        this.layoutResId =layoutResId;
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
+    }
 
     public AbstractDialog(String tag, int layoutResId) {
         this.tag = tag;

@@ -1,9 +1,11 @@
-FrostWire 1.7.4 - APR/29/2016
+FrostWire 1.7.4 - MAY/11/2016
+ - Issues saving to SD card on multiple devices fixed.
  - New 'Seed' action available on 'My files'. Create and seed
    a torrent of a file or many in one touch.
  - New handpicked file selection on .torrent downloads.
  - Search improvements and refactors.
- - New jlibtorrent 1.1.0.28
+ - New jlibtorrent 1.1.0.29
+ - Re-engineering and simplification of transfers architecture.
  - Fixes bug where a playlist could not be created out of the
    'More by artist' song list.
  - New horizontal swipe gesture based tab switching for transfers, my files.
@@ -11,6 +13,8 @@ FrostWire 1.7.4 - APR/29/2016
  - Updated inmobi library to 5.3.0.
  - No more repeated YouTube video search results. Results are now grouped, when
    touched the user can select the video format/quality to download.
+ - Dialogs make over.
+ - Improved shutdown.
 
 FrostWire 1.7.3 - APR/15/2016
  - Soundcloud search results include estimated file size.

@@ -22,6 +22,8 @@ import android.app.Application;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import java.io.File;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -29,6 +31,8 @@ import android.net.NetworkInfo;
 public final class NetworkManager {
 
     private final Application context;
+
+    private boolean tunnelUp;
 
     private static NetworkManager instance;
 
@@ -79,5 +83,33 @@ public final class NetworkManager {
 
     private ConnectivityManager getConnectivityManager() {
         return (ConnectivityManager) context.getSystemService(Application.CONNECTIVITY_SERVICE);
+    }
+
+    public boolean isTunnelUp() {
+        return tunnelUp;
+    }
+
+    // eventually move this to the Platform framework
+    public void detectTunnel() {
+        tunnelUp = isValidInterfaceName("tun0");
+    }
+
+    private static boolean isValidInterfaceName(String interfaceName) {
+        try {
+            String[] arr = new File("/sys/class/net").list();
+            if (arr == null) {
+                return false;
+            }
+            for (int i = 0; i < arr.length; i++) {
+                String validName = arr[i];
+                if (interfaceName.equals(validName)) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

@@ -21,8 +21,8 @@ package com.frostwire.android.gui.adapters.menu;
 import android.content.Context;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.transfers.BittorrentDownload;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
@@ -42,7 +42,7 @@ public final class PauseDownloadMenuAction extends MenuAction {
 
     @Override
     protected void onClick(Context context) {
-        if (download.isPausable()) {
+        if (!download.isPaused()) {
             download.pause();
             UXStats.instance().log(UXAction.DOWNLOAD_PAUSE);
         }

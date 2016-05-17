@@ -23,6 +23,7 @@ import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.logging.Logger;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
@@ -71,8 +72,9 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return info.getDisplayName();
     }
 
-    public String getStatus() {
-        return state.name();
+    @Override
+    public TransferState getState() {
+        return state;
     }
 
     public int getProgress() {
@@ -83,7 +85,8 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return info.getSize();
     }
 
-    public Date getDateCreated() {
+    @Override
+    public Date getCreated() {
         return created;
     }
 
@@ -92,6 +95,11 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     }
 
     public File getSavePath() {
+        return null;
+    }
+
+    @Override
+    public File getContentSavePath() {
         return null;
     }
 
@@ -115,11 +123,32 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return 0;
     }
 
-    public String getHash() {
+    public String getInfoHash() {
         return info.getHash();
     }
 
-    public String makeMagnetUri() {
+    @Override
+    public int getConnectedPeers() {
+        return 0;
+    }
+
+    @Override
+    public int getTotalPeers() {
+        return 0;
+    }
+
+    @Override
+    public int getConnectedSeeds() {
+        return 0;
+    }
+
+    @Override
+    public int getTotalSeeds() {
+        return 0;
+    }
+
+    @Override
+    public String magnetUri() {
         return info.makeMagnetUri();
     }
 
@@ -130,14 +159,6 @@ public class TorrentFetcherDownload implements BittorrentDownload {
 
     public String getSeeds() {
         return "";
-    }
-
-    public boolean isResumable() {
-        return false;
-    }
-
-    public boolean isPausable() {
-        return false;
     }
 
     public boolean isComplete() {
@@ -160,14 +181,19 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     }
 
     @Override
-    public void cancel() {
-        cancel(false);
+    public boolean isFinished() {
+        return false;
     }
 
     @Override
-    public void cancel(boolean deleteData) {
+    public void remove(boolean deleteData) {
         state = TransferState.CANCELED;
         manager.remove(this);
+    }
+
+    @Override
+    public void remove(boolean deleteTorrent, boolean deleteData) {
+        remove(deleteData);
     }
 
     public void pause() {
@@ -177,17 +203,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     }
 
     @Override
-    public boolean hasPaymentOptions() {
-        return false;
-    }
-
-    @Override
-    public PaymentOptions getPaymentOptions() {
-        return null;
-    }
-
-    @Override
-    public String getDetailsUrl() {
+    public String getName() {
         return info.getDetailsUrl();
     }
 
@@ -272,7 +288,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                     try {
                         downloadTorrent(data);
                     } finally {
-                        cancel();
+                        remove(false);
                     }
                 } else {
                     state = TransferState.ERROR;

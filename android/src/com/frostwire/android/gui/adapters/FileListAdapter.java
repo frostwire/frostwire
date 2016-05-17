@@ -24,6 +24,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
 import android.view.View;
@@ -38,6 +39,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.adapters.menu.*;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.util.ImageLoader;
@@ -125,10 +127,12 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         boolean showSingleOptions = showSingleOptions(checked, fd);
 
-        if (showSingleOptions) {
-            items.add(new SeedAction(context, fd));
-        } else {
-            items.add(new SeedAction(context, checked));
+        if (TransferManager.canSeedFromMyFilesTempHACK()) {
+            if (showSingleOptions) {
+                items.add(new SeedAction(context, fd));
+            } else {
+                items.add(new SeedAction(context, checked));
+            }
         }
 
         if (showSingleOptions) {
@@ -247,10 +251,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
             if (fd.fileType == Constants.FILE_TYPE_AUDIO) {
                 Uri uri = ContentUris.withAppendedId(ImageLoader.ALBUM_THUMBNAILS_URI, fd.albumId);
-                thumbnailLoader.load(uri, fileThumbnail, 96, 96);
+                Uri uriRetry = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, fd.id);
+                uriRetry = ImageLoader.getMetadataArtUri(uriRetry);
+                thumbnailLoader.load(uri, uriRetry, fileThumbnail, 96, 96);
             } else if (fd.fileType == Constants.FILE_TYPE_VIDEOS) {
                 Uri uri = ContentUris.withAppendedId(Video.Media.EXTERNAL_CONTENT_URI, fd.id);
-                thumbnailLoader.load(uri, fileThumbnail, 96, 96);
+                Uri uriRetry = ImageLoader.getMetadataArtUri(uri);
+                thumbnailLoader.load(uri, uriRetry, fileThumbnail, 96, 96);
             } else if (fd.fileType == Constants.FILE_TYPE_PICTURES) {
                 Uri uri = ContentUris.withAppendedId(Images.Media.EXTERNAL_CONTENT_URI, fd.id);
                 thumbnailLoader.load(uri, fileThumbnail, 96, 96);

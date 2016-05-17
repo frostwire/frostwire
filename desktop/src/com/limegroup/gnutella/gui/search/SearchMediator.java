@@ -73,6 +73,8 @@ public final class SearchMediator {
 
     static final String REPEAT_SEARCH_STRING = I18n.tr("Repeat Search");
 
+    static final String SEARCH_FOR_KEYWORDS = I18n.tr("Search for Keywords: {0}");
+
     static final String DOWNLOAD_PARTIAL_FILES_STRING = I18n.tr("Download Partial Files");
 
     static final String TORRENT_DETAILS_STRING = I18n.tr("Torrent Details");

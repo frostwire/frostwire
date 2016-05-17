@@ -31,13 +31,14 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.adnetworks.Offers;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.logging.Logger;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public class SearchProgressView extends LinearLayout {
-
+    private Logger LOG = Logger.getLogger(SearchProgressView.class);
     private final FreeAppsListener freeAppsListener;
 
     private ProgressBar progressbar;
@@ -156,6 +157,15 @@ public class SearchProgressView extends LinearLayout {
         } else {
             hideRetryViews();
         }
+    }
+
+    @Override
+    public void setOnTouchListener(OnTouchListener l) {
+        final int childCount = getChildCount();
+        for (int i=0; i < childCount; i++) {
+            getChildAt(i).setOnTouchListener(l);
+        }
+        super.setOnTouchListener(l);
     }
 
     public void setCurrentQueryReporter(CurrentQueryReporter currentQueryReporter) {

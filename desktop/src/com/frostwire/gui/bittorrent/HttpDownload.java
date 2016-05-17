@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,19 @@
 
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.bittorrent.CopyrightLicenseBroker;
+import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.gui.DigestUtils;
+import com.frostwire.gui.DigestUtils.DigestProgressListener;
+import com.frostwire.transfers.TransferState;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.http.HttpClient;
+import com.frostwire.util.http.HttpClient.HttpClientListener;
+import com.frostwire.util.http.HttpClient.RangeNotSupportedException;
+import com.limegroup.gnutella.settings.SharingSettings;
+import org.apache.commons.io.FilenameUtils;
+import org.limewire.util.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -26,19 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import com.frostwire.transfers.TransferState;
-
-import com.frostwire.bittorrent.CopyrightLicenseBroker;
-import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.gui.DigestUtils;
-import com.frostwire.gui.DigestUtils.DigestProgressListener;
-import com.frostwire.util.http.HttpClient;
-import com.frostwire.util.http.HttpClient.HttpClientListener;
-import com.frostwire.util.http.HttpClient.RangeNotSupportedException;
-import com.frostwire.util.HttpClientFactory;
-import com.limegroup.gnutella.settings.SharingSettings;
-import org.apache.commons.io.FilenameUtils;
 
 /**
  * @author gubatron
@@ -91,13 +91,13 @@ public class HttpDownload implements BTDownload {
         md5 = md5hash;
         deleteDataWhenCancelled = deleteFileWhenTransferCancelled;
 
-        completeFile = buildFile(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), saveAs);
+        completeFile = FileUtils.buildFile(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), saveAs);
         incompleteFile = buildIncompleteFile(completeFile);
 
         bytesReceived = 0;
         dateCreated = new Date();
 
-        httpClientListener = new HttpDownloadListenerImpl();
+        httpClientListener = new HttpDownloadListenerImpl(this);
 
         httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
         httpClient.setListener(httpClientListener);
@@ -334,20 +334,6 @@ public class HttpDownload implements BTDownload {
         });
     }
 
-    /** files are saved with (1), (2),... if there's one with the same name already. */
-    private static File buildFile(File savePath, String name) {
-        String baseName = FilenameUtils.getBaseName(name);
-        String ext = FilenameUtils.getExtension(name);
-
-        File f = new File(savePath, name);
-        int i = 1;
-        while (f.exists() && i < Integer.MAX_VALUE) {
-            f = new File(savePath, baseName + " (" + i + ")." + ext);
-            i++;
-        }
-        return f;
-    }
-
     private static File getIncompleteFolder() {
         File incompleteFolder = new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue().getParentFile(), "Incomplete");
         if (!incompleteFolder.exists()) {
@@ -363,11 +349,7 @@ public class HttpDownload implements BTDownload {
     }
 
     public boolean isComplete() {
-        if (bytesReceived > 0) {
-            return bytesReceived == size || state == TransferState.FINISHED;
-        } else {
-            return false;
-        }
+        return bytesReceived > 0 && (bytesReceived == size || state == TransferState.FINISHED);
     }
 
     private void updateAverageDownloadSpeed() {
@@ -385,6 +367,12 @@ public class HttpDownload implements BTDownload {
     }
 
     private final class HttpDownloadListenerImpl implements HttpClientListener {
+        private final HttpDownload dl;
+
+        public HttpDownloadListenerImpl(HttpDownload httpDownload) {
+            dl = httpDownload;
+        }
+
         @Override
         public void onError(HttpClient client, Throwable e) {
             if (e instanceof RangeNotSupportedException) {
@@ -420,6 +408,11 @@ public class HttpDownload implements BTDownload {
             } else {
                 state = TransferState.FINISHED;
                 cleanupIncomplete();
+
+                if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
+                    BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
+                }
+
                 HttpDownload.this.onComplete();
             }
         }

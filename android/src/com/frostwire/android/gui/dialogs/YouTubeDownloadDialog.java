@@ -37,8 +37,7 @@ import com.frostwire.search.youtube.YouTubePackageSearchResult;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created on 4/30/16.
@@ -51,7 +50,7 @@ import java.util.List;
 public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResult> {
     private static Logger LOG = Logger.getLogger(YouTubeDownloadDialog.class);
     private static WeakReference<YouTubePackageSearchResult> youTubePackageSearchResultWeakReference;
-    private static Pattern FORMAT_PATTERN = Pattern.compile(".*(H26.*|VP8.*|AAC.*)");
+    private static Pattern FORMAT_PATTERN = Pattern.compile("(?is)(H26.*p?|VP8.*p?|AAC.*p?)");
 
     public YouTubeDownloadDialog() {
         super();
@@ -65,7 +64,6 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
     public static YouTubeDownloadDialog newInstance(
             Context ctx,
             YouTubePackageSearchResult sr) {
-        // TODO: Make it so that the best quality is pre-selected.
         YouTubeDownloadDialog dlg = new YouTubeDownloadDialog(sr);
 
         dlg.onAttach((Activity) ctx);
@@ -102,7 +100,41 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
 
     @Override
     public ConfirmListDialogDefaultAdapter<SearchResult> createAdapter(Context context, List<SearchResult> listData, SelectionMode selectionMode, Bundle bundle) {
-        return new YouTubeEntriesDialogAdapter(context, listData);
+        final List<SearchResult> searchResults = filterVideoOnly(listData);
+        Collections.sort(searchResults, new SizeComparator());
+        return new YouTubeEntriesDialogAdapter(context, searchResults);
+    }
+
+    private List<SearchResult> filterVideoOnly(List<SearchResult> listData) {
+        List<SearchResult> result = new ArrayList<>();
+        for (SearchResult sr : listData) {
+            String format = extractFormat(sr.getDisplayName());
+            if (format.startsWith("AAC") || format.startsWith("MP3")) {
+                continue;
+            }
+            result.add(sr);
+        }
+        return result;
+    }
+
+    private static String extractFormat(String fileName) {
+        final Matcher matcher = FORMAT_PATTERN.matcher(fileName);
+        String format = null;
+        if (matcher.find()) {
+            format = matcher.group(1).replace("_"," ").trim();
+        }
+        return format;
+    }
+
+    static long getSearchResultSize(SearchResult data) {
+        if (data instanceof YouTubeCrawledSearchResult) {
+            return ((YouTubeCrawledSearchResult) data).getSize();
+        } else if (data instanceof YouTubeCrawledStreamableSearchResult) {
+            return ((YouTubeCrawledStreamableSearchResult) data).getSize();
+        } else {
+            LOG.warn("getItemSize() -> -1: unhandled instance type, class = ["+data.getClass().getSimpleName()+"]");
+        }
+        return -1;
     }
 
     private class YouTubeEntriesDialogAdapter extends ConfirmListDialogDefaultAdapter<SearchResult> {
@@ -113,23 +145,16 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
 
         @Override
         public CharSequence getItemTitle(SearchResult data) {
-            String s = data.getDisplayName().replaceAll("_", " ");
-            final Matcher matcher = FORMAT_PATTERN.matcher(s);
-            if (matcher.find()) {
-                final String quality = matcher.group(1);
-                s = s.replace(quality,"(" + quality + ")");
+            String result = data.getDisplayName();
+            if (YouTubeDownloadDialog.this.getDialogTitle() != null) {
+                result = extractFormat(data.getDisplayName());
             }
-            return s;
+            return result;
         }
 
         @Override
         public long getItemSize(SearchResult data) {
-            if (data instanceof YouTubeCrawledSearchResult) {
-                return ((YouTubeCrawledSearchResult) data).getSize();
-            } else if (data instanceof YouTubeCrawledStreamableSearchResult) {
-                return ((YouTubeCrawledStreamableSearchResult) data).getSize();
-            }
-            return -1;
+            return getSearchResultSize(data);
         }
 
         @Override
@@ -170,7 +195,6 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         public void onClick(View v) {
             if (Ref.alive(ctxRef) && Ref.alive(dlgRef) && Ref.alive(youTubePackageSearchResultWeakReference)) {
                 final AbstractConfirmListDialog dlg = dlgRef.get();
-                final YouTubePackageSearchResult youTubePackageSearchResult = youTubePackageSearchResultWeakReference.get();
                 final SearchResult searchResult = (SearchResult) dlg.getSelectedItem();
                 TransferManager.instance().download(searchResult);
                 dlg.dismiss();
@@ -180,6 +204,13 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
                     Offers.showInterstitialOfferIfNecessary((Activity) ctxRef.get());
                 }
             }
+        }
+    }
+
+    private static class SizeComparator implements Comparator<SearchResult> {
+        @Override
+        public int compare(SearchResult left, SearchResult right) {
+            return (int) (getSearchResultSize(right) - getSearchResultSize(left));
         }
     }
 }

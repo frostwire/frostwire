@@ -79,13 +79,13 @@ public class SoundcloudDownload implements BTDownload {
 
         String filename = sr.getFilename();
 
-        completeFile = buildFile(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), filename);
+        completeFile = org.limewire.util.FileUtils.buildFile(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), filename);
         tempAudio = buildTempFile(FilenameUtils.getBaseName(filename), "mp3");
 
         bytesReceived = 0;
         dateCreated = new Date();
 
-        httpClientListener = new HttpDownloadListenerImpl();
+        httpClientListener = new HttpDownloadListenerImpl(this);
 
         httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
         httpClient.setListener(httpClientListener);
@@ -292,22 +292,6 @@ public class SoundcloudDownload implements BTDownload {
         cleanupFile(completeFile);
     }
 
-    /**
-     * files are saved with (1), (2),... if there's one with the same name already.
-     */
-    private static File buildFile(File savePath, String name) {
-        String baseName = FilenameUtils.getBaseName(name);
-        String ext = FilenameUtils.getExtension(name);
-
-        File f = new File(savePath, name);
-        int i = 1;
-        while (f.exists() && i < Integer.MAX_VALUE) {
-            f = new File(savePath, baseName + " (" + i + ")." + ext);
-            i++;
-        }
-        return f;
-    }
-
     private static File getIncompleteFolder() {
         File incompleteFolder = new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue().getParentFile(), "Incomplete");
         if (!incompleteFolder.exists()) {
@@ -343,6 +327,13 @@ public class SoundcloudDownload implements BTDownload {
     }
 
     private final class HttpDownloadListenerImpl implements HttpClientListener {
+
+        private final SoundcloudDownload dl;
+
+        public HttpDownloadListenerImpl(SoundcloudDownload soundcloudDownload) {
+            dl = soundcloudDownload;
+        }
+
         @Override
         public void onError(HttpClient client, Throwable e) {
             state = TransferState.ERROR;
@@ -383,6 +374,11 @@ public class SoundcloudDownload implements BTDownload {
                     }
                 }
                 state = TransferState.FINISHED;
+
+                if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
+                    BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
+                    // TODO: Rich DHT announcement.
+                }
 
                 if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(completeFile)) {
                     if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {

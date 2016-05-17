@@ -24,6 +24,7 @@ package com.frostwire.transfers;
  */
 public enum TransferState {
 
+    FINISHING,
     QUEUED_FOR_CHECKING,
     CHECKING,
     DOWNLOADING_METADATA,
@@ -38,6 +39,9 @@ public enum TransferState {
     ERROR_HASH_MD5,
     ERROR_SIGNATURE,
     ERROR_NOT_ENOUGH_PEERS,
+    ERROR_NO_INTERNET,
+    ERROR_SAVE_DIR,
+    ERROR_TEMP_DIR,
     STOPPED,
     PAUSING,
     CANCELING,
@@ -50,5 +54,6 @@ public enum TransferState {
     UNKNOWN,
     ERROR_DISK_FULL,
     REDIRECTING,
-    STREAMING
+    STREAMING,
+    SCANNING
 }

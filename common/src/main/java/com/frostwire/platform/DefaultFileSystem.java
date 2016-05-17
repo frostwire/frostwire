@@ -80,6 +80,11 @@ public class DefaultFileSystem implements FileSystem {
     }
 
     @Override
+    public File[] listFiles(File file, FileFilter filter) {
+        return file.listFiles(filter);
+    }
+
+    @Override
     public boolean copy(File src, File dest) {
         try {
             FileUtils.copyFile(src, dest);
@@ -110,7 +115,11 @@ public class DefaultFileSystem implements FileSystem {
 
     @Override
     public void walk(File file, FileFilter filter) {
-        File[] arr = file.listFiles(filter);
+        walkFiles(Platforms.fileSystem(), file, filter);
+    }
+
+    public static void walkFiles(FileSystem fs, File file, FileFilter filter) {
+        File[] arr = fs.listFiles(file, filter);
         if (arr == null) {
             return;
         }
@@ -119,8 +128,8 @@ public class DefaultFileSystem implements FileSystem {
         while (!q.isEmpty()) {
             File child = q.pollFirst();
             filter.file(child);
-            if (child.isDirectory()) {
-                arr = child.listFiles(filter);
+            if (fs.isDirectory(child)) {
+                arr = fs.listFiles(child, filter);
                 if (arr != null) {
                     for (int i = arr.length - 1; i >= 0; i--) {
                         q.addFirst(arr[i]);

@@ -23,6 +23,7 @@ import android.os.Build;
 import android.support.v4.provider.DocumentFile;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.jlibtorrent.swig.posix_stat;
@@ -72,7 +73,11 @@ public final class AndroidPlatform extends AbstractPlatform {
         }
 
         if (NetworkManager.instance().isDataWIFIUp()) {
-            return NetworkType.MOBILE;
+            return NetworkType.WIFI;
+        }
+
+        if (NetworkManager.instance().isDataWiMAXUp()) {
+            return NetworkType.WIMAX;
         }
 
         return NetworkType.NONE;
@@ -83,6 +88,30 @@ public final class AndroidPlatform extends AbstractPlatform {
         return p.fileSystem() instanceof LollipopFileSystem;
     }
 
+    /**
+     * This method determines if the file {@code f} is protected by
+     * the SAF framework because it's in the real external SD card.
+     *
+     * @param f
+     * @return
+     */
+    public static boolean saf(File f) {
+        Platform p = Platforms.get();
+
+        if (!(p.fileSystem() instanceof LollipopFileSystem)) {
+            return false;
+        }
+
+        if (f.getPath().contains("/Android/data/com.frostwire.android/")) {
+            // private file, FUSE give us standard POSIX operations
+            return false;
+        }
+
+        LollipopFileSystem fs = (LollipopFileSystem) p.fileSystem();
+
+        return fs.getExtSdCardFolder(f) != null;
+    }
+
     private static FileSystem buildFileSystem(Application app) {
         FileSystem fs;
 
@@ -91,7 +120,12 @@ public final class AndroidPlatform extends AbstractPlatform {
             LibTorrent.setPosixWrapper(new PosixCalls(lfs));
             fs = lfs;
         } else {
-            fs = new DefaultFileSystem();
+            fs = new DefaultFileSystem() {
+                @Override
+                public void scan(File file) {
+                    Librarian.instance().scan(file);
+                }
+            };
         }
 
         return fs;

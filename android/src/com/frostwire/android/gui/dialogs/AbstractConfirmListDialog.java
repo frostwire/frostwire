@@ -100,7 +100,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
     /** rebuilds list of objects from json and does listView.setAdapter(YourAdapter(theObjectList)) */
     abstract public List<T> deserializeData(String listDataInJSON);
 
-    public AbstractConfirmListDialog() {
+    public AbstractConfirmListDialog()  {
         super(TAG, R.layout.dialog_confirm_list);
     }
 
@@ -150,11 +150,12 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         this.dlg = dlg;
         Bundle bundle = getArguments();
-
         String title = bundle.getString(BUNDLE_KEY_DIALOG_TITLE);
 
         TextView dialogTitle = findView(dlg, R.id.dialog_confirm_list_title);
-        dialogTitle.setText(title);
+        dialogTitle.setText(R.string.confirm_download);
+        TextView dialogText = findView(dlg, R.id.dialog_confirm_list_text);
+        dialogText.setText(title);
 
         initListViewAndAdapter(bundle);
         initSelectAllCheckbox();
@@ -204,6 +205,14 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
         selectAllCheckbox.setVisibility(View.VISIBLE);
         selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxOnCheckedChangeListener);
+    }
+
+    public String getDialogTitle() {
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            return bundle.getString(BUNDLE_KEY_DIALOG_TITLE);
+        }
+        return null;
     }
 
     public abstract ConfirmListDialogDefaultAdapter<T> createAdapter(Context context,
@@ -327,7 +336,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         return result;
     }
 
-    public T getSelectedItem() {
+    T getSelectedItem() {
         return (T) adapter.getSelectedItem();
     }
 
@@ -408,7 +417,6 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             updateSelectedCount();
         }
         updateSelectedInBundle();
-        scrollToSelectedRadioButton();
     }
 
     private void scrollToSelectedRadioButton() {

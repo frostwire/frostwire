@@ -82,7 +82,7 @@ public final class StoragePicker {
                         result = null;
                     } else {
                         LollipopFileSystem fs = (LollipopFileSystem) Platforms.fileSystem();
-                        result = fs.getPath(treeUri);
+                        result = fs.getTreePath(treeUri);
                         if (result != null && !result.endsWith("/FrostWire")) {
                             DocumentFile f = file.findFile("FrostWire");
                             if (f == null) {

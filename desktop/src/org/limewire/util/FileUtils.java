@@ -460,4 +460,20 @@ public class FileUtils {
 
         return false;
     }
+
+    /**
+     * files are saved with (1), (2),... if there's one with the same name already.
+     */
+    public static File buildFile(File savePath, String name) {
+        String baseName = FilenameUtils.getBaseName(name);
+        String ext = FilenameUtils.getExtension(name);
+
+        File f = new File(savePath, name);
+        int i = 1;
+        while (f.exists() && i < Integer.MAX_VALUE) {
+            f = new File(savePath, baseName + " (" + i + ")." + ext);
+            i++;
+        }
+        return f;
+    }
 }

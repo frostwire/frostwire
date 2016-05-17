@@ -20,6 +20,8 @@ package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.swig.byte_vector;
+import com.frostwire.jlibtorrent.swig.entry;
 
 import java.io.File;
 import java.util.Map;
@@ -45,7 +47,7 @@ public class BTInfoAdditionalMetadataHolder {
 
     public BTInfoAdditionalMetadataHolder(TorrentInfo tinfo, String paymentOptionsDisplayName) {
 
-        final Map<String, Entry> additionalInfoProperties = tinfo.toEntry().dictionary().get("info").dictionary();
+        final Map<String, Entry> additionalInfoProperties = getInfo(tinfo.toEntry().dictionary().get("info").swig());
 
         final Entry licenseEntry = additionalInfoProperties.get("license");
         final Entry paymentOptionsEntry = additionalInfoProperties.get("paymentOptions");
@@ -73,5 +75,17 @@ public class BTInfoAdditionalMetadataHolder {
 
     public PaymentOptions getPaymentOptions() {
         return paymentOptions;
+    }
+
+    private static Map<String, Entry> getInfo(entry e) {
+        entry.data_type type = e.type();
+        if (type == entry.data_type.dictionary_t) {
+            return new Entry(e).dictionary();
+        } else if (type == entry.data_type.preformatted_t) {
+            byte_vector v = e.preformatted_bytes();
+            e = entry.bdecode(v);
+            return new Entry(e).dictionary();
+        }
+        return null;
     }
 }

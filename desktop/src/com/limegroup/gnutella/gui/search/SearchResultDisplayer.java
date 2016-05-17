@@ -1,4 +1,7 @@
 /*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 package com.limegroup.gnutella.gui.search;
 
@@ -30,7 +34,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.TabbedPaneUI;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -84,7 +91,7 @@ public final class SearchResultDisplayer implements RefreshListener {
     private ChangeListener _activeSearchListener;
 
     /**
-     * Listener for events on the tabbedpane.
+     * Listener for events on the tabbed pane.
      */
     private final PaneListener PANE_LISTENER = new PaneListener();
 
@@ -93,7 +100,7 @@ public final class SearchResultDisplayer implements RefreshListener {
     /**
      * Constructs the search display elements.
      */
-    public SearchResultDisplayer() {
+    SearchResultDisplayer() {
         MAIN_PANEL = new BoxPanel(BoxPanel.Y_AXIS);
         MAIN_PANEL.setMinimumSize(new Dimension(0, 0));
 
@@ -115,36 +122,28 @@ public final class SearchResultDisplayer implements RefreshListener {
             promoSlides = new MultimediaSlideshowPanel(UpdateManagerSettings.OVERLAY_SLIDESHOW_JSON_URL.getValue(), getDefaultSlides());
         }
 
-        if (promoSlides != null) {
-            JPanel p = (JPanel) promoSlides;
-            //p.setBackground(Color.WHITE);
-            Dimension promoDimensions = new Dimension(717, 380);
-            p.setPreferredSize(promoDimensions);
-            p.setSize(promoDimensions);
-            p.setMaximumSize(promoDimensions);
+        JPanel p = (JPanel) promoSlides;
+        //p.setBackground(Color.WHITE);
+        Dimension promoDimensions = new Dimension(717, 380);
+        p.setPreferredSize(promoDimensions);
+        p.setSize(promoDimensions);
+        p.setMaximumSize(promoDimensions);
 
             /*
              The dummy result panel, used when no searches are active.
             */
-            SearchResultMediator DUMMY = new SearchResultMediator(p);
+        SearchResultMediator DUMMY = new SearchResultMediator(p);
 
-            /* Container for the DUMMY ResultPanel. I'm keeping a reference to this
-             * object so that I can refresh the image that it contains.
-             */
-            JPanel mainScreen = new JPanel(new BorderLayout());
-            promoSlides.setupContainerAndControls(mainScreen, true);
-
-            mainScreen.add(DUMMY.getComponent(), BorderLayout.CENTER);
-
-            results.add("dummy", mainScreen);
-        }
-
+        /* Container for the DUMMY ResultPanel. I'm keeping a reference to this
+         * object so that I can refresh the image that it contains.
+         */
+        JPanel mainScreen = new JPanel(new BorderLayout());
+        promoSlides.setupContainerAndControls(mainScreen, true);
+        mainScreen.add(DUMMY.getComponent(), BorderLayout.CENTER);
+        results.add("dummy", mainScreen);
         switcher.first(results);
-
         setupTabbedPane();
-
         MAIN_PANEL.add(results);
-
         CancelSearchIconProxy.updateTheme();
     }
     
@@ -169,14 +168,6 @@ public final class SearchResultDisplayer implements RefreshListener {
     void setSearchListener(ChangeListener listener) {
         _activeSearchListener = listener;
     }
-
-    /**
-     * Iterates through each displayed ResultPanel and fires an update.
-     */
-//    void updateResults() {
-//        for (int i = 0; i < entries.size(); i++)
-//            entries.get(i).refresh();
-//    }
 
     SearchResultMediator addResultTab(long token, List<String> searchTokens, SearchInformation info) {
         SearchResultMediator panel = new SearchResultMediator(token, searchTokens, info);
@@ -352,25 +343,9 @@ public final class SearchResultDisplayer implements RefreshListener {
     }
 
     /**
-     * Adds the specified ChangeListener to the list of listeners
-     * on the JTabbedPane.
-     */
-    void addChangeListener(ChangeListener listener) {
-        tabbedPane.addChangeListener(listener);
-    }
-
-    /**
-     * Adds the specified FocusListener to the list of listeners
-     * of the JTabbedPane.
-     */
-    void addFocusListener(FocusListener listener) {
-        tabbedPane.addFocusListener(listener);
-    }
-
-    /**
      * Shows the popup menu that displays various options to the user.
      */
-    void showMenu(MouseEvent e) {
+    private void showMenu(MouseEvent e) {
         SearchResultMediator rp = getSelectedResultPanel();
         if (rp != null) {
             JPopupMenu menu = rp.createPopupMenu(new SearchResultDataLine[0]);
@@ -419,7 +394,7 @@ public final class SearchResultDisplayer implements RefreshListener {
     /**
      * Get index for point.
      */
-    int getIndexForPoint(int x, int y) {
+    private int getIndexForPoint(int x, int y) {
         TabbedPaneUI ui = tabbedPane.getUI();
         return ui.tabForCoordinate(tabbedPane, x, y);
     }
@@ -441,7 +416,7 @@ public final class SearchResultDisplayer implements RefreshListener {
         }
     }
 
-    public boolean closeTabAt(int i) {
+    boolean closeTabAt(int i) {
         boolean closed = false;
         try {
             SearchResultMediator searchResultMediator = entries.get(i);
@@ -453,13 +428,13 @@ public final class SearchResultDisplayer implements RefreshListener {
         return closed;
     }
 
-    public void closeAllTabs() {
+    void closeAllTabs() {
         while (entries != null && entries.size() > 0) {
             closeTabAt(0);
         }
     }
 
-    public void closeOtherTabs() {
+    void closeOtherTabs() {
         if (entries == null || entries.size() < 2) {
             //nothing to close.
             return;
@@ -584,7 +559,7 @@ public final class SearchResultDisplayer implements RefreshListener {
         return title + " (" + total + " " + I18n.tr("results") + ")";
     }
 
-    public int tabCount() {
+    int tabCount() {
         int result = 0;
         if (entries != null && !entries.isEmpty()) {
             result = entries.size();
@@ -593,7 +568,7 @@ public final class SearchResultDisplayer implements RefreshListener {
         return result;
     }
 
-    public int currentTabIndex() {
+    int currentTabIndex() {
         return tabbedPane.getSelectedIndex();
     }
 

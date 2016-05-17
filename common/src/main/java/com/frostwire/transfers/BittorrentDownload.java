@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,17 +24,26 @@ import java.io.File;
  * @author gubatron
  * @author aldenml
  */
-public interface BittorrentDownload extends DownloadTransfer, UploadTransfer {
+public interface BittorrentDownload extends Transfer {
 
-    public String getInfoHash();
+    String getInfoHash();
 
-    public int getConnectedPeers();
+    /**
+     * Generates a magnet URI using the current information in
+     * the torrent. If the underlying torrent handle is invalid,
+     * null is returned.
+     *
+     * @return
+     */
+    String magnetUri();
 
-    public int getTotalPeers();
+    int getConnectedPeers();
 
-    public int getConnectedSeeds();
+    int getTotalPeers();
 
-    public int getTotalSeeds();
+    int getConnectedSeeds();
+
+    int getTotalSeeds();
 
     /**
      * For multi files torrents, returns the folder containing the files (savePath/torrentName)
@@ -42,17 +51,17 @@ public interface BittorrentDownload extends DownloadTransfer, UploadTransfer {
      *
      * @return
      */
-    public File getContentSavePath();
+    File getContentSavePath();
 
-    public boolean isPaused();
+    boolean isPaused();
 
-    public boolean isSeeding();
+    boolean isSeeding();
 
-    public boolean isFinished();
+    boolean isFinished();
 
-    public void pause();
+    void pause();
 
-    public void resume();
+    void resume();
 
-    public void remove(boolean deleteTorrent, boolean deleteData);
+    void remove(boolean deleteTorrent, boolean deleteData);
 }

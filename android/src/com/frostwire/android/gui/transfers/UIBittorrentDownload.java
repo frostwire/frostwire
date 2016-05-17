@@ -34,6 +34,8 @@ import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTDownloadListener;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.Platforms;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Ref;
@@ -88,53 +90,33 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public String makeMagnetUri() {
-        return dl.makeMagnetUri();
+    public String magnetUri() {
+        return dl.magnetUri();
     }
 
     @Override
-    public String getHash() {
+    public String getInfoHash() {
         return dl.getInfoHash();
     }
 
     @Override
-    public String getPeers() {
-        int connectedPeers = dl.getConnectedPeers();
-        int peers = dl.getTotalPeers();
-
-        String tmp = connectedPeers > peers ? "%1" : "%1 " + "/" + " %2";
-
-        tmp = tmp.replaceAll("%1", String.valueOf(connectedPeers));
-        tmp = tmp.replaceAll("%2", String.valueOf(peers));
-
-        return tmp;
+    public int getConnectedPeers() {
+        return dl.getConnectedPeers();
     }
 
     @Override
-    public String getSeeds() {
-        int connectedSeeds = dl.getConnectedSeeds();
-        int seeds = dl.getTotalSeeds();
-
-        String tmp = connectedSeeds > seeds ? "%1" : "%1 " + "/" + " %2";
-
-        tmp = tmp.replaceAll("%1", String.valueOf(connectedSeeds));
-        String param2 = "?";
-        if (seeds != -1) {
-            param2 = String.valueOf(seeds);
-        }
-        tmp = tmp.replaceAll("%2", param2);
-
-        return tmp;
+    public int getTotalPeers() {
+        return dl.getTotalPeers();
     }
 
     @Override
-    public boolean isResumable() {
-        return dl.isPaused();
+    public int getConnectedSeeds() {
+        return dl.getConnectedSeeds();
     }
 
     @Override
-    public boolean isPausable() {
-        return !dl.isPaused();
+    public int getTotalSeeds() {
+        return dl.getTotalSeeds();
     }
 
     @Override
@@ -145,6 +127,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     @Override
     public boolean isPaused() {
         return dl.isPaused();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return dl.isFinished();
     }
 
     public boolean hasPaymentOptions() {
@@ -171,16 +158,26 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public boolean isDownloading() {
-        return dl.isDownloading();
+    public File getContentSavePath() {
+        return dl.getContentSavePath();
     }
 
     @Override
-    public void cancel(boolean deleteData) {
-        cancel(null, false, deleteData);
+    public boolean isDownloading() {
+        return dl.getDownloadSpeed() > 0;
     }
 
-    public void cancel(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {
+    @Override
+    public void remove(boolean deleteData) {
+        remove(null, false, deleteData);
+    }
+
+    @Override
+    public void remove(boolean deleteTorrent, boolean deleteData) {
+        remove(null, deleteTorrent, deleteData);
+    }
+
+    public void remove(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {
         manager.remove(this);
 
         if (contextRef != null && Ref.alive(contextRef) && deleteData && isComplete()) {
@@ -216,11 +213,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public String getStatus() {
+    public TransferState getState() {
         if (noSpaceAvailableInCurrentMount) {
-            return TransferState.ERROR_DISK_FULL.toString();
+            return TransferState.ERROR_DISK_FULL;
         }
-        return dl.getState().toString();
+        return dl.getState();
     }
 
     @Override
@@ -240,7 +237,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public Date getDateCreated() {
+    public Date getCreated() {
         return dl.getCreated();
     }
 
@@ -280,12 +277,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public void cancel() {
-        cancel(false);
-    }
-
-    @Override
-    public String getDetailsUrl() {
+    public String getName() {
         return null;
     }
 
@@ -308,7 +300,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             TransferManager.instance().incrementDownloadsToReview();
             File saveLocation = getSavePath().getAbsoluteFile();
             Engine.instance().notifyDownloadFinished(getDisplayName(), saveLocation, dl.getInfoHash());
-            Librarian.instance().scan(saveLocation);
+            Platforms.fileSystem().scan(saveLocation);
         }
 
         private void pauseSeedingIfNecessary(BTDownload dl) {

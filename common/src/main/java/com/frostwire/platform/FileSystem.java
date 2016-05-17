@@ -44,6 +44,8 @@ public interface FileSystem {
 
     boolean delete(File file);
 
+    File[] listFiles(File file, FileFilter filter);
+
     boolean copy(File src, File dest);
 
     boolean write(File file, byte[] data);

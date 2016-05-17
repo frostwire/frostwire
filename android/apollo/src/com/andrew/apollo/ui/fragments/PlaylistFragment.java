@@ -11,23 +11,21 @@
 
 package com.andrew.apollo.ui.fragments;
 
-import android.app.AlertDialog;
-import android.content.ContentUris;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.PlaylistAdapter;
 import com.andrew.apollo.loaders.PlaylistLoader;
@@ -39,6 +37,7 @@ import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.views.AbstractDialog;
 
 import java.util.List;
 
@@ -51,7 +50,7 @@ import java.util.List;
  * @author Marcelina Knitter (@marcelinkaaa)
  */
 public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> {
-
+    //private static Logger LOG = Logger.getLogger(PlaylistFragment.class);
     public PlaylistFragment() {
         super(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, Fragments.PLAYLIST_FRAGMENT_LOADER_ID);
     }
@@ -109,7 +108,9 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
                     RenamePlaylist.getInstance(mItem.mPlaylistId).show(getFragmentManager(), "RenameDialog");
                     return true;
                 case FragmentMenuItems.DELETE:
-                    buildDeleteDialog().show();
+                    final PlaylistFragmentDeleteDialog playlistFragmentDeleteDialog = buildDeleteDialog();
+                    // This is to avoid casting issues between android.support.v4.app.FragmentManager and android.app.FragmentManager
+                    playlistFragmentDeleteDialog.show(getActivity().getFragmentManager());
                     return true;
                 default:
                     break;
@@ -170,44 +171,106 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         return true;
     }
 
-    private AlertDialog buildDeleteDialog() {
-        final AlertDialog apolloPlaylistDeleteDialog = new AlertDialog.Builder(getActivity()).create();
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        View inflator = inflater.inflate(R.layout.dialog_default, null);
-        apolloPlaylistDeleteDialog.setView(inflator);
+    private PlaylistFragmentDeleteDialog buildDeleteDialog() {
+        return PlaylistFragmentDeleteDialog.newInstance(this, mItem.mPlaylistName, mItem.mPlaylistId);
+    }
 
+    @Override
+    public void onAttach(Activity activity) {
+        PlaylistFragmentDeleteDialog.fragment = this;
+        super.onAttach(activity);
+    }
 
-        TextView dialogTitle = (TextView) inflator.findViewById(R.id.dialog_default_title);
-        dialogTitle.setText(getString(R.string.delete_dialog_title, mItem.mPlaylistName));
-
-        TextView text = (TextView) inflator.findViewById(R.id.dialog_default_text);
-        text.setText(R.string.are_you_sure_delete_files_text);
-
-        Button btnNegative = (Button) inflator.findViewById(R.id.dialog_default_button_no);
-        btnNegative.setText(R.string.cancel);
-        btnNegative.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                apolloPlaylistDeleteDialog.dismiss();
-            }
-        });
-
-        Button buttonYes = (Button) inflator.findViewById(R.id.dialog_default_button_yes);
-        buttonYes.setText(R.string.delete);
-        buttonYes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Uri mUri = ContentUris.withAppendedId(
-                        MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                        mItem.mPlaylistId);
-                getActivity().getContentResolver().delete(mUri, null, null);
+    private void deleteSelectedPlaylist(long playlistId) {
+        FragmentActivity activity = getActivity();
+        if (activity != null && activity.getContentResolver() != null) {
+            int deleted = MusicUtils.deletePlaylist(activity, playlistId);
+            if (deleted > 0) {
                 MusicUtils.refresh();
                 restartLoader(true);
                 refresh();
-                apolloPlaylistDeleteDialog.dismiss();
             }
-        });
-        return apolloPlaylistDeleteDialog;
+        }
     }
+
+    @SuppressWarnings("WeakerAccess")
+    public static class PlaylistFragmentDeleteDialog extends AbstractDialog {
+        private String playlistName;
+        private long playlistId;
+        static PlaylistFragment fragment;
+
+        public static PlaylistFragmentDeleteDialog newInstance(PlaylistFragment playlistFragment, String playlistName, long playlistId) {
+            fragment = playlistFragment;
+            return new PlaylistFragmentDeleteDialog(playlistName, playlistId);
+        }
+
+        public PlaylistFragmentDeleteDialog() {
+             super(R.layout.dialog_default);
+        }
+
+        private PlaylistFragmentDeleteDialog(String playlistName, long playlistId) {
+            super(R.layout.dialog_default);
+            this.playlistName = playlistName;
+            this.playlistId = playlistId;
+        }
+
+        @Override
+        protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+            if (playlistName != null && savedInstanceState != null) {
+                savedInstanceState.putString("playlistName", playlistName);
+                savedInstanceState.putLong("playlistId", playlistId);
+            } else if (savedInstanceState != null && savedInstanceState.getString("playlistName") != null) {
+                playlistName = savedInstanceState.getString("playlistName");
+                playlistId = savedInstanceState.getLong("playlistId");
+            }
+            TextView dialogTitle = findView(dlg, R.id.dialog_default_title);
+            dialogTitle.setText(getString(R.string.delete_dialog_title, playlistName));
+            TextView text = findView(dlg, R.id.dialog_default_text);
+            text.setText(getResources().getString(R.string.are_you_sure_delete_playlist, playlistName));
+            Button buttonYes = findView(dlg, R.id.dialog_default_button_yes);
+            buttonYes.setText(R.string.delete);
+            buttonYes.setOnClickListener(new ButtonOnClickListener(this, true));
+            Button btnNegative = findView(dlg, R.id.dialog_default_button_no);
+            btnNegative.setText(R.string.cancel);
+            btnNegative.setOnClickListener(new ButtonOnClickListener(this, false));
+        }
+
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            if (playlistName != null) {
+                outState.putString("playlistName", playlistName);
+                outState.putLong("playlistId", playlistId);
+            }
+            super.onSaveInstanceState(outState);
+        }
+
+        void onDelete() {
+            if (fragment != null) {
+                dismiss();
+                fragment.deleteSelectedPlaylist(playlistId);
+            }
+
+        }
+    }
+
+
+    @SuppressWarnings("WeakerAccess")
+    public static class ButtonOnClickListener implements View.OnClickListener {
+        private final boolean delete;
+        private final PlaylistFragmentDeleteDialog dialog;
+        public ButtonOnClickListener(PlaylistFragmentDeleteDialog dlg, boolean delete) {
+            this.delete = delete;
+            this.dialog = dlg;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (!delete) {
+                dialog.dismiss();
+            } else {
+                dialog.onDelete();
+            }
+        }
+    }
+
 }

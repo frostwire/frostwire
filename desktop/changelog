@@ -1,7 +1,9 @@
-frostwire (6.2.4) stable; urgency=high
-  * New jlibtorrent 1.1.0.28
+frostwire (6.2.5) stable; urgency=high
+  * Cloud transfers are automatically seeded if seeding is on.
+  * Improved 'Search for Keywords' suggestions for episodic queries.
+  * New jlibtorrent 1.1.0.29
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 28 Apr 2016 10:39:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Sat, 7 May 2016 22:15:00 -0500
 
 frostwire (6.2.4) stable; urgency=high
   * Fixes Monova search.

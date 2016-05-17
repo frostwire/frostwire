@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,21 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
-
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -41,13 +41,11 @@ import org.apache.commons.io.FilenameUtils;
  * @author marcelinkaaa
  */
 public class RenameFileMenuAction extends MenuAction {
-
     private final FileDescriptor fd;
     private final FileListAdapter adapter;
 
     public RenameFileMenuAction(Context context, FileListAdapter adapter, FileDescriptor fd) {
         super(context, R.drawable.contextmenu_icon_rename, R.string.rename);
-
         this.adapter = adapter;
         this.fd = fd;
     }
@@ -58,50 +56,8 @@ public class RenameFileMenuAction extends MenuAction {
     }
 
     private void showRenameFileDialog() {
-
-        final Dialog newRenameFileDialog = new Dialog(getContext(), R.style.DefaultDialogTheme);
-        newRenameFileDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        newRenameFileDialog.setContentView(R.layout.dialog_default_input);
-
-        TextView title = (TextView) newRenameFileDialog.findViewById(R.id.dialog_default_input_title);
-        title.setText(R.string.rename);
-
-        String filePath = fd.filePath;
-
-        String name = FilenameUtils.getBaseName(filePath);
-        final String ext = FilenameUtils.getExtension(filePath);
-
-        final EditText input = (EditText) newRenameFileDialog.findViewById(R.id.dialog_default_input_text);
-        input.setText(name);
-        input.selectAll();
-
-        Button buttonNo = (Button) newRenameFileDialog.findViewById(R.id.dialog_default_input_button_no);
-        buttonNo.setText(R.string.cancel);
-        buttonNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                newRenameFileDialog.dismiss();
-            }
-        });
-
-        Button buttonYes = (Button) newRenameFileDialog.findViewById(R.id.dialog_default_input_button_yes);
-        buttonYes.setText(android.R.string.ok);
-        buttonYes.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View v) {
-                                             String newFileName = input.getText().toString();
-                                             if (isValidFileName(newFileName)) {
-                                                 renameFile(newFileName);
-                                                 adapter.notifyDataSetChanged();
-                                                 newRenameFileDialog.dismiss();
-                                             } else {
-                                                 UIUtils.showLongMessage(getContext(), R.string.invalid_filename);
-                                             }
-                                         }
-                                     }
-        );
-
-        newRenameFileDialog.show();
+        RenameFileMenuActionDialog.renameAction = this;
+        RenameFileMenuActionDialog.newInstance(getFilePath()).show(((Activity) getContext()).getFragmentManager());
     }
 
     private boolean isValidFileName(String newFileName) {
@@ -115,7 +71,97 @@ public class RenameFileMenuAction extends MenuAction {
     }
 
     private void renameFile(String newFileName) {
-        fd.filePath = Librarian.instance().renameFile(fd, newFileName);
-        fd.title = FilenameUtils.getBaseName(newFileName);
+        if (isValidFileName(newFileName)) {
+            fd.filePath = Librarian.instance().renameFile(fd, newFileName);
+            fd.title = FilenameUtils.getBaseName(newFileName);
+            adapter.notifyDataSetChanged();
+        } else {
+            UIUtils.showLongMessage(getContext(), R.string.invalid_filename);
+        }
+    }
+
+    public String getFilePath() {
+        return fd.filePath;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public static class RenameFileMenuActionDialog extends AbstractDialog {
+        private static RenameFileMenuAction renameAction;
+        private String filePath;
+
+        public static RenameFileMenuActionDialog newInstance(String filePath) {
+            return new RenameFileMenuActionDialog(filePath);
+        }
+
+        public RenameFileMenuActionDialog() {
+            super();
+        }
+
+        private RenameFileMenuActionDialog(String filePath) {
+            super();
+            this.filePath = filePath;
+        }
+
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            if (filePath != null) {
+                outState.putString("filePath", filePath);
+            }
+            super.onSaveInstanceState(outState);
+        }
+
+        @Override
+        protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+            if (savedInstanceState == null && filePath != null) {
+                savedInstanceState = new Bundle();
+                savedInstanceState.putString("filePath", filePath);
+            } else if (savedInstanceState != null && filePath == null) {
+                filePath = savedInstanceState.getString("filePath");
+            }
+
+            TextView title = findView(dlg, R.id.dialog_default_input_title);
+            title.setText(R.string.rename);
+            String name = FilenameUtils.getBaseName(filePath);
+
+            EditText input = findView(dlg, R.id.dialog_default_input_text);
+            input.setText(name);
+            input.selectAll();
+
+            Button yesButton = findView(dlg, R.id.dialog_default_input_button_yes);
+            yesButton.setText(android.R.string.ok);
+            Button noButton = findView(dlg, R.id.dialog_default_input_button_no);
+            noButton.setText(R.string.cancel);
+
+            yesButton.setOnClickListener(new ButtonOnClickListener(this, true));
+            noButton.setOnClickListener(new ButtonOnClickListener(this, false));
+        }
+
+        public void rename() {
+            EditText input = findView(getDialog(), R.id.dialog_default_input_text);
+            if (RenameFileMenuActionDialog.renameAction != null) {
+                RenameFileMenuActionDialog.renameAction.renameFile(input.getText().toString());
+            }
+            dismiss();
+        }
+    }
+
+    private static class ButtonOnClickListener implements View.OnClickListener {
+        final private RenameFileMenuActionDialog newRenameFileDialog;
+        final private boolean rename;
+
+        ButtonOnClickListener(RenameFileMenuActionDialog newRenameFileDialog,
+                              boolean rename) {
+            this.newRenameFileDialog = newRenameFileDialog;
+            this.rename = rename;
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (!rename) {
+                newRenameFileDialog.dismiss();
+            } else {
+                newRenameFileDialog.rename();
+            }
+        }
     }
 }

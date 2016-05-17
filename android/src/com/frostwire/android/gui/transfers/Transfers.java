@@ -2,6 +2,7 @@ package com.frostwire.android.gui.transfers;
 
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.logging.Logger;
+import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 
 import java.io.File;
