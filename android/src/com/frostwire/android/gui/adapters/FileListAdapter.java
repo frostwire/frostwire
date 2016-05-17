@@ -345,9 +345,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         Resources res = getContext().getResources();
 
-        title.setTextColor(res.getColor(R.color.browse_peer_listview_item_foreground));
-        text.setTextColor(res.getColor(R.color.browse_peer_listview_item_foreground));
-        size.setTextColor(res.getColor(R.color.app_highlight_text));
+        title.setTextColor(res.getColor(R.color.app_text_primary));
+        text.setTextColor(res.getColor(R.color.app_text_primary));
+        size.setTextColor(res.getColor(R.color.basic_blue_darker_highlight));
     }
 
     private void setInactiveTextColors(View v) {

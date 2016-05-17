@@ -111,7 +111,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     private void maybeMarkTitleOpened(View view, SearchResult sr) {
         int clickedColor = getContext().getResources().getColor(R.color.browse_peer_listview_item_inactive_foreground);
-        int unclickedColor = getContext().getResources().getColor(R.color.basic_blue);
+        int unclickedColor = getContext().getResources().getColor(R.color.app_text_primary);
         TextView title = findView(view, R.id.view_bittorrent_search_result_list_item_title);
         title.setTextColor(LocalSearchEngine.instance().hasBeenOpened(sr) ? clickedColor : unclickedColor);
     }
