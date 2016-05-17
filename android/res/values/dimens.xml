@@ -35,6 +35,7 @@
     <dimen name="text_micro">11.0sp</dimen>
     <dimen name="text_x_small">12.0sp</dimen>
     <dimen name="text_small">14.0sp</dimen>
+    <dimen name="text_x_medium">15.0sp</dimen>
     <dimen name="text_medium">16.0sp</dimen>
     <dimen name="text_large">18.0sp</dimen>
     <dimen name="text_x_large">20.0sp</dimen>
