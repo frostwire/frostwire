@@ -33,8 +33,9 @@
 
     <!-- General app colors -->
     <color name="app_background">@color/basic_blue</color>
-    <color name="app_text_primary">#2b2d2e</color>
-    <color name="app_text_secondary">#ff696c6f</color>
+    <color name="app_text_primary">#2b2b2b</color>
+    <color name="app_text_secondary_dark">#4d4d4d</color>
+    <color name="app_text_secondary">#767676</color>
     <color name="app_text_disabled">#ffb5b5b5</color>
     <color name="app_body_gray_dark">@color/basic_gray_medium</color>
     <color name="action_bar_background">@color/basic_blue</color>
@@ -62,8 +63,7 @@
     <color name="app_dark_icons">#ff546676</color>
     <color name="app_light_icons">#ffe7ebee</color>
     <color name="app_highlight_text">#ff33b5e5</color>
-    <color name="app_list_cell_line">#ffdae2e9</color>
-    <color name="all_list_cell_background_visited">#ffe9eef3</color>
+    <color name="app_list_cell_line">#ffeceff1</color>
     <color name="app_menu_item_pressed">#ff314c61</color>
     <color name="app_menu_item_line">#ff1d2934</color>
     <color name="app_light_gray_text">#d9d9d9</color>
@@ -71,7 +71,7 @@
 
     <color name="browse_peer_listview_item_inactive_background">#ffeff0f1</color>
     <color name="browse_peer_listview_item_foreground">@color/app_list_item_title_text_color</color>
-    <color name="browse_peer_listview_item_inactive_foreground">#ffb1b1b1</color>
+    <color name="browse_peer_listview_item_inactive_foreground">@color/app_dark_grey_text</color>
 
     <color name="tpi_unselected_text_color">@color/basic_white</color>
     <color name="warning_red">#ffff0000</color>
