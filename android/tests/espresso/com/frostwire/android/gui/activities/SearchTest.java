@@ -28,7 +28,7 @@ import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.core.AllOf.allOf;
 
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(AndroidJUnit4.class)  //To access to an activity without extending ActivityInstrumentationTestCase2
 @LargeTest
 public class SearchTest {
 
@@ -53,8 +53,8 @@ public class SearchTest {
          */
         onView(allOf(withId(R.id.view_clearable_edit_text_input), isDescendantOfA(withId(R.id.fragment_search_input))))
                 .check(matches(isDisplayed()))
-                .perform(typeText("Creative Commons"))
-                .perform(pressKey(KeyEvent.KEYCODE_ENTER));
+                .perform(typeText("android")) //Search android so I can get results on applications too
+                .perform(pressKey(KeyEvent.KEYCODE_ENTER)); //press enter
 
 
         WaitUntiVisibleIdlingResource resource = new WaitUntiVisibleIdlingResource(
@@ -66,17 +66,19 @@ public class SearchTest {
         );
 
         //Layout: R.layout.view_searchinput_radiogroup
+        //Checking results in all labels
 
         checkForAtLeastOneResult(R.id.view_search_input_radio_audio);
         checkForAtLeastOneResult(R.id.view_search_input_radio_videos);
         checkForAtLeastOneResult(R.id.view_search_input_radio_pictures);
+        checkForAtLeastOneResult(R.id.view_search_input_radio_applications);
         checkForAtLeastOneResult(R.id.view_search_input_radio_documents);
         checkForAtLeastOneResult(R.id.view_search_input_radio_torrents);
 
         Espresso.unregisterIdlingResources(resource);
 
     }
-
+    //Check for at least one result in all labels
     private void checkForAtLeastOneResult(int radioButtonId) {
         onView(allOf(withId(radioButtonId), isDescendantOfA(withId(R.id.fragment_search_input))))
                 .check(matches(isDisplayed()))
