@@ -21,6 +21,7 @@ import android.content.Context;
 import com.android.vending.billing.IabHelper;
 import com.android.vending.billing.IabResult;
 import com.android.vending.billing.Inventory;
+import com.android.vending.billing.Purchase;
 import com.frostwire.logging.Logger;
 
 /**
@@ -33,12 +34,30 @@ public final class PlayStore {
 
     // Taken from: Google Play Developer Console -> Services & APIs
     // Base64-encoded RSA public key to include in your binary.
-    private final String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn4zB2rCYz3oXs33iFIHagzwpca0AEvRYHyr2xOW9gGwBokU51LdIjzq5NOzj3++aa9vIvj/K9eFHCPxkXa5g2qjm1+lc+fJwIEA/hAnA4ZIee3KrD52kyTqfZfhEYGklzvarbo3WN2gcUzwvvsVP9e1UZqtoYgFDThttKaFUboqqt1424lp7C2da89WTgHNpUyykIwQ1zYR34YOQ23SFPesSx8Fmz/Nz2rAHBNuFy13OE2LWPK+kLfm8P+tUAOcDSlq0NuT/FkuGpvziPaOS5BVpvfiAjjnUNLfH7dEO5wh7RPAskcNhQH1ykp6RauZFryMJbbHUe6ydGRHzpRkRpwIDAQAB";
+    private static final String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn4zB2rCYz3oXs33iFIHagzwpca0AEvRYHyr2xOW9gGwBokU51LdIjzq5NOzj3++aa9vIvj/K9eFHCPxkXa5g2qjm1+lc+fJwIEA/hAnA4ZIee3KrD52kyTqfZfhEYGklzvarbo3WN2gcUzwvvsVP9e1UZqtoYgFDThttKaFUboqqt1424lp7C2da89WTgHNpUyykIwQ1zYR34YOQ23SFPesSx8Fmz/Nz2rAHBNuFy13OE2LWPK+kLfm8P+tUAOcDSlq0NuT/FkuGpvziPaOS5BVpvfiAjjnUNLfH7dEO5wh7RPAskcNhQH1ykp6RauZFryMJbbHUe6ydGRHzpRkRpwIDAQAB";
+
+    private static final String SKU_NO_ADS_TEST = "frostwire.no_ads.test1";
 
     private IabHelper helper;
+    private IabHelper.QueryInventoryFinishedListener inventoryListener;
     private Inventory inventory;
 
     public PlayStore() {
+        inventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+            public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                if (result.isFailure()) {
+                    LOG.error("Failed to query inventory: " + result);
+                    return;
+                }
+
+                if (helper == null) {
+                    LOG.warn("Helper has been disposed");
+                    return;
+                }
+
+                PlayStore.this.inventory = inventory;
+            }
+        };
     }
 
     private static class Loader {
@@ -56,23 +75,7 @@ public final class PlayStore {
         }
 
         helper = new IabHelper(context, base64EncodedPublicKey);
-        helper.enableDebugLogging(true); // toggle this value for development
-
-        final IabHelper.QueryInventoryFinishedListener inventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-            public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-                if (result.isFailure()) {
-                    LOG.error("Failed to query inventory: " + result);
-                    return;
-                }
-
-                if (helper == null) {
-                    LOG.warn("Helper has been disposed");
-                    return;
-                }
-
-                PlayStore.this.inventory = inventory;
-            }
-        };
+        helper.enableDebugLogging(true, LOG.getName()); // toggle this value for development
 
         helper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
             @Override
@@ -82,18 +85,22 @@ public final class PlayStore {
                     return;
                 }
 
-                if (helper == null) {
-                    LOG.warn("Helper has been disposed");
-                    return;
-                }
-
-                try {
-                    helper.queryInventoryAsync(inventoryListener);
-                } catch (IabHelper.IabAsyncInProgressException e) {
-                    LOG.error("Error querying inventory. Another async operation in progress.", e);
-                }
+                refresh();
             }
         });
+    }
+
+    public void refresh() {
+        if (helper == null) {
+            LOG.warn("Helper has been disposed");
+            return;
+        }
+
+        try {
+            helper.queryInventoryAsync(inventoryListener);
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            LOG.error("Error querying inventory. Another async operation in progress.", e);
+        }
     }
 
     public void dispose() {
@@ -107,6 +114,18 @@ public final class PlayStore {
     }
 
     public boolean showAds() {
-        return true;
+        if (inventory == null) {
+            LOG.warn("Inventory not loaded, review your logic");
+            return true;
+        }
+
+        Purchase p = inventory.getPurchase(SKU_NO_ADS_TEST);
+        if (p == null) {
+            return true;
+        }
+
+        // more verifications of the potential subscription here
+
+        return false;
     }
 }

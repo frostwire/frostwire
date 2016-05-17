@@ -39,6 +39,7 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
@@ -112,6 +113,8 @@ public class EngineService extends Service implements IEngineService {
 
         BTEngine.getInstance().stop();
         ImageLoader.getInstance(this).shutdown();
+
+        PlayStore.getInstance().dispose();
 
         stopOkHttp();
 
