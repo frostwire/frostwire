@@ -101,15 +101,16 @@ public class Offers {
                                         final boolean shutdownAfterwards,
                                         final boolean dismissAfterwards) {
 
+        boolean interstitialShown = false;
+
         if (!PlayStore.getInstance().showAds()) {
             LOG.info("Skipping interstitial ads display, PlayStore reports no ads");
-        }
-
-        boolean interstitialShown = false;
-        final WeakReference<Activity> activityRef = Ref.weak(activity);
-        for (AdNetwork adNetwork : AD_NETWORKS) {
-            if (!interstitialShown && adNetwork.started()) {
-                interstitialShown = adNetwork.showInterstitial(activityRef, shutdownAfterwards, dismissAfterwards);
+        } else {
+            final WeakReference<Activity> activityRef = Ref.weak(activity);
+            for (AdNetwork adNetwork : AD_NETWORKS) {
+                if (!interstitialShown && adNetwork.started()) {
+                    interstitialShown = adNetwork.showInterstitial(activityRef, shutdownAfterwards, dismissAfterwards);
+                }
             }
         }
         if (!interstitialShown) {
