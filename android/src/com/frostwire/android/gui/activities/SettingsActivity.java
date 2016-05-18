@@ -49,6 +49,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference;
 import com.frostwire.android.gui.views.preference.SimpleActionPreference;
 import com.frostwire.android.gui.views.preference.StoragePreference;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.logging.Logger;
 import com.frostwire.uxstats.UXAction;
@@ -120,6 +121,7 @@ public class SettingsActivity extends PreferenceActivity {
         setupClearIndex();
         setupSearchEngines();
         setupUXStatsOption();
+        setupBuyNoAds();
         setupAbout();
     }
 
@@ -406,6 +408,23 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
+    private void setupBuyNoAds() {
+        Preference p = findPreference("frostwire.prefs.offers.buy_no_ads");
+        final PlayStore store = PlayStore.getInstance();
+        if (!store.showAds()) { // this if is intentional
+            p.setEnabled(false);
+        } else {
+            p.setEnabled(true);
+        }
+        p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                store.buyNoAds(SettingsActivity.this);
+                return true;
+            }
+        });
+    }
+
     private void setupAbout() {
         Preference p = findPreference(Constants.PREF_KEY_SHOW_ABOUT);
         p.setIntent(new Intent(this, AboutActivity.class));
@@ -454,6 +473,13 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        PlayStore store = PlayStore.getInstance();
+        if (store.handleActivityResult(requestCode, resultCode, data)) {
+            store.refresh();
+            setupBuyNoAds();
+            return;
+        }
+
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
         } else {
