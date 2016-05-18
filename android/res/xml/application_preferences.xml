@@ -19,36 +19,36 @@
  */
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-				  xmlns:frostwire="http://schemas.android.com/apk/res-auto">
+                  xmlns:frostwire="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory android:key="frostwire.prefs.general">
         <SwitchPreference android:key="frostwire.prefs.internal.connect_disconnect"
-           android:summary="@string/bittorrent_network_summary"
-           android:title="@string/bittorrent" />
+                          android:summary="@string/bittorrent_network_summary"
+                          android:title="@string/bittorrent"/>
         <com.frostwire.android.gui.views.preference.StoragePreference
                 android:key="frostwire.prefs.storage.path"
                 android:summary="@string/storage_preference_summary"
-                android:title="@string/storage_preference_title" />
+                android:title="@string/storage_preference_title"/>
         <Preference
                 android:key="frostwire.prefs.storage.path_asf"
                 android:summary="@string/storage_preference_summary"
                 android:title="@string/storage_preference_title">
-            <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE" />
+            <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE"/>
         </Preference>
     </PreferenceCategory>
 
     <PreferenceScreen
             android:key="frostwire.prefs.torrent.preference_category"
             android:title="@string/torrent_settings"
-            android:persistent="false" >
+            android:persistent="false">
         <CheckBoxPreference
                 android:key="frostwire.prefs.network.use_mobile_data"
                 android:summary="@string/use_mobile_data_summary"
-                android:title="@string/use_mobile_data" />
+                android:title="@string/use_mobile_data"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.torrent.seed_finished_torrents"
                 android:summary="@string/seed_finished_torrents_summary"
-                android:title="@string/seed_finished_torrents" />
+                android:title="@string/seed_finished_torrents"/>
         <com.frostwire.android.gui.views.preference.CheckBoxPreference
                 android:key="frostwire.prefs.torrent.seed_finished_torrents_wifi_only"
                 android:summary="@string/seed_finished_torrents_wifi_only_summary"
@@ -56,122 +56,122 @@
         <SwitchPreference
                 android:key="froswire.prefs.network.enable_dht"
                 android:summary="@string/enable_dht_summary"
-                android:title="@string/enable_dht" />
+                android:title="@string/enable_dht"/>
         <com.frostwire.android.gui.views.preference.NumberPickerPreference
                 android:key="frostwire.prefs.torrent.max_download_speed"
                 android:summary="@string/torrent_max_download_speed_summary"
                 android:title="@string/torrent_max_download_speed"
                 frostwire:picker_defaultValue="0"
                 frostwire:picker_endRange="102400"
-                frostwire:picker_startRange="0" />
+                frostwire:picker_startRange="0"/>
         <com.frostwire.android.gui.views.preference.NumberPickerPreference
                 android:key="frostwire.prefs.torrent.max_upload_speed"
                 android:summary="@string/torrent_max_upload_speed_summary"
                 android:title="@string/torrent_max_upload_speed"
                 frostwire:picker_defaultValue="0"
                 frostwire:picker_endRange="102400"
-                frostwire:picker_startRange="0" />
+                frostwire:picker_startRange="0"/>
         <com.frostwire.android.gui.views.preference.NumberPickerPreference
                 android:key="frostwire.prefs.torrent.max_downloads"
                 android:summary="@string/torrent_max_downloads_summary"
                 android:title="@string/torrent_max_downloads"
                 frostwire:picker_defaultValue="4"
                 frostwire:picker_endRange="10"
-                frostwire:picker_startRange="1" />
+                frostwire:picker_startRange="1"/>
         <com.frostwire.android.gui.views.preference.NumberPickerPreference
                 android:key="frostwire.prefs.torrent.max_uploads"
                 android:summary="@string/torrent_max_uploads_summary"
                 android:title="@string/torrent_max_uploads"
                 frostwire:picker_defaultValue="4"
                 frostwire:picker_endRange="10"
-                frostwire:picker_startRange="1" />
+                frostwire:picker_startRange="1"/>
         <com.frostwire.android.gui.views.preference.NumberPickerPreference
                 android:key="frostwire.prefs.torrent.max_total_connections"
                 android:summary="@string/torrent_max_total_connections_summary"
                 android:title="@string/torrent_max_total_connections"
                 frostwire:picker_defaultValue="200"
                 frostwire:picker_endRange="200"
-                frostwire:picker_startRange="10" />
+                frostwire:picker_startRange="10"/>
         <com.frostwire.android.gui.views.preference.NumberPickerPreference
                 android:key="frostwire.prefs.torrent.max_peers"
                 android:summary="@string/torrent_max_peers_summary"
                 android:title="@string/torrent_max_peers"
                 frostwire:picker_defaultValue="200"
                 frostwire:picker_endRange="200"
-                frostwire:picker_startRange="10" />
+                frostwire:picker_startRange="10"/>
 
         <com.frostwire.android.gui.views.preference.SimpleActionPreference
                 android:key="frostwire.prefs.internal.clear_index"
                 android:summary="@string/clear_search_cache_summary"
                 android:title="@string/clear_search_cache"
-                frostwire:button_text="@string/clear" />
+                frostwire:button_text="@string/clear"/>
     </PreferenceScreen>
     <PreferenceScreen
-        android:key="frostwire.prefs.search.preference_category"
-        android:title="@string/search_settings"
-        android:persistent="false" >
+            android:key="frostwire.prefs.search.preference_category"
+            android:title="@string/search_settings"
+            android:persistent="false">
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_archiveorg"
                 android:summary="@string/use_archiveorg"
-                android:title="@string/use_archiveorg" />
+                android:title="@string/use_archiveorg"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_bitsnoop"
                 android:summary="@string/use_bitsnoop"
-                android:title="@string/use_bitsnoop" />
+                android:title="@string/use_bitsnoop"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_btjunkie"
                 android:summary="@string/use_btjunkie"
-                android:title="@string/use_btjunkie" />
+                android:title="@string/use_btjunkie"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_extratorrent"
                 android:summary="@string/use_extratorrent"
-                android:title="@string/use_extratorrent" />
+                android:title="@string/use_extratorrent"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_eztv"
                 android:summary="@string/use_eztv"
-                android:title="@string/use_eztv" />
+                android:title="@string/use_eztv"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_frostclick"
                 android:summary="@string/use_frostclick"
-                android:title="@string/use_frostclick" />
+                android:title="@string/use_frostclick"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_mininova"
                 android:summary="@string/use_mininova"
-                android:title="@string/use_mininova" />
+                android:title="@string/use_mininova"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_monova"
                 android:summary="@string/use_monova_summary"
-                android:title="@string/use_monova" />
+                android:title="@string/use_monova"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_kat"
                 android:summary="@string/use_kat_summary"
                 android:title="@string/use_kat"
-                />
+        />
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_soundcloud"
                 android:summary="@string/use_soundcloud"
-                android:title="@string/use_soundcloud" />
+                android:title="@string/use_soundcloud"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_tpb"
                 android:summary="@string/use_tpb_summary"
-                android:title="@string/use_tpb" />
+                android:title="@string/use_tpb"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_torlock"
                 android:summary="@string/use_torlock"
-                android:title="@string/use_torlock" />
+                android:title="@string/use_torlock"/>
         <CheckBoxPreference
-            android:key="frostwire.prefs.search.use_yify"
-            android:summary="@string/use_yify_summary"
-            android:title="@string/use_yify" />
+                android:key="frostwire.prefs.search.use_yify"
+                android:summary="@string/use_yify_summary"
+                android:title="@string/use_yify"/>
         <CheckBoxPreference
-            android:key="frostwire.prefs.search.use_youtube"
-            android:summary="@string/use_youtube"
-            android:title="@string/use_youtube" />
+                android:key="frostwire.prefs.search.use_youtube"
+                android:summary="@string/use_youtube"
+                android:title="@string/use_youtube"/>
     </PreferenceScreen>
     <PreferenceScreen
-        android:key="frostwire.prefs.other.preference_category"
-        android:title="@string/other_settings"
-        android:persistent="false" >
+            android:key="frostwire.prefs.other.preference_category"
+            android:title="@string/other_settings"
+            android:persistent="false">
         <CheckBoxPreference
                 android:key="frostwire.prefs.gui.enable_permanent_status_notification"
                 android:title="@string/notify_frostwire_is_running"
@@ -179,34 +179,34 @@
 
         <CheckBoxPreference
                 android:key="frostwire.prefs.gui.show_transfers_on_download_start"
-                android:title="@string/show_transfers_on_download_start" />
+                android:title="@string/show_transfers_on_download_start"/>
         <CheckBoxPreference
                 android:key="frostwire.prefs.gui.show_new_transfer_dialog"
-                android:title="@string/show_new_transfer_dialog" />
+                android:title="@string/show_new_transfer_dialog"/>
         <CheckBoxPreference
-            android:key="frostwire.prefs.gui.vibrate_on_finished_download"
-            android:title="@string/vibrate_on_finished_download" />
+                android:key="frostwire.prefs.gui.vibrate_on_finished_download"
+                android:title="@string/vibrate_on_finished_download"/>
         <!--<CheckBoxPreference
                 android:key="frostwire.prefs.core.enable_experimental"
                 android:title="@string/enable_experimental" />-->
         <CheckBoxPreference
                 android:key="frostwire.prefs.uxstats.enabled"
                 android:summary="@string/anonymous_usage_statistics_summary"
-                android:title="@string/anonymous_usage_statistics" />
+                android:title="@string/anonymous_usage_statistics"/>
         <CheckBoxPreference
-            android:key="frostwire.prefs.gui.support_frostwire"
-            android:summary="@string/support_frostwire_summary"
-            android:title="@string/support_frostwire" />
+                android:key="frostwire.prefs.gui.support_frostwire"
+                android:summary="@string/support_frostwire_summary"
+                android:title="@string/support_frostwire"/>
     </PreferenceScreen>
 
     <Preference
-        android:key="frostwire.prefs.show_about"
-        android:title="@string/about">
+            android:key="frostwire.prefs.show_about"
+            android:title="@string/about">
         <intent
-            android:action="android.intent.action.VIEW"
-            android:targetPackage="com.frostwire.android"
-            android:targetClass="com.frostwire.android.gui.activities.AboutActivity"
-            />
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="com.frostwire.android"
+                android:targetClass="com.frostwire.android.gui.activities.AboutActivity"
+        />
     </Preference>
 
 </PreferenceScreen>
