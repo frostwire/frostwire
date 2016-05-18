@@ -20,8 +20,11 @@ package com.frostwire.gui.tabs;
 
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.limegroup.gnutella.gui.I18n;
+import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
  * @author gubatron
@@ -29,16 +32,99 @@ import javax.swing.*;
  */
 public final class TransfersTab extends AbstractTab {
     final BTDownloadMediator downloadMediator;
+    private final String FILTER_TEXT_HINT = I18n.tr("filter transfers here");
+    private JToggleButton filterAllButton;
+    private JToggleButton filterDownloadingButton;
+    private JToggleButton filterSeedingButton;
+    private JToggleButton filterFinishedButton;
+    private JPanel mainComponent;
+    private JTextArea filterText;
 
     public TransfersTab(BTDownloadMediator downloadMediator) {
         super(I18n.tr("Transfers"),
               I18n.tr("Transfers tab description goes here."),
               "transfers_tab");
         this.downloadMediator = downloadMediator;
-        // TODO: Add buttons up top pretending they're tabs and we'll tell the mediator to filter itself.
+        initComponents();
+    }
+
+    private void initComponents() {
+        mainComponent = new JPanel(new MigLayout("fill, insets 3px 3px 3px 3px, gap 0","[][grow]","[][grow]"));
+        mainComponent.add(createTextFilterComponent(), "w 200!, h 25!, gapleft 5px, center, shrink");
+        mainComponent.add(createFilterToggleButtons(),"w 332!, h 32!, pad 0 0 0 0, center, wrap");
+        mainComponent.add(downloadMediator.getComponent(),"cell 0 1 2 1,grow"); // "cell <column> <row> <width> <height>"
+    }
+
+    private JTextArea createTextFilterComponent() {
+        filterText = new JTextArea();
+        filterText.setEditable(true);
+        filterText.setText(FILTER_TEXT_HINT);
+        filterText.setFont(new Font("Helvetica",Font.PLAIN, 12));
+        filterText.setForeground(Color.GRAY);
+        filterText.addMouseListener(new TextFilterMouseAdapter());
+        filterText.addKeyListener(new TextFilterKeyAdapter());
+        filterText.selectAll();
+        return filterText;
+    }
+
+    private JPanel createFilterToggleButtons() {
+        JPanel filterButtonsContainer = new JPanel(new MigLayout("align center, ins 0 0 0 0"));
+        ButtonGroup filterGroup = new ButtonGroup();
+        filterAllButton = new JToggleButton(I18n.tr("All"),true);
+        filterDownloadingButton = new JToggleButton(I18n.tr("Downloading"),false);
+        filterSeedingButton = new JToggleButton(I18n.tr("Seeding"),false);
+        filterFinishedButton = new JToggleButton(I18n.tr("Finished"),false);
+
+        filterGroup.add(filterAllButton);
+        filterGroup.add(filterDownloadingButton);
+        filterGroup.add(filterSeedingButton);
+        filterGroup.add(filterFinishedButton);
+
+        filterButtonsContainer.add(filterAllButton);
+        filterButtonsContainer.add(filterDownloadingButton);
+        filterButtonsContainer.add(filterSeedingButton);
+        filterButtonsContainer.add(filterFinishedButton);
+        return filterButtonsContainer;
     }
 
     public JComponent getComponent() {
-        return downloadMediator.getComponent();
+        return mainComponent;
+    }
+
+    private void onTextFilterKeyTyped() {
+        if (filterText.getText().equals("")) {
+            restoreFilterTextHint();
+        } else {
+            filterText.setForeground(Color.BLACK);
+
+            // TODO: invoke filtering code here on BTDownloadMediator.
+        }
+    }
+
+    private void clearFilterTextHint() {
+        if (filterText.getText().equals(FILTER_TEXT_HINT)) {
+            filterText.setText("");
+            filterText.setForeground(Color.BLACK);
+        }
+    }
+
+    private void restoreFilterTextHint() {
+        filterText.setText(FILTER_TEXT_HINT);
+        filterText.setForeground(Color.GRAY);
+        filterText.selectAll();
+    }
+
+    private class TextFilterMouseAdapter extends MouseAdapter {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            clearFilterTextHint();
+        }
+    }
+
+    private class TextFilterKeyAdapter extends KeyAdapter {
+        @Override
+        public void keyReleased(KeyEvent e) {
+            onTextFilterKeyTyped();
+        }
     }
 }
