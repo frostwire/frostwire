@@ -582,7 +582,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
-
                     boolean[] filesSelection = null;
 
                     if (partialDownload) {

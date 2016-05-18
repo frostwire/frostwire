@@ -90,7 +90,7 @@ public class SendFileTransferHandler extends LimeTransferHandler {
 
         if (result == DialogOption.YES) {
             new SendFileProgressDialog(GUIMediator.getAppFrame(), files[0]).setVisible(true);
-            GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);
+            GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
             UXStats.instance().log(UXAction.SHARING_TORRENT_CREATED_WITH_SEND_TO_FRIEND_FROM_DND);
             return true;
         }

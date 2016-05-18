@@ -1089,7 +1089,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
             if (result == DialogOption.YES) {
                 new SendFileProgressDialog(GUIMediator.getAppFrame(), file).setVisible(true);
-                GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);
+                GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
                 UXStats.instance().log(UXAction.SHARING_TORRENT_CREATED_WITH_SEND_TO_FRIEND_FROM_PLAYER);
             }
             

@@ -49,7 +49,7 @@ public final class VisualConnectionCallback implements ActivityCallback {
     public void showDownloads() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);
+                GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
             }
         });
     }

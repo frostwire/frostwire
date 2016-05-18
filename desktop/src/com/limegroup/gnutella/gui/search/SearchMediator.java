@@ -448,6 +448,8 @@ public final class SearchMediator {
                 downloadLine(lines[i]);
             }
         }
+
+        GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
     }
 
     /**
@@ -459,7 +461,6 @@ public final class SearchMediator {
         if (line == null) {
             throw new NullPointerException("Tried to download null line");
         }
-
         line.getSearchResult().download(false);
     }
 

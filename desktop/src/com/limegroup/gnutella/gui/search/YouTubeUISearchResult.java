@@ -54,6 +54,7 @@ public final class YouTubeUISearchResult extends AbstractUISearchResult {
         }
         //System.out.println("YT Download URL: " + sr.getDownloadUrl());
         showDetails(false);
+        GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
         UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE);
     }
 
