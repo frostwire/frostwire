@@ -409,6 +409,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void setupBuyNoAds() {
+        /*
         Preference p = findPreference("frostwire.prefs.offers.buy_no_ads");
         final PlayStore store = PlayStore.getInstance();
         if (!store.showAds()) { // this if is intentional
@@ -422,7 +423,7 @@ public class SettingsActivity extends PreferenceActivity {
                 store.buyNoAds(SettingsActivity.this);
                 return true;
             }
-        });
+        });*/
     }
 
     private void setupAbout() {

@@ -199,10 +199,10 @@
                 android:title="@string/support_frostwire"/>-->
     </PreferenceScreen>
 
-    <Preference
+    <!--<Preference
             android:key="frostwire.prefs.offers.buy_no_ads"
             android:title="@string/buy_no_ads">
-    </Preference>
+    </Preference>-->
 
     <Preference
             android:key="frostwire.prefs.show_about"
