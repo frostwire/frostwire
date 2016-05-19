@@ -201,6 +201,31 @@ final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         return initializer != null && initializer.getState() == TransferState.SEEDING;
     }
 
+    public boolean isDownloading() {
+        final TransferState state = initializer.getState();
+        // almost like TorrentUtils.isActive() but doesn't consider uploading or seeding.
+        final boolean downloading = state == TransferState.ALLOCATING ||
+                                    state == TransferState.CHECKING ||
+                                    state == TransferState.DOWNLOADING ||
+                                    state == TransferState.DOWNLOADING_METADATA ||
+                                    state == TransferState.DOWNLOADING_TORRENT;
+        final boolean pausedButUnfinished = !initializer.isCompleted() && state == TransferState.PAUSED;
+        return initializer != null  && (downloading || pausedButUnfinished);
+    }
+
+    public boolean isFinished() {
+        return initializer != null && initializer.isCompleted() && !isSeeding();
+    }
+
+    public String getDisplayName() {
+        if (initializer == null) {
+            return "";
+        }
+        return initializer.getDisplayName();
+    }
+
+
+
     /**
      * Returns the <tt>Object</tt> stored at the specified column in this
      * line of data.

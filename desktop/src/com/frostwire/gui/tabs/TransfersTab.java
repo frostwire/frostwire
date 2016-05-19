@@ -32,7 +32,11 @@ import java.awt.event.*;
  */
 public final class TransfersTab extends AbstractTab {
     final BTDownloadMediator downloadMediator;
-    private final String FILTER_TEXT_HINT = I18n.tr("filter transfers here");
+
+    // it will be a reference to the download mediator above who is the one interested.
+    private TransfersFilterModeListener transfersFilterModeListener;
+
+    public static final String FILTER_TEXT_HINT = I18n.tr("filter transfers here");
     private JToggleButton filterAllButton;
     private JToggleButton filterDownloadingButton;
     private JToggleButton filterSeedingButton;
@@ -48,11 +52,28 @@ public final class TransfersTab extends AbstractTab {
         initComponents();
     }
 
+    public enum FilterMode {
+        ALL,
+        DOWNLOADING,
+        SEEDING,
+        FINISHED
+    }
+
+    public interface TransfersFilterModeListener {
+        void onFilterUpdate(FilterMode mode, String searchKeywords);
+        void onFilterUpdate(String searchKeywords);
+    }
+
     private void initComponents() {
         mainComponent = new JPanel(new MigLayout("fill, insets 3px 3px 3px 3px, gap 0","[][grow]","[][grow]"));
         mainComponent.add(createTextFilterComponent(), "w 200!, h 25!, gapleft 5px, center, shrink");
         mainComponent.add(createFilterToggleButtons(),"w 332!, h 32!, pad 0 0 0 0, center, wrap");
         mainComponent.add(downloadMediator.getComponent(),"cell 0 1 2 1,grow"); // "cell <column> <row> <width> <height>"
+        setTransfersFilterModeListener(downloadMediator);
+    }
+
+    private void setTransfersFilterModeListener(TransfersFilterModeListener transfersFilterModeListener) {
+        this.transfersFilterModeListener = transfersFilterModeListener;
     }
 
     private JTextArea createTextFilterComponent() {
@@ -74,12 +95,14 @@ public final class TransfersTab extends AbstractTab {
         filterDownloadingButton = new JToggleButton(I18n.tr("Downloading"),false);
         filterSeedingButton = new JToggleButton(I18n.tr("Seeding"),false);
         filterFinishedButton = new JToggleButton(I18n.tr("Finished"),false);
-
+        filterAllButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.ALL));
+        filterDownloadingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.DOWNLOADING));
+        filterSeedingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.SEEDING));
+        filterFinishedButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.FINISHED));
         filterGroup.add(filterAllButton);
         filterGroup.add(filterDownloadingButton);
         filterGroup.add(filterSeedingButton);
         filterGroup.add(filterFinishedButton);
-
         filterButtonsContainer.add(filterAllButton);
         filterButtonsContainer.add(filterDownloadingButton);
         filterButtonsContainer.add(filterSeedingButton);
@@ -92,12 +115,14 @@ public final class TransfersTab extends AbstractTab {
     }
 
     private void onTextFilterKeyTyped() {
-        if (filterText.getText().equals("")) {
+        final String text = filterText.getText();
+        if (text.equals("")) {
             restoreFilterTextHint();
         } else {
             filterText.setForeground(Color.BLACK);
-
-            // TODO: invoke filtering code here on BTDownloadMediator.
+            if (transfersFilterModeListener != null) {
+                transfersFilterModeListener.onFilterUpdate(text);
+            }
         }
     }
 
@@ -119,12 +144,31 @@ public final class TransfersTab extends AbstractTab {
         public void mouseClicked(MouseEvent e) {
             clearFilterTextHint();
         }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            clearFilterTextHint();
+        }
     }
 
     private class TextFilterKeyAdapter extends KeyAdapter {
         @Override
         public void keyReleased(KeyEvent e) {
             onTextFilterKeyTyped();
+        }
+    }
+
+    private class OnFilterButtonToggledListener implements ActionListener {
+        final private FilterMode filterMode;
+         OnFilterButtonToggledListener(FilterMode filterMode) {
+            this.filterMode = filterMode;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (transfersFilterModeListener != null) {
+                transfersFilterModeListener.onFilterUpdate(filterMode, filterText.getText());
+            }
         }
     }
 }

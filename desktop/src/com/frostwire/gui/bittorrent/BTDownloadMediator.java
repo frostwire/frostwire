@@ -25,6 +25,7 @@ import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.filters.TableLineFilter;
 import com.frostwire.gui.library.LibraryUtils;
 import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
@@ -47,7 +48,10 @@ import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.TableSettings;
-import com.limegroup.gnutella.settings.*;
+import com.limegroup.gnutella.settings.BittorrentSettings;
+import com.limegroup.gnutella.settings.QuestionsHandler;
+import com.limegroup.gnutella.settings.TablesHandlerSettings;
+import com.limegroup.gnutella.settings.iTunesSettings;
 import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
@@ -65,12 +69,8 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRowFilteredModel, BTDownloadDataLine, BTDownload> {
-
+public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRowFilteredModel, BTDownloadDataLine, BTDownload> implements TransfersTab.TransfersFilterModeListener {
     private static final Logger LOG = Logger.getLogger(BTDownloadMediator.class);
-
-    public static final int MIN_HEIGHT = 150;
-
     /**
      * instance, for singleton access
      */
@@ -98,7 +98,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     private Action showInLibraryAction;
     private Action clearInactiveAction;
 
-    private SeedingFilter seedingFilter;
+    private TransfersFilter transfersFilter;
 
     private Action sendToItunesAction;
 
@@ -155,13 +155,12 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      */
     protected void setupConstants() {
         MAIN_PANEL = new PaddedPanel(I18n.tr("Transfers"));
-        seedingFilter = new SeedingFilter();
-        DATA_MODEL = new BTDownloadRowFilteredModel(seedingFilter);//new BTDownloadModel();
+        transfersFilter = new TransfersFilter();
+        DATA_MODEL = new BTDownloadRowFilteredModel(transfersFilter);//new BTDownloadModel();
         TABLE = new LimeJTable(DATA_MODEL);
         TABLE.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        /*
-      The actual download buttons instance.
-     */
+
+        // the actual download buttons instance.
         BTDownloadButtons downloadButtons = new BTDownloadButtons(this);
         BUTTON_ROW = downloadButtons.getComponent();
         updateTableFilters();
@@ -194,24 +193,82 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         return btDownload != null && TorrentUtil.isActive(btDownload);
     }
 
+    @Override
+    public void onFilterUpdate(TransfersTab.FilterMode mode, String searchKeywords) {
+        transfersFilter.update(mode, searchKeywords);
+        updateTableFilters();
+    }
+
+    @Override
+    public void onFilterUpdate(String searchKeywords) {
+        transfersFilter.update(searchKeywords);
+        updateTableFilters();
+    }
+
     /**
      * Filter out all the models who are being seeded.
      *
      * @author gubatron
      */
-    class SeedingFilter implements TableLineFilter<BTDownloadDataLine> {
+    private class TransfersFilter implements TableLineFilter<BTDownloadDataLine> {
+        private TransfersTab.FilterMode mode = TransfersTab.FilterMode.ALL;
+        private String searchKeywords;
+
         @Override
-        public boolean allow(BTDownloadDataLine node) {
-            return ApplicationSettings.SHOW_SEEDING_TRANSFERS.getValue() || (node != null && !node.isSeeding());
+        public boolean allow(BTDownloadDataLine line) {
+            if (line == null) {
+                return false;
+            }
+            boolean result = false;
+            if (mode == TransfersTab.FilterMode.SEEDING) {
+                result = line.isSeeding();
+            } else if (mode == TransfersTab.FilterMode.DOWNLOADING) {
+                result = line.isDownloading();
+            } else if (mode == TransfersTab.FilterMode.FINISHED) {
+                result = line.isFinished();
+            } else if (mode == TransfersTab.FilterMode.ALL) {
+                result = true;
+            }
+            return result && matchKeywords(line, searchKeywords);
+        }
+
+        private boolean matchKeywords(BTDownloadDataLine line, String searchKeywords) {
+            // "Steve Jobs" iTune's like search.
+            if (searchKeywords == null ||
+                searchKeywords.equals("") ||
+                searchKeywords.trim().equals(TransfersTab.FILTER_TEXT_HINT)) {
+                return true;
+            }
+
+            String hayStack = line.getDisplayName().toLowerCase();
+            final String[] tokens = searchKeywords.split("\\s");
+
+            if (tokens.length == 1) {
+                return hayStack.contains(tokens[0].toLowerCase());
+            } else {
+                for (String needle : tokens) {
+                    if (!hayStack.contains(needle.toLowerCase())) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public void update(TransfersTab.FilterMode mode, String searchKeywords) {
+            this.mode = mode;
+            this.searchKeywords = searchKeywords;
+        }
+
+        public void update(String searchKeywords) {
+            this.searchKeywords = searchKeywords;
         }
     }
 
-    public void updateTableFilters() {
-
+    void updateTableFilters() {
         if (TABLE == null || DATA_MODEL == null) {
             return;
         }
-
         DATA_MODEL.filtersChanged();
     }
 
@@ -343,15 +400,15 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * to automatically clear completed download and if the download is
      * complete.
      *
-     * @param dloader the <tt>Downloader</tt> to remove from the list if it is
+     * @param downloader the <tt>Downloader</tt> to remove from the list if it is
      *                complete.
      */
-    public void remove(BTDownload dloader) {
-        super.remove(dloader);
-        dloader.remove();
+    public void remove(BTDownload downloader) {
+        super.remove(downloader);
+        downloader.remove();
     }
 
-    public BTDownload[] getSelectedBTDownloads() {
+    BTDownload[] getSelectedBTDownloads() {
         int[] sel = TABLE.getSelectedRows();
         ArrayList<BTDownload> btdownloadList = new ArrayList<>(sel.length);
         for (int aSel : sel) {
@@ -416,10 +473,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         menu.add(new SkinMenuItem(BTDownloadActions.REMOVE_TORRENT_ACTION));
         menu.add(new SkinMenuItem(BTDownloadActions.REMOVE_TORRENT_AND_DATA_ACTION));
         menu.add(new SkinMenuItem(removeYouTubeAction));
-
-        menu.addSeparator();
-
-        menu.add(new SkinMenuItem(BTDownloadActions.TOGGLE_SEEDS_VISIBILITY_ACTION));
 
         SkinMenu advancedMenu = BTDownloadMediatorAdvancedMenuFactory.createAdvancedSubMenu();
         if (advancedMenu != null) {
@@ -641,7 +694,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         });
     }
 
-    public BTDownload[] getSelectedDownloaders() {
+    BTDownload[] getSelectedDownloaders() {
         int[] sel = TABLE.getSelectedRows();
         ArrayList<BTDownload> downloaders = new ArrayList<>(sel.length);
         for (int aSel : sel) {
@@ -681,12 +734,12 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         return engine.getTotalUpload();
     }
 
-    public boolean isClearable(BTDownload initializeObject) {
+    private boolean isClearable(BTDownload initializeObject) {
         TransferState state = initializeObject.getState();
         return state != TransferState.SEEDING && state != TransferState.CHECKING && initializeObject.isCompleted();
     }
 
-    public void removeCompleted() {
+    void removeCompleted() {
         int n = DATA_MODEL.getRowCount();
         for (int i = n - 1; i >= 0; i--) {
             BTDownloadDataLine btDownloadDataLine = DATA_MODEL.get(i);
@@ -746,7 +799,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     /**
      * Load from the last settings saved the previous sorting preferences of this mediator.
      */
-    public void restoreSorting() {
+    private void restoreSorting() {
         int sortIndex = BittorrentSettings.BTMEDIATOR_COLUMN_SORT_INDEX.getValue();
         boolean sortOrder = BittorrentSettings.BTMEDIATOR_COLUMN_SORT_ORDER.getValue();
 

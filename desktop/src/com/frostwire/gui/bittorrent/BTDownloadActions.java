@@ -31,7 +31,6 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.iTunesMediator;
-import com.limegroup.gnutella.settings.ApplicationSettings;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -57,7 +56,6 @@ final class BTDownloadActions {
     static final CopyMagnetAction COPY_MAGNET_ACTION = new CopyMagnetAction();
     static final CopyInfoHashAction COPY_HASH_ACTION = new CopyInfoHashAction();
     static final SendBTDownloaderAudioFilesToiTunes SEND_TO_ITUNES_ACTION = new SendBTDownloaderAudioFilesToiTunes();
-    static final ToggleSeedsVisibilityAction TOGGLE_SEEDS_VISIBILITY_ACTION = new ToggleSeedsVisibilityAction();
     static final ShareTorrentAction SHARE_TORRENT_ACTION = new ShareTorrentAction();
     static final PlaySingleMediaFileAction PLAY_SINGLE_AUDIO_FILE_ACTION = new PlaySingleMediaFileAction();
 
@@ -383,37 +381,6 @@ final class BTDownloadActions {
                     new ShareTorrentDialog(t).setVisible(true);
                 }
             }
-        }
-    }
-
-    static class ToggleSeedsVisibilityAction extends RefreshingAction {
-        private static final long serialVersionUID = -1632629016830943795L;
-
-        public ToggleSeedsVisibilityAction() {
-            updateName();
-            putValue(LimeAction.SHORT_NAME, I18n.tr("Show Details"));
-            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Show Torrent Details"));
-        }
-
-        private void updateName() {
-            if (ApplicationSettings.SHOW_SEEDING_TRANSFERS.getValue()) {
-                putValue(Action.NAME, I18n.tr("Hide Seeding Transfers"));
-                putValue(LimeAction.SHORT_NAME, I18n.tr("Hide Seeding Transfers"));
-                putValue(Action.SHORT_DESCRIPTION, I18n.tr("Don't show Seeding Transfers"));
-            } else {
-                putValue(Action.NAME, I18n.tr("Show Seeding Transfers"));
-                putValue(LimeAction.SHORT_NAME, I18n.tr("Show Seeding Transfers"));
-                putValue(Action.SHORT_DESCRIPTION, I18n.tr("Show Seeding Transfers"));
-            }
-
-        }
-
-        @Override
-        protected void performAction(ActionEvent e) {
-            //toggle the setting
-            ApplicationSettings.SHOW_SEEDING_TRANSFERS.setValue(!ApplicationSettings.SHOW_SEEDING_TRANSFERS.getValue());
-            updateName();
-            BTDownloadMediator.instance().updateTableFilters();
         }
     }
 
