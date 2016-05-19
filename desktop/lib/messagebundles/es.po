@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-19 12:26-0400\n"
-"PO-Revision-Date: 2016-01-02 23:07-0300\n"
+"PO-Revision-Date: 2016-05-19 12:46-0400\n"
 "Last-Translator: Alejandro Martinez <bloghogwarts@gmail.com>\n"
 "Language-Team: FTA <saintrecall@gmail.com>\n"
 "Language: es\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Launchpad-Export-Date: 2008-09-16 15:59+0000\n"
-"X-Generator: Poedit 1.8.6\n"
+"X-Generator: Poedit 1.8.7\n"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/HideExitDialog.java:57
 msgid "Do you want to hide FrostWire?"
@@ -1056,7 +1056,7 @@ msgid ""
 "works can make me liable for counterfeiting and criminal copyright "
 "infringement."
 msgstr ""
-"Entiendo que al obtener ganancias de trabajos sin licenciamiento autorizado "
+"Entiendo que el obtener ganancias de trabajos sin licenciamiento autorizado "
 "puede conducirme a demandas criminales por falsificación y violación de "
 "derechos de autor."
 
@@ -1075,7 +1075,7 @@ msgstr "Opciones para el pago de donaciones y propinas"
 #. We use "Bitcoin" for the protocol (upper case B), and "bitcoins" for the units of currency (lower case b)
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsRenderer.java:78
 msgid "Name your price, Send a Tip or Donation in"
-msgstr "Nombra tu precio, envia una propina o donación en "
+msgstr "Nombra tu precio, envía una propina o donación en "
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsRenderer.java:78
 msgid "bitcoins"
@@ -1083,7 +1083,7 @@ msgstr "bitcoins"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsRenderer.java:79
 msgid "Name your price, Send a Tip or Donation via Paypal"
-msgstr "Nombra tu precio, envia una propina o donación por Paypal"
+msgstr "Nombra tu precio, envía una propina o donación por Paypal"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/SendFileProgressDialog.java:70
 msgid "Preparing selection"
@@ -1180,7 +1180,7 @@ msgstr "¡Hecho! Ahora comparte el enlace"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:392
 msgid "Twitter it"
-msgstr "Twitealo"
+msgstr "Tuitéalo"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:393
 msgid "Send the message above to Twitter"
@@ -1229,7 +1229,7 @@ msgstr "Has olvidado introducir una ruta para la carpeta de datos del torrent"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSaveFolderComponent.java:114
 msgid "Please enter a valid path for the Torrent Data Folder"
 msgstr ""
-"Por favor introduzca una ruta válida para la carpeta de datos del torrent."
+"Por favor introduce una ruta válida para la carpeta de datos del torrent."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSaveFolderComponent.java:132
 msgid "The Torrent Data Folder cannot be inside the"
@@ -1242,7 +1242,7 @@ msgstr "No se pudo encontrar la ruta de la carpeta."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSaveFolderComponent.java:143
 msgid "The Torrent Data Folder cannot be a parent folder of the"
-msgstr "La carpeta de datos de torrent no puede contener una carpeta de"
+msgstr "La carpeta de datos de torrent no puede contener una carpeta padre de"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSaveFolderComponent.java:160
 msgid "Use Default"
@@ -1310,8 +1310,9 @@ msgid "Do you want to enable torrent seeding?"
 msgstr "¿Desea habilitar en sembrado de torrent?"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TransferActionsRenderer.java:70
+#, fuzzy
 msgid "SHARE the download url/magnet of this seeding transfer"
-msgstr ""
+msgstr "COMPARTE en enlace url/magnet de esta transferencia compartida"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TransferActionsRenderer.java:86
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultActionsRenderer.java:82
@@ -1324,6 +1325,8 @@ msgid ""
 "SEED this torrent transfer so others can download it. The more seeds, the "
 "faster the downloads."
 msgstr ""
+"COMPARTE la transferencia de este torrent para que otros puedan descargarlo. "
+"Entre más compartan, más rápida serán las descargas."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/slides/SlideControlsOverlay.java:134
 msgid "Leave a tip"
@@ -2042,15 +2045,15 @@ msgstr "Buscar y descargar archivos desde Internet."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:39
 msgid "filter transfers here"
-msgstr ""
+msgstr "filtrar transferencias aquí"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:49
 msgid "Transfers tab description goes here."
-msgstr ""
+msgstr "La descripción de la pestaña de transferencias va aquí."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:94
 msgid "All"
-msgstr ""
+msgstr "Todo"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/theme/BaseFileChooserUI.java:531
 msgid "FileChooser.lookInLabelText"
@@ -2157,7 +2160,7 @@ msgstr "FileChooser.renameErrorText"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/theme/FrostwireInputDialog.java:94
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/InstallerUpdater.java:187
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/UpdateMediator.java:184
@@ -2363,9 +2366,8 @@ msgstr ""
 "BitTorrent, Inc."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/ApplicationHeader.java:69
-#, fuzzy
 msgid "Search or enter a cloud sourced URL"
-msgstr "Busca o ingresa una URL de YouTube/SoundCloud"
+msgstr "Busca o ingresa una URL de la nube"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/ApplicationHeader.java:186
 msgid "A new update has been downloaded."
@@ -2454,9 +2456,8 @@ msgid "&Search"
 msgstr "&Buscar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/GUIMediator.java:115
-#, fuzzy
 msgid "&Transfers"
-msgstr "Transferencias"
+msgstr "&Transferencias"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/GUIMediator.java:116
 msgid "&Library"
@@ -4919,9 +4920,8 @@ msgid "Close Tab"
 msgstr "Cerrar pestaña"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:90
-#, fuzzy
 msgid "Close All Tabs"
-msgstr "Cerrar pestaña"
+msgstr "Cerrar todas las pestañas"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:92
 msgid "Close Other Tabs"
@@ -5011,6 +5011,8 @@ msgstr ""
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/tables/AbstractActionsRenderer.java:121
 msgid "SHARE the download-url or magnet-url of this file with a friend"
 msgstr ""
+"COMPARTE el enlace de la descarga o el enlace “magnet” de este archivo a un "
+"amigo"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/tables/ColumnSelectionMenu.java:50
 msgid "Revert To Default"
@@ -5042,16 +5044,16 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/org/h2/fulltext/FullTextLucene2.java:180
 msgid "SCHEMA"
-msgstr ""
+msgstr "ESQUEMA"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/org/h2/fulltext/FullTextLucene2.java:181
 msgid "TABLE"
-msgstr ""
+msgstr "TABLA"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/org/h2/fulltext/FullTextLucene2.java:528
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/org/h2/fulltext/FullTextLucene2.java:545
 msgid "COLUMN_NAME"
-msgstr ""
+msgstr "NOMBRE_DE_COLUMNA"
 
 #~ msgid "Hide Seeding Transfers"
 #~ msgstr "Ocultar transferencia de compartidos"
