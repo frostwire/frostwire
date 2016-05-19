@@ -30,7 +30,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -839,7 +838,7 @@ public final class BTEngine {
             try {
                 session.asyncAddTorrent(new TorrentInfo(torrent), saveDir, priorities, resume);
             } catch (Throwable e) {
-                LOG.error("Unable to restore download from previous session", e);
+                LOG.error("Unable to restore download from previous session. ("+torrent.getAbsolutePath()+")", e);
             }
         }
     }

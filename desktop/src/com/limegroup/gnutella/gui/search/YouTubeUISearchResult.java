@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -47,14 +48,11 @@ public final class YouTubeUISearchResult extends AbstractUISearchResult {
 
     @Override
     public void download(boolean partial) {
-        if (partial) {
-            //GUIMediator.instance().openYouTubeVideoUrl(sr.getDetailsUrl());
-        } else {
+        if (!partial) {
+            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
             GUIMediator.instance().openYouTubeItem(sr);
         }
-        //System.out.println("YT Download URL: " + sr.getDownloadUrl());
         showDetails(false);
-        GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
         UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE);
     }
 

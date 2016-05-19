@@ -194,6 +194,7 @@ final class BTDownloadActions {
         public void performAction(ActionEvent e) {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             TorrentUtil.askForPermissionToSeedAndSeedDownloads(downloaders);
+            BTDownloadMediator.instance().updateTableFilters();
         }
     }
 
@@ -210,6 +211,7 @@ final class BTDownloadActions {
             for (int i = 0; i < downloaders.length; i++) {
                 downloaders[i].pause();
             }
+            BTDownloadMediator.instance().updateTableFilters();
             UXStats.instance().log(UXAction.DOWNLOAD_PAUSE);
         }
     }
@@ -259,6 +261,7 @@ final class BTDownloadActions {
                 downloaders[i].setDeleteDataWhenRemove(_deleteData);
             }
             BTDownloadMediator.instance().removeSelection();
+            BTDownloadMediator.instance().updateTableFilters();
             UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);
         }
     }

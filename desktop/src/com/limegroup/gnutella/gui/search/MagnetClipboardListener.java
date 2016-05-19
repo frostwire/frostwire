@@ -15,6 +15,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.logging.Logger;
 import com.limegroup.gnutella.MagnetOptions;
 import com.limegroup.gnutella.MediaType;
@@ -168,7 +169,7 @@ public class MagnetClipboardListener extends WindowAdapter {
                         }
                     }
                 }
-                GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
+                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
             }
         };
         GUIMediator.safeInvokeLater(r);

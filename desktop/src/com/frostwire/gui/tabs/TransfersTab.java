@@ -59,6 +59,18 @@ public final class TransfersTab extends AbstractTab {
         FINISHED
     }
 
+    public void showTransfers(FilterMode mode) {
+        if (mode == FilterMode.ALL) {
+            filterAllButton.doClick();
+        } else if (mode == FilterMode.DOWNLOADING) {
+            filterDownloadingButton.doClick();
+        } else if (mode == FilterMode.FINISHED) {
+            filterFinishedButton.doClick();
+        } else if (mode == FilterMode.SEEDING) {
+            filterSeedingButton.doClick();
+        }
+    }
+
     public interface TransfersFilterModeListener {
         void onFilterUpdate(FilterMode mode, String searchKeywords);
         void onFilterUpdate(String searchKeywords);

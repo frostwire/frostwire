@@ -16,6 +16,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTDownload;
+import com.frostwire.gui.tabs.TransfersTab;
 import com.limegroup.gnutella.ActivityCallback;
 
 import javax.swing.*;
@@ -49,7 +50,7 @@ public final class VisualConnectionCallback implements ActivityCallback {
     public void showDownloads() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
+                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
             }
         });
     }

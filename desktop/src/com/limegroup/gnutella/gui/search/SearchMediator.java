@@ -18,6 +18,7 @@ package com.limegroup.gnutella.gui.search;
 import com.frostwire.gui.filters.SearchFilter;
 import com.frostwire.gui.filters.SearchFilterFactory;
 import com.frostwire.gui.filters.SearchFilterFactoryImpl;
+import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.*;
 import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
@@ -443,13 +444,13 @@ public final class SearchMediator {
             return;
         }
 
+        GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
+
         for (int i = 0; i < lines.length; i++) {
             if (lines[i] != null) {
                 downloadLine(lines[i]);
             }
         }
-
-        GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
     }
 
     /**

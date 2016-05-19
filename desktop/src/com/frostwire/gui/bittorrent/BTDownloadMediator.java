@@ -265,7 +265,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         }
     }
 
-    void updateTableFilters() {
+    public void updateTableFilters() {
         if (TABLE == null || DATA_MODEL == null) {
             return;
         }
@@ -749,6 +749,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 DATA_MODEL.remove(i);
             }
         }
+        updateTableFilters();
     }
 
     public void stopCompleted() {
@@ -882,6 +883,8 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     protected void onComplete() {
                         final File savedFile = getSaveLocation();
                         if (savedFile.exists()) {
+                            BTDownloadMediator.instance().updateTableFilters();
+
                             if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
                                 if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
                                     iTunesMediator.instance().scanForSongs(savedFile);
