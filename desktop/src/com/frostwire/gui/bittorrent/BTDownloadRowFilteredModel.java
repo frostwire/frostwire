@@ -1,12 +1,11 @@
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.gui.filters.TableLineFilter;
+import com.frostwire.transfers.TransferState;
+import com.limegroup.gnutella.settings.BittorrentSettings;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.frostwire.transfers.TransferState;
-
-import com.frostwire.gui.filters.TableLineFilter;
-import com.limegroup.gnutella.settings.BittorrentSettings;
 
 /**
  * Filters out certain rows from the data model.
@@ -37,7 +36,7 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
             throw new NullPointerException("null filter");
 
         FILTER = f;
-        HIDDEN = new ArrayList<BTDownloadDataLine>();
+        HIDDEN = new ArrayList<>();
     }
 
     /**
