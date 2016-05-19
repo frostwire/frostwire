@@ -15,18 +15,10 @@
 
 package com.frostwire.gui.tabs;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JSplitPane;
-
-import com.frostwire.gui.bittorrent.BTDownloadMediator;
-import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.SearchMediator;
-import com.limegroup.gnutella.settings.UISettings;
+
+import javax.swing.*;
 
 /**
  * This class constructs the search/download tab, including all UI elements.
@@ -37,19 +29,13 @@ public final class SearchDownloadTab extends AbstractTab {
      * Split pane for the split between the search and download sections
      * of the window.
      */
-    private final JSplitPane searchDownloadSplitPane;
+    //private final JSplitPane searchDownloadSplitPane;
 
-    /**
-     * Constructs the tab for searches and downloads.
-     *
-     * @param SEARCH_MEDIATOR the <tt>SearchMediator</tt> instance for 
-     *  obtaining the necessary ui components to add
-     * @param downloadMediator the <tt>DownloadMediator</tt> instance for 
-     *  obtaining the necessary ui components to add
-     */
-    public SearchDownloadTab(BTDownloadMediator downloadMediator) {
-        super(I18n.tr("Search"), I18n.tr("Search and Download Files from the Internet."), "search_tab");
-
+    public SearchDownloadTab() {
+        super(I18n.tr("Search"),
+              I18n.tr("Search and Download Files from the Internet."),
+              "search_tab");
+        /*
         searchDownloadSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, SearchMediator.getResultComponent(), downloadMediator.getComponent());
         searchDownloadSplitPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
         searchDownloadSplitPane.setContinuousLayout(true);
@@ -66,13 +52,15 @@ public final class SearchDownloadTab extends AbstractTab {
                 UISettings.UI_TRANSFERS_DIVIDER_LOCATION.setValue(splitPane.getDividerLocation());
             }
         });
+        */
     }
 
     public JComponent getComponent() {
-        return searchDownloadSplitPane;
+        //return searchDownloadSplitPane;
+        return SearchMediator.getResultComponent();
     }
     
     public void setDividerLocation(int newLocation) {
-        searchDownloadSplitPane.setDividerLocation(newLocation);
+        //searchDownloadSplitPane.setDividerLocation(newLocation);
     }
 }

@@ -111,7 +111,9 @@ public final class GUIMediator {
     private boolean _remoteDownloadsAllowed;
 
     public enum Tabs {
-        SEARCH(I18n.tr("&Search")), LIBRARY(I18n.tr("&Library"));
+        SEARCH(I18n.tr("&Search")),
+        TRANSFERS(I18n.tr("&Transfers")),
+        LIBRARY(I18n.tr("&Library"));
 
         private Action navAction;
 
@@ -667,7 +669,7 @@ public final class GUIMediator {
         Runnable onOpenRunnable = new Runnable() {
             @Override
             public void run() {
-                setWindow(GUIMediator.Tabs.SEARCH);
+                setWindow(Tabs.TRANSFERS);
             }
         };
         getBTDownloadMediator().openTorrentFile(torrentFile, partialSelection, onOpenRunnable);
@@ -676,12 +678,12 @@ public final class GUIMediator {
 
     public void openTorrentForSeed(File torrentFile, File saveDir) {
         getBTDownloadMediator().openTorrentFileForSeed(torrentFile, saveDir);
-        setWindow(GUIMediator.Tabs.SEARCH);
+        setWindow(Tabs.TRANSFERS);
     }
 
     public final void openTorrentURI(String uri, boolean partialDownload) {
         getBTDownloadMediator().openTorrentURI(uri, partialDownload);
-        setWindow(GUIMediator.Tabs.SEARCH);
+        setWindow(Tabs.TRANSFERS);
     }
 
     /**
@@ -1470,22 +1472,22 @@ public final class GUIMediator {
 
     public void openTorrentSearchResult(TorrentSearchResult sr, boolean partial) {
         getBTDownloadMediator().openTorrentSearchResult(sr, partial);
-        setWindow(Tabs.SEARCH);
+        setWindow(Tabs.TRANSFERS);
     }
 
      public void openSoundcloudTrackUrl(String trackUrl, String title) {
         getBTDownloadMediator().downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, null);
-        setWindow(GUIMediator.Tabs.SEARCH);
+        setWindow(Tabs.TRANSFERS);
     }
 
     public void openSoundcloudTrackUrl(String trackUrl, String title, SoundcloudSearchResult sr) {
         getBTDownloadMediator().downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, sr);
-        setWindow(GUIMediator.Tabs.SEARCH);
+        setWindow(Tabs.TRANSFERS);
     }
 
     public void openYouTubeItem(YouTubeCrawledSearchResult sr) {
         getBTDownloadMediator().openYouTubeItem(sr);
-        setWindow(GUIMediator.Tabs.SEARCH);
+        setWindow(Tabs.TRANSFERS);
     }
 
     public void launchYouTubePreviewInBrowser(YouTubeCrawledStreamableSearchResult sr) {
@@ -1507,12 +1509,12 @@ public final class GUIMediator {
 
     public void openSlide(Slide slide) {
         getBTDownloadMediator().openSlide(slide);
-        setWindow(GUIMediator.Tabs.SEARCH);
+        setWindow(Tabs.TRANSFERS);
     }
 
     public void openHttp(final String httpUrl, final String title, final String saveFileAs, final long fileSize) {
         getBTDownloadMediator().openHttp(httpUrl, title, saveFileAs, fileSize);
-        setWindow(GUIMediator.Tabs.SEARCH);
+        setWindow(Tabs.TRANSFERS);
     }
 
     public void startSearch(String query) {

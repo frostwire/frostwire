@@ -15,26 +15,21 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
+import com.frostwire.logging.Logger;
+import com.limegroup.gnutella.MagnetOptions;
+import com.limegroup.gnutella.MediaType;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.util.QueryUtils;
+import org.limewire.concurrent.ExecutorsHelper;
+
+import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-
-import org.limewire.concurrent.ExecutorsHelper;
-
-import com.frostwire.logging.Logger;
-import com.limegroup.gnutella.MagnetOptions;
-import com.limegroup.gnutella.MediaType;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.util.QueryUtils;
 
 /**
  *
@@ -173,7 +168,7 @@ public class MagnetClipboardListener extends WindowAdapter {
                         }
                     }
                 }
-                GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);
+                GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
             }
         };
         GUIMediator.safeInvokeLater(r);

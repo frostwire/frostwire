@@ -19,7 +19,6 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
-import com.frostwire.search.archiveorg.ArchiveorgCrawledStreamableSearchResult;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -47,6 +46,7 @@ public final class ArchiveorgUISearchResult extends AbstractUISearchResult {
     public void download(boolean partial) {
         GUIMediator.instance().openHttp(sr.getDownloadUrl(), sr.getDisplayName(), sr.getFilename(), sr.getSize());
         showDetails(false);
+        GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
         UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE);
     }
 

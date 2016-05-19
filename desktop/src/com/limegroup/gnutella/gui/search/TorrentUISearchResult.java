@@ -54,6 +54,7 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
         GUIMediator gm = GUIMediator.instance();
         gm.openTorrentSearchResult(sr, partial);
         showDetails(false);
+        GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
         UXStats.instance().log((sr instanceof TorrentCrawledSearchResult) ? UXAction.DOWNLOAD_PARTIAL_TORRENT_FILE : UXAction.DOWNLOAD_FULL_TORRENT_FILE);
     }
 

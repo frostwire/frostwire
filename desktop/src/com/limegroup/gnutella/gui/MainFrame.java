@@ -41,6 +41,7 @@ import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
 import com.apple.eawt.FullScreenUtilities;
+import com.frostwire.gui.tabs.TransfersTab;
 import net.miginfocom.swing.MigLayout;
 
 import org.limewire.setting.SettingsGroupManager;
@@ -275,7 +276,8 @@ public final class MainFrame {
      * Build the Tab Structure based on advertising mode and Windows
      */
     private void buildTabs() {
-        TABS.put(GUIMediator.Tabs.SEARCH, new SearchDownloadTab(getBTDownloadMediator()));
+        TABS.put(GUIMediator.Tabs.SEARCH, new SearchDownloadTab());
+        TABS.put(Tabs.TRANSFERS, new TransfersTab(getBTDownloadMediator()));
         TABS.put(GUIMediator.Tabs.LIBRARY, new LibraryTab(getLibraryMediator()));
 
         TABBED_PANE.setPreferredSize(new Dimension(10000, 10000));

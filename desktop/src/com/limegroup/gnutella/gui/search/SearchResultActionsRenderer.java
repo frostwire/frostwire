@@ -186,6 +186,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             if (sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult) {
                 searchResult.download(true);
                 UXStats.instance().log(UXAction.SEARCH_RESULT_DETAIL_VIEW);
+                GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
             }
         }
     }
@@ -194,6 +195,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         if (e.getButton() == MouseEvent.BUTTON1) {
             searchResult.download(false);
             UXStats.instance().log(UXAction.SEARCH_RESULT_ROW_BUTTON_DOWNLOAD);
+            GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
         }
     }
 
