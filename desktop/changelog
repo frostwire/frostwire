@@ -4,6 +4,7 @@ frostwire (6.3.0) stable; urgency=high
   * If seeding setting is active, finished cloud transfers are seeded.
   * Improved 'Search for Keywords' suggestions for episodic queries.
   * New jlibtorrent 1.1.0.30
+  * Spanish Translation Updated
 
  -- FrostWire Team <contact@frostwire.com>  Thu, 19 May 2016 11:56:00 -0500
 
