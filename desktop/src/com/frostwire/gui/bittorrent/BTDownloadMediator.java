@@ -883,7 +883,12 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     protected void onComplete() {
                         final File savedFile = getSaveLocation();
                         if (savedFile.exists()) {
-                            BTDownloadMediator.instance().updateTableFilters();
+                            GUIMediator.safeInvokeLater(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                BTDownloadMediator.instance().updateTableFilters();
+                                                            }
+                                                        });
 
                             if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
                                 if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {

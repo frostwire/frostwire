@@ -93,7 +93,6 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
             BTDownloadDataLine tl = hidden.get(i);
             addSorted(tl);
         }
-
     }
 
     @Override
