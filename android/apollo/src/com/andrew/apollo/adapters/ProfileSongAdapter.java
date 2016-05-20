@@ -60,6 +60,8 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
      */
     private final LayoutInflater mInflater;
 
+    private final Object mDataListLock = new Object();
+
     /**
      * Fake header
      */
@@ -185,6 +187,22 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
             return ITEM_VIEW_TYPE_HEADER;
         }
         return ITEM_VIEW_TYPE_MUSIC;
+    }
+
+    @Override
+    public void insert(Song object, int index) {
+        super.insert(object, index);
+        synchronized (mDataListLock) {
+           mDataList.add(index,object);
+        }
+    }
+
+    @Override
+    public void remove(Song object) {
+        super.remove(object);
+        synchronized (mDataListLock) {
+            mDataList.remove(object);
+        }
     }
 
 

@@ -19,11 +19,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.ProfileSongAdapter;
+import com.andrew.apollo.dragdrop.DragSortListView;
 import com.andrew.apollo.dragdrop.DragSortListView.DragScrollProfile;
 import com.andrew.apollo.dragdrop.DragSortListView.DropListener;
 import com.andrew.apollo.dragdrop.DragSortListView.RemoveListener;
@@ -73,6 +76,19 @@ public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Son
         // Remove the song from playlist
         menu.add(Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_GROUP_ID, FragmentMenuItems.REMOVE_FROM_PLAYLIST, Menu.NONE,
                 getString(R.string.context_menu_remove_from_playlist));
+    }
+
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
+        super.onCreateView(inflater,container, savedInstanceState);
+        DragSortListView dsListView = (DragSortListView) mListView;
+        dsListView.setDropListener(this);
+        // Set the swipe to remove listener
+        dsListView.setRemoveListener(this);
+        // Quick scroll while dragging
+        dsListView.setDragScrollProfile(this);
+        return mRootView;
     }
 
     @Override
