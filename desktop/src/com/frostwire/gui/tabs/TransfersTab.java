@@ -96,6 +96,7 @@ public final class TransfersTab extends AbstractTab {
         filterText.setForeground(Color.GRAY);
         filterText.addMouseListener(new TextFilterMouseAdapter());
         filterText.addKeyListener(new TextFilterKeyAdapter());
+        filterText.addFocusListener(new TextFilterFocusAdapter());
         filterText.selectAll();
         return filterText;
     }
@@ -151,6 +152,12 @@ public final class TransfersTab extends AbstractTab {
         filterText.selectAll();
     }
 
+    private void onFilterTextFocusLost() {
+        if (filterText.getText().equals("")) {
+            restoreFilterTextHint();
+        }
+    }
+
     private class TextFilterMouseAdapter extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -167,6 +174,13 @@ public final class TransfersTab extends AbstractTab {
         @Override
         public void keyReleased(KeyEvent e) {
             onTextFilterKeyTyped();
+        }
+    }
+
+    private class TextFilterFocusAdapter extends FocusAdapter {
+        @Override
+        public void focusLost(FocusEvent e) {
+            onFilterTextFocusLost();
         }
     }
 
