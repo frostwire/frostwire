@@ -121,6 +121,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void onResume() {
         super.onResume();
         initStorageRelatedRichNotifications(getView());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         subscription = TimerService.subscribe(this, UI_UPDATE_INTERVAL_IN_SECS);
         onTime();
     }
