@@ -1,4 +1,4 @@
-FrostWire 1.7.4 - MAY/17/2016
+FrostWire 1.7.4 - MAY/23/2016
  - Issues saving to SD card on multiple devices fixed.
  - New 'Seed' action available on 'My files'. Create and seed
    a torrent of a file or many in one touch.
@@ -14,6 +14,7 @@ FrostWire 1.7.4 - MAY/17/2016
  - No more repeated YouTube video search results. Results are now grouped, when
    touched the user can select the video format/quality to download.
  - Dialogs make over. All dialogs have uniform look and re-appear on device rotation.
+ - Fixes issue with playlist song drag-n-drop reordering. Thanks @grzesiekrzaca!
  - Improved shutdown.
 
 FrostWire 1.7.3 - APR/15/2016
