@@ -42,6 +42,7 @@ import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NotificationUpdateDemon;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
@@ -109,6 +110,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private TimerSubscription playerSubscription;
     private BroadcastReceiver mainBroadcastReceiver;
     private boolean externalStoragePermissionsRequested = false;
+    private NotificationUpdateDemon notificationUpdateDemon;
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -416,6 +418,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         checkExternalStoragePermissionsOrBindMusicService();
+        notificationUpdateDemon = new NotificationUpdateDemon(getApplicationContext());
+        notificationUpdateDemon.start();
     }
 
     private void checkExternalStoragePermissionsOrBindMusicService() {
