@@ -79,7 +79,7 @@ public final class TransfersTab extends AbstractTab {
     private void initComponents() {
         mainComponent = new JPanel(new MigLayout("fill, insets 3px 3px 3px 3px, gap 0","[][grow]","[][grow]"));
         mainComponent.add(createTextFilterComponent(), "w 200!, h 25!, gapleft 5px, center, shrink");
-        mainComponent.add(createFilterToggleButtons(),"w 332!, h 32!, pad 0 0 0 0, center, wrap");
+        mainComponent.add(createFilterToggleButtons(),"w 400!, h 32!, pad 0 0 0 0, center, wrap");
         mainComponent.add(downloadMediator.getComponent(),"cell 0 1 2 1,grow"); // "cell <column> <row> <width> <height>"
         setTransfersFilterModeListener(downloadMediator);
     }
