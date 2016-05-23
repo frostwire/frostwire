@@ -191,16 +191,16 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
 
     @Override
     public void insert(Song object, int index) {
-        super.insert(object, index);
         synchronized (mDataListLock) {
-           mDataList.add(index,object);
+            super.insert(object, index);
+            mDataList.add(index,object);
         }
     }
 
     @Override
     public void remove(Song object) {
-        super.remove(object);
         synchronized (mDataListLock) {
+            super.remove(object);
             mDataList.remove(object);
         }
     }
