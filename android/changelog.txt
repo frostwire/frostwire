@@ -16,6 +16,7 @@ FrostWire 1.7.4 - MAY/23/2016
  - Dialogs make over. All dialogs have uniform look and re-appear on device rotation.
  - Fixes issue with playlist song drag-n-drop reordering. Thanks @grzesiekrzaca!
  - Improved shutdown.
+ - Fixes Torlock search.
 
 FrostWire 1.7.3 - APR/15/2016
  - Soundcloud search results include estimated file size.
