@@ -31,10 +31,10 @@ public class TorLockSearchPerformer extends TorrentRegexSearchPerformer<TorLockS
     private static final int MAX_RESULTS = 10;
     private static final String REGEX = "(?is)<a href=/torrent/([0-9]*?/.*?\\.html)>";
     private static final String HTML_REGEX = "(?is).*?<a href=\"/tor/(?<torrentid>.*?).torrent\">.*?" +
-            "<dt>NAME</dt><dd>(?<filename>.*?).torrent</dd>.*?" +
-            "<dt>SIZE</dt><dd>(?<filesize>.*?) in.*?" +
-            "<dt>ADDED</dt><dd>Uploaded on (?<time>.*?) by.*?" +
-            "<dt>SWARM</dt><dd><b style=\"color:#FF5400\">(?<seeds>\\d*?)</b>";
+            "<dt>NAME</dt>.?<dd>(?<filename>.*?).torrent</dd>.*?"  +
+            "<dt>SIZE</dt>.?<dd>(?<filesize>.*?) in.*?"  +
+            "<dt>ADDED</dt>.?<dd>Uploaded on (?<time>.*?) by.*?"  +
+            "<dt>SWARM</dt>.?<dd><b style=\"color:#FF5400\">(?<seeds>\\d*?)</b>";
 
     public TorLockSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
@@ -70,7 +70,7 @@ public class TorLockSearchPerformer extends TorrentRegexSearchPerformer<TorLockS
     }
 
 
-     /**
+/*
      public static void main(String[] args) throws Exception {
          //REGEX TEST CODE
 
@@ -83,7 +83,7 @@ public class TorLockSearchPerformer extends TorrentRegexSearchPerformer<TorLockS
 //         }
 
 
-         String resultHTML = FileUtils.readFileToString(new File("/Users/gubatron/Desktop/torlock-result.html"));
+         String resultHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/torlock-result.html"));
          final Pattern detailPattern = Pattern.compile(HTML_REGEX);
          final SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(resultHTML));
 
@@ -97,5 +97,5 @@ public class TorLockSearchPerformer extends TorrentRegexSearchPerformer<TorLockS
              System.out.println("No detail matched.");
          }
      }
-     */
+*/
 }
