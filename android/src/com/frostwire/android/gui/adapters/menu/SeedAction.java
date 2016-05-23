@@ -213,7 +213,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         btDownload.resume();
         final TorrentHandle torrentHandle = BTEngine.getInstance().getSession().findTorrent(new Sha1Hash(btDownload.getInfoHash()));
         if (torrentHandle != null) {
-            forceDHTAnnounceIfNoPeers(torrentHandle, null);
+            forceDHTAnnounceIfNoPeers(torrentHandle);
         } else {
             LOG.warn("seedBTDownload() could not find torrentHandle for existing torrent.");
         }
@@ -268,7 +268,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
                 forceDHTAnnounceIfNoPeers(torrentHandle);
                 torrentHandle.forceRecheck();
-                torrentHandle.forceReannounce();
             }
         });
     }
@@ -307,10 +306,8 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private static void forceDHTAnnounceIfNoPeers(final TorrentHandle torrentHandle) {
         final ArrayList<PeerInfo> peerInfos = torrentHandle.peerInfo();
         final TorrentStatus status = torrentHandle.getStatus();
-        final ArrayList<Pair<String, Integer>> dhtNodes = torrentHandle.getTorrentInfo().nodes();
         LOG.info("================================================");
         LOG.info("list peers        : " + status.getListPeers());
-        LOG.info("DHT Nodes         : " + dhtNodes.size());
         LOG.info("num connections   : " + status.getNumConnections());
         LOG.info("connect candidates: " + status.getConnectCandidates());
         LOG.info("announcing to DHT : " + status.announcingToDht());

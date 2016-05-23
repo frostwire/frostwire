@@ -627,8 +627,11 @@ public final class BTEngine {
     }
 
     private void logListenFailed(ListenFailedAlert alert) {
-        String s = "endpoint: " + alert.listenInterface() + " type:" + alert.swig().getSock_type();
-        LOG.info("Listen failed on " + s);
+        TcpEndpoint endp = alert.endpoint();
+        String addr = endp.address().swig().to_string();
+        final String message = alert.getError().message();
+        String s = "endpoint: " + addr + ":" + endp.port() + " type:" + alert.swig().getSock_type();
+        LOG.info("Listen failed on " + s + " (error: " + message + ")");
     }
 
     private void migrateVuzeDownloads() {
