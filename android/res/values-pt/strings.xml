@@ -414,6 +414,7 @@
     <string name="drawer_open">Abrir Gaveta de navegação</string>
     <string name="context_menu_remove_from_recent">Remover da recente</string>
     <string name="use_torlock">Use TorLock</string>
+    <string name="use_torrentdownloads">Use TorrentDownloads</string>
     <string name="use_monova">Use Monova</string>
     <string name="transfer_status_demuxing">Demuxeando</string>
     <string name="cannot_be_undone">Isso não pode ser desfeita</string>

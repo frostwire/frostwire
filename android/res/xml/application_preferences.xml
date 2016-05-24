@@ -160,6 +160,10 @@
                 android:summary="@string/use_torlock"
                 android:title="@string/use_torlock"/>
         <CheckBoxPreference
+                android:key="frostwire.prefs.search.use_torrentdownloads"
+                android:summary="@string/use_torrentdownloads"
+                android:title="@string/use_torrentdownloads"/>
+        <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_yify"
                 android:summary="@string/use_yify_summary"
                 android:title="@string/use_yify"/>

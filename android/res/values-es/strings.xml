@@ -406,6 +406,7 @@
     <string name="paused_song_name">Pausado %s</string>
     <string name="use_bitsnoop">Usar BitSnoop</string>
     <string name="use_torlock">Usar TorLock</string>
+    <string name="use_torrentdownloads">Usar TorrentDownloads</string>
     <string name="use_eztv">Usar Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="player_paused_press_and_hold_to_stop">Reproductor pausado. (Truco: Mantén presionado el botón de pausa por unos segundos para detener por completo)</string>

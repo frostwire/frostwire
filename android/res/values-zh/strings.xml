@@ -356,6 +356,7 @@
     <string name="add_transfer_label">貼上 Magnet（磁力）鏈接或 Torrent 鏈接</string>
     <string name="drawer_open">打開導覽面板</string>
     <string name="use_torlock">使用 TorLock</string>
+    <string name="use_torrentdownloads">使用 TorrentDownloads</string>
     <string name="use_monova">使用 Monova</string>
     <string name="enable_wifi_sharing_summary">和本地 Wi-Fi 網絡上的 Peer（用戶節點）共享檔案。</string>
     <string name="delete_this_track">刪除此曲目</string>

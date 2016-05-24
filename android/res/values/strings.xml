@@ -450,6 +450,7 @@
     <string name="paused_song_name">Paused %s</string>
     <string name="use_bitsnoop">Use BitSnoop</string>
     <string name="use_torlock">Use TorLock</string>
+    <string name="use_torrentdownloads">Use TorrentDownloads</string>
     <string name="use_eztv">Use Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="player_paused_press_and_hold_to_stop">Player paused. (Tip: Press and hold to stop)</string>
