@@ -39,7 +39,10 @@ import android.widget.RelativeLayout;
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
+import com.frostwire.android.AndroidPlatform;
+import com.frostwire.android.LollipopFileSystem;
 import com.frostwire.android.R;
+import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SoftwareUpdater;
@@ -47,10 +50,7 @@ import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.MainMenuAdapter;
 import com.frostwire.android.gui.adnetworks.Offers;
-import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
-import com.frostwire.android.gui.dialogs.NewTransferDialog;
-import com.frostwire.android.gui.dialogs.TermsUseDialog;
-import com.frostwire.android.gui.dialogs.YesNoDialog;
+import com.frostwire.android.gui.dialogs.*;
 import com.frostwire.android.gui.fragments.BrowsePeerFragment;
 import com.frostwire.android.gui.fragments.MainFragment;
 import com.frostwire.android.gui.fragments.SearchFragment;
@@ -62,7 +62,9 @@ import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
+import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.Platforms;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
@@ -459,12 +461,40 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void mainResume() {
+        checkSDPermission();
+
         syncSlideMenu();
         if (firstTime) {
             firstTime = false;
             Engine.instance().startServices(); // it's necessary for the first time after wizard
         }
         SoftwareUpdater.instance().checkForUpdate(this);
+    }
+
+    private void checkSDPermission() {
+        File data = Platforms.data();
+        if (!Platforms.fileSystem().canWrite(data) &&
+                !SDPermissionDialog.visible) {
+            SDPermissionDialog dlg = SDPermissionDialog.newInstance();
+            dlg.show(getFragmentManager());
+        }
+    }
+
+    private void handleSDPermissionDialogClick(int which) {
+        if (which == Dialog.BUTTON_POSITIVE) {
+            StoragePicker.show(this);
+        } else {
+            // TODO:
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
+            StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void checkLastSeenVersion() {
@@ -509,6 +539,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             onShutdownDialogButtonPositive();
         } else if (tag.equals(TermsUseDialog.TAG)) {
             controller.startWizardActivity();
+        } else if (tag.equals(SDPermissionDialog.TAG)) {
+            handleSDPermissionDialogClick(which);
         }
     }
 
