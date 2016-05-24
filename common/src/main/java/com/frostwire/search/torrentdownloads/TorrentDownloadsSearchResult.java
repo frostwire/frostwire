@@ -1,8 +1,4 @@
-
 /**
- * Created by alejandroarturom on 23-05-16.
- */
-/*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
@@ -34,8 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 /**
- * @author gubatron
- * @author aldenml
+ * @author alejandroarturom
  */
 public class TorrentDownloadsSearchResult extends AbstractTorrentSearchResult {
 

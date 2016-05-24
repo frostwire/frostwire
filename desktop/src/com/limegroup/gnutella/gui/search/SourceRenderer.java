@@ -39,7 +39,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.tables.DefaultTableBevelledCellRenderer;
 
 /**
- * 
+ *
  * @author gubatron
  * @author aldenml
  *

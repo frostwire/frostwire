@@ -1,11 +1,6 @@
-
-
-/**
- * Created by alejandroarturom on 23-05-16.
- */
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,33 +18,22 @@
 
 package com.frostwire.search.torrentdownloads;
 
-import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
-import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.SearchResult;
-import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
- * @author gubatron
- * @author aldenml
+ * @author alejandroarturom
  */
 public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer<TorrentDownloadsSearchResult> {
 
     private static final int MAX_RESULTS = 10;
     private static final String REGEX = "(?is)<a href=\"/torrent/([0-9]*?/.*?)\">*?";
     private static final String HTML_REGEX = "(?is).*?<li><a rel=\"nofollow\" href=\"http://itorrents.org/torrent/(?<torrentid>.*?).torrent?(.*?)\">.*?"  +
-           "<span>Name:.?</span>(?<filename>.*?)</a></p>.*?"   +
+            "<span>Name:.?</span>(?<filename>.*?)</a></p>.*?"   +
             "<span>Total Size:.?</span>(?<filesize>.*?)&nbsp;(?<unit>[A-Z]+)</p></div>.*?"  +
             "<span>Seeds:.?</span>.?(?<seeds>\\d*?)</p></div>.*?" +
-           "<span>Torrent added:.?</span>.?(?<time>[0-9\\-]+).*</p></div>.*?";
+            "<span>Torrent added:.?</span>.?(?<time>[0-9\\-]+).*</p></div>.*?";
 
     public TorrentDownloadsSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
@@ -72,54 +56,48 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
         int offset = html.indexOf("Torrent Search Results<span>");
         return offset > 0 ? offset : 0;
     }
-/*
+
     @Override
     protected int htmlSuffixOffset(String html) {
-        int offset = html.indexOf("<p>Torrents per page:");
+        int offset = html.indexOf("<h1>RECENT SEARCHES");
         return offset > 0 ? offset : 0;
     }
-*/
+
     @Override
     protected TorrentDownloadsSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         return new TorrentDownloadsSearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
     }
 
 
-
-
-
 /**
-     public static void main(String[] args) throws Exception {
-         //REGEX TEST CODE
+ public static void main(String[] args) throws Exception {
+ //REGEX TEST CODE
 
-//         String resultsHTML = FileUtils.readFileToString(new File("/Users/gubatron/Desktop/torlock-results.html"));
-//         final Pattern resultsPattern = Pattern.compile(REGEX);
-//
-//         final SearchMatcher matcher = SearchMatcher.from(resultsPattern.matcher(resultsHTML));
-//         while (matcher.find()) {
-//         System.out.println(matcher.group(1));
-//         }
-
-         //    TorrentDownloadsSearchPerformer performer = new TorrentDownloadsSearchPerformer("torrentdownloads.me", 7567, "game", 10000);
-   //      List<? extends SearchResult> searchResults = PerformersHelper.searchPageHelper(performer, FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/preliminares.html")), 20);
+ //         String resultsHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/torrentdownloads-results.html"));
+ //         final Pattern resultsPattern = Pattern.compile(REGEX);
+ //
+ //         final SearchMatcher matcher = SearchMatcher.from(resultsPattern.matcher(resultsHTML));
+ //         while (matcher.find()) {
+ //         System.out.println(matcher.group(1));
+ //         }
 
 
-         String resultHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/testa.html"));
-         final Pattern detailPattern = Pattern.compile(HTML_REGEX);
-         final SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(resultHTML));
+ String resultHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/testa.html"));
+ final Pattern detailPattern = Pattern.compile(HTML_REGEX);
+ final SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(resultHTML));
 
-         if (detailMatcher.find()) {
-             System.out.println("TorrentID: " + detailMatcher.group("torrentid"));
-             System.out.println("File name: " + detailMatcher.group("filename"));
-             System.out.println("Size: " + detailMatcher.group("filesize"));
-             System.out.println("Unit: " + detailMatcher.group("unit"));
-             System.out.println("Date: " + detailMatcher.group("time"));
-             System.out.println("Seeds: " + detailMatcher.group("seeds"));
-         } else {
-             System.out.println("No detail matched.");
-         }
+ if (detailMatcher.find()) {
+ System.out.println("TorrentID: " + detailMatcher.group("torrentid"));
+ System.out.println("File name: " + detailMatcher.group("filename"));
+ System.out.println("Size: " + detailMatcher.group("filesize"));
+ System.out.println("Unit: " + detailMatcher.group("unit"));
+ System.out.println("Date: " + detailMatcher.group("time"));
+ System.out.println("Seeds: " + detailMatcher.group("seeds"));
+ } else {
+ System.out.println("No detail matched.");
+ }
 
-     }
-*/
+ }
+ */
 }
 

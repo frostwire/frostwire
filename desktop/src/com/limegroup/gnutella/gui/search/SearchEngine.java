@@ -75,7 +75,7 @@ public abstract class SearchEngine {
     public static final int YIFI_ID = 17;
     public static final int BTJUNKIE_ID = 18;
     public static final int TORRENTDOWNLOADS_ID = 19;
-    
+
     public static final SearchEngine MININOVA = new SearchEngine(MININOVA_ID, "Mininova", SearchEnginesSettings.MININOVA_SEARCH_ENABLED, "www.mininova.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -182,7 +182,7 @@ public abstract class SearchEngine {
             return new BtjunkieSearchPerformer(BTJUNKIE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    
+
     public SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
@@ -197,7 +197,7 @@ public abstract class SearchEngine {
     public String getName() {
         return _name;
     }
-    
+
     public String getDomainName() {
         return _domainName;
     }
@@ -246,7 +246,7 @@ public abstract class SearchEngine {
 
         return null;
     }
-    
+
     /**
      * Used in Domain Alias Manifest QA test, don't delete.
      */
