@@ -472,6 +472,9 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void checkSDPermission() {
+        if (!AndroidPlatform.saf()) {
+            return;
+        }
         File data = Platforms.data();
         if (!Platforms.fileSystem().canWrite(data) &&
                 !SDPermissionDialog.visible) {
