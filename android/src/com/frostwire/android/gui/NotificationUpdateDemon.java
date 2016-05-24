@@ -14,23 +14,28 @@ import java.lang.ref.WeakReference;
 
 public class NotificationUpdateDemon implements TimerObserver{
 
+    private static final Logger LOG = Logger.getLogger(NotificationUpdateDemon.class);
     private static final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
 
     private Context parentContext;
     private TimerSubscription subscription;
 
     public NotificationUpdateDemon(Context parentContext) {
+        LOG.debug("Creating permanent notification demon");
         this.parentContext = parentContext;
     }
 
     public void start(){
+        LOG.debug("Starting permanent notification demon");
         if(subscription!=null){
+            LOG.debug("Stopping before (re)starting permanent notification demon");
             subscription.unsubscribe();
         }
         subscription = TimerService.subscribe(this,FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS);
     }
 
     public void stop(){
+        LOG.debug("Stopping permanent notification demon");
         subscription.unsubscribe();
     }
 

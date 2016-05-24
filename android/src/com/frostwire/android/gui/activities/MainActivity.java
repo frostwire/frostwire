@@ -110,7 +110,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private TimerSubscription playerSubscription;
     private BroadcastReceiver mainBroadcastReceiver;
     private boolean externalStoragePermissionsRequested = false;
-    private NotificationUpdateDemon notificationUpdateDemon;
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -418,8 +417,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         checkExternalStoragePermissionsOrBindMusicService();
-        notificationUpdateDemon = new NotificationUpdateDemon(getApplicationContext());
-        notificationUpdateDemon.start();
     }
 
     private void checkExternalStoragePermissionsOrBindMusicService() {

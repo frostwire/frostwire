@@ -37,6 +37,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.gui.NotificationUpdateDemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.offers.PlayStore;
@@ -69,6 +70,7 @@ public class EngineService extends Service implements IEngineService {
     // services in background
     private final CoreMediaPlayer mediaPlayer;
     private byte state;
+    private NotificationUpdateDemon notificationUpdateDemon;
 
     public EngineService() {
         binder = new EngineServiceBinder();
@@ -95,6 +97,8 @@ public class EngineService extends Service implements IEngineService {
 
         enableReceivers(true);
 
+        initializePermanentNotificationUpdates();
+
         return START_STICKY;
     }
 
@@ -103,6 +107,8 @@ public class EngineService extends Service implements IEngineService {
         LOG.debug("EngineService onDestroy");
 
         enableReceivers(false);
+
+        disablePermanentNotificationUpdates();
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
 
@@ -360,6 +366,17 @@ public class EngineService extends Service implements IEngineService {
 
     private int getNotificationIcon() {
         return R.drawable.frostwire_notification_flat;
+    }
+
+    private void initializePermanentNotificationUpdates(){
+        notificationUpdateDemon = new NotificationUpdateDemon(getApplicationContext());
+        notificationUpdateDemon.start();
+    }
+
+    private void disablePermanentNotificationUpdates(){
+        if(notificationUpdateDemon!=null){
+            notificationUpdateDemon.stop();
+        }
     }
 
     private static long[] buildVenezuelanVibe() {
