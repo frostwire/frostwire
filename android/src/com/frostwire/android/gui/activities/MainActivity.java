@@ -77,10 +77,8 @@ import java.util.Stack;
 import static com.andrew.apollo.utils.MusicUtils.mService;
 
 /**
- *
  * @author gubatron
  * @author aldenml
- *
  */
 public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
         OnDialogClickListener,
@@ -246,7 +244,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             // When another application wants to "Share" a file and has chosen FrostWire to do so.
             // We make the file "Shared" so it's visible for other FrostWire devices on the local network.
             else if (action.equals(Intent.ACTION_SEND) ||
-                     action.equals(Intent.ACTION_SEND_MULTIPLE)) {
+                    action.equals(Intent.ACTION_SEND_MULTIPLE)) {
                 controller.handleSendAction(intent);
                 intent.setAction(null);
             } else if (action.equals(Constants.ACTION_START_TRANSFER_FROM_PREVIEW)) {
@@ -345,7 +343,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
-    private Map<Integer,DangerousPermissionsChecker> initPermissionsCheckers() {
+    private Map<Integer, DangerousPermissionsChecker> initPermissionsCheckers() {
         Map<Integer, DangerousPermissionsChecker> checkers = new HashMap<>();
 
         // EXTERNAL STORAGE ACCESS CHECKER.
@@ -420,7 +418,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void checkExternalStoragePermissionsOrBindMusicService() {
         DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        if (!externalStoragePermissionsRequested && checker!=null && checker.noAccess()) {
+        if (!externalStoragePermissionsRequested && checker != null && checker.noAccess()) {
             checker.requestPermissions();
             externalStoragePermissionsRequested = true;
         } else if (mToken == null && checker != null && !checker.noAccess()) {
@@ -527,13 +525,13 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         invalidateOptionsMenu();
 
         Fragment fragment = getCurrentFragment();
-        int menuId=R.id.menu_main_search;
+        int menuId = R.id.menu_main_search;
         if (fragment instanceof SearchFragment) {
-            menuId=R.id.menu_main_search;
+            menuId = R.id.menu_main_search;
         } else if (fragment instanceof BrowsePeerFragment) {
-            menuId=R.id.menu_main_library;
+            menuId = R.id.menu_main_library;
         } else if (fragment instanceof TransfersFragment) {
-            menuId=R.id.menu_main_transfers;
+            menuId = R.id.menu_main_transfers;
         }
         setCheckedItem(menuId);
         updateHeader(getCurrentFragment());
@@ -590,8 +588,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                         controller.launchMyMusic();
                     } else if (id == R.id.menu_main_support) {
                         UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
-                    }
-                    else {
+                    } else {
                         listMenu.setItemChecked(position, true);
                         controller.switchFragment((int) id);
                     }
@@ -686,14 +683,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     public Fragment getFragmentByMenuId(int id) {
         switch (id) {
-        case R.id.menu_main_search:
-            return search;
-        case R.id.menu_main_library:
-            return library;
-        case R.id.menu_main_transfers:
-            return transfers;
-        default:
-            return null;
+            case R.id.menu_main_search:
+                return search;
+            case R.id.menu_main_library:
+                return library;
+            case R.id.menu_main_transfers:
+                return transfers;
+            default:
+                return null;
         }
     }
 
@@ -716,8 +713,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         switch (item.getItemId()) {
-        default:
-            return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
