@@ -6,8 +6,9 @@ frostwire (6.3.0) stable; urgency=high
   * New jlibtorrent 1.1.0.30
   * Spanish, Portuguese translations updated.
   * Fixes Torlock search.
+  * New Search Engine: TorrentDownloads.me
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 23 May 2016 19:24:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Tue, 24 May 2016 15:24:00 -0500
 
 frostwire (6.2.4) stable; urgency=high
   * Fixes Monova search.
