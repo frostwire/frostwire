@@ -40,7 +40,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     private static Logger LOG = Logger.getLogger(EztvSearchPerformer.class);
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"(/ep/.*?)\"";
-    private static String DYNAMIC_TRASH_CHECKER = null;
+    private static String DYNAMIC_TRASH_CHECK_STRING = null;
 
     // This is a good example of optional regex groups when a page might have different possible formats to parse.
     private static final String HTML_REGEX =
@@ -84,38 +84,48 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         return new EztvSearchResult(sr.getDetailsUrl(), matcher);
     }
 
-    @Override
-    protected int htmlPrefixOffset(String html) {
-        LOG.info("calling htmlPrefixOffset");
-        int offset = 0;
-        if (DYNAMIC_TRASH_CHECKER != null) {
-            offset = html.indexOf(DYNAMIC_TRASH_CHECKER);
+    protected int preliminaryHtmlPrefixOffset(String html) {
+        LOG.info("calling preliminaryHtmlPrefixOffset");
+        int fallbackOffset = fallbackPreliminaryHtmlOffset(html);
+        int offset;
+        if (EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING == null) {
+            offset = fallbackOffset;
+        } else {
+            LOG.info("looking for trash ["+ DYNAMIC_TRASH_CHECK_STRING +"] in:\n" + html + "\n\n");
+            offset = html.indexOf(DYNAMIC_TRASH_CHECK_STRING);
             // no trash found
             if (offset == -1) {
-                offset = html.indexOf("id=\"searchsearch_submit\"");
-                offset = offset > 0 ? offset : 0;
+                LOG.info("Didn't Find Trash!");
+                offset = fallbackOffset;
+            } else {
+                LOG.info("Found Trash at "+ offset + "!");
+                offset += 256;
             }
-        } else {
-            offset = html.indexOf("id=\"searchsearch_submit\"");
-            offset = offset > 0 ? offset : 0;
         }
         return offset;
     }
 
+    private int fallbackPreliminaryHtmlOffset(String html) {
+        int offset = html.indexOf("id=\"searchsearch_submit\"");
+        offset = offset > 0 ? offset : 0;
+        return offset;
+    }
+
     /**
+     *
      * EZTV tends to return place holder search results containing the latest
-     * additions to their index when there are no search results.
-     * We can find these on their home page. If we can find the last search result
-     * of their homepage among a list of search results, this means we have irrelevant
-     * search results on our hands.
-     * @param domainName
+     * additions to their index when there are no search results. This makes
+     * the FrostWire experience somewhat confusing since a lot of unrelated results
+     * show up.
+     * We can find these items on their home page. If we can find the last search result
+     * of their homepage among a list of search results, there's a really good chance
+     * we have irrelevant search results on our hands.
      */
     private void populateDynamicTrashChecker(String domainName) {
-        if (DYNAMIC_TRASH_CHECKER == null) {
+        if (EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING == null) {
             final HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
             try {
                 final byte[] bytes = client.getBytes("https://" + domainName, 5000);
-
                 if (bytes !=null) {
                     final Pattern pattern = Pattern.compile(REGEX);
                     final Matcher matcher = pattern.matcher(new String(bytes));
@@ -123,13 +133,12 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
                     while (matcher.find()) {
                         lastGroupFound = matcher.group(1);
                     }
-
                     if (lastGroupFound != null) {
-                        DYNAMIC_TRASH_CHECKER = lastGroupFound;
+                        EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING = lastGroupFound;
                     }
                 }
             } catch (Throwable t) {
-
+                LOG.error(t.getMessage(), t);
             }
         }
     }

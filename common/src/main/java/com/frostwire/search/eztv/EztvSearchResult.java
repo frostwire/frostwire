@@ -62,8 +62,8 @@ class EztvSearchResult extends AbstractTorrentSearchResult {
         }
 
         this.filename = parseFileName(FilenameUtils.getName(torrentUrl));
-
         this.infoHash = null;
+
         try {
             if (matcher.group("infohash") != null) {
                 this.infoHash = matcher.group("infohash");
