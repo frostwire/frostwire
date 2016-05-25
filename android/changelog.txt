@@ -1,4 +1,4 @@
-FrostWire 1.7.4 - MAY/24/2016
+FrostWire 1.7.4 - MAY/25/2016
  - Issues saving to SD card on multiple devices fixed.
  - New 'Seed' action available on 'My files'. Create and seed
    a torrent of a file or many in one touch.
@@ -16,7 +16,8 @@ FrostWire 1.7.4 - MAY/24/2016
  - Dialogs make over. All dialogs have uniform look and re-appear on device rotation.
  - Fixes issue with playlist song drag-n-drop reordering. Thanks @grzesiekrzaca!
  - Improved shutdown.
- - Fixes Torlock search.
+ - Fixes Torlock search. 
+ - EZTV no longer returns irrelevant results.
  - New Search Engine: TorrentDownloads.me
 
 FrostWire 1.7.3 - APR/15/2016
