@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ final class SearchOptionsPanel extends JPanel {
     public SearchOptionsPanel(SearchResultMediator resultPanel) {
         this.resultPanel = resultPanel;
 
-        engineCheckboxes = new HashMap<SearchEngine, JCheckBox>();
+        engineCheckboxes = new HashMap<>();
         
         setLayout(new MigLayout("insets 0, fillx"));
 
@@ -81,11 +81,11 @@ final class SearchOptionsPanel extends JPanel {
         resetFilters();
     }
 
-    public void onOptionsPanelShown() {
+    void onOptionsPanelShown() {
         textFieldKeywords.requestFocus();
     }
 
-    public void updateFiltersPanel() {
+    void updateFiltersPanel() {
         generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize, textFieldKeywords);
         updateCheckboxes(SearchEngine.getEngines());
         resultPanel.filterChanged(new SearchEngineFilter(engineCheckboxes), 0);
@@ -105,7 +105,7 @@ final class SearchOptionsPanel extends JPanel {
         }
     }
 
-    public void resetFilters() {
+    void resetFilters() {
         sliderSeeds.setMinimum(0);
         sliderSeeds.setMaximum(1000);
         sliderSeeds.setLowerValue(0);
@@ -133,7 +133,7 @@ final class SearchOptionsPanel extends JPanel {
     }
 
     private LabeledTextField createNameFilter() {
-        LabeledTextField textField = new LabeledTextField(I18n.tr("Name|Source|Ext."), 80, -1, 200);
+        LabeledTextField textField = new LabeledTextField(I18n.tr("Name|Source|Ext."), 80, -1, 240);
         
         textField.addKeyListener(new KeyAdapter() {
             @Override
@@ -171,7 +171,7 @@ final class SearchOptionsPanel extends JPanel {
 
     private void setupCheckboxes(List<SearchEngine> searchEngines, JPanel parent) {
 
-        final Map<JCheckBox, BooleanSetting> cBoxes = new HashMap<JCheckBox, BooleanSetting>();
+        final Map<JCheckBox, BooleanSetting> cBoxes = new HashMap<>();
 
         ItemListener listener = new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -228,7 +228,6 @@ final class SearchOptionsPanel extends JPanel {
     }
 
     private void sliderSeeds_stateChanged(ChangeEvent e) {
-        //System.out.println(sliderSeeds.getLowerValue() + " - " + sliderSeeds.getUpperValue());
         if (generalFilter != null) {
             generalFilter.setRangeSeeds(sliderSeeds.getLowerValue(), sliderSeeds.getUpperValue());
         }
