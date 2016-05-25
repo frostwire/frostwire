@@ -147,7 +147,7 @@ final class SearchOptionsPanel extends JPanel {
 
     private LabeledRangeSlider createSizeFilter() {
         LabeledRangeSlider slider = new LabeledRangeSlider(I18n.tr("Size"), null, 0, 1000);
-        slider.setPreferredSize(new Dimension(200, (int) slider.getPreferredSize().getHeight()));
+        slider.setPreferredSize(new Dimension(240, (int) slider.getPreferredSize().getHeight()));
         slider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 sliderSize_stateChanged(e);
@@ -159,7 +159,7 @@ final class SearchOptionsPanel extends JPanel {
 
     private LabeledRangeSlider createSeedsFilter() {
         LabeledRangeSlider slider = new LabeledRangeSlider(I18n.tr("Seeds"), null, 0, 1000);
-        slider.setPreferredSize(new Dimension(200, (int) slider.getPreferredSize().getHeight()));
+        slider.setPreferredSize(new Dimension(240, (int) slider.getPreferredSize().getHeight()));
         slider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 sliderSeeds_stateChanged(e);
