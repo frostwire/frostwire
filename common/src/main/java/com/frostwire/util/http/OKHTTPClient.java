@@ -71,10 +71,16 @@ public class OKHTTPClient extends AbstractHttpClient {
         byte[] result = null;
         final OkHttpClient okHttpClient = newOkHttpClient();
         final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, cookies);
+        ResponseBody responseBody = null;
         try {
-            result = getSyncResponse(okHttpClient, builder).body().bytes();
+            responseBody = getSyncResponse(okHttpClient, builder).body();
+            result = responseBody.bytes();
         } catch (Throwable e) {
             LOG.error("Error getting bytes from http body response: " + e.getMessage(), e);
+        } finally {
+           if (responseBody != null) {
+               closeQuietly(responseBody);
+           }
         }
         return result;
     }
@@ -85,13 +91,19 @@ public class OKHTTPClient extends AbstractHttpClient {
         final OkHttpClient okHttpClient = newOkHttpClient();
         final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, cookie);
         addCustomHeaders(customHeaders, builder);
+        ResponseBody responseBody = null;
         try {
-            result = getSyncResponse(okHttpClient, builder).body().string();
+            responseBody = getSyncResponse(okHttpClient, builder).body();
+            result = responseBody.string();
         } catch (IOException ioe) {
             //ioe.printStackTrace();
             throw ioe;
         } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
+        } finally {
+            if (responseBody != null) {
+                closeQuietly(responseBody);
+            }
         }
         return result;
     }
@@ -126,6 +138,7 @@ public class OKHTTPClient extends AbstractHttpClient {
             }
         }
         closeQuietly(fos);
+        closeQuietly(response.body());
         if (canceled) {
             onCancel();
         } else {
@@ -179,6 +192,7 @@ public class OKHTTPClient extends AbstractHttpClient {
             result = response.body().string();
             onComplete();
         }
+        closeQuietly(response.body());
         return result;
     }
 
