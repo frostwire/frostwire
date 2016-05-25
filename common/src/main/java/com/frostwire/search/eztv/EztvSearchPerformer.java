@@ -18,9 +18,14 @@
 
 package com.frostwire.search.eztv;
 
+import com.frostwire.logging.Logger;
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.http.HttpClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,9 +37,10 @@ import java.util.Map;
  *
  */
 public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchResult> {
-    //private static Logger LOG = Logger.getLogger(EztvSearchPerformer.class);
+    private static Logger LOG = Logger.getLogger(EztvSearchPerformer.class);
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"(/ep/.*?)\"";
+    private static String DYNAMIC_TRASH_CHECKER = null;
 
     // This is a good example of optional regex groups when a page might have different possible formats to parse.
     private static final String HTML_REGEX =
@@ -50,6 +56,13 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
 
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
+        populateDynamicTrashChecker(domainName);
+    }
+
+    @Override
+    public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
+        String itemId = matcher.group(1);
+        return new EztvTempSearchResult(getDomainName(),itemId);
     }
 
     @Override
@@ -67,20 +80,58 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     }
 
     @Override
-    public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
-        String itemId = matcher.group(1);
-        return new EztvTempSearchResult(getDomainName(),itemId);
-    }
-
-    @Override
     protected EztvSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         return new EztvSearchResult(sr.getDetailsUrl(), matcher);
     }
 
     @Override
     protected int htmlPrefixOffset(String html) {
-        int offset = html.indexOf("id=\"searchsearch_submit\"");
-        return offset > 0 ? offset : 0;
+        LOG.info("calling htmlPrefixOffset");
+        int offset = 0;
+        if (DYNAMIC_TRASH_CHECKER != null) {
+            offset = html.indexOf(DYNAMIC_TRASH_CHECKER);
+            // no trash found
+            if (offset == -1) {
+                offset = html.indexOf("id=\"searchsearch_submit\"");
+                offset = offset > 0 ? offset : 0;
+            }
+        } else {
+            offset = html.indexOf("id=\"searchsearch_submit\"");
+            offset = offset > 0 ? offset : 0;
+        }
+        return offset;
+    }
+
+    /**
+     * EZTV tends to return place holder search results containing the latest
+     * additions to their index when there are no search results.
+     * We can find these on their home page. If we can find the last search result
+     * of their homepage among a list of search results, this means we have irrelevant
+     * search results on our hands.
+     * @param domainName
+     */
+    private void populateDynamicTrashChecker(String domainName) {
+        if (DYNAMIC_TRASH_CHECKER == null) {
+            final HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
+            try {
+                final byte[] bytes = client.getBytes("https://" + domainName, 5000);
+
+                if (bytes !=null) {
+                    final Pattern pattern = Pattern.compile(REGEX);
+                    final Matcher matcher = pattern.matcher(new String(bytes));
+                    String lastGroupFound = null;
+                    while (matcher.find()) {
+                        lastGroupFound = matcher.group(1);
+                    }
+
+                    if (lastGroupFound != null) {
+                        DYNAMIC_TRASH_CHECKER = lastGroupFound;
+                    }
+                }
+            } catch (Throwable t) {
+
+            }
+        }
     }
 
     /**
