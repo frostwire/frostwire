@@ -30,8 +30,9 @@ import com.frostwire.search.kat.KATSearchPerformer;
 import com.frostwire.search.mininova.MininovaSearchPerformer;
 import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
-import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
+import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
+import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.youtube.YouTubeSearchPerformer;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
@@ -73,7 +74,8 @@ public abstract class SearchEngine {
 
     public static final int YIFI_ID = 17;
     public static final int BTJUNKIE_ID = 18;
-    
+    public static final int TORRENTDOWNLOADS_ID = 19;
+
     public static final SearchEngine MININOVA = new SearchEngine(MININOVA_ID, "Mininova", SearchEnginesSettings.MININOVA_SEARCH_ENABLED, "www.mininova.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -153,6 +155,13 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine TORRENTDOWNLOADS = new SearchEngine(TORRENTDOWNLOADS_ID, "TorrentDownloads", SearchEnginesSettings.TORRENTDOWNLOADS_SEARCH_ENABLED, "www.torrentdownloads.me") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new TorrentDownloadsSearchPerformer(TORRENTDOWNLOADS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     public static final SearchEngine EZTV = new SearchEngine(EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.ag") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -173,7 +182,7 @@ public abstract class SearchEngine {
             return new BtjunkieSearchPerformer(BTJUNKIE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    
+
     public SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
@@ -188,7 +197,7 @@ public abstract class SearchEngine {
     public String getName() {
         return _name;
     }
-    
+
     public String getDomainName() {
         return _domainName;
     }
@@ -208,7 +217,7 @@ public abstract class SearchEngine {
     }
 
     public static List<SearchEngine> getEngines() {
-        return Arrays.asList(YOUTUBE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, KAT, MONOVA, ARCHIVEORG, TORLOCK, YIFY, BTJUNKIE, BITSNOOP, EZTV);
+        return Arrays.asList(YOUTUBE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, KAT, MONOVA, ARCHIVEORG, TORLOCK, YIFY, BTJUNKIE, BITSNOOP, EZTV, TORRENTDOWNLOADS);
     }
 
     public static List<SearchEngine> getActiveEngines() {
@@ -237,7 +246,7 @@ public abstract class SearchEngine {
 
         return null;
     }
-    
+
     /**
      * Used in Domain Alias Manifest QA test, don't delete.
      */

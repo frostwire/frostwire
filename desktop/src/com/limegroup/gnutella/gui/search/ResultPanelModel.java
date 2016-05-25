@@ -15,18 +15,17 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
-import com.limegroup.gnutella.settings.SearchSettings;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /** 
  * Model for search results.
  *
- * Ensures that if new lines are added and they are similiar to old lines,
+ * Ensures that if new lines are added and they are similar to old lines,
  * that the new lines are added as extra information to the existing lines,
  * instead of as brand new lines.
  */
@@ -45,7 +44,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     /**
      * HashMap for quick access to indexes based on SHA1 info.
      */
-    private final Map<String, Integer> _indexes = new HashMap<String, Integer>();
+    private final Map<String, Integer> _indexes = new HashMap<>();
 
     private int _numResults;
 
@@ -83,9 +82,6 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      * multicast or secure results.
      */
     public int compare(SearchResultDataLine ta, SearchResultDataLine tb) {
-        int spamRet = compareSpam(ta, tb);
-        if (spamRet != 0)
-            return spamRet;
 
         //super.compare() will only sort Comparables and Strings.
         //since the Type column returns an Icon, we compare by hand using the file extension.
@@ -94,12 +90,12 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
         } else if (!isSorted() || _activeColumn != SearchTableColumns.COUNT_IDX) {
             return super.compare(ta, tb);
         } else {
-            return compareCount(ta, tb, false);
+            return compareCount(ta, tb);
         }
     }
 
     /** 
-     * Overrides the default remove to remove the index from the hashmap.
+     * Overrides the default remove to remove the index from the HashMap.
      *
      * @param row  the index of the row to remove.
      */
@@ -214,34 +210,12 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
         return get(idx).getHash();
     }
 
-    /** Compares the spam difference between the two rows. */
-    private int compareSpam(SearchResultDataLine a, SearchResultDataLine b) {
-        if (SearchSettings.moveJunkToBottom()) {
-            if (SpamFilter.isAboveSpamThreshold(a)) {
-                if (!SpamFilter.isAboveSpamThreshold(b)) {
-                    return 1;
-                }
-            } else if (SpamFilter.isAboveSpamThreshold(b)) {
-                return -1;
-            }
-        }
-
-        return 0;
-    }
-
     /**
      * Compares the count between two rows.
      */
-    private int compareCount(SearchResultDataLine a, SearchResultDataLine b, boolean spamCompare) {
-        if (spamCompare) {
-            int spamRet = compareSpam(a, b);
-            if (spamRet != 0)
-                return spamRet;
-        }
-
+    private int compareCount(SearchResultDataLine a, SearchResultDataLine b) {
         int c1 = a.getSeeds();
         int c2 = b.getSeeds();
-
         return (c1 - c2) * _ascending;
     }
 

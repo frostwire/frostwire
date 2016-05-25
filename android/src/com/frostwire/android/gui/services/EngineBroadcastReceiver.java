@@ -32,6 +32,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
@@ -116,6 +117,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void handleConnectedNetwork(NetworkInfo networkInfo) {
+        PlayStore.getInstance().refresh();
+
         if (NetworkManager.instance().isDataUp()) {
 
             boolean useTorrentsOnMobileData = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);

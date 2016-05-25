@@ -405,6 +405,7 @@
     <string name="add_transfer_label">Wklej magnet lub URL torrentu</string>
     <string name="drawer_open">Otwórz menu nawigacji</string>
     <string name="use_torlock">Używaj TorLock</string>
+    <string name="use_torrentdownloads">Używaj TorrentDownloads</string>
     <string name="use_monova">Używaj Monova</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="use_eztv">Używaj Eztv</string>

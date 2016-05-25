@@ -121,7 +121,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         searchPanels = createSearchPanel();
         add(searchPanels, "wmin 240px, wmax 370px, growprio 50, growx, gapright 10px, gapleft 5px");
 
-        //The Chat Tab is not a real Tab, it's a button, it's creation is done inside this method.
         addTabButtons(tabs);
 
         createUpdateButton();
@@ -213,25 +212,25 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy");
 
         for (Tabs t : GUIMediator.Tabs.values()) {
-            final Tabs lameFinalT = t; //java...
+            final Tabs finalTab = t; //java...
             AbstractButton button = createTabButton(tabs.get(t));
             button.setFont(buttonFont);
 
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    onMainApplicationHeaderTabActionPerformed(tabs, lameFinalT);
+                    onMainApplicationHeaderTabActionPerformed(tabs, finalTab);
                 }
 
-                private void onMainApplicationHeaderTabActionPerformed(final Map<Tabs, Tab> tabs, final Tabs lameFinalT) {
-                    prepareSearchTabAsSearchTrigger(lameFinalT);
-                    showSearchField(tabs.get(lameFinalT));
-                    GUIMediator.instance().setWindow(lameFinalT);
+                private void onMainApplicationHeaderTabActionPerformed(final Map<Tabs, Tab> tabs, final Tabs tab) {
+                    prepareSearchTabAsSearchTrigger(tab);
+                    showSearchField(tabs.get(tab));
+                    GUIMediator.instance().setWindow(tab);
                 }
                 
-                void prepareSearchTabAsSearchTrigger(final Tabs lameFinalT) {
+                void prepareSearchTabAsSearchTrigger(final Tabs tab) {
                     String query = null;
-                    if (lameFinalT == Tabs.SEARCH) {
+                    if (tab == Tabs.SEARCH) {
                         if (!cloudSearchField.getText().isEmpty()) {
                             query = cloudSearchField.getText();
                         } else if (cloudSearchField.getText().isEmpty() && !librarySearchField.getText().isEmpty()) {

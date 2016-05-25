@@ -18,19 +18,6 @@
 
 package com.frostwire.gui.library;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.table.TableCellRenderer;
-
 import com.frostwire.alexandria.Library;
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.gui.bittorrent.SendFileProgressDialog;
@@ -41,8 +28,8 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
-import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.DialogOption;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.LimeAction;
@@ -50,6 +37,16 @@ import com.limegroup.gnutella.gui.options.ConfigureOptionsAction;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.DataLineModel;
+
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -277,7 +274,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
 
             if (result == DialogOption.YES) {
                 new SendFileProgressDialog(GUIMediator.getAppFrame(), file).setVisible(true);
-                GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);
+                GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
                 UXStats.instance().log(UXAction.SHARING_TORRENT_CREATED_WITH_SEND_TO_FRIEND_FROM_LIBRARY);
             }
         }

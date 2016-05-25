@@ -195,28 +195,6 @@
     <!-- Menu Media Type end -->
 
 
-    <!-- Browse Peer list begin -->
-
-    <style name="BrowsePeerList"></style>
-
-    <style name="BrowsePeerList.Item"></style>
-
-    <style name="BrowsePeerList.Item.Title">
-        <item name="android:singleLine">true</item>
-        <item name="android:textSize">15sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/browse_peer_listview_item_foreground</item>
-    </style>
-
-    <style name="BrowsePeerList.Item.Extra">
-        <item name="android:singleLine">true</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/browse_peer_listview_item_foreground</item>
-    </style>
-
-    <!-- Browse Peer list end -->
-
-
     <!-- Transfers list begin -->
 
     <style name="TransfersList"></style>
@@ -277,35 +255,41 @@
 
     <style name="ListItemTitle">
         <item name="android:singleLine">true</item>
-        <item name="android:textSize">15sp</item>
+        <item name="android:textSize">@dimen/text_x_medium</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/app_list_item_title_text_color</item>
-    </style>
-
-    <style name="ListItemExtra">
-        <item name="android:singleLine">true</item>
-        <item name="android:textSize">14dp</item>
-        <item name="android:textColor">@color/app_list_item_title_text_color</item>
+        <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
     <style name="ListItemSize">
         <item name="android:singleLine">true</item>
-        <item name="android:textSize">13sp</item>
-        <item name="android:textColor">@color/app_highlight_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
-    <style name="ListItemAd">
-        <item name="android:singleLine">true</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">#ffffffff</item>
-        <item name="android:background">#ffedb802</item>
-        <item name="android:padding">2sp</item>
+    <style name="ListItemSize.browsePeerList">
+        <item name="android:textSize">@dimen/text_x_small</item>
+        <item name="android:fontFamily">sans-serif-regular</item>
     </style>
 
     <style name="ListItemExt">
         <item name="android:singleLine">true</item>
-        <item name="android:textSize">13dp</item>
-        <item name="android:textColor">#ff3b3b3b</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textColor">@color/app_text_secondary_dark</item>
+    </style>
+
+    <style name="ListItemExtra">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/app_text_secondary_dark</item>
+    </style>
+
+    <style name="ListItemAd">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">@dimen/text_x_small</item>
+        <item name="android:textColor">@color/basic_white</item>
+        <item name="android:background">#ffedb802</item>
+        <item name="android:padding">2sp</item>
     </style>
 
     <style name="TransferListItemSize">

@@ -102,6 +102,7 @@
     <string name="done">Done</string>
     <string name="home">Home</string>
     <string name="about">About</string>
+    <string name="buy_no_ads">BUY NO ADS</string>
     <string name="send_to_third_party">Send/Upload</string>
     <string name="send_file_using">Send file using</string>
     <string name="my_files">My Files</string>
@@ -449,6 +450,7 @@
     <string name="paused_song_name">Paused %s</string>
     <string name="use_bitsnoop">Use BitSnoop</string>
     <string name="use_torlock">Use TorLock</string>
+    <string name="use_torrentdownloads">Use TorrentDownloads</string>
     <string name="use_eztv">Use Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="player_paused_press_and_hold_to_stop">Player paused. (Tip: Press and hold to stop)</string>
@@ -603,4 +605,5 @@
     <string name="the_file_could_not_be_seeded_enable_seeding">The file could not be seeded. Enable seeding on settings.</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">The file could not be seeded. BitTorrent will remain disconnected.</string>
     <string name="fetching_torrent_ellipsis">Fetching torrent…</string>
+    <string name="sd_permission_no_accessible_path">The path you selected in the SD is not accessible any more. Press OK to select again.</string>
 </resources>

@@ -39,7 +39,10 @@ import android.widget.RelativeLayout;
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
+import com.frostwire.android.AndroidPlatform;
+import com.frostwire.android.LollipopFileSystem;
 import com.frostwire.android.R;
+import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SoftwareUpdater;
@@ -47,10 +50,7 @@ import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.MainMenuAdapter;
 import com.frostwire.android.gui.adnetworks.Offers;
-import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
-import com.frostwire.android.gui.dialogs.NewTransferDialog;
-import com.frostwire.android.gui.dialogs.TermsUseDialog;
-import com.frostwire.android.gui.dialogs.YesNoDialog;
+import com.frostwire.android.gui.dialogs.*;
 import com.frostwire.android.gui.fragments.BrowsePeerFragment;
 import com.frostwire.android.gui.fragments.MainFragment;
 import com.frostwire.android.gui.fragments.SearchFragment;
@@ -62,7 +62,9 @@ import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
+import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.Platforms;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
@@ -77,10 +79,8 @@ import java.util.Stack;
 import static com.andrew.apollo.utils.MusicUtils.mService;
 
 /**
- *
  * @author gubatron
  * @author aldenml
- *
  */
 public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
         OnDialogClickListener,
@@ -246,7 +246,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             // When another application wants to "Share" a file and has chosen FrostWire to do so.
             // We make the file "Shared" so it's visible for other FrostWire devices on the local network.
             else if (action.equals(Intent.ACTION_SEND) ||
-                     action.equals(Intent.ACTION_SEND_MULTIPLE)) {
+                    action.equals(Intent.ACTION_SEND_MULTIPLE)) {
                 controller.handleSendAction(intent);
                 intent.setAction(null);
             } else if (action.equals(Constants.ACTION_START_TRANSFER_FROM_PREVIEW)) {
@@ -345,7 +345,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
-    private Map<Integer,DangerousPermissionsChecker> initPermissionsCheckers() {
+    private Map<Integer, DangerousPermissionsChecker> initPermissionsCheckers() {
         Map<Integer, DangerousPermissionsChecker> checkers = new HashMap<>();
 
         // EXTERNAL STORAGE ACCESS CHECKER.
@@ -420,7 +420,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void checkExternalStoragePermissionsOrBindMusicService() {
         DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        if (!externalStoragePermissionsRequested && checker!=null && checker.noAccess()) {
+        if (!externalStoragePermissionsRequested && checker != null && checker.noAccess()) {
             checker.requestPermissions();
             externalStoragePermissionsRequested = true;
         } else if (mToken == null && checker != null && !checker.noAccess()) {
@@ -461,12 +461,43 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void mainResume() {
+        checkSDPermission();
+
         syncSlideMenu();
         if (firstTime) {
             firstTime = false;
             Engine.instance().startServices(); // it's necessary for the first time after wizard
         }
         SoftwareUpdater.instance().checkForUpdate(this);
+    }
+
+    private void checkSDPermission() {
+        if (!AndroidPlatform.saf()) {
+            return;
+        }
+        File data = Platforms.data();
+        if (!Platforms.fileSystem().canWrite(data) &&
+                !SDPermissionDialog.visible) {
+            SDPermissionDialog dlg = SDPermissionDialog.newInstance();
+            dlg.show(getFragmentManager());
+        }
+    }
+
+    private void handleSDPermissionDialogClick(int which) {
+        if (which == Dialog.BUTTON_POSITIVE) {
+            StoragePicker.show(this);
+        } else {
+            // TODO:
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
+            StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void checkLastSeenVersion() {
@@ -511,6 +542,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             onShutdownDialogButtonPositive();
         } else if (tag.equals(TermsUseDialog.TAG)) {
             controller.startWizardActivity();
+        } else if (tag.equals(SDPermissionDialog.TAG)) {
+            handleSDPermissionDialogClick(which);
         }
     }
 
@@ -527,13 +560,13 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         invalidateOptionsMenu();
 
         Fragment fragment = getCurrentFragment();
-        int menuId=R.id.menu_main_search;
+        int menuId = R.id.menu_main_search;
         if (fragment instanceof SearchFragment) {
-            menuId=R.id.menu_main_search;
+            menuId = R.id.menu_main_search;
         } else if (fragment instanceof BrowsePeerFragment) {
-            menuId=R.id.menu_main_library;
+            menuId = R.id.menu_main_library;
         } else if (fragment instanceof TransfersFragment) {
-            menuId=R.id.menu_main_transfers;
+            menuId = R.id.menu_main_transfers;
         }
         setCheckedItem(menuId);
         updateHeader(getCurrentFragment());
@@ -590,8 +623,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                         controller.launchMyMusic();
                     } else if (id == R.id.menu_main_support) {
                         UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
-                    }
-                    else {
+                    } else {
                         listMenu.setItemChecked(position, true);
                         controller.switchFragment((int) id);
                     }
@@ -686,14 +718,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     public Fragment getFragmentByMenuId(int id) {
         switch (id) {
-        case R.id.menu_main_search:
-            return search;
-        case R.id.menu_main_library:
-            return library;
-        case R.id.menu_main_transfers:
-            return transfers;
-        default:
-            return null;
+            case R.id.menu_main_search:
+                return search;
+            case R.id.menu_main_library:
+                return library;
+            case R.id.menu_main_transfers:
+                return transfers;
+            default:
+                return null;
         }
     }
 
@@ -716,8 +748,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         switch (item.getItemId()) {
-        default:
-            return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

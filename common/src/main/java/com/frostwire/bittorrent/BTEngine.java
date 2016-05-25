@@ -30,7 +30,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -628,8 +627,11 @@ public final class BTEngine {
     }
 
     private void logListenFailed(ListenFailedAlert alert) {
-        String s = "endpoint: " + alert.listenInterface() + " type:" + alert.swig().getSock_type();
-        LOG.info("Listen failed on " + s);
+        TcpEndpoint endp = alert.endpoint();
+        String addr = endp.address().swig().to_string();
+        final String message = alert.getError().message();
+        String s = "endpoint: " + addr + ":" + endp.port() + " type:" + alert.swig().getSock_type();
+        LOG.info("Listen failed on " + s + " (error: " + message + ")");
     }
 
     private void migrateVuzeDownloads() {
@@ -839,7 +841,7 @@ public final class BTEngine {
             try {
                 session.asyncAddTorrent(new TorrentInfo(torrent), saveDir, priorities, resume);
             } catch (Throwable e) {
-                LOG.error("Unable to restore download from previous session", e);
+                LOG.error("Unable to restore download from previous session. ("+torrent.getAbsolutePath()+")", e);
             }
         }
     }

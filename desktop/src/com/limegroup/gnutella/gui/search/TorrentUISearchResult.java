@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.uxstats.UXAction;
@@ -51,6 +52,7 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
 
     @Override
     public void download(boolean partial) {
+        GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
         GUIMediator gm = GUIMediator.instance();
         gm.openTorrentSearchResult(sr, partial);
         showDetails(false);

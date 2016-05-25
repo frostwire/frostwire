@@ -25,6 +25,7 @@ import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.HttpResponseCache;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.bittorrent.BTContext;
@@ -53,6 +54,8 @@ public class MainApplication extends Application {
         super.onCreate();
 
         try {
+
+            PlayStore.getInstance().initialize(this); // as early as possible
 
             ignoreHardwareMenu();
             installHttpCache();

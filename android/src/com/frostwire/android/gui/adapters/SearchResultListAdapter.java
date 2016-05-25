@@ -111,7 +111,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     private void maybeMarkTitleOpened(View view, SearchResult sr) {
         int clickedColor = getContext().getResources().getColor(R.color.browse_peer_listview_item_inactive_foreground);
-        int unclickedColor = getContext().getResources().getColor(R.color.basic_blue);
+        int unclickedColor = getContext().getResources().getColor(R.color.app_text_primary);
         TextView title = findView(view, R.id.view_bittorrent_search_result_list_item_title);
         title.setTextColor(LocalSearchEngine.instance().hasBeenOpened(sr) ? clickedColor : unclickedColor);
     }
@@ -236,19 +236,19 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     private int getFileTypeIconId() {
         switch (fileType) {
             case Constants.FILE_TYPE_APPLICATIONS:
-                return R.drawable.browse_peer_application_icon_selector_menu;
+                return R.drawable.list_item_application_icon;
             case Constants.FILE_TYPE_AUDIO:
-                return R.drawable.browse_peer_audio_icon_selector_menu;
+                return R.drawable.list_item_audio_icon;
             case Constants.FILE_TYPE_DOCUMENTS:
-                return R.drawable.browse_peer_document_icon_selector_menu;
+                return R.drawable.list_item_document_icon;
             case Constants.FILE_TYPE_PICTURES:
-                return R.drawable.browse_peer_picture_icon_selector_menu;
+                return R.drawable.list_item_picture_icon;
             case Constants.FILE_TYPE_VIDEOS:
-                return R.drawable.browse_peer_video_icon_selector_menu;
+                return R.drawable.list_item_video_icon;
             case Constants.FILE_TYPE_TORRENTS:
-                return R.drawable.browse_peer_torrent_icon_selector_menu;
+                return R.drawable.list_item_torrent_icon;
             default:
-                return R.drawable.question_mark;
+                return R.drawable.list_item_question_mark;
         }
     }
 

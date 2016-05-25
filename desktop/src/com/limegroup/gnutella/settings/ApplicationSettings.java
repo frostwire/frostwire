@@ -136,11 +136,6 @@ public class ApplicationSettings extends LimeProps {
 
     public static final BooleanSetting SHOW_HIDE_EXIT_DIALOG = FACTORY.createBooleanSetting("SHOW_HIDE_EXIT_DIALOG", true);
 
-    /**
-     * Whether or not to show SEEDING torrents on the transfer manager
-     */
-    public static final BooleanSetting SHOW_SEEDING_TRANSFERS = FACTORY.createBooleanSetting("SHOW_SEEDING_TRANSFERS", true);
-
     public static final FileSetting APP_DATABASES_PATH = FACTORY.createFileSetting("APP_DATABASES_PATH", new File(CommonUtils.getUserSettingsDir(), "dbs"));
 
     public static final IntSetting GUI_TABLES_FONT_SIZE = (IntSetting) FACTORY.createIntSetting("GUI_TABLES_FONT_SIZE", 0).setAlwaysSave(true);

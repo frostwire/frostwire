@@ -1,4 +1,4 @@
-FrostWire 1.7.4 - MAY/11/2016
+FrostWire 1.7.4 - MAY/24/2016
  - Issues saving to SD card on multiple devices fixed.
  - New 'Seed' action available on 'My files'. Create and seed
    a torrent of a file or many in one touch.
@@ -13,8 +13,11 @@ FrostWire 1.7.4 - MAY/11/2016
  - Updated inmobi library to 5.3.0.
  - No more repeated YouTube video search results. Results are now grouped, when
    touched the user can select the video format/quality to download.
- - Dialogs make over.
+ - Dialogs make over. All dialogs have uniform look and re-appear on device rotation.
+ - Fixes issue with playlist song drag-n-drop reordering. Thanks @grzesiekrzaca!
  - Improved shutdown.
+ - Fixes Torlock search.
+ - New Search Engine: TorrentDownloads.me
 
 FrostWire 1.7.3 - APR/15/2016
  - Soundcloud search results include estimated file size.

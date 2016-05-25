@@ -44,6 +44,8 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
+import com.frostwire.platform.FileSystem;
+import com.frostwire.platform.Platforms;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
@@ -1497,12 +1499,13 @@ public final class MusicUtils {
                     selection.toString(), null);
 
             // Step 3: Remove files from card
+            FileSystem fs = Platforms.fileSystem();
             c.moveToFirst();
             while (!c.isAfterLast()) {
                 final String name = c.getString(1);
                 try { // File.delete can throw a security exception
                     final File f = new File(name);
-                    if (!f.delete()) {
+                    if (!fs.delete(f)) {
                         // I'm not sure if we'd ever get here (deletion would
                         // have to fail, but no exception thrown)
                         Log.e("MusicUtils", "Failed to delete file " + name);

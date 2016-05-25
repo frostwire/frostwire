@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -44,6 +45,7 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
 
     @Override
     public void download(boolean partial) {
+        GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
         GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr.getDisplayName(), sr);
         showDetails(false);
         UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE);

@@ -189,7 +189,7 @@ configurations.all {
 
 dependencies {
     compile 'com.android.support:support-v4:23.2.1'
-    compile 'com.google.android.gms:play-services-ads:8.4.0'
+    compile 'com.google.android.gms:play-services-ads:9.0.0'
     compile 'com.inmobi.monetization:inmobi-ads:5.3.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
 

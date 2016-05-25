@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.AlphaIcon;
 import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
@@ -186,6 +187,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             if (sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult) {
                 searchResult.download(true);
                 UXStats.instance().log(UXAction.SEARCH_RESULT_DETAIL_VIEW);
+                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
             }
         }
     }
@@ -194,6 +196,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         if (e.getButton() == MouseEvent.BUTTON1) {
             searchResult.download(false);
             UXStats.instance().log(UXAction.SEARCH_RESULT_ROW_BUTTON_DOWNLOAD);
+            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
         }
     }
 

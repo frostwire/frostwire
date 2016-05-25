@@ -38,9 +38,7 @@ import com.frostwire.util.Ref;
 import org.apache.commons.io.FilenameUtils;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created on 4/19/16.
@@ -128,6 +126,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
 
     @Override
     public ConfirmListDialogDefaultAdapter<TorrentFileEntry> createAdapter(Context context, List<TorrentFileEntry> listData, SelectionMode selectionMode, Bundle bundle) {
+        Collections.sort(listData, new NameComparator());
         return new HandpickedTorrentFileEntriesDialogAdapter(context, listData, selectionMode);
     }
 
@@ -303,6 +302,13 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
                 }
             });
 
+        }
+    }
+
+    private static class NameComparator implements Comparator<TorrentFileEntry> {
+        @Override
+        public int compare(TorrentFileEntry left, TorrentFileEntry right) {
+            return left.getDisplayName().compareTo(right.getDisplayName());
         }
     }
 }

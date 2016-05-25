@@ -399,6 +399,7 @@
     <string name="paused_song_name">%s на паузе</string>
     <string name="use_bitsnoop">Использовать BitSnoop</string>
     <string name="use_torlock">Использовать TorLock</string>
+    <string name="use_torrentdownloads">Использовать TorrentDownloads</string>
     <string name="use_eztv">Использовать Eztv</string>
     <string name="transfer_status_demuxing">Демультиплексирование</string>
     <string name="player_paused_press_and_hold_to_stop">Приостановлено. (Совет: нажмите и удерживайте, чтобы приостановить)</string>

@@ -1,12 +1,11 @@
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.gui.filters.TableLineFilter;
+import com.frostwire.transfers.TransferState;
+import com.limegroup.gnutella.settings.BittorrentSettings;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.frostwire.transfers.TransferState;
-
-import com.frostwire.gui.filters.TableLineFilter;
-import com.limegroup.gnutella.settings.BittorrentSettings;
 
 /**
  * Filters out certain rows from the data model.
@@ -37,7 +36,7 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
             throw new NullPointerException("null filter");
 
         FILTER = f;
-        HIDDEN = new ArrayList<BTDownloadDataLine>();
+        HIDDEN = new ArrayList<>();
     }
 
     /**
@@ -86,27 +85,14 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
 
         // For stuff in _list, we can just re-add the DataLines as-is.
         for (int i = 0; i < existing.size(); i++) {
-            //if (isSorted()) {
-            //see override of getSortedPosition.
-            //rebuild only seems to happen when we first build the table
-            //in which case addSorted takes care of business by invoking getSortedPosition.
             addSorted(existing.get(i));
-            //} else {
-            //	add(existing.get(i));
-            //	}
         }
 
         // Merge the hidden TableLines
         for (int i = 0; i < hidden.size(); i++) {
             BTDownloadDataLine tl = hidden.get(i);
-
-            //if(isSorted()) {
             addSorted(tl);
-            //} else {
-            //    add(tl);
-            // }
         }
-
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
@@ -99,11 +100,17 @@ public class Offers {
     public static void showInterstitial(final Activity activity,
                                         final boolean shutdownAfterwards,
                                         final boolean dismissAfterwards) {
+
         boolean interstitialShown = false;
-        final WeakReference<Activity> activityRef = Ref.weak(activity);
-        for (AdNetwork adNetwork : AD_NETWORKS) {
-            if (!interstitialShown && adNetwork.started()) {
-                interstitialShown = adNetwork.showInterstitial(activityRef, shutdownAfterwards, dismissAfterwards);
+
+        if (!PlayStore.getInstance().showAds()) {
+            LOG.info("Skipping interstitial ads display, PlayStore reports no ads");
+        } else {
+            final WeakReference<Activity> activityRef = Ref.weak(activity);
+            for (AdNetwork adNetwork : AD_NETWORKS) {
+                if (!interstitialShown && adNetwork.started()) {
+                    interstitialShown = adNetwork.showInterstitial(activityRef, shutdownAfterwards, dismissAfterwards);
+                }
             }
         }
         if (!interstitialShown) {

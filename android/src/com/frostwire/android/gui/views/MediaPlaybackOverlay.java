@@ -45,12 +45,12 @@ public class MediaPlaybackOverlay {
         paintCircleFill.setStyle(Paint.Style.FILL);
         paintCircleFill.setAntiAlias(true);
 
-        paintCircleStroke.setColor(Color.parseColor("#ff525254"));
+        paintCircleStroke.setColor(Color.parseColor("#ff3b3b3b"));
         paintCircleStroke.setStrokeWidth(5);
         paintCircleStroke.setStyle(Paint.Style.STROKE);
         paintCircleStroke.setAntiAlias(true);
 
-        paintShapeFill.setColor(Color.parseColor("#ff525254"));
+        paintShapeFill.setColor(Color.parseColor("#ff3b3b3b"));
         paintShapeFill.setStyle(Paint.Style.FILL);
         paintShapeFill.setAntiAlias(true);
     }

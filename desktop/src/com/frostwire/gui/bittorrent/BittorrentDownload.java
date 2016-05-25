@@ -508,13 +508,10 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                 if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
                     TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, showShareTorrentDialog);
                     dl.setDeleteDataWhenRemove(false);
-                    GUIMediator.instance().getBTDownloadMediator().remove(dl);
+                    BTDownloadMediator.instance().remove(dl);
+                    BTDownloadMediator.instance().updateTableFilters();
                 }
             }
-            // revise this if we decide to do file normalization, meanwhile, will handle these downloads in above case.
-        /* else if (dl instanceof YouTubeDownload) {
-            // TODO: normalize file, remove transfer, get rid of unnormalized file, then make torrent with normalized file.
-        } */
         }
     }
 }
