@@ -197,10 +197,10 @@
                 android:key="frostwire.prefs.uxstats.enabled"
                 android:summary="@string/anonymous_usage_statistics_summary"
                 android:title="@string/anonymous_usage_statistics"/>
-        <!--<CheckBoxPreference
+        <CheckBoxPreference
                 android:key="frostwire.prefs.gui.support_frostwire"
                 android:summary="@string/support_frostwire_summary"
-                android:title="@string/support_frostwire"/>-->
+                android:title="@string/support_frostwire"/>
     </PreferenceScreen>
 
     <!--<Preference
