@@ -476,11 +476,18 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (!AndroidPlatform.saf()) {
             return;
         }
-        File data = Platforms.data();
-        if (!Platforms.fileSystem().canWrite(data) &&
-                !SDPermissionDialog.visible) {
-            SDPermissionDialog dlg = SDPermissionDialog.newInstance();
-            dlg.show(getFragmentManager());
+
+        try {
+            File data = Platforms.data();
+            File parent = data.getParentFile();
+            if (!Platforms.fileSystem().canWrite(parent) &&
+                    !SDPermissionDialog.visible) {
+                SDPermissionDialog dlg = SDPermissionDialog.newInstance();
+                dlg.show(getFragmentManager());
+            }
+        } catch (Throwable e) {
+            // we can't do anything about this
+            LOG.error("Unable to detect if we have SD permissions", e);
         }
     }
 
