@@ -480,6 +480,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         try {
             File data = Platforms.data();
             File parent = data.getParentFile();
+
+            if (!AndroidPlatform.saf(parent)) {
+                return;
+            }
             if (!Platforms.fileSystem().canWrite(parent) &&
                     !SDPermissionDialog.visible) {
                 SDPermissionDialog dlg = SDPermissionDialog.newInstance();
