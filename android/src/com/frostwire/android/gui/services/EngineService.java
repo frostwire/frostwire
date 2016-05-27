@@ -37,6 +37,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.gui.NotificationUpdateDemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.offers.PlayStore;
@@ -69,6 +70,7 @@ public class EngineService extends Service implements IEngineService {
     // services in background
     private final CoreMediaPlayer mediaPlayer;
     private byte state;
+    private NotificationUpdateDemon notificationUpdateDemon;
 
     public EngineService() {
         binder = new EngineServiceBinder();
@@ -95,6 +97,8 @@ public class EngineService extends Service implements IEngineService {
 
         enableReceivers(true);
 
+        initializePermanentNotificationUpdates();
+
         return START_STICKY;
     }
 
@@ -103,6 +107,8 @@ public class EngineService extends Service implements IEngineService {
         LOG.debug("EngineService onDestroy");
 
         enableReceivers(false);
+
+        disablePermanentNotificationUpdates();
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
 
@@ -234,76 +240,6 @@ public class EngineService extends Service implements IEngineService {
         Log.v(TAG, "Engine started");
     }
 
-    public static void updatePermanentStatusNotification(WeakReference<Context> contextRef,
-                                                         int downloads,
-                                                         String sDown,
-                                                         int uploads,
-                                                         String sUp) {
-        if (!Ref.alive(contextRef) ||
-                !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
-            return;
-        }
-        final Context context = contextRef.get();
-
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-                R.layout.view_permanent_status_notification);
-
-        PendingIntent showFrostWireIntent = PendingIntent.getActivity(context,
-                0,
-                new Intent(context,
-                        MainActivity.class).
-                        setAction(Constants.ACTION_SHOW_TRANSFERS).
-                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
-                0);
-
-//        PendingIntent showVPNIntent = PendingIntent.getActivity(context,
-//                1,
-//                new Intent(context,
-//                        VPNStatusDetailActivity.class).
-//                        setAction(isVPNactive ?
-//                                Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
-//                                Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
-//                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
-//                0);
-
-        PendingIntent shutdownIntent = PendingIntent.getActivity(context,
-                1,
-                new Intent(context,
-                        MainActivity.class).
-                        setAction(Constants.ACTION_REQUEST_SHUTDOWN).
-                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
-                0);
-
-
-        // VPN status
-//        remoteViews.setImageViewResource(R.id.view_permanent_status_vpn_icon, isVPNactive ?
-//                R.drawable.notification_shutdown : R.drawable.notification_shutdown);
-//        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_vpn_icon, showVPNIntent);
-
-
-        // Click on shutdown image button.
-        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
-
-        // Click on title takes to transfers.
-        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
-
-        // Transfers status.
-        remoteViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
-        remoteViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
-
-        Notification notification = new NotificationCompat.Builder(context).
-                setSmallIcon(R.drawable.frostwire_notification_flat).
-                setContentIntent(showFrostWireIntent).
-                setContent(remoteViews).
-                build();
-        notification.flags |= Notification.FLAG_NO_CLEAR;
-
-        final NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        if (notificationManager != null) {
-            notificationManager.notify(FROSTWIRE_STATUS_NOTIFICATION, notification);
-        }
-    }
-
     public synchronized void stopServices(boolean disconnected) {
         if (isStopped() || isStopping() || isDisconnected()) {
             return;
@@ -360,6 +296,17 @@ public class EngineService extends Service implements IEngineService {
 
     private int getNotificationIcon() {
         return R.drawable.frostwire_notification_flat;
+    }
+
+    private void initializePermanentNotificationUpdates(){
+        notificationUpdateDemon = new NotificationUpdateDemon(getApplicationContext());
+        notificationUpdateDemon.start();
+    }
+
+    private void disablePermanentNotificationUpdates(){
+        if(notificationUpdateDemon!=null){
+            notificationUpdateDemon.stop();
+        }
     }
 
     private static long[] buildVenezuelanVibe() {
