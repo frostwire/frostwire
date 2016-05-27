@@ -44,7 +44,6 @@ import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.MenuDialog;
 import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.SwipeDetector;
@@ -61,7 +60,6 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 /**
@@ -71,7 +69,8 @@ import java.util.*;
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener, SwipeListener {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
-    private static final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
+    private static final int DHT_STATUS_UPDATE_INTERVAL_IN_SECS = 10;
+    private static final int UI_UPDATE_INTERVAL_IN_SECS = 2;
     private final Comparator<Transfer> transferComparator;
     private final ButtonAddTransferListener buttonAddTransferListener;
     private final ButtonMenuListener buttonMenuListener;
@@ -87,7 +86,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TransferListAdapter adapter;
     private TransferStatus selectedStatus;
     private TimerSubscription subscription;
-    private int androidNotificationUpdateTick;
+    private int delayedDHTUpdateTimeElapsed;
     private boolean isVPNactive;
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
@@ -119,21 +118,21 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        subscription = TimerService.subscribe(this, 2);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         initStorageRelatedRichNotifications(getView());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        subscription = TimerService.subscribe(this, UI_UPDATE_INTERVAL_IN_SECS);
         onTime();
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onStop() {
+        super.onStop();
         subscription.unsubscribe();
     }
 
@@ -153,6 +152,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     @Override
     public void onTime() {
+        if(!this.isVisible()){
+            subscription.unsubscribe();
+            return;
+        }
         if (adapter != null) {
             List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
             Collections.sort(transfers, transferComparator);
@@ -169,7 +172,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         int downloads = TransferManager.instance().getActiveDownloads();
         int uploads = TransferManager.instance().getActiveUploads();
 
-        updatePermanentStatusNotification(sDown, sUp, downloads, uploads);
+        delayedDHTCheck();
         updateStatusBar(sDown, sUp, downloads, uploads);
     }
 
@@ -179,16 +182,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
     }
 
-    private void updatePermanentStatusNotification(String sDown, String sUp, int downloads, int uploads) {
-        if (++androidNotificationUpdateTick >= FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS) {
-            androidNotificationUpdateTick = 0;
-            EngineService.updatePermanentStatusNotification(
-                    new WeakReference<Context>(getActivity()),
-                    downloads,
-                    sDown,
-                    uploads,
-                    sUp);
-
+    private void delayedDHTCheck() {
+        delayedDHTUpdateTimeElapsed += UI_UPDATE_INTERVAL_IN_SECS;
+        if (delayedDHTUpdateTimeElapsed >= DHT_STATUS_UPDATE_INTERVAL_IN_SECS) {
+            delayedDHTUpdateTimeElapsed = 0;
             checkDHTPeers();
         }
     }
