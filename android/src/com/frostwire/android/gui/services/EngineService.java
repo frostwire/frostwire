@@ -28,9 +28,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.RemoteViews;
 import com.andrew.apollo.MediaButtonIntentReceiver;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -45,13 +43,11 @@ import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.logging.Logger;
-import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
 import com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver;
 import com.squareup.okhttp.ConnectionPool;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -298,13 +294,13 @@ public class EngineService extends Service implements IEngineService {
         return R.drawable.frostwire_notification_flat;
     }
 
-    private void initializePermanentNotificationUpdates(){
+    private void initializePermanentNotificationUpdates() {
         notificationUpdateDemon = new NotificationUpdateDemon(getApplicationContext());
         notificationUpdateDemon.start();
     }
 
-    private void disablePermanentNotificationUpdates(){
-        if(notificationUpdateDemon!=null){
+    private void disablePermanentNotificationUpdates() {
+        if (notificationUpdateDemon != null) {
             notificationUpdateDemon.stop();
         }
     }

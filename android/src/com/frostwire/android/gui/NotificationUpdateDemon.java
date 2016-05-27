@@ -35,11 +35,11 @@ public class NotificationUpdateDemon implements TimerObserver{
 
     public void start() {
         LOG.debug("Starting permanent notification demon");
-        if(mTimerSubscription != null) {
+        if (mTimerSubscription != null) {
             LOG.debug("Stopping before (re)starting permanent notification demon");
             mTimerSubscription.unsubscribe();
         }
-        mTimerSubscription = TimerService.subscribe(this,FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS);
+        mTimerSubscription = TimerService.subscribe(this, FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS);
     }
 
     public void stop() {

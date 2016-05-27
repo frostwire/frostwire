@@ -490,7 +490,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         restartLoader(false);
     }
 
-    protected boolean restartLoader(boolean force) {
+    public boolean restartLoader(boolean force) {
         if (force || (System.currentTimeMillis() - lastRestartLoader) >= 5000) {
             lastRestartLoader = System.currentTimeMillis();
             getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
