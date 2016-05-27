@@ -520,12 +520,17 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
 
             if (action.equals(Constants.ACTION_FILE_ADDED_OR_REMOVED)) {
-                reloadFiles(Constants.FILE_TYPE_APPLICATIONS);
-                reloadFiles(Constants.FILE_TYPE_RINGTONES);
-                reloadFiles(Constants.FILE_TYPE_TORRENTS);
-                reloadFiles(Constants.FILE_TYPE_PICTURES);
-                reloadFiles(Constants.FILE_TYPE_VIDEOS);
-                reloadFiles(Constants.FILE_TYPE_AUDIO);
+                if (intent.hasExtra(Constants.EXTRA_REFRESH_FILE_TYPE)) {
+                    reloadFiles(intent.getByteExtra(Constants.EXTRA_REFRESH_FILE_TYPE, Constants.FILE_TYPE_AUDIO));
+                } else {
+                    // reload everything
+                    reloadFiles(Constants.FILE_TYPE_APPLICATIONS);
+                    reloadFiles(Constants.FILE_TYPE_RINGTONES);
+                    reloadFiles(Constants.FILE_TYPE_TORRENTS);
+                    reloadFiles(Constants.FILE_TYPE_PICTURES);
+                    reloadFiles(Constants.FILE_TYPE_VIDEOS);
+                    reloadFiles(Constants.FILE_TYPE_AUDIO);
+                }
             }
         }
     }
