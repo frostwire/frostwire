@@ -48,11 +48,6 @@ public class NotificationUpdateDemon implements TimerObserver{
     }
 
     private void updatePermanentStatusNotification() {
-
-        if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
-            return;
-        }
-
         //  format strings
         String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
         String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
@@ -133,5 +128,10 @@ public class NotificationUpdateDemon implements TimerObserver{
     @Override
     public void onTime() {
         updatePermanentStatusNotification();
+    }
+
+    @Override
+    public boolean canBeSkipped() {
+        return !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION);
     }
 }
