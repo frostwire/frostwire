@@ -568,4 +568,19 @@
     <string name="get_express_VPN">Obtén ExpressVPN</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Estás conectado a Internet usando un VPN. <br><br> Si no lo estás, te recomendamos usar <b>ExpressVPN</b> para encriptar tu conexión y <b>proteger tu privacidad</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">La ruta seleccionada no es un directorio</string>
+    <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">El archivo no pudo ser compartido. BitTorrent permanecerá desconectado.</string>
+    <string name="the_file_could_not_be_seeded_enable_seeding">El archivo no pudo ser compartido. Habilite la capacidad de Compartir en las preferencias.</string>
+    <string name="scanning">Finalizando - Escaneando</string>
+    <string name="according_to_settings_i_cant_seed_unless_wifi">De acuerdo a sus preferencias no puedo empezar a compartir a menos que esté conectado a una red Wi-Fi. El archivo estará listo para ser compartido automaticamente cuando vuelva a una red Wi-Fi con acceso a Internet.</string>
+    <string name="are_you_sure_delete_playlist">Está seguro que desea borrar el playlist %s</string>
+    <string name="delete_files">Borrar archivos</string>
+    <string name="http_download_status_temp_dir_error">Directorio temporal no existe o no puede ser creado</string>
+    <string name="finishing">Terminando</string>
+    <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">BitTorrent está desconectado. Le gustaría que lo inicie por Ud.?</string>
+    <string name="sd_permission_no_accessible_path">La ruta que ha seleccionado en la tarjeta SD no es accesible como antes. Presione OK para seleccionarla de nuevo.</string>
+    <string name="wifi_network_unavailable">Red WiFi No Disponible</string>
+    <string name="pick_the_files_you_want_to_download_from_this_torrent">Seleccione los archivos que desea descargar de este torrent</string>
+    <string name="seeding_is_currently_disabled">Compartir está desabilitado en sus preferencias. Le gustaria que activara la capacidad de compartir para que Ud. pueda compartir este archivo?</string>
+    <string name="fetching_torrent_ellipsis">Obteniendo torrent…</string>
+    <string name="enable_seeding">Habilitar Compartir</string>
 </resources>
