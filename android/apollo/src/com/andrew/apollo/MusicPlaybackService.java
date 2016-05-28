@@ -2085,7 +2085,7 @@ public class MusicPlaybackService extends Service {
      * Stops playback.
      */
     public void stop() {
-        stop(true);
+        stop(false);
     }
 
     /**
