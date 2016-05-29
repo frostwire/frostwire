@@ -54,7 +54,6 @@ public class MainApplication extends Application {
         super.onCreate();
 
         try {
-
             PlayStore.getInstance().initialize(this); // as early as possible
 
             ignoreHardwareMenu();
