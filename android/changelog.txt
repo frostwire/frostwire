@@ -4,7 +4,7 @@ FrostWire 1.7.4 - MAY/27/2016
    a torrent of a file or many in one touch.
  - New handpicked file selection on .torrent downloads.
  - Search improvements and refactors.
- - New jlibtorrent 1.1.0.29
+ - New jlibtorrent 1.1.0.31
  - Re-engineering and simplification of transfers architecture.
  - Fixes bug where a playlist could not be created out of the
    'More by artist' song list.

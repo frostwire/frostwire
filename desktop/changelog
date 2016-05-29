@@ -3,13 +3,13 @@ frostwire (6.3.0) stable; urgency=high
   * Finished cloud transfers are seedeable.
   * If seeding setting is active, finished cloud transfers are seeded.
   * Improved 'Search for Keywords' suggestions for episodic queries.
-  * New jlibtorrent 1.1.0.30
+  * New jlibtorrent 1.1.0.31
   * Spanish, Portuguese translations updated.
   * Fixes Torlock search. 
   * EZTV no longer returns irrelevant results.
   * New Search Engine: TorrentDownloads.me
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 25 May 2016 18:32:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Sun, 29 May 2016 11:42:00 -0500
 
 frostwire (6.2.4) stable; urgency=high
   * Fixes Monova search.
