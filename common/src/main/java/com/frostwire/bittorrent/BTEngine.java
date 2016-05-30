@@ -835,7 +835,10 @@ public final class BTEngine {
     }
 
     private void onExternalIpAlert(ExternalIpAlert alert) {
-        this.externalAddress = alert.getExternalAddress();
+        final Address candidateAddress = alert.getExternalAddress();
+        if (!candidateAddress.toString().equals("0.0.0.0")) {
+            this.externalAddress = alert.getExternalAddress();
+        }
     }
 
     private final class RestoreDownloadTask implements Runnable {

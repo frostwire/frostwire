@@ -93,9 +93,11 @@ public final class MagnetUriBuilder {
                         NetworkInterface iface = networkInterfaces.nextElement();
                         final List<InterfaceAddress> interfaceAddresses = iface.getInterfaceAddresses();
                         for (InterfaceAddress ifaceAddress : interfaceAddresses) {
-                            String address = ifaceAddress.getAddress().toString().replace("/","");
-
-                            if (!address.equals("::")) {
+                            String address = ifaceAddress.getAddress().getHostAddress();
+                            if (!address.startsWith("::") &&
+                                !address.equals("127.0.0.1") &&
+                                !address.contains("dummy") &&
+                                !address.contains("wlan")) {
                                 magnetUri = magnetUri + "&x.pe=" + address +":" + btEngine.getListenPort();
                             }
                         }
