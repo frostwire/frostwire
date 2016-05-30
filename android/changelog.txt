@@ -1,4 +1,4 @@
-FrostWire 1.7.4 - MAY/27/2016
+FrostWire 1.7.4 - MAY/29/2016
  - Issues saving to SD card on multiple devices fixed.
  - New 'Seed' action available on 'My files'. Create and seed
    a torrent of a file or many in one touch.
