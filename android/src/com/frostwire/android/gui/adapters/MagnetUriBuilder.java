@@ -25,6 +25,11 @@ import com.frostwire.logging.Logger;
 import com.frostwire.transfers.BittorrentDownload;
 
 import java.io.File;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -67,13 +72,40 @@ public final class MagnetUriBuilder {
 
     private String appendXPEParameter(String magnetUri) {
         String xpe = null;
-        if (BTEngine.getInstance().getExternalAddress() != null) {
-            Address externalAddress = BTEngine.getInstance().getExternalAddress();
-            xpe = externalAddress.toString() + externalAddress.toV4()
+        final BTEngine btEngine = BTEngine.getInstance();
+        if (btEngine.getExternalAddress() != null && btEngine.getListenPort() != -1) {
+            Address externalAddress = btEngine.getExternalAddress();
+            xpe = externalAddress.toString() + ":" + btEngine.getListenPort();
         }
         if (xpe != null) {
             magnetUri = magnetUri + "&x.pe=" + xpe;
         }
+
+        // since I don't know what the internal port is and usually
+        // when ports are mapped they match, I'll also go through the list
+        // of internal addresses
+        if (btEngine.getListenPort() != -1) {
+            try {
+                final Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+
+                if (networkInterfaces != null) {
+                    while (networkInterfaces.hasMoreElements()) {
+                        NetworkInterface iface = networkInterfaces.nextElement();
+                        final List<InterfaceAddress> interfaceAddresses = iface.getInterfaceAddresses();
+                        for (InterfaceAddress ifaceAddress : interfaceAddresses) {
+                            String address = ifaceAddress.getAddress().toString().replace("/","");
+
+                            if (!address.equals("::")) {
+                                magnetUri = magnetUri + "&x.pe=" + address +":" + btEngine.getListenPort();
+                            }
+                        }
+                    }
+                }
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+        }
+
         return magnetUri;
     }
 }

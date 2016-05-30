@@ -168,7 +168,6 @@ public final class BTEngine {
 
             loadSettings();
             fireStarted();
-
         } finally {
             sync.unlock();
         }
@@ -829,6 +828,10 @@ public final class BTEngine {
 
     public Address getExternalAddress() {
         return this.externalAddress;
+    }
+
+    public int getListenPort() {
+        return this.session.getListenPort();
     }
 
     private void onExternalIpAlert(ExternalIpAlert alert) {
