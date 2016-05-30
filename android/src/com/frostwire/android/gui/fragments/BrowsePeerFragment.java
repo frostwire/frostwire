@@ -41,7 +41,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Finger;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
-import com.frostwire.android.gui.adapters.FileListAdapter;
+import com.frostwire.android.gui.adapters.menu.FileListAdapter;
 import com.frostwire.android.gui.util.SwipeDetector;
 import com.frostwire.android.gui.util.SwipeListener;
 import com.frostwire.android.gui.util.UIUtils;

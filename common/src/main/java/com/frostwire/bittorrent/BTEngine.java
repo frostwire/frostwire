@@ -50,7 +50,8 @@ public final class BTEngine {
             DHT_STATS.swig(),
             STORAGE_MOVED.swig(),
             LISTEN_SUCCEEDED.swig(),
-            LISTEN_FAILED.swig()
+            LISTEN_FAILED.swig(),
+            EXTERNAL_IP.swig()
     };
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
@@ -69,6 +70,7 @@ public final class BTEngine {
     private boolean firewalled;
     private BTEngineListener listener;
     private int totalDHTNodes;
+    private Address externalAddress;
 
     private BTEngine() {
         this.sync = new ReentrantLock();
@@ -812,6 +814,9 @@ public final class BTEngine {
                 case STORAGE_MOVED:
                     doResumeData((TorrentAlert<?>) alert, true);
                     break;
+                case EXTERNAL_IP:
+                    onExternalIpAlert((ExternalIpAlert) alert);
+                    break;
                 case LISTEN_SUCCEEDED:
                     //logListenSucceeded((ListenSucceededAlert) alert);
                     break;
@@ -820,6 +825,14 @@ public final class BTEngine {
                     break;
             }
         }
+    }
+
+    public Address getExternalAddress() {
+        return this.externalAddress;
+    }
+
+    private void onExternalIpAlert(ExternalIpAlert alert) {
+        this.externalAddress = alert.getExternalAddress();
     }
 
     private final class RestoreDownloadTask implements Runnable {
