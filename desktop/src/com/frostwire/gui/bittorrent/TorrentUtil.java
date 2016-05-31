@@ -211,7 +211,7 @@ public final class TorrentUtil {
             libtorrent.add_files(fs, file.getAbsolutePath());
             create_torrent torrentCreator = new create_torrent(fs);
 
-            if (dhtTrackedOnly) {
+            if (!dhtTrackedOnly) {
                 torrentCreator.add_tracker("udp://tracker.openbittorrent.com:80");
                 torrentCreator.add_tracker("udp://tracker.publicbt.com:80");
                 torrentCreator.add_tracker("udp://open.demonii.com:1337");
