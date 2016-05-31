@@ -51,26 +51,24 @@ import java.util.*;
 public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<HandpickedTorrentDownloadDialog.TorrentFileEntry> {
     private static Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialog.class);
     private TorrentInfo torrentInfo;
+    private String magnetUri;
     private static final String BUNDLE_KEY_TORRENT_INFO_DATA = "torrentInfoData";
+    private static final String BUNDLE_KEY_MAGNET_URI = "magnetUri";
 
     public HandpickedTorrentDownloadDialog() {
         super();
     }
 
-    private HandpickedTorrentDownloadDialog(TorrentInfo tinfo) {
-        super();
-        this.torrentInfo = tinfo;
-    }
-
     public static HandpickedTorrentDownloadDialog newInstance(
             Context ctx,
-            TorrentInfo tinfo) {
+            TorrentInfo tinfo,
+            String magnetUri) {
         //
         // ideas:  - pre-selected file(s) to just check the one(s)
         //         - passing a file path
         //         - passing a byte[] to create the tinfo from.
 
-        HandpickedTorrentDownloadDialog dlg = new HandpickedTorrentDownloadDialog(tinfo);
+        HandpickedTorrentDownloadDialog dlg = new HandpickedTorrentDownloadDialog();
 
         // this creates a bundle that gets passed to setArguments(). It's supposed to be ready
         // before the dialog is attached to the underlying activity, after we attach to it, then
@@ -87,7 +85,11 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
                 ctx.getString(R.string.pick_the_files_you_want_to_download_from_this_torrent),
                 JsonUtils.toJson(torrentInfoList),
                 SelectionMode.MULTIPLE_SELECTION);
-        dlg.getArguments().putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, allChecked);
+        final Bundle arguments = dlg.getArguments();
+        arguments.putByteArray(BUNDLE_KEY_TORRENT_INFO_DATA, tinfo.bencode());
+        arguments.putString(BUNDLE_KEY_MAGNET_URI, magnetUri);
+        arguments.putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, allChecked);
+
         dlg.setOnYesListener(new OnStartDownloadsClickListener(ctx, dlg));
         return dlg;
     }
@@ -112,11 +114,13 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         return new OnStartDownloadsClickListener(getActivity(), dlg);
     }
 
+    /*
     @Override
     void prepareArguments(int dialogIcon, String dialogTitle, String dialogText, String listDataInJSON, SelectionMode selectionMode) {
         super.prepareArguments(dialogIcon, dialogTitle, dialogText, listDataInJSON, selectionMode);
         onSaveInstanceState(getArguments());
     }
+    */
 
     @Override
     public List<TorrentFileEntry> deserializeData(String listDataInJSON) {
@@ -132,8 +136,9 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (outState!=null) {
+        if (outState!=null && torrentInfo != null) {
             outState.putByteArray(BUNDLE_KEY_TORRENT_INFO_DATA, torrentInfo.bencode());
+            outState.putString(BUNDLE_KEY_MAGNET_URI, magnetUri);
         }
         super.onSaveInstanceState(outState); //saves the torrentInfo in bytes.
     }
@@ -141,16 +146,22 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         byte[] torrentInfoData;
+        Bundle arguments = getArguments();
         if (this.torrentInfo == null &&
-            savedInstanceState != null &&
-            (torrentInfoData=savedInstanceState.getByteArray(BUNDLE_KEY_TORRENT_INFO_DATA))!=null) {
+                arguments != null &&
+            (torrentInfoData=arguments.getByteArray(BUNDLE_KEY_TORRENT_INFO_DATA))!=null) {
             torrentInfo = TorrentInfo.bdecode(torrentInfoData);
+            magnetUri = arguments.getString(BUNDLE_KEY_MAGNET_URI, null);
         }
         super.initComponents(dlg, savedInstanceState);
     }
 
     private TorrentInfo getTorrentInfo() {
         return torrentInfo;
+    }
+
+    public String getMagnetUri() {
+        return magnetUri;
     }
 
     private static class TorrentFileEntryList {
@@ -297,7 +308,8 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
                 public void run() {
                     BTEngine.getInstance().download(theDialog.getTorrentInfo(),
                             null,
-                            selection);
+                            selection,
+                            theDialog.getMagnetUri());
                     UIUtils.showTransfersOnDownloadStart(context);
                 }
             });

@@ -357,14 +357,14 @@ public final class BTEngine {
             }
         }
 
-        download(ti, saveDir, priorities, null);
+        download(ti, saveDir, priorities, null, null);
 
         if (!exists) {
             saveResumeTorrent(torrent);
         }
     }
 
-    public void download(TorrentInfo ti, File saveDir, boolean[] selection) {
+    public void download(TorrentInfo ti, File saveDir, boolean[] selection, String magnetUrlParams) {
         if (session == null) {
             return;
         }
@@ -393,7 +393,7 @@ public final class BTEngine {
             }
         }
 
-        download(ti, saveDir, priorities, null);
+        download(ti, saveDir, priorities, null, magnetUrlParams);
 
         if (!torrentHandleExists) {
             File torrent = saveTorrent(ti);
@@ -421,12 +421,12 @@ public final class BTEngine {
             Priority[] priorities = th.getFilePriorities();
             if (priorities[fileIndex] == Priority.IGNORE) {
                 priorities[fileIndex] = Priority.NORMAL;
-                download(ti, saveDir, priorities, null);
+                download(ti, saveDir, priorities, null, null);
             }
         } else {
             Priority[] priorities = Priority.array(Priority.IGNORE, ti.numFiles());
             priorities[fileIndex] = Priority.NORMAL;
-            download(ti, saveDir, priorities, null);
+            download(ti, saveDir, priorities, null, null);
         }
 
         if (!exists) {
@@ -716,7 +716,7 @@ public final class BTEngine {
         }
     }
 
-    public void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile) {
+    public void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, String magnetUrlParams) {
 
         TorrentHandle th = session.findTorrent(ti.infoHash());
 
@@ -738,7 +738,64 @@ public final class BTEngine {
                 th.resume();
             }
         } else { // new download
-            session.asyncAddTorrent(ti, saveDir, priorities, resumeFile);
+            addTorrentSupport(ti, saveDir, priorities, resumeFile, true, magnetUrlParams);
+            //session.asyncAddTorrent(ti, saveDir, priorities, resumeFile);
+        }
+    }
+
+    private TorrentHandle addTorrentSupport(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, boolean async, String magnetUrlParams) {
+
+        String savePath = null;
+        if (saveDir != null) {
+            savePath = saveDir.getAbsolutePath();
+        } else if (resumeFile == null) {
+            throw new IllegalArgumentException("Both saveDir and resumeFile can't be null at the same time");
+        }
+
+        add_torrent_params p = add_torrent_params.create_instance();
+
+        if (magnetUrlParams != null) {
+            p.setUrl(magnetUrlParams);
+        }
+
+        p.set_ti(ti.swig());
+        if (savePath != null) {
+            p.setSave_path(savePath);
+        }
+
+        if (priorities != null) {
+            byte_vector v = new byte_vector();
+            for (int i = 0; i < priorities.length; i++) {
+                v.push_back((byte) priorities[i].swig());
+            }
+            p.set_file_priorities(v);
+        }
+        p.setStorage_mode(storage_mode_t.storage_mode_sparse);
+
+        long flags = p.get_flags();
+
+        flags &= ~add_torrent_params.flags_t.flag_auto_managed.swigValue();
+
+        if (resumeFile != null) {
+            try {
+                byte[] data = FileUtils.readFileToByteArray(resumeFile);
+                p.set_resume_data(Vectors.bytes2byte_vector(data));
+
+                flags |= add_torrent_params.flags_t.flag_use_resume_save_path.swigValue();
+            } catch (Throwable e) {
+                LOGGER.warn("Unable to set resume data", e);
+            }
+        }
+
+        p.set_flags(flags);
+
+        if (async) {
+            session.swig().async_add_torrent(p);
+            return null;
+        } else {
+            error_code ec = new error_code();
+            torrent_handle th = session.swig().add_torrent(p, ec);
+            return new TorrentHandle(th);
         }
     }
 

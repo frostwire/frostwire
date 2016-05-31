@@ -253,7 +253,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 final Session session = BTEngine.getInstance().getSession();
 
                 // so the TorrentHandle object is created and added to the libtorrent session.
-                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
+                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
 
                 final TorrentHandle torrentHandle =
                         session.findTorrent(tinfo.infoHash());
@@ -265,7 +265,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
                 // so it will call fireDownloadUpdate(torrentHandle) -> UIBittorrentDownload.updateUI()
                 // which calculates the download items;
-                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
+                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
                 forceDHTAnnounceIfNoPeers(torrentHandle);
                 torrentHandle.forceRecheck();
             }

@@ -337,7 +337,7 @@ public final class TransferManager {
                 }
             } else {
                 if (u.getScheme().equalsIgnoreCase("file")) {
-                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())));
+                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())), null);
                 } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https") || u.getScheme().equalsIgnoreCase("magnet")) {
                     // this executes the listener method when it fetches the bytes.
                     new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()), fetcherListener);
