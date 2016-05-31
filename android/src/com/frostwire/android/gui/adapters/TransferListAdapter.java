@@ -337,7 +337,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 R.drawable.contextmenu_icon_magnet,
                 R.string.transfers_context_menu_copy_magnet,
                 R.string.transfers_context_menu_copy_magnet_copied,
-                new MagnetUriBuilder(download)
+                new MagnetUriBuilder(download).getMagnet()
         ));
 
         items.add(new CopyToClipboardMenuAction(context.get(),

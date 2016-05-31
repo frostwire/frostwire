@@ -54,8 +54,7 @@ public final class MagnetUriBuilder {
         this(null, download);
     }
 
-    @Override
-    public String toString() {
+    public String getMagnet() {
         if (this.torrentFilePath != null) {
             try {
                 String magnetUri = new TorrentInfo(new File(this.torrentFilePath)).makeMagnetUri();

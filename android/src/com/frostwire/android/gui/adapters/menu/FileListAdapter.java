@@ -157,7 +157,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                         R.drawable.contextmenu_icon_magnet,
                         R.string.transfers_context_menu_copy_magnet,
                         R.string.transfers_context_menu_copy_magnet_copied,
-                        new MagnetUriBuilder(fd.filePath)
+                        new MagnetUriBuilder(fd.filePath).getMagnet()
                 ));
 
                 items.add(new CopyToClipboardMenuAction(context,
