@@ -38,39 +38,22 @@ import java.util.List;
 public final class MagnetUriBuilder {
 
     private static Logger LOG = Logger.getLogger(MagnetUriBuilder.class);
-    private final String torrentFilePath;
-    private final BittorrentDownload btDownload;
 
-    MagnetUriBuilder(String torrentFilePath, BittorrentDownload btDownload) {
-        this.torrentFilePath = torrentFilePath;
-        this.btDownload = btDownload;
-    }
+    /** The x.pe-less magnet */
+    private final String magnetUri;
 
     public MagnetUriBuilder(String torrentFilePath) {
-        this(torrentFilePath, null);
+         magnetUri = extractMagnetUri(torrentFilePath);
     }
 
     public MagnetUriBuilder(BittorrentDownload download) {
-        this(null, download);
+         magnetUri = download.magnetUri();
     }
 
+    // WIP: We still need to figure out the right ports for the right network interfaces.
     public String getMagnet() {
-        if (this.torrentFilePath != null) {
-            try {
-                String magnetUri = new TorrentInfo(new File(this.torrentFilePath)).makeMagnetUri();
-                magnetUri = appendXPEParameter(magnetUri);
-                return magnetUri;
-            } catch (Throwable e) {
-                LOG.warn("Error trying to get magnet", e);
-            }
-        } else if (this.btDownload != null) {
-            return appendXPEParameter(btDownload.magnetUri());
-        }
-        return super.toString();
-    }
-
-    private String appendXPEParameter(String magnetUri) {
         String xpe = null;
+        String resultUri = null;
         final BTEngine btEngine = BTEngine.getInstance();
         if (btEngine.getExternalAddress() != null && btEngine.getListenPort() != -1) {
             Address externalAddress = btEngine.getExternalAddress();
@@ -79,13 +62,16 @@ public final class MagnetUriBuilder {
         LOG.info("creating magnet with:");
         if (xpe != null) {
             LOG.info("external address: " + xpe);
-            magnetUri = magnetUri + "&x.pe=" + xpe;
+            resultUri = magnetUri + "&x.pe=" + xpe;
         }
 
         // since I don't know what the internal port is and usually
         // when ports are mapped they match, I'll also go through the list
         // of internal addresses
         if (btEngine.getListenPort() != -1) {
+            if (resultUri == null) {
+                resultUri = magnetUri;
+            }
             try {
                 final Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
 
@@ -109,7 +95,7 @@ public final class MagnetUriBuilder {
                                     // surround with brackets.
                                     address = "[" + address + "]";
                                 }
-                                magnetUri = magnetUri + "&x.pe=" + address +":" + btEngine.getListenPort();
+                                resultUri = resultUri + "&x.pe=" + address +":" + btEngine.getListenPort();
                                 LOG.info(address + " : " + btEngine.getListenPort());
                             }
                         }
@@ -119,7 +105,16 @@ public final class MagnetUriBuilder {
                 e.printStackTrace();
             }
         }
+        return resultUri;
+    }
 
-        return magnetUri;
+    private static String extractMagnetUri(String torrentFilePath) {
+        try {
+            String magnetUri = new TorrentInfo(new File(torrentFilePath)).makeMagnetUri();
+            return magnetUri;
+        } catch (Throwable e) {
+            LOG.warn("Error trying to get magnet", e);
+        }
+        return null;
     }
 }
