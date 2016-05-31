@@ -228,12 +228,12 @@ public class TorrentFetcherDownload implements BTDownload {
         });
     }
 
-    private void downloadTorrent(final byte[] data) {
+    private void downloadTorrent(final byte[] data, final String magnetUri) {
         if (relativePath != null) {
             try {
                 TorrentInfo ti = TorrentInfo.bdecode(data);
                 boolean[] selection = calculateSelection(ti, relativePath);
-                BTEngine.getInstance().download(ti, null, selection);
+                BTEngine.getInstance().download(ti, null, selection, magnetUri);
             } catch (Throwable e) {
                 LOG.error("Error downloading torrent", e);
             }
@@ -254,7 +254,7 @@ public class TorrentFetcherDownload implements BTDownload {
                         }
 
                         TorrentInfo ti = TorrentInfo.bdecode(data);
-                        BTEngine.getInstance().download(ti, null, selection);
+                        BTEngine.getInstance().download(ti, null, selection, magnetUri);
 
                     } catch (Throwable e) {
                         LOG.error("Error downloading torrent", e);
@@ -317,7 +317,7 @@ public class TorrentFetcherDownload implements BTDownload {
 
                 if (data != null) {
                     try {
-                        downloadTorrent(data);
+                        downloadTorrent(data, uri);
                     } finally {
                         cancel();
                     }
