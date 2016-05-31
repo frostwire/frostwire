@@ -267,12 +267,6 @@ public final class BTEngine {
         } catch (Throwable e) {
             LOGGER.error("Error loading session state", e);
         }
-        final SettingsPack sp = session.getSettingsPack();
-        sp.setBoolean(settings_pack.bool_types.enable_upnp.swigValue(), true);
-        sp.setBoolean(settings_pack.bool_types.enable_natpmp.swigValue(), true);
-        sp.setBoolean(settings_pack.bool_types.announce_double_nat.swigValue(), true);
-        session.applySettings(sp);
-        saveSettings();
     }
 
     public void saveSettings() {
