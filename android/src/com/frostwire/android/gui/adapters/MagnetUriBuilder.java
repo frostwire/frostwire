@@ -77,7 +77,9 @@ public final class MagnetUriBuilder {
             Address externalAddress = btEngine.getExternalAddress();
             xpe = externalAddress.toString() + ":" + btEngine.getListenPort();
         }
+        LOG.info("creating magnet with:");
         if (xpe != null) {
+            LOG.info("external address: " + xpe);
             magnetUri = magnetUri + "&x.pe=" + xpe;
         }
 
@@ -98,7 +100,18 @@ public final class MagnetUriBuilder {
                                 !address.equals("127.0.0.1") &&
                                 !address.contains("dummy") &&
                                 !address.contains("wlan")) {
+
+                                // IPv6 address should be expressed as [address]:port
+                                if (address.contains(":")) {
+                                    // remove the %22 or whatever mask at the end.
+                                    if (address.indexOf("%")!=1) {
+                                        address = address.substring(0,address.indexOf("%"));
+                                    }
+                                    // surround with brackets.
+                                    address = "[" + address + "]";
+                                }
                                 magnetUri = magnetUri + "&x.pe=" + address +":" + btEngine.getListenPort();
+                                LOG.info(address + " : " + btEngine.getListenPort());
                             }
                         }
                     }
