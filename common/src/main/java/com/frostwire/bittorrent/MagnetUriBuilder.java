@@ -16,9 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.android.gui.adapters;
+package com.frostwire.bittorrent;
 
-import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Address;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.logging.Logger;

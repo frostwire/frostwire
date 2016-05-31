@@ -36,7 +36,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.adapters.MagnetUriBuilder;
+import com.frostwire.bittorrent.MagnetUriBuilder;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;

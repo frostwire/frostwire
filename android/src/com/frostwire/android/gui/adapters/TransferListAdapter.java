@@ -43,6 +43,7 @@ import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.bittorrent.BTDownloadItem;
+import com.frostwire.bittorrent.MagnetUriBuilder;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.WebSearchPerformer;
