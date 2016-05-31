@@ -41,12 +41,15 @@ import static com.frostwire.jlibtorrent.alerts.AlertType.*;
  */
 public final class BTEngine {
 
-    private static final Logger LOG = Logger.getLogger(BTEngine.class);
+    private static final Logger LOGGER = Logger.getLogger(BTEngine.class);
 
     private static final int[] INNER_LISTENER_TYPES = new int[]{TORRENT_ADDED.swig(),
             PIECE_FINISHED.swig(),
             PORTMAP.swig(),
             PORTMAP_ERROR.swig(),
+            PORTMAP_LOG.swig(),
+            LOG.swig(),
+            PEER_LOG.swig(),
             DHT_STATS.swig(),
             STORAGE_MOVED.swig(),
             LISTEN_SUCCEEDED.swig(),
@@ -55,18 +58,15 @@ public final class BTEngine {
     };
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
-
+    private static final boolean SESSION_LOGGING = true;
     public static BTContext ctx;
 
     private final ReentrantLock sync;
     private final InnerListener innerListener;
-
     private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
 
     private Session session;
     private Downloader downloader;
-
-
     private boolean firewalled;
     private BTEngineListener listener;
     private int totalDHTNodes;
@@ -163,9 +163,8 @@ public final class BTEngine {
                 return;
             }
 
-            session = new Session(ctx.interfaces, ctx.retries, false, innerListener);
+            session = new Session(ctx.interfaces, ctx.retries, SESSION_LOGGING, innerListener);
             downloader = new Downloader(session);
-
             loadSettings();
             fireStarted();
         } finally {
@@ -248,7 +247,7 @@ public final class BTEngine {
                 }
             }
         } catch (Throwable e) {
-            LOG.error("Error changing save path for session", e);
+            LOGGER.error("Error changing save path for session", e);
         }
     }
 
@@ -266,8 +265,14 @@ public final class BTEngine {
                 revertToDefaultConfiguration();
             }
         } catch (Throwable e) {
-            LOG.error("Error loading session state", e);
+            LOGGER.error("Error loading session state", e);
         }
+        final SettingsPack sp = session.getSettingsPack();
+        sp.setBoolean(settings_pack.bool_types.enable_upnp.swigValue(), true);
+        sp.setBoolean(settings_pack.bool_types.enable_natpmp.swigValue(), true);
+        sp.setBoolean(settings_pack.bool_types.announce_double_nat.swigValue(), true);
+        session.applySettings(sp);
+        saveSettings();
     }
 
     public void saveSettings() {
@@ -279,7 +284,7 @@ public final class BTEngine {
             byte[] data = session.saveState();
             FileUtils.writeByteArrayToFile(settingsFile(), data);
         } catch (Throwable e) {
-            LOG.error("Error saving session state", e);
+            LOGGER.error("Error saving session state", e);
         }
     }
 
@@ -455,7 +460,7 @@ public final class BTEngine {
         }
 
         if (ctx.homeDir == null || !ctx.homeDir.exists()) {
-            LOG.warn("Wrong setup with BTEngine home dir");
+            LOGGER.warn("Wrong setup with BTEngine home dir");
             return;
         }
 
@@ -475,14 +480,14 @@ public final class BTEngine {
 
                         File savePath = readSavePath(infoHash);
                         if (setupSaveDir(savePath) == null) {
-                            LOG.warn("Can't create data dir or mount point is not accessible");
+                            LOGGER.warn("Can't create data dir or mount point is not accessible");
                             return;
                         }
 
                         restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
                     }
                 } catch (Throwable e) {
-                    LOG.error("Error restoring torrent download: " + t, e);
+                    LOGGER.error("Error restoring torrent download: " + t, e);
                 }
             }
         }
@@ -550,7 +555,7 @@ public final class BTEngine {
             fs.scan(torrentFile);
         } catch (Throwable e) {
             torrentFile = null;
-            LOG.warn("Error saving torrent info to file", e);
+            LOGGER.warn("Error saving torrent info to file", e);
         }
 
         return torrentFile;
@@ -564,7 +569,7 @@ public final class BTEngine {
             byte[] arr = Vectors.byte_vector2bytes(e.bencode());
             FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHash().toString()), arr);
         } catch (Throwable e) {
-            LOG.warn("Error saving resume torrent", e);
+            LOGGER.warn("Error saving resume torrent", e);
         }
     }
 
@@ -581,7 +586,7 @@ public final class BTEngine {
                 th.saveResumeData();
             }
         } catch (Throwable e) {
-            LOG.warn("Error triggering resume data", e);
+            LOGGER.warn("Error triggering resume data", e);
         }
     }
 
@@ -605,7 +610,7 @@ public final class BTEngine {
                 listener.downloadAdded(this, dl);
             }
         } catch (Throwable e) {
-            LOG.error("Unable to create and/or notify the new download", e);
+            LOGGER.error("Unable to create and/or notify the new download", e);
         }
     }
 
@@ -616,7 +621,7 @@ public final class BTEngine {
                 listener.downloadUpdate(this, dl);
             }
         } catch (Throwable e) {
-            LOG.error("Unable to notify update the a download", e);
+            LOGGER.error("Unable to notify update the a download", e);
         }
     }
 
@@ -624,7 +629,7 @@ public final class BTEngine {
         TcpEndpoint endp = alert.getEndpoint();
         String addr = endp.address().swig().to_string();
         String s = "endpoint: " + addr + ":" + endp.port() + " type:" + alert.swig().getSock_type();
-        LOG.info("Listen succeeded on " + s);
+        LOGGER.info("Listen succeeded on " + s);
     }
 
     private void logListenFailed(ListenFailedAlert alert) {
@@ -632,7 +637,7 @@ public final class BTEngine {
         String addr = endp.address().swig().to_string();
         final String message = alert.getError().message();
         String s = "endpoint: " + addr + ":" + endp.port() + " type:" + alert.swig().getSock_type();
-        LOG.info("Listen failed on " + s + " (error: " + message + ")");
+        LOGGER.info("Listen failed on " + s + " (error: " + message + ")");
     }
 
     private void migrateVuzeDownloads() {
@@ -660,19 +665,19 @@ public final class BTEngine {
                         }
 
                         if (torrent.exists() && saveDir.exists()) {
-                            LOG.info("Restored old vuze download: " + torrent);
+                            LOGGER.info("Restored old vuze download: " + torrent);
                             restoreDownloadsQueue.add(new RestoreDownloadTask(torrent, saveDir, priorities, null));
                             saveResumeTorrent(torrent);
                         }
                     } catch (Throwable e) {
-                        LOG.error("Error restoring vuze torrent download", e);
+                        LOGGER.error("Error restoring vuze torrent download", e);
                     }
                 }
 
                 file.delete();
             }
         } catch (Throwable e) {
-            LOG.error("Error migrating old vuze downloads", e);
+            LOGGER.error("Error migrating old vuze downloads", e);
         }
     }
 
@@ -683,7 +688,7 @@ public final class BTEngine {
             if (ctx.dataDir != null) {
                 result = ctx.dataDir;
             } else {
-                LOG.warn("Unable to setup save dir path, review your logic, both saveDir and ctx.dataDir are null.");
+                LOGGER.warn("Unable to setup save dir path, review your logic, both saveDir and ctx.dataDir are null.");
             }
         } else {
             result = saveDir;
@@ -693,12 +698,12 @@ public final class BTEngine {
 
         if (result != null && !fs.isDirectory(result) && !fs.mkdirs(result)) {
             result = null;
-            LOG.warn("Failed to create save dir to download");
+            LOGGER.warn("Failed to create save dir to download");
         }
 
         if (result != null && !fs.canWrite(result)) {
             result = null;
-            LOG.warn("Failed to setup save dir with write access");
+            LOGGER.warn("Failed to setup save dir with write access");
         }
 
         return result;
@@ -802,10 +807,22 @@ public final class BTEngine {
                     doResumeData((TorrentAlert<?>) alert, false);
                     break;
                 case PORTMAP:
+                    LOGGER.info("Got a portmap alert! -> externalPort = " + ((PortmapAlert) alert).externalPort());
                     firewalled = false;
                     break;
                 case PORTMAP_ERROR:
+                    LOGGER.info("Got a portmap ERROR alert!");
                     firewalled = true;
+                    break;
+                case PORTMAP_LOG:
+                    LOGGER.info("PortmapLogAlert: " + ((PortmapLogAlert) alert).logMessage());
+                    LOGGER.info("meanwhile my session.listen_port() is " + session.swig().listen_port() + " == " + session.getListenPort());
+                    break;
+                case LOG:
+                    LOGGER.info("LogAlert: " + ((LogAlert) alert).msg());
+                    break;
+                case PEER_LOG:
+                    LOGGER.info("PeerLogAlert: " + ((PeerLogAlert) alert).msg());
                     break;
                 case DHT_STATS:
                     totalDHTNodes = (int) session.getStats().dhtNodes();
@@ -860,7 +877,7 @@ public final class BTEngine {
             try {
                 session.asyncAddTorrent(new TorrentInfo(torrent), saveDir, priorities, resume);
             } catch (Throwable e) {
-                LOG.error("Unable to restore download from previous session. ("+torrent.getAbsolutePath()+")", e);
+                LOGGER.error("Unable to restore download from previous session. ("+torrent.getAbsolutePath()+")", e);
             }
         }
     }
