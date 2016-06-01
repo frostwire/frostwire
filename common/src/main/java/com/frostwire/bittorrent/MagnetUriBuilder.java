@@ -19,14 +19,13 @@
 package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.Address;
+import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.logging.Logger;
 import com.frostwire.transfers.BittorrentDownload;
 
 import java.io.File;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
+import java.net.*;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -38,19 +37,21 @@ public final class MagnetUriBuilder {
 
     private static Logger LOG = Logger.getLogger(MagnetUriBuilder.class);
 
-    /** The x.pe-less magnet */
+    /**
+     * The x.pe-less magnet
+     */
     private final String magnetUri;
 
     public MagnetUriBuilder(String torrentFilePathOrMagnetUri) {
         torrentFilePathOrMagnetUri = torrentFilePathOrMagnetUri.trim();
         if (torrentFilePathOrMagnetUri.startsWith("magnet:?") ||
-            torrentFilePathOrMagnetUri.contains("xt=") ||
-            torrentFilePathOrMagnetUri.contains("dn=") ||
-            torrentFilePathOrMagnetUri.contains("kt=") ||
-            torrentFilePathOrMagnetUri.contains("mt=") ||
-            torrentFilePathOrMagnetUri.contains("xs=") ||
-            torrentFilePathOrMagnetUri.contains("as=") ||
-            torrentFilePathOrMagnetUri.contains("tr=")) {
+                torrentFilePathOrMagnetUri.contains("xt=") ||
+                torrentFilePathOrMagnetUri.contains("dn=") ||
+                torrentFilePathOrMagnetUri.contains("kt=") ||
+                torrentFilePathOrMagnetUri.contains("mt=") ||
+                torrentFilePathOrMagnetUri.contains("xs=") ||
+                torrentFilePathOrMagnetUri.contains("as=") ||
+                torrentFilePathOrMagnetUri.contains("tr=")) {
             magnetUri = torrentFilePathOrMagnetUri;
         } else {
             magnetUri = extractMagnetUri(torrentFilePathOrMagnetUri);
@@ -59,69 +60,114 @@ public final class MagnetUriBuilder {
 
     @SuppressWarnings("unused")
     public MagnetUriBuilder(BittorrentDownload download) {
-         magnetUri = download.magnetUri();
+        magnetUri = download.magnetUri();
     }
 
-    // WIP: We still need to figure out the right ports for the right network interfaces.
     public String getMagnet() {
-        String xpe = null;
-        String resultUri = null;
-        final BTEngine btEngine = BTEngine.getInstance();
-        if (btEngine.getExternalAddress() != null && btEngine.getListenPort() != -1) {
-            Address externalAddress = btEngine.getExternalAddress();
-            xpe = externalAddress.toString() + ":" + btEngine.getListenPort();
-        }
-        LOG.info("creating magnet with:");
-        if (xpe != null) {
-            LOG.info("external address: " + xpe);
-            resultUri = magnetUri + "&x.pe=" + xpe;
+
+        List<TcpEndpoint> listenEndpoints = BTEngine.getInstance().listenEndpoints();
+        if (listenEndpoints.isEmpty()) {
+            return "";
         }
 
-        // since I don't know what the internal port is and usually
-        // when ports are mapped they match, I'll also go through the list
-        // of internal addresses
-        if (btEngine.getListenPort() != -1) {
-            if (resultUri == null) {
-                resultUri = magnetUri;
-            }
+        Address external = BTEngine.getInstance().externalAddress();
+
+        return magnetUri + buildPeersParameters(listenEndpoints, external);
+    }
+
+    private static String buildPeersParameters(List<TcpEndpoint> endpoints, Address external) {
+        if (endpoints.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for (TcpEndpoint endp : endpoints) {
             try {
-                final Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-
-                if (networkInterfaces != null) {
-                    while (networkInterfaces.hasMoreElements()) {
-                        NetworkInterface iface = networkInterfaces.nextElement();
-                        final List<InterfaceAddress> interfaceAddresses = iface.getInterfaceAddresses();
-                        for (InterfaceAddress ifaceAddress : interfaceAddresses) {
-                            String address = ifaceAddress.getAddress().getHostAddress();
-                            if (!address.startsWith("::") &&
-                                !address.equals("127.0.0.1") &&
-                                !address.contains("dummy") &&
-                                !address.contains("wlan") &&
-                                !address.contains("0.0.0.0") &&          // any local address
-                                !address.contains("0:0:0:0:0:0:0:1") &&  // loopback
-                                !address.contains("fe80:0:0:0:0:0:0:1")) // link-local unicast address
-                            {
-                                // IPv6 address should be expressed as [address]:port
-                                if (address.contains(":")) {
-                                    // remove the %22 or whatever mask at the end.
-                                    if (address.contains("%")) {
-                                        address = address.substring(0,address.indexOf("%"));
-                                    }
-                                    // surround with brackets.
-                                    address = "[" + address + "]";
-                                }
-                                resultUri = resultUri + "&x.pe=" + address +":" + btEngine.getListenPort();
-                                LOG.info(address + " : " + btEngine.getListenPort());
-                            }
-                        }
-                    }
-                }
-            } catch (SocketException e) {
-                e.printStackTrace();
+                processEndpoint(endp, external, sb);
+            } catch (Throwable e) {
+                LOG.error("Error processing listen endpoint", e);
             }
         }
-        LOG.info(resultUri);
-        return resultUri;
+
+        return sb.toString();
+    }
+
+    private static void processEndpoint(TcpEndpoint endp, Address external, StringBuilder sb) {
+        Address address = endp.address();
+        if (address.isLoopback() || address.isMulticast()) {
+            return;
+        }
+
+        if (address.isUnspecified()) {
+            try {
+                addAllInterfaces(endp, sb);
+            } catch (Throwable e) {
+                LOG.error("Error adding all listen interfaces", e);
+            }
+        } else {
+            addEndpoint(endp.address(), endp.port(), sb);
+        }
+
+        if (external != null) {
+            addEndpoint(external, endp.port(), sb);
+        }
+    }
+
+    private static void addAllInterfaces(TcpEndpoint endp, StringBuilder sb) throws SocketException {
+        Address address = endp.address();
+
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface iface = networkInterfaces.nextElement();
+            if (iface.isLoopback()) {
+                continue;
+            }
+            List<InterfaceAddress> interfaceAddresses = iface.getInterfaceAddresses();
+            for (InterfaceAddress ifaceAddress : interfaceAddresses) {
+                InetAddress inetAddress = ifaceAddress.getAddress();
+
+                if (inetAddress.isLoopbackAddress()) {
+                    continue;
+                }
+
+                boolean isIPv6 = inetAddress instanceof Inet6Address;
+
+                // same family?
+                if (!isIPv6 && !address.isV4()) {
+                    continue;
+                }
+                if (isIPv6 && !address.isV6()) {
+                    continue;
+                }
+
+                String hostAddress = ifaceAddress.getAddress().getHostAddress();
+
+                // IPv6 address should be expressed as [address]:port
+                if (isIPv6) {
+                    // remove the %22 or whatever mask at the end.
+                    if (hostAddress.contains("%")) {
+                        hostAddress = hostAddress.substring(0, hostAddress.indexOf("%"));
+                    }
+                    // surround with brackets.
+                    hostAddress = "[" + hostAddress + "]";
+                }
+                sb.append("&x.pe=" + hostAddress + ":" + endp.port());
+            }
+        }
+    }
+
+    private static void addEndpoint(Address address, int port, StringBuilder sb) {
+        String hostAddress = address.toString();
+        if (hostAddress.contains("invalid")) {
+            return;
+        }
+
+        if (address.isV6()) {
+            hostAddress = "[" + hostAddress + "]";
+        }
+        sb.append("&x.pe=" + hostAddress + ":" + port);
     }
 
     private static String extractMagnetUri(String torrentFilePath) {

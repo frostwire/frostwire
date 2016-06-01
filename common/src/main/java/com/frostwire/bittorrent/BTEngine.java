@@ -165,6 +165,7 @@ public final class BTEngine {
 
             firewalled = true;
             listenEndpoints.clear();
+            externalAddress = null;
 
             session = new Session(ctx.interfaces, ctx.retries, false, innerListener);
             downloader = new Downloader(session);
@@ -623,14 +624,20 @@ public final class BTEngine {
     }
 
     private void onListenSucceeded(ListenSucceededAlert alert) {
-        TcpEndpoint endp = alert.getEndpoint();
-        if (alert.getSocketType() == ListenSucceededAlert.SocketType.TCP ||
-                alert.getSocketType() == ListenSucceededAlert.SocketType.UDP) {
-            listenEndpoints.add(endp);
-        }
+        try {
+            TcpEndpoint endp = alert.getEndpoint();
+            if (alert.getSocketType() == ListenSucceededAlert.SocketType.TCP ||
+                    alert.getSocketType() == ListenSucceededAlert.SocketType.UDP) {
+                String address = endp.address().toString();
+                int port = endp.port();
+                listenEndpoints.add(new TcpEndpoint(address, port));
+            }
 
-        String s = "endpoint: " + endp + " type:" + alert.getSocketType();
-        LOGGER.info("Listen succeeded on " + s);
+            String s = "endpoint: " + endp + " type:" + alert.getSocketType();
+            LOGGER.info("Listen succeeded on " + s);
+        } catch (Throwable e) {
+            LOGGER.error("Error adding listen endpoint to internal list", e);
+        }
     }
 
     private void onListenFailed(ListenFailedAlert alert) {
@@ -888,19 +895,24 @@ public final class BTEngine {
         }
     }
 
-    public Address getExternalAddress() {
+    public Address externalAddress() {
         return this.externalAddress;
     }
 
-    public int getListenPort() {
-        return this.session.getListenPort();
+    public List<TcpEndpoint> listenEndpoints() {
+        return new LinkedList<>(listenEndpoints);
     }
 
     private void onExternalIpAlert(ExternalIpAlert alert) {
-        // libtorrent perform all kind of tests
-        // to avoid non usable addresses
-        externalAddress = alert.getExternalAddress();
-        LOGGER.info("External IP: " + externalAddress);
+        try {
+            // libtorrent perform all kind of tests
+            // to avoid non usable addresses
+            String address = alert.getExternalAddress().toString();
+            externalAddress = new Address(address);
+            LOGGER.info("External IP: " + externalAddress);
+        } catch (Throwable e) {
+            LOGGER.error("Error saving reported external ip", e);
+        }
     }
 
     private final class RestoreDownloadTask implements Runnable {
