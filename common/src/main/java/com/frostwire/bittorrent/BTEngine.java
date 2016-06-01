@@ -159,6 +159,8 @@ public final class BTEngine {
                 return;
             }
 
+            firewalled = true;
+
             session = new Session(ctx.interfaces, ctx.retries, false, innerListener);
             downloader = new Downloader(session);
             loadSettings();
