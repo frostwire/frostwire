@@ -163,9 +163,18 @@ public final class BTEngine {
                 return;
             }
 
-            session = new Session(ctx.interfaces, ctx.retries, SESSION_LOGGING, innerListener);
+            //session = new Session(ctx.interfaces, ctx.retries, SESSION_LOGGING, innerListener);
+            SettingsPack sp = new SettingsPack();
+            sp.setBoolean(settings_pack.bool_types.enable_upnp.swigValue(), false);
+            sp.setBoolean(settings_pack.bool_types.enable_natpmp.swigValue(), false);
+            sp.setString(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
+            sp.setInteger(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
+            session = new Session(sp, SESSION_LOGGING, innerListener);
             downloader = new Downloader(session);
             loadSettings();
+            sp.setBoolean(settings_pack.bool_types.enable_upnp.swigValue(), true);
+            sp.setBoolean(settings_pack.bool_types.enable_natpmp.swigValue(), true);
+            session.applySettings(sp);
             fireStarted();
         } finally {
             sync.unlock();
@@ -866,14 +875,16 @@ public final class BTEngine {
                     firewalled = true;
                     break;
                 case PORTMAP_LOG:
-                    LOGGER.info("PortmapLogAlert: " + ((PortmapLogAlert) alert).logMessage());
-                    LOGGER.info("meanwhile my session.listen_port() is " + session.swig().listen_port() + " == " + session.getListenPort());
+                    if (((PortmapLogAlert) alert).logMessage().contains("port map [ mapping")) {
+                        LOGGER.info("PortmapLogAlert: " + ((PortmapLogAlert) alert).logMessage() + " (session.listen_port() => " + session.getListenPort() + ")");
+                    }
+                    //LOGGER.info("meanwhile my session.listen_port() is " + session.swig().listen_port() + " == " + session.getListenPort());
                     break;
                 case LOG:
-                    LOGGER.info("LogAlert: " + ((LogAlert) alert).msg());
+                    //LOGGER.info("LogAlert: " + ((LogAlert) alert).msg());
                     break;
                 case PEER_LOG:
-                    LOGGER.info("PeerLogAlert: " + ((PeerLogAlert) alert).msg());
+                    //LOGGER.info("PeerLogAlert: " + ((PeerLogAlert) alert).msg());
                     break;
                 case DHT_STATS:
                     totalDHTNodes = (int) session.getStats().dhtNodes();
