@@ -889,10 +889,9 @@ public final class BTEngine {
     }
 
     private void onExternalIpAlert(ExternalIpAlert alert) {
-        final Address candidateAddress = alert.getExternalAddress();
-        if (!candidateAddress.toString().equals("0.0.0.0")) {
-            this.externalAddress = alert.getExternalAddress();
-        }
+        // libtorrent perform all kind of tests
+        // to avoid non usable addresses
+        this.externalAddress = alert.getExternalAddress();
     }
 
     private final class RestoreDownloadTask implements Runnable {
