@@ -97,7 +97,10 @@ public final class MagnetUriBuilder {
                                 !address.equals("127.0.0.1") &&
                                 !address.contains("dummy") &&
                                 !address.contains("wlan") &&
-                                !address.contains("0.0.0.0")) {
+                                !address.contains("0.0.0.0") &&          // any local address
+                                !address.contains("0:0:0:0:0:0:0:1") &&  // loopback
+                                !address.contains("fe80:0:0:0:0:0:0:1")) // link-local unicast address
+                            {
                                 // IPv6 address should be expressed as [address]:port
                                 if (address.contains(":")) {
                                     // remove the %22 or whatever mask at the end.
