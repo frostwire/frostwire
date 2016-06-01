@@ -63,15 +63,19 @@ public final class BTEngine {
 
     private Session session;
     private Downloader downloader;
-    private boolean firewalled;
     private BTEngineListener listener;
     private int totalDHTNodes;
+
+    private boolean firewalled;
+    private List<TcpEndpoint> listenEndpoints;
     private Address externalAddress;
 
     private BTEngine() {
         this.sync = new ReentrantLock();
         this.innerListener = new InnerListener();
         this.restoreDownloadsQueue = new LinkedList<>();
+
+        this.listenEndpoints = new LinkedList<>();
     }
 
     private static class Loader {
@@ -160,6 +164,7 @@ public final class BTEngine {
             }
 
             firewalled = true;
+            listenEndpoints.clear();
 
             session = new Session(ctx.interfaces, ctx.retries, false, innerListener);
             downloader = new Downloader(session);
@@ -617,18 +622,21 @@ public final class BTEngine {
         }
     }
 
-    private void logListenSucceeded(ListenSucceededAlert alert) {
+    private void onListenSucceeded(ListenSucceededAlert alert) {
         TcpEndpoint endp = alert.getEndpoint();
-        String addr = endp.address().swig().to_string();
-        String s = "endpoint: " + addr + ":" + endp.port() + " type:" + alert.swig().getSock_type();
+        if (alert.getSocketType() == ListenSucceededAlert.SocketType.TCP ||
+                alert.getSocketType() == ListenSucceededAlert.SocketType.UDP) {
+            listenEndpoints.add(endp);
+        }
+
+        String s = "endpoint: " + endp + " type:" + alert.getSocketType();
         LOGGER.info("Listen succeeded on " + s);
     }
 
-    private void logListenFailed(ListenFailedAlert alert) {
+    private void onListenFailed(ListenFailedAlert alert) {
         TcpEndpoint endp = alert.endpoint();
-        String addr = endp.address().swig().to_string();
-        final String message = alert.getError().message();
-        String s = "endpoint: " + addr + ":" + endp.port() + " type:" + alert.swig().getSock_type();
+        String s = "endpoint: " + endp + " type:" + alert.getSocketType();
+        String message = alert.getError().message();
         LOGGER.info("Listen failed on " + s + " (error: " + message + ")");
     }
 
@@ -868,10 +876,10 @@ public final class BTEngine {
                     doResumeData((TorrentAlert<?>) alert, true);
                     break;
                 case LISTEN_SUCCEEDED:
-                    //logListenSucceeded((ListenSucceededAlert) alert);
+                    onListenSucceeded((ListenSucceededAlert) alert);
                     break;
                 case LISTEN_FAILED:
-                    //logListenFailed((ListenFailedAlert) alert);
+                    onListenFailed((ListenFailedAlert) alert);
                     break;
                 case EXTERNAL_IP:
                     onExternalIpAlert((ExternalIpAlert) alert);
@@ -891,7 +899,8 @@ public final class BTEngine {
     private void onExternalIpAlert(ExternalIpAlert alert) {
         // libtorrent perform all kind of tests
         // to avoid non usable addresses
-        this.externalAddress = alert.getExternalAddress();
+        externalAddress = alert.getExternalAddress();
+        LOGGER.info("External IP: " + externalAddress);
     }
 
     private final class RestoreDownloadTask implements Runnable {
