@@ -17,6 +17,7 @@
 
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
@@ -250,7 +251,7 @@ public class ShareTorrentDialog extends JDialog {
 
     private String getLink() {
         if (link == null) {
-            link = "http://maglnk.com/" + info_hash + "/?" + TorrentUtil.getMagnetURLParameters(torrent);
+            link = "http://maglnk.com/" + info_hash + "/?" + TorrentUtil.getMagnetURLParameters(torrent, BTEngine.getInstance().getSession());
         }
         return link;
     }
@@ -456,7 +457,7 @@ public class ShareTorrentDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            GUIMediator.setClipboardContent(TorrentUtil.getMagnet(info_hash) + "&" + TorrentUtil.getMagnetURLParameters(torrent));
+            GUIMediator.setClipboardContent(TorrentUtil.getMagnet(info_hash) + "&" + TorrentUtil.getMagnetURLParameters(torrent, BTEngine.getInstance().getSession()));
             setTitle(I18n.tr("Magnet copied to clipboard."));
 
             JButton source = (JButton) e.getSource();

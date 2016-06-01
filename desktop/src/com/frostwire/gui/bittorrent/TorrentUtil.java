@@ -42,7 +42,9 @@
  */
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.bittorrent.MagnetUriBuilder;
 import com.frostwire.jlibtorrent.AnnounceEntry;
+import com.frostwire.jlibtorrent.Session;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.*;
@@ -67,7 +69,7 @@ import java.util.Set;
 
 public final class TorrentUtil {
 
-    public interface UITorrentMakerListener {
+    interface UITorrentMakerListener {
         void onCreateTorrentError(final error_code ec);
         void beforeOpenForSeedInUIThread();
         void onException();
@@ -127,18 +129,24 @@ public final class TorrentUtil {
         return "magnet:?xt=urn:btih:" + hash;
     }
 
-    public static String getMagnetURLParameters(TorrentInfo torrent) {
+    static String getMagnetURLParameters(TorrentInfo torrent, Session session) {
         StringBuilder sb = new StringBuilder();
 
-        //dn
+        //dn (display name)
         sb.append("dn=");
         sb.append(UrlUtils.encode(torrent.name()));
 
+        //tr (trackers)
         final List<AnnounceEntry> trackers = torrent.trackers();
         for (AnnounceEntry tracker : trackers) {
             final String url = tracker.url();
             sb.append("&tr=");
             sb.append(UrlUtils.encode(url));
+        }
+
+        //x.pe (bootstrapping peer(s) ip:port)
+        if (session != null) {
+            return new MagnetUriBuilder(sb.toString()).getMagnet();
         }
 
         return sb.toString();
@@ -205,7 +213,7 @@ public final class TorrentUtil {
      * @param showShareTorrentDialog - show the share dialog when done
      * @param dhtTrackedOnly - if true, no trackers are added, otherwise adds a list of default trackers.
      */
-    public static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog, boolean dhtTrackedOnly) {
+    private static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog, boolean dhtTrackedOnly) {
         try {
             file_storage fs = new file_storage();
             libtorrent.add_files(fs, file.getAbsolutePath());
@@ -261,7 +269,7 @@ public final class TorrentUtil {
         }
     }
 
-    public static boolean isActive(BTDownload dl) {
+    static boolean isActive(BTDownload dl) {
         if (dl == null) {
             return false;
         }

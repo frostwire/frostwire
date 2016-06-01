@@ -41,10 +41,23 @@ public final class MagnetUriBuilder {
     /** The x.pe-less magnet */
     private final String magnetUri;
 
-    public MagnetUriBuilder(String torrentFilePath) {
-         magnetUri = extractMagnetUri(torrentFilePath);
+    public MagnetUriBuilder(String torrentFilePathOrMagnetUri) {
+        torrentFilePathOrMagnetUri = torrentFilePathOrMagnetUri.trim();
+        if (torrentFilePathOrMagnetUri.startsWith("magnet:?") ||
+            torrentFilePathOrMagnetUri.contains("xt=") ||
+            torrentFilePathOrMagnetUri.contains("dn=") ||
+            torrentFilePathOrMagnetUri.contains("kt=") ||
+            torrentFilePathOrMagnetUri.contains("mt=") ||
+            torrentFilePathOrMagnetUri.contains("xs=") ||
+            torrentFilePathOrMagnetUri.contains("as=") ||
+            torrentFilePathOrMagnetUri.contains("tr=")) {
+            magnetUri = torrentFilePathOrMagnetUri;
+        } else {
+            magnetUri = extractMagnetUri(torrentFilePathOrMagnetUri);
+        }
     }
 
+    @SuppressWarnings("unused")
     public MagnetUriBuilder(BittorrentDownload download) {
          magnetUri = download.magnetUri();
     }
@@ -83,12 +96,12 @@ public final class MagnetUriBuilder {
                             if (!address.startsWith("::") &&
                                 !address.equals("127.0.0.1") &&
                                 !address.contains("dummy") &&
-                                !address.contains("wlan")) {
-
+                                !address.contains("wlan") &&
+                                !address.contains("0.0.0.0")) {
                                 // IPv6 address should be expressed as [address]:port
                                 if (address.contains(":")) {
                                     // remove the %22 or whatever mask at the end.
-                                    if (address.indexOf("%")!=1) {
+                                    if (address.contains("%")) {
                                         address = address.substring(0,address.indexOf("%"));
                                     }
                                     // surround with brackets.
@@ -104,13 +117,13 @@ public final class MagnetUriBuilder {
                 e.printStackTrace();
             }
         }
+        LOG.info(resultUri);
         return resultUri;
     }
 
     private static String extractMagnetUri(String torrentFilePath) {
         try {
-            String magnetUri = new TorrentInfo(new File(torrentFilePath)).makeMagnetUri();
-            return magnetUri;
+            return new TorrentInfo(new File(torrentFilePath)).makeMagnetUri();
         } catch (Throwable e) {
             LOG.warn("Error trying to get magnet", e);
         }
