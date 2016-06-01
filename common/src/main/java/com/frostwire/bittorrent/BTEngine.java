@@ -58,7 +58,7 @@ public final class BTEngine {
     };
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
-    private static final boolean SESSION_LOGGING = true;
+    private static final boolean SESSION_LOGGING = false;
     public static BTContext ctx;
 
     private final ReentrantLock sync;
@@ -163,18 +163,9 @@ public final class BTEngine {
                 return;
             }
 
-            //session = new Session(ctx.interfaces, ctx.retries, SESSION_LOGGING, innerListener);
-            SettingsPack sp = new SettingsPack();
-            sp.setBoolean(settings_pack.bool_types.enable_upnp.swigValue(), false);
-            sp.setBoolean(settings_pack.bool_types.enable_natpmp.swigValue(), false);
-            sp.setString(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
-            sp.setInteger(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
-            session = new Session(sp, SESSION_LOGGING, innerListener);
+            session = new Session(ctx.interfaces, ctx.retries, SESSION_LOGGING, innerListener);
             downloader = new Downloader(session);
             loadSettings();
-            sp.setBoolean(settings_pack.bool_types.enable_upnp.swigValue(), true);
-            sp.setBoolean(settings_pack.bool_types.enable_natpmp.swigValue(), true);
-            session.applySettings(sp);
             fireStarted();
         } finally {
             sync.unlock();
