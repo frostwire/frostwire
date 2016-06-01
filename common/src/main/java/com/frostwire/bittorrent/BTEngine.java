@@ -49,7 +49,6 @@ public final class BTEngine {
             PORTMAP_ERROR.swig(),
             PORTMAP_LOG.swig(),
             LOG.swig(),
-            PEER_LOG.swig(),
             DHT_STATS.swig(),
             STORAGE_MOVED.swig(),
             LISTEN_SUCCEEDED.swig(),
@@ -858,24 +857,16 @@ public final class BTEngine {
                     doResumeData((TorrentAlert<?>) alert, false);
                     break;
                 case PORTMAP:
-                    LOGGER.info("Got a portmap alert! -> externalPort = " + ((PortmapAlert) alert).externalPort());
                     firewalled = false;
                     break;
                 case PORTMAP_ERROR:
-                    LOGGER.info("Got a portmap ERROR alert!");
                     firewalled = true;
                     break;
                 case PORTMAP_LOG:
-                    if (((PortmapLogAlert) alert).logMessage().contains("port map [ mapping")) {
-                        LOGGER.info("PortmapLogAlert: " + ((PortmapLogAlert) alert).logMessage() + " (session.listen_port() => " + session.getListenPort() + ")");
-                    }
-                    //LOGGER.info("meanwhile my session.listen_port() is " + session.swig().listen_port() + " == " + session.getListenPort());
+                    LOGGER.info("PortmapLogAlert: " + ((PortmapLogAlert) alert).logMessage());
                     break;
                 case LOG:
-                    //LOGGER.info("LogAlert: " + ((LogAlert) alert).msg());
-                    break;
-                case PEER_LOG:
-                    //LOGGER.info("PeerLogAlert: " + ((PeerLogAlert) alert).msg());
+                    LOGGER.info("LogAlert: " + ((LogAlert) alert).msg());
                     break;
                 case DHT_STATS:
                     totalDHTNodes = (int) session.getStats().dhtNodes();
@@ -883,14 +874,14 @@ public final class BTEngine {
                 case STORAGE_MOVED:
                     doResumeData((TorrentAlert<?>) alert, true);
                     break;
-                case EXTERNAL_IP:
-                    onExternalIpAlert((ExternalIpAlert) alert);
-                    break;
                 case LISTEN_SUCCEEDED:
                     //logListenSucceeded((ListenSucceededAlert) alert);
                     break;
                 case LISTEN_FAILED:
                     //logListenFailed((ListenFailedAlert) alert);
+                    break;
+                case EXTERNAL_IP:
+                    onExternalIpAlert((ExternalIpAlert) alert);
                     break;
             }
         }
@@ -930,7 +921,7 @@ public final class BTEngine {
             try {
                 session.asyncAddTorrent(new TorrentInfo(torrent), saveDir, priorities, resume);
             } catch (Throwable e) {
-                LOGGER.error("Unable to restore download from previous session. ("+torrent.getAbsolutePath()+")", e);
+                LOGGER.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
             }
         }
     }
