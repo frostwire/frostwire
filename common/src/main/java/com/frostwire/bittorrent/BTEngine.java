@@ -47,8 +47,6 @@ public final class BTEngine {
             PIECE_FINISHED.swig(),
             PORTMAP.swig(),
             PORTMAP_ERROR.swig(),
-            PORTMAP_LOG.swig(),
-            LOG.swig(),
             DHT_STATS.swig(),
             STORAGE_MOVED.swig(),
             LISTEN_SUCCEEDED.swig(),
@@ -57,7 +55,6 @@ public final class BTEngine {
     };
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
-    private static final boolean SESSION_LOGGING = false;
     public static BTContext ctx;
 
     private final ReentrantLock sync;
@@ -162,7 +159,7 @@ public final class BTEngine {
                 return;
             }
 
-            session = new Session(ctx.interfaces, ctx.retries, SESSION_LOGGING, innerListener);
+            session = new Session(ctx.interfaces, ctx.retries, false, innerListener);
             downloader = new Downloader(session);
             loadSettings();
             fireStarted();
@@ -861,12 +858,6 @@ public final class BTEngine {
                     break;
                 case PORTMAP_ERROR:
                     firewalled = true;
-                    break;
-                case PORTMAP_LOG:
-                    LOGGER.info("PortmapLogAlert: " + ((PortmapLogAlert) alert).logMessage());
-                    break;
-                case LOG:
-                    LOGGER.info("LogAlert: " + ((LogAlert) alert).msg());
                     break;
                 case DHT_STATS:
                     totalDHTNodes = (int) session.getStats().dhtNodes();
