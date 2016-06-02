@@ -46,8 +46,9 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     private static final String HTML_REGEX =
             "(?is)<td class=\"section_post_header\" colspan=\"2\"><h1><span style.*?>(?<displaynamefallback>.*?)</span></h1></td>.*?"+
             "Download Links.*?"+
-            "(<a href=\"(?<magneturl>magnet:\\?.*?)\" class=\"magnet\".*?)?"+
-            "(<a href=\"(?<torrenturl>http(s)?.*?torrent)\" class=\"download_.\".*?)?"+
+            ".*<a href=\"(?<magneturl>magnet:\\?.*?)\" class=\"magnet\".*?"+
+            //"(<a href=\"(?<magneturl>magnet:\\?.*?)\" title=\"Magnet Link\".*?)?"+
+            ".*<a href=\"(?<torrenturl>http(s)?.*?\\.torrent)\" class=\"download_.\".*?"+
             "(Torrent Info.*?title=\"(?<displayname>.*?)\".*?)?"+
             "(<b>Torrent File:</b>\\s+(?<displayname2>.*?)<br.*?)?"+
             "(<b>Torrent Hash:</b>\\s+(?<infohash>.*?)<br.*?)?" +
@@ -85,10 +86,11 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     }
 
     protected int preliminaryHtmlPrefixOffset(String html) {
-        LOG.info("calling preliminaryHtmlPrefixOffset");
+        //LOG.info("calling preliminaryHtmlPrefixOffset");
         int fallbackOffset = fallbackPreliminaryHtmlOffset(html);
         int offset;
         if (EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING == null) {
+            //LOG.info("Don't have trash to look for :(");
             offset = fallbackOffset;
         } else {
             //LOG.info("looking for trash ["+ DYNAMIC_TRASH_CHECK_STRING +"] in:\n" + html + "\n\n");
@@ -122,7 +124,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
      * we have irrelevant search results on our hands.
      */
     private void populateDynamicTrashChecker(String domainName) {
-        if (EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING == null) {
+        if (EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING == null || EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING.isEmpty()) {
             final HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
             try {
                 final byte[] bytes = client.getBytes("https://" + domainName, 5000);
@@ -135,6 +137,8 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
                     }
                     if (lastGroupFound != null) {
                         EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING = lastGroupFound;
+                        //LOG.info("Using the following as TRASH:");
+                        LOG.info(EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING);
                     }
                 }
             } catch (Throwable t) {
@@ -146,7 +150,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     /**
     public static void main(String[] args) throws Throwable {
         
-        byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/eztv4.html"));
+        byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/eztv5.html"));
         String fileStr = new String(readAllBytes,"utf-8");
 
         //Pattern pattern = Pattern.compile(REGEX);

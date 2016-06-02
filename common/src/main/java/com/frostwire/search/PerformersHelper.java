@@ -79,7 +79,17 @@ public final class PerformersHelper {
     public static List<? extends SearchResult> crawlTorrent(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data, boolean detectAlbums) {
         List<TorrentCrawledSearchResult> list = new LinkedList<TorrentCrawledSearchResult>();
 
-        TorrentInfo ti = TorrentInfo.bdecode(data);
+        if (data == null) {
+            return list;
+        }
+
+        TorrentInfo ti = null;
+        try {
+            ti = TorrentInfo.bdecode(data);
+        } catch (Throwable t) {
+            LOG.error("Can't bdecode:\n" + new String(data) + "\n\n");
+            throw t;
+        }
 
         int numFiles = ti.numFiles();
         FileStorage fs = ti.files();
