@@ -199,6 +199,7 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void startMagnetDownload(String magnet) {
+        UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
         TransferManager.instance().downloadTorrent(magnet,
                 new HandpickedTorrentDownloadDialogOnFetch(getActivity()));
     }
