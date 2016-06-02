@@ -138,7 +138,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
                     if (lastGroupFound != null) {
                         EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING = lastGroupFound;
                         //LOG.info("Using the following as TRASH:");
-                        LOG.info(EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING);
+                        //LOG.info(EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING);
                     }
                 }
             } catch (Throwable t) {
