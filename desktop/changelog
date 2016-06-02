@@ -1,4 +1,5 @@
 frostwire (6.3.0) stable; urgency=high
+  * Greatly improved seeding connectivity. Seed and share magnets!
   * New transfers tab, allows you to filter transfers by state and keywords.
   * Finished cloud transfers are seedeable.
   * If seeding setting is active, finished cloud transfers are seeded.
@@ -9,7 +10,7 @@ frostwire (6.3.0) stable; urgency=high
   * EZTV no longer returns irrelevant results.
   * New Search Engine: TorrentDownloads.me
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 29 May 2016 11:42:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Thu, 02 Jun 2016 11:42:00 -0500
 
 frostwire (6.2.4) stable; urgency=high
   * Fixes Monova search.
