@@ -51,7 +51,8 @@ public final class BTEngine {
             STORAGE_MOVED.swig(),
             LISTEN_SUCCEEDED.swig(),
             LISTEN_FAILED.swig(),
-            EXTERNAL_IP.swig()
+            EXTERNAL_IP.swig(),
+            METADATA_RECEIVED.swig()
     };
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
@@ -955,6 +956,9 @@ public final class BTEngine {
                 case EXTERNAL_IP:
                     onExternalIpAlert((ExternalIpAlert) alert);
                     break;
+                case METADATA_RECEIVED:
+                    saveMagnetData((MetadataReceivedAlert) alert);
+                    break;
             }
         }
     }
@@ -976,6 +980,19 @@ public final class BTEngine {
             LOGGER.info("External IP: " + externalAddress);
         } catch (Throwable e) {
             LOGGER.error("Error saving reported external ip", e);
+        }
+    }
+
+    private void saveMagnetData(MetadataReceivedAlert alert) {
+        try {
+            torrent_handle th = alert.handle().swig();
+            TorrentInfo ti = new TorrentInfo(th.get_torrent_copy());
+            String sha1 = ti.infoHash().toHex();
+            byte[] data = ti.bencode();
+
+            MAGNET_CACHE.put(sha1, data);
+        } catch (Throwable e) {
+            LOGGER.error("Error in saving magnet in internal cache", e);
         }
     }
 
