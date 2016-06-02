@@ -257,6 +257,11 @@ public final class TransferManager {
                     return;
                 }
 
+                File savePath = dl.getSavePath();
+                if (savePath != null && savePath.toString().contains("fetch_magnet/")) {
+                    return;
+                }
+
                 bittorrentDownloads.add(new UIBittorrentDownload(TransferManager.this, dl));
             }
 
