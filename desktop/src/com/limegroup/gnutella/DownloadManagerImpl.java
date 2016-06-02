@@ -63,6 +63,10 @@ public final class DownloadManagerImpl implements DownloadManager {
 
                     File savePath = dl.getSavePath();
 
+                    if (savePath != null && savePath.toString().contains("fetch_magnet/")) {
+                        return;
+                    }
+
                     // don't add frostwire update downloads to the download manager.
                     if (savePath != null) {
                         final File parentFile = savePath.getParentFile();
