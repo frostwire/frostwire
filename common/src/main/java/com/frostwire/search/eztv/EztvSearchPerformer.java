@@ -91,14 +91,14 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         if (EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING == null) {
             offset = fallbackOffset;
         } else {
-            LOG.info("looking for trash ["+ DYNAMIC_TRASH_CHECK_STRING +"] in:\n" + html + "\n\n");
+            //LOG.info("looking for trash ["+ DYNAMIC_TRASH_CHECK_STRING +"] in:\n" + html + "\n\n");
             offset = html.indexOf(DYNAMIC_TRASH_CHECK_STRING);
             // no trash found
             if (offset == -1) {
-                LOG.info("Didn't Find Trash!");
+                //LOG.info("Didn't Find Trash!");
                 offset = fallbackOffset;
             } else {
-                LOG.info("Found Trash at "+ offset + "!");
+                //LOG.info("Found Trash at "+ offset + "!");
                 offset += 256;
             }
         }
