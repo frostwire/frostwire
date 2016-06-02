@@ -26,4 +26,5 @@ package com.frostwire.android.gui.views;
  */
 public interface TimerObserver {
     void onTime();
+    boolean canBeSkipped();
 }

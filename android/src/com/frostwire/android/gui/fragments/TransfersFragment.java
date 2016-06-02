@@ -118,12 +118,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        subscription = TimerService.subscribe(this, 2);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         initStorageRelatedRichNotifications(getView());
@@ -131,8 +125,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onStart(){
+        super.onStart();
+        subscription = TimerService.subscribe(this, UI_UPDATE_INTERVAL_IN_SECS);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
         subscription.unsubscribe();
     }
 
@@ -148,6 +148,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (adapter != null) {
             adapter.dismissDialogs();
         }
+    }
+
+    @Override
+    public boolean canBeSkipped() {
+        return !isVisible();
     }
 
     @Override

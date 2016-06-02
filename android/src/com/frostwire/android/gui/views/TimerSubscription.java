@@ -55,7 +55,9 @@ public final class TimerSubscription {
     public void onTime() {
         if (!isUnsubscribed()) { // double check of unsubscribed intentional 
             try {
-                observerRef.get().onTime();
+                if(!observerRef.get().canBeSkipped()) {
+                    observerRef.get().onTime();
+                }
             } catch (Throwable e) {
                 unsubscribe();
                 LOG.error("Error notifying observer, performed automatic unsubscribe", e);

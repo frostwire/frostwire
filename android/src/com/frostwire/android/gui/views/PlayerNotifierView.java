@@ -102,6 +102,11 @@ public class PlayerNotifierView extends LinearLayout implements TimerObserver {
     }
 
     @Override
+    public boolean canBeSkipped() {
+        return false;
+    }
+
+    @Override
     public void onTime() {
         CoreMediaPlayer mp = Engine.instance().getMediaPlayer();
         if (mp != null) {
