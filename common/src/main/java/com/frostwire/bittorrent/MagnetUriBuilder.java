@@ -72,7 +72,9 @@ public final class MagnetUriBuilder {
 
         Address external = BTEngine.getInstance().externalAddress();
 
-        return magnetUri + buildPeersParameters(listenEndpoints, external);
+        String magnetUriEx = magnetUri + buildPeersParameters(listenEndpoints, external);
+        //System.out.println(magnetUriEx);
+        return magnetUriEx;
     }
 
     private static String buildPeersParameters(List<TcpEndpoint> endpoints, Address external) {

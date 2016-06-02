@@ -626,8 +626,7 @@ public final class BTEngine {
     private void onListenSucceeded(ListenSucceededAlert alert) {
         try {
             TcpEndpoint endp = alert.getEndpoint();
-            if (alert.getSocketType() == ListenSucceededAlert.SocketType.TCP ||
-                    alert.getSocketType() == ListenSucceededAlert.SocketType.UDP) {
+            if (alert.getSocketType() == ListenSucceededAlert.SocketType.TCP) {
                 String address = endp.address().toString();
                 int port = endp.port();
                 listenEndpoints.add(new TcpEndpoint(address, port));
