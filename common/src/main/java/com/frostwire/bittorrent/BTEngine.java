@@ -70,6 +70,9 @@ public final class BTEngine {
     private List<TcpEndpoint> listenEndpoints;
     private Address externalAddress;
 
+    private static final LruCache<String, byte[]> MAGNET_CACHE = new LruCache<String, byte[]>(50);
+    private static final Object MAGNET_LOCK = new Object();
+
     private BTEngine() {
         this.sync = new ReentrantLock();
         this.innerListener = new InnerListener();
@@ -449,7 +452,69 @@ public final class BTEngine {
             return null;
         }
 
-        return downloader.fetchMagnet(uri, timeout);
+        add_torrent_params p = add_torrent_params.create_instance_disabled_storage();
+        error_code ec = new error_code();
+        libtorrent.parse_magnet_uri(uri, p, ec);
+        p.setUrl(uri);
+
+        if (ec.value() != 0) {
+            throw new IllegalArgumentException(ec.message());
+        }
+
+        final sha1_hash info_hash = p.getInfo_hash();
+        String sha1 = info_hash.to_hex();
+
+        byte[] data = MAGNET_CACHE.get(sha1);
+        if (data != null) {
+            return data;
+        }
+
+        boolean add;
+        torrent_handle th;
+
+        synchronized (MAGNET_LOCK) {
+            th = session.swig().find_torrent(info_hash);
+            if (th != null && th.is_valid()) {
+                // we have a download with the same info-hash, let's wait
+                add = false;
+            } else {
+                add = true;
+            }
+
+            if (add) {
+                p.setName("fetch_magnet:" + uri);
+                p.setSave_path("fetch_magnet/" + uri);
+
+                long flags = p.get_flags();
+                flags &= ~add_torrent_params.flags_t.flag_auto_managed.swigValue();
+                p.set_flags(flags);
+
+                ec.clear();
+                th = session.swig().add_torrent(p, ec);
+                th.resume();
+            }
+        }
+
+        int n = 0;
+        do {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+
+            data = MAGNET_CACHE.get(sha1);
+
+            n++;
+        } while (n < timeout && data == null);
+
+        synchronized (MAGNET_LOCK) {
+            if (add && th != null && th.is_valid()) {
+                session.swig().remove_torrent(th);
+            }
+        }
+
+        return data;
     }
 
     public void restoreDownloads() {
@@ -1061,5 +1126,19 @@ public final class BTEngine {
 
     public int getTotalDHTNodes() {
         return totalDHTNodes;
+    }
+
+    private static final class LruCache<K, V> extends LinkedHashMap<K, V> {
+
+        private final int maxSize;
+
+        public LruCache(int maxSize) {
+            this.maxSize = maxSize;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+            return size() > maxSize;
+        }
     }
 }
