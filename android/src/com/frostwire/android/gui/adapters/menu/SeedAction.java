@@ -275,6 +275,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private void onSeedingEnabled() {
         TransferManager.instance().enableSeeding();
         seedEm();
+        UIUtils.showTransfersOnDownloadStart(getContext());
     }
 
     private void onBittorrentConnect() {
