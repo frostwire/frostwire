@@ -703,7 +703,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
      */
     private static File getBiggestSDCardDir(Context context) {
         try {
-            String primaryPath = context.getExternalFilesDir(null).getParent();
+            final File externalFilesDir = context.getExternalFilesDir(null);
+            // this occurs on the android emulator
+            if (externalFilesDir == null) {
+                return null;
+            }
+            String primaryPath = externalFilesDir.getParent();
 
             long biggestBytesAvailable = -1;
 
