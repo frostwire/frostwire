@@ -130,7 +130,7 @@ public final class MagnetUriBuilder {
             for (InterfaceAddress ifaceAddress : interfaceAddresses) {
                 InetAddress inetAddress = ifaceAddress.getAddress();
 
-                if (inetAddress.isLoopbackAddress()) {
+                if (inetAddress.isLoopbackAddress() || inetAddress.isLinkLocalAddress()) {
                     continue;
                 }
 
