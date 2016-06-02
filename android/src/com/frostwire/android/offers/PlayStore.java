@@ -150,7 +150,11 @@ public final class PlayStore {
             return;
         }
 
-        helper.disposeWhenFinished();
+        try {
+            helper.disposeWhenFinished();
+        } catch (Throwable e) {
+            LOG.error("Error disposing the internal helper (review your logic)", e);
+        }
         helper = null;
     }
 
