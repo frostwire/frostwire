@@ -212,9 +212,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private void seedBTDownload() {
         btDownload.resume();
         final TorrentHandle torrentHandle = BTEngine.getInstance().getSession().findTorrent(new Sha1Hash(btDownload.getInfoHash()));
-        if (torrentHandle != null) {
-            forceDHTAnnounceIfNoPeers(torrentHandle);
-        } else {
+        if (torrentHandle == null) {
             LOG.warn("seedBTDownload() could not find torrentHandle for existing torrent.");
         }
     }
@@ -266,7 +264,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 // so it will call fireDownloadUpdate(torrentHandle) -> UIBittorrentDownload.updateUI()
                 // which calculates the download items;
                 BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
-                forceDHTAnnounceIfNoPeers(torrentHandle);
                 torrentHandle.forceRecheck();
             }
         });
@@ -298,40 +295,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         });
 
 
-    }
-
-    /** TODO: Move this method somewhere more useful if it works.
-     *  It could be used for smarter re-announce logic after hearing
-     *  Arvid's advice. It could also be used to re-adjust the dht_announce_interval
-     *  interval to allow for more capacity (longer intervals if we already have peers) */
-    private static void forceDHTAnnounceIfNoPeers(final TorrentHandle torrentHandle) {
-        final ArrayList<PeerInfo> peerInfos = torrentHandle.peerInfo();
-        final TorrentStatus status = torrentHandle.getStatus();
-        LOG.info("================================================");
-        LOG.info("list peers        : " + status.getListPeers());
-        LOG.info("num connections   : " + status.getNumConnections());
-        LOG.info("connect candidates: " + status.getConnectCandidates());
-        LOG.info("announcing to DHT : " + status.announcingToDht());
-        LOG.info("announcing to LSD : " + status.announcingToLsd());
-        LOG.info("next announce in  : " + status.nextAnnounce() + " ms");
-        LOG.info("================================================\n");
-
-        if (peerInfos.size() == 0) {
-            LOG.info("had no peers");
-            LOG.info("forcing re-announcement.");
-            torrentHandle.forceDHTAnnounce();
-
-            //We'll check ourselves again after the interval and 1.5 minutes.
-            Engine.instance().getThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
-                    long sleepForAnnounceCheck = 30000;
-                    LOG.info("sleeping(sleepForAnnounceCheck = " + sleepForAnnounceCheck+")...");
-                    SystemClock.sleep(sleepForAnnounceCheck);
-                    forceDHTAnnounceIfNoPeers(torrentHandle);
-                }
-            });
-        }
     }
 
     // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.
