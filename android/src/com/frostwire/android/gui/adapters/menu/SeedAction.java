@@ -46,7 +46,6 @@ import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -239,32 +238,8 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
                 final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
 
-                // IDEAS:
-                // 1. Create a CanonicalDHTAnnouncer which keeps track
-                // of nodes we could use for DHT-announcing-bootstrapping.
-                // Issue a GET_PEERS request on startup, and out of those
-                // peers do a thandle.connect_peer(...) of at least 5 DHT
-                // bootstraping nodes for this torrent. This way we don't
-                // have to way for a GET_PEERS_REPLY message to create the
-                // .torrent.
-
-                final Session session = BTEngine.getInstance().getSession();
-
                 // so the TorrentHandle object is created and added to the libtorrent session.
                 BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
-
-                final TorrentHandle torrentHandle =
-                        session.findTorrent(tinfo.infoHash());
-
-                torrentHandle.saveResumeData();
-                torrentHandle.pause();
-                torrentHandle.setAutoManaged(true);
-                torrentHandle.scrapeTracker();
-
-                // so it will call fireDownloadUpdate(torrentHandle) -> UIBittorrentDownload.updateUI()
-                // which calculates the download items;
-                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
-                torrentHandle.forceRecheck();
             }
         });
     }
