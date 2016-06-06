@@ -75,13 +75,16 @@ public final class TimerSubscription {
         }
         if (observer instanceof Fragment) {
             call = ((Fragment) observer).isVisible();
+            if (observer instanceof AbstractFragment) {
+                call = !((AbstractFragment) observer).isPaused();
+            }
         }
         if (observer instanceof AbstractActivity) {
             call = !((AbstractActivity) observer).isPaused();
         }
         if (call) {
             observer.onTime();
-            LOG.debug("ON TIME: class-" + observer.getClass());
+            //LOG.debug("ON TIME: class-" + observer.getClass());
         }
     }
 }
