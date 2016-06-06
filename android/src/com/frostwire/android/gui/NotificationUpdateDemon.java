@@ -20,7 +20,7 @@ import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.logging.Logger;
 
-public class NotificationUpdateDemon implements TimerObserver{
+public class NotificationUpdateDemon implements TimerObserver {
 
     private static final Logger LOG = Logger.getLogger(NotificationUpdateDemon.class);
     private static final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
@@ -28,13 +28,16 @@ public class NotificationUpdateDemon implements TimerObserver{
     private Context mParentContext;
     private TimerSubscription mTimerSubscription;
 
+    private RemoteViews notificationViews;
+    private Notification notificationObject;
+
     public NotificationUpdateDemon(Context parentContext) {
-        LOG.debug("Creating permanent notification demon");
         mParentContext = parentContext;
+
+        setupNotification();
     }
 
     public void start() {
-        LOG.debug("Starting permanent notification demon");
         if (mTimerSubscription != null) {
             LOG.debug("Stopping before (re)starting permanent notification demon");
             mTimerSubscription.unsubscribe();
@@ -53,6 +56,11 @@ public class NotificationUpdateDemon implements TimerObserver{
             return;
         }
 
+        if (notificationViews == null || notificationObject == null) {
+            LOG.warn("Notification views or object are null, review your logic");
+            return;
+        }
+
         //  format strings
         String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
         String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
@@ -61,29 +69,29 @@ public class NotificationUpdateDemon implements TimerObserver{
         int downloads = TransferManager.instance().getActiveDownloads();
         int uploads = TransferManager.instance().getActiveUploads();
 
+        // Transfers status.
+        notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
+        notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
+
+        final NotificationManager notificationManager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
+        }
+    }
+
+    private void setupNotification() {
+        if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
+            return;
+        }
+
         RemoteViews remoteViews = new RemoteViews(mParentContext.getPackageName(),
                 R.layout.view_permanent_status_notification);
 
         PendingIntent showFrostWireIntent = createShowFrostwireIntent();
-//      PendingIntent showVPNIntent = createShowVPNIntent();
         PendingIntent shutdownIntent = createShutdownIntent();
 
-
-        // VPN status
-//        remoteViews.setImageViewResource(R.id.view_permanent_status_vpn_icon, isVPNactive ?
-//                R.drawable.notification_shutdown : R.drawable.notification_shutdown);
-//        remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_vpn_icon, showVPNIntent);
-
-
-        // Click on shutdown image button.
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
-
-        // Click on title takes to transfers.
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
-
-        // Transfers status.
-        remoteViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
-        remoteViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
 
         Notification notification = new NotificationCompat.Builder(mParentContext).
                 setSmallIcon(R.drawable.frostwire_notification_flat).
@@ -92,13 +100,11 @@ public class NotificationUpdateDemon implements TimerObserver{
                 build();
         notification.flags |= Notification.FLAG_NO_CLEAR;
 
-        final NotificationManager notificationManager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager != null) {
-            notificationManager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notification);
-        }
+        notificationViews = remoteViews;
+        notificationObject = notification;
     }
 
-    private PendingIntent createShowFrostwireIntent(){
+    private PendingIntent createShowFrostwireIntent() {
         return PendingIntent.getActivity(mParentContext,
                 0,
                 new Intent(mParentContext,
@@ -108,7 +114,7 @@ public class NotificationUpdateDemon implements TimerObserver{
                 0);
     }
 
-    private PendingIntent createShutdownIntent(){
+    private PendingIntent createShutdownIntent() {
         return PendingIntent.getActivity(mParentContext,
                 1,
                 new Intent(mParentContext,
