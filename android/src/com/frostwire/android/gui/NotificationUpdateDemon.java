@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
@@ -138,6 +139,14 @@ public class NotificationUpdateDemon implements TimerObserver {
 
     @Override
     public void onTime() {
-        updatePermanentStatusNotification();
+        if (isScreenOn()) {
+            updatePermanentStatusNotification();
+            //LOG.debug("updatePermanentStatusNotification");
+        }
+    }
+
+    private boolean isScreenOn() {
+        PowerManager pm = (PowerManager) mParentContext.getSystemService(Context.POWER_SERVICE);
+        return pm.isScreenOn();
     }
 }

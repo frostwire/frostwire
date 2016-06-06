@@ -84,7 +84,7 @@ public final class TimerSubscription {
         }
         if (call) {
             observer.onTime();
-            //LOG.debug("ON TIME: class-" + observer.getClass());
+            //LOG.debug("ON TIME: class-" + observer.getClass().getName());
         }
     }
 }
