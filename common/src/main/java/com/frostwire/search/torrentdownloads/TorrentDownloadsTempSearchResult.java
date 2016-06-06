@@ -31,7 +31,7 @@ public class TorrentDownloadsTempSearchResult extends AbstractSearchResult imple
 
     public TorrentDownloadsTempSearchResult(String domainName, String itemId) {
         this.itemId = itemId;
-        this.detailsUrl = "http://www.torrentdownloads.me/torrent/" + itemId;
+        this.detailsUrl = "https://"+domainName+"/torrent/" + itemId;
     }
 
     public String getItemId() {
