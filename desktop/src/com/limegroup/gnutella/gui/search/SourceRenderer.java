@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,31 +18,23 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
-
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.tables.DefaultTableBevelledCellRenderer;
 
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author gubatron
  * @author aldenml
- *
  */
 public class SourceRenderer extends DefaultTableBevelledCellRenderer implements TableCellRenderer {
 
@@ -62,7 +54,7 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             sourceIcons.put("tpb", GUIMediator.getThemeImage("tpb_source"));
             sourceIcons.put("bitsnoop", GUIMediator.getThemeImage("bitsnoop_off"));
             sourceIcons.put("torlock", GUIMediator.getThemeImage("torlock_off"));
-            sourceIcons.put("torrentdownloads", GUIMediator.getThemeImage("torlock_off")); //to-do
+            sourceIcons.put("torrentdownloads", GUIMediator.getThemeImage("torrentdownloads_source"));
             sourceIcons.put("eztv", GUIMediator.getThemeImage("eztv_off"));
             sourceIcons.put("default", GUIMediator.getThemeImage("seeding_small_source"));
         } catch (Throwable e) {
