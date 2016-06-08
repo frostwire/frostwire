@@ -1,3 +1,15 @@
+FrostWire 1.7.5 - JUN/08/2016
+ - Power saving improvements in notifications and screen refreshing
+ - (Plus-only) Fixes bug on update dialog where buttons would
+   disappear if too many bullets were shown
+ - New jlibtorrent 1.1.0.32
+ - jlibtorrent: back-port extra checks in pe_crypto from master
+ - jlibtorrent: upgrade libtommath to 1.0
+ - jlibtorrent: fixed logging bug related to add_torrent_params::flags
+ - jlibtorrent: fixed crash on invalid input in http_parser
+ - jlibtorrent: early resume data reset when fatal_disk_error
+ - jlibtorrent: revert handshake round-trip optimization
+
 FrostWire 1.7.4 - JUN/02/2016
  - Greatly improved first seed connectivity. Share magnets!
  - Issues saving to SD card on multiple devices fixed.
