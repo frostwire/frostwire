@@ -497,10 +497,11 @@ public final class SearchFragment extends AbstractFragment implements
         if (adapter == null) {
             return;
         }
-        adapter.getFileType();
         final byte currentFileType = (byte) adapter.getFileType();
-        final byte nextFileType = (right) ? toTheRightOf.get(currentFileType) : toTheLeftOf.get(currentFileType);
-        searchInput.performClickOnRadioButton(nextFileType);
+        if (currentFileType != -1) { // SearchResultListAdapter#NO_FILE_TYPE (refactor this)
+            final byte nextFileType = (right) ? toTheRightOf.get(currentFileType) : toTheLeftOf.get(currentFileType);
+            searchInput.performClickOnRadioButton(nextFileType);
+        }
     }
 
     private static class SearchInputOnSearchListener implements SearchInputView.OnSearchListener {
