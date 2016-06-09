@@ -49,7 +49,7 @@ public class Offers {
     private static List<AdNetwork> AD_NETWORKS;
 
     public static void initAdNetworks(Activity activity) {
-        AD_NETWORKS = Arrays.asList(APP_LOVIN, IN_MOBI); //, MOBILE_CORE});
+        AD_NETWORKS = Arrays.asList(new AdNetwork[]{APP_LOVIN, IN_MOBI}); //, MOBILE_CORE});
         for (AdNetwork adNetwork : AD_NETWORKS) {
             adNetwork.initialize(activity);
         }

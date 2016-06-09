@@ -36,7 +36,8 @@ public class InMobiAdNetwork implements AdNetwork {
     private boolean started = false;
     private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150l;
 
-    public InMobiAdNetwork() {}
+    public InMobiAdNetwork() {
+    }
 
     public void initialize(final Activity activity) {
         if (!enabled()) {
@@ -45,24 +46,19 @@ public class InMobiAdNetwork implements AdNetwork {
         }
 
         if (!started) {
-            Offers.THREAD_POOL.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        // this initialize call is very expensive, this is why we should be invoked in a thread.
-                        LOG.info("InMobi.initialize()...");
-                        InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
-                        //InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
-                        LOG.info("InMobi.initialized.");
-                        started = true;
-                        LOG.info("Load InmobiInterstitial.");
-                        loadNewInterstitial(activity);
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                        started = false;
-                    }
-                }
-            });
+            try {
+                // this initialize call is very expensive, this is why we should be invoked in a thread.
+                LOG.info("InMobi.initialize()...");
+                InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
+                //InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
+                LOG.info("InMobi.initialized.");
+                started = true;
+                LOG.info("Load InmobiInterstitial.");
+                loadNewInterstitial(activity);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                started = false;
+            }
         }
     }
 
@@ -127,7 +123,7 @@ public class InMobiAdNetwork implements AdNetwork {
                 try {
                     inmobiListener = new InMobiListener(activity);
                     inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
-                    inmobiInterstitial.load();;
+                    inmobiInterstitial.load();
                 } catch (Throwable t) {
                     // don't crash, keep going.
                     // possible android.util.AndroidRuntimeException: android.content.pm.PackageManager$NameNotFoundException: com.google.android.webview
