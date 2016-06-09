@@ -16,16 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// if false, you will need to have a symlink to frostwire-jlibtorrent at the root of the project.
-// this won't work for windows users, who will either have to have this in true, or just
-// copy frostwire-jlibtorrent if they need to hack frostwire-jlibtorrent while coding.
-def useJlibtorrentFromMaven = true
 def JLIBTORRENT_VERSION='1.1.0.32'
-
-if (!useJlibtorrentFromMaven && !new File("frostwire-jlibtorrent").exists()) {
-    def path = new File("frostwire-jlibtorrent").getAbsolutePath()
-    throw new Exception("You want to use jlibtorrent from source but you don't have a symlink at '" + path + "' with the sources.");
-}
 
 import groovy.swing.SwingBuilder
 
@@ -111,16 +102,6 @@ android {
 
                 srcDir 'apollo/src'
                 srcDir 'src'
-
-                if (!useJlibtorrentFromMaven) {
-                    //To avoid 'Can't register given path of type 'SOURCE' ... error in intelliJ
-                    //make a symlink to frostwire-jlibtorrent inside our content root folder,
-                    //at the same level where desktop,common and android are.
-                    srcDir 'frostwire-jlibtorrent/src/main/java'
-                    exclude '**/demo/*.java'
-                }
-
-                exclude '**/MobileCore*.java'
             }
         }
 
@@ -173,9 +154,7 @@ dependencies {
     compile 'com.inmobi.monetization:inmobi-ads:5.3.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    if (useJlibtorrentFromMaven) {
-        compile 'com.frostwire:jlibtorrent:' + JLIBTORRENT_VERSION
-    }
+    compile 'com.frostwire:jlibtorrent:' + JLIBTORRENT_VERSION
     compile 'com.frostwire:jlibtorrent-android-arm:' + JLIBTORRENT_VERSION
     compile 'com.frostwire:jlibtorrent-android-x86:' + JLIBTORRENT_VERSION
 
