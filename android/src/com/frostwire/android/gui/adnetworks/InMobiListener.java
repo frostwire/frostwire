@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package com.frostwire.android.gui.adnetworks;
 
-
 import android.app.Activity;
+import android.app.Application;
+import android.content.Intent;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
@@ -33,12 +34,14 @@ import java.util.Map;
 public class InMobiListener implements InterstitialListener, InMobiInterstitial.InterstitialAdListener {
     private final Logger LOG = Logger.getLogger(InMobiInterstitial.InterstitialAdListener.class);
     private final WeakReference<Activity> activityRef;
+    private final Application app;
     private boolean shutdownAfterDismiss = false;
     private boolean finishAfterDismiss = false;
     private boolean ready;
 
     public InMobiListener(Activity hostActivity) {
         activityRef = new WeakReference<Activity>(hostActivity);
+        this.app = hostActivity.getApplication();
     }
 
     @Override
@@ -50,9 +53,11 @@ public class InMobiListener implements InterstitialListener, InMobiInterstitial.
             if (callerActivity != null && callerActivity instanceof MainActivity) {
                 MainActivity mainActivity = (MainActivity) callerActivity;
                 mainActivity.shutdown();
-            } else if (callerActivity != null) {
-                //MIGHT DO: there's a way to shutdown, by sending a shutdown-<GUID> enabled Intent to MainActivity.
-                LOG.warn("Couldn't shutdown because listener didn't have a MainActivity reference, had another kind (" + callerActivity.getClass().getName() + ")");
+            } else {
+                Intent i = new Intent(app, MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
+                app.startActivity(i);
             }
         }
 
