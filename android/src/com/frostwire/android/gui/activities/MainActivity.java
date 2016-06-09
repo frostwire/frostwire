@@ -189,7 +189,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         setupFragments();
         setupMenuItems();
         setupInitialFragment(savedInstanceState);
-        playerSubscription = TimerService.subscribe((TimerObserver) findView(R.id.activity_main_player_notifier), 1);
+        playerSubscription = TimerService.subscribe(((PlayerNotifierView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
         onNewIntent(getIntent());
         SoftwareUpdater.instance().addConfigurationUpdateListener(this);
         setupActionBar();
