@@ -221,25 +221,30 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         Engine.instance().getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                File file = new File(fd.filePath);
-                File saveDir = file.getParentFile();
-                file_storage fs = new file_storage();
-                fs.add_file(file.getName(), file.length());
-                fs.set_name(file.getName());
-                create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
-                // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
-                // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
-                ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
-                ct.set_priv(false);
+                try {
+                    File file = new File(fd.filePath);
+                    File saveDir = file.getParentFile();
+                    file_storage fs = new file_storage();
+                    fs.add_file(file.getName(), file.length());
+                    fs.set_name(file.getName());
+                    create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
+                    // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
+                    // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
+                    ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
+                    ct.set_priv(false);
 
-                final error_code ec = new error_code();
-                libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
+                    final error_code ec = new error_code();
+                    libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
 
-                final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
-                final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
+                    final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
+                    final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
 
-                // so the TorrentHandle object is created and added to the libtorrent session.
-                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
+                    // so the TorrentHandle object is created and added to the libtorrent session.
+                    BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
+                } catch (Throwable e) {
+                    // TODO: better handle this error
+                    LOG.error("Error creating torrent for seed", e);
+                }
             }
         });
     }
