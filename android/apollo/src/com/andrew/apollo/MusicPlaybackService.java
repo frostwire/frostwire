@@ -1443,6 +1443,11 @@ public class MusicPlaybackService extends Service {
      */
     private void updateRemoteControlClient(final String what) {
 
+        if (mRemoteControlClient == null) {
+            Log.d(TAG, "mRemoteControlClient is null, review your logic");
+            return;
+        }
+
         int playState;
         if (isPlaying()) {
             playState = RemoteControlClient.PLAYSTATE_PLAYING;
