@@ -18,20 +18,18 @@
 
 package com.frostwire.gui.updates;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.JOptionPane;
-
+import com.frostwire.logging.Logger;
+import com.limegroup.gnutella.gui.DialogOption;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.UpdateSettings;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.OSUtils;
 
-import com.frostwire.logging.Logger;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.DialogOption;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.settings.UpdateSettings;
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * 
@@ -220,5 +218,9 @@ public final class UpdateMediator {
         } catch (Throwable e) {
             return false;
         }
+    }
+
+    public int getUpdateDownloadProgress() {
+        return InstallerUpdater.getUpdateDownloadProgress();
     }
 }
