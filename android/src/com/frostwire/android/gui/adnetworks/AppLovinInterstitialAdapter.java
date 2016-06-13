@@ -67,6 +67,17 @@ public class AppLovinInterstitialAdapter implements InterstitialListener, AppLov
             try {
                 this.activityRef = activityWeakReference;
                 final AppLovinInterstitialAdDialog adDialog = AppLovinInterstitialAd.create(AppLovinSdk.getInstance(activityRef.get()), activityRef.get());
+
+                if (adDialog.isShowing()) {
+                    // this could happens because a previous ad failed to be properly dismissed
+                    // since the code is obfuscated there is no realistic possibility to detect where
+                    // the error is, then it needs to be discussed with the provider or change
+                    // our usage patter of the framework.
+                    LOG.warn("Review the applovin ad framework");
+                    adDialog.dismiss();
+                    return false;
+                }
+
                 adDialog.setAdDisplayListener(this);
                 adDialog.showAndRender(ad);
                 result = true;
