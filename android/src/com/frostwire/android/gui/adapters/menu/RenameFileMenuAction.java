@@ -89,16 +89,14 @@ public class RenameFileMenuAction extends MenuAction {
         private String filePath;
 
         public static RenameFileMenuActionDialog newInstance(String filePath) {
-            return new RenameFileMenuActionDialog(filePath);
+            RenameFileMenuActionDialog dlg = new RenameFileMenuActionDialog();
+            dlg.filePath = filePath; // bad design having non empty constructors
+            // no time to refactor now
+            return dlg;
         }
 
         public RenameFileMenuActionDialog() {
-            super();
-        }
-
-        private RenameFileMenuActionDialog(String filePath) {
-            super();
-            this.filePath = filePath;
+            super(R.layout.dialog_default_input);
         }
 
         @Override

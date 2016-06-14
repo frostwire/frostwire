@@ -87,7 +87,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
         }
 
         public CreateNewPlaylistDialog() {
-            super();
+            super(R.layout.dialog_default_input);
         }
 
         @Override
