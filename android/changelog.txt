@@ -1,13 +1,18 @@
-FrostWire 1.7.5 - JUN/09/2016
+FrostWire 1.7.5 - JUN/14/2016
  - Power saving improvements in notifications and screen refreshing
  - (Plus-only) Fixes bug on update dialog where buttons would
    disappear if too many bullets were shown
- - Shutdown improvements.
- - Crash fixes.
+ - Shutdown improvements
+ - Dialog fixes
+ - Crash fixes
+ - New jlibtorrent 1.1.0.34
  - jlibtorrent: fixed logging bug related to add_torrent_params::flags
  - jlibtorrent: fixed crash on invalid input in http_parser
  - jlibtorrent: early resume data reset when fatal_disk_error
  - jlibtorrent: revert handshake round-trip optimization
+ - Eztv search improvements
+ - Http client initialization improvements
+
 
 FrostWire 1.7.4 - JUN/02/2016
  - Greatly improved first seed connectivity. Share magnets!
