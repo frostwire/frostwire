@@ -19,7 +19,6 @@
 package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -30,7 +29,9 @@ import java.util.List;
  * @author aldenml
  */
 public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
+
     private static final Logger LOG = Logger.getLogger(PagedWebSearchPerformer.class);
+
     private final int pages;
 
     public PagedWebSearchPerformer(String domainName, long token, String keywords, int timeout, int pages) {
@@ -50,7 +51,7 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
         try {
             String url = getUrl(page, getEncodedKeywords());
             String text = fetchSearchPage(url);
-            if (!StringUtils.isNullOrEmpty(text)) {
+            if (text != null) {
                 result = searchPage(text);
             }
         } catch (Throwable e) {
