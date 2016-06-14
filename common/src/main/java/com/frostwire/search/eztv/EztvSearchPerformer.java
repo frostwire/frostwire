@@ -19,15 +19,13 @@
 package com.frostwire.search.eztv;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.regex.Matcher;
-import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
-import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.http.HttpClient;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -35,10 +33,10 @@ import java.util.Map;
  * @author aldenml
  */
 public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchResult> {
+
     private static Logger LOG = Logger.getLogger(EztvSearchPerformer.class);
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"(/ep/.*?)\"";
-    private static String DYNAMIC_TRASH_CHECK_STRING = null;
 
     // This is a good example of optional regex groups when a page might have different possible formats to parse.
     private static final String HTML_REGEX =
@@ -55,7 +53,6 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
 
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
-        populateDynamicTrashChecker(domainName);
     }
 
     @Override
@@ -70,7 +67,9 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         formData.put("SearchString1", getEncodedKeywords());
         formData.put("SearchString", "");
         formData.put("search", "Search");
-        return post(url, formData);
+        String page = post(url, formData);
+
+        return page != null && isValidPage(page) ? page : null;
     }
 
     @Override
@@ -83,65 +82,31 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         return new EztvSearchResult(sr.getDetailsUrl(), matcher);
     }
 
-    protected int preliminaryHtmlPrefixOffset(String html) {
-        //LOG.info("calling preliminaryHtmlPrefixOffset");
-        int fallbackOffset = fallbackPreliminaryHtmlOffset(html);
-        int offset;
-        if (EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING == null) {
-            //LOG.info("Don't have trash to look for :(");
-            offset = fallbackOffset;
-        } else {
-            //LOG.info("looking for trash ["+ DYNAMIC_TRASH_CHECK_STRING +"] in:\n" + html + "\n\n");
-            offset = html.indexOf(DYNAMIC_TRASH_CHECK_STRING);
-            // no trash found
-            if (offset == -1) {
-                //LOG.info("Didn't Find Trash!");
-                offset = fallbackOffset;
-            } else {
-                //LOG.info("Found Trash at "+ offset + "!");
-                offset += 256;
-            }
-        }
-        return offset;
-    }
-
-    private int fallbackPreliminaryHtmlOffset(String html) {
+    @Override
+    protected int htmlPrefixOffset(String html) {
         int offset = html.indexOf("id=\"searchsearch_submit\"");
-        offset = offset > 0 ? offset : 0;
-        return offset;
+        return offset > 0 ? offset : 0;
     }
 
-    /**
-     * EZTV tends to return place holder search results containing the latest
-     * additions to their index when there are no search results. This makes
-     * the FrostWire experience somewhat confusing since a lot of unrelated results
-     * show up.
-     * We can find these items on their home page. If we can find the last search result
-     * of their homepage among a list of search results, there's a really good chance
-     * we have irrelevant search results on our hands.
-     */
-    private void populateDynamicTrashChecker(String domainName) {
-        if (EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING == null || EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING.isEmpty()) {
-            final HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
-            try {
-                final byte[] bytes = client.getBytes("https://" + domainName, 5000);
-                if (bytes != null) {
-                    final Pattern pattern = Pattern.compile(REGEX);
-                    final Matcher matcher = pattern.matcher(new String(bytes));
-                    String lastGroupFound = null;
-                    while (matcher.find()) {
-                        lastGroupFound = matcher.group(1);
-                    }
-                    if (lastGroupFound != null) {
-                        EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING = lastGroupFound;
-                        //LOG.info("Using the following as TRASH:");
-                        //LOG.info(EztvSearchPerformer.DYNAMIC_TRASH_CHECK_STRING);
-                    }
-                }
-            } catch (Throwable t) {
-                LOG.error(t.getMessage(), t);
+    // EZTV is very simplistic in the search engine
+    // just a simple keyword check allows to discard the page
+    private boolean isValidPage(String page) {
+        String[] keywords = getKeywords().split(" ");
+        String k = null;
+        // select the first keyword with length >= 3
+        for (int i = 0; k == null && i < keywords.length; i++) {
+            String s = keywords[i];
+            if (s.length() >= 3) {
+                k = s;
             }
         }
+        if (k == null) {
+            k = keywords[0];
+        }
+
+        int count = StringUtils.countMatches(page.toLowerCase(Locale.US), k.toLowerCase(Locale.US));
+
+        return count > 9;
     }
 
     /**
