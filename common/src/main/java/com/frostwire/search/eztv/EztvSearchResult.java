@@ -33,15 +33,16 @@ import java.util.Locale;
  * @author gubatron
  * @author aldenml
  */
-class EztvSearchResult extends AbstractTorrentSearchResult {
-    private String filename;
-    private String displayName;
-    private String detailsUrl;
+final class EztvSearchResult extends AbstractTorrentSearchResult {
+
+    private final String filename;
+    private final String displayName;
+    private final String detailsUrl;
     private String torrentUrl;
     private String infoHash;
-    private long size;
-    private long creationTime;
-    private int seeds;
+    private final long size;
+    private final long creationTime;
+    private final int seeds;
 
     EztvSearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
@@ -70,7 +71,8 @@ class EztvSearchResult extends AbstractTorrentSearchResult {
             } else if (torrentUrl.startsWith("magnet:?xt=urn:btih:")) {
                 this.infoHash = torrentUrl.substring(20, 52);
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
 
         this.seeds = -1;
         this.creationTime = parseCreationTime(matcher.group("creationtime"));

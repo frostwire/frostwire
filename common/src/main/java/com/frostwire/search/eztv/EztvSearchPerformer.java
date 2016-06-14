@@ -18,7 +18,6 @@
 
 package com.frostwire.search.eztv;
 
-import com.frostwire.logging.Logger;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
@@ -34,7 +33,6 @@ import java.util.Map;
  */
 public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchResult> {
 
-    private static Logger LOG = Logger.getLogger(EztvSearchPerformer.class);
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"(/ep/.*?)\"";
 
