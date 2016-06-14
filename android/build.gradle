@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-def JLIBTORRENT_VERSION='1.1.0.33'
+def JLIBTORRENT_VERSION='1.1.0.34'
 
 import groovy.swing.SwingBuilder
 
