@@ -26,7 +26,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
-import com.frostwire.android.gui.views.ClickAdapter;
 
 /**
  * @author gubatron
@@ -34,11 +33,10 @@ import com.frostwire.android.gui.views.ClickAdapter;
  * @author marcelinkaaa
  */
 public class YesNoDialog extends AbstractDialog {
+
     private static final String ID_KEY = "id";
     private static final String TITLE_KEY = "title";
     private static final String MESSAGE_KEY = "message";
-    private Button buttonNo;
-    private Button buttonYes;
     private String id;
 
     public YesNoDialog() {
@@ -58,7 +56,7 @@ public class YesNoDialog extends AbstractDialog {
     }
 
     @Override
-    protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+    protected void initComponents(final Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
 
         id = args.getString(ID_KEY);
@@ -74,38 +72,27 @@ public class YesNoDialog extends AbstractDialog {
         TextView defaultDialogText = findView(dlg, R.id.dialog_default_text);
         defaultDialogText.setText(messageId);
 
-        ButtonListener yesButtonListener = new ButtonListener(this, Dialog.BUTTON_POSITIVE);
-        ButtonListener noButtonListener = new ButtonListener(this, Dialog.BUTTON_NEGATIVE);
-
-        buttonYes = findView(dlg, R.id.dialog_default_button_yes);
+        Button buttonYes = findView(dlg, R.id.dialog_default_button_yes);
         buttonYes.setText(android.R.string.yes);
-        buttonYes.setOnClickListener(yesButtonListener);
+        buttonYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performDialogClick(id, Dialog.BUTTON_POSITIVE);
+            }
+        });
 
-        buttonNo = findView(dlg, R.id.dialog_default_button_no);
+        Button buttonNo = findView(dlg, R.id.dialog_default_button_no);
         buttonNo.setText(android.R.string.no);
-        buttonNo.setOnClickListener(noButtonListener);
+        buttonNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dlg.dismiss();
+            }
+        });
     }
 
     @Override
     protected void performDialogClick(String tag, int which) {
         super.performDialogClick(id, which);
-    }
-
-    private static final class ButtonListener extends ClickAdapter<YesNoDialog> {
-        private int which;
-
-        public ButtonListener(YesNoDialog owner, int which) {
-            super(owner);
-            this.which = which;
-        }
-
-        @Override
-        public void onClick(YesNoDialog owner, View v) {
-            super.onClick(owner, v);
-            if (this.which == Dialog.BUTTON_POSITIVE) {
-                owner.performDialogClick(this.which);
-            }
-            owner.dismiss();
-        }
     }
 }
