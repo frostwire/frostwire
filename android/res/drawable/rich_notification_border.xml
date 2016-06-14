@@ -31,8 +31,4 @@
         android:radius="0dp"
         android:topRightRadius="0dp" />
 
-    <stroke
-        android:width="0dp"
-        android:color="@color/app_rich_notification_divider" />
-
 </shape>

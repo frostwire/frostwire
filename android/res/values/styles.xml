@@ -194,6 +194,23 @@
 
     <!-- Menu Media Type end -->
 
+    <style name="RichNotificationTitle">
+        <item name="android:textSize">@dimen/text_x_medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="RichNotificationDescription">
+        <item name="android:textSize">@dimen/text_x_small</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="RichNotificationButtonText">
+        <item name="android:textSize">@dimen/text_x_medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
 
     <!-- Transfers list begin -->
 

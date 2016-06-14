@@ -499,7 +499,7 @@
     <string name="saving_to_sd_card">Saving to SD card.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android will erase downloaded files if FrostWire is uninstalled.</string>
     <string name="saving_to_internal_memory">Saving to Internal Memory</string>
-    <string name="saving_to_internal_memory_description">You also have an SD card (%1$s available)</string>
+    <string name="saving_to_internal_memory_description">You also have an SD card (%1$s free)</string>
     <string name="device_memory">Device\'s Memory</string>
     <string name="device_storage">Device\'s Storage</string>
     <string name="sdcard_storage">SD\'s Storage</string>
@@ -606,4 +606,5 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">The file could not be seeded. BitTorrent will remain disconnected.</string>
     <string name="fetching_torrent_ellipsis">Fetching torrent…</string>
     <string name="sd_permission_no_accessible_path">The path you selected in the SD is not accessible any more. Press OK to select again.</string>
+    <string name="ok">OK</string>
 </resources>
