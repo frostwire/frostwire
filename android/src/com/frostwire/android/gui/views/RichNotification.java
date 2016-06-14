@@ -72,12 +72,7 @@ public class RichNotification extends LinearLayout {
 		}
 		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.RichNotification);
 		icon = attributes.getDrawable(R.styleable.RichNotification_rich_notification_icon);
-		titleUnderlined = attributes.getBoolean(R.styleable.RichNotification_rich_notification_title_underlined, false);
-        if (titleUnderlined) {
-        	title = "<u>" + attributes.getString(R.styleable.RichNotification_rich_notification_title) + "</u>";
-        } else {
-        	title = attributes.getString(R.styleable.RichNotification_rich_notification_title);
-        }
+		title = attributes.getString(R.styleable.RichNotification_rich_notification_title);
 		description = attributes.getString(R.styleable.RichNotification_rich_notification_description);
 		numberOfActionLinks = attributes.getInteger(R.styleable.RichNotification_rich_notification_number_of_action_links, 0);
 		actionLinksHorizontalMargin = attributes.getInteger(R.styleable.RichNotification_rich_notification_action_links_horizontal_margin, 5);
@@ -98,7 +93,6 @@ public class RichNotification extends LinearLayout {
     /**
      * Removes all previous action links if they were there
      * and adds the corresponding TextViews.
-     * @param links
      */
     public void updateActionLinks(RichNotificationActionLink ... actionLinks) {
 		LinearLayout actionLinksContainer = (LinearLayout) findViewById(R.id.view_rich_notification_action_links);
@@ -152,7 +146,7 @@ public class RichNotification extends LinearLayout {
 		textViewTitle.setTypeface(ROBOTO_LIGHT, Typeface.BOLD);
 		textViewDescription.setTypeface(ROBOTO_LIGHT, Typeface.NORMAL);
 		
-		ImageButton dismissButton = (ImageButton) findViewById(R.id.view_rich_notification_close_button);
+		TextView dismissButton = (TextView) findViewById(R.id.view_rich_notification_close_button);
 		dismissButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

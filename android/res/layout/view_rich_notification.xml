@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
@@ -20,73 +19,71 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rich_notification_border"
     android:gravity="center_vertical|left"
     android:orientation="horizontal"
-    android:padding="0sp"
-    android:background="@drawable/rich_notification_border" >
+    android:paddingBottom="12dp"
+    android:paddingLeft="12dp"
+    android:paddingRight="18dp"
+    android:paddingTop="12dp">
 
-    <ImageView android:id="@+id/view_rich_notification_icon"
+    <ImageView
+        android:id="@+id/view_rich_notification_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleType="fitCenter"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_marginLeft="5sp"
-        android:layout_marginRight="5sp"/>
-    
-    <LinearLayout 
+        android:layout_marginRight="12dp"
+        android:scaleType="fitCenter" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_weight="1.0"
-        android:layout_width="0dip"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
         android:gravity="center_vertical"
-        android:layout_gravity="center_vertical"        
-        android:layout_marginRight="5sp">
-        
-        <TextView android:id="@+id/view_rich_notification_title"
-            android:text="@string/dummy_title"
-            android:textSize="@dimen/text_size_small"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/view_rich_notification_title"
+            style="@style/RichNotificationTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="@string/dummy_title" />
+
+        <TextView
+            android:id="@+id/view_rich_notification_description"
+            style="@style/RichNotificationDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="@string/dummy_content_description" />
+
+        <LinearLayout
+            android:id="@+id/view_rich_notification_action_links"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"/>
-        
-        <TextView android:id="@+id/view_rich_notification_description"
-            android:text="@string/dummy_content_description"
-            android:textSize="@dimen/text_size_micro"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"/>
+            android:gravity="center_vertical|right"
+            android:orientation="horizontal">
 
-        <LinearLayout android:id="@+id/view_rich_notification_action_links"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
-                      android:orientation="horizontal"
-                      android:gravity="center_vertical|right">
-
-            <TextView android:text="@string/dummy_extra"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textAppearance="@android:style/TextAppearance.Small"
-                      android:textColor="@color/basic_blue"
-                      android:singleLine="true"
-                      android:textStyle="bold"
-                      android:visibility="gone"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/dummy_extra"
+                android:textAppearance="@android:style/TextAppearance.Small"
+                android:textColor="@color/basic_blue"
+                android:textStyle="bold"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
-    
-    <View android:id="@+id/view_rich_notification_close_button_vertical_separator"
-        android:layout_width="1sp"
-        android:layout_height="fill_parent"
-        android:layout_marginTop="10sp"
-        android:layout_marginBottom="10sp"
-        android:layout_marginRight="5sp"
-        android:background="@color/app_rich_notification_divider"/>
 
-    <ImageButton android:id="@+id/view_rich_notification_close_button"
+    <TextView
+        android:id="@+id/view_rich_notification_close_button"
+        style="@style/RichNotificationButtonText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:background="@null"
-        android:layout_marginRight="5sp"
-        android:src="@drawable/clearable_edittext_clear_icon"/>
+        android:text="@string/ok" />
 </LinearLayout>
