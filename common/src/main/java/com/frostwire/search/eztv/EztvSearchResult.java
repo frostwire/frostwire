@@ -38,7 +38,7 @@ final class EztvSearchResult extends AbstractTorrentSearchResult {
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
-    private String torrentUrl;
+    private final String torrentUrl;
     private String infoHash;
     private final long size;
     private final long creationTime;
@@ -55,12 +55,7 @@ final class EztvSearchResult extends AbstractTorrentSearchResult {
             dispName = matcher.group("displaynamefallback");
         }
         this.displayName = HtmlManipulator.replaceHtmlEntities(dispName).trim();
-
-        if (matcher.group("torrenturl") != null) {
-            this.torrentUrl = matcher.group("torrenturl");
-        } else if (matcher.group("magneturl") != null) {
-            this.torrentUrl = matcher.group("magneturl");
-        }
+        this.torrentUrl = buildTorrentUrl(matcher);
 
         this.filename = parseFileName(FilenameUtils.getName(torrentUrl));
         this.infoHash = null;
@@ -144,5 +139,16 @@ final class EztvSearchResult extends AbstractTorrentSearchResult {
         } catch (Throwable ignored) {
         }
         return result;
+    }
+
+    private static String buildTorrentUrl(SearchMatcher matcher) {
+        String url = null;
+        if (matcher.group("torrenturl") != null) {
+            url = matcher.group("torrenturl");
+            url = url.replaceAll(" ", "%20");
+        } else if (matcher.group("magneturl") != null) {
+            url = matcher.group("magneturl");
+        }
+        return url;
     }
 }

@@ -20,6 +20,7 @@ package com.frostwire.android.gui.transfers;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
 import com.frostwire.android.R;
@@ -42,7 +43,6 @@ import com.frostwire.transfers.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -321,7 +321,7 @@ public final class TransferManager {
                 return null;
             }
 
-            URI u = URI.create(url);
+            Uri u = Uri.parse(url);
 
             if (!u.getScheme().equalsIgnoreCase("file") &&
                 !u.getScheme().equalsIgnoreCase("http") &&
@@ -353,7 +353,7 @@ public final class TransferManager {
             return download;
         } catch (Throwable e) {
             LOG.warn("Error creating download from uri: " + url);
-            return new InvalidBittorrentDownload(R.string.empty_string);
+            return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
         }
     }
 
