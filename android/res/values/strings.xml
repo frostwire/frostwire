@@ -606,5 +606,4 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">The file could not be seeded. BitTorrent will remain disconnected.</string>
     <string name="fetching_torrent_ellipsis">Fetching torrent…</string>
     <string name="sd_permission_no_accessible_path">The path you selected in the SD is not accessible any more. Press OK to select again.</string>
-    <string name="ok">OK</string>
 </resources>
