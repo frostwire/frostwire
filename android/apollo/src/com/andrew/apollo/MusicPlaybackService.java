@@ -2097,6 +2097,10 @@ public class MusicPlaybackService extends Service {
      * Resumes or starts playback.
      */
     public void play() {
+        if (mAudioManager == null) {
+            return;
+        }
+
         int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
