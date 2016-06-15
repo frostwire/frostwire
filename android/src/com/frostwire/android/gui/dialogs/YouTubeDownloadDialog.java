@@ -109,7 +109,9 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         List<SearchResult> result = new ArrayList<>();
         for (SearchResult sr : listData) {
             String format = extractFormat(sr.getDisplayName());
-            if (format.startsWith("AAC") || format.startsWith("MP3")) {
+            if (format.startsWith("AAC") ||
+                format.startsWith("MP3") ||
+                format.startsWith("H263 MP3")) {
                 continue;
             }
             result.add(sr);
