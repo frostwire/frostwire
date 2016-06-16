@@ -71,6 +71,7 @@ import java.util.List;
  */
 public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRowFilteredModel, BTDownloadDataLine, BTDownload> implements TransfersTab.TransfersFilterModeListener {
     private static final Logger LOG = Logger.getLogger(BTDownloadMediator.class);
+    public static final int MIN_HEIGHT = 150;
     /**
      * instance, for singleton access
      */

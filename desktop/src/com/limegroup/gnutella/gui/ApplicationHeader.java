@@ -55,12 +55,12 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     /*
     * The property to store the selected icon in.
     */
-    private static final String SELECTED = "SELECTED_ICON";
+    private static final String SELECTED_ICON = "SELECTED_ICON";
 
     /**
      * The property to store the unselected icon in.
      */
-    private static final String DESELECTED = "DESELECTED_ICON";
+    private static final String DESELECTED_ICON = "DESELECTED_ICON";
 
     private static final String CLOUD_SEARCH_FIELD = "cloud_search_field";
 
@@ -213,6 +213,9 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
         for (Tabs t : GUIMediator.Tabs.values()) {
             final Tabs finalTab = t; //java...
+            if (tabs.get(t) == null || !t.isEnabled()) {
+                continue;
+            }
             AbstractButton button = createTabButton(tabs.get(t));
             button.setFont(buttonFont);
 
@@ -230,7 +233,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                 
                 void prepareSearchTabAsSearchTrigger(final Tabs tab) {
                     String query = null;
-                    if (tab == Tabs.SEARCH) {
+                    if (tab == Tabs.SEARCH || tab == Tabs.SEARCH_TRANSFERS) {
                         if (!cloudSearchField.getText().isEmpty()) {
                             query = cloudSearchField.getText();
                         } else if (cloudSearchField.getText().isEmpty() && !librarySearchField.getText().isEmpty()) {
@@ -300,12 +303,12 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
         button.putClientProperty("tab", t);
 
-        button.putClientProperty(SELECTED, icon);
+        button.putClientProperty(SELECTED_ICON, icon);
         if (icon != null) {
             disabledIcon = icon;//ImageManipulator.darken(icon);
             rolloverIcon = icon;//ImageManipulator.brighten(icon);
         }
-        button.putClientProperty(DESELECTED, disabledIcon);
+        button.putClientProperty(DESELECTED_ICON, disabledIcon);
         button.setIcon(disabledIcon);
         button.setPressedIcon(rolloverIcon);
         button.setSelectedIcon(disabledIcon);

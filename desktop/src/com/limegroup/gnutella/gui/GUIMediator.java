@@ -39,10 +39,7 @@ import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
-import com.limegroup.gnutella.settings.ApplicationSettings;
-import com.limegroup.gnutella.settings.LibrarySettings;
-import com.limegroup.gnutella.settings.QuestionsHandler;
-import com.limegroup.gnutella.settings.StartupSettings;
+import com.limegroup.gnutella.settings.*;
 import com.limegroup.gnutella.util.LaunchException;
 import com.limegroup.gnutella.util.Launcher;
 import org.limewire.concurrent.ThreadExecutor;
@@ -114,6 +111,7 @@ public final class GUIMediator {
     public enum Tabs {
         SEARCH(I18n.tr("&Search")),
         TRANSFERS(I18n.tr("&Transfers")),
+        SEARCH_TRANSFERS(I18n.tr("&Search")),
         LIBRARY(I18n.tr("&Library"));
 
         private Action navAction;
@@ -159,6 +157,10 @@ public final class GUIMediator {
 
         public String getName() {
             return name;
+        }
+
+        public boolean isEnabled() {
+            return navAction.isEnabled();
         }
 
         private class NavigationAction extends AbstractAction {
@@ -606,6 +608,10 @@ public final class GUIMediator {
      * @param tabEnum index of the tab to display
      */
     public void setWindow(GUIMediator.Tabs tabEnum) {
+        if (UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue() && tabEnum == Tabs.TRANSFERS) {
+            tabEnum = Tabs.SEARCH_TRANSFERS;
+        }
+
         getMainFrame().getApplicationHeader().showSearchField(getMainFrame().getTab(tabEnum));
         getMainFrame().setSelectedTab(tabEnum);
 
