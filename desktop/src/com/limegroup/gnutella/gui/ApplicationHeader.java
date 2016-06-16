@@ -235,6 +235,11 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                     String query = null;
                     if (tab == Tabs.SEARCH || tab == Tabs.SEARCH_TRANSFERS) {
                         if (!cloudSearchField.getText().isEmpty()) {
+
+                            if (cloudSearchField.getText().equals(CLOUD_SEARCH_FIELD_HINT_TEXT)) {
+                                cloudSearchField.setText("");
+                            }
+
                             query = cloudSearchField.getText();
                         } else if (cloudSearchField.getText().isEmpty() && !librarySearchField.getText().isEmpty()) {
                             //they want internet search while on the library
