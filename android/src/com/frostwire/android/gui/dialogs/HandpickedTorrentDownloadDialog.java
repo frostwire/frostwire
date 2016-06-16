@@ -26,7 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
-import com.frostwire.android.gui.adnetworks.Offers;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.bittorrent.BTEngine;
