@@ -377,7 +377,6 @@ public final class SoftwareUpdater {
             }
         }
 
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_MOBILE_CORE, update.config.mobileCore);
         ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_APPLOVIN, update.config.appLovin);
         ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_INMOBI, update.config.inmobi);
         ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
@@ -450,7 +449,6 @@ public final class SoftwareUpdater {
     private static class Config {
         int supportThreshold = 100;
         Map<String, Boolean> activeSearchEngines;
-        boolean mobileCore = false;
         boolean appLovin = false;
         boolean inmobi = false;
         int interstitialOffersTransferStarts = 5;

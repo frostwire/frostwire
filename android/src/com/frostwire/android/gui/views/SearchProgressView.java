@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,21 +29,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.offers.Offers;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.logging.Logger;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public class SearchProgressView extends LinearLayout {
-    private Logger LOG = Logger.getLogger(SearchProgressView.class);
-    private final FreeAppsListener freeAppsListener;
 
     private ProgressBar progressbar;
     private Button buttonCancel;
-    private Button buttonFreeApps;
     private TextView textNoResults;
     private TextView textTryOtherKeywords;
     private TextView textTryFrostWirePlus;
@@ -53,7 +48,6 @@ public class SearchProgressView extends LinearLayout {
 
     public SearchProgressView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.freeAppsListener = new FreeAppsListener(this);
         this.progressEnabled = true;
     }
 
@@ -110,7 +104,6 @@ public class SearchProgressView extends LinearLayout {
 
         progressbar = (ProgressBar) findViewById(R.id.view_search_progress_progressbar);
         buttonCancel = (Button) findViewById(R.id.view_search_progress_button_cancel);
-        buttonFreeApps = (Button) findViewById(R.id.view_search_progress_button_free_apps);
         textNoResults = (TextView) findViewById(R.id.view_search_progress_text_no_results_feedback);
         textTryOtherKeywords = (TextView) findViewById(R.id.view_search_progress_try_other_keywords);
 
@@ -120,8 +113,6 @@ public class SearchProgressView extends LinearLayout {
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
             initTryFrostWirePlusListener();
         }
-
-        initButtonFreeApps();
     }
 
     private void initTryFrostWirePlusListener() {
@@ -133,16 +124,10 @@ public class SearchProgressView extends LinearLayout {
         });
     }
 
-    private void initButtonFreeApps() {
-        buttonFreeApps.setVisibility(View.GONE);
-        buttonFreeApps.setOnClickListener(freeAppsListener);
-    }
-
     private void startProgress() {
         progressbar.setVisibility(View.VISIBLE);
         buttonCancel.setText(android.R.string.cancel);
         textNoResults.setVisibility(View.GONE);
-        buttonFreeApps.setVisibility(View.GONE);
         hideRetryViews();
     }
 
@@ -150,7 +135,6 @@ public class SearchProgressView extends LinearLayout {
         progressbar.setVisibility(View.GONE);
         buttonCancel.setText(R.string.retry_search);
         textNoResults.setVisibility(View.VISIBLE);
-        buttonFreeApps.setVisibility(Offers.isFreeAppsEnabled() ? View.VISIBLE : View.GONE);
 
         if (currentQueryReporter.getCurrentQuery() != null) {
             showRetryViews();
@@ -162,7 +146,7 @@ public class SearchProgressView extends LinearLayout {
     @Override
     public void setOnTouchListener(OnTouchListener l) {
         final int childCount = getChildCount();
-        for (int i=0; i < childCount; i++) {
+        for (int i = 0; i < childCount; i++) {
             getChildAt(i).setOnTouchListener(l);
         }
         super.setOnTouchListener(l);
@@ -170,18 +154,6 @@ public class SearchProgressView extends LinearLayout {
 
     public void setCurrentQueryReporter(CurrentQueryReporter currentQueryReporter) {
         this.currentQueryReporter = currentQueryReporter;
-    }
-
-    private static final class FreeAppsListener extends ClickAdapter<View> {
-
-        public FreeAppsListener(View owner) {
-            super(owner);
-        }
-
-        @Override
-        public void onClick(View owner, View v) {
-            Offers.onFreeAppsClick(v.getContext());
-        }
     }
 
     public interface CurrentQueryReporter {

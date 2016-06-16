@@ -101,7 +101,6 @@ public final class Constants {
     public static final String PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG = "frostwire.prefs.gui.show_new_transfer_dialog";
     public static final String PREF_KEY_GUI_SUPPORT_FROSTWIRE = "frostwire.prefs.gui.support_frostwire";
     public static final String PREF_KEY_GUI_SUPPORT_FROSTWIRE_THRESHOLD = "frostwire.prefs.gui.support_frostwire_threshold";
-    public static final String PREF_KEY_GUI_USE_MOBILE_CORE = "frostwire.prefs.gui.use_mobile_core";
     public static final String PREF_KEY_GUI_USE_APPLOVIN = "frostwire.prefs.gui.use_applovin";
     public static final String PREF_KEY_GUI_USE_INMOBI = "frostwire.prefs.gui.use_inmobi";
     public static final String PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS = "frostwire.prefs.gui.interstitial_offers_transfer_starts";
@@ -171,7 +170,6 @@ public final class Constants {
 
     public static final long LIBRARIAN_FILE_COUNT_CACHE_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
-    public static final String MOBILE_CORE_DEVHASH = "6OJUVFECLGYH3JKYZB41VLQA4JXW5";
     public static final String INMOBI_INTERSTITIAL_PROPERTY_ID = "c1e6be702d614523b725af8b86f99e8f";
 
     public static final int NOTIFIED_BLOOM_FILTER_BITSET_SIZE = 320000; //40 kilobytes
@@ -185,7 +183,6 @@ public final class Constants {
     public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
 
     public static final String VPN_LEARN_MORE_URL = "http://www.frostwire.com/vpn.expressvpn.learnmore";
-    public static final String PIA_URL = "http://www.frostwire.com/vpn.pia";
     public static final String EXPRESSVPN_URL_BASIC = "http://www.frostwire.com/vpn.expressvpn";
     public static final String EXPRESSVPN_URL_PLUS = "http://www.frostwire.com/vpn.expressvpn";
     public static final float EXPRESSVPN_STARTING_USD_PRICE = 8.32f;

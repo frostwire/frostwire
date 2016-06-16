@@ -69,10 +69,6 @@ public final class MainController {
         activity.startActivity(i);
     }
 
-    public void showFreeApps(Context context) {
-        Offers.onFreeAppsClick(context);
-    }
-
     public void launchMyMusic() {
         Intent i = new Intent(activity, com.andrew.apollo.ui.activities.HomeActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
