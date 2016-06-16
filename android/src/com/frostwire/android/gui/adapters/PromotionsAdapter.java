@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,16 +29,14 @@ import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 /**
  * Adapter in control of the List View shown when we're browsing the files of
  * one peer.
- * 
+ *
  * @author gubatron
  * @author aldenml
- * 
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
@@ -51,19 +49,19 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         this.slides = slides;
         this.imageLoader = ImageLoader.getInstance(ctx);
     }
-    
+
     @Override
     public void setupView(View convertView, ViewGroup parent, Slide viewItem) {
         ImageView imageView = findView(convertView, R.id.view_promotions_item_image);
-        
+
         GridView gridView = (GridView) parent;
-        int promoWidth = getColumnWidth(gridView); //hack
+        int promoWidth = gridView.getColumnWidth();
         int promoHeight = (int) (promoWidth * PROMO_HEIGHT_TO_WIDTH_RATIO);
 
         if (promoWidth > 0 && promoHeight > 0) {
             imageLoader.load(Uri.parse(viewItem.imageSrc), imageView, promoWidth, promoHeight);
         }
-     }
+    }
 
     @Override
     public int getCount() {
@@ -78,29 +76,5 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     @Override
     public long getItemId(int position) {
         return position;
-    }
-    
-    /**
-     * This is a hack.
-     * The reason is that, the very first time we try to find out what are the dimensions
-     * of the FWGridView component in the PromotionsAdapter.getView() method, it always
-     * returns 0. The idea was to use the width of the component, and the orientation of the
-     * device, and then we'd know if we're in a single column mode or 2 column mode when displaying
-     * the promos. This however works every time, but I'm not sure if it'll break after Android API 16 (Jelly Bean)
-     * since Android later introduced it's own getColumnWidth() method.
-     * @return
-     */
-    private int getColumnWidth(GridView grid) {
-        try {
-            Field field = GridView.class.getDeclaredField("mColumnWidth");
-            field.setAccessible(true);
-            Integer value = (Integer) field.get(grid);
-            field.setAccessible(false);
-            return value.intValue();
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
