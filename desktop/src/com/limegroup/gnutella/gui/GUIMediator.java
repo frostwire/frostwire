@@ -608,10 +608,12 @@ public final class GUIMediator {
      * @param tabEnum index of the tab to display
      */
     public void setWindow(GUIMediator.Tabs tabEnum) {
-        if (UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue() &&
-            tabEnum == Tabs.TRANSFERS &&
-            Tabs.SEARCH_TRANSFERS.isEnabled())   {
-            tabEnum = Tabs.SEARCH_TRANSFERS;
+        if (tabEnum == Tabs.TRANSFERS || tabEnum == Tabs.SEARCH_TRANSFERS) {
+            if (Tabs.TRANSFERS.isEnabled()) {
+                tabEnum = Tabs.TRANSFERS;
+            } else if (Tabs.SEARCH_TRANSFERS.isEnabled()) {
+                tabEnum = Tabs.SEARCH_TRANSFERS;
+            }
         }
 
         getMainFrame().getApplicationHeader().showSearchField(getMainFrame().getTab(tabEnum));
