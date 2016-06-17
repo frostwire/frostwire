@@ -79,7 +79,7 @@ public final class TransfersTab extends AbstractTab {
     private void initComponents() {
         mainComponent = new JPanel(new MigLayout("fill, insets 3px 3px 3px 3px, gap 0","[][grow]","[][grow]"));
         mainComponent.add(createTextFilterComponent(), "w 200!, h 25!, gapleft 5px, center, shrink");
-        mainComponent.add(createFilterToggleButtons(),"w 400!, h 32!, pad 0 0 0 0, center, wrap");
+        mainComponent.add(createFilterToggleButtons(),"w 400!, h 32!, pad 12 0 0 0, right, wrap");
         mainComponent.add(downloadMediator.getComponent(),"cell 0 1 2 1,grow"); // "cell <column> <row> <width> <height>"
         setTransfersFilterModeListener(downloadMediator);
     }
@@ -112,6 +112,14 @@ public final class TransfersTab extends AbstractTab {
         filterDownloadingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.DOWNLOADING));
         filterSeedingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.SEEDING));
         filterFinishedButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.FINISHED));
+        final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 9);
+        final Dimension buttonDimension = new Dimension(90,18);
+        applyFontAndDimensionToFilterToggleButtons(smallHelvetica, buttonDimension,
+                filterAllButton, filterDownloadingButton,filterSeedingButton,filterFinishedButton);
+
+        filterAllButton.setPreferredSize(buttonDimension);
+        filterAllButton.setMinimumSize(buttonDimension);
+        filterAllButton.setMaximumSize(buttonDimension);
         filterGroup.add(filterAllButton);
         filterGroup.add(filterDownloadingButton);
         filterGroup.add(filterSeedingButton);
@@ -121,6 +129,15 @@ public final class TransfersTab extends AbstractTab {
         filterButtonsContainer.add(filterSeedingButton);
         filterButtonsContainer.add(filterFinishedButton);
         return filterButtonsContainer;
+    }
+
+    private void applyFontAndDimensionToFilterToggleButtons(Font font, Dimension dimension, JToggleButton ... buttons) {
+        for (JToggleButton button : buttons) {
+            button.setFont(font);
+            button.setMinimumSize(dimension);
+            button.setMaximumSize(dimension);
+            button.setPreferredSize(dimension);
+        }
     }
 
     public JComponent getComponent() {
