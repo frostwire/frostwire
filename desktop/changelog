@@ -1,3 +1,18 @@
+frostwire (6.3.1) stable; urgency=high
+  * New: "View > Search/Transfers split screen" option.
+  * New jlibtorrent 1.1.0.34
+  * jlibtorrent: fixed crash on invalid input in http_parser
+  * jlibtorrent: early resume data reset when fatal_disk_error
+  * jlibtorrent: optimize allow-fast logic
+  * jlibtorrent: fixed inverted priority of incoming piece suggestions
+  * jlibtorrent: fixed bug related to flag_merge_resume_http_seeds flag
+  * jlibtorrent: don't add peers from url if add_torrent_impl returns invalid handle
+  * HTTP client improvements
+  * EZTV fixes
+  * New icon for TorrentDownloads search results
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 16 Jun 2016 18:42:00 -0500
+
 frostwire (6.3.0) stable; urgency=high
   * Greatly improved seeding connectivity. Seed and share magnets!
   * New transfers tab, allows you to filter transfers by state and keywords.
