@@ -271,11 +271,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
     }
 
     private boolean isPlaying() {
-        if (initializer != null) {
-            return MediaPlayer.instance().isThisBeingPlayed(initializer);
-        }
-
-        return false;
+        return initializer != null && MediaPlayer.instance().isThisBeingPlayed(initializer);
     }
 
     public LimeTableColumn getColumn(int idx) {

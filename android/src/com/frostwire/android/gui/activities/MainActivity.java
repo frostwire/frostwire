@@ -288,6 +288,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
         //go!
         final String uri = intent.getDataString();
+        intent.setAction(null);
         if (uri != null) {
             TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this));
         } else {
