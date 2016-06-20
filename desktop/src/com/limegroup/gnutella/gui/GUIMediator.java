@@ -1487,16 +1487,15 @@ public final class GUIMediator {
     }
 
     public void openTorrentSearchResult(TorrentSearchResult sr, boolean partial) {
-        //showTransfers(TransfersTab.FilterMode.ALL);
         getBTDownloadMediator().openTorrentSearchResult(sr, partial);
     }
 
-     public void openSoundcloudTrackUrl(String trackUrl, String title) {
+     public void openSoundcloudTrackUrl(String trackUrl) {
         showTransfers(TransfersTab.FilterMode.ALL);
         getBTDownloadMediator().downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, null);
     }
 
-    public void openSoundcloudTrackUrl(String trackUrl, String title, SoundcloudSearchResult sr) {
+    public void openSoundcloudTrackUrl(String trackUrl, SoundcloudSearchResult sr) {
         showTransfers(TransfersTab.FilterMode.ALL);
         getBTDownloadMediator().downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, sr);
     }

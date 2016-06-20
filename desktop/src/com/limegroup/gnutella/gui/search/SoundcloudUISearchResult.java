@@ -46,7 +46,7 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
     @Override
     public void download(boolean partial) {
         GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-        GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr.getDisplayName(), sr);
+        GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr);
         showDetails(false);
         UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE);
     }
