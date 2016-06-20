@@ -21,6 +21,7 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.logging.Logger;
@@ -252,10 +253,9 @@ public class TorrentFetcherDownload implements BTDownload {
                                 return;
                             }
                         }
-
                         TorrentInfo ti = TorrentInfo.bdecode(data);
                         BTEngine.getInstance().download(ti, null, selection, magnetUri);
-
+                        GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
                     } catch (Throwable e) {
                         LOG.error("Error downloading torrent", e);
                     }

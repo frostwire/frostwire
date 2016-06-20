@@ -1487,7 +1487,7 @@ public final class GUIMediator {
     }
 
     public void openTorrentSearchResult(TorrentSearchResult sr, boolean partial) {
-        showTransfers(TransfersTab.FilterMode.ALL);
+        //showTransfers(TransfersTab.FilterMode.ALL);
         getBTDownloadMediator().openTorrentSearchResult(sr, partial);
     }
 
