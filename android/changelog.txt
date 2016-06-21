@@ -1,3 +1,6 @@
+FrostWire 1.7.6 - JUN/20/2016
+ - Fixes bug where torrent picker dialog would keep reappearing.
+
 FrostWire 1.7.5 - JUN/14/2016
  - Power saving improvements in notifications and screen refreshing
  - (Plus-only) Fixes bug on update dialog where buttons would
