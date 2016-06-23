@@ -23,6 +23,7 @@ import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -98,6 +99,10 @@ public final class TransfersTab extends AbstractTab {
         filterText.addKeyListener(new TextFilterKeyAdapter());
         filterText.addFocusListener(new TextFilterFocusAdapter());
         filterText.selectAll();
+        final CompoundBorder compoundBorder =
+                BorderFactory.createCompoundBorder(filterText.getBorder(),
+                        BorderFactory.createEmptyBorder(4, 2, 2, 2));
+        filterText.setBorder(compoundBorder);
         return filterText;
     }
 
