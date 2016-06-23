@@ -477,7 +477,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     public void setDownloadRateLimit(int limit) {
         th.setDownloadLimit(limit);
-        th.saveResumeData();
     }
 
     public int getUploadRateLimit() {
@@ -486,7 +485,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     public void setUploadRateLimit(int limit) {
         th.setUploadLimit(limit);
-        th.saveResumeData();
     }
 
     public void requestTrackerAnnounce() {
@@ -517,7 +515,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         }
 
         th.replaceTrackers(list);
-        th.saveResumeData();
     }
 
     @Override

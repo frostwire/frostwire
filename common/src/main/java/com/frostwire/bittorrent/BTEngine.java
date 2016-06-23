@@ -929,7 +929,6 @@ public final class BTEngine {
                 case TORRENT_ADDED:
                     TorrentAlert<?> torrentAlert = (TorrentAlert<?>) alert;
                     fireDownloadAdded(torrentAlert);
-                    doResumeData(torrentAlert, false);
                     runNextRestoreDownloadTask();
                     break;
                 case PIECE_FINISHED:
