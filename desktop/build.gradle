@@ -34,7 +34,7 @@ dependencies {
     compile 'com.h2database:h2:1.4.191'
     compile 'org.apache.lucene:lucene-core:3.5.0'
     compile 'net.jthink:jaudiotagger:2.2.5'
-    compile 'com.frostwire:jlibtorrent:1.1.0.34'
+    compile 'com.frostwire:jlibtorrent:1.1.0.35'
 
     compile fileTree(dir: 'lib/jars', include: ['*.jar'])
 }
