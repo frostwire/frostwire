@@ -125,7 +125,11 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
 
     @Override
     protected int preliminaryHtmlPrefixOffset(String page) {
-        return page.indexOf("<div class=\"yt-uix-hovercard-content\">");
+        int offset = page.indexOf("<div class=\"yt-uix-hovercard-content\">");
+        if (offset == -1) {
+            offset = page.indexOf("class=\"num-results first-focus\"");
+        }
+        return offset;
     }
 
     @Override
