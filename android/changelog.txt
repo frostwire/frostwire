@@ -1,4 +1,5 @@
-FrostWire 1.7.6 - JUN/23/2016
+FrostWire 1.7.6 - JUN/25 /2016
+ - Fixes YT search issues
  - New jlibtorrent 1.1.0.35
  - Fixes bug where torrent picker dialog would keep reappearing
  - Crash fixes

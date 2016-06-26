@@ -1,3 +1,10 @@
+frostwire (6.3.2) stable; urgency=high
+  * Fixes YT search issues
+  * New jlibtorrent 1.1.0.35
+  * Crash fixes
+
+ -- FrostWire Team <contact@frostwire.com>  Sat, 25 Jun 2016 04:21:39 -0500
+
 frostwire (6.3.1) stable; urgency=high
   * New: "View > Search/Transfers split screen" option.
   * New jlibtorrent 1.1.0.34
