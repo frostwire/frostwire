@@ -23,7 +23,6 @@ import android.content.Context;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.logging.Logger;
-import com.frostwire.util.Ref;
 import com.inmobi.ads.InMobiInterstitial;
 import com.inmobi.sdk.InMobiSdk;
 
@@ -48,12 +47,12 @@ public class InMobiAdNetwork implements AdNetwork {
         if (!started) {
             try {
                 // this initialize call is very expensive, this is why we should be invoked in a thread.
-                LOG.info("InMobi.initialize()...");
+                //LOG.info("InMobi.initialize()...");
                 InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
                 //InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
-                LOG.info("InMobi.initialized.");
+                //LOG.info("InMobi.initialized.");
                 started = true;
-                LOG.info("Load InmobiInterstitial.");
+                //LOG.info("Load InmobiInterstitial.");
                 loadNewInterstitial(activity);
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -89,14 +88,9 @@ public class InMobiAdNetwork implements AdNetwork {
         inmobiListener.dismissActivityAfterwards(dismissActivityAfterward);
 
         if (inmobiInterstitial.isReady()) {
+//            LOG.info("inmobiInterstitial.isReady()");
             try {
                 inmobiInterstitial.show();
-
-                if (Ref.alive(activityWeakReference)) {
-                    loadNewInterstitial(activityWeakReference.get());
-                }
-
-                LOG.info("InMobi Interstitial shown.");
                 return true;
             } catch (Throwable e) {
                 LOG.error("InMobi Interstitial failed on .show()!", e);
@@ -125,6 +119,7 @@ public class InMobiAdNetwork implements AdNetwork {
                     inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
                     inmobiInterstitial.load();
                 } catch (Throwable t) {
+                    LOG.warn("InmobiAdNetwork.loadInterstitial() failed", t);
                     // don't crash, keep going.
                     // possible android.util.AndroidRuntimeException: android.content.pm.PackageManager$NameNotFoundException: com.google.android.webview
                 }
