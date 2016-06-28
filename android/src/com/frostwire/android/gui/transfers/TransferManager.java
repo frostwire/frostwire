@@ -104,7 +104,7 @@ public final class TransferManager {
     }
 
     public List<Transfer> getTransfers() {
-        List<Transfer> transfers = new ArrayList<Transfer>();
+        List<Transfer> transfers = new ArrayList<>();
 
         if (httpDownloads != null) {
             transfers.addAll(httpDownloads);
@@ -483,7 +483,7 @@ public final class TransferManager {
         List<Transfer> transfers = new ArrayList<>();
         transfers.addAll(httpDownloads);
         for (Transfer t : transfers) {
-            if (t instanceof Transfer && !t.isComplete() && ((Transfer) t).isDownloading()) {
+            if (t instanceof Transfer && !t.isComplete() && t.isDownloading()) {
                 t.remove(false);
             }
         }
@@ -500,7 +500,6 @@ public final class TransferManager {
     public void resetStartedTransfers() {
         startedTransfers = 0;
     }
-
 
     /**
      * @return true if less than 10MB available
