@@ -48,7 +48,7 @@ public final class Offers {
     private static List<AdNetwork> AD_NETWORKS;
 
     public static void initAdNetworks(Activity activity) {
-        AD_NETWORKS = Arrays.asList(new AdNetwork[]{APP_LOVIN, IN_MOBI});
+        AD_NETWORKS = Arrays.asList(new AdNetwork[]{IN_MOBI, APP_LOVIN});
         for (AdNetwork adNetwork : AD_NETWORKS) {
             adNetwork.initialize(activity);
         }
@@ -100,9 +100,6 @@ public final class Offers {
         boolean itsBeenLongEnough = timeSinceLastOffer >= INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS;
         boolean startedEnoughTransfers = startedTransfers >= INTERSTITIAL_OFFERS_TRANSFER_STARTS;
         boolean shouldDisplayFirstOne = (Offers.lastInterstitialShownTimestamp == -1 && startedEnoughTransfers);
-
-//        LOG.info("it's been long enough: " + itsBeenLongEnough);
-//        LOG.info("started enough transfers: " + startedEnoughTransfers);
 
         if (shouldDisplayFirstOne || (itsBeenLongEnough && startedEnoughTransfers)) {
             Offers.showInterstitial(ctx, false, false);

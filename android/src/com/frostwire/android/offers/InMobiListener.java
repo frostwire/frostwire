@@ -174,12 +174,12 @@ class InMobiListener implements InterstitialListener, InMobiInterstitial.Interst
         @Override
         public void run() {
             if (!Ref.alive(interstitialRef)) {
-                //LOG.info("Can't reload interstitial, lost reference to interstitial. aborting.");
+                LOG.info("Can't reload interstitial, lost reference to interstitial. aborting.");
                 return;
             }
             InMobiInterstitial imInterstitial = interstitialRef.get();
             try {
-                //LOG.info("Reloading ads (Attempts left: " + INTERSTITIAL_RETRIES_LEFT + ")");
+                LOG.info("Reloading ads (Attempts left: " + INTERSTITIAL_RETRIES_LEFT + ")");
                 if (imInterstitial != null) {
                     try {
                         imInterstitial.load();
