@@ -536,13 +536,21 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void showLastBackDialog() {
-        YesNoDialog dlg = YesNoDialog.newInstance(LAST_BACK_DIALOG_ID, R.string.minimize_frostwire, R.string.are_you_sure_you_wanna_leave);
+        YesNoDialog dlg = YesNoDialog.newInstance(
+                LAST_BACK_DIALOG_ID,
+                R.string.minimize_frostwire,
+                R.string.are_you_sure_you_wanna_leave,
+                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.show(getFragmentManager()); //see onDialogClick
     }
 
     private void showShutdownDialog() {
         UXStats.instance().flush();
-        YesNoDialog dlg = YesNoDialog.newInstance(SHUTDOWN_DIALOG_ID, R.string.app_shutdown_dlg_title, R.string.app_shutdown_dlg_message);
+        YesNoDialog dlg = YesNoDialog.newInstance(
+                SHUTDOWN_DIALOG_ID,
+                R.string.app_shutdown_dlg_title,
+                R.string.app_shutdown_dlg_message,
+                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.show(getFragmentManager()); //see onDialogClick
     }
 

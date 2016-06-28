@@ -33,10 +33,11 @@ import com.frostwire.android.gui.views.AbstractDialog;
  * @author marcelinkaaa
  */
 public class YesNoDialog extends AbstractDialog {
-
+    public static final byte FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK = 0x1;
     private static final String ID_KEY = "id";
     private static final String TITLE_KEY = "title";
     private static final String MESSAGE_KEY = "message";
+    private static final String YES_NO_DIALOG_FLAGS = "yesnodialog_flags";
     private String id;
 
     public YesNoDialog() {
@@ -44,12 +45,17 @@ public class YesNoDialog extends AbstractDialog {
     }
 
     public static YesNoDialog newInstance(String id, int titleId, int messageId) {
+        return newInstance(id, titleId, messageId, (byte) 0x0);
+    }
+
+    public static YesNoDialog newInstance(String id, int titleId, int messageId, byte dialogFlags) {
         YesNoDialog f = new YesNoDialog();
 
         Bundle args = new Bundle();
         args.putString(ID_KEY, id);
         args.putInt(TITLE_KEY, titleId);
         args.putInt(MESSAGE_KEY, messageId);
+        args.putByte(YES_NO_DIALOG_FLAGS, dialogFlags);
         f.setArguments(args);
 
         return f;
@@ -63,6 +69,7 @@ public class YesNoDialog extends AbstractDialog {
 
         int titleId = args.getInt(TITLE_KEY);
         int messageId = args.getInt(MESSAGE_KEY);
+        final byte flags = args.getByte(YES_NO_DIALOG_FLAGS);
 
         dlg.setContentView(R.layout.dialog_default);
 
@@ -77,6 +84,9 @@ public class YesNoDialog extends AbstractDialog {
         buttonYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if ((flags & FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK) == FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK) {
+                    dlg.dismiss();
+                }
                 performDialogClick(id, Dialog.BUTTON_POSITIVE);
             }
         });
