@@ -196,7 +196,14 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     private void seedFileDescriptor(FileDescriptor fd) {
         if (fd.filePath.endsWith(".torrent")) {
-            BTEngine.getInstance().download(new File(fd.filePath), null, new boolean[]{true});
+            try {
+                BTEngine.getInstance().download(new File(fd.filePath), null, new boolean[]{true});
+            } catch (Throwable e) {
+                // TODO: better notify the user
+                LOG.error("Error starting download from file descriptor", e);
+                // sometimes a file descriptor could be visible in the UI but not exists
+                // due to the android providers getting out of sync.
+            }
         } else {
             buildTorrentAndSeedIt(fd);
         }
