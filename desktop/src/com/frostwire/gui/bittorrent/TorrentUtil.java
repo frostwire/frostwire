@@ -249,7 +249,7 @@ public final class TorrentUtil {
 
             final TorrentInfo torrent = TorrentInfo.bdecode(bencoded_torrent_bytes);
 
-            SwingUtilities.invokeLater(new Runnable() {
+            GUIMediator.safeInvokeLater(new Runnable() {
                 public void run() {
                     if (uiTorrentMakerListener != null) {
                         uiTorrentMakerListener.beforeOpenForSeedInUIThread();
