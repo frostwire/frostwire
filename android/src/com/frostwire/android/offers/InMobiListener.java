@@ -52,12 +52,7 @@ class InMobiListener implements InterstitialListener, InMobiInterstitial.Interst
     @Override
     public void onAdDismissed(InMobiInterstitial imInterstitial) {
         //LOG.info("InMobiListener.onAdDismissed");
-        Activity callerActivity = Ref.alive(activityRef) ? activityRef.get() : null;
-        ifShutdownAfterDismiss(callerActivity);
-        ifFinishAfterDismiss(callerActivity);
-        if (!shutdownAfterDismiss) {
-            reloadInterstitialLater(imInterstitial, INTERSTITIAL_RELOAD_WAIT_IN_SECS);
-        }
+        wrapItUp(imInterstitial);
     }
 
     @Override
@@ -87,17 +82,11 @@ class InMobiListener implements InterstitialListener, InMobiInterstitial.Interst
     @Override
     public void onUserLeftApplication(InMobiInterstitial imInterstitial) {
         //LOG.info("InMobiListener.onUserLeftApplication!");
-        Activity callerActivity = Ref.alive(activityRef) ? activityRef.get() : null;
-        ifShutdownAfterDismiss(callerActivity);
-        ifFinishAfterDismiss(callerActivity);
-        if (!shutdownAfterDismiss) {
-            reloadInterstitialLater(imInterstitial, INTERSTITIAL_RELOAD_WAIT_IN_SECS);
-        }
+        wrapItUp(imInterstitial);
     }
 
     @Override
     public void onAdRewardActionCompleted(InMobiInterstitial inMobiInterstitial, Map<Object, Object> map) {
-
     }
 
     @Override
@@ -161,6 +150,15 @@ class InMobiListener implements InterstitialListener, InMobiInterstitial.Interst
         INTERSTITIAL_RETRIES_LEFT--;
         Handler h = new Handler(Looper.getMainLooper());
         h.postDelayed(new InterstitialReloader(imInterstitial), secondsLater*1000);
+    }
+
+    private void wrapItUp(InMobiInterstitial imInterstitial) {
+        Activity callerActivity = Ref.alive(activityRef) ? activityRef.get() : null;
+        ifShutdownAfterDismiss(callerActivity);
+        ifFinishAfterDismiss(callerActivity);
+        if (!shutdownAfterDismiss) {
+            reloadInterstitialLater(imInterstitial, INTERSTITIAL_RELOAD_WAIT_IN_SECS);
+        }
     }
 
     private static class InterstitialReloader implements Runnable {
