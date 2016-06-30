@@ -34,8 +34,10 @@ public class InMobiAdNetwork implements AdNetwork {
     private InMobiInterstitial inmobiInterstitial;
     private boolean started = false;
     private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150l;
+    private final boolean DEBUG_MODE;
 
-    public InMobiAdNetwork() {
+    public InMobiAdNetwork(boolean debugMode) {
+        DEBUG_MODE = debugMode;
     }
 
     public void initialize(final Activity activity) {
@@ -49,7 +51,9 @@ public class InMobiAdNetwork implements AdNetwork {
                 // this initialize call is very expensive, this is why we should be invoked in a thread.
                 LOG.info("InMobi.initialize()...");
                 InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
-                //InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
+                if (DEBUG_MODE) {
+                    InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
+                }
                 LOG.info("InMobi.initialized.");
                 started = true;
                 LOG.info("Load InmobiInterstitial.");
@@ -66,6 +70,10 @@ public class InMobiAdNetwork implements AdNetwork {
     }
 
     public boolean enabled() {
+        if (DEBUG_MODE) {
+            return true;
+        }
+
         ConfigurationManager config;
         boolean isInMobiEnabled = false;
         try {

@@ -30,11 +30,14 @@ import com.frostwire.logging.Logger;
 import java.lang.ref.WeakReference;
 
 public class AppLovinAdNetwork implements AdNetwork {
+    private final boolean DEBUG_MODE;
     private static final Logger LOG = Logger.getLogger(AppLovinAdNetwork.class);
     private AppLovinInterstitialAdapter interstitialAdapter = null;
     private boolean started = false;
 
-    public AppLovinAdNetwork() {}
+    public AppLovinAdNetwork(boolean debugMode) {
+        DEBUG_MODE = debugMode;
+    }
 
     public void initialize(final Activity activity) {
         if (!enabled()) {
@@ -46,7 +49,11 @@ public class AppLovinAdNetwork implements AdNetwork {
             public void run() {
                 try {
                     if (!started) {
-                        AppLovinSdk.initializeSdk(activity.getApplicationContext());
+                        final Context applicationContext = activity.getApplicationContext();
+                        AppLovinSdk.initializeSdk(applicationContext);
+                        if (DEBUG_MODE) {
+                            AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(true);
+                        }
                         loadNewInterstitial(activity);
                         started = true;
                     }
@@ -72,6 +79,10 @@ public class AppLovinAdNetwork implements AdNetwork {
     }
 
     public boolean enabled() {
+        if (DEBUG_MODE) {
+            return true;
+        }
+
         ConfigurationManager config;
         boolean enabled = false;
         try {

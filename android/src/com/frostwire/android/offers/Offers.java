@@ -43,12 +43,16 @@ public final class Offers {
 
     static final ThreadPool THREAD_POOL = new ThreadPool("SearchManager", 1, 5, 1L, new LinkedBlockingQueue<Runnable>(), true);
     private static long lastInterstitialShownTimestamp = -1;
-    private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
-    private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
+    private final static boolean DEBUG_MODE = false;
+    private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork(DEBUG_MODE);
+    private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork(DEBUG_MODE);
     private static List<AdNetwork> AD_NETWORKS;
 
     public static void initAdNetworks(Activity activity) {
-        AD_NETWORKS = Arrays.asList(new AdNetwork[]{IN_MOBI, APP_LOVIN});
+        AD_NETWORKS = Arrays.asList(new AdNetwork[]{
+            IN_MOBI,
+            APP_LOVIN
+        });
         for (AdNetwork adNetwork : AD_NETWORKS) {
             adNetwork.initialize(activity);
         }
@@ -92,9 +96,9 @@ public final class Offers {
         TransferManager TM = TransferManager.instance();
         int startedTransfers = TM.incrementStartedTransfers();
         ConfigurationManager CM = ConfigurationManager.instance();
-        final int INTERSTITIAL_OFFERS_TRANSFER_STARTS = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS);
+        final int INTERSTITIAL_OFFERS_TRANSFER_STARTS = DEBUG_MODE ? 1 : CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS);
         final int INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
-        final long INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS = TimeUnit.MINUTES.toMillis(INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
+        final long INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS = DEBUG_MODE ? 10000 : TimeUnit.MINUTES.toMillis(INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
 
         long timeSinceLastOffer = System.currentTimeMillis() - Offers.lastInterstitialShownTimestamp;
         boolean itsBeenLongEnough = timeSinceLastOffer >= INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS;
