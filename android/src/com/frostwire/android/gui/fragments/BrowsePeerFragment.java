@@ -394,7 +394,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     private void updateFiles(Object[] data) {
-        if (data == null) {
+        if (data == null || data.length < 2 || data[1] == null) {
             LOG.warn("Something wrong, data is null");
             return;
         }
