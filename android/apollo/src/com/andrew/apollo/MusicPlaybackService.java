@@ -1408,11 +1408,20 @@ public class MusicPlaybackService extends Service {
 
         if (what.equals(META_CHANGED)) {
             // Increase the play count for favorite songs.
+            if (mFavoritesCache == null) {
+                mFavoritesCache = FavoritesStore.getInstance(this);
+            }
+
             if (mFavoritesCache.getSongId(getAudioId()) != null) {
                 mFavoritesCache.addSongId(getAudioId(), getTrackName(), getAlbumName(),
                         getArtistName());
             }
             // Add the track to the recently played list.
+
+            if (mRecentsCache == null) {
+                mRecentsCache = RecentStore.getInstance(this);
+            }
+
             mRecentsCache.addAlbumId(getAlbumId(), getAlbumName(), getArtistName(),
                     MusicUtils.getSongCountForAlbum(this, getAlbumId()),
                     MusicUtils.getReleaseDateForAlbum(this, getAlbumId()));
