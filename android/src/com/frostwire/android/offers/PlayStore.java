@@ -219,11 +219,11 @@ public final class PlayStore extends StoreBase {
         if (product != null) {
             l.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 31);
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 183);
         if (product != null) {
             l.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 31);
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 365);
         if (product != null) {
             l.put(product.sku(), product);
         }
@@ -231,11 +231,11 @@ public final class PlayStore extends StoreBase {
         if (product != null) {
             l.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 31);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 183);
         if (product != null) {
             l.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 31);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 365);
         if (product != null) {
             l.put(product.sku(), product);
         }
