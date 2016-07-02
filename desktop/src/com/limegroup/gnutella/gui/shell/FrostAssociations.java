@@ -27,18 +27,18 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 
 public class FrostAssociations {
-	
-    /** 
-     * A constant for the current associations "level"
-     * increment this when adding new associations 
-     */
-    public static final int CURRENT_ASSOCIATIONS = 2;
-    
+
+	/**
+	 * A constant for the current associations "level"
+	 * increment this when adding new associations
+	 */
+	public static final int CURRENT_ASSOCIATIONS = 2;
+
 	private static final String PROGRAM;
 	private static final String UNSUPPORTED_PLATFORM = "";
-	
+
 	private static Collection<LimeAssociationOption> options;
-	
+
 	static {
 		if (OSUtils.isWindows())
 			PROGRAM = "FrostWire";
@@ -47,23 +47,22 @@ public class FrostAssociations {
 		else
 			PROGRAM = UNSUPPORTED_PLATFORM;
 	}
-	
+
 	public synchronized static Collection<LimeAssociationOption> getSupportedAssociations() {
 		if (options == null)
 			options = getSupportedAssociationsImpl();
 		return options;
 	}
-	
+
 	public synchronized static boolean anyAssociationsSupported() {
 		return !getSupportedAssociations().isEmpty();
 	}
-	
+
 	private static Collection<LimeAssociationOption> getSupportedAssociationsImpl() {
-	    if (CommonUtils.isPortable()) {
-	        return Collections.emptyList();
-	    }
-	    
-	    
+		if (CommonUtils.isPortable()) {
+			return Collections.emptyList();
+		}
+
 		Collection<LimeAssociationOption> ret = new ArrayList<LimeAssociationOption>();
 		
 		// strings that the shell will understand 
@@ -95,8 +94,8 @@ public class FrostAssociations {
 				ShellAssociation tor = new FileTypeAssociation("torrent",
 						"application/x-bittorrent", 
 						fileOpener, "open",
-						"FrostWire Torrent", 
-						fileIcon);				
+						I18n.tr("FrostWire Torrent"),
+						fileIcon);
 				LimeAssociationOption torrentwin = 
 					new LimeAssociationOption(tor,
 							ApplicationSettings.HANDLE_TORRENTS,
@@ -108,7 +107,7 @@ public class FrostAssociations {
 			{
 				ShellAssociation file = new FileTypeAssociation("torrent",
 					"Application/x-bittorrent", fileOpener, "open",
-					"FrostWire Torrent", fileIcon);
+					I18n.tr("FrostWire Torrent"), fileIcon);
 				LimeAssociationOption torrent = new LimeAssociationOption(
 						file,
 						ApplicationSettings.HANDLE_TORRENTS,
