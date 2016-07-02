@@ -73,7 +73,7 @@ public final class Offers {
 
         boolean interstitialShown = false;
 
-        if (!PlayStore.getInstance().showAds()) {
+        if (Products.disableAds(PlayStore.getInstance())) {
             LOG.info("Skipping interstitial ads display, PlayStore reports no ads");
         } else {
             final WeakReference<Activity> activityRef = Ref.weak(activity);
