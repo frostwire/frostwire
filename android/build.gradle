@@ -61,6 +61,8 @@ def changeApkOutput(variant) {
         flavor = 'basic'
     } else if (variant.productFlavors[0].name.equals("plus1")) {
         flavor = 'plus'
+    } else if (variant.productFlavors[0].name.equals("store")) {
+        flavor = 'store'
     }
     def suffix = project.ext.versionName + '-b' + project.ext.versionCode + '-' + flavor
     def name = "$project.buildDir/frostwire-android-" + variant.buildType.name + '-' + suffix

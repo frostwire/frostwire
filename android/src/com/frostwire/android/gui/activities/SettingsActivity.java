@@ -441,7 +441,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupStore() {
         Preference p = findPreference("frostwire.prefs.offers.buy_no_ads");
-        if (!Constants.IS_STORE_ENABLE) {
+        if (p != null && !Constants.IS_STORE_ENABLE) {
             PreferenceScreen s = getPreferenceScreen();
             s.removePreference(p);
         }
