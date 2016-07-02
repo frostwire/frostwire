@@ -23,9 +23,7 @@ import android.content.Intent;
 import com.android.vending.billing.*;
 import com.frostwire.logging.Logger;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -68,7 +66,7 @@ public final class PlayStore extends StoreBase {
                     return;
                 }
 
-                if (inventory != null) {
+                if (inventory == null) {
                     LOG.warn("Failed to get inventory, something wrong with the IabHelper");
                     return;
                 }
@@ -206,31 +204,51 @@ public final class PlayStore extends StoreBase {
     }
 
 
-    private List<Product> buildProducts(Inventory inventory) {
+    private Map<String, Product> buildProducts(Inventory inventory) {
         if (inventory == null) {
             LOG.warn("Inventory is null, review your logic");
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
 
-        List<Product> l = new LinkedList<>();
+        Map<String, Product> l = new HashMap<>();
 
         // build each product, one by one, not magic here intentionally
-        Product product = null;
+        Product product;
 
         product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_MONTH_SKU, INAPP_TYPE, inventory, 31);
         if (product != null) {
-            l.add(product);
+            l.put(product.sku(), product);
+        }
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 31);
+        if (product != null) {
+            l.put(product.sku(), product);
+        }
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 31);
+        if (product != null) {
+            l.put(product.sku(), product);
+        }
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, INAPP_TYPE, inventory, 31);
+        if (product != null) {
+            l.put(product.sku(), product);
+        }
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 31);
+        if (product != null) {
+            l.put(product.sku(), product);
+        }
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 31);
+        if (product != null) {
+            l.put(product.sku(), product);
         }
 
         return l;
     }
 
     private Product buildDisableAds(final String sku, final String type, Inventory inventory, final int days) {
-        SkuDetails d = inventory.getSkuDetails(sku);
+        final SkuDetails d = inventory.getSkuDetails(sku);
         Purchase p = inventory.getPurchase(sku);
 
         // see if product exists
-        boolean exists = d != null && d.getType() == type; // product exists in the play store
+        final boolean exists = d != null && d.getType() == type; // product exists in the play store
 
         // see if it the user has some conflicting sku purchase
         String[] disableAdsSku = new String[]{
@@ -276,6 +294,21 @@ public final class PlayStore extends StoreBase {
             @Override
             public boolean subscription() {
                 return type == SUBS_TYPE;
+            }
+
+            @Override
+            public String title() {
+                return exists ? d.getTitle() : "NA";
+            }
+
+            @Override
+            public String description() {
+                return exists ? d.getDescription() : "NA";
+            }
+
+            @Override
+            public String price() {
+                return exists ? d.getPrice() : "NA";
             }
 
             @Override

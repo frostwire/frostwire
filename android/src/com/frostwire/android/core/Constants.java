@@ -48,6 +48,9 @@ public final class Constants {
      */
     public static final String FROSTWIRE_BUILD = BUILD_PREFIX + (BuildConfig.VERSION_CODE % 1000);
 
+    // change it to a constant true when the test phase is done
+    public static final boolean IS_STORE_ENABLE = BuildConfig.FLAVOR.equals("store") || BuildConfig.DEBUG;
+
     public static final String APP_PACKAGE_NAME = "com.frostwire.android";
 
     public static final String FROSTWIRE_VERSION_STRING = BuildConfig.VERSION_NAME;
@@ -118,8 +121,6 @@ public final class Constants {
     public static final String PREF_KEY_STORAGE_PATH = "frostwire.prefs.storage.path";
 
     public static final String PREF_KEY_UXSTATS_ENABLED = "frostwire.prefs.uxstats.enabled";
-
-    public static final String PREF_KEY_SHOW_ABOUT = "frostwire.prefs.show_about";
 
     public static final String ACTION_OPEN_TORRENT_URL = "android.intent.action.VIEW";
     public static final String ACTION_REQUEST_SHUTDOWN = "com.frostwire.android.ACTION_REQUEST_SHUTDOWN";

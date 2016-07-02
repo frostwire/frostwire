@@ -17,7 +17,9 @@
 
 package com.frostwire.android.offers;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author gubatron
@@ -25,29 +27,26 @@ import java.util.*;
  */
 abstract class StoreBase implements Store {
 
-    protected List<Product> products;
+    protected Map<String, Product> products;
 
     protected StoreBase() {
-        this.products = Collections.emptyList();
+        this.products = Collections.emptyMap();
     }
 
     @Override
-    public List<Product> available() {
-        List<Product> l = new LinkedList<>();
+    public Map<String, Product> products() {
+        return Collections.unmodifiableMap(products);
+    }
 
-        for (Product p : products) {
-            if (p.available()) {
-                l.add(p);
-            }
-        }
-
-        return Collections.unmodifiableList(l);
+    @Override
+    public Product product(String sku) {
+        return products.get(sku);
     }
 
     @Override
     public boolean enable(String code) {
         boolean r = false;
-        Iterator<Product> it = products.iterator();
+        Iterator<Product> it = products.values().iterator();
 
         while (!r && it.hasNext()) {
             r = it.next().enable(code);

@@ -21,6 +21,7 @@ import android.app.Activity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gubatron
@@ -33,7 +34,9 @@ public interface Store {
      *
      * @return
      */
-    List<Product> available();
+    Map<String, Product> products();
+
+    Product product(String sku);
 
     /**
      * Determines if there is some product in the store with the

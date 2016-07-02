@@ -41,6 +41,17 @@ public interface Product {
      */
     boolean subscription();
 
+    String title();
+
+    String description();
+
+    /**
+     * Formatted string
+     *
+     * @return
+     */
+    String price();
+
     /**
      * The product is available for purchase.
      * <p>

@@ -203,10 +203,15 @@
                 android:title="@string/support_frostwire"/>
     </PreferenceScreen>
 
-    <!--<Preference
+    <Preference
             android:key="frostwire.prefs.offers.buy_no_ads"
             android:title="@string/buy_no_ads">
-    </Preference>-->
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="com.frostwire.android"
+                android:targetClass="com.frostwire.android.gui.activities.BuyActivity"
+        />
+    </Preference>
 
     <Preference
             android:key="frostwire.prefs.show_about"
