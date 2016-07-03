@@ -52,6 +52,8 @@ public interface Product {
      */
     String price();
 
+    String currency();
+
     /**
      * The product is available for purchase.
      * <p>

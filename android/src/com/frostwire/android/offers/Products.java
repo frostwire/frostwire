@@ -17,7 +17,8 @@
 
 package com.frostwire.android.offers;
 
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author gubatron
@@ -38,5 +39,97 @@ public final class Products {
 
     public static boolean disableAds(Store store) {
         return store.enable(DISABLE_ADS_FEATURE);
+    }
+
+    static Map<String, Product> mockProducts() {
+        Product p1 = new Product() {
+            @Override
+            public String sku() {
+                return Products.INAPP_DISABLE_ADS_1_MONTH_SKU;
+            }
+
+            @Override
+            public boolean subscription() {
+                return false;
+            }
+
+            @Override
+            public String title() {
+                return Products.INAPP_DISABLE_ADS_1_MONTH_SKU;
+            }
+
+            @Override
+            public String description() {
+                return Products.INAPP_DISABLE_ADS_1_MONTH_SKU;
+            }
+
+            @Override
+            public String price() {
+                return "$0.99";
+            }
+
+            @Override
+            public String currency() {
+                return "USD";
+            }
+
+            @Override
+            public boolean available() {
+                return true;
+            }
+
+            @Override
+            public boolean enable(String feature) {
+                return false;
+            }
+        };
+        Product p2 = new Product() {
+            @Override
+            public String sku() {
+                return Products.SUBS_DISABLE_ADS_1_MONTH_SKU;
+            }
+
+            @Override
+            public boolean subscription() {
+                return true;
+            }
+
+            @Override
+            public String title() {
+                return Products.SUBS_DISABLE_ADS_1_MONTH_SKU;
+            }
+
+            @Override
+            public String description() {
+                return Products.SUBS_DISABLE_ADS_1_MONTH_SKU;
+            }
+
+            @Override
+            public String price() {
+                return "$0.99";
+            }
+
+            @Override
+            public String currency() {
+                return "USD";
+            }
+
+            @Override
+            public boolean available() {
+                return true;
+            }
+
+            @Override
+            public boolean enable(String feature) {
+                return false;
+            }
+        };
+
+        Map<String, Product> m = new HashMap<>();
+
+        m.put(p1.sku(), p1);
+        m.put(p2.sku(), p2);
+
+        return m;
     }
 }

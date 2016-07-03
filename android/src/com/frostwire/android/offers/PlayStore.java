@@ -21,9 +21,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import com.android.vending.billing.*;
+import com.frostwire.android.BuildConfig;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,6 +56,8 @@ public final class PlayStore extends StoreBase {
     private IabHelper.OnConsumeFinishedListener consumeFinishedListener;
 
     private long lastRefreshTime;
+
+    private String lastSkuPurchased;
 
     public PlayStore() {
         inventoryListener = new IabHelper.QueryInventoryFinishedListener() {
@@ -88,6 +94,7 @@ public final class PlayStore extends StoreBase {
                 }
 
                 String sku = purchase.getSku();
+                lastSkuPurchased = sku;
                 LOG.info("Purchased sku " + sku);
             }
         };
@@ -178,6 +185,22 @@ public final class PlayStore extends StoreBase {
         } catch (IabHelper.IabAsyncInProgressException e) {
             LOG.error("Error launching purchase flow. Another async operation in progress.", e);
         }
+
+        if (BuildConfig.DEBUG) {
+            UIUtils.showLongMessage(activity, "The purchase will be mocked");
+            lastSkuPurchased = p.sku();
+        }
+    }
+
+    @Override
+    public boolean enable(String code) {
+        if (BuildConfig.DEBUG) {
+            if (lastSkuPurchased != null) {
+                return true;
+            }
+        }
+
+        return super.enable(code);
     }
 
     public void dispose() {
@@ -210,37 +233,42 @@ public final class PlayStore extends StoreBase {
             return Collections.emptyMap();
         }
 
-        Map<String, Product> l = new HashMap<>();
+        // the play store testing is a really painful experience
+        if (BuildConfig.DEBUG) {
+            return Products.mockProducts();
+        }
+
+        Map<String, Product> m = new HashMap<>();
 
         // build each product, one by one, not magic here intentionally
         Product product;
 
         product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_MONTH_SKU, INAPP_TYPE, inventory, 31);
         if (product != null) {
-            l.put(product.sku(), product);
+            m.put(product.sku(), product);
         }
         product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 183);
         if (product != null) {
-            l.put(product.sku(), product);
+            m.put(product.sku(), product);
         }
         product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 365);
         if (product != null) {
-            l.put(product.sku(), product);
+            m.put(product.sku(), product);
         }
         product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, INAPP_TYPE, inventory, 31);
         if (product != null) {
-            l.put(product.sku(), product);
+            m.put(product.sku(), product);
         }
         product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 183);
         if (product != null) {
-            l.put(product.sku(), product);
+            m.put(product.sku(), product);
         }
         product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 365);
         if (product != null) {
-            l.put(product.sku(), product);
+            m.put(product.sku(), product);
         }
 
-        return l;
+        return m;
     }
 
     private Product buildDisableAds(final String sku, final String type, Inventory inventory, final int days) {
@@ -310,6 +338,11 @@ public final class PlayStore extends StoreBase {
             @Override
             public String price() {
                 return exists ? d.getPrice() : "NA";
+            }
+
+            @Override
+            public String currency() {
+                return exists ? d.getPriceCurrencyCode() : "NA";
             }
 
             @Override
