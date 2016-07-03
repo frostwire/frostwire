@@ -147,7 +147,7 @@ android {
             // this is basic plus store enable
             // for a while the versionCode is the basic + 1
             applicationId 'com.frostwire.android'
-            versionCode 9010001 + project.ext.versionCode
+            versionCode 9010000 + project.ext.versionCode + 2
         }
     }
 
