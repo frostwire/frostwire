@@ -31,7 +31,7 @@ public final class Constants {
     private Constants() {
     }
 
-    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic") && !BuildConfig.DEBUG;
+    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = (BuildConfig.FLAVOR.equals("basic") || BuildConfig.FLAVOR.equals("store")) && !BuildConfig.DEBUG;
 
     public static final boolean IS_FREE_DISTRIBUTION = true;
 
@@ -40,7 +40,7 @@ public final class Constants {
     /**
      * This occurs when developing on IDEA, but we want to treat it as a plus build.
      */
-    public static final boolean IS_BASIC_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
+    public static final boolean IS_BASIC_DEBUG = (BuildConfig.FLAVOR.equals("basic") || BuildConfig.FLAVOR.equals("store")) && BuildConfig.DEBUG;
 
     /**
      * should manually match the manifest, here for convenience so we can ask for it from static contexts without
