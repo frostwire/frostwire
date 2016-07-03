@@ -27,6 +27,7 @@ import com.frostwire.logging.Logger;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -161,7 +162,9 @@ public final class PlayStore extends StoreBase {
         }
 
         try {
-            helper.queryInventoryAsync(inventoryListener);
+            List<String> items = Products.itemSkus();
+            List<String> subs = Products.subsSkus();
+            helper.queryInventoryAsync(true, items, subs, inventoryListener);
         } catch (IabHelper.IabAsyncInProgressException e) {
             LOG.error("Error querying inventory. Another async operation in progress.", e);
         }
@@ -233,11 +236,6 @@ public final class PlayStore extends StoreBase {
             return Collections.emptyMap();
         }
 
-        // the play store testing is a really painful experience
-        if (BuildConfig.DEBUG) {
-            return Products.mockProducts();
-        }
-
         Map<String, Product> m = new HashMap<>();
 
         // build each product, one by one, not magic here intentionally
@@ -255,15 +253,15 @@ public final class PlayStore extends StoreBase {
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, INAPP_TYPE, inventory, 31);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, SUBS_TYPE, inventory, 31);
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 183);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, SUBS_TYPE, inventory, 183);
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 365);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, SUBS_TYPE, inventory, 365);
         if (product != null) {
             m.put(product.sku(), product);
         }
@@ -276,7 +274,7 @@ public final class PlayStore extends StoreBase {
         Purchase p = inventory.getPurchase(sku);
 
         // see if product exists
-        final boolean exists = d != null && d.getType() == type; // product exists in the play store
+        final boolean exists = d != null && d.getType().equals(type); // product exists in the play store
 
         // see if it the user has some conflicting sku purchase
         String[] disableAdsSku = new String[]{
