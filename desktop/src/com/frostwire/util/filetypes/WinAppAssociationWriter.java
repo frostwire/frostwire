@@ -22,6 +22,7 @@ package com.frostwire.util.filetypes;
 
 import java.util.Iterator;
 import java.util.List;
+import org.limewire.util.OSUtils;
 //import org.jdesktop.jdic.filetypes.Association;
 //import org.jdesktop.jdic.filetypes.RegisterFailedException;
 
@@ -391,16 +392,10 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
         throws RegisterFailedException {
     	//LOCAL_MACHINE. Association, in this case, should only be written into LOCAL_MACHINE rather
     	//than the CURRENT_USER.
-    	boolean isOldWindows = false;
-    	String osName = System.getProperty("os.name").toLowerCase();
-    	if ((osName.indexOf("98") != -1) || 
-    	    (osName.indexOf("me") != -1) || 
-    	    (osName.indexOf("nt") != -1)) {
-    		isOldWindows = true;
-    	}
-    	if (isOldWindows) {
-    		regLevel = AppConstants.SYSTEM_LEVEL;
-    	}
+			if (!OSUtils.isGoodWindows()) {
+				regLevel = AppConstants.SYSTEM_LEVEL;
+			}
+
         BackupAssociation backupAssoc = new BackupAssociation(assoc, regLevel);
         String curMimeType = backupAssoc.getCurMimeType();
         String curFileExt = backupAssoc.getCurFileExt();
@@ -467,28 +462,22 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
      * @param regLevel given registry level
      * @throws RegisterFailedException if the operation fails.
      */
-    public void unregisterAssociation(Association assoc, int regLevel) 
+    public void unregisterAssociation(Association assoc, int regLevel)
         throws RegisterFailedException {
-        //Note: Windows 98, Windows ME & Windows NT will only take care of registry information from
-		//LOCAL_MACHINE. Association, in this case, should only be unregistered from LOCAL_MACHINE rather
-		//than the CURRENT_USER.
-		boolean isOldWindows = false;
-		String osName = System.getProperty("os.name").toLowerCase();
-		if ((osName.indexOf("98") != -1) || 
-			(osName.indexOf("me") != -1) || 
-			(osName.indexOf("nt") != -1)) {
-			isOldWindows = true;
-		}
-		if (isOldWindows) {
-			regLevel = AppConstants.SYSTEM_LEVEL;
-		}
-		
+
+			//Note: Windows 98, Windows ME & Windows NT will only take care of registry information from
+			//LOCAL_MACHINE. Association, in this case, should only be unregistered from LOCAL_MACHINE rather
+			//than the CURRENT_USER.
+			if (!OSUtils.isGoodWindows()) {
+				regLevel = AppConstants.SYSTEM_LEVEL;
+			}
+
         BackupAssociation backupAssoc = new BackupAssociation(assoc, regLevel);
         String curMimeType = backupAssoc.getCurMimeType();
         String curFileExt = backupAssoc.getCurFileExt();
         boolean curMimeTypeExisted = backupAssoc.getCurMimeTypeExisted();
         boolean curFileExtExisted = backupAssoc.getCurFileExtExisted();
-    
+
         try {
             if (curMimeTypeExisted) {
                 WinRegistryUtil.removeMimeType(curMimeType, regLevel);
@@ -498,7 +487,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
             }
         } catch (RegisterFailedException e) {
             restoreAssociationUnregistration(backupAssoc, regLevel);
-            
+
             throw e;
         }
     }

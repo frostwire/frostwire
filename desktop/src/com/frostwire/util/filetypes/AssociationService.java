@@ -160,7 +160,7 @@ public class AssociationService {
         if (!appAssocReader.isFileExtExist(fileExt)) {
             return null;
         }
-        
+
         // Get the association associated with the file extension.
         Association assoc = new Association();
         String mimeType = appAssocReader.getMimeTypeByFileExt(fileExt);        
@@ -174,15 +174,15 @@ public class AssociationService {
         if (iconFileName != null) {
             assoc.setIconFileName(iconFileName);
         }
-        
+
         if (mimeType != null) {
             assoc.setMimeType(mimeType);
         }
-        
+
         if (description != null) {
             assoc.setDescription(description);
         }
-      
+
         if (actionList != null) {
             Iterator<Action> iter = actionList.iterator();
 

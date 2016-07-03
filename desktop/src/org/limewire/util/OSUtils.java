@@ -104,82 +104,74 @@ public class OSUtils {
 
 	private static boolean _isMacOSX107;
 
-    /**
-     * Sets the operating system variables.
-     */
-    public static void setOperatingSystems() {
-    	_isWindows = false;
-    	_isWindows7 = false;
-    	_isWindows8 = false;
-    	_isWindowsVista = false;
-    	_isWindowsNT = false;
-    	_isWindowsXP = false;
-    	_isWindows95 = false;
-    	_isWindows98 = false;
-    	_isWindowsMe = false;
-    	_isSolaris = false;
-    	_isUbuntu = false;
-    	_isFedora = false;
-    	_isLinux = false;
-    	_isOS2 = false;
-    	_isMacOSX = false;
-    	_isMacOSX105 = false;
-    	_isMacOSX106 = false;
-    
-    	String os = System.getProperty("os.name");
-        System.out.println("os.name=\"" + os + "\"");
-        os = os.toLowerCase(Locale.US);
-    
-    	// set the operating system variables
-    	_isWindows = os.indexOf("windows") != -1;
-    	
-    	if (os.indexOf("windows nt") != -1)
-    		_isWindowsNT = true;
-        if (os.indexOf("windows xp") != -1)
-            _isWindowsXP = true;
-        if (os.indexOf("windows vista") != -1)
-            _isWindowsVista = true;
-        if (os.indexOf("windows 7") != -1) {
-            _isWindows7 = true;
-        }
-        if (os.indexOf("windows 8") != -1) {
-            _isWindows8 = true;
-        }
-    	if(os.indexOf("windows 95") != -1)
-    	   _isWindows95 = true;
-    	if(os.indexOf("windows 98") != -1)
-    	   _isWindows98 = true;
-    	if(os.indexOf("windows me") != -1)
-    	   _isWindowsMe = true;
-        
-    	_isSolaris = os.indexOf("solaris") != -1;
-    	_isLinux   = os.indexOf("linux")   != -1;
-        _isOS2     = os.indexOf("os/2")    != -1;
-        
-        if (_isLinux) {
-        	String unameStr = UnameReader.read();
-        	_isUbuntu = unameStr.contains("buntu") || unameStr.contains("ebian");
-        	_isFedora = unameStr.contains("edora") || unameStr.contains("ed Hat");
-        }
-        
-        if(_isWindows || _isLinux)
-            _supportsTray = true;
-        
-    	if(os.startsWith("mac os")) {
-    		if(os.endsWith("x")) {
-    			_isMacOSX = true;
-    			
-    			if (System.getProperty("os.version").startsWith("10.5"))
-    			    _isMacOSX105 = true;
-    			
-    			if (System.getProperty("os.version").startsWith("10.6"))
-    			    _isMacOSX106 = true;
-    			
-    			if (System.getProperty("os.version").startsWith("10.7"))
-    				_isMacOSX107 = true;
-    		}
-    	}
-    }    
+
+	/**
+	 * Sets the operating system variables.
+	 */
+	public static void setOperatingSystems() {
+		_isWindows = false;
+		_isWindows8 = false;
+		_isWindows7 = false;
+		_isWindowsVista = false;
+		_isWindowsXP = false;
+		_isWindowsMe = false;
+		_isWindowsNT = false;
+		_isWindows98 = false;
+		_isWindows95 = false;
+		_isLinux = false;
+		_isUbuntu = false;
+		_isFedora = false;
+		_isMacOSX = false;
+		_isMacOSX105 = false;
+		_isMacOSX106 = false;
+		_isSolaris = false;
+		_isOS2 = false;
+
+		String os = System.getProperty("os.name");
+		System.out.println("os.name=\"" + os + "\"");
+		os = os.toLowerCase(Locale.US);
+
+		// set the operating system variables
+		_isWindows	= os.indexOf("windows") != -1;
+		_isSolaris	= os.indexOf("solaris") != -1;
+		_isLinux	= os.indexOf("linux") != -1;
+		_isOS2		= os.indexOf("os/2") != -1;
+
+		if(_isWindows){
+			_isWindows8	= os.indexOf("windows 8") != -1;
+			_isWindows7	= os.indexOf("windows 7") != -1;
+			_isWindowsVista	= os.indexOf("windows vista") != -1;
+			_isWindowsXP	= os.indexOf("windows xp") != -1;
+			_isWindowsNT	= os.indexOf("windows nt") != -1;
+			_isWindowsMe	= os.indexOf("windows me") != -1;
+			_isWindows98	= os.indexOf("windows 98") != -1;
+			_isWindows95	= os.indexOf("windows 95") != -1;
+		}
+
+		if (_isLinux) {
+			String unameStr = UnameReader.read();
+			_isUbuntu = unameStr.contains("buntu") || unameStr.contains("ebian");
+			_isFedora = unameStr.contains("edora") || unameStr.contains("ed Hat");
+		}
+
+		if(_isWindows || _isLinux)
+			_supportsTray = true;
+
+		if(os.startsWith("mac os")) {
+			if(os.endsWith("x")) {
+				_isMacOSX = true;
+
+				if (System.getProperty("os.version").startsWith("10.5"))
+						_isMacOSX105 = true;
+
+				if (System.getProperty("os.version").startsWith("10.6"))
+						_isMacOSX106 = true;
+
+				if (System.getProperty("os.version").startsWith("10.7"))
+					_isMacOSX107 = true;
+			}
+		}
+	}
 
     /**
      * Returns the operating system.

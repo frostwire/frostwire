@@ -64,12 +64,12 @@ public class FrostAssociations {
 		}
 
 		Collection<LimeAssociationOption> ret = new ArrayList<LimeAssociationOption>();
-		
+
 		// strings that the shell will understand 
 		String fileOpener = null;
 		String fileIcon = null;
 		String protocolOpener = null;
-		
+
 		if (OSUtils.isWindows()) {
 			String runningPath = SystemUtils.getRunningPath();
 			
@@ -86,10 +86,10 @@ public class FrostAssociations {
 				//fileIcon = runningPath+",1";				
 			}
 		} 
-		
+
 		// if we have a string that opens a file, register torrents
 		if (fileOpener != null) {			
-			
+
 			if (OSUtils.isWindows()) { // Windows users
 				ShellAssociation tor = new FileTypeAssociation("torrent",
 						"application/x-bittorrent", 
@@ -116,7 +116,7 @@ public class FrostAssociations {
 				ret.add(torrent);
 			}
 		}
-		
+
 		// if we have a string that opens a protocol, register magnets
 		if (protocolOpener != null) {
 			// Note: MagnetAssociation will only work on windows
@@ -124,8 +124,7 @@ public class FrostAssociations {
 			LimeAssociationOption magOption = new LimeAssociationOption(
 					mag,
 					ApplicationSettings.HANDLE_MAGNETS,
-					"magnet:",
-                    I18n.tr("\"magnet:\" links"));
+					"magnet:", I18n.tr("\"magnet:\" links"));
 			ret.add(magOption);
 		}
 		
