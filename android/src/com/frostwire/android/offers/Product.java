@@ -55,10 +55,19 @@ public interface Product {
     String currency();
 
     /**
+     * The product is currently owned by the user.
+     *
+     * @return
+     */
+    boolean purchased();
+
+    /**
      * The product is available for purchase.
      * <p>
      * For example, a subscription is always available while a
      * consumable item could be available based on some rule.
+     * Another example of an unavailable product is one than
+     * is in conflict with a currently owned one.
      *
      * @return
      */

@@ -59,4 +59,75 @@ public final class Products {
     public static boolean disableAds(Store store) {
         return store.enable(DISABLE_ADS_FEATURE);
     }
+
+    static class ProductBase implements Product {
+
+        private final String sku;
+        private final boolean subscription;
+        private final String title;
+        private final String description;
+        private final String price;
+        private final String currency;
+        private final boolean purchased;
+        private final boolean available;
+
+        public ProductBase(String sku, boolean subscription,
+                           String title, String description,
+                           String price, String currency,
+                           boolean purchased, boolean available) {
+            this.sku = sku;
+            this.subscription = subscription;
+            this.title = title;
+            this.description = description;
+            this.price = price;
+            this.currency = currency;
+            this.purchased = purchased;
+            this.available = available;
+        }
+
+        @Override
+        public String sku() {
+            return sku;
+        }
+
+        @Override
+        public boolean subscription() {
+            return subscription;
+        }
+
+        @Override
+        public String title() {
+            return title;
+        }
+
+        @Override
+        public String description() {
+            return description;
+        }
+
+        @Override
+        public String price() {
+            return price;
+        }
+
+        @Override
+        public String currency() {
+            return currency;
+        }
+
+        @Override
+        public boolean purchased() {
+            return purchased;
+        }
+
+        @Override
+        public boolean available() {
+            return available;
+        }
+
+        @Override
+        public boolean enable(String feature) {
+            return false;
+        }
+    }
 }

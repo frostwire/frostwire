@@ -276,6 +276,12 @@ public final class PlayStore extends StoreBase {
         // see if product exists
         final boolean exists = d != null && d.getType().equals(type); // product exists in the play store
 
+        final boolean subscription = type == SUBS_TYPE;
+        final String title = exists ? d.getTitle() : "NA";
+        final String description = exists ? d.getDescription() : "NA";
+        final String price = exists ? d.getPrice() : "NA";
+        final String currency = exists ? d.getPriceCurrencyCode() : "NA";
+
         // see if it the user has some conflicting sku purchase
         String[] disableAdsSku = new String[]{
                 Products.INAPP_DISABLE_ADS_1_MONTH_SKU,
@@ -312,41 +318,8 @@ public final class PlayStore extends StoreBase {
         final boolean available = exists && !conflict && !purchased;
         final long purchaseTime = purchased ? p.getPurchaseTime() : 0;
 
-        return new Product() {
-            @Override
-            public String sku() {
-                return sku;
-            }
-
-            @Override
-            public boolean subscription() {
-                return type == SUBS_TYPE;
-            }
-
-            @Override
-            public String title() {
-                return exists ? d.getTitle() : "NA";
-            }
-
-            @Override
-            public String description() {
-                return exists ? d.getDescription() : "NA";
-            }
-
-            @Override
-            public String price() {
-                return exists ? d.getPrice() : "NA";
-            }
-
-            @Override
-            public String currency() {
-                return exists ? d.getPriceCurrencyCode() : "NA";
-            }
-
-            @Override
-            public boolean available() {
-                return available;
-            }
+        return new Products.ProductBase(sku, subscription, title,
+                description, price, currency, purchased, available) {
 
             @Override
             public boolean enable(String feature) {
