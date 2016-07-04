@@ -91,7 +91,7 @@ public class BuyActivity extends AbstractActivity {
         }
 
         b.setText("title:" + p.title() + "\n" + "desc:" +
-                p.description() + "\n" + "price:" + p.price());
+                p.description() + "\n" + "price:" + p.price() + "purchased:" + p.purchased());
         if (p.available()) {
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
