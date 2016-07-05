@@ -196,14 +196,14 @@ public final class PlayStore extends StoreBase {
     }
 
     @Override
-    public boolean enable(String code) {
+    public boolean enabled(String code) {
         if (BuildConfig.DEBUG) {
             if (lastSkuPurchased != null) {
                 return true;
             }
         }
 
-        return super.enable(code);
+        return super.enabled(code);
     }
 
     public void dispose() {
@@ -329,7 +329,7 @@ public final class PlayStore extends StoreBase {
                 }
 
                 // if available, then the user does not have it, then
-                // the feature is not enable
+                // the feature is not enabled
                 if (available) {
                     return false;
                 }

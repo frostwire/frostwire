@@ -22,6 +22,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
+ * CODE STYLE NOMENCLATURE: @aldenml names abstract classes which aren't meant to be extended
+ * by anybody "*Base" classes, API users should use the concrete implementations.
+ *
+ * If an abstract class is meant to be extended, then it's named *Abstract.
+ *
  * @author gubatron
  * @author aldenml
  */
@@ -44,7 +49,7 @@ abstract class StoreBase implements Store {
     }
 
     @Override
-    public boolean enable(String code) {
+    public boolean enabled(String code) {
         boolean r = false;
         Iterator<Product> it = products.values().iterator();
 

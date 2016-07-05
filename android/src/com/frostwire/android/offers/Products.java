@@ -56,8 +56,8 @@ public final class Products {
         );
     }
 
-    public static boolean disableAds(Store store) {
-        return store.enable(DISABLE_ADS_FEATURE);
+    public static boolean disabledAds(Store store) {
+        return store.enabled(DISABLE_ADS_FEATURE);
     }
 
     static class ProductBase implements Product {
