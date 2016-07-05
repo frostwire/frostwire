@@ -24,14 +24,14 @@ import com.frostwire.search.CrawlableSearchResult;
 /**
  * @author alejandroarturom
  */
-public class TorrentDownloadsTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
+public final class TorrentDownloadsTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
     private final String itemId;
     private final String detailsUrl;
 
-    public TorrentDownloadsTempSearchResult(String domainName, String itemId) {
+    TorrentDownloadsTempSearchResult(String domainName, String itemId) {
         this.itemId = itemId;
-        this.detailsUrl = "http://www.torrentdownloads.me/torrent/" + itemId;
+        this.detailsUrl = "https://" + domainName + "/torrent/" + itemId;
     }
 
     public String getItemId() {

@@ -41,7 +41,7 @@ import com.frostwire.android.gui.services.Engine;
  * @author aldenml
  *
  */
-public class PlayerNotifierView extends LinearLayout implements TimerObserver {
+public class PlayerNotifierView extends LinearLayout {
 
     private String lastStatusShown;
     private TextView statusText;
@@ -52,10 +52,23 @@ public class PlayerNotifierView extends LinearLayout implements TimerObserver {
     private TranslateAnimation showNotifierAnimation;
     private TranslateAnimation hideNotifierAnimation;
 
+    private TimerObserver refresher;
+
     public PlayerNotifierView(Context context, AttributeSet set) {
         super(context, set);
 
         initAnimations();
+
+        refresher = new TimerObserver() {
+            @Override
+            public void onTime() {
+                refresherOnTime();
+            }
+        };
+    }
+
+    public TimerObserver getRefresher() {
+        return refresher;
     }
 
     private void initAnimations() {
@@ -101,8 +114,7 @@ public class PlayerNotifierView extends LinearLayout implements TimerObserver {
         notifierIconImageView.setBackgroundResource(notifierResourceId);
     }
 
-    @Override
-    public void onTime() {
+    public void refresherOnTime() {
         CoreMediaPlayer mp = Engine.instance().getMediaPlayer();
         if (mp != null) {
             FileDescriptor fd = mp.getCurrentFD();

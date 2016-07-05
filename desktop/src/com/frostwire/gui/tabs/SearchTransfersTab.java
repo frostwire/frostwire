@@ -1,4 +1,7 @@
 /*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,30 +16,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 package com.frostwire.gui.tabs;
 
+import com.frostwire.gui.bittorrent.BTDownloadMediator;
+import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.search.SearchMediator;
+import com.limegroup.gnutella.settings.UISettings;
 
 import javax.swing.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
- * This class constructs the search/download tab, including all UI elements.
+ * Created on 6/15/16.
+ * @author gubatron
+ * @author aldenml
  */
-public final class SearchDownloadTab extends AbstractTab {
+public class SearchTransfersTab extends AbstractTab {
+    private final JSplitPane searchDownloadSplitPane;
 
-    /**
-     * Split pane for the split between the search and download sections
-     * of the window.
-     */
-    //private final JSplitPane searchDownloadSplitPane;
-
-    public SearchDownloadTab() {
+    public SearchTransfersTab(SearchTab searchTab, TransfersTab transfersTab) {
+        // It will look like the SearchTab.
         super(I18n.tr("Search"),
-              I18n.tr("Search and Download Files from the Internet."),
-              "search_tab");
-        /*
-        searchDownloadSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, SearchMediator.getResultComponent(), downloadMediator.getComponent());
+                I18n.tr("Search and Download Files from the Internet."),
+                "search_tab");
+
+        searchDownloadSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                searchTab.getComponent(),
+                transfersTab.getComponent());
+
         searchDownloadSplitPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
         searchDownloadSplitPane.setContinuousLayout(true);
         searchDownloadSplitPane.setResizeWeight(0.6);
@@ -52,15 +63,23 @@ public final class SearchDownloadTab extends AbstractTab {
                 UISettings.UI_TRANSFERS_DIVIDER_LOCATION.setValue(splitPane.getDividerLocation());
             }
         });
-        */
+
+        searchDownloadSplitPane.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println("UISettings.UI_TRANSFERS_DIVIDER_LOCATION = " + UISettings.UI_TRANSFERS_DIVIDER_LOCATION.getValue());
+                System.out.println("searchDownloadSplitPane.getSize() = " + searchDownloadSplitPane.getSize());
+                System.out.println("searchDownloadSplitPane.getDividerLocation() = " + searchDownloadSplitPane.getDividerLocation());
+            }
+        });
     }
 
+    @Override
     public JComponent getComponent() {
-        //return searchDownloadSplitPane;
-        return SearchMediator.getResultComponent();
+        return searchDownloadSplitPane;
     }
-    
+
     public void setDividerLocation(int newLocation) {
-        //searchDownloadSplitPane.setDividerLocation(newLocation);
+        searchDownloadSplitPane.setDividerLocation(newLocation);
     }
 }

@@ -19,6 +19,7 @@
 package com.frostwire.gui.bittorrent;
 
 import com.frostwire.alexandria.Playlist;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.LibraryUtils;
 import com.frostwire.gui.player.MediaPlayer;
@@ -316,12 +317,17 @@ final class BTDownloadActions {
             for (int i = 0; i < downloaders.length; i++) {
                 BTDownload d = downloaders[i];
                 if (d instanceof BittorrentDownload) {
-                    String magnetUri = ((BittorrentDownload) d).makeMagnetUri();
+                    BittorrentDownload btDownload = (BittorrentDownload) d;
+                    String magnetUri = btDownload.makeMagnetUri();
                     str += magnetUri;
+                    str += "&" + TorrentUtil.getMagnetURLParameters(btDownload.getTorrentInfo(), BTEngine.getInstance().getSession());
+
                     if (i < downloaders.length - 1) {
                         str += System.lineSeparator();
                     }
                 }
+
+
             }
 
             GUIMediator.setClipboardContent(str);

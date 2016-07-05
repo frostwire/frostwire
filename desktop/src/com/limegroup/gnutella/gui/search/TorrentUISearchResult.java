@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.uxstats.UXAction;
@@ -52,7 +51,6 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
 
     @Override
     public void download(boolean partial) {
-        GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
         GUIMediator gm = GUIMediator.instance();
         gm.openTorrentSearchResult(sr, partial);
         showDetails(false);

@@ -20,7 +20,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.frostwire.android" android:installLocation="auto"
-          android:versionCode="252" android:versionName="1.7.4">
+          android:versionCode="274" android:versionName="1.7.6">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9050xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9010xyz" (don't commit like this) -->
@@ -156,6 +156,8 @@
                   android:label="@string/application_label" android:screenOrientation="portrait"/>
         <activity android:name=".gui.activities.SettingsActivity"
                   android:label="@string/activity_preferences_name" android:theme="@style/Preferences"/>
+        <activity android:name="com.frostwire.android.gui.activities.BuyActivity"
+                  android:label="@string/buy_no_ads"/>
         <activity android:name="com.frostwire.android.gui.activities.AboutActivity"
                   android:label="@string/about"/>
         <activity android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
@@ -268,26 +270,6 @@
                   android:label="@string/activity_VPN"
                   android:excludeFromRecents="true"
                   android:noHistory="true"/>
-
-        <!-- mobile core -->
-        <!--
-        <activity
-                android:name="com.ironsource.mobilcore.InterstitialVideoActivity"
-                android:configChanges="keyboardHidden|orientation|screenSize"
-                android:keepScreenOn="true"/>
-
-        <service
-                android:name="com.ironsource.mobilcore.MobileCoreReport"
-                android:enabled="true"
-                android:exported="false">
-        </service>
-
-        <receiver
-                android:name="com.ironsource.mobilcore.InstallationTracker"
-                android:enabled="true">
-        </receiver>
-        -->
-        <!-- end of mobile core -->
 
         <!-- InMobi -->
         <activity android:name="com.inmobi.rendering.InMobiAdActivity"

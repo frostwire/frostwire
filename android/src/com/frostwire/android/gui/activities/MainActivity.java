@@ -40,7 +40,6 @@ import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.AndroidPlatform;
-import com.frostwire.android.LollipopFileSystem;
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
@@ -49,7 +48,7 @@ import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.MainMenuAdapter;
-import com.frostwire.android.gui.adnetworks.Offers;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.gui.dialogs.*;
 import com.frostwire.android.gui.fragments.BrowsePeerFragment;
 import com.frostwire.android.gui.fragments.MainFragment;
@@ -188,7 +187,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         setupFragments();
         setupMenuItems();
         setupInitialFragment(savedInstanceState);
-        playerSubscription = TimerService.subscribe((TimerObserver) findView(R.id.activity_main_player_notifier), 1);
+        playerSubscription = TimerService.subscribe(((PlayerNotifierView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
         onNewIntent(getIntent());
         SoftwareUpdater.instance().addConfigurationUpdateListener(this);
         setupActionBar();
@@ -289,6 +288,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
         //go!
         final String uri = intent.getDataString();
+        intent.setAction(null);
         if (uri != null) {
             TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this));
         } else {
@@ -475,11 +475,22 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (!AndroidPlatform.saf()) {
             return;
         }
-        File data = Platforms.data();
-        if (!Platforms.fileSystem().canWrite(data) &&
-                !SDPermissionDialog.visible) {
-            SDPermissionDialog dlg = SDPermissionDialog.newInstance();
-            dlg.show(getFragmentManager());
+
+        try {
+            File data = Platforms.data();
+            File parent = data.getParentFile();
+
+            if (!AndroidPlatform.saf(parent)) {
+                return;
+            }
+            if (!Platforms.fileSystem().canWrite(parent) &&
+                    !SDPermissionDialog.visible) {
+                SDPermissionDialog dlg = SDPermissionDialog.newInstance();
+                dlg.show(getFragmentManager());
+            }
+        } catch (Throwable e) {
+            // we can't do anything about this
+            LOG.error("Unable to detect if we have SD permissions", e);
         }
     }
 
@@ -525,13 +536,21 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void showLastBackDialog() {
-        YesNoDialog dlg = YesNoDialog.newInstance(LAST_BACK_DIALOG_ID, R.string.minimize_frostwire, R.string.are_you_sure_you_wanna_leave);
+        YesNoDialog dlg = YesNoDialog.newInstance(
+                LAST_BACK_DIALOG_ID,
+                R.string.minimize_frostwire,
+                R.string.are_you_sure_you_wanna_leave,
+                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.show(getFragmentManager()); //see onDialogClick
     }
 
     private void showShutdownDialog() {
         UXStats.instance().flush();
-        YesNoDialog dlg = YesNoDialog.newInstance(SHUTDOWN_DIALOG_ID, R.string.app_shutdown_dlg_title, R.string.app_shutdown_dlg_message);
+        YesNoDialog dlg = YesNoDialog.newInstance(
+                SHUTDOWN_DIALOG_ID,
+                R.string.app_shutdown_dlg_title,
+                R.string.app_shutdown_dlg_message,
+                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.show(getFragmentManager()); //see onDialogClick
     }
 

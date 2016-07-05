@@ -21,35 +21,42 @@ package com.frostwire.search.eztv;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchResult> {
-    //private static Logger LOG = Logger.getLogger(EztvSearchPerformer.class);
+
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"(/ep/.*?)\"";
 
     // This is a good example of optional regex groups when a page might have different possible formats to parse.
     private static final String HTML_REGEX =
-            "(?is)<td class=\"section_post_header\" colspan=\"2\"><h1><span style.*?>(?<displaynamefallback>.*?)</span></h1></td>.*?"+
-            "Download Links.*?"+
-            "(<a href=\"(?<magneturl>magnet:\\?.*?)\" class=\"magnet\".*?)?"+
-            "(<a href=\"(?<torrenturl>http(s)?.*?torrent)\" class=\"download_.\".*?)?"+
-            "(Torrent Info.*?title=\"(?<displayname>.*?)\".*?)?"+
-            "(<b>Torrent File:</b>\\s+(?<displayname2>.*?)<br.*?)?"+
-            "(<b>Torrent Hash:</b>\\s+(?<infohash>.*?)<br.*?)?" +
-            "<b>Filesize:</b>\\s+(?<filesize>.*?)<br.*?"+
-            "<b>Released:</b>\\s+(?<creationtime>.*?)<br";
+            "(?is)<td class=\"section_post_header\" colspan=\"2\"><h1><span style.*?>(?<displaynamefallback>.*?)</span></h1></td>.*?" +
+                    "Download Links.*?" +
+                    ".*<a href=\"(?<magneturl>magnet:\\?.*?)\" class=\"magnet\".*?" +
+                    //"(<a href=\"(?<magneturl>magnet:\\?.*?)\" title=\"Magnet Link\".*?)?"+
+                    ".*<a href=\"(?<torrenturl>http(s)?.*?\\.torrent)\" class=\"download_.\".*?" +
+                    "(Torrent Info.*?title=\"(?<displayname>.*?)\".*?)?" +
+                    "(<b>Torrent File:</b>\\s+(?<displayname2>.*?)<br.*?)?" +
+                    "(<b>Torrent Hash:</b>\\s+(?<infohash>.*?)<br.*?)?" +
+                    "<b>Filesize:</b>\\s+(?<filesize>.*?)<br.*?" +
+                    "<b>Released:</b>\\s+(?<creationtime>.*?)<br";
 
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
+    }
+
+    @Override
+    public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
+        String itemId = matcher.group(1);
+        return new EztvTempSearchResult(getDomainName(), itemId);
     }
 
     @Override
@@ -58,18 +65,14 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         formData.put("SearchString1", getEncodedKeywords());
         formData.put("SearchString", "");
         formData.put("search", "Search");
-        return post(url, formData);
+        String page = post(url, formData);
+
+        return page != null && isValidPage(page) ? page : null;
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "https://"+getDomainName()+"/search/";
-    }
-
-    @Override
-    public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
-        String itemId = matcher.group(1);
-        return new EztvTempSearchResult(getDomainName(),itemId);
+        return "https://" + getDomainName() + "/search/";
     }
 
     @Override
@@ -83,35 +86,56 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         return offset > 0 ? offset : 0;
     }
 
-    /**
-    public static void main(String[] args) throws Throwable {
-        
-        byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/eztv4.html"));
-        String fileStr = new String(readAllBytes,"utf-8");
-
-        //Pattern pattern = Pattern.compile(REGEX);
-        Pattern pattern = Pattern.compile(HTML_REGEX);
-        
-        Matcher matcher = pattern.matcher(fileStr);
-        
-        int found = 0;
-        while (matcher.find()) {
-            found++;
-            System.out.println("\nfound " + found);
-            System.out.println("magneturl: [" + matcher.group("magneturl") + "]");
-            System.out.println("torrenturl: [" + matcher.group("torrenturl") + "]");
-            System.out.println("displayname: [" + matcher.group("displayname") + "]");
-            System.out.println("displayname2: [" + matcher.group("displayname2") + "]");
-            System.out.println("displaynamefallback: [" + matcher.group("displaynamefallback") + "]");
-            System.out.println("infohash: [" + matcher.group("infohash") + "]");
-            System.out.println("filesize: [" + matcher.group("filesize") + "]");
-            System.out.println("creationtime: [" + matcher.group("creationtime") + "]");
-            System.out.println("===");
-
-            SearchMatcher sm = new SearchMatcher(matcher);
-            EztvSearchResult sr = new EztvSearchResult("http://someurl.com", sm);
+    // EZTV is very simplistic in the search engine
+    // just a simple keyword check allows to discard the page
+    private boolean isValidPage(String page) {
+        String[] keywords = getKeywords().split(" ");
+        String k = null;
+        // select the first keyword with length >= 3
+        for (int i = 0; k == null && i < keywords.length; i++) {
+            String s = keywords[i];
+            if (s.length() >= 3) {
+                k = s;
+            }
         }
-        System.out.println("-done-");
+        if (k == null) {
+            k = keywords[0];
+        }
+
+        int count = StringUtils.countMatches(page.toLowerCase(Locale.US), k.toLowerCase(Locale.US));
+
+        return count > 9;
     }
-    */
+
+    /**
+     public static void main(String[] args) throws Throwable {
+
+     byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/eztv5.html"));
+     String fileStr = new String(readAllBytes,"utf-8");
+
+     //Pattern pattern = Pattern.compile(REGEX);
+     Pattern pattern = Pattern.compile(HTML_REGEX);
+
+     Matcher matcher = pattern.matcher(fileStr);
+
+     int found = 0;
+     while (matcher.find()) {
+     found++;
+     System.out.println("\nfound " + found);
+     System.out.println("magneturl: [" + matcher.group("magneturl") + "]");
+     System.out.println("torrenturl: [" + matcher.group("torrenturl") + "]");
+     System.out.println("displayname: [" + matcher.group("displayname") + "]");
+     System.out.println("displayname2: [" + matcher.group("displayname2") + "]");
+     System.out.println("displaynamefallback: [" + matcher.group("displaynamefallback") + "]");
+     System.out.println("infohash: [" + matcher.group("infohash") + "]");
+     System.out.println("filesize: [" + matcher.group("filesize") + "]");
+     System.out.println("creationtime: [" + matcher.group("creationtime") + "]");
+     System.out.println("===");
+
+     SearchMatcher sm = new SearchMatcher(matcher);
+     EztvSearchResult sr = new EztvSearchResult("http://someurl.com", sm);
+     }
+     System.out.println("-done-");
+     }
+     */
 }

@@ -43,6 +43,7 @@ import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.bittorrent.BTDownloadItem;
+import com.frostwire.bittorrent.MagnetUriBuilder;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.WebSearchPerformer;
@@ -337,7 +338,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 R.drawable.contextmenu_icon_magnet,
                 R.string.transfers_context_menu_copy_magnet,
                 R.string.transfers_context_menu_copy_magnet_copied,
-                download.magnetUri()
+                new MagnetUriBuilder(download).getMagnet()
         ));
 
         items.add(new CopyToClipboardMenuAction(context.get(),

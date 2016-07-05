@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
     static {
         UNIT_TO_BYTE_MULTIPLIERS_MAP = new HashMap<>();
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("B", 0);
+        UNIT_TO_BYTE_MULTIPLIERS_MAP.put("octets", 0);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("KB", 1);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("MB", 2);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("GB", 3);
@@ -73,7 +74,13 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
             return  -1;
         }
 
-        long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
+        final Integer unitMultiplier = UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit);
+        long multiplier = 1;
+
+        if (unitMultiplier != null) {
+            multiplier = BYTE_MULTIPLIERS[unitMultiplier];
+        }
+
         //fractional size
         if (amount.indexOf(".") > 0) {
             float floatAmount = Float.parseFloat(amount);

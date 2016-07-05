@@ -44,7 +44,7 @@
     <color name="body_background_gray_light">@color/basic_gray_lighter</color>
     <color name="btn_background_on_light">@color/basic_blue</color>
     <color name="app_text_highlight">@color/basic_blue_highlight</color>
-    <color name="app_rich_notification_background">#ffffedad</color>
+    <color name="app_rich_notification_background">#ffffe16a</color>
     <color name="app_rich_notification_divider">#ffe7d58f</color>
     <color name="app_list_item_title_text_color">#ff3b3b3b</color>
 

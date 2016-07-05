@@ -46,7 +46,6 @@ import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -197,7 +196,14 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     private void seedFileDescriptor(FileDescriptor fd) {
         if (fd.filePath.endsWith(".torrent")) {
-            BTEngine.getInstance().download(new File(fd.filePath), null, new boolean[]{true});
+            try {
+                BTEngine.getInstance().download(new File(fd.filePath), null, new boolean[]{true});
+            } catch (Throwable e) {
+                // TODO: better notify the user
+                LOG.error("Error starting download from file descriptor", e);
+                // sometimes a file descriptor could be visible in the UI but not exists
+                // due to the android providers getting out of sync.
+            }
         } else {
             buildTorrentAndSeedIt(fd);
         }
@@ -212,9 +218,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private void seedBTDownload() {
         btDownload.resume();
         final TorrentHandle torrentHandle = BTEngine.getInstance().getSession().findTorrent(new Sha1Hash(btDownload.getInfoHash()));
-        if (torrentHandle != null) {
-            forceDHTAnnounceIfNoPeers(torrentHandle);
-        } else {
+        if (torrentHandle == null) {
             LOG.warn("seedBTDownload() could not find torrentHandle for existing torrent.");
         }
     }
@@ -224,50 +228,30 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         Engine.instance().getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                File file = new File(fd.filePath);
-                File saveDir = file.getParentFile();
-                file_storage fs = new file_storage();
-                fs.add_file(file.getName(), file.length());
-                fs.set_name(file.getName());
-                create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
-                // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
-                // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
-                ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
-                ct.set_priv(false);
+                try {
+                    File file = new File(fd.filePath);
+                    File saveDir = file.getParentFile();
+                    file_storage fs = new file_storage();
+                    fs.add_file(file.getName(), file.length());
+                    fs.set_name(file.getName());
+                    create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
+                    // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
+                    // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
+                    ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
+                    ct.set_priv(false);
 
-                final error_code ec = new error_code();
-                libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
+                    final error_code ec = new error_code();
+                    libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
 
-                final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
-                final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
+                    final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
+                    final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
 
-                // IDEAS:
-                // 1. Create a CanonicalDHTAnnouncer which keeps track
-                // of nodes we could use for DHT-announcing-bootstrapping.
-                // Issue a GET_PEERS request on startup, and out of those
-                // peers do a thandle.connect_peer(...) of at least 5 DHT
-                // bootstraping nodes for this torrent. This way we don't
-                // have to way for a GET_PEERS_REPLY message to create the
-                // .torrent.
-
-                final Session session = BTEngine.getInstance().getSession();
-
-                // so the TorrentHandle object is created and added to the libtorrent session.
-                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
-
-                final TorrentHandle torrentHandle =
-                        session.findTorrent(tinfo.infoHash());
-
-                torrentHandle.saveResumeData();
-                torrentHandle.pause();
-                torrentHandle.setAutoManaged(true);
-                torrentHandle.scrapeTracker();
-
-                // so it will call fireDownloadUpdate(torrentHandle) -> UIBittorrentDownload.updateUI()
-                // which calculates the download items;
-                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true});
-                forceDHTAnnounceIfNoPeers(torrentHandle);
-                torrentHandle.forceRecheck();
+                    // so the TorrentHandle object is created and added to the libtorrent session.
+                    BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
+                } catch (Throwable e) {
+                    // TODO: better handle this error
+                    LOG.error("Error creating torrent for seed", e);
+                }
             }
         });
     }
@@ -275,6 +259,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private void onSeedingEnabled() {
         TransferManager.instance().enableSeeding();
         seedEm();
+        UIUtils.showTransfersOnDownloadStart(getContext());
     }
 
     private void onBittorrentConnect() {
@@ -297,40 +282,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         });
 
 
-    }
-
-    /** TODO: Move this method somewhere more useful if it works.
-     *  It could be used for smarter re-announce logic after hearing
-     *  Arvid's advice. It could also be used to re-adjust the dht_announce_interval
-     *  interval to allow for more capacity (longer intervals if we already have peers) */
-    private static void forceDHTAnnounceIfNoPeers(final TorrentHandle torrentHandle) {
-        final ArrayList<PeerInfo> peerInfos = torrentHandle.peerInfo();
-        final TorrentStatus status = torrentHandle.getStatus();
-        LOG.info("================================================");
-        LOG.info("list peers        : " + status.getListPeers());
-        LOG.info("num connections   : " + status.getNumConnections());
-        LOG.info("connect candidates: " + status.getConnectCandidates());
-        LOG.info("announcing to DHT : " + status.announcingToDht());
-        LOG.info("announcing to LSD : " + status.announcingToLsd());
-        LOG.info("next announce in  : " + status.nextAnnounce() + " ms");
-        LOG.info("================================================\n");
-
-        if (peerInfos.size() == 0) {
-            LOG.info("had no peers");
-            LOG.info("forcing re-announcement.");
-            torrentHandle.forceDHTAnnounce();
-
-            //We'll check ourselves again after the interval and 1.5 minutes.
-            Engine.instance().getThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
-                    long sleepForAnnounceCheck = 30000;
-                    LOG.info("sleeping(sleepForAnnounceCheck = " + sleepForAnnounceCheck+")...");
-                    SystemClock.sleep(sleepForAnnounceCheck);
-                    forceDHTAnnounceIfNoPeers(torrentHandle);
-                }
-            });
-        }
     }
 
     // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.

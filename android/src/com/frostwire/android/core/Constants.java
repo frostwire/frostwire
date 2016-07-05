@@ -31,7 +31,7 @@ public final class Constants {
     private Constants() {
     }
 
-    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic") && !BuildConfig.DEBUG;
+    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = (BuildConfig.FLAVOR.equals("basic") || BuildConfig.FLAVOR.equals("store")) && !BuildConfig.DEBUG;
 
     public static final boolean IS_FREE_DISTRIBUTION = true;
 
@@ -40,13 +40,16 @@ public final class Constants {
     /**
      * This occurs when developing on IDEA, but we want to treat it as a plus build.
      */
-    public static final boolean IS_BASIC_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
+    public static final boolean IS_BASIC_DEBUG = (BuildConfig.FLAVOR.equals("basic") || BuildConfig.FLAVOR.equals("store")) && BuildConfig.DEBUG;
 
     /**
      * should manually match the manifest, here for convenience so we can ask for it from static contexts without
      * needing to pass the Android app context to obtain the PackageManager instance.
      */
     public static final String FROSTWIRE_BUILD = BUILD_PREFIX + (BuildConfig.VERSION_CODE % 1000);
+
+    // change it to a constant true when the test phase is done
+    public static final boolean IS_STORE_ENABLE = BuildConfig.FLAVOR.equals("store") || BuildConfig.DEBUG;
 
     public static final String APP_PACKAGE_NAME = "com.frostwire.android";
 
@@ -101,7 +104,6 @@ public final class Constants {
     public static final String PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG = "frostwire.prefs.gui.show_new_transfer_dialog";
     public static final String PREF_KEY_GUI_SUPPORT_FROSTWIRE = "frostwire.prefs.gui.support_frostwire";
     public static final String PREF_KEY_GUI_SUPPORT_FROSTWIRE_THRESHOLD = "frostwire.prefs.gui.support_frostwire_threshold";
-    public static final String PREF_KEY_GUI_USE_MOBILE_CORE = "frostwire.prefs.gui.use_mobile_core";
     public static final String PREF_KEY_GUI_USE_APPLOVIN = "frostwire.prefs.gui.use_applovin";
     public static final String PREF_KEY_GUI_USE_INMOBI = "frostwire.prefs.gui.use_inmobi";
     public static final String PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS = "frostwire.prefs.gui.interstitial_offers_transfer_starts";
@@ -120,8 +122,6 @@ public final class Constants {
 
     public static final String PREF_KEY_UXSTATS_ENABLED = "frostwire.prefs.uxstats.enabled";
 
-    public static final String PREF_KEY_SHOW_ABOUT = "frostwire.prefs.show_about";
-
     public static final String ACTION_OPEN_TORRENT_URL = "android.intent.action.VIEW";
     public static final String ACTION_REQUEST_SHUTDOWN = "com.frostwire.android.ACTION_REQUEST_SHUTDOWN";
     public static final String ACTION_SHOW_TRANSFERS = "com.frostwire.android.ACTION_SHOW_TRANSFERS";
@@ -138,7 +138,7 @@ public final class Constants {
     public static final String ACTION_FILE_ADDED_OR_REMOVED = "com.frostwire.android.ACTION_FILE_ADDED_OR_REMOVED";
     public static final String EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION = "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION";
     public static final String EXTRA_DOWNLOAD_COMPLETE_PATH = "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_PATH";
-
+    public static final String EXTRA_REFRESH_FILE_TYPE = "com.frostwire.android.EXTRA_REFRESH_FILE_TYPE";
 
     public static final String BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION = "com.frostwire.android.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION.";
 
@@ -171,7 +171,6 @@ public final class Constants {
 
     public static final long LIBRARIAN_FILE_COUNT_CACHE_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
-    public static final String MOBILE_CORE_DEVHASH = "6OJUVFECLGYH3JKYZB41VLQA4JXW5";
     public static final String INMOBI_INTERSTITIAL_PROPERTY_ID = "c1e6be702d614523b725af8b86f99e8f";
 
     public static final int NOTIFIED_BLOOM_FILTER_BITSET_SIZE = 320000; //40 kilobytes
@@ -185,7 +184,6 @@ public final class Constants {
     public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
 
     public static final String VPN_LEARN_MORE_URL = "http://www.frostwire.com/vpn.expressvpn.learnmore";
-    public static final String PIA_URL = "http://www.frostwire.com/vpn.pia";
     public static final String EXPRESSVPN_URL_BASIC = "http://www.frostwire.com/vpn.expressvpn";
     public static final String EXPRESSVPN_URL_PLUS = "http://www.frostwire.com/vpn.expressvpn";
     public static final float EXPRESSVPN_STARTING_USD_PRICE = 8.32f;

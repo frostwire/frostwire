@@ -485,7 +485,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
             return (dl instanceof BittorrentDownload && dl.isCompleted()) || dl.isCompleted();
         }
 
-        public static void onSeedTransfer(com.frostwire.gui.bittorrent.BTDownload dl, boolean showShareTorrentDialog) {
+        public static void onSeedTransfer(final com.frostwire.gui.bittorrent.BTDownload dl, final boolean showShareTorrentDialog) {
             boolean canShareNow = canShareNow(dl);
             if (!canShareNow) {
                 System.out.println("Not doing anything.");
@@ -500,18 +500,33 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                 return;
             }
 
-            if (dl instanceof BittorrentDownload &&
-                TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[]{dl}) &&
-                showShareTorrentDialog) {
-                new ShareTorrentDialog(((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
-            } else if (dl instanceof SoundcloudDownload || dl instanceof YouTubeDownload || dl instanceof HttpDownload) {
-                if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
-                    TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, showShareTorrentDialog);
-                    dl.setDeleteDataWhenRemove(false);
-                    BTDownloadMediator.instance().remove(dl);
-                    BTDownloadMediator.instance().updateTableFilters();
+            GUIMediator.safeInvokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (dl instanceof BittorrentDownload &&
+                            TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[]{dl}) &&
+                            showShareTorrentDialog) {
+                        new ShareTorrentDialog(((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
+                    } else if (dl instanceof SoundcloudDownload || dl instanceof YouTubeDownload || dl instanceof HttpDownload) {
+                        if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, showShareTorrentDialog);
+                                    dl.setDeleteDataWhenRemove(false);
+                                    GUIMediator.safeInvokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            BTDownloadMediator.instance().remove(dl);
+                                            BTDownloadMediator.instance().updateTableFilters();
+                                        }
+                                    });
+                                }
+                            }).start();
+                        }
+                    }
                 }
-            }
+            });
         }
     }
 }

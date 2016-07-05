@@ -22,7 +22,6 @@ import android.app.Application;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -178,7 +177,9 @@ public final class Librarian {
             Log.e(TAG, "Failed to delete files from media store", e);
         }
         invalidateCountCache(fileType);
-        UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
+        UIUtils.broadcastAction(context,
+                Constants.ACTION_FILE_ADDED_OR_REMOVED,
+                new UIUtils.IntentByteExtra(Constants.EXTRA_REFRESH_FILE_TYPE, fileType));
     }
 
     public void scan(File file) {

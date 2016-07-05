@@ -112,7 +112,13 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             h.post(new Runnable() {
                 @Override
                 public void run() {
-                    AbstractConfirmListDialog.super.show(fManager);
+                    try {
+                        AbstractConfirmListDialog.super.show(fManager);
+                    } catch (Throwable e) {
+                        // java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
+                        // TODO: this needs a refactor
+                        LOG.error("Error in show, review your logic", e);
+                    }
                 }
             });
         } else {

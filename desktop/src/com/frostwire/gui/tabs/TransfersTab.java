@@ -23,6 +23,7 @@ import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -77,9 +78,9 @@ public final class TransfersTab extends AbstractTab {
     }
 
     private void initComponents() {
-        mainComponent = new JPanel(new MigLayout("fill, insets 3px 3px 3px 3px, gap 0","[][grow]","[][grow]"));
-        mainComponent.add(createTextFilterComponent(), "w 200!, h 25!, gapleft 5px, center, shrink");
-        mainComponent.add(createFilterToggleButtons(),"w 400!, h 32!, pad 0 0 0 0, center, wrap");
+        mainComponent = new JPanel(new MigLayout("fill, insets 6px 0px 0px 0px, gap 0","[][grow]","[][grow]"));
+        mainComponent.add(createTextFilterComponent(), "w 200!, h 30!, gapleft 5px, center, shrink");
+        mainComponent.add(createFilterToggleButtons(),"w 500!, h 30!, pad 2 0 0 0, right, wrap");
         mainComponent.add(downloadMediator.getComponent(),"cell 0 1 2 1,grow"); // "cell <column> <row> <width> <height>"
         setTransfersFilterModeListener(downloadMediator);
     }
@@ -98,11 +99,15 @@ public final class TransfersTab extends AbstractTab {
         filterText.addKeyListener(new TextFilterKeyAdapter());
         filterText.addFocusListener(new TextFilterFocusAdapter());
         filterText.selectAll();
+        final CompoundBorder compoundBorder =
+                BorderFactory.createCompoundBorder(filterText.getBorder(),
+                        BorderFactory.createEmptyBorder(4, 2, 2, 2));
+        filterText.setBorder(compoundBorder);
         return filterText;
     }
 
     private JPanel createFilterToggleButtons() {
-        JPanel filterButtonsContainer = new JPanel(new MigLayout("align center, ins 0 0 0 0"));
+        JPanel filterButtonsContainer = new JPanel(new MigLayout("align right, ins 0 0 0 8"));
         ButtonGroup filterGroup = new ButtonGroup();
         filterAllButton = new JToggleButton(I18n.tr("All"),true);
         filterDownloadingButton = new JToggleButton(I18n.tr("Downloading"),false);
@@ -112,6 +117,14 @@ public final class TransfersTab extends AbstractTab {
         filterDownloadingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.DOWNLOADING));
         filterSeedingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.SEEDING));
         filterFinishedButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.FINISHED));
+        final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 12);
+        final Dimension buttonDimension = new Dimension(115,28);
+        applyFontAndDimensionToFilterToggleButtons(smallHelvetica, buttonDimension,
+                filterAllButton, filterDownloadingButton,filterSeedingButton,filterFinishedButton);
+
+        filterAllButton.setPreferredSize(buttonDimension);
+        filterAllButton.setMinimumSize(buttonDimension);
+        filterAllButton.setMaximumSize(buttonDimension);
         filterGroup.add(filterAllButton);
         filterGroup.add(filterDownloadingButton);
         filterGroup.add(filterSeedingButton);
@@ -121,6 +134,15 @@ public final class TransfersTab extends AbstractTab {
         filterButtonsContainer.add(filterSeedingButton);
         filterButtonsContainer.add(filterFinishedButton);
         return filterButtonsContainer;
+    }
+
+    private void applyFontAndDimensionToFilterToggleButtons(Font font, Dimension dimension, JToggleButton ... buttons) {
+        for (JToggleButton button : buttons) {
+            button.setFont(font);
+            button.setMinimumSize(dimension);
+            button.setMaximumSize(dimension);
+            button.setPreferredSize(dimension);
+        }
     }
 
     public JComponent getComponent() {

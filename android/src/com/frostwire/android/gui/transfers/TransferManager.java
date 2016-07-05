@@ -20,6 +20,7 @@ package com.frostwire.android.gui.transfers;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
 import com.frostwire.android.R;
@@ -42,7 +43,6 @@ import com.frostwire.transfers.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -104,7 +104,7 @@ public final class TransferManager {
     }
 
     public List<Transfer> getTransfers() {
-        List<Transfer> transfers = new ArrayList<Transfer>();
+        List<Transfer> transfers = new ArrayList<>();
 
         if (httpDownloads != null) {
             transfers.addAll(httpDownloads);
@@ -257,6 +257,11 @@ public final class TransferManager {
                     return;
                 }
 
+                File savePath = dl.getSavePath();
+                if (savePath != null && savePath.toString().contains("fetch_magnet/")) {
+                    return;
+                }
+
                 bittorrentDownloads.add(new UIBittorrentDownload(TransferManager.this, dl));
             }
 
@@ -316,7 +321,7 @@ public final class TransferManager {
                 return null;
             }
 
-            URI u = URI.create(url);
+            Uri u = Uri.parse(url);
 
             if (!u.getScheme().equalsIgnoreCase("file") &&
                 !u.getScheme().equalsIgnoreCase("http") &&
@@ -337,7 +342,7 @@ public final class TransferManager {
                 }
             } else {
                 if (u.getScheme().equalsIgnoreCase("file")) {
-                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())));
+                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())), null);
                 } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https") || u.getScheme().equalsIgnoreCase("magnet")) {
                     // this executes the listener method when it fetches the bytes.
                     new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()), fetcherListener);
@@ -348,7 +353,7 @@ public final class TransferManager {
             return download;
         } catch (Throwable e) {
             LOG.warn("Error creating download from uri: " + url);
-            return new InvalidBittorrentDownload(R.string.empty_string);
+            return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
         }
     }
 
@@ -478,7 +483,7 @@ public final class TransferManager {
         List<Transfer> transfers = new ArrayList<>();
         transfers.addAll(httpDownloads);
         for (Transfer t : transfers) {
-            if (t instanceof Transfer && !t.isComplete() && ((Transfer) t).isDownloading()) {
+            if (t instanceof Transfer && !t.isComplete() && t.isDownloading()) {
                 t.remove(false);
             }
         }
@@ -495,7 +500,6 @@ public final class TransferManager {
     public void resetStartedTransfers() {
         startedTransfers = 0;
     }
-
 
     /**
      * @return true if less than 10MB available

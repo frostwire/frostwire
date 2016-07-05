@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,48 +18,73 @@
 
 package com.frostwire.android.gui.views;
 
-import java.lang.ref.WeakReference;
-
+import android.app.Fragment;
+import android.view.View;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 
+import java.lang.ref.WeakReference;
+
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public final class TimerSubscription {
 
     private static final Logger LOG = Logger.getLogger(TimerSubscription.class);
 
-    private final WeakReference<TimerObserver> observerRef;
+    private final WeakReference<TimerObserver> observer;
 
     private boolean unsubscribed;
 
     public TimerSubscription(TimerObserver observer) {
-        this.observerRef = Ref.weak(observer);
+        this.observer = Ref.weak(observer);
 
         this.unsubscribed = false;
     }
 
     public boolean isUnsubscribed() {
-        return unsubscribed || !Ref.alive(observerRef);
+        if (!unsubscribed && !Ref.alive(observer)) {
+            unsubscribe();
+        }
+
+        return unsubscribed;
     }
 
     public void unsubscribe() {
         unsubscribed = true;
-        Ref.free(observerRef);
+        Ref.free(observer);
     }
 
     public void onTime() {
         if (!isUnsubscribed()) { // double check of unsubscribed intentional 
             try {
-                observerRef.get().onTime();
+                onTime(observer.get());
             } catch (Throwable e) {
                 unsubscribe();
                 LOG.error("Error notifying observer, performed automatic unsubscribe", e);
             }
+        }
+    }
+
+    private static void onTime(TimerObserver observer) {
+        boolean call = true;
+        if (observer instanceof View) {
+            // light version of visible check
+            call = ((View) observer).getVisibility() != View.GONE;
+        }
+        if (observer instanceof Fragment) {
+            call = ((Fragment) observer).isVisible();
+            if (observer instanceof AbstractFragment) {
+                call = !((AbstractFragment) observer).isPaused();
+            }
+        }
+        if (observer instanceof AbstractActivity) {
+            call = !((AbstractActivity) observer).isPaused();
+        }
+        if (call) {
+            observer.onTime();
+            //LOG.debug("ON TIME: class-" + observer.getClass().getName());
         }
     }
 }

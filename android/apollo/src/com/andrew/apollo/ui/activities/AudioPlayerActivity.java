@@ -112,7 +112,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     // Queue switch
     private ImageView mQueueSwitch;
 
-    // Progess
+    // Progress
     private SeekBar mProgress;
 
     // Broadcast receiver
@@ -124,7 +124,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     // View pager
     private ViewPager mViewPager;
 
-    // Pager adpater
+    // Pager adapter
     private PagerAdapter mPagerAdapter;
 
     // ViewPager container
@@ -157,7 +157,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Initialze the theme resources
+        // Initialize the theme resources
         mResources = new ThemeUtils(this);
         // Set the overflow style
         mResources.setOverflowStyle(this);
@@ -514,7 +514,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         // Initialize the ViewPager
         mViewPager = (ViewPager)findViewById(R.id.audio_player_pager);
-        // Attch the adapter
+        // Attach the adapter
         mViewPager.setAdapter(mPagerAdapter);
         // Offscreen pager loading limit
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);

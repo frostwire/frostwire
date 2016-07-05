@@ -1,14 +1,38 @@
+frostwire (6.3.2) stable; urgency=high
+  * Fixes YT search issues
+  * New jlibtorrent 1.1.0.35
+  * Crash fixes
+
+ -- FrostWire Team <contact@frostwire.com>  Sat, 25 Jun 2016 04:21:39 -0500
+
+frostwire (6.3.1) stable; urgency=high
+  * New: "View > Search/Transfers split screen" option.
+  * New jlibtorrent 1.1.0.34
+  * jlibtorrent: fixed crash on invalid input in http_parser
+  * jlibtorrent: early resume data reset when fatal_disk_error
+  * jlibtorrent: optimize allow-fast logic
+  * jlibtorrent: fixed inverted priority of incoming piece suggestions
+  * jlibtorrent: fixed bug related to flag_merge_resume_http_seeds flag
+  * jlibtorrent: don't add peers from url if add_torrent_impl returns invalid handle
+  * HTTP client improvements
+  * EZTV fixes
+  * New icon for TorrentDownloads search results
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 16 Jun 2016 18:42:00 -0500
+
 frostwire (6.3.0) stable; urgency=high
+  * Greatly improved seeding connectivity. Seed and share magnets!
   * New transfers tab, allows you to filter transfers by state and keywords.
   * Finished cloud transfers are seedeable.
   * If seeding setting is active, finished cloud transfers are seeded.
   * Improved 'Search for Keywords' suggestions for episodic queries.
-  * New jlibtorrent 1.1.0.30
+  * New jlibtorrent 1.1.0.31
   * Spanish, Portuguese translations updated.
-  * Fixes Torlock search.
+  * Fixes Torlock search. 
+  * EZTV no longer returns irrelevant results.
   * New Search Engine: TorrentDownloads.me
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 24 May 2016 15:24:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Thu, 02 Jun 2016 11:42:00 -0500
 
 frostwire (6.2.4) stable; urgency=high
   * Fixes Monova search.

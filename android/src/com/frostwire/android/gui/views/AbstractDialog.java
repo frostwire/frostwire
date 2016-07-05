@@ -40,9 +40,6 @@ import java.util.List;
  * @author marcelinkaaa
  */
 public abstract class AbstractDialog extends DialogFragment {
-    public AbstractDialog() {
-        this(R.layout.dialog_default_input);
-    }
 
     protected static String getSuggestedTAG(Class clazz) {
         StringBuilder sb = new StringBuilder();

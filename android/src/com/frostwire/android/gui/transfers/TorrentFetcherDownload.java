@@ -19,7 +19,6 @@
 package com.frostwire.android.gui.transfers;
 
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.logging.Logger;
@@ -232,7 +231,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                 selection = calculateSelection(ti, info.getRelativePath());
             }
 
-            BTEngine.getInstance().download(ti, null, selection);
+            BTEngine.getInstance().download(ti, null, selection, null);
 
         } catch (Throwable e) {
             LOG.error("Error downloading torrent", e);
@@ -277,11 +276,10 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                 }
 
                 if (data != null) {
-
                     // Don't download the torrent yourself, there's a listener waiting
                     // for the .torrent, and it's up to this listener to start the transfer.
                     if (fetcherListener!=null) {
-                        fetcherListener.onTorrentInfoFetched(data);
+                        fetcherListener.onTorrentInfoFetched(data, uri);
                         return;
                     }
 

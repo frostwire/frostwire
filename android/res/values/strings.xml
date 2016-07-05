@@ -499,7 +499,7 @@
     <string name="saving_to_sd_card">Saving to SD card.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android will erase downloaded files if FrostWire is uninstalled.</string>
     <string name="saving_to_internal_memory">Saving to Internal Memory</string>
-    <string name="saving_to_internal_memory_description">You also have an SD card (%1$s available)</string>
+    <string name="saving_to_internal_memory_description">You also have an SD card (%1$s free)</string>
     <string name="device_memory">Device\'s Memory</string>
     <string name="device_storage">Device\'s Storage</string>
     <string name="sdcard_storage">SD\'s Storage</string>
@@ -540,7 +540,7 @@
     <string name="dummy_build" translatable="false">[build number]</string>
     <string name="basic">Basic</string>
     <string name="plus">Plus</string>
-    <string name="try_other_keywords">Try less/other keywords</string>
+    <string name="try_other_keywords">Try fewer/different keywords</string>
     <string name="try_frostwire_plus_for_more_results">Try FrostWire Plus for more results</string>
     <string name="action_menu_overflow_description">More options</string>
     <string name="rate_our_app">Rate our App</string>

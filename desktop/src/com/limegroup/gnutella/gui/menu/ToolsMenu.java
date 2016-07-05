@@ -129,7 +129,7 @@ final class ToolsMenu extends AbstractMenu {
             if (UpdateMediator.instance().isUpdated()) {
                 text = I18n.tr("You are up to date with FrostWire") + " v." + UpdateMediator.instance().getLatestVersion();
             } else if (UpdateMediator.instance().isUpdateDownloading()) {
-                text = I18n.tr("Downloading update...");
+                text = I18n.tr("Downloading update...") + "(" + UpdateMediator.instance().getUpdateDownloadProgress() + "%)";
                 enabled = false;
             } else if (UpdateMediator.instance().isUpdateDownloaded()) {
                 text = I18n.tr("Install update") + " v." + UpdateMediator.instance().getLatestVersion();

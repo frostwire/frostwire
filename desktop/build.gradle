@@ -17,16 +17,6 @@ apply from: '../common/dependencies.gradle'
 
 sourceCompatibility = 1.7
 
-// if false, you will need to have a symlink to frostwire-jlibtorrent at the root of the project.
-// this won't work for windows users, who will either have to have this in true, or just
-// copy frostwire-jlibtorrent if they need to hack frostwire-jlibtorrent while coding.
-def useJlibtorrentFromMaven = true
-
-if (!useJlibtorrentFromMaven && !new File("frostwire-jlibtorrent").exists()) {
-    def path = new File("frostwire-jlibtorrent").getAbsolutePath()
-    throw new Exception("You want to use jlibtorrent from source but you don't have a symlink at '" + path + "' with the sources.");
-}
-
 compileJava {
     options.encoding = '8859_1'
 }
@@ -44,10 +34,7 @@ dependencies {
     compile 'com.h2database:h2:1.4.191'
     compile 'org.apache.lucene:lucene-core:3.5.0'
     compile 'net.jthink:jaudiotagger:2.2.5'
-
-    if (useJlibtorrentFromMaven) {
-        compile 'com.frostwire:jlibtorrent:1.1.0.30'
-    }
+    compile 'com.frostwire:jlibtorrent:1.1.0.35'
 
     compile fileTree(dir: 'lib/jars', include: ['*.jar'])
 }
@@ -55,16 +42,8 @@ dependencies {
 sourceSets {
     main {
         java {
-            // frostwire-common
             srcDir '../common/src/main/java'
             srcDir 'src'
-
-            if (!useJlibtorrentFromMaven) {
-                //To avoid 'Can't register given path of type 'SOURCE' ... error in intelliJ
-                //make a symlink to frostwire-jlibtorrent inside our content root folder,
-                //at the same level where desktop,common and android are.
-                srcDir 'frostwire-jlibtorrent/src/main/java'
-            }
         }
 
         resources {

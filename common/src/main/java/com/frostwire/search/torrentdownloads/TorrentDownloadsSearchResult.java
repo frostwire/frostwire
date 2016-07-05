@@ -1,4 +1,4 @@
-/**
+/*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
@@ -32,18 +32,18 @@ import java.util.Locale;
 /**
  * @author alejandroarturom
  */
-public class TorrentDownloadsSearchResult extends AbstractTorrentSearchResult {
+public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchResult {
 
-    private String filename;
-    private String displayName;
-    private String detailsUrl;
-    private String torrentUrl;
-    private String infoHash;
-    private long size;
-    private long creationTime;
-    private int seeds;
+    private final String filename;
+    private final String displayName;
+    private final String detailsUrl;
+    private final String torrentUrl;
+    private final String infoHash;
+    private final long size;
+    private final long creationTime;
+    private final int seeds;
 
-    public TorrentDownloadsSearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
+    TorrentDownloadsSearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
         this.infoHash = null;
         this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl));

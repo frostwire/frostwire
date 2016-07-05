@@ -197,16 +197,21 @@
                 android:key="frostwire.prefs.uxstats.enabled"
                 android:summary="@string/anonymous_usage_statistics_summary"
                 android:title="@string/anonymous_usage_statistics"/>
-        <!--<CheckBoxPreference
+        <CheckBoxPreference
                 android:key="frostwire.prefs.gui.support_frostwire"
                 android:summary="@string/support_frostwire_summary"
-                android:title="@string/support_frostwire"/>-->
+                android:title="@string/support_frostwire"/>
     </PreferenceScreen>
 
-    <!--<Preference
+    <Preference
             android:key="frostwire.prefs.offers.buy_no_ads"
             android:title="@string/buy_no_ads">
-    </Preference>-->
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="com.frostwire.android"
+                android:targetClass="com.frostwire.android.gui.activities.BuyActivity"
+        />
+    </Preference>
 
     <Preference
             android:key="frostwire.prefs.show_about"

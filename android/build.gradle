@@ -16,16 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// if false, you will need to have a symlink to frostwire-jlibtorrent at the root of the project.
-// this won't work for windows users, who will either have to have this in true, or just
-// copy frostwire-jlibtorrent if they need to hack frostwire-jlibtorrent while coding.
-def useJlibtorrentFromMaven = true
-def JLIBTORRENT_VERSION='1.1.0.30'
-
-if (!useJlibtorrentFromMaven && !new File("frostwire-jlibtorrent").exists()) {
-    def path = new File("frostwire-jlibtorrent").getAbsolutePath()
-    throw new Exception("You want to use jlibtorrent from source but you don't have a symlink at '" + path + "' with the sources.");
-}
+def JLIBTORRENT_VERSION='1.1.0.35'
 
 import groovy.swing.SwingBuilder
 
@@ -37,7 +28,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.android.tools.build:gradle:2.1.2'
     }
 }
 
@@ -70,6 +61,8 @@ def changeApkOutput(variant) {
         flavor = 'basic'
     } else if (variant.productFlavors[0].name.equals("plus1")) {
         flavor = 'plus'
+    } else if (variant.productFlavors[0].name.equals("store")) {
+        flavor = 'store'
     }
     def suffix = project.ext.versionName + '-b' + project.ext.versionCode + '-' + flavor
     def name = "$project.buildDir/frostwire-android-" + variant.buildType.name + '-' + suffix
@@ -89,7 +82,7 @@ project.ext.versionName = manifestVersionName()
 android {
 
     compileSdkVersion 16
-    buildToolsVersion '23.0.3'
+    buildToolsVersion '24.0.0'
 
     defaultConfig {
         versionName project.ext.versionName
@@ -114,16 +107,6 @@ android {
 
                 srcDir 'apollo/src'
                 srcDir 'src'
-
-                if (!useJlibtorrentFromMaven) {
-                    //To avoid 'Can't register given path of type 'SOURCE' ... error in intelliJ
-                    //make a symlink to frostwire-jlibtorrent inside our content root folder,
-                    //at the same level where desktop,common and android are.
-                    srcDir 'frostwire-jlibtorrent/src/main/java'
-                    exclude '**/demo/*.java'
-                }
-
-                exclude '**/MobileCore*.java'
             }
         }
 
@@ -171,6 +154,12 @@ android {
             applicationId 'com.frostwire.android'
             versionCode 9050000 + project.ext.versionCode
         }
+        store {
+            // this is basic plus store enable
+            // for a while the versionCode is the basic + 1
+            applicationId 'com.frostwire.android'
+            versionCode 9010000 + project.ext.versionCode + 2
+        }
     }
 
     applicationVariants.all { variant ->
@@ -189,13 +178,11 @@ configurations.all {
 
 dependencies {
     compile 'com.android.support:support-v4:23.2.1'
-    compile 'com.google.android.gms:play-services-ads:9.0.0'
-    compile 'com.inmobi.monetization:inmobi-ads:5.3.0'
+    compile 'com.google.android.gms:play-services-ads:9.0.2'
+    compile 'com.inmobi.monetization:inmobi-ads:5.3.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    if (useJlibtorrentFromMaven) {
-        compile 'com.frostwire:jlibtorrent:' + JLIBTORRENT_VERSION
-    }
+    compile 'com.frostwire:jlibtorrent:' + JLIBTORRENT_VERSION
     compile 'com.frostwire:jlibtorrent-android-arm:' + JLIBTORRENT_VERSION
     compile 'com.frostwire:jlibtorrent-android-x86:' + JLIBTORRENT_VERSION
 

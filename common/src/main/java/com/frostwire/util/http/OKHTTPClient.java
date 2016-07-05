@@ -198,13 +198,6 @@ public class OKHTTPClient extends AbstractHttpClient {
 
     private void prepareOkHttpClientForPost(OkHttpClient okHttpClient, boolean gzip) {
         okHttpClient.setFollowRedirects(false);
-        okHttpClient.setHostnameVerifier(new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        });
-        okHttpClient.setSslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY);
         if (gzip) {
             if (okHttpClient.interceptors().size() > 0) {
                 okHttpClient.interceptors().remove(0);
@@ -272,6 +265,13 @@ public class OKHTTPClient extends AbstractHttpClient {
         searchClient.setDispatcher(new Dispatcher(pool));
         searchClient.setFollowRedirects(true);
         searchClient.setFollowSslRedirects(true);
+        searchClient.setHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
+        searchClient.setSslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY);
         searchClient.setConnectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
         // Maybe we should use a custom connection pool here. Using default.
         //searchClient.setConnectionPool(?);

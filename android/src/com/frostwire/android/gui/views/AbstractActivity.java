@@ -29,19 +29,21 @@ import android.os.Bundle;
 import android.view.View;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public abstract class AbstractActivity extends Activity {
 
     private final int layoutResId;
     private final ArrayList<String> fragmentTags;
 
+    private boolean paused;
+
     public AbstractActivity(int layoutResId) {
         this.layoutResId = layoutResId;
-        this.fragmentTags = new ArrayList<String>();
+        this.fragmentTags = new ArrayList<>();
+
+        this.paused = false;
     }
 
     @Override
@@ -52,6 +54,22 @@ public abstract class AbstractActivity extends Activity {
         if (tag != null && !fragmentTags.contains(tag)) {
             fragmentTags.add(tag);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        paused = false;
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        paused = true;
+        super.onPause();
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 
     List<Fragment> getVisibleFragments() {

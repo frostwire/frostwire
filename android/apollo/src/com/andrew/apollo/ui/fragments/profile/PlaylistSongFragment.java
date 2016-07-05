@@ -88,6 +88,10 @@ public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Son
         dsListView.setRemoveListener(this);
         // Quick scroll while dragging
         dsListView.setDragScrollProfile(this);
+        //fix scrollbar todo figure out why was it disabled in ApolloFragment
+        dsListView.setVerticalScrollBarEnabled(true);
+        dsListView.setFastScrollEnabled(true);
+
         return mRootView;
     }
 

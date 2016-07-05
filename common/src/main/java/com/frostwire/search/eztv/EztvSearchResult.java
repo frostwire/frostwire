@@ -33,15 +33,16 @@ import java.util.Locale;
  * @author gubatron
  * @author aldenml
  */
-class EztvSearchResult extends AbstractTorrentSearchResult {
-    private String filename;
-    private String displayName;
-    private String detailsUrl;
-    private String torrentUrl;
+final class EztvSearchResult extends AbstractTorrentSearchResult {
+
+    private final String filename;
+    private final String displayName;
+    private final String detailsUrl;
+    private final String torrentUrl;
     private String infoHash;
-    private long size;
-    private long creationTime;
-    private int seeds;
+    private final long size;
+    private final long creationTime;
+    private final int seeds;
 
     EztvSearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
@@ -54,23 +55,19 @@ class EztvSearchResult extends AbstractTorrentSearchResult {
             dispName = matcher.group("displaynamefallback");
         }
         this.displayName = HtmlManipulator.replaceHtmlEntities(dispName).trim();
-
-        if (matcher.group("torrenturl") != null) {
-            this.torrentUrl = matcher.group("torrenturl");
-        } else if (matcher.group("magneturl") != null) {
-            this.torrentUrl = matcher.group("magneturl");
-        }
+        this.torrentUrl = buildTorrentUrl(matcher);
 
         this.filename = parseFileName(FilenameUtils.getName(torrentUrl));
-
         this.infoHash = null;
+
         try {
             if (matcher.group("infohash") != null) {
                 this.infoHash = matcher.group("infohash");
             } else if (torrentUrl.startsWith("magnet:?xt=urn:btih:")) {
                 this.infoHash = torrentUrl.substring(20, 52);
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
 
         this.seeds = -1;
         this.creationTime = parseCreationTime(matcher.group("creationtime"));
@@ -142,5 +139,16 @@ class EztvSearchResult extends AbstractTorrentSearchResult {
         } catch (Throwable ignored) {
         }
         return result;
+    }
+
+    private static String buildTorrentUrl(SearchMatcher matcher) {
+        String url = null;
+        if (matcher.group("torrenturl") != null) {
+            url = matcher.group("torrenturl");
+            url = url.replaceAll(" ", "%20");
+        } else if (matcher.group("magneturl") != null) {
+            url = matcher.group("magneturl");
+        }
+        return url;
     }
 }

@@ -32,8 +32,12 @@ public abstract class AbstractFragment extends Fragment {
 
     private final int layoutResId;
 
+    private boolean paused;
+
     public AbstractFragment(int layoutResId) {
         this.layoutResId = layoutResId;
+
+        this.paused = false;
     }
 
     @Override
@@ -45,6 +49,22 @@ public abstract class AbstractFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        paused = false;
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        paused = true;
+        super.onPause();
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 
     @SuppressWarnings("unchecked")

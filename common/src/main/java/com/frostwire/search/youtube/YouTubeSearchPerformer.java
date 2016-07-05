@@ -41,7 +41,7 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
 
     private static final Logger LOG = Logger.getLogger(YouTubeSearchPerformer.class);
 
-    private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title[ ]*\"><a href=\"(?<link>/watch.*?)\".*? title=\"(?<title>.*?)\".*? Duration: (?<duration>.*?)\\.</span>.*?(by |byline\">)<a href=\"/user/(?<user>.*?)\"";
+    private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title[ ]*\"><a href=\"(?<link>/watch.*?)\".*? title=\"(?<title>.*?)\".*? Duration: (?<duration>.*?)\\.</span>.*?(by |byline\">)<a href=\"/(user|channel)/(?<user>.*?)\"";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     private static final int MAX_RESULTS = 20;
@@ -125,7 +125,11 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
 
     @Override
     protected int preliminaryHtmlPrefixOffset(String page) {
-        return page.indexOf("<div class=\"yt-uix-hovercard-content\">");
+        int offset = page.indexOf("<div class=\"yt-uix-hovercard-content\">");
+        if (offset == -1) {
+            offset = page.indexOf("class=\"num-results first-focus\"");
+        }
+        return offset;
     }
 
     @Override

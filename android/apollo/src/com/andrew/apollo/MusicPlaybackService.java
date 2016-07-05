@@ -1408,11 +1408,20 @@ public class MusicPlaybackService extends Service {
 
         if (what.equals(META_CHANGED)) {
             // Increase the play count for favorite songs.
+            if (mFavoritesCache == null) {
+                mFavoritesCache = FavoritesStore.getInstance(this);
+            }
+
             if (mFavoritesCache.getSongId(getAudioId()) != null) {
                 mFavoritesCache.addSongId(getAudioId(), getTrackName(), getAlbumName(),
                         getArtistName());
             }
             // Add the track to the recently played list.
+
+            if (mRecentsCache == null) {
+                mRecentsCache = RecentStore.getInstance(this);
+            }
+
             mRecentsCache.addAlbumId(getAlbumId(), getAlbumName(), getArtistName(),
                     MusicUtils.getSongCountForAlbum(this, getAlbumId()),
                     MusicUtils.getReleaseDateForAlbum(this, getAlbumId()));
@@ -1442,6 +1451,11 @@ public class MusicPlaybackService extends Service {
      * @param what The broadcast
      */
     private void updateRemoteControlClient(final String what) {
+
+        if (mRemoteControlClient == null) {
+            Log.d(TAG, "mRemoteControlClient is null, review your logic");
+            return;
+        }
 
         int playState;
         if (isPlaying()) {
@@ -2092,6 +2106,10 @@ public class MusicPlaybackService extends Service {
      * Resumes or starts playback.
      */
     public void play() {
+        if (mAudioManager == null) {
+            return;
+        }
+
         int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 

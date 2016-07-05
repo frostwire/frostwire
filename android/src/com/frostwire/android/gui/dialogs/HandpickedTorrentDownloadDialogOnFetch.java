@@ -35,7 +35,8 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  * @author aldenml
  *
- */public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherListener {
+ */
+public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherListener {
     private WeakReference<Context> contextRef;
     private WeakReference<FragmentManager> fragmentManagerRef;
     private static Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialogOnFetch.class);
@@ -46,11 +47,11 @@ import java.lang.ref.WeakReference;
     }
 
     @Override
-    public void onTorrentInfoFetched(byte[] torrentInfoData) {
-        createHandpickedTorrentDownloadDialog(torrentInfoData);
+    public void onTorrentInfoFetched(byte[] torrentInfoData, String magnetUri) {
+        createHandpickedTorrentDownloadDialog(torrentInfoData, magnetUri);
     }
 
-    private void createHandpickedTorrentDownloadDialog(byte[] torrentInfoData) {
+    private void createHandpickedTorrentDownloadDialog(byte[] torrentInfoData, String magnetUri) {
         if (!Ref.alive(contextRef) ||
             !Ref.alive(fragmentManagerRef) ||
             torrentInfoData == null || torrentInfoData.length == 0) {
@@ -63,7 +64,8 @@ import java.lang.ref.WeakReference;
             final HandpickedTorrentDownloadDialog dlg =
                     HandpickedTorrentDownloadDialog.newInstance(
                             contextRef.get(),
-                            TorrentInfo.bdecode(torrentInfoData));
+                            TorrentInfo.bdecode(torrentInfoData),
+                            magnetUri);
             dlg.show(fragmentManagerRef.get());
         } catch (Throwable t) {
             LOG.warn("Could not create or show HandpickedTorrentDownloadDialog", t);

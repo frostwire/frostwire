@@ -29,7 +29,6 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
@@ -90,16 +89,14 @@ public class RenameFileMenuAction extends MenuAction {
         private String filePath;
 
         public static RenameFileMenuActionDialog newInstance(String filePath) {
-            return new RenameFileMenuActionDialog(filePath);
+            RenameFileMenuActionDialog dlg = new RenameFileMenuActionDialog();
+            dlg.filePath = filePath; // bad design having non empty constructors
+            // no time to refactor now
+            return dlg;
         }
 
         public RenameFileMenuActionDialog() {
-            super();
-        }
-
-        private RenameFileMenuActionDialog(String filePath) {
-            super();
-            this.filePath = filePath;
+            super(R.layout.dialog_default_input);
         }
 
         @Override

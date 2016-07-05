@@ -35,7 +35,8 @@ public abstract class CrawlRegexSearchPerformer<T extends CrawlableSearchResult>
 
     @Override
     protected List<? extends SearchResult> searchPage(String page) {
-        String reducedPage = PerformersHelper.reduceHtml(page, preliminaryHtmlPrefixOffset(page), preliminaryHtmlSuffixOffset(page));
+        final int prefixOffset = preliminaryHtmlPrefixOffset(page);
+        String reducedPage = PerformersHelper.reduceHtml(page, prefixOffset, preliminaryHtmlSuffixOffset(page));
         return PerformersHelper.searchPageHelper(this, reducedPage, regexMaxResults);
     }
 

@@ -442,10 +442,26 @@ public final class UIUtils {
         socialLinksDialog.show();
     }
 
-    public static void broadcastAction(Context ctx, String actionCode) {
+    // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over enginner.
+    public static class IntentByteExtra {
+        public String name;
+        public byte value;
+        public IntentByteExtra(String name, byte value) {
+            this.name = name;
+            this.value = value;
+        }
+    }
+
+    public static void broadcastAction(Context ctx, String actionCode, IntentByteExtra... extras) {
         if (ctx == null || actionCode == null) {
             return;
         }
-        ctx.sendBroadcast(new Intent(actionCode));
+        final Intent intent = new Intent(actionCode);
+        if (extras != null && extras.length > 0) {
+            for (IntentByteExtra extra : extras) {
+                intent.putExtra(extra.name, extra.value);
+            }
+        }
+        ctx.sendBroadcast(intent);
     }
 }

@@ -37,6 +37,9 @@ import org.limewire.util.CommonUtils;
 import javax.swing.*;
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,6 +57,7 @@ public class InstallerUpdater implements Runnable {
 
     private static String lastMD5;
     private static boolean isDownloadingUpdate = false;
+    private static int downloadProgress = 0;
 
     private final boolean forceUpdate;
 
@@ -61,6 +65,10 @@ public class InstallerUpdater implements Runnable {
         _updateMessage = updateMessage;
         forceUpdate = force;
         isDownloadingUpdate = false;
+    }
+
+    public static int getUpdateDownloadProgress() {
+        return downloadProgress;
     }
 
     public void start() {
@@ -123,6 +131,39 @@ public class InstallerUpdater implements Runnable {
         }
         try {
             HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
+            httpClient.setListener(new HttpClient.HttpClientListener() {
+                long contentLength;
+                long downloaded = 0;
+
+                @Override
+                public void onError(HttpClient client, Throwable e) {
+
+                }
+
+                @Override
+                public void onData(HttpClient client, byte[] buffer, int offset, int length) {
+                    downloaded += length;
+                    downloadProgress = (int) ((float) downloaded/contentLength*100.0);
+                }
+
+                @Override
+                public void onComplete(HttpClient client) {
+
+                }
+
+                @Override
+                public void onCancel(HttpClient client) {
+
+                }
+
+                @Override
+                public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
+                    final Set<String> strings = headerFields.keySet();
+                    if (headerFields.containsKey("Content-Length")) {
+                        contentLength = Long.valueOf(headerFields.get("Content-Length").get(0));
+                    }
+                }
+            });
             try {
                 httpClient.save(_updateMessage.getInstallerUrl(), installerFileLocation, true);
             } catch (HttpRangeException e) {
@@ -329,6 +370,7 @@ public class InstallerUpdater implements Runnable {
 
         } else if (state == TorrentStatus.State.DOWNLOADING) {
             System.out.println("stateChanged(STATE_DOWNLOADING)");
+            downloadProgress = (int)(_manager.getStatus().getProgress()*100);
         } /*else if (state == DownloadManager.STATE_READY || state == TorrentStatus.State.STATE_QUEUED) {
             System.out.println("stateChanged(STATE_READY)");
             manager.startDownload();

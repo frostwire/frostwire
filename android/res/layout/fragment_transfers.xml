@@ -87,7 +87,7 @@
         frostwire:rich_notification_title_underlined="true"
         frostwire:rich_notification_description="@string/android_will_erase_files_if_frostwire_is_uninstalled"
         android:layout_width="match_parent"
-        android:layout_height="64sp"  
+        android:layout_height="wrap_content"
     />
 
     <com.frostwire.android.gui.views.RichNotification
@@ -97,7 +97,7 @@
         frostwire:rich_notification_title_underlined="true"
         frostwire:rich_notification_description="@string/saving_to_internal_memory_description"
         android:layout_width="match_parent"
-        android:layout_height="64sp"  
+        android:layout_height="wrap_content"
     />
 
     <RelativeLayout android:layout_width="match_parent"

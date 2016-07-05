@@ -192,10 +192,17 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
             FilenameUtils.getExtension(initializer.getName()) != null &&
             FilenameUtils.getExtension(initializer.getName()).endsWith("torrent")) {
 
-            BTInfoAdditionalMetadataHolder additionalMetadataHolder = new BTInfoAdditionalMetadataHolder(initializer, initializer.getName());
+            BTInfoAdditionalMetadataHolder additionalMetadataHolder = null;
 
-            boolean hasLicense = additionalMetadataHolder.getLicenseBroker() != null;
-            boolean hasPaymentOptions = additionalMetadataHolder.getPaymentOptions() != null;
+            try {
+                additionalMetadataHolder = new BTInfoAdditionalMetadataHolder(initializer, initializer.getName());
+            } catch (Throwable t) {
+                System.err.println("[InvalidTorrent] Can't create BTInfoAdditionalMetadataholder out of " + initializer.getAbsolutePath() );
+                t.printStackTrace();
+            }
+
+            boolean hasLicense = additionalMetadataHolder!=null && additionalMetadataHolder.getLicenseBroker() != null;
+            boolean hasPaymentOptions = additionalMetadataHolder != null && additionalMetadataHolder.getPaymentOptions() != null;
             
             if (hasLicense) {
                  System.out.println(initializer);
@@ -210,7 +217,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
                 paymentOptions = new PaymentOptions(null, null);
             }
             paymentOptions.setItemName(_name);
-
         }
     }
 
@@ -265,11 +271,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
     }
 
     private boolean isPlaying() {
-        if (initializer != null) {
-            return MediaPlayer.instance().isThisBeingPlayed(initializer);
-        }
-
-        return false;
+        return initializer != null && MediaPlayer.instance().isThisBeingPlayed(initializer);
     }
 
     public LimeTableColumn getColumn(int idx) {

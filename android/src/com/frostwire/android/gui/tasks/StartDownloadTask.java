@@ -21,7 +21,7 @@ package com.frostwire.android.gui.tasks;
 import android.app.Activity;
 import android.content.Context;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.adnetworks.Offers;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
 import com.frostwire.android.gui.transfers.ExistingDownload;

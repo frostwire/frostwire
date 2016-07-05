@@ -15,11 +15,10 @@
 
 package com.limegroup.gnutella.settings;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-
 import org.limewire.setting.BooleanSetting;
 import org.limewire.setting.IntSetting;
+
+import java.awt.*;
 
 /**
  * Settings to deal with UI.
@@ -101,9 +100,9 @@ public final class UISettings extends LimeProps {
 	 * upload panel.
 	 */
 	public static final IntSetting UI_TRANSFERS_DIVIDER_LOCATION =
-		FACTORY.createIntSetting("UI_TRANSFERS_DIVIDER_LOCATION", Integer.MAX_VALUE);
+		FACTORY.createIntSetting("UI_TRANSFERS_DIVIDER_LOCATION", 400);
     
-    /** Setting for if native icons should be preloaded. */
+    /** Setting for if native icons should be pre-loaded. */
     public static final BooleanSetting PRELOAD_NATIVE_ICONS =
         FACTORY.createBooleanSetting("PRELOAD_NATIVE_ICONS", true);
     
@@ -128,5 +127,7 @@ public final class UISettings extends LimeProps {
         FACTORY.createBooleanSetting("SHOW_NOTIFICATIONS", true);
     
 
-
+    /** Use Classic Search/Transfer tab, or new Search, Transfer tabs */
+    public static final BooleanSetting UI_SEARCH_TRANSFERS_SPLIT_VIEW =
+            FACTORY.createBooleanSetting("UI_SEARCH_TRANSFERS_SPLIT_VIEW", false);
 }

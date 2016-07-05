@@ -41,7 +41,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Finger;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
-import com.frostwire.android.gui.adapters.FileListAdapter;
+import com.frostwire.android.gui.adapters.menu.FileListAdapter;
 import com.frostwire.android.gui.util.SwipeDetector;
 import com.frostwire.android.gui.util.SwipeListener;
 import com.frostwire.android.gui.util.UIUtils;
@@ -394,7 +394,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     private void updateFiles(Object[] data) {
-        if (data == null) {
+        if (data == null || data.length < 2 || data[1] == null) {
             LOG.warn("Something wrong, data is null");
             return;
         }
@@ -520,12 +520,17 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
 
             if (action.equals(Constants.ACTION_FILE_ADDED_OR_REMOVED)) {
-                reloadFiles(Constants.FILE_TYPE_APPLICATIONS);
-                reloadFiles(Constants.FILE_TYPE_RINGTONES);
-                reloadFiles(Constants.FILE_TYPE_TORRENTS);
-                reloadFiles(Constants.FILE_TYPE_PICTURES);
-                reloadFiles(Constants.FILE_TYPE_VIDEOS);
-                reloadFiles(Constants.FILE_TYPE_AUDIO);
+                if (intent.hasExtra(Constants.EXTRA_REFRESH_FILE_TYPE)) {
+                    reloadFiles(intent.getByteExtra(Constants.EXTRA_REFRESH_FILE_TYPE, Constants.FILE_TYPE_AUDIO));
+                } else {
+                    // reload everything
+                    reloadFiles(Constants.FILE_TYPE_APPLICATIONS);
+                    reloadFiles(Constants.FILE_TYPE_RINGTONES);
+                    reloadFiles(Constants.FILE_TYPE_TORRENTS);
+                    reloadFiles(Constants.FILE_TYPE_PICTURES);
+                    reloadFiles(Constants.FILE_TYPE_VIDEOS);
+                    reloadFiles(Constants.FILE_TYPE_AUDIO);
+                }
             }
         }
     }

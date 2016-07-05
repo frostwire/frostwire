@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
@@ -41,6 +42,7 @@ import com.frostwire.logging.Logger;
  * @author aldenml
  */
 public class CreateNewPlaylistMenuAction extends MenuAction {
+    public static PlaylistFragment fragment;
     private static Logger LOG = Logger.getLogger(CreateNewPlaylistMenuAction.class);
     private final long[] fileDescriptors;
 
@@ -66,10 +68,16 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
         if (fileDescriptors != null) {
             MusicUtils.addToPlaylist(getContext(), fileDescriptors, playlistId);
         }
+
+        if (fragment != null) {
+            fragment.restartLoader(true);
+            fragment.refresh();
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
     public static class CreateNewPlaylistDialog extends AbstractDialog {
+        public static PlaylistFragment fragment;
         private Dialog dlg;
         private static CreateNewPlaylistMenuAction menuAction;
 
@@ -79,7 +87,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
         }
 
         public CreateNewPlaylistDialog() {
-            super();
+            super(R.layout.dialog_default_input);
         }
 
         @Override

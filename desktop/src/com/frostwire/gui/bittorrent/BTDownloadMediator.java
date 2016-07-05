@@ -71,6 +71,7 @@ import java.util.List;
  */
 public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRowFilteredModel, BTDownloadDataLine, BTDownload> implements TransfersTab.TransfersFilterModeListener {
     private static final Logger LOG = Logger.getLogger(BTDownloadMediator.class);
+    public static final int MIN_HEIGHT = 150;
     /**
      * instance, for singleton access
      */
@@ -295,30 +296,40 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * set the clear button appropriately.
      */
     public void doRefresh() {
+        if (DATA_MODEL == null) {
+            return;
+        }
+
         DATA_MODEL.refresh();
 
-        int[] selRows = TABLE.getSelectedRows();
-
-        if (selRows.length > 0) {
-            BTDownloadDataLine dataLine = DATA_MODEL.get(selRows[0]);
-
-            BTDownload dl = dataLine.getInitializeObject();
-            boolean completed = dl.isCompleted();
-
-            resumeAction.setEnabled(dl.isResumable());
-            pauseAction.setEnabled(dl.isPausable());
-            exploreAction.setEnabled(completed);
-            showInLibraryAction.setEnabled(completed);
+        if (TABLE != null) {
+            int[] selRows = TABLE.getSelectedRows();
+            if (selRows.length > 0) {
+                BTDownloadDataLine dataLine = DATA_MODEL.get(selRows[0]);
+                if (dataLine != null) {
+                    BTDownload dl = dataLine.getInitializeObject();
+                    if (dl != null) {
+                        boolean completed = dl.isCompleted();
+                        resumeAction.setEnabled(dl.isResumable());
+                        pauseAction.setEnabled(dl.isPausable());
+                        exploreAction.setEnabled(completed);
+                        showInLibraryAction.setEnabled(completed);
+                    }
+                }
+            }
         }
 
         int n = DATA_MODEL.getRowCount();
         boolean anyClearable = false;
         for (int i = n - 1; i >= 0; i--) {
             BTDownloadDataLine btDownloadDataLine = DATA_MODEL.get(i);
-            BTDownload initializeObject = btDownloadDataLine.getInitializeObject();
-            if (isClearable(initializeObject)) {
-                anyClearable = true;
-                break;
+
+            if (btDownloadDataLine != null) {
+                BTDownload initializeObject = btDownloadDataLine.getInitializeObject();
+                if (initializeObject != null && isClearable(initializeObject)) {
+                    anyClearable = true;
+                    break;
+                }
             }
         }
 

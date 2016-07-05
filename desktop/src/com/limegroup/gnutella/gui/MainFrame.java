@@ -15,43 +15,10 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.dnd.DropTarget;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
-
 import com.apple.eawt.FullScreenUtilities;
-import com.frostwire.gui.tabs.TransfersTab;
-import net.miginfocom.swing.MigLayout;
-
-import org.limewire.setting.SettingsGroupManager;
-import org.limewire.util.OSUtils;
-
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.library.LibraryMediator;
-import com.frostwire.gui.tabs.LibraryTab;
-import com.frostwire.gui.tabs.SearchDownloadTab;
-import com.frostwire.gui.tabs.Tab;
+import com.frostwire.gui.tabs.*;
 import com.limegroup.gnutella.gui.GUIMediator.Tabs;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.dnd.TransferHandlerDropTargetListener;
@@ -59,13 +26,24 @@ import com.limegroup.gnutella.gui.menu.MenuMediator;
 import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.gui.search.MagnetClipboardListener;
 import com.limegroup.gnutella.settings.ApplicationSettings;
+import net.miginfocom.swing.MigLayout;
+import org.limewire.setting.SettingsGroupManager;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.dnd.DropTarget;
+import java.awt.event.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.limegroup.gnutella.settings.UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW;
 
 /**
  * This class constructs the main <tt>JFrame</tt> for the program as well as 
  * all of the other GUI classes.  
  */
 public final class MainFrame {
-
     /**
      * Handle to the <tt>JTabbedPane</tt> instance.
      */
@@ -207,7 +185,6 @@ public final class MainFrame {
         contentPane.setLayout(new MigLayout("insets 0, gap 0"));
 
         buildTabs();
-
         APPLICATION_HEADER = new ApplicationHeader(TABS);
 
         contentPane.add(APPLICATION_HEADER, "growx, dock north");
@@ -276,21 +253,32 @@ public final class MainFrame {
      * Build the Tab Structure based on advertising mode and Windows
      */
     private void buildTabs() {
-        TABS.put(GUIMediator.Tabs.SEARCH, new SearchDownloadTab());
-        TABS.put(Tabs.TRANSFERS, new TransfersTab(getBTDownloadMediator()));
-        TABS.put(GUIMediator.Tabs.LIBRARY, new LibraryTab(getLibraryMediator()));
+        SearchTab searchTab = new SearchTab();
+        TransfersTab transfersTab = new TransfersTab(getBTDownloadMediator());
+        LibraryTab libraryTab = new LibraryTab(getLibraryMediator());
+
+        // keep references to the tab objects.
+        TABS.put(Tabs.SEARCH, searchTab);
+        TABS.put(Tabs.TRANSFERS, transfersTab);
+        TABS.put(Tabs.LIBRARY, libraryTab);
+
+        SearchTransfersTab searchTransfers = new SearchTransfersTab(searchTab, transfersTab);
+        TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
 
         TABBED_PANE.setPreferredSize(new Dimension(10000, 10000));
+        addTabs(UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue());
+        TABBED_PANE.setRequestFocusEnabled(false);
+    }
 
-        // add all tabs initially....
-        for (GUIMediator.Tabs tab : GUIMediator.Tabs.values()) {
-            Tab t = TABS.get(tab);
-            if (t != null && t.getComponent() != null) {
-                this.addTab(t);
+    private void addTabs(boolean useSearchTransfersSplitView) {
+        TABBED_PANE.removeAll();
+        updateEnabledTabs(useSearchTransfersSplitView);
+        for (Tabs tabEnum : Tabs.values()) {
+            final Tab tab = TABS.get(tabEnum);
+            if (tabEnum.isEnabled() && tab != null && tab.getComponent() != null) {
+                addTab(tab);
             }
         }
-
-        TABBED_PANE.setRequestFocusEnabled(false);
     }
 
     /**
@@ -305,13 +293,23 @@ public final class MainFrame {
     }
 
     /**
+     * @param useSearchTransfersSplitView true if you want the old split style.
+     */
+    private void updateEnabledTabs(boolean useSearchTransfersSplitView) {
+        TABBED_PANE.removeAll();
+        Tabs.SEARCH.setEnabled(!useSearchTransfersSplitView);
+        Tabs.TRANSFERS.setEnabled(!useSearchTransfersSplitView);
+        Tabs.SEARCH_TRANSFERS.setEnabled(useSearchTransfersSplitView);
+        Tabs.LIBRARY.setEnabled(true);
+    }
+
+    /**
      * Sets the selected index in the wrapped <tt>JTabbedPane</tt>.
      *
-     * @param index the tab index to select
+     * @param tab index to select
      */
     public final void setSelectedTab(GUIMediator.Tabs tab) {
         CardLayout cl = (CardLayout) (TABBED_PANE.getLayout());
-
         Tab t = TABS.get(tab);
         cl.show(TABBED_PANE, t.getTitle());
         APPLICATION_HEADER.selectTab(t);
@@ -321,7 +319,7 @@ public final class MainFrame {
      * Sets the x,y location as well as the height and width of the main
      * application <tt>Frame</tt>.
      */
-    private final void setFrameDimensions() {
+    private void setFrameDimensions() {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         GraphicsConfiguration gc = gd.getDefaultConfiguration();
@@ -329,8 +327,8 @@ public final class MainFrame {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        int locX = 0;
-        int locY = 0;
+        int locX;
+        int locY;
 
         int appWidth = Math.min(screenSize.width - insets.left - insets.right, ApplicationSettings.APP_WIDTH.getValue());
         int appHeight = Math.min(screenSize.height - insets.top - insets.bottom, ApplicationSettings.APP_HEIGHT.getValue());
@@ -359,7 +357,7 @@ public final class MainFrame {
         FRAME.setLocation(locX, locY);
         FRAME.setSize(new Dimension(appWidth, appHeight));
         FRAME.getContentPane().setSize(new Dimension(appWidth, appHeight));
-        ((JComponent) FRAME.getContentPane()).setPreferredSize(new Dimension(appWidth, appHeight));
+        FRAME.getContentPane().setPreferredSize(new Dimension(appWidth, appHeight));
 
         //re-maximize if we shutdown while maximized.
         if (ApplicationSettings.MAXIMIZE_WINDOW.getValue() && Toolkit.getDefaultToolkit().isFrameStateSupported(Frame.MAXIMIZED_BOTH)) {
@@ -444,7 +442,7 @@ public final class MainFrame {
     }
 
     public void resizeSearchTransferDivider(int newLocation) {
-        SearchDownloadTab searchTab = (SearchDownloadTab) TABS.get(GUIMediator.Tabs.SEARCH);
+        SearchTransfersTab searchTab = (SearchTransfersTab) TABS.get(Tabs.SEARCH_TRANSFERS);
         searchTab.setDividerLocation(newLocation);
     }
 }

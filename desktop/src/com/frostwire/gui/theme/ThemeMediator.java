@@ -19,7 +19,7 @@
 package com.frostwire.gui.theme;
 
 import com.apple.laf.AquaFonts;
-import com.frostwire.gui.tabs.SearchDownloadTab;
+import com.frostwire.gui.tabs.SearchTab;
 import com.frostwire.logging.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIMediator.Tabs;
@@ -278,7 +278,7 @@ public final class ThemeMediator {
         if (e.getSource() instanceof Component) {
             Window eventParentWindow = SwingUtilities.getWindowAncestor((Component) e.getSource());
             if (GUIMediator.getAppFrame().equals(eventParentWindow)) {
-                SearchDownloadTab searchTab = (SearchDownloadTab) GUIMediator.instance().getTab(Tabs.SEARCH);
+                SearchTab searchTab = (SearchTab) GUIMediator.instance().getTab(Tabs.SEARCH);
                 if (searchTab.getComponent().isVisible()) {
                     SearchMediator.getSearchResultDisplayer().closeCurrentTab();
                 }

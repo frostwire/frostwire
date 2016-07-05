@@ -187,7 +187,10 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             if (sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult) {
                 searchResult.download(true);
                 UXStats.instance().log(UXAction.SEARCH_RESULT_DETAIL_VIEW);
-                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
+
+                if (sr instanceof ArchiveorgTorrentSearchResult) {
+                    GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
+                }
             }
         }
     }

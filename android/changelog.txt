@@ -1,10 +1,35 @@
-FrostWire 1.7.4 - MAY/24/2016
+FrostWire 1.7.6 - JUN/29/2016
+ - Fixes YT search issues
+ - New jlibtorrent 1.1.0.35
+ - Fixes bug where torrent picker dialog would keep reappearing
+ - Improves shutdown and ad display logic
+ - Crash fixes
+ - applovin 6.2.4
+
+FrostWire 1.7.5 - JUN/14/2016
+ - Power saving improvements in notifications and screen refreshing
+ - (Plus-only) Fixes bug on update dialog where buttons would
+   disappear if too many bullets were shown
+ - Shutdown improvements
+ - Dialog fixes
+ - Crash fixes
+ - New jlibtorrent 1.1.0.34
+ - jlibtorrent: fixed logging bug related to add_torrent_params::flags
+ - jlibtorrent: fixed crash on invalid input in http_parser
+ - jlibtorrent: early resume data reset when fatal_disk_error
+ - jlibtorrent: revert handshake round-trip optimization
+ - Eztv search improvements
+ - Http client initialization improvements
+
+
+FrostWire 1.7.4 - JUN/02/2016
+ - Greatly improved first seed connectivity. Share magnets!
  - Issues saving to SD card on multiple devices fixed.
  - New 'Seed' action available on 'My files'. Create and seed
    a torrent of a file or many in one touch.
  - New handpicked file selection on .torrent downloads.
  - Search improvements and refactors.
- - New jlibtorrent 1.1.0.29
+ - New jlibtorrent 1.1.0.31
  - Re-engineering and simplification of transfers architecture.
  - Fixes bug where a playlist could not be created out of the
    'More by artist' song list.
@@ -16,7 +41,8 @@ FrostWire 1.7.4 - MAY/24/2016
  - Dialogs make over. All dialogs have uniform look and re-appear on device rotation.
  - Fixes issue with playlist song drag-n-drop reordering. Thanks @grzesiekrzaca!
  - Improved shutdown.
- - Fixes Torlock search.
+ - Fixes Torlock search. 
+ - EZTV no longer returns irrelevant results.
  - New Search Engine: TorrentDownloads.me
 
 FrostWire 1.7.3 - APR/15/2016

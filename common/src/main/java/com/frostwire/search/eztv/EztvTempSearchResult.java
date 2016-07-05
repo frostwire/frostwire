@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import com.frostwire.search.CrawlableSearchResult;
  * @author gubatron
  * @author aldenml
  */
-public class EztvTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
+public final class EztvTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
     private final String itemId;
     private final String detailsUrl;

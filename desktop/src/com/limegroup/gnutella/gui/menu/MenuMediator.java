@@ -15,11 +15,10 @@
 
 package com.limegroup.gnutella.gui.menu;
 
-import javax.swing.JMenuBar;
-import javax.swing.JPopupMenu;
-
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+
+import javax.swing.*;
 
 /**
  * This class acts as a mediator among all of the various items of the 
@@ -68,7 +67,7 @@ public final class MenuMediator {
      * Constant handle to the single <tt>ViewMenu</tt> instance for
      * the application.
      */
-    private final Menu VIEW_MENU = new ViewMenu("VIEW");
+    private final Menu VIEW_MENU = new ViewMenu();
 
     /**
      * Singleton accessor method for obtaining the <tt>MenuMediator</tt>

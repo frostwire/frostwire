@@ -701,7 +701,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         Border border = BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(), BorderFactory.createMatteBorder(0, 1, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
         sp.setBorder(border);
         sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        Dimension d = new Dimension(230, 70000);
+        Dimension d = new Dimension(250, 70000);
         sp.setPreferredSize(d);
         sp.setMaximumSize(d);
 

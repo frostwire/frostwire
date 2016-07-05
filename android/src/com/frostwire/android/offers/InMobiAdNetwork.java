@@ -16,14 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.android.gui.adnetworks;
+package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.logging.Logger;
-import com.frostwire.util.Ref;
 import com.inmobi.ads.InMobiInterstitial;
 import com.inmobi.sdk.InMobiSdk;
 
@@ -35,8 +34,11 @@ public class InMobiAdNetwork implements AdNetwork {
     private InMobiInterstitial inmobiInterstitial;
     private boolean started = false;
     private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150l;
+    private final boolean DEBUG_MODE;
 
-    public InMobiAdNetwork() {}
+    public InMobiAdNetwork(boolean debugMode) {
+        DEBUG_MODE = debugMode;
+    }
 
     public void initialize(final Activity activity) {
         if (!enabled()) {
@@ -45,24 +47,21 @@ public class InMobiAdNetwork implements AdNetwork {
         }
 
         if (!started) {
-            Offers.THREAD_POOL.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        // this initialize call is very expensive, this is why we should be invoked in a thread.
-                        LOG.info("InMobi.initialize()...");
-                        InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
-                        //InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
-                        LOG.info("InMobi.initialized.");
-                        started = true;
-                        LOG.info("Load InmobiInterstitial.");
-                        loadNewInterstitial(activity);
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                        started = false;
-                    }
+            try {
+                // this initialize call is very expensive, this is why we should be invoked in a thread.
+                LOG.info("InMobi.initialize()...");
+                InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
+                if (DEBUG_MODE) {
+                    InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
                 }
-            });
+                LOG.info("InMobi.initialized.");
+                started = true;
+                LOG.info("Load InmobiInterstitial.");
+                loadNewInterstitial(activity);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                started = false;
+            }
         }
     }
 
@@ -71,6 +70,10 @@ public class InMobiAdNetwork implements AdNetwork {
     }
 
     public boolean enabled() {
+        if (DEBUG_MODE) {
+            return true;
+        }
+
         ConfigurationManager config;
         boolean isInMobiEnabled = false;
         try {
@@ -93,14 +96,9 @@ public class InMobiAdNetwork implements AdNetwork {
         inmobiListener.dismissActivityAfterwards(dismissActivityAfterward);
 
         if (inmobiInterstitial.isReady()) {
+//            LOG.info("inmobiInterstitial.isReady()");
             try {
                 inmobiInterstitial.show();
-
-                if (Ref.alive(activityWeakReference)) {
-                    loadNewInterstitial(activityWeakReference.get());
-                }
-
-                LOG.info("InMobi Interstitial shown.");
                 return true;
             } catch (Throwable e) {
                 LOG.error("InMobi Interstitial failed on .show()!", e);
@@ -127,8 +125,9 @@ public class InMobiAdNetwork implements AdNetwork {
                 try {
                     inmobiListener = new InMobiListener(activity);
                     inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
-                    inmobiInterstitial.load();;
+                    inmobiInterstitial.load();
                 } catch (Throwable t) {
+                    LOG.warn("InmobiAdNetwork.loadInterstitial() failed", t);
                     // don't crash, keep going.
                     // possible android.util.AndroidRuntimeException: android.content.pm.PackageManager$NameNotFoundException: com.google.android.webview
                 }

@@ -1516,7 +1516,9 @@ public final class MusicUtils {
                 }
             }
             c.close();
-            UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
+            UIUtils.broadcastAction(context,
+                    Constants.ACTION_FILE_ADDED_OR_REMOVED,
+                    new UIUtils.IntentByteExtra(Constants.EXTRA_REFRESH_FILE_TYPE, Constants.FILE_TYPE_AUDIO));
         }
 
         if (showNotification) {

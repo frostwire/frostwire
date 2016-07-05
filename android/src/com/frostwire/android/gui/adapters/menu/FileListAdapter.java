@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.android.gui.adapters;
+package com.frostwire.android.gui.adapters.menu;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -36,8 +36,8 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.adapters.FileListAdapter.FileDescriptorItem;
-import com.frostwire.android.gui.adapters.menu.*;
+import com.frostwire.bittorrent.MagnetUriBuilder;
+import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
@@ -157,7 +157,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                         R.drawable.contextmenu_icon_magnet,
                         R.string.transfers_context_menu_copy_magnet,
                         R.string.transfers_context_menu_copy_magnet_copied,
-                        new MagnetUriBuilder(fd.filePath)
+                        new MagnetUriBuilder(fd.filePath).getMagnet()
                 ));
 
                 items.add(new CopyToClipboardMenuAction(context,
@@ -488,26 +488,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return false;
     }
 
-    private static final class MagnetUriBuilder {
 
-        private final String torrentFilePath;
-
-        MagnetUriBuilder(String torrentFilePath) {
-            this.torrentFilePath = torrentFilePath;
-        }
-
-        @Override
-        public String toString() {
-            if (this.torrentFilePath != null) {
-                try {
-                    return new TorrentInfo(new File(this.torrentFilePath)).makeMagnetUri();
-                } catch (Throwable e) {
-                    LOG.warn("Error trying to get magnet", e);
-                }
-            }
-            return super.toString();
-        }
-    }
 
     private static final class InfoHashBuilder {
 

@@ -156,7 +156,9 @@ public class VPNStatusDetailActivity extends AbstractActivity {
         }
 
         startActivity(newIntent);
-        super.onBackPressed();
+        try {
+            super.onBackPressed();
+        } catch (Throwable ignored) {}
     }
 
     // Let's minimize the use of anonymous classes $1, $2 for every listener out there. DRY principle is the prime coding directive.

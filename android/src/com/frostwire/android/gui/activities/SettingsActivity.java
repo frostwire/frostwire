@@ -121,8 +121,7 @@ public class SettingsActivity extends PreferenceActivity {
         setupClearIndex();
         setupSearchEngines();
         setupUXStatsOption();
-        setupBuyNoAds();
-        setupAbout();
+        setupStore();
     }
 
     private void setupTorrentOptions() {
@@ -408,29 +407,6 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
-    private void setupBuyNoAds() {
-        /*
-        Preference p = findPreference("frostwire.prefs.offers.buy_no_ads");
-        final PlayStore store = PlayStore.getInstance();
-        if (!store.showAds()) { // this if is intentional
-            p.setEnabled(false);
-        } else {
-            p.setEnabled(true);
-        }
-        p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                store.buyNoAds(SettingsActivity.this);
-                return true;
-            }
-        });*/
-    }
-
-    private void setupAbout() {
-        Preference p = findPreference(Constants.PREF_KEY_SHOW_ABOUT);
-        p.setIntent(new Intent(this, AboutActivity.class));
-    }
-
     private void setupStorageOption() {
         // intentional repetition of preference value here
         String kitkatKey = "frostwire.prefs.storage.path";
@@ -463,6 +439,14 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
+    private void setupStore() {
+        Preference p = findPreference("frostwire.prefs.offers.buy_no_ads");
+        if (p != null && !Constants.IS_STORE_ENABLE) {
+            PreferenceScreen s = getPreferenceScreen();
+            s.removePreference(p);
+        }
+    }
+
     @Override
     public void startActivity(Intent intent) {
         if (intent != null && StoragePicker.ACTION_OPEN_DOCUMENT_TREE.equals(intent.getAction())) {
@@ -474,13 +458,6 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        PlayStore store = PlayStore.getInstance();
-        if (store.handleActivityResult(requestCode, resultCode, data)) {
-            store.refresh();
-            setupBuyNoAds();
-            return;
-        }
-
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
         } else {

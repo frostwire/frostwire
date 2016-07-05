@@ -54,7 +54,6 @@ public class MainApplication extends Application {
         super.onCreate();
 
         try {
-
             PlayStore.getInstance().initialize(this); // as early as possible
 
             ignoreHardwareMenu();
@@ -120,7 +119,7 @@ public class MainApplication extends Application {
         ctx.torrentsDir = paths.torrents();
         ctx.dataDir = paths.data();
         ctx.interfaces = "0.0.0.0:0,[::]:0";
-        ctx.retries = 10;
+        ctx.retries = 0;
         ctx.optimizeMemory = true;
 
         BTEngine.ctx = ctx;
@@ -133,7 +132,7 @@ public class MainApplication extends Application {
         } else {
             // just make sure it's started otherwise.
             // (we could be coming back from a crash on an unstable state)
-            dht.start();
+            //dht.start();
         }
     }
 

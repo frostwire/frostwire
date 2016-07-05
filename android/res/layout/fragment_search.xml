@@ -46,7 +46,7 @@
             frostwire:rich_notification_number_of_action_links="2"
             frostwire:rich_notification_action_links_horizontal_margin="14"
             android:layout_width="match_parent"
-            android:layout_height="75sp"
+            android:layout_height="wrap_content"
             android:visibility="gone"
             />
 

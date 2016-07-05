@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ import com.frostwire.regex.Pattern;
  * @author aldenml
  *
  */
-public interface RegexSearchPerformer<T extends SearchResult> extends SearchPerformer {
+interface RegexSearchPerformer<T extends SearchResult> extends SearchPerformer {
 
-    public Pattern getPattern();
+    Pattern getPattern();
 
-    public T fromMatcher(SearchMatcher matcher);
+    T fromMatcher(SearchMatcher matcher);
 }

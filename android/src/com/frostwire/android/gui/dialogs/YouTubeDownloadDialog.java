@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.adnetworks.Offers;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
@@ -109,7 +109,9 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         List<SearchResult> result = new ArrayList<>();
         for (SearchResult sr : listData) {
             String format = extractFormat(sr.getDisplayName());
-            if (format.startsWith("AAC") || format.startsWith("MP3")) {
+            if (format.startsWith("AAC") ||
+                format.startsWith("MP3") ||
+                format.startsWith("H263 MP3")) {
                 continue;
             }
             result.add(sr);
