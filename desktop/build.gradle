@@ -31,7 +31,7 @@ repositories {
 
 dependencies {
     compile 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
-    compile 'com.h2database:h2:1.4.191'
+    compile 'com.h2database:h2:1.4.192'
     compile 'org.apache.lucene:lucene-core:3.6.2'
     compile 'net.jthink:jaudiotagger:2.2.5'
     compile 'com.frostwire:jlibtorrent:1.1.0.35'
