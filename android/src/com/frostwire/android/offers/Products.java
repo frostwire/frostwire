@@ -69,12 +69,14 @@ public final class Products {
         private final String price;
         private final String currency;
         private final boolean purchased;
+        private final long purchaseTime;
         private final boolean available;
 
         public ProductBase(String sku, boolean subscription,
                            String title, String description,
                            String price, String currency,
-                           boolean purchased, boolean available) {
+                           boolean purchased, long purchaseTime,
+                           boolean available) {
             this.sku = sku;
             this.subscription = subscription;
             this.title = title;
@@ -82,6 +84,7 @@ public final class Products {
             this.price = price;
             this.currency = currency;
             this.purchased = purchased;
+            this.purchaseTime = purchaseTime;
             this.available = available;
         }
 
@@ -118,6 +121,11 @@ public final class Products {
         @Override
         public boolean purchased() {
             return purchased;
+        }
+
+        @Override
+        public long purchaseTime() {
+            return purchaseTime;
         }
 
         @Override

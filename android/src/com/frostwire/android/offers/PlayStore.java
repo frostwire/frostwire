@@ -319,7 +319,7 @@ public final class PlayStore extends StoreBase {
         final long purchaseTime = purchased ? p.getPurchaseTime() : 0;
 
         return new Products.ProductBase(sku, subscription, title,
-                description, price, currency, purchased, available) {
+                description, price, currency, purchased, purchaseTime, available) {
 
             @Override
             public boolean enable(String feature) {

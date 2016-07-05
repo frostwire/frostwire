@@ -60,6 +60,15 @@ public interface Product {
     boolean purchased();
 
     /**
+     * Purchase time, this value only have meaning if the method
+     * {@link #purchased()} returns true, and represents the number
+     * of milliseconds since January 1, 1970 00:00:00 UTC.
+     *
+     * @return
+     */
+    long purchaseTime();
+
+    /**
      * The product is available for purchase.
      * <p>
      * For example, a subscription is always available while a
