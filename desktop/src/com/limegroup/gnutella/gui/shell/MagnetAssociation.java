@@ -8,14 +8,12 @@ public class MagnetAssociation implements ShellAssociation {
 	private static final String MAGNET_PROTOCOL = "Magnet Protocol";
 	
 	private final ShellAssociation protocol, handler;
-	
+
 	public MagnetAssociation(String program, String executable) {
-		protocol = new WindowsProtocolShellAssociation(executable,
-				MAGNET_EXTENTION,
-				MAGNET_PROTOCOL);
-		handler = new WindowsMagnetHandlerAssociation(program, executable);
+		protocol = new WindowsProtocolShellAssociation(executable, MAGNET_EXTENTION, MAGNET_PROTOCOL);
+		handler  = new WindowsMagnetHandlerAssociation(program, executable);
 	}
-	
+
 	public boolean isAvailable() {
 		return protocol.isAvailable();
 	}
