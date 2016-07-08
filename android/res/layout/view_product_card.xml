@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:background="@color/body_background_white"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+<!-- TODO: @marcelinkaaa please add custom android:background attribute here using shapes so we can have rounded borders.
+     See view_rich_notification.xml and rich_notification_border.xml as a refresher guide.
+     My guess is that we should have 2 different border xml files, one round and gray
+     for the unselected state, and then he highlighted one. Perhaps it can be done with a single
+     .xml
+     When this object is clicked/focused, its default handler will probably try to change the background
+     drawable asset.
+
+     TODO: @marcelinkaaa please replace hardcoded styles for proper styles wherever they belong in the
+     resources.
+-->
+    <TextView android:id="@+id/view_product_card_title_bold_portion"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/dummy_title_bold"
+              android:textStyle="bold"
+              android:textColor="@color/black"/>
+
+    <TextView android:id="@+id/view_product_card_title_normal_portion"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/dummy_title"
+              android:textStyle="bold"
+              android:layout_alignParentTop="true" android:layout_toRightOf="@+id/view_product_card_title_bold_portion"
+              android:layout_marginLeft="16dp"/>
+
+    <TextView android:id="@+id/view_product_card_hint_button"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/dummy_hint"
+              android:textStyle="bold"
+              android:layout_alignParentTop="true"
+              android:layout_alignParentRight="true"/>
+
+    <TextView android:id="@+id/view_product_card_price"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/dummy_price"
+              android:textStyle="bold"
+              android:layout_marginTop="15dp"
+              android:layout_below="@+id/view_product_card_title_bold_portion" android:layout_alignParentLeft="true"/>
+
+    <TextView android:id="@+id/view_product_card_description"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/dummy_content_description"
+              android:textStyle="bold"
+              android:layout_marginTop="25dp" android:layout_below="@+id/view_product_card_price"
+              android:layout_alignParentLeft="true"/>
+</RelativeLayout>
