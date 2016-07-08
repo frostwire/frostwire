@@ -162,7 +162,7 @@ frostwire (6.1.4) stable; urgency=high
   * Considerably faster search source processing (new regex engine).
   * Fixes YouTube search.
 	
- -- FrostWire Team <contact@frostwire.com>  Aug, 14 Jul 2015 16:15:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Sun, 14 Aug 2015 16:15:00 -0500
 
 frostwire (6.1.3) stable; urgency=high
   * libtorrent/jlibtorrent core update.
