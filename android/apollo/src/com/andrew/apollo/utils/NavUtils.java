@@ -18,16 +18,10 @@ import android.content.Intent;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.provider.MediaStore;
-
 import com.andrew.apollo.Config;
-import com.frostwire.android.R;
-import com.andrew.apollo.model.Album;
-import com.andrew.apollo.ui.activities.AudioPlayerActivity;
-import com.andrew.apollo.ui.activities.HomeActivity;
-import com.andrew.apollo.ui.activities.ProfileActivity;
-import com.andrew.apollo.ui.activities.SearchActivity;
-import com.andrew.apollo.ui.activities.SettingsActivity;
+import com.andrew.apollo.ui.activities.*;
 import com.devspark.appmsg.AppMsg;
+import com.frostwire.android.R;
 
 /**
  * Various navigation helpers.
