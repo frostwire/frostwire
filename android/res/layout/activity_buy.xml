@@ -24,6 +24,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
+              android:background="@color/basic_gray_light"
               >
     <com.frostwire.android.gui.views.ProductCardView
             android:id="@+id/activity_buy_product_card_30_days"
@@ -65,7 +66,7 @@
     <Button android:id="@+id/activity_buy_button_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/buy_no_ads"
+            android:text="@string/remove_ads"
             android:visibility="visible"
     />
     <Button android:id="@+id/activity_buy_button_2"
@@ -91,6 +92,6 @@
     <Button android:id="@+id/activity_buy_button_6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/buy_no_ads"
+            android:text="@string/remove_ads"
             android:visibility="gone"/>
 </LinearLayout>

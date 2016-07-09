@@ -50,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/basic_grey_light">
+        android:background="@color/basic_gray_light">
 
         <CheckBox
             android:id="@+id/dialog_confirm_list_select_all_checkbox"
