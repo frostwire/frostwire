@@ -21,10 +21,12 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
@@ -34,6 +36,10 @@ import com.frostwire.android.offers.Products;
  * @author aldenml
  */
 public class BuyActivity extends AbstractActivity {
+
+    private ProductCardView card30days;
+    private ProductCardView card1year;
+    private ProductCardView card6months;
 
     public BuyActivity() {
         super(R.layout.activity_buy);
@@ -46,6 +52,15 @@ public class BuyActivity extends AbstractActivity {
             getActionBar().setDisplayHomeAsUpEnabled(true);
             getActionBar().setIcon(android.R.color.transparent);
         }
+
+        card30days = findView(R.id.activity_buy_product_card_30_days);
+        card1year = findView(R.id.activity_buy_product_card_1_year);
+        card6months = findView(R.id.activity_buy_product_card_6_months);
+
+        View.OnTouchListener cardTouchListener = createCardTouchListener();
+        card30days.setOnTouchListener(cardTouchListener);
+        card1year.setOnTouchListener(cardTouchListener);
+        card6months.setOnTouchListener(cardTouchListener);
 
         Product p;
         p = PlayStore.getInstance().product(Products.INAPP_DISABLE_ADS_1_MONTH_SKU);
@@ -60,6 +75,49 @@ public class BuyActivity extends AbstractActivity {
         setupButton(R.id.activity_buy_button_5, p);
         p = PlayStore.getInstance().product(Products.SUBS_DISABLE_ADS_1_YEAR_SKU);
         setupButton(R.id.activity_buy_button_6, p);
+    }
+
+    void on30DaysCardTouched() {
+        card30days.setSelected(true);
+        card1year.setSelected(false);
+        card6months.setSelected(false);
+    }
+
+    void on1YearCardTouched() {
+        card30days.setSelected(false);
+        card1year.setSelected(true);
+        card6months.setSelected(false);
+    }
+
+    void on6MonthsCardTouched() {
+        card30days.setSelected(false);
+        card1year.setSelected(false);
+        card6months.setSelected(true);
+    }
+
+    private View.OnTouchListener createCardTouchListener() {
+        return new ProductCardViewOnTouchListener();
+    }
+
+    private class ProductCardViewOnTouchListener implements View.OnTouchListener {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (v instanceof ProductCardView) {
+                int id = v.getId();
+                switch (id) {
+                    case R.id.activity_buy_product_card_30_days:
+                        BuyActivity.this.on30DaysCardTouched();
+                        break;
+                    case R.id.activity_buy_product_card_1_year:
+                        BuyActivity.this.on1YearCardTouched();
+                        break;
+                    case R.id.activity_buy_product_card_6_months:
+                        BuyActivity.this.on6MonthsCardTouched();
+                        break;
+                }
+            }
+            return false;
+        }
     }
 
     @Override

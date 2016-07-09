@@ -26,6 +26,7 @@
         <attr name="product_card_description" format="string"/>
         <attr name="product_card_hint_button_caption" format="string"/>
         <attr name="product_card_hint_button_visible" format="boolean"/>
+        <attr name="product_card_selected" format="boolean"/>
     </declare-styleable>
 
 	<declare-styleable name="RichNotification">
