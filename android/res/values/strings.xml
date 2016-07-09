@@ -608,6 +608,9 @@
     <string name="sd_permission_no_accessible_path">The path you selected in the SD is not accessible any more. Press OK to select again.</string>
     <string name="dummy_price">$ 99.99</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="thirty_days">thirty_days</string>
+    <string name="thirty_days">30 days</string>
+    <string name="one_year">1 year</string>
+    <string name="six_months">6 months</string>
     <string name="ad_free">Ad-free</string>
+    <string name="best_value">Best Value</string>
 </resources>

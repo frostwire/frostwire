@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <declare-styleable name="ProductCard">
+    <declare-styleable name="ProductCardView">
         <attr name="product_card_title_bold" format="string"/>
         <attr name="product_card_title_normal" format="string"/>
         <attr name="product_card_price" format="string"/>

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.frostwire.android.R;
+import com.frostwire.logging.Logger;
 
 /**
  * Created on 7/7/16.
@@ -15,8 +16,9 @@ import com.frostwire.android.R;
  * @author aldenml
  *
  */
-public class ProductCard extends RelativeLayout {
-
+public class ProductCardView extends RelativeLayout {
+    @SuppressWarnings("unused")
+    private static Logger LOGGER = Logger.getLogger(ProductCardView.class);
     private final String titleBold;
     private final String titleNormal;
     private final String price;
@@ -24,20 +26,23 @@ public class ProductCard extends RelativeLayout {
     private final String hintButtonCaption;
     private final boolean hintButtonVisible;
 
-    public ProductCard(Context context, AttributeSet attrs) {
+    public ProductCardView(Context context, AttributeSet attrs) {
         super(context, attrs);
         if (isInEditMode()) {
-            titleBold = titleNormal = price = description = hintButtonCaption = null;
+            titleBold = "[Title Bold]";
+            titleNormal = "[dummy title]";
+            price = "$0.99";
+            description = hintButtonCaption = null;
             hintButtonVisible = false;
             return;
         }
-        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.RichNotification);
-        titleBold = attributes.getString(R.styleable.ProductCard_product_card_title_bold);
-        titleNormal = attributes.getString(R.styleable.ProductCard_product_card_title_normal);
-        price = attributes.getString(R.styleable.ProductCard_product_card_price);
-        description = attributes.getString(R.styleable.ProductCard_product_card_description);
-        hintButtonVisible = attributes.getBoolean(R.styleable.ProductCard_product_card_hint_button_visible, false);
-        hintButtonCaption = attributes.getString(R.styleable.ProductCard_product_card_hint_button_caption);
+        TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ProductCardView, 0, 0);
+        titleBold = attributes.getString(R.styleable.ProductCardView_product_card_title_bold);
+        titleNormal = attributes.getString(R.styleable.ProductCardView_product_card_title_normal);
+        price = attributes.getString(R.styleable.ProductCardView_product_card_price);
+        description = attributes.getString(R.styleable.ProductCardView_product_card_description);
+        hintButtonVisible = attributes.getBoolean(R.styleable.ProductCardView_product_card_hint_button_visible, false);
+        hintButtonCaption = attributes.getString(R.styleable.ProductCardView_product_card_hint_button_caption);
         attributes.recycle();
     }
 
