@@ -26,11 +26,11 @@ public class ProductCard extends RelativeLayout {
 
     public ProductCard(Context context, AttributeSet attrs) {
         super(context, attrs);
-        /**if (isInEditMode()) {
+        if (isInEditMode()) {
             titleBold = titleNormal = price = description = hintButtonCaption = null;
             hintButtonVisible = false;
             return;
-        }*/
+        }
         TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.RichNotification);
         titleBold = attributes.getString(R.styleable.ProductCard_product_card_title_bold);
         titleNormal = attributes.getString(R.styleable.ProductCard_product_card_title_normal);
@@ -49,26 +49,11 @@ public class ProductCard extends RelativeLayout {
     }
 
     private void initComponents() {
-        initTextViews(
-            new int[] {
-                R.id.view_product_card_title_bold_portion,
-                R.id.view_product_card_title_normal_portion,
-                R.id.view_product_card_price,
-                R.id.view_product_card_description
-            },
-            new String[] {
-                titleBold,
-                titleNormal,
-                price,
-                description
-        });
+        initTextView(R.id.view_product_card_title_bold_portion, titleBold);
+        initTextView(R.id.view_product_card_title_normal_portion, titleNormal);
+        initTextView(R.id.view_product_card_price, price);
+        initTextView(R.id.view_product_card_description, description);
         initTextView(R.id.view_product_card_hint_button, hintButtonCaption, hintButtonVisible);
-    }
-
-    private void initTextViews(int[] ids, String[] values) {
-        for (int i=0; i < ids.length; i++) {
-            initTextView(ids[i],values[i]);
-        }
     }
 
     private void initTextView(int id, String value) {
