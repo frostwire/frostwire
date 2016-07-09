@@ -2,9 +2,6 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -67,28 +64,12 @@ public class ProductCardView extends LinearLayout {
      */
     public void setSelected(boolean selected) {
         super.setSelected(selected);
-        LOGGER.info("setSelected("+selected+")");
         setBackground(selected ? R.drawable.product_card_background_selected : R.drawable.product_card_background);
     }
 
     private void setBackground(int id) {
-        final int sdk = android.os.Build.VERSION.SDK_INT;
-        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            setBackgroundDrawable(getDrawable(id));
-        } else {
-            setBackground(getDrawable(id));
-        }
+        getChildAt(0).setBackgroundResource(id);
     }
-
-    private Drawable getDrawable(int id) {
-        final int version = Build.VERSION.SDK_INT;
-        if (version >= 21) {
-            return ContextCompat.getDrawable(getContext(), id);
-        } else {
-            return getContext().getResources().getDrawable(id);
-        }
-    }
-
 
     private void initComponents() {
         initTextView(R.id.view_product_card_title_bold_portion, titleBold);
