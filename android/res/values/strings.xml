@@ -103,6 +103,7 @@
     <string name="home">Home</string>
     <string name="about">About</string>
     <string name="remove_ads">Remove Ads</string>
+    <string name="remove_ads_description">Support FrostWire\'s future and enjoy an free experience</string>
     <string name="send_to_third_party">Send/Upload</string>
     <string name="send_file_using">Send file using</string>
     <string name="my_files">My Files</string>
