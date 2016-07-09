@@ -56,6 +56,7 @@ public class ProductCard extends RelativeLayout {
         initTextView(R.id.view_product_card_hint_button, hintButtonCaption, hintButtonVisible);
     }
 
+
     private void initTextView(int id, String value) {
         initTextView(id, value, true);
     }

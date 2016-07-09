@@ -25,6 +25,17 @@
               android:layout_height="match_parent"
               android:orientation="vertical"
               android:background="@color/body_background_white">
+    <com.frostwire.android.gui.views.ProductCard
+            android:id="@+id/activity_buy_product_card_1_month"
+            android:layout_width="match_parent"
+            android:layout_height="85dp"
+            android:visibility="visible"
+            frostwire:product_card_title_bold="@string/thirty_days"
+            frostwire:product_card_title_normal="@string/ad_free"
+            frostwire:product_card_price="$0.99"
+            frostwire:product_card_description="@string/dummy_content_description"
+            frostwire:product_card_hint_button_visible="false"/>
+
 
     <com.frostwire.android.gui.views.ProductCard
             android:id="@+id/activity_buy_product_card_1_month"
@@ -70,5 +81,4 @@
             android:layout_height="wrap_content"
             android:text="@string/buy_no_ads"
             android:visibility="gone"/>
-
 </LinearLayout>

@@ -24,33 +24,24 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:background="@drawable/product_card_border">
-<!-- TODO: @marcelinkaaa please add custom android:background attribute here using shapes so we can have rounded borders.
-     See view_rich_notification.xml and rich_notification_border.xml as a refresher guide.
-     My guess is that we should have 2 different border xml files, one round and gray
-     for the unselected state, and then he highlighted one. Perhaps it can be done with a single
-     .xml
-     When this object is clicked/focused, its default handler will probably try to change the background
-     drawable asset.
 
-     TODO: @marcelinkaaa please replace hardcoded styles for proper styles wherever they belong in the
-     resources.
--->
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
+                  android:orientation="horizontal"
                   android:layout_margin="12dp">
+
         <TextView android:id="@+id/view_product_card_title_bold_portion"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:text="@string/dummy_title_bold"
-                  android:textStyle="bold"
-                  android:textColor="@color/black"/>
+                  style="@style/BuyNoAdsCardTitle.Bold"/>
 
         <TextView android:id="@+id/view_product_card_title_normal_portion"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:text="@string/dummy_title"
-                  android:layout_marginLeft="5dp"/>
-
+                  android:layout_marginLeft="5dp"
+                  style="@style/BuyNoAdsCardTitle"/>
         <!-- separating filler -->
         <View android:layout_width="0dp"
               android:layout_height="0dp"
@@ -61,22 +52,31 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:text="@string/dummy_hint"
-                  android:textSize="@dimen/text_x_small" android:background="@drawable/product_card_hint_button_border"
-                  android:textColor="@color/basic_white" android:paddingTop="5dp"
-                  android:paddingBottom="5dp" android:paddingLeft="10dp" android:paddingRight="10dp"/>
+                  android:textSize="@dimen/text_x_small"
+                  android:background="@drawable/product_card_hint_button_border"
+                  android:textColor="@color/basic_white"
+                  android:paddingLeft="10dp"
+                  android:paddingRight="10dp"
+                  android:paddingBottom="4dp"
+                  android:paddingTop="4dp"
+                  style="@style/BuyNoAdsCardHint"/>
     </LinearLayout>
 
     <TextView android:id="@+id/view_product_card_price"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="@string/dummy_price"
-              android:textStyle="bold" android:layout_marginLeft="12dp" android:textSize="@dimen/text_size_large"/>
+              android:textStyle="bold"
+              android:layout_marginLeft="12dp"
+              android:textSize="@dimen/text_size_large"
+              style="@style/BuyNoAdsCardPrice"/>
 
     <TextView android:id="@+id/view_product_card_description"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="@string/dummy_content_description"
               android:textStyle="bold"
-              android:layout_margin="12dp" android:textSize="@dimen/text_x_small"
-              android:textColor="@color/frostwire_gray_explanation_text"/>
+              android:layout_margin="12dp"
+              android:textSize="@dimen/text_x_small"
+              style="@style/BuyNoAdsCardDescription"/>
 </LinearLayout>
