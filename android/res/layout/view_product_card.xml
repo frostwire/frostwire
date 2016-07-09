@@ -23,7 +23,7 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:background="@drawable/product_card_border">
+              android:background="@drawable/product_card_background">
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
                   android:layout_height="wrap_content"
                   android:text="@string/dummy_hint"
                   android:textSize="@dimen/text_x_small"
-                  android:background="@drawable/product_card_hint_button_border"
+                  android:background="@drawable/product_card_hint_button_background"
                   android:textColor="@color/basic_white"
                   android:paddingLeft="10dp"
                   android:paddingRight="10dp"

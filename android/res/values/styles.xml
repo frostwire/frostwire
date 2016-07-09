@@ -466,7 +466,7 @@
     </style>
     <style name="BuyNoAdsCardHint">
         <item name="android:textColor">@color/basic_white</item>
-        <item name="android:background">@drawable/product_card_hint_button_border</item>
+        <item name="android:background">@drawable/product_card_hint_button_background</item>
         <item name="android:textSize">@dimen/text_x_small</item>
     </style>
 
