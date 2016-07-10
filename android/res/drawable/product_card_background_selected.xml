@@ -20,22 +20,14 @@
  */
 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:left="4dp" android:top="4dp" android:right="0dp">
-    <!-- gets painted in the background, the shadow illusion -->
-    <shape xmlns:android="http://schemas.android.com/apk/res/android"
-           android:shape="rectangle">
-        <solid android:color="#aaaaaa"/>
-        <corners android:radius="4dp"/>
-    </shape>
-</item>
 
 <item android:left="1dp" android:top="1dp" android:right="1dp" android:bottom="1dp">
     <!-- gets painted last, on top. a smaller rectangle, filled in white with a blue stroke and rounded corners. -->
     <shape xmlns:android="http://schemas.android.com/apk/res/android"
            android:shape="rectangle">
         <solid android:color="@color/basic_white"/>
-        <stroke android:width="3dp" android:color="@color/app_highlight_text"/>
-        <corners android:radius="4dp"/>
+        <stroke android:width="3dp" android:color="@color/basic_blue_highlight"/>
+        <corners android:radius="3dp"/>
     </shape>
 </item>
 </layer-list>
