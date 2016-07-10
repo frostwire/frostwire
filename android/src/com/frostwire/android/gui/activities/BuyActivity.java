@@ -1,5 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (marcelinkaaa)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,25 +22,31 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
+import com.frostwire.android.gui.views.ProductPaymentOptionsView;
+import com.frostwire.android.gui.views.ProductPaymentOptionsViewListener;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
+import com.frostwire.logging.Logger;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class BuyActivity extends AbstractActivity {
+public class BuyActivity extends AbstractActivity implements ProductPaymentOptionsViewListener {
 
+    private Logger LOGGER = Logger.getLogger(BuyActivity.class);
     private ProductCardView card30days;
     private ProductCardView card1year;
     private ProductCardView card6months;
+    private ProductCardView selectedProductCard;
+    private ProductPaymentOptionsView paymentOptionsView;
 
     public BuyActivity() {
         super(R.layout.activity_buy);
@@ -53,55 +60,89 @@ public class BuyActivity extends AbstractActivity {
             getActionBar().setIcon(android.R.color.transparent);
         }
 
+        initProductCards();
+        initPaymentOptionsView();
+    }
+
+    private void initProductCards() {
         card30days = findView(R.id.activity_buy_product_card_30_days);
         card1year = findView(R.id.activity_buy_product_card_1_year);
         card6months = findView(R.id.activity_buy_product_card_6_months);
 
-        View.OnTouchListener cardTouchListener = createCardTouchListener();
-        card30days.setOnTouchListener(cardTouchListener);
-        card1year.setOnTouchListener(cardTouchListener);
-        card6months.setOnTouchListener(cardTouchListener);
+        final PlayStore store = PlayStore.getInstance();
+        initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, Products.INAPP_DISABLE_ADS_1_MONTH_SKU);
+        initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
+        initProductCard(card6months, store, Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, Products.INAPP_DISABLE_ADS_6_MONTHS_SKU);
 
-        Product p;
-        p = PlayStore.getInstance().product(Products.INAPP_DISABLE_ADS_1_MONTH_SKU);
-        setupButton(R.id.activity_buy_button_1, p);
-        p = PlayStore.getInstance().product(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU);
-        setupButton(R.id.activity_buy_button_2, p);
-        p = PlayStore.getInstance().product(Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
-        setupButton(R.id.activity_buy_button_3, p);
-        p = PlayStore.getInstance().product(Products.SUBS_DISABLE_ADS_1_MONTH_SKU);
-        setupButton(R.id.activity_buy_button_4, p);
-        p = PlayStore.getInstance().product(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU);
-        setupButton(R.id.activity_buy_button_5, p);
-        p = PlayStore.getInstance().product(Products.SUBS_DISABLE_ADS_1_YEAR_SKU);
-        setupButton(R.id.activity_buy_button_6, p);
+        View.OnClickListener cardClickListener = createCardClickListener();
+        card30days.setOnClickListener(cardClickListener);
+        card1year.setOnClickListener(cardClickListener);
+        card6months.setOnClickListener(cardClickListener);
+
+        selectedProductCard = card1year;
     }
 
-    void on30DaysCardTouched() {
-        card30days.setSelected(true);
-        card1year.setSelected(false);
-        card6months.setSelected(false);
+    private void initPaymentOptionsView() {
+        paymentOptionsView = findView(R.id.activity_buy_product_payment_options_view);
+        paymentOptionsView.setBuyButtonsListener(this);
     }
 
-    void on1YearCardTouched() {
-        card30days.setSelected(false);
-        card1year.setSelected(true);
-        card6months.setSelected(false);
+    private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String inappSKU) {
+        if (card != null && store != null && subsSKU != null && inappSKU != null) {
+            card.setTag(R.id.SUBS_PRODUCT_KEY, store.product(subsSKU));
+            card.setTag(R.id.INAPP_PRODUCT_KEY, store.product(inappSKU));
+        }
     }
 
-    void on6MonthsCardTouched() {
-        card30days.setSelected(false);
-        card1year.setSelected(false);
-        card6months.setSelected(true);
+    private void on30DaysCardTouched() {
+        selectedProductCard = card30days;
     }
 
-    private View.OnTouchListener createCardTouchListener() {
-        return new ProductCardViewOnTouchListener();
+    private void on1YearCardTouched() {
+        selectedProductCard = card1year;
     }
 
-    private class ProductCardViewOnTouchListener implements View.OnTouchListener {
+    private void on6MonthsCardTouched() {
+        selectedProductCard = card6months;
+    }
+
+    private void highlightSelectedCard() {
+        card30days.setSelected(selectedProductCard == card30days);
+        card1year.setSelected(selectedProductCard == card1year);
+        card6months.setSelected(selectedProductCard == card6months);
+    }
+
+    private void showPaymentOptionsBelowSelectedCard() {
+        final ViewGroup contentView = (ViewGroup) findViewById(android.R.id.content);
+        final ViewGroup layout = (ViewGroup) contentView.getChildAt(0);
+        if (layout != null) {
+            layout.removeView(paymentOptionsView);
+            int selectedCardIndex = layout.indexOfChild(selectedProductCard);
+            layout.addView(paymentOptionsView, selectedCardIndex+1);
+        }
+    }
+
+    private View.OnClickListener createCardClickListener() {
+        return new ProductCardViewOnClickListener();
+    }
+
+    @Override
+    public void onBuyAutomaticRenewal() {
+        //TODO
+        Product p = (Product) selectedProductCard.getTag(R.id.SUBS_PRODUCT_KEY);
+        LOGGER.info("onBuyAutomaticRenewal: " + p.currency() + " " + p.price() + " " + p.title());
+    }
+
+    @Override
+    public void onBuyOneTime() {
+        //TODO
+        Product p = (Product) selectedProductCard.getTag(R.id.INAPP_PRODUCT_KEY);
+        LOGGER.info("onBuyOneTime: " + p.currency() + " " + p.price() + " " + p.title());
+    }
+
+    private class ProductCardViewOnClickListener implements View.OnClickListener {
         @Override
-        public boolean onTouch(View v, MotionEvent event) {
+        public void onClick(View v) {
             if (v instanceof ProductCardView) {
                 int id = v.getId();
                 switch (id) {
@@ -114,9 +155,13 @@ public class BuyActivity extends AbstractActivity {
                     case R.id.activity_buy_product_card_6_months:
                         BuyActivity.this.on6MonthsCardTouched();
                         break;
+                    default:
+                        BuyActivity.this.on1YearCardTouched();
+                        break;
                 }
+                highlightSelectedCard();
+                showPaymentOptionsBelowSelectedCard();
             }
-            return false;
         }
     }
 

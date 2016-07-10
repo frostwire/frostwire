@@ -167,6 +167,8 @@ public final class PlayStore extends StoreBase {
             helper.queryInventoryAsync(true, items, subs, inventoryListener);
         } catch (IabHelper.IabAsyncInProgressException e) {
             LOG.error("Error querying inventory. Another async operation in progress.", e);
+        } catch (Throwable t) {
+            LOG.error("Error querying inventory.",  t);
         }
     }
 

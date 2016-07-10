@@ -477,6 +477,15 @@
         <item name="android:paddingRight">10dp</item>
         <item name="android:layout_marginBottom">4dp</item>
     </style>
+    <style name="BuyNoAdsSelectOptionBelowTitle" parent="BuyNoAdsCardTitle.Bold"/>
+    <style name="BuyNoAdsBuyButton" parent="BuyNoAdsCardHint">
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
+    </style>
 
     <!-- Wizard Activity -->
     <style name="WizardTitle">
