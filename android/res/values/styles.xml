@@ -450,15 +450,17 @@
     <!-- Buy No Ads Activity -->
     <style name="BuyNoAdsCardTitle">
         <item name="android:textColor">@color/app_text_primary</item>
-        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:textSize">@dimen/text_large</item>
     </style>
     <style name="BuyNoAdsCardTitle.Bold">
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
     <style name="BuyNoAdsCardPrice">
         <item name="android:textColor">@color/app_text_primary</item>
-        <item name="android:textSize">@dimen/text_large</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_x_large</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">8dp</item>
     </style>
     <style name="BuyNoAdsCardDescription">
         <item name="android:textColor">@color/app_text_secondary_dark</item>
@@ -468,6 +470,11 @@
         <item name="android:textColor">@color/basic_white</item>
         <item name="android:background">@drawable/product_card_hint_button_background</item>
         <item name="android:textSize">@dimen/text_x_small</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:paddingTop">1dp</item>
+        <item name="android:paddingBottom">1dp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
     </style>
 
     <!-- Wizard Activity -->

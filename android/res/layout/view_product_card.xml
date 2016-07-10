@@ -23,12 +23,15 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:background="@drawable/product_card_background">
+              android:background="@drawable/product_card_background"
+              android:padding="12dp"
+              android:layout_marginLeft="8dp"
+              android:layout_marginRight="8dp"
+              android:layout_marginTop="10dp">
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:layout_margin="12dp">
+                  android:orientation="horizontal">
 
         <TextView android:id="@+id/view_product_card_title_bold_portion"
                   android:layout_width="wrap_content"
@@ -52,13 +55,7 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:text="@string/dummy_hint"
-                  android:textSize="@dimen/text_x_small"
                   android:background="@drawable/product_card_hint_button_background"
-                  android:textColor="@color/basic_white"
-                  android:paddingLeft="10dp"
-                  android:paddingRight="10dp"
-                  android:paddingBottom="4dp"
-                  android:paddingTop="4dp"
                   style="@style/BuyNoAdsCardHint"/>
     </LinearLayout>
 
@@ -66,17 +63,11 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="@string/dummy_price"
-              android:textStyle="bold"
-              android:layout_marginLeft="12dp"
-              android:textSize="@dimen/text_size_large"
               style="@style/BuyNoAdsCardPrice"/>
 
     <TextView android:id="@+id/view_product_card_description"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="@string/dummy_content_description"
-              android:textStyle="bold"
-              android:layout_margin="12dp"
-              android:textSize="@dimen/text_x_small"
               style="@style/BuyNoAdsCardDescription"/>
 </LinearLayout>

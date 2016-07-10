@@ -30,6 +30,7 @@
     <color name="basic_gray_light">#c8efefef</color>
     <color name="basic_gray_medium">#d1dddddd</color>
     <color name="basic_gray_dark">#76dddddd</color>
+    <color name="basic_gray_dark_solid">#c9c9c9</color>
 
     <!-- General app colors -->
     <color name="app_background">@color/basic_blue</color>
