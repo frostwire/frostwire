@@ -25,6 +25,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
@@ -74,6 +76,12 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         initActionBar();
         initProductCards(getLastSelectedCardViewId(savedInstanceState));
         initPaymentOptionsView(getLastPaymentOptionsViewVisibility(savedInstanceState));
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        scrollToSelectedCard();
     }
 
     private void initActionBar() {
@@ -176,9 +184,20 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void highlightSelectedCard() {
+        if (selectedProductCard == null) {
+            return;
+        }
         card30days.setSelected(selectedProductCard == card30days);
         card1year.setSelected(selectedProductCard == card1year);
         card6months.setSelected(selectedProductCard == card6months);
+    }
+
+    private void scrollToSelectedCard() {
+        ScrollView scrollView =  (ScrollView) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        LinearLayout linearLayout = (LinearLayout) scrollView.getChildAt(0);
+        int index = linearLayout.indexOfChild(selectedProductCard);
+        int cardHeight = selectedProductCard.getHeight() + selectedProductCard.getPaddingTop();
+        scrollView.scrollTo(0, index * cardHeight);
     }
 
     private void showPaymentOptionsBelowSelectedCard() {
@@ -219,6 +238,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 }
                 highlightSelectedCard();
                 showPaymentOptionsBelowSelectedCard();
+                scrollToSelectedCard();
             }
         }
     }
