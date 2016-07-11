@@ -41,6 +41,9 @@ import com.frostwire.logging.Logger;
  */
 public class BuyActivity extends AbstractActivity implements ProductPaymentOptionsViewListener {
 
+    private final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
+    private final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
+
     private Logger LOGGER = Logger.getLogger(BuyActivity.class);
     private ProductCardView card30days;
     private ProductCardView card1year;
@@ -53,18 +56,35 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     @Override
+    public void onBuyAutomaticRenewal() {
+        //TODO
+        Product p = (Product) selectedProductCard.getTag(R.id.SUBS_PRODUCT_KEY);
+        LOGGER.info("onBuyAutomaticRenewal: " + p.currency() + " " + p.price() + " " + p.title());
+    }
+
+    @Override
+    public void onBuyOneTime() {
+        //TODO
+        Product p = (Product) selectedProductCard.getTag(R.id.INAPP_PRODUCT_KEY);
+        LOGGER.info("onBuyOneTime: " + p.currency() + " " + p.price() + " " + p.title());
+    }
+
+    @Override
     protected void initComponents(Bundle savedInstanceState) {
+        initActionBar();
+        initProductCards(getLastSelectedCardViewId(savedInstanceState));
+        initPaymentOptionsView(getLastPaymentOptionsViewVisibility(savedInstanceState));
+    }
+
+    private void initActionBar() {
         ActionBar bar = getActionBar();
         if (bar != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
             getActionBar().setIcon(android.R.color.transparent);
         }
-
-        initProductCards();
-        initPaymentOptionsView();
     }
 
-    private void initProductCards() {
+    private void initProductCards(int lastSelectedCardViewId) {
         card30days = findView(R.id.activity_buy_product_card_30_days);
         card1year = findView(R.id.activity_buy_product_card_1_year);
         card6months = findView(R.id.activity_buy_product_card_6_months);
@@ -79,12 +99,33 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         card1year.setOnClickListener(cardClickListener);
         card6months.setOnClickListener(cardClickListener);
 
-        selectedProductCard = card1year;
+        initLastCardSelection(lastSelectedCardViewId);
     }
 
-    private void initPaymentOptionsView() {
+    private void initLastCardSelection(int lastSelectedCardViewId) {
+        switch (lastSelectedCardViewId)  {
+            case R.id.activity_buy_product_card_30_days:
+                selectedProductCard = card30days;
+                break;
+            case R.id.activity_buy_product_card_6_months:
+                selectedProductCard = card6months;
+                break;
+            case R.id.activity_buy_product_card_1_year:
+            default:
+                selectedProductCard = card1year;
+                break;
+        }
+        highlightSelectedCard();
+    }
+
+    private void initPaymentOptionsView(int paymentOptionsVisibility) {
         paymentOptionsView = findView(R.id.activity_buy_product_payment_options_view);
         paymentOptionsView.setBuyButtonsListener(this);
+        paymentOptionsView.setVisibility(paymentOptionsVisibility);
+
+        if (paymentOptionsVisibility == View.VISIBLE) {
+            showPaymentOptionsBelowSelectedCard();
+        }
     }
 
     private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String inappSKU) {
@@ -92,6 +133,33 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
             card.setTag(R.id.SUBS_PRODUCT_KEY, store.product(subsSKU));
             card.setTag(R.id.INAPP_PRODUCT_KEY, store.product(inappSKU));
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(LAST_SELECTED_CARD_ID_KEY, selectedProductCard.getId());
+        outState.putInt(PAYMENT_OPTIONS_VISIBILITY_KEY, paymentOptionsView.getVisibility());
+        super.onSaveInstanceState(outState);
+    }
+
+    private int getLastSelectedCardViewId(Bundle savedInstanceState) {
+        int lastSelectedCardViewId = -1;
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(LAST_SELECTED_CARD_ID_KEY)) {
+                lastSelectedCardViewId = savedInstanceState.getInt(LAST_SELECTED_CARD_ID_KEY);
+            }
+        }
+        return lastSelectedCardViewId;
+    }
+
+    private int getLastPaymentOptionsViewVisibility(Bundle savedInstanceState) {
+        int paymentOptionsVisibility = View.GONE;
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(PAYMENT_OPTIONS_VISIBILITY_KEY)) {
+                paymentOptionsVisibility = savedInstanceState.getInt(PAYMENT_OPTIONS_VISIBILITY_KEY);
+            }
+        }
+        return paymentOptionsVisibility;
     }
 
     private void on30DaysCardTouched() {
@@ -127,20 +195,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     private View.OnClickListener createCardClickListener() {
         return new ProductCardViewOnClickListener();
-    }
-
-    @Override
-    public void onBuyAutomaticRenewal() {
-        //TODO
-        Product p = (Product) selectedProductCard.getTag(R.id.SUBS_PRODUCT_KEY);
-        LOGGER.info("onBuyAutomaticRenewal: " + p.currency() + " " + p.price() + " " + p.title());
-    }
-
-    @Override
-    public void onBuyOneTime() {
-        //TODO
-        Product p = (Product) selectedProductCard.getTag(R.id.INAPP_PRODUCT_KEY);
-        LOGGER.info("onBuyOneTime: " + p.currency() + " " + p.price() + " " + p.title());
     }
 
     private class ProductCardViewOnClickListener implements View.OnClickListener {
