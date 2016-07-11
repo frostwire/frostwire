@@ -114,11 +114,14 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     private void showPaymentOptionsBelowSelectedCard() {
         final ViewGroup contentView = (ViewGroup) findViewById(android.R.id.content);
-        final ViewGroup layout = (ViewGroup) contentView.getChildAt(0);
+        final ViewGroup scrollView = (ViewGroup) contentView.getChildAt(0);
+        final ViewGroup layout = (ViewGroup) scrollView.getChildAt(0);
         if (layout != null) {
+            // TODO: Animation portion
             layout.removeView(paymentOptionsView);
             int selectedCardIndex = layout.indexOfChild(selectedProductCard);
             layout.addView(paymentOptionsView, selectedCardIndex+1);
+            paymentOptionsView.setVisibility(View.VISIBLE);
         }
     }
 

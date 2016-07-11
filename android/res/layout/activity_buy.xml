@@ -19,6 +19,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:frostwire="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
@@ -52,7 +56,8 @@
     <com.frostwire.android.gui.views.ProductPaymentOptionsView
             android:id="@+id/activity_buy_product_payment_options_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
 
     <com.frostwire.android.gui.views.ProductCardView
             android:id="@+id/activity_buy_product_card_6_months"
@@ -64,37 +69,5 @@
             frostwire:product_card_price="$4.45"
             frostwire:product_card_description="@string/dummy_content_description"
             frostwire:product_card_hint_button_visible="false"/>
-
-
-    <Button android:id="@+id/activity_buy_button_1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/remove_ads"
-            android:visibility="visible"
-    />
-    <Button android:id="@+id/activity_buy_button_2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/remove_ads"
-            android:visibility="gone"/>
-    <Button android:id="@+id/activity_buy_button_3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/remove_ads"
-            android:visibility="gone"/>
-    <Button android:id="@+id/activity_buy_button_4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/remove_ads"
-            android:visibility="gone"/>
-    <Button android:id="@+id/activity_buy_button_5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/remove_ads"
-            android:visibility="gone"/>
-    <Button android:id="@+id/activity_buy_button_6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/remove_ads"
-            android:visibility="gone"/>
 </LinearLayout>
+</ScrollView>
