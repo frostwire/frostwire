@@ -132,6 +132,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         if (card != null && store != null && subsSKU != null && inappSKU != null) {
             card.setTag(R.id.SUBS_PRODUCT_KEY, store.product(subsSKU));
             card.setTag(R.id.INAPP_PRODUCT_KEY, store.product(inappSKU));
+            card.updateData(store.product(subsSKU));
         }
     }
 

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.frostwire.android.R;
+import com.frostwire.android.offers.Product;
 import com.frostwire.logging.Logger;
 
 /**
@@ -21,8 +22,8 @@ public class ProductCardView extends LinearLayout {
     private static Logger LOGGER = Logger.getLogger(ProductCardView.class);
     private final String titleBold;
     private final String titleNormal;
-    private final String price;
-    private final String description;
+    private String price;
+    private String description;
     private final String hintButtonCaption;
     private final boolean selected;
     private final boolean hintButtonVisible;
@@ -47,6 +48,19 @@ public class ProductCardView extends LinearLayout {
         hintButtonVisible = attributes.getBoolean(R.styleable.ProductCardView_product_card_hint_button_visible, false);
         hintButtonCaption = attributes.getString(R.styleable.ProductCardView_product_card_hint_button_caption);
         attributes.recycle();
+    }
+
+    public void updateData(Product p) {
+        String currency = p.currency();
+        String productPrice = p.price();
+        String productDescription = p.description();
+        if (currency != null && productPrice != null) {
+            price = currency + " " + productPrice;
+        }
+        if (productDescription != null) {
+            description = productDescription;
+        }
+        initComponents();
     }
 
     @Override
