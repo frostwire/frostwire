@@ -23,7 +23,6 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import com.frostwire.android.R;
 
 /**
@@ -46,11 +45,11 @@ public class ProductPaymentOptionsView extends LinearLayout {
         View.inflate(getContext(), R.layout.view_product_payment_options, this);
         BuyButtonClickListener clickListener = new BuyButtonClickListener();
 
-        final TextView automaticRenewalBuyButton = (TextView) findViewById(R.id.view_product_payment_options_buy_automatic_renewal_button);
-        automaticRenewalBuyButton.setOnClickListener(clickListener);
+        final LinearLayout automaticRenewalLayout = (LinearLayout) findViewById(R.id.view_product_payment_options_buy_automatic_renewal_layout);
+        automaticRenewalLayout.setOnClickListener(clickListener);
 
-        final TextView oneTimeBuyButton = (TextView) findViewById(R.id.view_product_payment_options_buy_one_time_button);
-        oneTimeBuyButton.setOnClickListener(clickListener);
+        final LinearLayout oneTimeBuyLayout = (LinearLayout) findViewById(R.id.view_product_payment_options_buy_one_time_layout);
+        oneTimeBuyLayout.setOnClickListener(clickListener);
     }
 
     public void setBuyButtonsListener(ProductPaymentOptionsViewListener listener) {
@@ -62,10 +61,10 @@ public class ProductPaymentOptionsView extends LinearLayout {
         public void onClick(View v) {
             if (listener != null) {
                 switch (v.getId()) {
-                    case R.id.view_product_payment_options_buy_automatic_renewal_button:
+                    case R.id.view_product_payment_options_buy_automatic_renewal_layout:
                         listener.onBuyAutomaticRenewal();
                         break;
-                    case R.id.view_product_payment_options_buy_one_time_button:
+                    case R.id.view_product_payment_options_buy_one_time_layout:
                         listener.onBuyOneTime();
                         break;
                 }

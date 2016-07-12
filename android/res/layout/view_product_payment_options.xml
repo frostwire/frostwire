@@ -49,11 +49,13 @@
                   android:layout_gravity="center_vertical"
                   style="@style/BuyNoAdsBuyButton"/>
 
-        <LinearLayout android:layout_width="0dp"
+        <LinearLayout android:id="@+id/view_product_payment_options_buy_automatic_renewal_layout"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:orientation="vertical"
                       android:paddingLeft="20dp"
-                      android:layout_weight="1.0">
+                      android:layout_weight="1.0"
+                      android:clickable="true">
 
             <TextView android:id="@+id/view_product_payment_options_buy_automatic_renewal_text"
                       android:layout_width="wrap_content"
@@ -70,11 +72,13 @@
     </LinearLayout>
 
     <!-- One Time Purchase Option -->
-    <LinearLayout android:layout_width="match_parent"
+    <LinearLayout android:id="@+id/view_product_payment_options_buy_one_time_layout"
+                  android:layout_width="match_parent"
                   android:layout_height="0dp"
                   android:layout_marginTop="20dp"
                   android:orientation="horizontal"
-                  android:layout_weight="1">
+                  android:layout_weight="1"
+                  android:clickable="true">
 
         <TextView android:id="@+id/view_product_payment_options_buy_one_time_button"
                   android:layout_width="wrap_content"

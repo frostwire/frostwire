@@ -59,16 +59,23 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     @Override
     public void onBuyAutomaticRenewal() {
-        //TODO
-        Product p = (Product) selectedProductCard.getTag(R.id.SUBS_PRODUCT_KEY);
-        LOGGER.info("onBuyAutomaticRenewal: " + p.currency() + " " + p.price() + " " + p.title());
+        purchaseProduct(R.id.SUBS_PRODUCT_KEY);
     }
 
     @Override
     public void onBuyOneTime() {
-        //TODO
-        Product p = (Product) selectedProductCard.getTag(R.id.INAPP_PRODUCT_KEY);
-        LOGGER.info("onBuyOneTime: " + p.currency() + " " + p.price() + " " + p.title());
+        purchaseProduct(R.id.INAPP_PRODUCT_KEY);
+    }
+
+    private void purchaseProduct(int tagId) {
+        Product p = (Product) selectedProductCard.getTag(tagId);
+        if (p != null) {
+            try {
+                PlayStore.getInstance().purchase(BuyActivity.this, p);
+            } catch (Throwable t) {
+                LOGGER.error("Couldn't make product purchase.", t);
+            }
+        }
     }
 
     @Override
@@ -248,6 +255,13 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         PlayStore store = PlayStore.getInstance();
         if (store.handleActivityResult(requestCode, resultCode, data)) {
             store.refresh();
+
+            if (data != null &&
+                data.hasExtra("RESPONSE_CODE") &&
+                data.getIntExtra("RESPONSE_CODE",0) == 5) {
+                return;
+            }
+
             finish();
         }
     }
