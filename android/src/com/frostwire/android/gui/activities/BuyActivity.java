@@ -24,7 +24,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import com.frostwire.android.R;
@@ -52,6 +53,8 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private ProductCardView card6months;
     private ProductCardView selectedProductCard;
     private ProductPaymentOptionsView paymentOptionsView;
+    private Animation slideUpAnimation;
+    private Animation slideDownAnimation;
 
     public BuyActivity() {
         super(R.layout.activity_buy);
@@ -82,6 +85,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     protected void initComponents(Bundle savedInstanceState) {
         initActionBar();
         initProductCards(getLastSelectedCardViewId(savedInstanceState));
+        initAnimations();
         initPaymentOptionsView(getLastPaymentOptionsViewVisibility(savedInstanceState));
     }
 
@@ -97,6 +101,11 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
             getActionBar().setDisplayHomeAsUpEnabled(true);
             getActionBar().setIcon(android.R.color.transparent);
         }
+    }
+
+    private void initAnimations() {
+        slideUpAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+        slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
     }
 
     private void initProductCards(int lastSelectedCardViewId) {
@@ -212,11 +221,46 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         final ViewGroup scrollView = (ViewGroup) contentView.getChildAt(0);
         final ViewGroup layout = (ViewGroup) scrollView.getChildAt(0);
         if (layout != null) {
-            // TODO: Animation portion
-            layout.removeView(paymentOptionsView);
             int selectedCardIndex = layout.indexOfChild(selectedProductCard);
-            layout.addView(paymentOptionsView, selectedCardIndex+1);
-            paymentOptionsView.setVisibility(View.VISIBLE);
+            final int paymentOptionsViewIndex = layout.indexOfChild(paymentOptionsView);
+
+            if (paymentOptionsView.getVisibility() == View.VISIBLE) {
+                if (paymentOptionsViewIndex-1 == selectedCardIndex) {
+                    // no need to animate payment options on the same card
+                    // where it's already shown.
+                    return;
+                }
+
+                paymentOptionsView.clearAnimation();
+                paymentOptionsView.startAnimation(slideUpAnimation);
+
+                // I tried in numerous ways to use AnimationListeners
+                // but they did not work, it seems these APIs are broken.
+                // I even tried overriding the onAnimationEnd() method on
+                // the view. AnimationListeners will never be invoked
+                // not on the Animation object, not on the view, not on the
+                // Layout (ViewGroup), this is one of the suggested workaround
+                // if you need to do something right after an animation is done.
+                paymentOptionsView.postDelayed(new Runnable() {
+                                                   @Override
+                                                   public void run() {
+                                                       layout.removeView(paymentOptionsView);
+                                                       int selectedCardIndex = layout.indexOfChild(selectedProductCard);
+                                                       layout.addView(paymentOptionsView, selectedCardIndex + 1);
+                                                       paymentOptionsView.clearAnimation();
+                                                       paymentOptionsView.startAnimation(slideDownAnimation);
+                                                   }
+                                               },
+                        slideUpAnimation.getDuration() + 100);
+            } else {
+                // first time shown
+                layout.removeView(paymentOptionsView);
+                // gotta recalculate
+                selectedCardIndex = layout.indexOfChild(selectedProductCard);
+                layout.addView(paymentOptionsView, selectedCardIndex+1);
+                paymentOptionsView.setVisibility(View.VISIBLE);
+                paymentOptionsView.startAnimation(slideDownAnimation);
+            }
         }
     }
 
@@ -255,13 +299,12 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         PlayStore store = PlayStore.getInstance();
         if (store.handleActivityResult(requestCode, resultCode, data)) {
             store.refresh();
-
+            // user clicked outside of the PlayStore purchase dialog
             if (data != null &&
                 data.hasExtra("RESPONSE_CODE") &&
                 data.getIntExtra("RESPONSE_CODE",0) == 5) {
                 return;
             }
-
             finish();
         }
     }
@@ -274,28 +317,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void setupButton(int id, final Product p) {
-        Button b = findView(id);
-        if (p == null) {
-            b.setText("NA");
-            b.setEnabled(false);
-            return;
-        }
-
-        b.setText("title:" + p.title() + "\n" + "desc:" +
-                p.description() + "\n" + "price:" + p.price() + "purchased:" + p.purchased());
-        if (p.available()) {
-            b.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PlayStore.getInstance().purchase(BuyActivity.this, p);
-                }
-            });
-        } else {
-            b.setEnabled(false);
         }
     }
 }
