@@ -225,7 +225,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
             final int paymentOptionsViewIndex = layout.indexOfChild(paymentOptionsView);
 
             if (paymentOptionsView.getVisibility() == View.VISIBLE) {
-                if (paymentOptionsViewIndex-1 == selectedCardIndex) {
+                if (paymentOptionsViewIndex - 1 == selectedCardIndex) {
                     // no need to animate payment options on the same card
                     // where it's already shown.
                     return;
@@ -234,6 +234,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 paymentOptionsView.clearAnimation();
                 paymentOptionsView.startAnimation(slideUpAnimation);
 
+                // APOLOGIES FOR THE UGLY HACK BELOW.
                 // I tried in numerous ways to use AnimationListeners
                 // but they did not work, it seems these APIs are broken.
                 // I even tried overriding the onAnimationEnd() method on
@@ -241,27 +242,29 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 // not on the Animation object, not on the view, not on the
                 // Layout (ViewGroup), this is one of the suggested workaround
                 // if you need to do something right after an animation is done.
-                paymentOptionsView.postDelayed(new Runnable() {
-                                                   @Override
-                                                   public void run() {
-                                                       layout.removeView(paymentOptionsView);
-                                                       int selectedCardIndex = layout.indexOfChild(selectedProductCard);
-                                                       layout.addView(paymentOptionsView, selectedCardIndex + 1);
-                                                       paymentOptionsView.clearAnimation();
-                                                       paymentOptionsView.startAnimation(slideDownAnimation);
-                                                   }
-                                               },
+                // TL;DR; Android's AnimationListeners are broken. -gubatron.
+                paymentOptionsView.postDelayed(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                slideDownPaymentOptionsView(layout);
+                            }
+                        },
                         slideUpAnimation.getDuration() + 100);
             } else {
                 // first time shown
-                layout.removeView(paymentOptionsView);
-                // gotta recalculate
-                selectedCardIndex = layout.indexOfChild(selectedProductCard);
-                layout.addView(paymentOptionsView, selectedCardIndex+1);
-                paymentOptionsView.setVisibility(View.VISIBLE);
-                paymentOptionsView.startAnimation(slideDownAnimation);
+                slideDownPaymentOptionsView(layout);
             }
         }
+    }
+
+    private void slideDownPaymentOptionsView(final ViewGroup layout) {
+        paymentOptionsView.clearAnimation();
+        layout.removeView(paymentOptionsView);
+        int selectedCardIndex = layout.indexOfChild(selectedProductCard);
+        paymentOptionsView.setVisibility(View.VISIBLE);
+        layout.addView(paymentOptionsView, selectedCardIndex + 1);
+        paymentOptionsView.startAnimation(slideDownAnimation);
     }
 
     private View.OnClickListener createCardClickListener() {
