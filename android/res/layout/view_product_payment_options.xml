@@ -25,9 +25,9 @@
               android:layout_height="wrap_content"
               android:background="#e2e2e2"
               android:padding="12dp"
-              android:layout_marginLeft="8dp"
-              android:layout_marginRight="8dp"
-              android:layout_marginTop="10dp">
+              android:layout_marginLeft="3dp"
+              android:layout_marginRight="3dp"
+              android:layout_marginBottom="4dp">
 
     <TextView style="@style/BuyNoAdsSelectOptionBelowTitle"
               android:layout_width="wrap_content"
