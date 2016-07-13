@@ -306,6 +306,8 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
             if (data != null &&
                 data.hasExtra("RESPONSE_CODE") &&
                 data.getIntExtra("RESPONSE_CODE",0) == 5) {
+                paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.AutomaticRenewal);
+                paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.OneTimePurchase);
                 return;
             }
             finish();
