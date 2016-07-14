@@ -38,6 +38,8 @@ import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.logging.Logger;
 
+import java.util.Random;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -98,8 +100,19 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private void initActionBar() {
         ActionBar bar = getActionBar();
         if (bar != null) {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-            getActionBar().setIcon(android.R.color.transparent);
+            bar.setDisplayHomeAsUpEnabled(true);
+            bar.setIcon(android.R.color.transparent);
+            final String titlePrefix = getString(R.string.remove_ads);
+            int[] suffixes = { R.string.save_bandwidth,
+                               R.string.support_frostwire,
+                               R.string.support_free_software,
+                               R.string.cheaper_than_drinks,
+                               R.string.cheaper_than_lattes,
+                               R.string.cheaper_than_parking,
+                               R.string.keep_the_project_alive };
+            int suffixId = suffixes[new Random().nextInt(suffixes.length)];
+            final String titleSuffix = getString(suffixId);
+            bar.setTitle(titlePrefix + ". " + titleSuffix +".");
         }
     }
 
