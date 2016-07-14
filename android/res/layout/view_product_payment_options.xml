@@ -24,7 +24,10 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:background="@drawable/product_payment_options_background"
-              android:padding="12dp"
+              android:paddingTop="0dp"
+              android:paddingLeft="12dp"
+              android:paddingRight="12dp"
+              android:paddingBottom="12dp"
               android:layout_marginLeft="3dp"
               android:layout_marginRight="3dp"
               android:layout_marginBottom="4dp">
