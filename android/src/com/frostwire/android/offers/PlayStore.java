@@ -253,31 +253,30 @@ public final class PlayStore extends StoreBase {
         // build each product, one by one, not magic here intentionally
         Product product;
 
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_MONTH_SKU, INAPP_TYPE, inventory, 31);
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_MONTH_SKU, INAPP_TYPE, inventory, Products.getProductDurationInDays(Products.INAPP_DISABLE_ADS_1_MONTH_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 183);
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, Products.getProductDurationInDays(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 365);
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, Products.getProductDurationInDays(Products.INAPP_DISABLE_ADS_1_YEAR_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, SUBS_TYPE, inventory, 31);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, SUBS_TYPE, inventory,  Products.getProductDurationInDays(Products.SUBS_DISABLE_ADS_1_MONTH_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, SUBS_TYPE, inventory, 183);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, SUBS_TYPE, inventory,  Products.getProductDurationInDays(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, SUBS_TYPE, inventory, 365);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, SUBS_TYPE, inventory,  Products.getProductDurationInDays(Products.SUBS_DISABLE_ADS_1_YEAR_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-
         return m;
     }
 

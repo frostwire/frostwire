@@ -38,6 +38,11 @@ public final class Products {
     public static final String SUBS_DISABLE_ADS_6_MONTHS_SKU = getSKU("com.frostwire.subs.disable_ads.6_months");
     public static final String SUBS_DISABLE_ADS_1_YEAR_SKU = getSKU("com.frostwire.subs.disable_ads.1_year");
 
+    // inapp product duration in days
+    private static final int DISABLE_ADS_1_MONTH_DAYS = 31;
+    private static final int DISABLE_ADS_6_MONTHS_DAYS = 183;
+    private static final int DISABLE_ADS_1_YEAR_DAYS = 365;
+
     // features codes
     public static final String DISABLE_ADS_FEATURE = "DISABLE_ADS_FEATURE";
 
@@ -59,6 +64,24 @@ public final class Products {
 
     public static boolean disabledAds(Store store) {
         return store.enabled(DISABLE_ADS_FEATURE);
+    }
+
+    public static int getProductDurationInDays(String sku) {
+        int result = -1;
+        if (sku == null || sku.isEmpty()) {
+            return result;
+        }
+        if (INAPP_DISABLE_ADS_1_MONTH_SKU.equals(sku) ||
+                SUBS_DISABLE_ADS_1_MONTH_SKU.equals(sku)) {
+            result = DISABLE_ADS_1_MONTH_DAYS;
+        } else if (INAPP_DISABLE_ADS_6_MONTHS_SKU.equals(sku) ||
+                SUBS_DISABLE_ADS_6_MONTHS_SKU.equals(sku)) {
+            result = DISABLE_ADS_6_MONTHS_DAYS;
+        } else if (INAPP_DISABLE_ADS_1_YEAR_SKU.equals(sku) ||
+                SUBS_DISABLE_ADS_1_YEAR_SKU.equals(sku)) {
+            result = DISABLE_ADS_1_YEAR_DAYS;
+        }
+        return result;
     }
 
     private static String getSKU(String skuId) {

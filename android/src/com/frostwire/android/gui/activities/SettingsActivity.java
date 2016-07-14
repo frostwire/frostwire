@@ -54,6 +54,7 @@ import com.frostwire.android.gui.views.preference.SimpleActionPreference;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
+import com.frostwire.android.offers.Products;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.logging.Logger;
 import com.frostwire.uxstats.UXAction;
@@ -455,7 +456,20 @@ public class SettingsActivity extends PreferenceActivity {
             final Collection<Product> products = playStore.purchasedProducts();
             if (products != null && products.size() > 0) {
                 Product product = products.iterator().next();
-                p.setSummary(getString(R.string.current_plan) + ":" + product.description());
+                String daysLeft = "";
+                // if it's a one time purchase, show user how many days left she has.
+                if (!product.subscription() && product.purchased()) {
+                    int daysBought = Products.getProductDurationInDays(product.sku());
+                    if (daysBought > 0) {
+                        final int MILLISECONDS_IN_A_DAY = 86400;
+                        long timePassed = System.currentTimeMillis() - product.purchaseTime();
+                        int daysPassed = (int) timePassed / MILLISECONDS_IN_A_DAY;
+                        if (daysPassed > 0 && daysPassed < daysBought) {
+                            daysLeft = " (" + getString(R.string.days_left) + ": " + String.valueOf(daysBought - daysPassed) + ")";
+                        }
+                    }
+                }
+                p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
             }
         }
     }

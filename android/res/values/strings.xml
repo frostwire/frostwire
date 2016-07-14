@@ -622,4 +622,5 @@
     <string name="no_trial_period_included">No trial period included</string>
     <string name="error_connection_timed_out">Error: connection timed out/dropped. Try again.</string>
     <string name="current_plan">Current plan:</string>
+    <string name="days_left">days left</string>
 </resources>
