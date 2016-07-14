@@ -24,4 +24,8 @@
     <item name="selected_view" type="id"/>
     <item name="abstract_list_adapter_holder_tag_id" type="id"/>
 
+    <!-- BuyActivity Product Card keys for attaching products to cards with setTag(key, Object) -->
+    <item name="INAPP_PRODUCT_KEY" type="id"/>
+    <item name="SUBS_PRODUCT_KEY" type="id"/>
+
 </resources>
