@@ -102,7 +102,8 @@
     <string name="done">Done</string>
     <string name="home">Home</string>
     <string name="about">About</string>
-    <string name="buy_no_ads">BUY NO ADS</string>
+    <string name="remove_ads">Remove Ads</string>
+    <string name="remove_ads_description">Enjoy the ad-free experience, support FrostWire</string>
     <string name="send_to_third_party">Send/Upload</string>
     <string name="send_file_using">Send file using</string>
     <string name="my_files">My Files</string>
@@ -606,4 +607,19 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">The file could not be seeded. BitTorrent will remain disconnected.</string>
     <string name="fetching_torrent_ellipsis">Fetching torrent…</string>
     <string name="sd_permission_no_accessible_path">The path you selected in the SD is not accessible any more. Press OK to select again.</string>
+    <string name="dummy_price">$ 99.99</string>
+    <string name="dummy_title_bold">[Bold Title]</string>
+    <string name="thirty_days">30 days</string>
+    <string name="one_year">1 year</string>
+    <string name="six_months">6 months</string>
+    <string name="ad_free">Ad-free</string>
+    <string name="best_value">Best Value</string>
+    <string name="select_option_below">Select option below:</string>
+    <string name="buy_uppercase">BUY</string>
+    <string name="automatic_renewal">Automatic Renewal</string>
+    <string name="includes_3_day_free_trial">Includes 3 day free-trial. Recommended</string>
+    <string name="one_time_purchase">One Time Purchase</string>
+    <string name="no_trial_period_included">No trial period included</string>
+    <string name="error_connection_timed_out">Error: connection timed out/dropped. Try again.</string>
+    <string name="current_plan">Current plan:</string>
 </resources>

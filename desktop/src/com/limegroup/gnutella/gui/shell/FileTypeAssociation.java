@@ -12,18 +12,18 @@ import com.frostwire.util.filetypes.RegisterFailedException;
 
 
 public class FileTypeAssociation implements ShellAssociation {
-    
-    private static final Logger LOG = Logger.getLogger(FileTypeAssociation.class);
+
+	private static final Logger LOG = Logger.getLogger(FileTypeAssociation.class);
 
 	private static final AssociationService SERVICE = new AssociationService();
 	
 	private final String extention;
-    private final String mimeType;
-    private final String executable;
-    private final String verb;
-    
+	private final String mimeType;
+	private final String executable;
+	private final String verb;
+
 	private final Association association = new Association();
-	
+
 	public FileTypeAssociation(String extention, 
 			String mimeType, String executable, String verb, 
 			String description, String iconPath) {
@@ -40,8 +40,7 @@ public class FileTypeAssociation implements ShellAssociation {
 		if (iconPath != null) // don't chance passing null to jdic
 			association.setIconFileName(iconPath);
 	}
-	
-	
+
 	public boolean isAvailable() {
 	    try {
     		// if no association at all, then it is available

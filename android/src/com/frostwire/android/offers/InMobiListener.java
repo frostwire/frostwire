@@ -58,7 +58,7 @@ class InMobiListener implements InterstitialListener, InMobiInterstitial.Interst
     @Override
     public void onAdLoadFailed(final InMobiInterstitial imInterstitial, InMobiAdRequestStatus imErrorCode) {
         ready = false;
-        LOG.info("InMobiListener.onAdLoadFailed");
+        LOG.info("InMobiListener.onAdLoadFailed - errorCode: " + imErrorCode.getStatusCode() + " - " + imErrorCode.getMessage());
         reloadInterstitialLater(imInterstitial, INTERSTITIAL_RELOAD_WAIT_IN_SECS);
     }
 

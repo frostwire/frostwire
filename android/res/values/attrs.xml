@@ -19,6 +19,16 @@
  */
 -->
 <resources>
+    <declare-styleable name="ProductCardView">
+        <attr name="product_card_title_bold" format="string"/>
+        <attr name="product_card_title_normal" format="string"/>
+        <attr name="product_card_price" format="string"/>
+        <attr name="product_card_description" format="string"/>
+        <attr name="product_card_hint_button_caption" format="string"/>
+        <attr name="product_card_hint_button_visible" format="boolean"/>
+        <attr name="product_card_selected" format="boolean"/>
+    </declare-styleable>
+
 	<declare-styleable name="RichNotification">
 	    <attr name="rich_notification_icon" format="reference"/>
 	    <attr name="rich_notification_title" format="string"/>

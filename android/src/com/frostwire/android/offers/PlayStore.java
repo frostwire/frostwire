@@ -25,10 +25,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -167,6 +164,8 @@ public final class PlayStore extends StoreBase {
             helper.queryInventoryAsync(true, items, subs, inventoryListener);
         } catch (IabHelper.IabAsyncInProgressException e) {
             LOG.error("Error querying inventory. Another async operation in progress.", e);
+        } catch (Throwable t) {
+            LOG.error("Error querying inventory.",  t);
         }
     }
 
@@ -196,14 +195,27 @@ public final class PlayStore extends StoreBase {
     }
 
     @Override
-    public boolean enable(String code) {
+    public boolean enabled(String code) {
         if (BuildConfig.DEBUG) {
             if (lastSkuPurchased != null) {
                 return true;
             }
         }
 
-        return super.enable(code);
+        return super.enabled(code);
+    }
+
+    public Collection<Product> purchasedProducts() {
+        Collection<Product> allAvailableProducts = products().values();
+        Collection<Product> purchasedProducts  = new ArrayList<>();
+        final Iterator<Product> iterator = allAvailableProducts.iterator();
+        while (iterator.hasNext()) {
+            Product product = iterator.next();
+            if (product.enable(Products.DISABLE_ADS_FEATURE)) {
+                purchasedProducts.add(product);
+            }
+        }
+        return purchasedProducts;
     }
 
     public void dispose() {
@@ -319,7 +331,7 @@ public final class PlayStore extends StoreBase {
         final long purchaseTime = purchased ? p.getPurchaseTime() : 0;
 
         return new Products.ProductBase(sku, subscription, title,
-                description, price, currency, purchased, available) {
+                description, price, currency, purchased, purchaseTime, available) {
 
             @Override
             public boolean enable(String feature) {
@@ -329,7 +341,7 @@ public final class PlayStore extends StoreBase {
                 }
 
                 // if available, then the user does not have it, then
-                // the feature is not enable
+                // the feature is not enabled
                 if (available) {
                     return false;
                 }

@@ -34,6 +34,21 @@ public class Slide {
     /** Download the file via HTTP */
     public static final int DOWNLOAD_METHOD_HTTP = 2;
 
+    // FLAGS
+    public static final int POST_DOWNLOAD_UNZIP = 1;
+    public static final int POST_DOWNLOAD_DELETE_ZIP_FILE = 1 << 1;
+    public static final int POST_DOWNLOAD_EXECUTE = 1 << 2;
+    public static final int PREVIEW_AUDIO_USING_FWPLAYER = 1 << 3;
+    public static final int PREVIEW_AUDIO_USING_BROWSER = 1 << 4;
+    public static final int PREVIEW_VIDEO_USING_FWPLAYER = 1 << 5;
+    public static final int PREVIEW_VIDEO_USING_BROWSER = 1 << 6;
+    public static final int SHOW_AUDIO_PREVIEW_BUTTON = 1 << 7;
+    public static final int SHOW_VIDEO_PREVIEW_BUTTON = 1 << 8;
+    public static final int OPEN_CLICK_URL_ON_DOWNLOAD = 1 << 9;
+    public static final int SHOW_PREVIEW_BUTTONS_ON_THE_LEFT = 1 << 10;
+    public static final int IS_ADVERTISEMENT = 1 << 11;
+
+
     /**
      * url of image that will be displayed on this slide
      */

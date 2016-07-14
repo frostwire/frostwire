@@ -114,6 +114,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         TRANSFER_STATE_STRING_MAP.put(TransferState.DEMUXING, c.getString(R.string.transfer_status_demuxing));
         TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_DISK_FULL, c.getString(R.string.error_no_space_left_on_device));
         TRANSFER_STATE_STRING_MAP.put(TransferState.SCANNING, c.getString(R.string.scanning));
+        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_CONNECTION_TIMED_OUT, c.getString(R.string.error_connection_timed_out));
         TRANSFER_STATE_STRING_MAP.put(TransferState.UNKNOWN, "");
     }
 

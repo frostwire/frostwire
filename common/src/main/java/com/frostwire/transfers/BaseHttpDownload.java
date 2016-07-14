@@ -251,6 +251,11 @@ public abstract class BaseHttpDownload implements Transfer {
                 complete(TransferState.ERROR_DISK_FULL);
             }
 
+            if (e.getMessage() != null  && e.getMessage().contains("Connection timed out")) {
+                //javax.net.ssl.SSLException: Read error: ssl=0xd5ba0bc0: I/O error during system call, Connection timed out
+                complete(TransferState.ERROR_CONNECTION_TIMED_OUT);
+            }
+
             // TODO: research here for an actual difference between
             // no internet and no network
             if (Platforms.get().networkType() == Platform.NetworkType.NONE) {

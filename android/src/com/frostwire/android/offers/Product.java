@@ -17,8 +17,6 @@
 
 package com.frostwire.android.offers;
 
-import java.util.Date;
-
 /**
  * The product mirrors the stock in the store, this is intended
  * to have a static list of instances in the store (locally) to
@@ -62,6 +60,15 @@ public interface Product {
     boolean purchased();
 
     /**
+     * Purchase time, this value only have meaning if the method
+     * {@link #purchased()} returns true, and represents the number
+     * of milliseconds since January 1, 1970 00:00:00 UTC.
+     *
+     * @return
+     */
+    long purchaseTime();
+
+    /**
      * The product is available for purchase.
      * <p>
      * For example, a subscription is always available while a
@@ -74,7 +81,7 @@ public interface Product {
     boolean available();
 
     /**
-     * The product feature is enable at the moment.
+     * The product feature is enabled at the moment.
      *
      * @param feature
      * @return

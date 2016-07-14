@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Marcelina Knitter (@marcelinkaaa)
+ * Alden Torres (aldenml)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="#e2e2e2"
+              android:padding="12dp"
+              android:layout_marginLeft="3dp"
+              android:layout_marginRight="3dp"
+              android:layout_marginBottom="4dp">
+
+    <TextView style="@style/BuyNoAdsSelectOptionBelowTitle"
+              android:layout_width="wrap_content"
+              android:layout_height="0dp"
+              android:text="@string/select_option_below"
+              android:layout_weight="1"/>
+
+    <!-- Automatic Renewal Option -->
+    <LinearLayout android:id="@+id/view_product_payment_options_buy_automatic_renewal_layout"
+                  android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:layout_marginTop="20dp"
+                  android:orientation="horizontal"
+                  android:layout_weight="1" android:baselineAligned="false">
+        <RelativeLayout android:layout_width="0dp"
+                        android:layout_weight="0.3"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center">
+            <TextView android:id="@+id/view_product_payment_options_buy_automatic_renewal_button"
+                      style="@style/BuyNoAdsBuyButton"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/buy_uppercase"
+                      android:background="@drawable/product_card_hint_button_background"
+                      android:layout_gravity="center_vertical"
+                      android:visibility="visible"/>
+            <ProgressBar android:id="@+id/view_product_payment_options_progressbar_automatic_renewal"
+                         style="?android:attr/progressBarStyle"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_gravity="center"
+                         android:visibility="gone"/>
+        </RelativeLayout>
+
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:paddingLeft="20dp"
+                      android:layout_weight="0.7">
+            <TextView android:id="@+id/view_product_payment_options_buy_automatic_renewal_text"
+                      style="@style/BuyNoAdsCardTitle.Bold"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/automatic_renewal"/>
+
+            <TextView android:id="@+id/view_product_payment_options_buy_automatic_renewal_trial_remark"
+                      style="@style/BuyNoAdsCardDescription"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/includes_3_day_free_trial"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- One Time Purchase Option -->
+    <LinearLayout android:id="@+id/view_product_payment_options_buy_one_time_layout"
+                  android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:layout_marginTop="20dp"
+                  android:orientation="horizontal"
+                  android:layout_weight="1">
+        <RelativeLayout android:layout_width="0dp"
+                        android:layout_weight="0.3"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center">
+            <TextView android:id="@+id/view_product_payment_options_buy_one_time_button"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/buy_uppercase"
+                      android:background="@drawable/product_card_hint_button_background"
+                      android:layout_gravity="center_vertical"
+                      style="@style/BuyNoAdsBuyButton"/>
+            <ProgressBar android:id="@+id/view_product_payment_options_progressbar_one_time"
+                         style="?android:attr/progressBarStyle"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_gravity="center"
+                         android:visibility="gone"/>
+        </RelativeLayout>
+
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:paddingLeft="20dp"
+                      android:layout_weight="0.7"
+                      >
+            <TextView android:id="@+id/view_product_payment_options_buy_one_time_text"
+                      style="@style/BuyNoAdsCardTitle.Bold"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/one_time_purchase"/>
+
+            <TextView android:id="@+id/view_product_payment_options_buy_one_time_trial_remark"
+                      style="@style/BuyNoAdsCardDescription"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/no_trial_period_included"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

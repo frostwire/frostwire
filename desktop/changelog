@@ -1,3 +1,9 @@
+frostwire (6.3.3) stable; urgency=high
+  * Fixes freeze issue
+  * Fixes YT search issues
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 05 Jul 2016 13:39:05 -0500
+
 frostwire (6.3.2) stable; urgency=high
   * Fixes YT search issues
   * New jlibtorrent 1.1.0.35
@@ -156,7 +162,7 @@ frostwire (6.1.4) stable; urgency=high
   * Considerably faster search source processing (new regex engine).
   * Fixes YouTube search.
 	
- -- FrostWire Team <contact@frostwire.com>  Aug, 14 Jul 2015 16:15:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Sun, 14 Aug 2015 16:15:00 -0500
 
 frostwire (6.1.3) stable; urgency=high
   * libtorrent/jlibtorrent core update.
@@ -217,7 +223,7 @@ frostwire (6.0.8) stable; urgency=high
   * Misc fixes in Library functionality.
   * Crash fixes.
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 24 April 2015 04:44:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Fri, 24 Apr 2015 04:44:00 -0500
 
 frostwire (6.0.7) stable; urgency=high
   * New feature: Preview while you download.	
@@ -237,7 +243,7 @@ frostwire (6.0.7) stable; urgency=high
   * Upgraded frostwire-jlibtorrent to the latest code from libtorrent.
   * UX-improvement: A repeated search will honor active search engines.
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 08 April 2015 22:24:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Wed, 08 Apr 2015 22:24:00 -0500
 
 frostwire (6.0.6) stable; urgency=high
   * Fixes bug where default save location for torrents would not be accounted for.
@@ -251,7 +257,7 @@ frostwire (6.0.6) stable; urgency=high
     now the window is focused to make sure the user doesn't get lost during the
     update process.
 	
- -- FrostWire Team <contact@frostwire.com>  Thu, 17 February 2015 14:44:30 -0500
+ -- FrostWire Team <contact@frostwire.com>  Thu, 17 Feb 2015 14:44:30 -0500
 
 frostwire (6.0.5) stable; urgency=high
   * Fixes out of memory crash and freeze when importing lots of songs from the FrostWire
@@ -264,7 +270,7 @@ frostwire (6.0.5) stable; urgency=high
   * Fixes YT search issues.
   * New mplayer binaries with HTTPS support.
 	
- -- FrostWire Team <contact@frostwire.com>  Wed, 28 January 2015 14:18:12 -0500
+ -- FrostWire Team <contact@frostwire.com>  Wed, 28 Jan 2015 14:18:12 -0500
 
 frostwire (6.0.4) stable; urgency=high
   * Implements torrent loading algorithm to avoid CPU overuse when checking
@@ -277,7 +283,7 @@ frostwire (6.0.4) stable; urgency=high
     download would not merge the two and continue to download the rest
     of the torrent.
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 16 January 2015 14:31:06 -0500
+ -- FrostWire Team <contact@frostwire.com>  Fri, 16 Jan 2015 14:31:06 -0500
 
 frostwire (6.0.3) stable; urgency=high
   * Solves issue getting correct single file location from transfer manager.
@@ -289,7 +295,7 @@ frostwire (6.0.3) stable; urgency=high
   * Croatian, Bulgarian, Polish, translation updates.
   * More cleanups and refactors.
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 3 December 2014 16:53:57 -0500
+ -- FrostWire Team <contact@frostwire.com>  Wed, 3 Dec 2014 16:53:57 -0500
 
 frostwire (6.0.2) stable; urgency=high
   * Maximum concurrent torrent download settings defaults raised to 10.
@@ -298,7 +304,7 @@ frostwire (6.0.2) stable; urgency=high
   * Croatian translation update.
   * Minor refactors
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 19 November 2014 16:26:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Wed, 19 Nov 2014 16:26:00 -0500
 
 frostwire (6.0.1) stable; urgency=high
   * Fixes YouTube download Error.
@@ -310,7 +316,7 @@ frostwire (6.0.1) stable; urgency=high
   * Polish translation updates. Thanks @nalesnikld, @paulinka.
   * Spanish translation updates.
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 17 November 2014 14:16:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Mon, 17 Nov 2014 14:16:00 -0500
 
 frostwire (6.0.0) stable; urgency=high
   PERFORMANCE:
@@ -332,7 +338,7 @@ frostwire (6.0.0) stable; urgency=high
   * Simplified Chinese translation updates. Thanks @eudaemon01.
   * German translation updates. Thanks @paulinka.
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 10 November 2014 18:18:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Mon, 10 Nov 2014 18:18:00 -0500
 
 frostwire (5.7.7) stable; urgency=high
   * New: VPN connection status indicator.
@@ -353,14 +359,14 @@ frostwire (5.7.7) stable; urgency=high
     the library.
   * Updated MigLayout source code to version 4.0
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 01 October 2014 17:00:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Wed, 01 Oct 2014 17:00:00 -0500
 
 frostwire (5.7.6) stable; urgency=high
   * New: Filter search results by file extension, source name.
   * UI: Now table rows have a subtle bevel effect.
   * UI: Adds support for full screen mode on Mac OSX. Thanks to Tim Farris.
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 21 August 2014 23:53:35 -0500
+ -- FrostWire Team <contact@frostwire.com>  Thu, 21 Aug 2014 23:53:35 -0500
 
 frostwire (5.7.5) stable; urgency=high
   * Improved mp4 parser.
@@ -370,7 +376,7 @@ frostwire (5.7.5) stable; urgency=high
   * Fixes soundcloud url track/set downloads.
   * Fixes possible cloud download errors.
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 11 August 2014 17:46:15 -0500
+ -- FrostWire Team <contact@frostwire.com>  Tue, 11 Aug 2014 17:46:15 -0500
 
 frostwire (5.7.4) stable; urgency=high
   * Fixes issues with youtube downloads.
@@ -1184,7 +1190,7 @@ frostwire (4.21.8) stable; urgency=high
     torrent seeding, and how to avoid being scammed into paying for
     FrostWire. DO NOT PAY FOR FROSTWIRE.
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 9 June 2011 17:40:20 -0500
+ -- FrostWire Team <contact@frostwire.com>  Thu, 9 Jun 2011 17:40:20 -0500
 
 frostwire (4.21.7) stable; urgency=high
 

@@ -19,8 +19,7 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 
-import java.util.Date;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -45,7 +44,7 @@ public interface Store {
      * @param feature
      * @return
      */
-    boolean enable(String feature);
+    boolean enabled(String feature);
 
     /**
      * Synchronize with the actual server store data.
@@ -59,4 +58,6 @@ public interface Store {
      * @param p
      */
     void purchase(Activity activity, Product p);
+
+    Collection<Product> purchasedProducts();
 }

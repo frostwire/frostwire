@@ -17,6 +17,8 @@
 
 package com.frostwire.android.offers;
 
+import com.frostwire.android.BuildConfig;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,17 +27,16 @@ import java.util.List;
  * @author aldenml
  */
 public final class Products {
-
     private Products() {
     }
 
     // products SKUs
-    public static final String INAPP_DISABLE_ADS_1_MONTH_SKU = "com.frostwire.inapp.disable_ads.1_month.test";
-    public static final String INAPP_DISABLE_ADS_6_MONTHS_SKU = "com.frostwire.inapp.disable_ads.6_months.test";
-    public static final String INAPP_DISABLE_ADS_1_YEAR_SKU = "com.frostwire.inapp.disable_ads.1_year.test";
-    public static final String SUBS_DISABLE_ADS_1_MONTH_SKU = "com.frostwire.subs.disable_ads.1_month.test";
-    public static final String SUBS_DISABLE_ADS_6_MONTHS_SKU = "com.frostwire.subs.disable_ads.6_months.test";
-    public static final String SUBS_DISABLE_ADS_1_YEAR_SKU = "com.frostwire.subs.disable_ads.1_year.test";
+    public static final String INAPP_DISABLE_ADS_1_MONTH_SKU = getSKU("com.frostwire.inapp.disable_ads.1_month");
+    public static final String INAPP_DISABLE_ADS_6_MONTHS_SKU = getSKU("com.frostwire.inapp.disable_ads.6_months");
+    public static final String INAPP_DISABLE_ADS_1_YEAR_SKU = getSKU("com.frostwire.inapp.disable_ads.1_year");
+    public static final String SUBS_DISABLE_ADS_1_MONTH_SKU = getSKU("com.frostwire.subs.disable_ads.1_month");
+    public static final String SUBS_DISABLE_ADS_6_MONTHS_SKU = getSKU("com.frostwire.subs.disable_ads.6_months");
+    public static final String SUBS_DISABLE_ADS_1_YEAR_SKU = getSKU("com.frostwire.subs.disable_ads.1_year");
 
     // features codes
     public static final String DISABLE_ADS_FEATURE = "DISABLE_ADS_FEATURE";
@@ -56,8 +57,15 @@ public final class Products {
         );
     }
 
-    public static boolean disableAds(Store store) {
-        return store.enable(DISABLE_ADS_FEATURE);
+    public static boolean disabledAds(Store store) {
+        return store.enabled(DISABLE_ADS_FEATURE);
+    }
+
+    private static String getSKU(String skuId) {
+        if (!BuildConfig.DEBUG) {
+            return skuId;
+        }
+        return skuId + ".test";
     }
 
     static class ProductBase implements Product {
@@ -69,12 +77,14 @@ public final class Products {
         private final String price;
         private final String currency;
         private final boolean purchased;
+        private final long purchaseTime;
         private final boolean available;
 
         public ProductBase(String sku, boolean subscription,
                            String title, String description,
                            String price, String currency,
-                           boolean purchased, boolean available) {
+                           boolean purchased, long purchaseTime,
+                           boolean available) {
             this.sku = sku;
             this.subscription = subscription;
             this.title = title;
@@ -82,6 +92,7 @@ public final class Products {
             this.price = price;
             this.currency = currency;
             this.purchased = purchased;
+            this.purchaseTime = purchaseTime;
             this.available = available;
         }
 
@@ -118,6 +129,11 @@ public final class Products {
         @Override
         public boolean purchased() {
             return purchased;
+        }
+
+        @Override
+        public long purchaseTime() {
+            return purchaseTime;
         }
 
         @Override
