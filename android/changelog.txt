@@ -1,5 +1,6 @@
-FrostWire 1.7.7 - JUL/05/2016
+FrostWire 1.7.7 - JUL/13/2016
  - Fixes YT search issues
+ - Remove Ads
 
 FrostWire 1.7.6 - JUN/29/2016
  - Fixes YT search issues
