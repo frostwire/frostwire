@@ -20,21 +20,19 @@
  */
 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:top="10dp" android:left="8dp" android:right="8dp">
+    <item>
         <shape android:shape="rectangle">
             <solid android:color="@color/basic_gray_dark_solid"/>
-            <corners android:radius="3dp"/>
+            <corners android:bottomLeftRadius="3dp"
+                     android:bottomRightRadius="3dp"/>
         </shape>
     </item>
 
-    <item
-        android:left="8.5dp"
-        android:right="8.5dp"
-        android:top="10.5dp"
-        android:bottom="2dp">
+    <item android:bottom="2dp">
         <shape android:shape="rectangle">
-            <solid android:color="@color/basic_white"/>
-            <corners android:radius="3dp"/>
+            <solid android:color="#e2e2e2"/>
+            <corners android:bottomLeftRadius="3dp"
+                     android:bottomRightRadius="3dp"/>
         </shape>
     </item>
 </layer-list>
