@@ -29,8 +29,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.PromotionsAdapter;
+import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.offers.Products;
 import com.frostwire.frostclick.Slide;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -67,7 +70,22 @@ public class PromotionsView extends LinearLayout {
 
     public void updateAdapter() {
         if (getSlides() != null) {
-            gridview.setAdapter(new PromotionsAdapter(gridview.getContext(), getSlides()));
+            List<Slide> slides = getSlides();
+            if (Products.disabledAds(PlayStore.getInstance())) {
+                // remove all ad slides flagged as advertisement
+                removeAds(slides);
+            }
+            gridview.setAdapter(new PromotionsAdapter(gridview.getContext(), slides));
+        }
+    }
+
+    private void removeAds(List<Slide> slides) {
+        final Iterator<Slide> iterator = slides.iterator();
+        while (iterator.hasNext()) {
+            final Slide next = iterator.next();
+            if ((next.flags & Slide.IS_ADVERTISEMENT) == Slide.IS_ADVERTISEMENT) {
+                iterator.remove();
+            }
         }
     }
 
