@@ -55,5 +55,6 @@ public enum TransferState {
     ERROR_DISK_FULL,
     REDIRECTING,
     STREAMING,
-    SCANNING
+    SCANNING,
+    ERROR_CONNECTION_TIMED_OUT
 }

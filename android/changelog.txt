@@ -1,6 +1,7 @@
 FrostWire 1.7.7 - JUL/13/2016
  - Fixes YT search issues
  - Remove Ads
+ - More descriptive error when cloud transfers are timed out
 
 FrostWire 1.7.6 - JUN/29/2016
  - Fixes YT search issues
