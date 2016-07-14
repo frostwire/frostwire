@@ -48,7 +48,7 @@ public class Slide {
     public static final int SHOW_VIDEO_PREVIEW_BUTTON = 1 << 8;
     public static final int OPEN_CLICK_URL_ON_DOWNLOAD = 1 << 9;
     public static final int SHOW_PREVIEW_BUTTONS_ON_THE_LEFT = 1 << 10;
-    public static final int IS_ADVERTISEMENT = 1 << 11
+    public static final int IS_ADVERTISEMENT = 1 << 11;
 
     public Slide() {
 
