@@ -25,10 +25,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.logging.Logger;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -206,6 +203,19 @@ public final class PlayStore extends StoreBase {
         }
 
         return super.enabled(code);
+    }
+
+    public Collection<Product> purchasedProducts() {
+        Collection<Product> allAvailableProducts = products().values();
+        Collection<Product> purchasedProducts  = new ArrayList<>();
+        final Iterator<Product> iterator = allAvailableProducts.iterator();
+        while (iterator.hasNext()) {
+            Product product = iterator.next();
+            if (product.enable(Products.DISABLE_ADS_FEATURE)) {
+                purchasedProducts.add(product);
+            }
+        }
+        return purchasedProducts;
     }
 
     public void dispose() {

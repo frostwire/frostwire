@@ -19,6 +19,7 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -57,4 +58,6 @@ public interface Store {
      * @param p
      */
     void purchase(Activity activity, Product p);
+
+    Collection<Product> purchasedProducts();
 }

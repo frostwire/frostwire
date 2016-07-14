@@ -84,6 +84,8 @@ public final class Offers {
             }
         }
         if (!interstitialShown) {
+
+
             if (dismissAfterwards) {
                 activity.finish();
             }

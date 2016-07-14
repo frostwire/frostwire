@@ -29,8 +29,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.*;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.view.*;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -50,10 +53,13 @@ import com.frostwire.android.gui.views.preference.NumberPickerPreference;
 import com.frostwire.android.gui.views.preference.SimpleActionPreference;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.offers.Product;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.logging.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+
+import java.util.Collection;
 
 /**
  * See {@link ConfigurationManager}
@@ -444,6 +450,13 @@ public class SettingsActivity extends PreferenceActivity {
         if (p != null && !Constants.IS_STORE_ENABLE) {
             PreferenceScreen s = getPreferenceScreen();
             s.removePreference(p);
+        } else if (p != null) {
+            final PlayStore playStore = PlayStore.getInstance();
+            final Collection<Product> products = playStore.purchasedProducts();
+            if (products != null && products.size() > 0) {
+                Product product = products.iterator().next();
+                p.setSummary(getString(R.string.current_plan) + ":" + product.description());
+            }
         }
     }
 
