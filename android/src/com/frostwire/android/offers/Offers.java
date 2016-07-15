@@ -46,12 +46,14 @@ public final class Offers {
     private final static boolean DEBUG_MODE = false;
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork(DEBUG_MODE);
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork(DEBUG_MODE);
+    private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork(DEBUG_MODE);
     private static List<AdNetwork> AD_NETWORKS;
 
     public static void initAdNetworks(Activity activity) {
         AD_NETWORKS = Arrays.asList(new AdNetwork[]{
-                IN_MOBI,
-                APP_LOVIN
+                //IN_MOBI,
+                //APP_LOVIN,
+                REMOVE_ADS
         });
 
         for (AdNetwork adNetwork : AD_NETWORKS) {

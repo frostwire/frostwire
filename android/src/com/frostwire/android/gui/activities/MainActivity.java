@@ -275,6 +275,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 LOG.warn("Error handling download complete notification", e);
             }
         }
+
+        if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
+            finish();
+        }
     }
 
     private void openTorrentUrl(Intent intent) {

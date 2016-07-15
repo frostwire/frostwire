@@ -29,6 +29,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
@@ -95,6 +97,38 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         scrollToSelectedCard();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        final Intent intent = getIntent();
+        boolean wasCreatedAsInterstitial = intent.hasExtra("shutdownActivityAfterwards") && intent.hasExtra("dismissActivityAfterward");
+
+        if (wasCreatedAsInterstitial) {
+            boolean dismissActivityAfterward = intent.getBooleanExtra("dismissActivityAfterward", false);
+            boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
+            String callerActivity = intent.getStringExtra("callerActivity");
+
+            LOGGER.info("dismissActivityAfterward=" + dismissActivityAfterward);
+            LOGGER.info("shutdownActivityAfterwards="+shutdownActivityAfterwards);
+            LOGGER.info("callerActivity="+callerActivity);
+
+            if (dismissActivityAfterward) {
+                Intent i = new Intent(getApplication(), MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.putExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY, true);
+                getApplication().startActivity(i);
+                return;
+            }
+
+            if (shutdownActivityAfterwards) {
+                Intent i = new Intent(getApplication(), MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
+                getApplication().startActivity(i);
+            }
+        }
     }
 
     private void initActionBar() {
