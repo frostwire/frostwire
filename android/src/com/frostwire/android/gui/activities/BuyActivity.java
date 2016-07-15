@@ -26,8 +26,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -102,10 +104,11 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        final Intent intent = getIntent();
-        boolean wasCreatedAsInterstitial = intent.hasExtra("shutdownActivityAfterwards") && intent.hasExtra("dismissActivityAfterward");
+    }
 
-        if (wasCreatedAsInterstitial) {
+    private void onInterstitialActionBarDismiss() {
+        final Intent intent = getIntent();
+        if (intent !=null && intent.hasExtra("interstitialMode")) {
             boolean dismissActivityAfterward = intent.getBooleanExtra("dismissActivityAfterward", false);
             boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
             String callerActivity = intent.getStringExtra("callerActivity");
@@ -132,22 +135,49 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void initActionBar() {
-        ActionBar bar = getActionBar();
+        final ActionBar bar = getActionBar();
         if (bar != null) {
-            bar.setDisplayHomeAsUpEnabled(true);
-            bar.setIcon(android.R.color.transparent);
-            final String titlePrefix = getString(R.string.remove_ads);
-            int[] suffixes = { R.string.save_bandwidth,
-                               R.string.support_frostwire,
-                               R.string.support_free_software,
-                               R.string.cheaper_than_drinks,
-                               R.string.cheaper_than_lattes,
-                               R.string.cheaper_than_parking,
-                               R.string.keep_the_project_alive };
-            int suffixId = suffixes[new Random().nextInt(suffixes.length)];
-            final String titleSuffix = getString(suffixId);
-            bar.setTitle(titlePrefix + ". " + titleSuffix +".");
+            final String title = getActionBarTitle();
+            if (getIntent().hasExtra("interstitialMode")) {
+                initInterstitialModeActionBar(bar, title);
+            } else {
+                bar.setDisplayHomeAsUpEnabled(true);
+                bar.setIcon(android.R.color.transparent);
+                bar.setTitle(title);
+            }
         }
+    }
+
+    private String getActionBarTitle() {
+        final String titlePrefix = getString(R.string.remove_ads);
+        final int[] suffixes = { R.string.save_bandwidth,
+                           R.string.support_frostwire,
+                           R.string.support_free_software,
+                           R.string.cheaper_than_drinks,
+                           R.string.cheaper_than_lattes,
+                           R.string.cheaper_than_parking,
+                           R.string.keep_the_project_alive };
+        final int suffixId = suffixes[new Random().nextInt(suffixes.length)];
+        final String titleSuffix = getString(suffixId);
+        return titlePrefix + ". " + titleSuffix +".";
+    }
+
+    private void initInterstitialModeActionBar(ActionBar bar, String title) {
+        // custom view for interstitial mode's action bar.
+        bar.setDisplayShowHomeEnabled(false);
+        bar.setDisplayShowTitleEnabled(false);
+        bar.setDisplayShowCustomEnabled(true);
+        final LinearLayout customActionBar = (LinearLayout) getLayoutInflater().inflate(R.layout.view_actionbar_interstitial_buy_activity, null);
+        final TextView titleTextView = (TextView) customActionBar.findViewById(R.id.view_actionbar_interstitial_buy_activity_title);
+        titleTextView.setText(title);
+        final ImageButton closeButton = (ImageButton) customActionBar.findViewById(R.id.view_actionbar_interstitial_buy_activity_dismiss_button);
+        closeButton.setClickable(true);
+        closeButton.setOnClickListener(new OnDismissButtonClickListener());
+
+        // so it fills the entire place, otherwise it leaves a bit of space on the right hand side, despite the custom view
+        // having no padding or margins. http://stackoverflow.com/questions/27298282/android-actionbars-custom-view-not-filling-parent
+        ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        bar.setCustomView(customActionBar, layoutParams);
     }
 
     private void initAnimations() {
@@ -369,6 +399,14 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private class OnDismissButtonClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            onInterstitialActionBarDismiss();
+            finish();
         }
     }
 }
