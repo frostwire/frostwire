@@ -130,6 +130,9 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 R.string.cheaper_than_drinks,
                 R.string.cheaper_than_lattes,
                 R.string.cheaper_than_parking,
+                R.string.cheaper_than_beer,
+                R.string.cheaper_than_cigarettes,
+                R.string.cheaper_than_gas,
                 R.string.keep_the_project_alive};
 
         int suffixId = pitches[new Random().nextInt(pitches.length)];

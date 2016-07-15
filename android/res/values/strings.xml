@@ -627,6 +627,10 @@
     <string name="cheaper_than_lattes">Cheaper than Lattes</string>
     <string name="cheaper_than_drinks">Cheaper than Drinks</string>
     <string name="cheaper_than_parking">Cheaper than Parking</string>
+    <string name="cheaper_than_cigarettes">Cheaper than Cigarettes</string>
+    <string name="cheaper_than_beer">Cheaper than Beer</string>
+    <string name="cheaper_than_coffee">Cheaper than Coffee</string>
+    <string name="cheaper_than_gas">Cheaper than Gas</string>
     <string name="no_interruptions">No Interruptions</string>
     <string name="keep_the_project_alive">Keep the Project Alive</string>
 </resources>
