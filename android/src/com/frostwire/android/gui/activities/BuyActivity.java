@@ -21,10 +21,7 @@ package com.frostwire.android.gui.activities;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -90,10 +87,62 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     @Override
     protected void initComponents(Bundle savedInstanceState) {
-        initActionBar();
-        initProductCards(getLastSelectedCardViewId(savedInstanceState));
+        final boolean interstitialMode = getIntent().hasExtra("interstitialMode");
         initAnimations();
+        initActionBar(interstitialMode);
+        initOfferLayer(interstitialMode);
+        initProductCards(getLastSelectedCardViewId(savedInstanceState));
         initPaymentOptionsView(getLastPaymentOptionsViewVisibility(savedInstanceState));
+    }
+
+    private void initActionBar(boolean interstitialMode) {
+        final ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            final String title = getActionBarTitle();
+            if (interstitialMode) {
+                hideOSTitleBar();
+                initInterstitialModeActionBar(actionBar, title);
+                actionBar.hide();
+            } else {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setIcon(android.R.color.transparent);
+                actionBar.setTitle(title);
+            }
+        }
+    }
+
+    private String getActionBarTitle() {
+        final String titlePrefix = getString(R.string.remove_ads);
+        final int[] suffixes = {R.string.save_bandwidth,
+                R.string.support_frostwire,
+                R.string.support_free_software,
+                R.string.cheaper_than_drinks,
+                R.string.cheaper_than_lattes,
+                R.string.cheaper_than_parking,
+                R.string.keep_the_project_alive};
+        final int suffixId = suffixes[new Random().nextInt(suffixes.length)];
+        final String titleSuffix = getString(suffixId);
+        return titlePrefix + ". " + titleSuffix + ".";
+    }
+
+    private void initOfferLayer(boolean interstitialMode) {
+        if (!interstitialMode) {
+            View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
+            offerLayout.setVisibility(View.GONE);
+            return;
+        }
+
+        final InterstitialOfferDismissButtonClickListener dismissOfferClickListener = new InterstitialOfferDismissButtonClickListener();
+        ImageButton dismissButton = findView(R.id.activity_buy_interstitial_dismiss_button);
+        dismissButton.setClickable(true);
+        dismissButton.setOnClickListener(dismissOfferClickListener);
+
+        final OfferClickListener offerClickListener = new OfferClickListener();
+        ImageButton frostWireLogoButton = findView(R.id.activity_buy_interstitial_frostwire_logo);
+        frostWireLogoButton.setClickable(true);
+        frostWireLogoButton.setOnClickListener(offerClickListener);
+
+        // TODO THE SAME FOR THE REST OF THE SCREEN.
     }
 
     @Override
@@ -103,23 +152,42 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onBackPressed() {
+        handleBackButtonPressed();
     }
 
-    private void hideTitleBar() {
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // this method is for older than API 5
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            handleBackButtonPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void handleBackButtonPressed() {
+        Intent intent = getIntent();
+        if (intent.hasExtra("interstitialMode")) {
+            onInterstitialActionBarDismiss();
+        } else {
+            finish();
+        }
+    }
+
+    private void hideOSTitleBar() {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
     }
 
-    private void showTitleBar() {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    }
+//    private void showTitleBar() {
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+//        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//    }
 
     private void onInterstitialActionBarDismiss() {
         final Intent intent = getIntent();
-        if (intent !=null && intent.hasExtra("interstitialMode")) {
+        if (intent != null && intent.hasExtra("interstitialMode")) {
             boolean dismissActivityAfterward = intent.getBooleanExtra("dismissActivityAfterward", false);
             boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
 
@@ -140,35 +208,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         }
     }
 
-    private void initActionBar() {
-        final ActionBar bar = getActionBar();
-        if (bar != null) {
-            final String title = getActionBarTitle();
-            if (getIntent().hasExtra("interstitialMode")) {
-                hideTitleBar();
-                initInterstitialModeActionBar(bar, title);
-            } else {
-                bar.setDisplayHomeAsUpEnabled(true);
-                bar.setIcon(android.R.color.transparent);
-                bar.setTitle(title);
-            }
-        }
-    }
-
-    private String getActionBarTitle() {
-        final String titlePrefix = getString(R.string.remove_ads);
-        final int[] suffixes = { R.string.save_bandwidth,
-                           R.string.support_frostwire,
-                           R.string.support_free_software,
-                           R.string.cheaper_than_drinks,
-                           R.string.cheaper_than_lattes,
-                           R.string.cheaper_than_parking,
-                           R.string.keep_the_project_alive };
-        final int suffixId = suffixes[new Random().nextInt(suffixes.length)];
-        final String titleSuffix = getString(suffixId);
-        return titlePrefix + ". " + titleSuffix +".";
-    }
-
     private void initInterstitialModeActionBar(ActionBar bar, String title) {
         // custom view for interstitial mode's action bar.
         bar.setDisplayShowHomeEnabled(false);
@@ -179,11 +218,11 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         titleTextView.setText(title);
         final ImageButton closeButton = (ImageButton) customActionBar.findViewById(R.id.view_actionbar_interstitial_buy_activity_dismiss_button);
         closeButton.setClickable(true);
-        closeButton.setOnClickListener(new OnDismissButtonClickListener());
+        closeButton.setOnClickListener(new InterstitialActionBarDismissButtonClickListener());
 
         // so it fills the entire place, otherwise it leaves a bit of space on the right hand side, despite the custom view
         // having no padding or margins. http://stackoverflow.com/questions/27298282/android-actionbars-custom-view-not-filling-parent
-        ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         bar.setCustomView(customActionBar, layoutParams);
     }
 
@@ -211,7 +250,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void initLastCardSelection(int lastSelectedCardViewId) {
-        switch (lastSelectedCardViewId)  {
+        switch (lastSelectedCardViewId) {
             case R.id.activity_buy_product_card_30_days:
                 selectedProductCard = card30days;
                 break;
@@ -293,7 +332,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void scrollToSelectedCard() {
-        ScrollView scrollView =  (ScrollView) findViewById(R.id.activity_buy_scrollview);
+        ScrollView scrollView = (ScrollView) findViewById(R.id.activity_buy_scrollview);
         LinearLayout linearLayout = (LinearLayout) scrollView.getChildAt(0);
         int index = linearLayout.indexOfChild(selectedProductCard);
         int cardHeight = selectedProductCard.getHeight() + selectedProductCard.getPaddingTop();
@@ -387,8 +426,8 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
             store.refresh();
             // user clicked outside of the PlayStore purchase dialog
             if (data != null &&
-                data.hasExtra("RESPONSE_CODE") &&
-                data.getIntExtra("RESPONSE_CODE",0) == 5) {
+                    data.hasExtra("RESPONSE_CODE") &&
+                    data.getIntExtra("RESPONSE_CODE", 0) == 5) {
                 paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.AutomaticRenewal);
                 paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.OneTimePurchase);
                 return;
@@ -408,11 +447,34 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         }
     }
 
-    private class OnDismissButtonClickListener implements View.OnClickListener {
+    private class InterstitialActionBarDismissButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             onInterstitialActionBarDismiss();
             finish();
+        }
+    }
+
+    private class InterstitialOfferDismissButtonClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            onInterstitialActionBarDismiss();
+        }
+    }
+
+    private class OfferClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            final View offerLayout = v.findViewById(R.id.activity_buy_interstitial_linear_layout);
+            offerLayout.startAnimation(slideUpAnimation);
+            v.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    offerLayout.setVisibility(View.GONE);
+                    getActionBar().show();
+                }
+            }, slideUpAnimation.getDuration()+50);
         }
     }
 }
