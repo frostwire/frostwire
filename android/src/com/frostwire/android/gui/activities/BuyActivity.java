@@ -166,6 +166,11 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
         // going for it handling
         final OfferClickListener offerClickListener = new OfferClickListener();
+
+        final View topClickArea = findView(R.id.activity_buy_interstitial_click_area_1);
+        topClickArea.setClickable(true);
+        topClickArea.setOnClickListener(offerClickListener);
+
         final TextView supportFrostWire = findView(R.id.activity_buy_interstitial_support_frostwire);
         supportFrostWire.setText(supportFrostWire.getText().toString().toUpperCase());
         supportFrostWire.setClickable(true);

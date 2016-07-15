@@ -80,46 +80,57 @@
                   android:orientation="vertical"
                   android:background="@color/frostwire_light_blue" android:weightSum="1">
 
-        <ImageButton android:id="@+id/activity_buy_interstitial_dismiss_button"
-                     android:src="@drawable/ic_ab_close_clear_cancel"
-                     android:background="@color/transparent"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:layout_weight="0"
-                     android:paddingRight="5dp"
-                     android:layout_gravity="right"/>
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal">
+            <View android:id="@+id/activity_buy_interstitial_click_area_1"
+                  android:layout_width="0dp"
+                  android:layout_height="match_parent"
+                  android:layout_weight="1.0"/>
+            <ImageButton android:id="@+id/activity_buy_interstitial_dismiss_button"
+                         android:src="@drawable/ic_ab_close_clear_cancel"
+                         android:background="@color/transparent"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="0"
+                         android:paddingTop="10dp"
+                         android:paddingRight="10dp"
+                         android:paddingBottom="10dp"
+                         android:layout_gravity="center"/>
+        </LinearLayout>
 
         <TextView android:id="@+id/activity_buy_interstitial_support_frostwire"
-                  android:layout_width="wrap_content"
+                  android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_gravity="center_horizontal"
-                  android:layout_marginTop="50dp"
+                  android:padding="30dp"
+                  android:gravity="center_horizontal"
                   android:text="@string/support_frostwire"
                   android:textStyle="bold"
                   android:textSize="@dimen/text_size_xx_large"/>
 
         <TextView android:id="@+id/activity_buy_interstitial_random_pitch"
-                  android:layout_width="wrap_content"
+                  android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_gravity="center_horizontal"
-                  android:layout_marginTop="15dp"
+                  android:paddingBottom="20dp"
+                  android:paddingTop="10dp"
+                  android:gravity="center_horizontal"
                   android:text="@string/save_bandwidth"
                   android:textSize="@dimen/text_size_xx_large"/>
 
         <TextView android:id="@+id/activity_buy_interstitial_remove_ads"
-                  android:layout_width="wrap_content"
+                  android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_gravity="center_horizontal"
-                  android:layout_marginTop="50dp"
+                  android:paddingTop="20dp"
+                  android:paddingBottom="30dp"
+                  android:gravity="center"
                   android:textColor="@color/basic_white"
                   android:textStyle="bold"
                   android:textSize="@dimen/text_size_dayum"
                   android:text="@string/remove_ads"/>
 
         <ImageButton android:id="@+id/activity_buy_interstitial_frostwire_logo"
-                android:layout_width="150dp"
+                     android:layout_width="match_parent"
                      android:layout_height="150dp"
-                     android:layout_marginTop="30dp"
                      android:scaleType="fitCenter"
                      android:layout_gravity="center_horizontal"
                      android:background="@color/transparent"
