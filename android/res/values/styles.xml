@@ -457,10 +457,10 @@
     </style>
     <style name="BuyNoAdsCardPrice">
         <item name="android:textColor">@color/app_text_primary</item>
-        <item name="android:textSize">@dimen/text_x_large</item>
+        <item name="android:textSize">@dimen/text_large</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:paddingTop">2dp</item>
-        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
     </style>
     <style name="BuyNoAdsCardDescription">
         <item name="android:textColor">@color/app_text_secondary_dark</item>
@@ -477,7 +477,9 @@
         <item name="android:paddingRight">10dp</item>
         <item name="android:layout_marginBottom">4dp</item>
     </style>
-    <style name="BuyNoAdsSelectOptionBelowTitle" parent="BuyNoAdsCardTitle.Bold"/>
+    <style name="BuyNoAdsSelectOptionBelowTitle" parent="BuyNoAdsCardTitle.Bold">
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
     <style name="BuyNoAdsBuyButton" parent="BuyNoAdsCardHint">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>

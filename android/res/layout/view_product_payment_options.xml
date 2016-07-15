@@ -36,13 +36,14 @@
               android:layout_width="wrap_content"
               android:layout_height="0dp"
               android:text="@string/select_option_below"
-              android:layout_weight="1"/>
+              android:layout_weight="1"
+              android:layout_marginTop="8dp" />
 
     <!-- Automatic Renewal Option -->
     <LinearLayout android:id="@+id/view_product_payment_options_buy_automatic_renewal_layout"
                   android:layout_width="match_parent"
                   android:layout_height="0dp"
-                  android:layout_marginTop="20dp"
+                  android:layout_marginTop="15dp"
                   android:orientation="horizontal"
                   android:layout_weight="1" android:baselineAligned="false">
         <RelativeLayout android:layout_width="0dp"
@@ -90,7 +91,8 @@
                   android:layout_height="0dp"
                   android:layout_marginTop="20dp"
                   android:orientation="horizontal"
-                  android:layout_weight="1">
+                  android:layout_weight="1"
+                  android:layout_marginBottom="10dp">
         <RelativeLayout android:layout_width="0dp"
                         android:layout_weight="0.3"
                         android:layout_height="wrap_content"
