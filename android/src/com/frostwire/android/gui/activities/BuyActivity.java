@@ -167,17 +167,17 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         // going for it handling
         final OfferClickListener offerClickListener = new OfferClickListener();
         final TextView supportFrostWire = findView(R.id.activity_buy_interstitial_support_frostwire);
-        supportFrostWire.setText(supportFrostWire.getText().toString().toUpperCase());
+        supportFrostWire.setText(supportFrostWire.getText().toString());
         supportFrostWire.setClickable(true);
         supportFrostWire.setOnClickListener(offerClickListener);
 
         final TextView randomPitch = findView(R.id.activity_buy_interstitial_random_pitch);
-        randomPitch.setText(getRandomPitch(true).toUpperCase());
+        randomPitch.setText(getRandomPitch(true));
         randomPitch.setClickable(true);
         randomPitch.setOnClickListener(offerClickListener);
 
         final TextView removeAds = findView(R.id.activity_buy_interstitial_remove_ads);
-        //removeAds.setText(removeAds.getText().toString().toUpperCase());
+        //removeAds.setText(removeAds.getText().toString());
         removeAds.setClickable(true);
         removeAds.setOnClickListener(offerClickListener);
 
@@ -186,7 +186,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         frostWireLogoButton.setOnClickListener(offerClickListener);
 
         final TextView adFree = findView(R.id.activity_buy_interstitial_ad_free);
-        adFree.setText(adFree.getText().toString().toUpperCase());
+        adFree.setText(adFree.getText().toString());
         adFree.setClickable(true);
         adFree.setOnClickListener(offerClickListener);
     }

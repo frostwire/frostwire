@@ -487,6 +487,32 @@
         <item name="android:layout_marginBottom">0dp</item>
     </style>
 
+    <style name="BuyNoAdsAdText">
+        <item name="android:textColor">@color/app_text_primary</item>
+        <item name="android:textSize">@dimen/text_xx_large</item>
+    </style>
+    <style name="BuyNoAdsAdText.Support">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="BuyNoAdsAdText.Project">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">@dimen/text_x_large</item>
+    </style>
+    <style name="BuyNoAdsAdText.Remove">
+        <item name="android:textColor">@color/basic_white</item>
+        <item name="android:textSize">28.0sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="BuyNoAdsAdText.AdFree">
+        <item name="android:textSize">@dimen/text_x_large</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingLeft">24dp</item>
+        <item name="android:paddingRight">24dp</item>
+    </style>
     <!-- Wizard Activity -->
     <style name="WizardTitle">
         <item name="android:textSize">@dimen/text_size_x_large</item>
