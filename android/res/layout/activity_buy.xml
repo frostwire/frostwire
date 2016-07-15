@@ -89,7 +89,8 @@
                      android:paddingRight="5dp"
                      android:layout_gravity="right"/>
 
-        <TextView android:layout_width="wrap_content"
+        <TextView android:id="@+id/activity_buy_interstitial_support_frostwire"
+                  android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_gravity="center_horizontal"
                   android:layout_marginTop="50dp"
@@ -97,14 +98,16 @@
                   android:textStyle="bold"
                   android:textSize="@dimen/text_size_xx_large"/>
 
-        <TextView android:layout_width="wrap_content"
+        <TextView android:id="@+id/activity_buy_interstitial_random_pitch"
+                  android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_gravity="center_horizontal"
                   android:layout_marginTop="15dp"
                   android:text="@string/save_bandwidth"
                   android:textSize="@dimen/text_size_xx_large"/>
 
-        <TextView android:layout_width="wrap_content"
+        <TextView android:id="@+id/activity_buy_interstitial_remove_ads"
+                  android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_gravity="center_horizontal"
                   android:layout_marginTop="50dp"
@@ -122,7 +125,8 @@
                      android:background="@color/transparent"
                      android:src="@drawable/app_icon" android:layout_weight="0.07"/>
 
-        <TextView android:layout_width="wrap_content"
+        <TextView android:id="@+id/activity_buy_interstitial_ad_free"
+                  android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_marginTop="25dp"
                   android:layout_gravity="center_horizontal"

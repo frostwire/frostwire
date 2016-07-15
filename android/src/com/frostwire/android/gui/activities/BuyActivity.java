@@ -57,7 +57,8 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private ProductCardView card6months;
     private ProductCardView selectedProductCard;
     private ProductPaymentOptionsView paymentOptionsView;
-    private Animation slideUpAnimation;
+    private Animation scaleUpAnimation;
+    private Animation scaleDownAnimation;
     private Animation slideDownAnimation;
 
     public BuyActivity() {
@@ -113,16 +114,27 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     private String getActionBarTitle() {
         final String titlePrefix = getString(R.string.remove_ads);
-        final int[] suffixes = {R.string.save_bandwidth,
+        return titlePrefix + ". " + getRandomPitch(false) + ".";
+    }
+
+    private String getRandomPitch(final boolean avoidSupportPitches) {
+        final int[] pitches = {R.string.save_bandwidth,
                 R.string.support_frostwire,
                 R.string.support_free_software,
                 R.string.cheaper_than_drinks,
                 R.string.cheaper_than_lattes,
                 R.string.cheaper_than_parking,
                 R.string.keep_the_project_alive};
-        final int suffixId = suffixes[new Random().nextInt(suffixes.length)];
-        final String titleSuffix = getString(suffixId);
-        return titlePrefix + ". " + titleSuffix + ".";
+
+        int suffixId = pitches[new Random().nextInt(pitches.length)];
+
+        if (avoidSupportPitches) {
+          while (suffixId == R.string.support_frostwire || suffixId == R.string.support_free_software) {
+              suffixId = pitches[new Random().nextInt(pitches.length)];
+          }
+        }
+
+        return getString(suffixId);
     }
 
     private void initOfferLayer(boolean interstitialMode) {
@@ -132,17 +144,37 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
             return;
         }
 
+        // dismiss handling.
         final InterstitialOfferDismissButtonClickListener dismissOfferClickListener = new InterstitialOfferDismissButtonClickListener();
         ImageButton dismissButton = findView(R.id.activity_buy_interstitial_dismiss_button);
         dismissButton.setClickable(true);
         dismissButton.setOnClickListener(dismissOfferClickListener);
 
+        // going for it handling
         final OfferClickListener offerClickListener = new OfferClickListener();
-        ImageButton frostWireLogoButton = findView(R.id.activity_buy_interstitial_frostwire_logo);
+        final TextView supportFrostWire = findView(R.id.activity_buy_interstitial_support_frostwire);
+        supportFrostWire.setText(supportFrostWire.getText().toString().toUpperCase());
+        supportFrostWire.setClickable(true);
+        supportFrostWire.setOnClickListener(offerClickListener);
+
+        final TextView randomPitch = findView(R.id.activity_buy_interstitial_random_pitch);
+        randomPitch.setText(getRandomPitch(true).toUpperCase());
+        randomPitch.setClickable(true);
+        randomPitch.setOnClickListener(offerClickListener);
+
+        final TextView removeAds = findView(R.id.activity_buy_interstitial_remove_ads);
+        //removeAds.setText(removeAds.getText().toString().toUpperCase());
+        removeAds.setClickable(true);
+        removeAds.setOnClickListener(offerClickListener);
+
+        final ImageButton frostWireLogoButton = findView(R.id.activity_buy_interstitial_frostwire_logo);
         frostWireLogoButton.setClickable(true);
         frostWireLogoButton.setOnClickListener(offerClickListener);
 
-        // TODO THE SAME FOR THE REST OF THE SCREEN.
+        final TextView adFree = findView(R.id.activity_buy_interstitial_ad_free);
+        adFree.setText(adFree.getText().toString().toUpperCase());
+        adFree.setClickable(true);
+        adFree.setOnClickListener(offerClickListener);
     }
 
     @Override
@@ -205,6 +237,8 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 i.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
                 getApplication().startActivity(i);
             }
+
+            finish();
         }
     }
 
@@ -227,8 +261,12 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void initAnimations() {
-        slideUpAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_up);
-        slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+        scaleUpAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_up);
+        scaleDownAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_down);
+
+        if (getIntent().hasExtra("interstitialMode")) {
+            slideDownAnimation=AnimationUtils.loadAnimation(this, R.anim.slide_down);
+        }
     }
 
     private void initProductCards(int lastSelectedCardViewId) {
@@ -354,7 +392,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 }
 
                 paymentOptionsView.clearAnimation();
-                paymentOptionsView.startAnimation(slideUpAnimation);
+                paymentOptionsView.startAnimation(scaleUpAnimation);
 
                 // APOLOGIES FOR THE UGLY HACK BELOW.
                 // I tried in numerous ways to use AnimationListeners
@@ -372,7 +410,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                                 slideDownPaymentOptionsView(layout);
                             }
                         },
-                        slideUpAnimation.getDuration() + 100);
+                        scaleUpAnimation.getDuration() + 100);
             } else {
                 // first time shown
                 slideDownPaymentOptionsView(layout);
@@ -386,7 +424,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         int selectedCardIndex = layout.indexOfChild(selectedProductCard);
         paymentOptionsView.setVisibility(View.VISIBLE);
         layout.addView(paymentOptionsView, selectedCardIndex + 1);
-        paymentOptionsView.startAnimation(slideDownAnimation);
+        paymentOptionsView.startAnimation(scaleDownAnimation);
     }
 
     private View.OnClickListener createCardClickListener() {
@@ -466,15 +504,15 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
         @Override
         public void onClick(View v) {
-            final View offerLayout = v.findViewById(R.id.activity_buy_interstitial_linear_layout);
-            offerLayout.startAnimation(slideUpAnimation);
+            final View offerLayout = findViewById(R.id.activity_buy_interstitial_linear_layout);
+            offerLayout.startAnimation(slideDownAnimation);
             v.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     offerLayout.setVisibility(View.GONE);
                     getActionBar().show();
                 }
-            }, slideUpAnimation.getDuration()+50);
+            }, slideDownAnimation.getDuration()+50);
         }
     }
 }
