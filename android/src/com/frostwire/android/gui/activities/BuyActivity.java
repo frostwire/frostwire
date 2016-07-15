@@ -48,8 +48,10 @@ import java.util.Random;
  */
 public class BuyActivity extends AbstractActivity implements ProductPaymentOptionsViewListener {
 
+    public static final String INTERSTITIAL_MODE = "interstitialMode";
     private final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
     private final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
+    private final String OFFER_ACCEPTED = "offer_accepted";
 
     private Logger LOGGER = Logger.getLogger(BuyActivity.class);
     private ProductCardView card30days;
@@ -60,6 +62,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private Animation scaleUpAnimation;
     private Animation scaleDownAnimation;
     private Animation slideDownAnimation;
+    private boolean offerAccepted;
 
     public BuyActivity() {
         super(R.layout.activity_buy);
@@ -88,7 +91,10 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     @Override
     protected void initComponents(Bundle savedInstanceState) {
-        final boolean interstitialMode = getIntent().hasExtra("interstitialMode");
+        final boolean interstitialMode = getIntent().hasExtra(INTERSTITIAL_MODE);
+        offerAccepted = savedInstanceState != null &&
+                savedInstanceState.containsKey(OFFER_ACCEPTED) &&
+                savedInstanceState.getBoolean(OFFER_ACCEPTED,false);
         initAnimations();
         initActionBar(interstitialMode);
         initOfferLayer(interstitialMode);
@@ -141,6 +147,14 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         if (!interstitialMode) {
             View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
             offerLayout.setVisibility(View.GONE);
+            return;
+        }
+
+        // user rotates screen after having already accepted the offer
+        if (offerAccepted) {
+            View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
+            offerLayout.setVisibility(View.GONE);
+            getActionBar().show();
             return;
         }
 
@@ -200,7 +214,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     private void handleBackButtonPressed() {
         Intent intent = getIntent();
-        if (intent.hasExtra("interstitialMode")) {
+        if (intent.hasExtra(INTERSTITIAL_MODE)) {
             onInterstitialActionBarDismiss();
         } else {
             finish();
@@ -219,7 +233,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     private void onInterstitialActionBarDismiss() {
         final Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("interstitialMode")) {
+        if (intent != null && intent.hasExtra(INTERSTITIAL_MODE)) {
             boolean dismissActivityAfterward = intent.getBooleanExtra("dismissActivityAfterward", false);
             boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
 
@@ -263,10 +277,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private void initAnimations() {
         scaleUpAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_up);
         scaleDownAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_down);
-
-        if (getIntent().hasExtra("interstitialMode")) {
-            slideDownAnimation=AnimationUtils.loadAnimation(this, R.anim.slide_down);
-        }
+        slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
     }
 
     private void initProductCards(int lastSelectedCardViewId) {
@@ -325,6 +336,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(LAST_SELECTED_CARD_ID_KEY, selectedProductCard.getId());
         outState.putInt(PAYMENT_OPTIONS_VISIBILITY_KEY, paymentOptionsView.getVisibility());
+        outState.putBoolean(OFFER_ACCEPTED, offerAccepted);
         super.onSaveInstanceState(outState);
     }
 
@@ -407,18 +419,18 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                         new Runnable() {
                             @Override
                             public void run() {
-                                slideDownPaymentOptionsView(layout);
+                                scaleDownPaymentOptionsView(layout);
                             }
                         },
                         scaleUpAnimation.getDuration() + 100);
             } else {
                 // first time shown
-                slideDownPaymentOptionsView(layout);
+                scaleDownPaymentOptionsView(layout);
             }
         }
     }
 
-    private void slideDownPaymentOptionsView(final ViewGroup layout) {
+    private void scaleDownPaymentOptionsView(final ViewGroup layout) {
         paymentOptionsView.clearAnimation();
         layout.removeView(paymentOptionsView);
         int selectedCardIndex = layout.indexOfChild(selectedProductCard);
@@ -496,21 +508,24 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private class InterstitialOfferDismissButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
+            offerAccepted = false;
             onInterstitialActionBarDismiss();
         }
     }
 
     private class OfferClickListener implements View.OnClickListener {
-
         @Override
         public void onClick(View v) {
             final View offerLayout = findViewById(R.id.activity_buy_interstitial_linear_layout);
+            offerAccepted = true;
+            offerLayout.clearAnimation();
             offerLayout.startAnimation(slideDownAnimation);
             v.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    offerLayout.setVisibility(View.GONE);
                     getActionBar().show();
+                    offerLayout.setVisibility(View.GONE);
+                    offerLayout.clearAnimation();
                 }
             }, slideDownAnimation.getDuration()+50);
         }
