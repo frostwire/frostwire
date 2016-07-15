@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -106,16 +107,21 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         super.onDestroy();
     }
 
+    private void hideTitleBar() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+    }
+
+    private void showTitleBar() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
     private void onInterstitialActionBarDismiss() {
         final Intent intent = getIntent();
         if (intent !=null && intent.hasExtra("interstitialMode")) {
             boolean dismissActivityAfterward = intent.getBooleanExtra("dismissActivityAfterward", false);
             boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
-            String callerActivity = intent.getStringExtra("callerActivity");
-
-            LOGGER.info("dismissActivityAfterward=" + dismissActivityAfterward);
-            LOGGER.info("shutdownActivityAfterwards="+shutdownActivityAfterwards);
-            LOGGER.info("callerActivity="+callerActivity);
 
             if (dismissActivityAfterward) {
                 Intent i = new Intent(getApplication(), MainActivity.class);
@@ -139,6 +145,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         if (bar != null) {
             final String title = getActionBarTitle();
             if (getIntent().hasExtra("interstitialMode")) {
+                hideTitleBar();
                 initInterstitialModeActionBar(bar, title);
             } else {
                 bar.setDisplayHomeAsUpEnabled(true);
@@ -286,7 +293,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void scrollToSelectedCard() {
-        ScrollView scrollView =  (ScrollView) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        ScrollView scrollView =  (ScrollView) findViewById(R.id.activity_buy_scrollview);
         LinearLayout linearLayout = (LinearLayout) scrollView.getChildAt(0);
         int index = linearLayout.indexOfChild(selectedProductCard);
         int cardHeight = selectedProductCard.getHeight() + selectedProductCard.getPaddingTop();
@@ -294,8 +301,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void showPaymentOptionsBelowSelectedCard() {
-        final ViewGroup contentView = (ViewGroup) findViewById(android.R.id.content);
-        final ViewGroup scrollView = (ViewGroup) contentView.getChildAt(0);
+        final ViewGroup scrollView = (ViewGroup) findViewById(R.id.activity_buy_scrollview);
         final ViewGroup layout = (ViewGroup) scrollView.getChildAt(0);
         if (layout != null) {
             int selectedCardIndex = layout.indexOfChild(selectedProductCard);
