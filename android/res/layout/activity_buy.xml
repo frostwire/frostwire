@@ -131,6 +131,11 @@
                   android:layout_marginTop="25dp"
                   android:layout_gravity="center_horizontal"
                   android:textSize="@dimen/text_size_xx_large"
+                  android:background="@drawable/activity_buy_interstitial_ad_free_button_background"
+                  android:paddingTop="20dp"
+                  android:paddingRight="30dp"
+                  android:paddingLeft="30dp"
+                  android:paddingBottom="20dp"
                   android:text="@string/ad_free"/>
 
     </LinearLayout>

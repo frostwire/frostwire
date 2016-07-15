@@ -48,7 +48,6 @@ public class Slide {
     public static final int SHOW_PREVIEW_BUTTONS_ON_THE_LEFT = 1 << 10;
     public static final int IS_ADVERTISEMENT = 1 << 11;
 
-
     /**
      * url of image that will be displayed on this slide
      */
