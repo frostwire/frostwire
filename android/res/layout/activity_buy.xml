@@ -47,7 +47,6 @@
                     android:id="@+id/activity_buy_product_card_1_year"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="visible"
                     frostwire:product_card_selected="true"
                     frostwire:product_card_title_bold="@string/one_year"
                     frostwire:product_card_title_normal="@string/ad_free"
@@ -66,7 +65,6 @@
                     android:id="@+id/activity_buy_product_card_6_months"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="visible"
                     frostwire:product_card_title_bold="@string/six_months"
                     frostwire:product_card_title_normal="@string/ad_free"
                     frostwire:product_card_price="$4.45"
@@ -80,44 +78,54 @@
                   android:orientation="vertical"
                   android:background="@color/basic_blue_highlight" android:weightSum="1">
 
-        <ImageButton android:id="@+id/activity_buy_interstitial_dismiss_button"
-                     android:src="@drawable/full_screen_close"
-                     android:background="@color/transparent"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:layout_weight="0"
-            android:layout_gravity="right"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp" />
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal">
+            <View android:id="@+id/activity_buy_interstitial_click_area_1"
+                  android:layout_width="0dp"
+                  android:layout_height="match_parent"
+                  android:layout_weight="1.0"/>
+            <ImageButton android:id="@+id/activity_buy_interstitial_dismiss_button"
+                         android:src="@drawable/full_screen_close"
+                         android:background="@color/transparent"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="0"
+                         android:paddingTop="10dp"
+                         android:paddingRight="10dp"
+                         android:paddingBottom="10dp"
+                         android:layout_gravity="center"/>
+        </LinearLayout>
 
         <TextView android:id="@+id/activity_buy_interstitial_support_frostwire"
-                  android:layout_width="wrap_content"
+                  android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_gravity="center_horizontal"
-                  android:layout_marginTop="50dp"
+                  android:padding="30dp"
+                  android:gravity="center_horizontal"
                   android:text="@string/support_frostwire"
                   style="@style/BuyNoAdsAdText.Support" />
 
         <TextView android:id="@+id/activity_buy_interstitial_random_pitch"
-                  android:layout_width="wrap_content"
+                  android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_gravity="center_horizontal"
-                  android:layout_marginTop="10dp"
+                  android:paddingBottom="20dp"
+                  android:paddingTop="10dp"
+                  android:gravity="center_horizontal"
                   android:text="@string/save_bandwidth"
                   style="@style/BuyNoAdsAdText.Project" />
 
         <TextView android:id="@+id/activity_buy_interstitial_remove_ads"
-                  android:layout_width="wrap_content"
+                  android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_gravity="center_horizontal"
-                  android:layout_marginTop="30dp"
                   android:text="@string/remove_ads"
+                  android:paddingTop="20dp"
+                  android:paddingBottom="30dp"
+                  android:gravity="center"
                   style="@style/BuyNoAdsAdText.Remove"/>
 
         <ImageButton android:id="@+id/activity_buy_interstitial_frostwire_logo"
-                android:layout_width="150dp"
+                     android:layout_width="match_parent"
                      android:layout_height="150dp"
-                     android:layout_marginTop="30dp"
                      android:scaleType="fitCenter"
                      android:layout_gravity="center_horizontal"
                      android:background="@color/transparent"
@@ -126,11 +134,14 @@
         <TextView android:id="@+id/activity_buy_interstitial_ad_free"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="10dp"
+                  android:layout_marginTop="25dp"
+                  android:paddingTop="20dp"
+                  android:paddingRight="30dp"
+                  android:paddingLeft="30dp"
+                  android:paddingBottom="20dp"
                   android:layout_gravity="center_horizontal"
-                  android:background="@drawable/ad_free_background"
+                  android:background="@drawable/activity_buy_interstitial_ad_free_button_background"
                   android:text="@string/ad_free"
                   style="@style/BuyNoAdsAdText.AdFree" />
-
     </LinearLayout>
 </FrameLayout>
