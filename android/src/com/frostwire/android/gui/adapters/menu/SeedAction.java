@@ -141,7 +141,8 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         YesNoDialog dlg = YesNoDialog.newInstance(
             DLG_TURN_BITTORRENT_BACK_ON,
              R.string.bittorrent_off,
-             R.string.bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you);
+             R.string.bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you,
+             YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.setOnDialogClickListener(this);
         dlg.show(((Activity) getContext()).getFragmentManager());
     }
