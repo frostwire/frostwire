@@ -21,6 +21,8 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.util.Ref;
 
@@ -54,6 +56,14 @@ class RemoveAdsNetwork implements AdNetwork {
 
     @Override
     public boolean enabled() {
+        ConfigurationManager config;
+        enabled = true;
+        try {
+            config = ConfigurationManager.instance();
+            enabled = config.getBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         return enabled;
     }
 

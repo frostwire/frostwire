@@ -78,7 +78,7 @@ public class InMobiAdNetwork implements AdNetwork {
         boolean isInMobiEnabled = false;
         try {
             config = ConfigurationManager.instance();
-            isInMobiEnabled = (config.getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE) && config.getBoolean(Constants.PREF_KEY_GUI_USE_INMOBI));
+            isInMobiEnabled = config.getBoolean(Constants.PREF_KEY_GUI_USE_INMOBI);
         } catch (Throwable e) {
             e.printStackTrace();
         }

@@ -377,6 +377,7 @@ public final class SoftwareUpdater {
 
         ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_APPLOVIN, update.config.appLovin);
         ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_INMOBI, update.config.inmobi);
+        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS, update.config.removeads);
         ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
         ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
 
@@ -445,10 +446,10 @@ public final class SoftwareUpdater {
 
     @SuppressWarnings("CanBeFinal")
     private static class Config {
-        int supportThreshold = 100;
         Map<String, Boolean> activeSearchEngines;
         boolean appLovin = false;
         boolean inmobi = false;
+        boolean removeads = true;
         int interstitialOffersTransferStarts = 5;
         int interstitialTransferOffersTimeoutInMinutes = 15;
 

@@ -18,7 +18,6 @@
 
 package com.frostwire.android.core;
 
-import android.content.Context;
 import android.os.Environment;
 
 import java.util.Collections;
@@ -35,21 +34,21 @@ final class ConfigurationDefaults {
     private final Map<String, Object> defaultValues;
     private final Map<String, Object> resetValues;
 
-    public ConfigurationDefaults(Context context) {
-        defaultValues = new HashMap<String, Object>();
-        resetValues = new HashMap<String, Object>();
-        load(context);
+    ConfigurationDefaults() {
+        defaultValues = new HashMap<>();
+        resetValues = new HashMap<>();
+        load();
     }
 
-    public Map<String, Object> getDefaultValues() {
+    Map<String, Object> getDefaultValues() {
         return Collections.unmodifiableMap(defaultValues);
     }
 
-    public Map<String, Object> getResetValues() {
+    Map<String, Object> getResetValues() {
         return Collections.unmodifiableMap(resetValues);
     }
 
-    private void load(Context context) {
+    private void load() {
         defaultValues.put(Constants.PREF_KEY_CORE_UUID, uuidToByteArray(UUID.randomUUID()));
         defaultValues.put(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION, "");//won't know until I see it.
         defaultValues.put(Constants.PREF_KEY_CORE_EXPERIMENTAL, false);
@@ -63,12 +62,11 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION, true);
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_TRANSFERS_ON_DOWNLOAD_START, true);
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG, true);
-        defaultValues.put(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, Constants.IS_FREE_DISTRIBUTION);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_INMOBI, false);
+        defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 5);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, 15);
-
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN, 20);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN, 10);
         defaultValues.put(Constants.PREF_KEY_SEARCH_INTERVAL_MS_FOR_TORRENT_DEEP_SCAN, 2000);
@@ -103,12 +101,12 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, false);
         defaultValues.put(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY, true);
 
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, Long.valueOf(0));
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, Long.valueOf(0));
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, Long.valueOf(4));
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, Long.valueOf(4));
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, Long.valueOf(200));
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_PEERS, Long.valueOf(200));
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, 0L);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, 0L);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, 4L);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, 4L);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, 200L);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_PEERS, 200L);
 
         defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath()); // /mnt/sdcard
 

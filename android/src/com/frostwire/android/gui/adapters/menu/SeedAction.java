@@ -80,7 +80,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     // Reminder: Currently disabled when using SD Card.
-    public SeedAction(Context context, FileDescriptor fd) {
+    SeedAction(Context context, FileDescriptor fd) {
         this(context, fd, null, null, null);
     }
 
@@ -90,7 +90,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     // Reminder: Currently disabled when using SD Card.
-    public SeedAction(Context context, List<FileDescriptor> checked) {
+    SeedAction(Context context, List<FileDescriptor> checked) {
         this(context, null, checked, null, null);
     }
 
@@ -287,7 +287,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.
-    public static class ShowNoWifiInformationDialog extends AbstractDialog {
+    private static class ShowNoWifiInformationDialog extends AbstractDialog {
         public static ShowNoWifiInformationDialog newInstance() {
              return new ShowNoWifiInformationDialog();
         }
@@ -314,7 +314,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private static class OkButtonOnClickListener implements View.OnClickListener {
         private final Dialog newNoWifiInformationDialog;
 
-        public OkButtonOnClickListener(Dialog newNoWifiInformationDialog) {
+        OkButtonOnClickListener(Dialog newNoWifiInformationDialog) {
             this.newNoWifiInformationDialog = newNoWifiInformationDialog;
         }
 

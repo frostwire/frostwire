@@ -87,7 +87,7 @@ public class AppLovinAdNetwork implements AdNetwork {
         boolean enabled = false;
         try {
             config = ConfigurationManager.instance();
-            enabled = (config.getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE) && config.getBoolean(Constants.PREF_KEY_GUI_USE_APPLOVIN));
+            enabled = config.getBoolean(Constants.PREF_KEY_GUI_USE_APPLOVIN);
         } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
         }

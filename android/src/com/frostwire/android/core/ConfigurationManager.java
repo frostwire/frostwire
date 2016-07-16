@@ -63,7 +63,7 @@ public class ConfigurationManager {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = preferences.edit();
 
-        defaults = new ConfigurationDefaults(context);
+        defaults = new ConfigurationDefaults();
 
         initPreferences();
     }
