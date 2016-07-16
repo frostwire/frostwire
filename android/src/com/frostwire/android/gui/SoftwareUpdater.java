@@ -363,8 +363,6 @@ public final class SoftwareUpdater {
             return;
         }
 
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE_THRESHOLD, new Random().nextInt(100) < update.config.supportThreshold);
-
         if (update.config.activeSearchEngines != null && update.config.activeSearchEngines.keySet() != null) {
             for (String name : update.config.activeSearchEngines.keySet()) {
                 SearchEngine engine = SearchEngine.forName(name);

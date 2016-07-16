@@ -51,8 +51,8 @@ public final class Offers {
 
     public static void initAdNetworks(Activity activity) {
         AD_NETWORKS = Arrays.asList(new AdNetwork[]{
-                //IN_MOBI,
-                //APP_LOVIN,
+                IN_MOBI,
+                APP_LOVIN,
                 REMOVE_ADS
         });
 
