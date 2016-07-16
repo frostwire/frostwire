@@ -24,6 +24,7 @@ import android.content.Intent;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
+import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -34,10 +35,10 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  */
 class RemoveAdsNetwork implements AdNetwork {
-    private boolean enabled;
     private boolean started;
     @SuppressWarnings("unused")
     private final boolean DEBUG_MODE;
+    private static final Logger LOGGER = Logger.getLogger(RemoveAdsNetwork.class);
 
     RemoveAdsNetwork(boolean debugMode) {
         DEBUG_MODE = debugMode;
@@ -45,36 +46,46 @@ class RemoveAdsNetwork implements AdNetwork {
 
     @Override
     public void initialize(Activity activity) {
-        enabled = !Products.disabledAds(PlayStore.getInstance());
-        started = true;
+        if (!(started = enabled())) {
+            LOGGER.info("RemoveAds initialize(): aborted. not enabled.");
+            started = false;
+            return;
+        }
     }
 
     @Override
     public void stop(Context context) {
-        enabled = false;
+        started = false;
     }
 
     @Override
     public boolean enabled() {
         ConfigurationManager config;
-        enabled = true;
+        boolean enabled = false;
         try {
-            config = ConfigurationManager.instance();
-            enabled = config.getBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS);
+            if (Products.disabledAds(PlayStore.getInstance())) {
+                enabled = false;
+            } else {
+                config = ConfigurationManager.instance();
+                LOGGER.info("config use removeAds -> " + config.getBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS));
+                enabled = config.getBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS);
+            }
         } catch (Throwable e) {
             e.printStackTrace();
         }
+        LOGGER.info("enabled() -> " + enabled);
         return enabled;
     }
 
     @Override
     public boolean started() {
+        LOGGER.info("started() -> " + started);
         return started;
     }
 
     @Override
     public boolean showInterstitial(WeakReference<Activity> activityRef, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward) {
-        if (started && enabled && Ref.alive(activityRef)) {
+        if (started() && enabled() && Ref.alive(activityRef)) {
             Intent intent = new Intent(activityRef.get(), BuyActivity.class);
             intent.putExtra(BuyActivity.INTERSTITIAL_MODE, true);
             intent.putExtra("shutdownActivityAfterwards", shutdownActivityAfterwards);

@@ -49,7 +49,7 @@ public final class Constants {
     public static final String FROSTWIRE_BUILD = BUILD_PREFIX + (BuildConfig.VERSION_CODE % 1000);
 
     // change it to a constant true when the test phase is done
-    public static final boolean IS_STORE_ENABLE = BuildConfig.FLAVOR.equals("store") || BuildConfig.DEBUG;
+    public static final boolean IS_STORE_ENABLED = BuildConfig.FLAVOR.equals("store") || BuildConfig.DEBUG;
 
     public static final String APP_PACKAGE_NAME = "com.frostwire.android";
 

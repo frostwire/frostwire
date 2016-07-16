@@ -41,6 +41,7 @@ public class AppLovinAdNetwork implements AdNetwork {
 
     public void initialize(final Activity activity) {
         if (!enabled()) {
+            LOG.info("AppLovin initialize(): aborted. not enabled.");
             return;
         }
 
