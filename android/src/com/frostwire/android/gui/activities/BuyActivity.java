@@ -482,14 +482,24 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         PlayStore store = PlayStore.getInstance();
         if (store.handleActivityResult(requestCode, resultCode, data)) {
             store.refresh();
+
+            // RESPONSE_CODE = 0 -> Payment Successful
+            // RESPONSE_CODE = 1 || 5 -> Clicked outside Payment Window
+
             // user clicked outside of the PlayStore purchase dialog
             if (data != null &&
                     data.hasExtra("RESPONSE_CODE") &&
-                    data.getIntExtra("RESPONSE_CODE", 0) == 5) {
+                    (data.getIntExtra("RESPONSE_CODE", 0) == 1 ||
+                     data.getIntExtra("RESPONSE_CODE", 0) == 5)) {
                 paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.AutomaticRenewal);
                 paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.OneTimePurchase);
                 return;
             }
+//            LOGGER.info("onActivityResult: resultCode=" + resultCode);
+//            LOGGER.info("onActivityResult: has RESPONSE_CODE? " + data.hasExtra("RESPONSE_CODE"));
+//            if (data.hasExtra("RESPONSE_CODE")) {
+//                LOGGER.info("onActivityResult: RESPONSE_CODE= " + data.getIntExtra("RESPONSE_CODE",0));
+//            }
             finish();
         }
     }
