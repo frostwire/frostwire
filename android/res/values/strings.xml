@@ -621,7 +621,7 @@
     <string name="one_time_purchase">One Time Purchase</string>
     <string name="no_trial_period_included">No trial period included</string>
     <string name="error_connection_timed_out">Error: connection timed out/dropped. Try again.</string>
-    <string name="current_plan">Current plan:</string>
+    <string name="current_plan">Current plan</string>
     <string name="days_left">days left</string>
     <string name="save_bandwidth">Save Bandwidth</string>
     <string name="cheaper_than_lattes">Cheaper than Lattes</string>

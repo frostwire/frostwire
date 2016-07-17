@@ -453,9 +453,9 @@ public class SettingsActivity extends PreferenceActivity {
             s.removePreference(p);
         } else if (p != null) {
             final PlayStore playStore = PlayStore.getInstance();
-            final Collection<Product> products = playStore.purchasedProducts();
-            if (products != null && products.size() > 0) {
-                Product product = products.iterator().next();
+            final Collection<Product> purchasedProducts = playStore.purchasedProducts();
+            if (purchasedProducts != null && purchasedProducts.size() > 0) {
+                Product product = purchasedProducts.iterator().next();
                 String daysLeft = "";
                 // if it's a one time purchase, show user how many days left she has.
                 if (!product.subscription() && product.purchased()) {
@@ -470,6 +470,7 @@ public class SettingsActivity extends PreferenceActivity {
                     }
                 }
                 p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
+                p.setEnabled(false);
             }
         }
     }
