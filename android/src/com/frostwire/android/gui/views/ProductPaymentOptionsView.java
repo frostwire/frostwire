@@ -28,10 +28,10 @@ import com.frostwire.android.R;
 
 /**
  * Created on 7/7/16.
+ *
  * @author gubatron
  * @author marcelinkaaa
  * @author aldenml
- *
  */
 public class ProductPaymentOptionsView extends LinearLayout {
     public enum PurchaseButton {
@@ -107,7 +107,7 @@ public class ProductPaymentOptionsView extends LinearLayout {
         TextView purchaseButton = (TextView) findViewById(buttonId);
         ProgressBar progressBar = (ProgressBar) findViewById(progressBarId);
 
-        return new View[] { purchaseButton, progressBar };
+        return new View[]{purchaseButton, progressBar};
     }
 
     private class BuyButtonClickListener implements OnClickListener {
