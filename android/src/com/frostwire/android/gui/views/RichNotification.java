@@ -55,8 +55,7 @@ public class RichNotification extends LinearLayout {
         return r;
     }
 
-	public static final List<Integer> wasDismissed = new ArrayList<Integer>();
-	private boolean titleUnderlined;
+	public static final List<Integer> wasDismissed = new ArrayList<>();
 	private String title;
 	private String description;
 	private Drawable icon;
@@ -140,7 +139,7 @@ public class RichNotification extends LinearLayout {
 			}
 		};
 
-		TextView textViewTitle = updateTextViewText(R.id.view_rich_notification_title, (titleUnderlined) ? Html.fromHtml(title) : title, onClickNotificationListener);
+		TextView textViewTitle = updateTextViewText(R.id.view_rich_notification_title, title, onClickNotificationListener);
 		TextView textViewDescription = updateTextViewText(R.id.view_rich_notification_description, description, onClickNotificationListener);
 		
 		textViewTitle.setTypeface(ROBOTO_LIGHT, Typeface.BOLD);
