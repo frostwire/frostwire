@@ -72,7 +72,7 @@
                       android:paddingLeft="20dp"
                       android:layout_weight="0.7">
             <TextView android:id="@+id/view_product_payment_options_buy_automatic_renewal_text"
-                      style="@style/BuyNoAdsCardTitle.Bold"
+                      style="@style/BuyNoAdsCardTitle.Purchase"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/automatic_renewal"/>
@@ -118,7 +118,7 @@
                       android:paddingLeft="20dp"
                       android:layout_weight="0.7">
             <TextView android:id="@+id/view_product_payment_options_buy_one_time_text"
-                      style="@style/BuyNoAdsCardTitle.Bold"
+                      style="@style/BuyNoAdsCardTitle.Purchase"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/one_time_purchase"/>
