@@ -585,7 +585,7 @@
     <string name="enable_seeding">Habilitar Compartir</string>
     <string name="error_connection_timed_out">Error: Se agotó el tiempo de conexión. Intenta nuevamente.</string>
 <string name="buy_uppercase">COMPRAR</string>
-<string name="cheaper_than_parking">Más barato que aparcar el auto</string>
+<string name="cheaper_than_parking">Menos que aparcar el auto</string>
 <string name="dummy_price">$ 99.99</string>
 <string name="one_time_purchase">Pago Único</string>
 <string name="one_year">1 año</string>
