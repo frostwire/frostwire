@@ -94,7 +94,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         final boolean interstitialMode = getIntent().hasExtra(INTERSTITIAL_MODE);
         offerAccepted = savedInstanceState != null &&
                 savedInstanceState.containsKey(OFFER_ACCEPTED) &&
-                savedInstanceState.getBoolean(OFFER_ACCEPTED,false);
+                savedInstanceState.getBoolean(OFFER_ACCEPTED, false);
         initAnimations();
         initActionBar(interstitialMode);
         initOfferLayer(interstitialMode);
@@ -138,9 +138,9 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         int suffixId = pitches[new Random().nextInt(pitches.length)];
 
         if (avoidSupportPitches) {
-          while (suffixId == R.string.support_frostwire || suffixId == R.string.support_free_software) {
-              suffixId = pitches[new Random().nextInt(pitches.length)];
-          }
+            while (suffixId == R.string.support_frostwire || suffixId == R.string.support_free_software) {
+                suffixId = pitches[new Random().nextInt(pitches.length)];
+            }
         }
 
         return getString(suffixId);
@@ -333,10 +333,27 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String inappSKU) {
-        if (card != null && store != null && subsSKU != null && inappSKU != null) {
-            card.setTag(R.id.SUBS_PRODUCT_KEY, store.product(subsSKU));
-            card.setTag(R.id.INAPP_PRODUCT_KEY, store.product(inappSKU));
-            card.updateData(store.product(subsSKU));
+        if (card == null) {
+            throw new IllegalArgumentException("card argument can't be null");
+        }
+        if (store == null) {
+            throw new IllegalArgumentException("store argument can't be null");
+        }
+        if (subsSKU == null) {
+            throw new IllegalArgumentException("subsSKU argument can't be null");
+        }
+        if (inappSKU == null) {
+            throw new IllegalArgumentException("inappSKU argument can't be null");
+        }
+
+        Product prodSubs = store.product(subsSKU);
+        Product prodInApp = store.product(inappSKU);
+
+        card.setTag(R.id.SUBS_PRODUCT_KEY, prodSubs);
+        card.setTag(R.id.INAPP_PRODUCT_KEY, prodInApp);
+
+        if (prodSubs != null) {
+            card.updateData(prodSubs);
         }
     }
 
@@ -490,7 +507,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
             if (data != null &&
                     data.hasExtra("RESPONSE_CODE") &&
                     (data.getIntExtra("RESPONSE_CODE", 0) == 1 ||
-                     data.getIntExtra("RESPONSE_CODE", 0) == 5)) {
+                            data.getIntExtra("RESPONSE_CODE", 0) == 5)) {
                 paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.AutomaticRenewal);
                 paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.OneTimePurchase);
                 return;
@@ -545,7 +562,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                     offerLayout.setVisibility(View.GONE);
                     offerLayout.clearAnimation();
                 }
-            }, slideDownAnimation.getDuration()+50);
+            }, slideDownAnimation.getDuration() + 50);
         }
     }
 }
