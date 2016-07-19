@@ -193,10 +193,10 @@
     </style>
 
     <!-- Menu Media Type end -->
-
+    <!--v21-->
     <style name="RichNotificationTitle">
         <item name="android:textSize">@dimen/text_x_medium</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
@@ -205,10 +205,10 @@
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textColor">@color/app_text_primary</item>
     </style>
-
+    <!--v21-->
     <style name="RichNotificationButtonText">
         <item name="android:textSize">@dimen/text_x_medium</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
@@ -217,10 +217,10 @@
     <style name="TransfersList"></style>
 
     <style name="TransfersList.Item"></style>
-
+    <!--v21-->
     <style name="TransfersList.Item.Title">
         <item name="android:textSize">@dimen/text_medium</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:singleLine">true</item>
         <item name="android:textColor">@color/app_text_primary</item>
     </style>
@@ -279,7 +279,6 @@
 
     <style name="ListItemSize">
         <item name="android:singleLine">true</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textColor">@color/app_text_primary</item>
     </style>
@@ -372,8 +371,7 @@
     <style name="GetVPNButton">
         <item name="android:background">@drawable/vpn_button_background_selector</item>
         <item name="android:textColor">@color/basic_white</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_large</item>
         <item name="android:paddingLeft">35dp</item>
         <item name="android:paddingRight">35dp</item>
         <item name="android:paddingTop">0dp</item>
@@ -423,7 +421,7 @@
     </style>
     <style name="VPNTitleSecond">
         <item name="android:textSize">@dimen/text_size_large</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:layout_marginTop">-5dp</item>
     </style>
     <style name="VPNTitleSecond.Color">
@@ -431,7 +429,7 @@
     </style>
     <style name="VPNSubTitle">
         <item name="android:textSize">@dimen/text_size_medium</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
     </style>
     <style name="VPNText">
         <item name="android:textSize">@dimen/text_size_medium</item>
@@ -453,7 +451,10 @@
         <item name="android:textSize">@dimen/text_large</item>
     </style>
     <style name="BuyNoAdsCardTitle.Bold">
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="BuyNoAdsCardTitle.Purchase">
+        <item name="android:textStyle">normal</item>
     </style>
     <style name="BuyNoAdsCardPrice">
         <item name="android:textColor">@color/app_text_primary</item>
@@ -470,7 +471,7 @@
         <item name="android:textColor">@color/basic_white</item>
         <item name="android:background">@drawable/product_card_hint_button_background</item>
         <item name="android:textSize">@dimen/text_x_small</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:paddingTop">3dp</item>
         <item name="android:paddingBottom">3dp</item>
         <item name="android:paddingLeft">10dp</item>
@@ -508,7 +509,7 @@
     </style>
     <style name="BuyNoAdsAdText.AdFree">
         <item name="android:textSize">@dimen/text_x_large</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:paddingBottom">16dp</item>
         <item name="android:paddingTop">16dp</item>
@@ -518,7 +519,7 @@
     <!-- Wizard Activity -->
     <style name="WizardTitle">
         <item name="android:textSize">@dimen/text_size_x_large</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
     <style name="WizardText">
@@ -543,9 +544,9 @@
         <item name="android:layout_marginTop">15dp</item>
         <item name="android:layout_marginBottom">15dp</item>
     </style>
-
+    <!--v21-->
     <style name="MediumText">
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
     <!-- Default Dialog -->
@@ -561,12 +562,13 @@
         <item name="android:textSize">@dimen/text_large</item>
         <item name="android:buttonStyle">@style/DefaultDialogTheme.Buttons</item>
     </style>
+    <!-- v21 -->
     <style name="DefaultDialogTheme.TitleBar">
         <item name="android:background">@drawable/default_dialog_title_background</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">@dimen/text_x_large</item>
         <item name="android:padding">15dp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
     </style>
     <style name="DefaultDialogTheme.MainText">
         <item name="android:textSize">@dimen/text_large</item>
@@ -586,10 +588,11 @@
         <item name="android:gravity">center</item>
         <item name="android:minLines">1</item>
     </style>
+    <!--v21-->
     <style name="DefaultDialogTheme.SmallTextMedium">
         <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textColor">@color/app_text_secondary</item>
         <item name="android:padding">3dp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
     </style>
  </resources>
