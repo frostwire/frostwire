@@ -118,24 +118,24 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private String getRandomPitch(final boolean avoidSupportPitches) {
-        final int[] pitches = {R.string.save_bandwidth,
+        // put "support" pitches at the beginning and modify offset2
+        final int[] pitches = {
                 R.string.support_frostwire,
                 R.string.support_free_software,
+                R.string.save_bandwidth,
                 R.string.cheaper_than_drinks,
                 R.string.cheaper_than_lattes,
                 R.string.cheaper_than_parking,
                 R.string.cheaper_than_beer,
                 R.string.cheaper_than_cigarettes,
                 R.string.cheaper_than_gas,
-                R.string.keep_the_project_alive};
+                R.string.keep_the_project_alive
+        };
+        final int offset1 = 0;
+        final int offset2 = 2;
 
-        int suffixId = pitches[new Random().nextInt(pitches.length)];
-
-        if (avoidSupportPitches) {
-            while (suffixId == R.string.support_frostwire || suffixId == R.string.support_free_software) {
-                suffixId = pitches[new Random().nextInt(pitches.length)];
-            }
-        }
+        int offset = !avoidSupportPitches ? offset1 : offset2;
+        int suffixId = pitches[offset + new Random().nextInt(pitches.length - offset)];
 
         return getString(suffixId);
     }
