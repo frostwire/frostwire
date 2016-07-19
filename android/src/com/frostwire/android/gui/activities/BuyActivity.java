@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -38,7 +39,6 @@ import com.frostwire.android.gui.views.ProductPaymentOptionsViewListener;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
-import com.frostwire.logging.Logger;
 
 import java.util.Random;
 
@@ -47,7 +47,7 @@ import java.util.Random;
  * @author aldenml
  */
 public class BuyActivity extends AbstractActivity implements ProductPaymentOptionsViewListener {
-    //private static final Logger LOGGER =Logger.getLogger(BuyActivity.class);
+
     public static final String INTERSTITIAL_MODE = "interstitialMode";
     private final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
     private final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
@@ -58,8 +58,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private ProductCardView card6months;
     private ProductCardView selectedProductCard;
     private ProductPaymentOptionsView paymentOptionsView;
-    private Animation scaleUpAnimation;
-    private Animation scaleDownAnimation;
     private Animation slideDownAnimation;
     private boolean offerAccepted;
 
@@ -278,8 +276,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void initAnimations() {
-        scaleUpAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_up);
-        scaleDownAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_down);
         slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
     }
 
@@ -423,26 +419,15 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                     return;
                 }
 
-                paymentOptionsView.clearAnimation();
-                paymentOptionsView.startAnimation(scaleUpAnimation);
-
-                // APOLOGIES FOR THE UGLY HACK BELOW.
-                // I tried in numerous ways to use AnimationListeners
-                // but they did not work, it seems these APIs are broken.
-                // I even tried overriding the onAnimationEnd() method on
-                // the view. AnimationListeners will never be invoked
-                // not on the Animation object, not on the view, not on the
-                // Layout (ViewGroup), this is one of the suggested workaround
-                // if you need to do something right after an animation is done.
-                // TL;DR; Android's AnimationListeners are broken. -gubatron.
-                paymentOptionsView.postDelayed(
-                        new Runnable() {
+                paymentOptionsView.animate().setDuration(200)
+                        .scaleY(0).setInterpolator(new DecelerateInterpolator())
+                        .withEndAction(new Runnable() {
                             @Override
                             public void run() {
                                 scaleDownPaymentOptionsView(layout);
                             }
-                        },
-                        scaleUpAnimation.getDuration() + 100);
+                        })
+                        .start();
             } else {
                 // first time shown
                 scaleDownPaymentOptionsView(layout);
@@ -451,12 +436,13 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void scaleDownPaymentOptionsView(final ViewGroup layout) {
-        paymentOptionsView.clearAnimation();
         layout.removeView(paymentOptionsView);
         int selectedCardIndex = layout.indexOfChild(selectedProductCard);
         paymentOptionsView.setVisibility(View.VISIBLE);
         layout.addView(paymentOptionsView, selectedCardIndex + 1);
-        paymentOptionsView.startAnimation(scaleDownAnimation);
+        paymentOptionsView.animate().setDuration(200)
+                .scaleY(1).setInterpolator(new DecelerateInterpolator())
+                .start();
     }
 
     private View.OnClickListener createCardClickListener() {

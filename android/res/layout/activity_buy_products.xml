@@ -56,7 +56,9 @@
                 android:id="@+id/activity_buy_product_payment_options_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:transformPivotY="0dp"
+                android:scaleY="0"/>
 
         <com.frostwire.android.gui.views.ProductCardView
                 android:id="@+id/activity_buy_product_card_6_months"
