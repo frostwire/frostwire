@@ -38,6 +38,7 @@ import com.frostwire.android.gui.views.ProductPaymentOptionsViewListener;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
+import com.frostwire.logging.Logger;
 
 import java.util.Random;
 
@@ -46,7 +47,7 @@ import java.util.Random;
  * @author aldenml
  */
 public class BuyActivity extends AbstractActivity implements ProductPaymentOptionsViewListener {
-
+    //private static final Logger LOGGER =Logger.getLogger(BuyActivity.class);
     public static final String INTERSTITIAL_MODE = "interstitialMode";
     private final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
     private final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
@@ -495,13 +496,8 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
             store.refresh();
 
             // RESPONSE_CODE = 0 -> Payment Successful
-            // RESPONSE_CODE = 1 || 5 -> Clicked outside Payment Window
-
             // user clicked outside of the PlayStore purchase dialog
-            if (data != null &&
-                    data.hasExtra("RESPONSE_CODE") &&
-                    (data.getIntExtra("RESPONSE_CODE", 0) == 1 ||
-                            data.getIntExtra("RESPONSE_CODE", 0) == 5)) {
+            if (data != null && data.hasExtra("RESPONSE_CODE") && data.getIntExtra("RESPONSE_CODE", 0) != 0) {
                 paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.AutomaticRenewal);
                 paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.OneTimePurchase);
                 return;
