@@ -21,7 +21,7 @@
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="match_parent" android:layout_width="match_parent">
 
-    <include layout="@layout/activity_buy_products_layout"/>
+    <include layout="@layout/activity_buy_products"/>
 
     <LinearLayout android:id="@+id/activity_buy_interstitial_linear_layout"
                   android:layout_width="match_parent"
