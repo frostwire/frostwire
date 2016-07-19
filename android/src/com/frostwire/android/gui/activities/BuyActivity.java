@@ -401,7 +401,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void scrollToSelectedCard() {
-        ScrollView scrollView = (ScrollView) findViewById(R.id.activity_buy_scrollview);
+        ScrollView scrollView = findView(R.id.activity_buy_scrollview);
         LinearLayout linearLayout = (LinearLayout) scrollView.getChildAt(0);
         int index = linearLayout.indexOfChild(selectedProductCard);
         int cardHeight = selectedProductCard.getHeight() + selectedProductCard.getPaddingTop();
@@ -409,7 +409,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void showPaymentOptionsBelowSelectedCard() {
-        final ViewGroup scrollView = (ViewGroup) findViewById(R.id.activity_buy_scrollview);
+        final ViewGroup scrollView = findView(R.id.activity_buy_scrollview);
         final ViewGroup layout = (ViewGroup) scrollView.getChildAt(0);
         if (layout != null) {
             int selectedCardIndex = layout.indexOfChild(selectedProductCard);
@@ -545,7 +545,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private class OfferClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            final View offerLayout = findViewById(R.id.activity_buy_interstitial_linear_layout);
+            final View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
             offerAccepted = true;
             offerLayout.clearAnimation();
             offerLayout.startAnimation(slideDownAnimation);

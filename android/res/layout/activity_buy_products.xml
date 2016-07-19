@@ -19,13 +19,13 @@
  */
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:frostwire="http://schemas.android.com/apk/res-auto"
             android:id="@+id/activity_buy_scrollview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/basic_gray">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:frostwire="http://schemas.android.com/apk/res-auto"
-                  android:layout_width="match_parent"
+
+    <LinearLayout android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:orientation="vertical"
                   android:background="@color/basic_gray">
@@ -67,5 +67,7 @@
                 frostwire:product_card_price="$4.45"
                 frostwire:product_card_description="@string/dummy_content_description"
                 frostwire:product_card_hint_button_visible="false"/>
+
     </LinearLayout>
+
 </ScrollView>
