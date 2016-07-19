@@ -1,9 +1,9 @@
 frostwire (6.3.4) stable; urgency=high
   * Fixes YT search issues
   * New media player based on mplayer 1.3.0 and ffmpeg 3.0 fixes
-    YT audio preview issues, video playback issues.
+    YT audio preview issues, video playback issues. VP8, VP9, HEVC support.
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 17 Jul 2016 00:27:44 -0500
+ -- FrostWire Team <contact@frostwire.com>  Mon, 18 Jul 2016 20:59:05 -0500
 	
 frostwire (6.3.3) stable; urgency=high
   * Fixes freeze issue
