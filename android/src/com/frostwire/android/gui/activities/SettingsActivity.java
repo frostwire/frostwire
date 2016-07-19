@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.*;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,9 +50,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.preference.NumberPickerPreference;
-import com.frostwire.android.gui.views.preference.SimpleActionPreference;
-import com.frostwire.android.gui.views.preference.StoragePreference;
+import com.frostwire.android.gui.views.preference.*;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
@@ -240,6 +239,17 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupOtherOptions() {
         setupPermanentStatusNotificationOption();
+        setupSupportFrostWireOption();
+    }
+
+    private void setupSupportFrostWireOption() {
+         if (Constants.IS_STORE_ENABLED) {
+             PreferenceScreen category = (PreferenceScreen) findPreference(Constants.PREF_KEY_OTHER_PREFERENCE_CATEGORY);
+             final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
+             if (category != null && preference != null) {
+                 category.removePreference(preference);
+             }
+         }
     }
 
     private void setupPermanentStatusNotificationOption() {
