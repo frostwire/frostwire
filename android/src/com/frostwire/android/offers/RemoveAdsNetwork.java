@@ -48,6 +48,9 @@ class RemoveAdsNetwork implements AdNetwork {
     public void initialize(Activity activity) {
         if (!(started = enabled())) {
             LOGGER.info("RemoveAds initialize(): aborted. not enabled.");
+            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+                LOGGER.info("RemoveAds initialize(): not available for plus.");
+            }
             started = false;
             return;
         }
@@ -63,7 +66,7 @@ class RemoveAdsNetwork implements AdNetwork {
         ConfigurationManager config;
         boolean enabled = false;
         try {
-            if (Products.disabledAds(PlayStore.getInstance())) {
+            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Products.disabledAds(PlayStore.getInstance())) {
                 enabled = false;
             } else {
                 config = ConfigurationManager.instance();
