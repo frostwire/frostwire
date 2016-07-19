@@ -165,7 +165,7 @@ public final class PlayStore extends StoreBase {
         } catch (IabHelper.IabAsyncInProgressException e) {
             LOG.error("Error querying inventory. Another async operation in progress.", e);
         } catch (Throwable t) {
-            LOG.error("Error querying inventory.",  t);
+            LOG.error("Error querying inventory.", t);
         }
     }
 
@@ -186,6 +186,8 @@ public final class PlayStore extends StoreBase {
             helper.launchPurchaseFlow(activity, p.sku(), codeRequest, purchaseFinishedListener);
         } catch (IabHelper.IabAsyncInProgressException e) {
             LOG.error("Error launching purchase flow. Another async operation in progress.", e);
+        } catch (Throwable e) {
+            LOG.error("Error launching purchase flow.", e);
         }
 
         if (BuildConfig.DEBUG) {
@@ -207,7 +209,7 @@ public final class PlayStore extends StoreBase {
 
     public Collection<Product> purchasedProducts() {
         Collection<Product> allAvailableProducts = products().values();
-        Collection<Product> purchasedProducts  = new ArrayList<>();
+        Collection<Product> purchasedProducts = new ArrayList<>();
         final Iterator<Product> iterator = allAvailableProducts.iterator();
         while (iterator.hasNext()) {
             Product product = iterator.next();
@@ -265,15 +267,15 @@ public final class PlayStore extends StoreBase {
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, SUBS_TYPE, inventory,  Products.getProductDurationInDays(Products.SUBS_DISABLE_ADS_1_MONTH_SKU));
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, SUBS_TYPE, inventory, Products.getProductDurationInDays(Products.SUBS_DISABLE_ADS_1_MONTH_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, SUBS_TYPE, inventory,  Products.getProductDurationInDays(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU));
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, SUBS_TYPE, inventory, Products.getProductDurationInDays(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, SUBS_TYPE, inventory,  Products.getProductDurationInDays(Products.SUBS_DISABLE_ADS_1_YEAR_SKU));
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, SUBS_TYPE, inventory, Products.getProductDurationInDays(Products.SUBS_DISABLE_ADS_1_YEAR_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }

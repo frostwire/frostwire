@@ -38,7 +38,6 @@ import com.frostwire.android.gui.views.ProductPaymentOptionsViewListener;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
-import com.frostwire.logging.Logger;
 
 import java.util.Random;
 
@@ -53,7 +52,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
     private final String OFFER_ACCEPTED = "offer_accepted";
 
-    private Logger LOGGER = Logger.getLogger(BuyActivity.class);
     private ProductCardView card30days;
     private ProductCardView card1year;
     private ProductCardView card6months;
@@ -81,11 +79,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private void purchaseProduct(int tagId) {
         Product p = (Product) selectedProductCard.getTag(tagId);
         if (p != null) {
-            try {
-                PlayStore.getInstance().purchase(BuyActivity.this, p);
-            } catch (Throwable t) {
-                LOGGER.error("Couldn't make product purchase.", t);
-            }
+            PlayStore.getInstance().purchase(BuyActivity.this, p);
         }
     }
 
