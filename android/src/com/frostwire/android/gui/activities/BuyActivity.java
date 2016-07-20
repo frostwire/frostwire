@@ -21,7 +21,10 @@ package com.frostwire.android.gui.activities;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.*;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
@@ -197,10 +200,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     @Override
     public void onBackPressed() {
-        handleBackButtonPressed();
-    }
-
-    private void handleBackButtonPressed() {
         Intent intent = getIntent();
         if (intent.hasExtra(INTERSTITIAL_MODE)) {
             onInterstitialActionBarDismiss();
