@@ -21,10 +21,7 @@ package com.frostwire.android.gui.activities;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.view.*;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
@@ -84,31 +81,33 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        final boolean interstitialMode = getIntent().hasExtra(INTERSTITIAL_MODE);
+        if (interstitialMode) {
+            hideOSTitleBar();
+        } else {
+            final ActionBar bar = getActionBar();
+            if (bar != null) {
+                bar.setDisplayHomeAsUpEnabled(true);
+                bar.setIcon(android.R.color.transparent);
+                bar.setTitle(getActionBarTitle());
+            }
+        }
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     protected void initComponents(Bundle savedInstanceState) {
         final boolean interstitialMode = getIntent().hasExtra(INTERSTITIAL_MODE);
         offerAccepted = savedInstanceState != null &&
                 savedInstanceState.containsKey(OFFER_ACCEPTED) &&
                 savedInstanceState.getBoolean(OFFER_ACCEPTED, false);
-        initActionBar(interstitialMode);
+        if (interstitialMode) {
+            initInterstitialModeActionBar(getActionBarTitle());
+        }
         initOfferLayer(interstitialMode);
         initProductCards(getLastSelectedCardViewId(savedInstanceState));
         initPaymentOptionsView(getLastPaymentOptionsViewVisibility(savedInstanceState));
-    }
-
-    private void initActionBar(boolean interstitialMode) {
-        final ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            final String title = getActionBarTitle();
-            if (interstitialMode) {
-                hideOSTitleBar();
-                initInterstitialModeActionBar(actionBar, title);
-                actionBar.hide();
-            } else {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setIcon(android.R.color.transparent);
-                actionBar.setTitle(title);
-            }
-        }
     }
 
     private String getActionBarTitle() {
@@ -150,7 +149,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         if (offerAccepted) {
             View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
             offerLayout.setVisibility(View.GONE);
-            getActionBar().show();
             return;
         }
 
@@ -183,14 +181,11 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void hideOSTitleBar() {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        Window w = getWindow();
+        w.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        w.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        w.requestFeature(Window.FEATURE_NO_TITLE);
     }
-
-//    private void showTitleBar() {
-//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-//        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//    }
 
     private void onInterstitialActionBarDismiss() {
         final Intent intent = getIntent();
@@ -217,22 +212,13 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         }
     }
 
-    private void initInterstitialModeActionBar(ActionBar bar, String title) {
-        // custom view for interstitial mode's action bar.
-        bar.setDisplayShowHomeEnabled(false);
-        bar.setDisplayShowTitleEnabled(false);
-        bar.setDisplayShowCustomEnabled(true);
-        final LinearLayout customActionBar = (LinearLayout) getLayoutInflater().inflate(R.layout.view_actionbar_interstitial_buy_activity, null);
-        final TextView titleTextView = (TextView) customActionBar.findViewById(R.id.view_actionbar_interstitial_buy_activity_title);
+    private void initInterstitialModeActionBar(String title) {
+        View v = findView(R.id.activity_buy_actionbar_interstitial);
+        v.setVisibility(View.VISIBLE);
+        TextView titleTextView = findView(R.id.activity_buy_actionbar_interstitial_buy_activity_title);
         titleTextView.setText(title);
-        final ImageButton closeButton = (ImageButton) customActionBar.findViewById(R.id.view_actionbar_interstitial_buy_activity_dismiss_button);
-        closeButton.setClickable(true);
+        ImageButton closeButton = findView(R.id.activity_buy_actionbar_interstitial_buy_activity_dismiss_button);
         closeButton.setOnClickListener(new InterstitialActionBarDismissButtonClickListener());
-
-        // so it fills the entire place, otherwise it leaves a bit of space on the right hand side, despite the custom view
-        // having no padding or margins. http://stackoverflow.com/questions/27298282/android-actionbars-custom-view-not-filling-parent
-        ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        bar.setCustomView(customActionBar, layoutParams);
     }
 
     private void initProductCards(int lastSelectedCardViewId) {
@@ -473,10 +459,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                     .withEndAction(new Runnable() {
                         @Override
                         public void run() {
-                            ActionBar bar = getActionBar();
-                            if (bar != null) {
-                                bar.show();
-                            }
                             offerLayout.setVisibility(View.GONE);
                         }
                     })
