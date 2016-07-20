@@ -165,7 +165,7 @@ public final class Products {
         }
 
         @Override
-        public boolean enable(String feature) {
+        public boolean enabled(String feature) {
             return false;
         }
     }

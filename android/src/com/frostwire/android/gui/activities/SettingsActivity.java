@@ -465,7 +465,7 @@ public class SettingsActivity extends PreferenceActivity {
             final PlayStore playStore = PlayStore.getInstance();
             final Collection<Product> purchasedProducts = playStore.purchasedProducts();
             if (purchasedProducts != null && purchasedProducts.size() > 0) {
-                Product product = purchasedProducts.iterator().next();
+                final Product product = purchasedProducts.iterator().next();
                 String daysLeft = "";
                 // if it's a one time purchase, show user how many days left she has.
                 if (!product.subscription() && product.purchased()) {
@@ -481,6 +481,21 @@ public class SettingsActivity extends PreferenceActivity {
                 }
                 p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
                 p.setEnabled(false);
+
+                p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        if (purchasedProducts != null && !purchasedProducts.isEmpty()) {
+                            LOG.info("Products purchased by user:");
+                            for (Product p : purchasedProducts) {
+                                LOG.info(" - " + p.description() + " (" + p.sku() + ")");
+                            }
+                        } else {
+                            LOG.info("Couldn't find any purchases.");
+                        }
+                        return false;
+                    }
+                });
             }
         }
     }

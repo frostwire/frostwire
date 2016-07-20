@@ -213,7 +213,7 @@ public final class PlayStore extends StoreBase {
         final Iterator<Product> iterator = allAvailableProducts.iterator();
         while (iterator.hasNext()) {
             Product product = iterator.next();
-            if (product.enable(Products.DISABLE_ADS_FEATURE)) {
+            if (product.enabled(Products.DISABLE_ADS_FEATURE)) {
                 purchasedProducts.add(product);
             }
         }
@@ -335,7 +335,7 @@ public final class PlayStore extends StoreBase {
                 description, price, currency, purchased, purchaseTime, available) {
 
             @Override
-            public boolean enable(String feature) {
+            public boolean enabled(String feature) {
                 // only support disable ads feature
                 if (feature != Products.DISABLE_ADS_FEATURE) {
                     return false;

@@ -54,7 +54,7 @@ abstract class StoreBase implements Store {
         Iterator<Product> it = products.values().iterator();
 
         while (!r && it.hasNext()) {
-            r = it.next().enable(code);
+            r = it.next().enabled(code);
         }
 
         return r;
