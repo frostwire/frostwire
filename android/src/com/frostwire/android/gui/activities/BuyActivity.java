@@ -51,9 +51,9 @@ import java.util.Random;
 public class BuyActivity extends AbstractActivity implements ProductPaymentOptionsViewListener {
 
     public static final String INTERSTITIAL_MODE = "interstitialMode";
-    private final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
-    private final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
-    private final String OFFER_ACCEPTED = "offer_accepted";
+    private static final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
+    private static final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
+    private static final String OFFER_ACCEPTED = "offer_accepted";
 
     private ProductCardView card30days;
     private ProductCardView card1year;
