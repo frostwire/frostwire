@@ -5,75 +5,67 @@
  * Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="match_parent" android:layout_width="match_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_height="match_parent"
+             android:layout_width="match_parent">
+
     <include layout="@layout/activity_buy_products"/>
 
     <LinearLayout android:id="@+id/activity_buy_interstitial_linear_layout"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:orientation="vertical"
-                  android:background="@color/basic_blue_highlight" android:weightSum="1">
+                  android:background="@color/basic_blue_highlight"
+                  android:weightSum="1">
 
-        <LinearLayout android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:orientation="horizontal">
-            <View android:id="@+id/activity_buy_interstitial_click_area_1"
-                  android:layout_width="0dp"
-                  android:layout_height="match_parent"
-                  android:layout_weight="1.0"/>
-            <ImageButton android:id="@+id/activity_buy_interstitial_dismiss_button"
-                         android:src="@drawable/full_screen_close"
-                         android:background="@color/transparent"
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:layout_weight="0"
-                         android:layout_gravity="center"
-                         style="@style/BuyNoAdsAdText.AdFree"/>
-        </LinearLayout>
+        <ImageButton android:id="@+id/activity_buy_interstitial_dismiss_button"
+                     android:src="@drawable/full_screen_close"
+                     android:background="@color/transparent"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_weight="0"
+                     android:layout_gravity="center|right"
+                     android:contentDescription="@null"
+                     style="@style/BuyNoAdsAdText.AdFree"/>
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical">
+        <LinearLayout android:orientation="vertical"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:gravity="center_vertical">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|center"
-                android:gravity="center"
-                android:layout_marginTop="-25dp">
+            <LinearLayout android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_gravity="center_horizontal|center"
+                          android:gravity="center"
+                          android:layout_marginTop="-25dp">
 
-                <ImageButton android:id="@+id/activity_buy_interstitial_frostwire_logo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="80dp"
-                    android:src="@drawable/app_icon"
-                    android:background="@color/transparent"
-                    android:paddingRight="20dp"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitXY" />
+                <ImageView android:layout_width="wrap_content"
+                           android:layout_height="80dp"
+                           android:src="@drawable/app_icon"
+                           android:background="@color/transparent"
+                           android:paddingRight="20dp"
+                           android:adjustViewBounds="true"
+                           android:scaleType="fitXY"
+                           android:contentDescription="@null"/>
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                <LinearLayout android:orientation="vertical"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content">
 
-                    <TextView android:id="@+id/activity_buy_interstitial_support_frostwire"
-                              android:layout_width="match_parent"
+                    <TextView android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:gravity="center_horizontal"
                               android:text="@string/support_frostwire"
@@ -89,11 +81,12 @@
                               android:textAllCaps="false"
                               android:textSize="25sp"
                               style="@style/BuyNoAdsAdText.Project"/>
+
                 </LinearLayout>
+
             </LinearLayout>
 
-            <TextView android:id="@+id/activity_buy_interstitial_remove_ads"
-                      android:layout_width="match_parent"
+            <TextView android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:text="@string/remove_ads"
                       android:paddingTop="10dp"
@@ -102,16 +95,16 @@
                       style="@style/BuyNoAdsAdText.Remove"
                       android:visibility="gone"/>
 
-            <TextView android:id="@+id/activity_buy_interstitial_ad_free"
-                      android:layout_width="wrap_content"
+            <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:layout_gravity="center_horizontal"
                       android:background="@drawable/activity_buy_interstitial_ad_free_button_background"
                       android:text="@string/remove_ads"
                       android:layout_marginTop="30dp"
                       style="@style/BuyNoAdsAdText.AdFree"/>
+
         </LinearLayout>
 
-
     </LinearLayout>
+
 </FrameLayout>
