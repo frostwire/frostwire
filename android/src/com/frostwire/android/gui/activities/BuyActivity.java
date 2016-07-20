@@ -22,8 +22,7 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -58,7 +57,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     private ProductCardView card6months;
     private ProductCardView selectedProductCard;
     private ProductPaymentOptionsView paymentOptionsView;
-    private Animation slideDownAnimation;
     private boolean offerAccepted;
 
     public BuyActivity() {
@@ -88,7 +86,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         offerAccepted = savedInstanceState != null &&
                 savedInstanceState.containsKey(OFFER_ACCEPTED) &&
                 savedInstanceState.getBoolean(OFFER_ACCEPTED, false);
-        initAnimations();
         initActionBar(interstitialMode);
         initOfferLayer(interstitialMode);
         initProductCards(getLastSelectedCardViewId(savedInstanceState));
@@ -273,10 +270,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         // having no padding or margins. http://stackoverflow.com/questions/27298282/android-actionbars-custom-view-not-filling-parent
         ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         bar.setCustomView(customActionBar, layoutParams);
-    }
-
-    private void initAnimations() {
-        slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
     }
 
     private void initProductCards(int lastSelectedCardViewId) {
@@ -529,16 +522,19 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         public void onClick(View v) {
             final View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
             offerAccepted = true;
-            offerLayout.clearAnimation();
-            offerLayout.startAnimation(slideDownAnimation);
-            v.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getActionBar().show();
-                    offerLayout.setVisibility(View.GONE);
-                    offerLayout.clearAnimation();
-                }
-            }, slideDownAnimation.getDuration() + 50);
+            offerLayout.animate().setDuration(500)
+                    .translationY(offerLayout.getBottom()).setInterpolator(new AccelerateDecelerateInterpolator())
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            ActionBar bar = getActionBar();
+                            if (bar != null) {
+                                bar.show();
+                            }
+                            offerLayout.setVisibility(View.GONE);
+                        }
+                    })
+                    .start();
         }
     }
 }
