@@ -154,42 +154,16 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
             return;
         }
 
-        // dismiss handling.
         final InterstitialOfferDismissButtonClickListener dismissOfferClickListener = new InterstitialOfferDismissButtonClickListener();
         ImageButton dismissButton = findView(R.id.activity_buy_interstitial_dismiss_button);
-        dismissButton.setClickable(true);
         dismissButton.setOnClickListener(dismissOfferClickListener);
 
-        // going for it handling
         final OfferClickListener offerClickListener = new OfferClickListener();
-
-        final View topClickArea = findView(R.id.activity_buy_interstitial_click_area_1);
-        topClickArea.setClickable(true);
-        topClickArea.setOnClickListener(offerClickListener);
-
-        final TextView supportFrostWire = findView(R.id.activity_buy_interstitial_support_frostwire);
-        supportFrostWire.setText(supportFrostWire.getText().toString());
-        supportFrostWire.setClickable(true);
-        supportFrostWire.setOnClickListener(offerClickListener);
+        View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
+        offerLayout.setOnClickListener(offerClickListener);
 
         final TextView randomPitch = findView(R.id.activity_buy_interstitial_random_pitch);
         randomPitch.setText(getRandomPitch(true));
-        randomPitch.setClickable(true);
-        randomPitch.setOnClickListener(offerClickListener);
-
-        final TextView removeAds = findView(R.id.activity_buy_interstitial_remove_ads);
-        //removeAds.setText(removeAds.getText().toString());
-        removeAds.setClickable(true);
-        removeAds.setOnClickListener(offerClickListener);
-
-        final ImageButton frostWireLogoButton = findView(R.id.activity_buy_interstitial_frostwire_logo);
-        frostWireLogoButton.setClickable(true);
-        frostWireLogoButton.setOnClickListener(offerClickListener);
-
-        final TextView adFree = findView(R.id.activity_buy_interstitial_ad_free);
-        adFree.setText(adFree.getText().toString());
-        adFree.setClickable(true);
-        adFree.setOnClickListener(offerClickListener);
     }
 
     @Override
