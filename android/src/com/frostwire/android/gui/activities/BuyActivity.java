@@ -271,7 +271,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
         initProductCard(card6months, store, Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, Products.INAPP_DISABLE_ADS_6_MONTHS_SKU);
 
-        View.OnClickListener cardClickListener = createCardClickListener();
+        View.OnClickListener cardClickListener = new ProductCardViewOnClickListener();
         card30days.setOnClickListener(cardClickListener);
         card1year.setOnClickListener(cardClickListener);
         card6months.setOnClickListener(cardClickListener);
@@ -425,10 +425,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         paymentOptionsView.animate().setDuration(200)
                 .scaleY(1).setInterpolator(new DecelerateInterpolator())
                 .start();
-    }
-
-    private View.OnClickListener createCardClickListener() {
-        return new ProductCardViewOnClickListener();
     }
 
     private class ProductCardViewOnClickListener implements View.OnClickListener {
