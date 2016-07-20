@@ -93,7 +93,6 @@ class RemoveAdsNetwork implements AdNetwork {
             intent.putExtra(BuyActivity.INTERSTITIAL_MODE, true);
             intent.putExtra("shutdownActivityAfterwards", shutdownActivityAfterwards);
             intent.putExtra("dismissActivityAfterward", dismissActivityAfterward);
-            intent.putExtra("callerActivity", activityRef.get().getLocalClassName());
             activityRef.get().startActivity(intent);
             return true;
         }

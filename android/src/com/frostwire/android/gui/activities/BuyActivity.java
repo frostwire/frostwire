@@ -200,16 +200,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         handleBackButtonPressed();
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // this method is for older than API 5
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            handleBackButtonPressed();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
     private void handleBackButtonPressed() {
         Intent intent = getIntent();
         if (intent.hasExtra(INTERSTITIAL_MODE)) {
