@@ -358,18 +358,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         return paymentOptionsVisibility;
     }
 
-    private void on30DaysCardTouched() {
-        selectedProductCard = card30days;
-    }
-
-    private void on1YearCardTouched() {
-        selectedProductCard = card1year;
-    }
-
-    private void on6MonthsCardTouched() {
-        selectedProductCard = card6months;
-    }
-
     private void highlightSelectedCard() {
         if (selectedProductCard == null) {
             return;
@@ -434,17 +422,16 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 int id = v.getId();
                 switch (id) {
                     case R.id.activity_buy_product_card_30_days:
-                        BuyActivity.this.on30DaysCardTouched();
+                        selectedProductCard = card30days;
                         break;
                     case R.id.activity_buy_product_card_1_year:
-                        BuyActivity.this.on1YearCardTouched();
+                        selectedProductCard = card1year;
                         break;
                     case R.id.activity_buy_product_card_6_months:
-                        BuyActivity.this.on6MonthsCardTouched();
+                        selectedProductCard = card6months;
                         break;
                     default:
-                        BuyActivity.this.on1YearCardTouched();
-                        break;
+                        throw new IllegalArgumentException("Card view not handled, review layout");
                 }
                 highlightSelectedCard();
                 showPaymentOptionsBelowSelectedCard();
