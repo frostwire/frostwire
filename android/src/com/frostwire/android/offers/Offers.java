@@ -77,6 +77,8 @@ public final class Offers {
 
         if (Products.disabledAds(PlayStore.getInstance())) {
             LOG.info("Skipping interstitial ads display, PlayStore reports no ads");
+        } else if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE)) {
+            LOG.info("Skipping interstitial ads display, Plus instance not supporting FrostWire development");
         } else {
             final WeakReference<Activity> activityRef = Ref.weak(activity);
             for (AdNetwork adNetwork : AD_NETWORKS) {
@@ -87,8 +89,6 @@ public final class Offers {
             }
         }
         if (!interstitialShown) {
-
-
             if (dismissAfterwards) {
                 activity.finish();
             }
