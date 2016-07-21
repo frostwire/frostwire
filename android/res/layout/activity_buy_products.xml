@@ -50,7 +50,8 @@
                      android:layout_height="wrap_content"
                      android:layout_weight="0"
                      android:paddingRight="2dp"
-                     android:layout_gravity="center_vertical|right"/>
+                     android:layout_gravity="center_vertical|right"
+                     android:contentDescription="@null"/>
 
     </LinearLayout>
 

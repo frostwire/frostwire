@@ -85,11 +85,7 @@ public class ProductCardView extends LinearLayout {
      */
     public void setSelected(boolean selected) {
         super.setSelected(selected);
-        setBackground(selected ? R.drawable.product_card_background_selected : R.drawable.product_card_background);
-    }
-
-    private void setBackground(int id) {
-        getChildAt(0).setBackgroundResource(id);
+        setBackgroundResource(selected ? R.drawable.product_card_background_selected : R.drawable.product_card_background);
     }
 
     private void initComponents() {
