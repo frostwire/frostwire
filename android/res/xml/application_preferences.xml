@@ -143,11 +143,6 @@
                 android:summary="@string/use_monova_summary"
                 android:title="@string/use_monova"/>
         <CheckBoxPreference
-                android:key="frostwire.prefs.search.use_kat"
-                android:summary="@string/use_kat_summary"
-                android:title="@string/use_kat"
-        />
-        <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_soundcloud"
                 android:summary="@string/use_soundcloud"
                 android:title="@string/use_soundcloud"/>

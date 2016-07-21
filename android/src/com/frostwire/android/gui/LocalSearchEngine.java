@@ -22,7 +22,6 @@ import android.text.Html;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.search.*;
 import com.frostwire.search.extratorrent.ExtratorrentSearchResult;
-import com.frostwire.search.kat.KATSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.StringUtils;
@@ -44,7 +43,7 @@ public final class LocalSearchEngine {
     private final int MIN_SEEDS_TORRENT_RESULT;
 
     private static LocalSearchEngine instance;
-    private final HashSet<Integer> opened = new HashSet<Integer>();
+    private final HashSet<Integer> opened = new HashSet<>();
     private long currentSearchToken;
     private List<String> currentSearchTokens;
     private boolean searchFinished;
@@ -190,7 +189,7 @@ public final class LocalSearchEngine {
                         if (age > 31536000000l) {
                             continue;
                         }
-                    } else if (sr instanceof KATSearchResult || sr instanceof ExtratorrentSearchResult) {
+                    } else if (sr instanceof ExtratorrentSearchResult) {
                         // TODO: Search architecture hack, gotta abstract these guys.
                         if (((TorrentSearchResult) sr).getSeeds() < KAT_MIN_SEEDS_TORRENT_RESULT) {
                             continue;

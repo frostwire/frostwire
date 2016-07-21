@@ -26,7 +26,6 @@ import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
-import com.frostwire.search.kat.KATSearchPerformer;
 import com.frostwire.search.mininova.MininovaSearchPerformer;
 import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
@@ -60,7 +59,6 @@ public abstract class SearchEngine {
     private final BooleanSetting _setting;
 
     public static final int MININOVA_ID = 1;
-    public static final int KAT_ID = 8;
     public static final int EXTRATORRENT_ID = 4;
     public static final int TPB_ID = 6;
     public static final int MONOVA_ID = 7;
@@ -80,13 +78,6 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new MininovaSearchPerformer(MININOVA.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
-    public static final SearchEngine KAT = new SearchEngine(KAT_ID, "KAT", SearchEnginesSettings.KAT_SEARCH_ENABLED, "kat.cr") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new KATSearchPerformer(KAT.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
@@ -218,7 +209,7 @@ public abstract class SearchEngine {
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        return Arrays.asList(YOUTUBE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, KAT, MONOVA, ARCHIVEORG, TORLOCK, YIFY, BTJUNKIE, BITSNOOP, EZTV, TORRENTDOWNLOADS);
+        return Arrays.asList(YOUTUBE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, MONOVA, ARCHIVEORG, TORLOCK, YIFY, BTJUNKIE, BITSNOOP, EZTV, TORRENTDOWNLOADS);
     }
 
     public static List<SearchEngine> getActiveEngines() {
