@@ -29,6 +29,7 @@ import com.frostwire.util.ThreadPool;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +42,7 @@ public final class Offers {
     private Offers() {
     }
 
-    static final ThreadPool THREAD_POOL = new ThreadPool("SearchManager", 1, 5, 1L, new LinkedBlockingQueue<Runnable>(), true);
+    static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<Runnable>(), true);
     private static long lastInterstitialShownTimestamp = -1;
 
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
@@ -59,6 +60,10 @@ public final class Offers {
         for (AdNetwork adNetwork : AD_NETWORKS) {
             adNetwork.initialize(activity);
         }
+
+        // I do this afterwards because the Products.listEnabled() method shouldn't be done on the UI thread.
+        // also the network.stop() method shouldn't have any thread-safety issues.
+        stopAdNetworksIfPurchasedRemoveAds(activity);
     }
 
     public static void stopAdNetworks(Context context) {
@@ -116,5 +121,26 @@ public final class Offers {
             TM.resetStartedTransfers();
             Offers.lastInterstitialShownTimestamp = System.currentTimeMillis();
         }
+    }
+
+    private static void stopAdNetworksIfPurchasedRemoveAds(Context ctx) {
+        final WeakReference<Context> ctxRef = Ref.weak(ctx);
+        THREAD_POOL.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (!Ref.alive(ctxRef)) {
+                    return;
+                }
+                final Context context = ctxRef.get();
+                final ConfigurationManager CM = ConfigurationManager.instance();
+                final PlayStore playStore = PlayStore.getInstance();
+                final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
+                if (purchasedProducts != null && purchasedProducts.size() > 0) {
+                    LOG.info("Turning off ads, user previously purchased AdRemoval");
+                    CM.setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
+                    Offers.stopAdNetworks(context);
+                }
+            }
+        });
     }
 }
