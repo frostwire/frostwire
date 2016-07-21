@@ -27,6 +27,7 @@ import java.util.List;
  * @author aldenml
  */
 public final class Products {
+
     private Products() {
     }
 
@@ -38,7 +39,7 @@ public final class Products {
     public static final String SUBS_DISABLE_ADS_6_MONTHS_SKU = getSKU("com.frostwire.subs.disable_ads.6_months");
     public static final String SUBS_DISABLE_ADS_1_YEAR_SKU = getSKU("com.frostwire.subs.disable_ads.1_year");
 
-    // inapp product duration in days
+    // inapp/subs product duration in days
     private static final int DISABLE_ADS_1_MONTH_DAYS = 31;
     private static final int DISABLE_ADS_6_MONTHS_DAYS = 183;
     private static final int DISABLE_ADS_1_YEAR_DAYS = 365;
@@ -66,11 +67,9 @@ public final class Products {
         return store.enabled(DISABLE_ADS_FEATURE);
     }
 
-    public static int getProductDurationInDays(String sku) {
+    public static int toDays(String sku) {
         int result = -1;
-        if (sku == null || sku.isEmpty()) {
-            return result;
-        }
+
         if (INAPP_DISABLE_ADS_1_MONTH_SKU.equals(sku) ||
                 SUBS_DISABLE_ADS_1_MONTH_SKU.equals(sku)) {
             result = DISABLE_ADS_1_MONTH_DAYS;
@@ -81,6 +80,11 @@ public final class Products {
                 SUBS_DISABLE_ADS_1_YEAR_SKU.equals(sku)) {
             result = DISABLE_ADS_1_YEAR_DAYS;
         }
+
+        if (result < 0) {
+            throw new IllegalArgumentException("SKU argument does not represent a product with duration");
+        }
+
         return result;
     }
 

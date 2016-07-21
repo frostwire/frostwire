@@ -474,7 +474,7 @@ public class SettingsActivity extends PreferenceActivity {
                 String daysLeft = "";
                 // if it's a one time purchase, show user how many days left she has.
                 if (!product.subscription() && product.purchased()) {
-                    int daysBought = Products.getProductDurationInDays(product.sku());
+                    int daysBought = Products.toDays(product.sku());
                     if (daysBought > 0) {
                         final int MILLISECONDS_IN_A_DAY = 86400;
                         long timePassed = System.currentTimeMillis() - product.purchaseTime();
