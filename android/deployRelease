@@ -1,0 +1,26 @@
+#!/usr/bin/env perl -w
+$num_args = $#ARGV + 1;
+my $flavor='plus';
+
+if ($num_args > 0) {
+    $flavor = $ARGV[0];
+
+    if ($flavor ne 'plus' && $flavor ne'basic' && $flavor ne 'store') {
+	print "\nInvalid flavor '$flavor'. (flavors: <basic|plus|store>)\n\n";
+        exit;
+    }
+
+} else {
+    print "\nNo flavor argument given.\n";
+    print "\nUsage: ./deployRelease <basic|plus|store>\n\n";
+    exit;
+}
+
+my $manifest=`cat AndroidManifest.xml | grep "android:versionCode" | head -n 1`;
+$manifest =~ /android:versionCode="(.*)" android:versionName="(.*?)">$/g;
+my $build=$1;
+my $version=$2;
+print "BUILD:$build\n";
+print "VERSION:$version\n";
+print "FLAVOR:$flavor\n";
+system("adb uninstall com.frostwire.android; ./gradlew clean assembleRelease; cd build; adb install frostwire-android-release-$version-b$build-$flavor.apk; cd ..");
