@@ -39,13 +39,10 @@
         <TextView android:id="@+id/view_product_card_title_normal_portion"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
+                  android:layout_weight="1"
                   android:text="@string/dummy_title"
                   android:layout_marginLeft="5dp"
                   style="@style/BuyNoAdsCardTitle"/>
-        <!-- separating filler -->
-        <View android:layout_width="0dp"
-              android:layout_height="0dp"
-              android:layout_weight="1.0"/>
 
         <TextView android:id="@+id/view_product_card_hint_button"
                   android:layout_width="wrap_content"
