@@ -34,6 +34,7 @@ import com.frostwire.android.R;
  * @author aldenml
  */
 public class ProductPaymentOptionsView extends LinearLayout {
+
     public enum PurchaseButton {
         AutomaticRenewal,
         OneTimePurchase
