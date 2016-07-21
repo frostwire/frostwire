@@ -67,6 +67,8 @@ public class InMobiAdNetwork implements AdNetwork {
 
     @Override
     public void stop(Context context) {
+        started = false;
+        LOG.info("stopped");
     }
 
     public boolean enabled() {

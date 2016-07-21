@@ -28,7 +28,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.*;
-import android.preference.CheckBoxPreference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +37,7 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.Toast;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
@@ -50,15 +50,19 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.preference.*;
+import com.frostwire.android.gui.views.preference.NumberPickerPreference;
+import com.frostwire.android.gui.views.preference.SimpleActionPreference;
+import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.logging.Logger;
+import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 
 /**
@@ -71,6 +75,7 @@ import java.util.Collection;
 public class SettingsActivity extends PreferenceActivity {
 
     private static final Logger LOG = Logger.getLogger(SettingsActivity.class);
+    private static final boolean INTERNAL_BUILD = true;
     private static String currentPreferenceKey = null;
     private boolean finishOnBack = false;
 
@@ -480,22 +485,8 @@ public class SettingsActivity extends PreferenceActivity {
                     }
                 }
                 p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
-                p.setEnabled(false);
-
-                p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        if (purchasedProducts != null && !purchasedProducts.isEmpty()) {
-                            LOG.info("Products purchased by user:");
-                            for (Product p : purchasedProducts) {
-                                LOG.info(" - " + p.description() + " (" + p.sku() + ")");
-                            }
-                        } else {
-                            LOG.info("Couldn't find any purchases.");
-                        }
-                        return false;
-                    }
-                });
+                p.setOnPreferenceClickListener(new RemoveAdsOnPreferenceClickListener(this, purchasedProducts));
+                //otherwise, a BuyActivity intent has been configured on application_preferences.xml
             }
         }
     }
@@ -646,6 +637,51 @@ public class SettingsActivity extends PreferenceActivity {
                 preferenceScreen.onItemClick(null, null, itemNumber, 0);
                 break;
             }
+        }
+    }
+
+    private static class RemoveAdsOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
+        private int clicksLeftToConsumeProducts = 20;
+        private final Collection<Product> purchasedProducts;
+        private WeakReference<SettingsActivity> activityRef;
+
+        RemoveAdsOnPreferenceClickListener(SettingsActivity activity, final Collection<Product> purchasedProducts) {
+            activityRef = Ref.weak(activity);
+            this.purchasedProducts = purchasedProducts;
+        }
+
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            if (purchasedProducts != null && !purchasedProducts.isEmpty()) {
+                LOG.info("Products purchased by user:");
+                for (Product p : purchasedProducts) {
+                    LOG.info(" - " + p.description() + " (" + p.sku() + ")");
+                }
+
+                if (INTERNAL_BUILD) {
+                    clicksLeftToConsumeProducts--;
+                    LOG.info("If you click again " + clicksLeftToConsumeProducts + " times, all your ONE-TIME purchases will be forced-consumed.");
+                    if (0 >= clicksLeftToConsumeProducts && clicksLeftToConsumeProducts < 11) {
+                        if (clicksLeftToConsumeProducts == 0) {
+                            for (Product p : purchasedProducts) {
+                                PlayStore.getInstance().consumePurchasedProduct(p);
+                                LOG.info(" - " + p.description() + " (" + p.sku() + ") force-consumed!");
+                                UIUtils.showToastMessage(preference.getContext(),
+                                        "Product " + p.sku() + " forced-consumed.",
+                                        Toast.LENGTH_SHORT);
+                            }
+                            if (Ref.alive(activityRef)) {
+                                activityRef.get().finish();
+                            }
+                        }
+                    }
+                }
+
+                return true; // true = click was handled.
+            } else {
+                LOG.info("Couldn't find any purchases.");
+            }
+            return false;
         }
     }
 }

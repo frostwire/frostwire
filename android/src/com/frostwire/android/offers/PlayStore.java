@@ -213,12 +213,30 @@ public final class PlayStore extends StoreBase {
         final Iterator<Product> iterator = allAvailableProducts.iterator();
         while (iterator.hasNext()) {
             Product product = iterator.next();
-            if (product.enabled(Products.DISABLE_ADS_FEATURE)) {
+            if (product.enabled(Products.DISABLE_ADS_FEATURE) && product.purchased()) {
                 purchasedProducts.add(product);
             }
         }
         return purchasedProducts;
     }
+
+    public void consumePurchasedProduct(Product product) {
+        try {
+            final Inventory inventory = helper.queryInventory();
+            final Purchase purchase = inventory.getPurchase(product.sku());
+            helper.consumeAsync(purchase, consumeFinishedListener);
+            LOG.info("product " + product.sku() + " consumed.");
+        } catch (IabException e) {
+            LOG.error(e.getMessage(), e);
+            e.printStackTrace();
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            LOG.error(e.getMessage(), e);
+            e.printStackTrace();
+        } catch (Throwable e) {
+            LOG.error(e.getMessage(), e);
+        }
+    }
+
 
     public void dispose() {
         if (helper == null) {

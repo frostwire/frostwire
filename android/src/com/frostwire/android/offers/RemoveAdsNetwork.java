@@ -38,7 +38,7 @@ class RemoveAdsNetwork implements AdNetwork {
     private boolean started;
     @SuppressWarnings("unused")
     private final boolean DEBUG_MODE;
-    private static final Logger LOGGER = Logger.getLogger(RemoveAdsNetwork.class);
+    private static final Logger LOG = Logger.getLogger(RemoveAdsNetwork.class);
 
     RemoveAdsNetwork(boolean debugMode) {
         DEBUG_MODE = debugMode;
@@ -47,9 +47,9 @@ class RemoveAdsNetwork implements AdNetwork {
     @Override
     public void initialize(Activity activity) {
         if (!(started = enabled())) {
-            LOGGER.info("RemoveAds initialize(): aborted. not enabled.");
+            LOG.info("RemoveAds initialize(): aborted. not enabled.");
             if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-                LOGGER.info("RemoveAds initialize(): not available for plus.");
+                LOG.info("RemoveAds initialize(): not available for plus.");
             }
             started = false;
             return;
@@ -59,6 +59,7 @@ class RemoveAdsNetwork implements AdNetwork {
     @Override
     public void stop(Context context) {
         started = false;
+        LOG.info("stopped");
     }
 
     @Override
@@ -70,19 +71,19 @@ class RemoveAdsNetwork implements AdNetwork {
                 enabled = false;
             } else {
                 config = ConfigurationManager.instance();
-                LOGGER.info("config use removeAds -> " + config.getBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS));
+                LOG.info("config use removeAds -> " + config.getBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS));
                 enabled = config.getBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS);
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        LOGGER.info("enabled() -> " + enabled);
+        LOG.info("enabled() -> " + enabled);
         return enabled;
     }
 
     @Override
     public boolean started() {
-        LOGGER.info("started() -> " + started);
+        LOG.info("started() -> " + started);
         return started;
     }
 

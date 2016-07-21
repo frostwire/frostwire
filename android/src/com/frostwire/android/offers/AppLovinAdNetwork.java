@@ -67,7 +67,8 @@ public class AppLovinAdNetwork implements AdNetwork {
 
     @Override
     public void stop(Context context) {
-
+        started = false;
+        LOG.info("stopped");
     }
 
     public void loadNewInterstitial(Activity activity) {

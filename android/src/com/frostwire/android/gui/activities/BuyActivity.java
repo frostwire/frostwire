@@ -35,6 +35,7 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsViewListener;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
@@ -418,6 +419,8 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 //            if (data.hasExtra("RESPONSE_CODE")) {
 //                LOGGER.info("onActivityResult: RESPONSE_CODE= " + data.getIntExtra("RESPONSE_CODE",0));
 //            }
+            // make sure ads won't show on this session any more if we got a positive response.
+            Offers.stopAdNetworks(this);
             finish();
         }
     }
