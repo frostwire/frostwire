@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
@@ -8,18 +25,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.offers.Product;
-import com.frostwire.logging.Logger;
 
 /**
  * Created on 7/7/16.
+ *
  * @author gubatron
  * @author marcelinkaaa
  * @author aldenml
- *
  */
 public class ProductCardView extends LinearLayout {
-    @SuppressWarnings("unused")
-    private static Logger LOGGER = Logger.getLogger(ProductCardView.class);
+
     private final String titleBold;
     private final String titleNormal;
     private String price;
@@ -30,15 +45,6 @@ public class ProductCardView extends LinearLayout {
 
     public ProductCardView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        if (isInEditMode()) {
-            titleBold = "[Title Bold]";
-            titleNormal = "[dummy title]";
-            price = "$0.99";
-            description = "[dummy description]";
-            hintButtonCaption = "[dummy hint]";
-            selected = hintButtonVisible = false;
-            return;
-        }
         TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ProductCardView, 0, 0);
         titleBold = attributes.getString(R.styleable.ProductCardView_product_card_title_bold);
         titleNormal = attributes.getString(R.styleable.ProductCardView_product_card_title_normal);
@@ -74,6 +80,7 @@ public class ProductCardView extends LinearLayout {
 
     /**
      * Replaces the card's background to make it look selected/not selected.
+     *
      * @param selected
      */
     public void setSelected(boolean selected) {
@@ -98,16 +105,12 @@ public class ProductCardView extends LinearLayout {
     }
 
     private void initTextView(int id, String value, boolean visible) {
-        TextView textView = findView(id);
+        TextView textView = (TextView) findViewById(id);
         if (visible && value != null) {
             textView.setText(value);
             textView.setVisibility(View.VISIBLE);
-        }  else {
+        } else {
             textView.setVisibility(View.GONE);
         }
-    }
-
-    private <T> T findView(int id) {
-        return (T) findViewById(id);
     }
 }
