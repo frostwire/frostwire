@@ -89,6 +89,12 @@ public final class Products {
         return result;
     }
 
+    /**
+     * Returns a list of products that have been purchased and enabled to the user.
+     * @param store
+     * @param code
+     * @return
+     */
     public static List<Product> listEnabled(Store store, String code) {
         List<Product> list = new LinkedList<>();
 
