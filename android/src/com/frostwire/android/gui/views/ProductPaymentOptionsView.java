@@ -66,29 +66,29 @@ public class ProductPaymentOptionsView extends LinearLayout {
     }
 
     public void hideProgressBarOnButton(PurchaseButton button) {
-        View[] views = getButtonAndProgressBarViews(button);
+        View[] views = getButtonAndProgressBarViews(button == PurchaseButton.AutomaticRenewal);
         views[0].setVisibility(View.VISIBLE);
         views[1].setVisibility(View.GONE);
     }
 
     private void showProgressBarOnButton(PurchaseButton button) {
-        View[] views = getButtonAndProgressBarViews(button);
+        View[] views = getButtonAndProgressBarViews(button == PurchaseButton.AutomaticRenewal);
         views[0].setVisibility(View.GONE);
         views[1].setVisibility(View.VISIBLE);
     }
 
-    private View[] getButtonAndProgressBarViews(PurchaseButton button) {
-        int buttonId = button == PurchaseButton.AutomaticRenewal ?
-                R.id.view_product_payment_options_buy_automatic_renewal_button :
-                R.id.view_product_payment_options_buy_one_time_button;
-        int progressBarId = button == PurchaseButton.AutomaticRenewal ?
-                R.id.view_product_payment_options_progressbar_automatic_renewal :
-                R.id.view_product_payment_options_progressbar_one_time;
+    private View[] getButtonAndProgressBarViews(boolean subscription) {
+        View[] views = subscription ?
+                new View[]{
+                        findViewById(R.id.view_product_payment_options_buy_automatic_renewal_button),
+                        findViewById(R.id.view_product_payment_options_progressbar_automatic_renewal)
+                } :
+                new View[]{
+                        findViewById(R.id.view_product_payment_options_buy_one_time_button),
+                        findViewById(R.id.view_product_payment_options_progressbar_one_time)
+                };
 
-        TextView purchaseButton = (TextView) findViewById(buttonId);
-        ProgressBar progressBar = (ProgressBar) findViewById(progressBarId);
-
-        return new View[]{purchaseButton, progressBar};
+        return views;
     }
 
     private class BuyButtonClickListener implements OnClickListener {
