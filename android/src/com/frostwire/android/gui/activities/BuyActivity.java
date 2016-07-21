@@ -414,13 +414,11 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.OneTimePurchase);
                 return;
             }
-//            LOGGER.info("onActivityResult: resultCode=" + resultCode);
-//            LOGGER.info("onActivityResult: has RESPONSE_CODE? " + data.hasExtra("RESPONSE_CODE"));
-//            if (data.hasExtra("RESPONSE_CODE")) {
-//                LOGGER.info("onActivityResult: RESPONSE_CODE= " + data.getIntExtra("RESPONSE_CODE",0));
-//            }
+
             // make sure ads won't show on this session any more if we got a positive response.
             Offers.stopAdNetworks(this);
+            // in case user gets plus
+            ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
             finish();
         }
     }
