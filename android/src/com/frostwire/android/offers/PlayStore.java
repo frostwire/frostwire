@@ -343,6 +343,8 @@ public final class PlayStore extends StoreBase {
                     helper.consumeAsync(p, consumeFinishedListener);
                 } catch (IabHelper.IabAsyncInProgressException e) {
                     LOG.error("Error consuming purchase. Another async operation in progress.", e);
+                } catch (Throwable e) {
+                    LOG.error("Error consuming purchase", e);
                 }
                 purchased = false;
             }
