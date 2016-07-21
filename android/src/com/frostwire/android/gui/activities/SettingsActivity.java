@@ -248,13 +248,13 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void setupSupportFrostWireOption() {
-         if (Constants.IS_STORE_ENABLED) {
-             PreferenceScreen category = (PreferenceScreen) findPreference(Constants.PREF_KEY_OTHER_PREFERENCE_CATEGORY);
-             final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
-             if (category != null && preference != null) {
-                 category.removePreference(preference);
-             }
-         }
+        if (Constants.IS_STORE_ENABLED) {
+            PreferenceScreen category = (PreferenceScreen) findPreference(Constants.PREF_KEY_OTHER_PREFERENCE_CATEGORY);
+            final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
+            if (category != null && preference != null) {
+                category.removePreference(preference);
+            }
+        }
     }
 
     private void setupPermanentStatusNotificationOption() {
@@ -468,7 +468,7 @@ public class SettingsActivity extends PreferenceActivity {
             s.removePreference(p);
         } else if (p != null) {
             final PlayStore playStore = PlayStore.getInstance();
-            final Collection<Product> purchasedProducts = playStore.purchasedProducts();
+            final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
             if (purchasedProducts != null && purchasedProducts.size() > 0) {
                 final Product product = purchasedProducts.iterator().next();
                 String daysLeft = "";

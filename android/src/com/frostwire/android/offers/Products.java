@@ -20,6 +20,7 @@ package com.frostwire.android.offers;
 import com.frostwire.android.BuildConfig;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -86,6 +87,18 @@ public final class Products {
         }
 
         return result;
+    }
+
+    public static List<Product> listEnabled(Store store, String code) {
+        List<Product> list = new LinkedList<>();
+
+        for (Product p : store.products().values()) {
+            if (!p.available() && p.purchased() && p.enabled(code)) {
+                list.add(p);
+            }
+        }
+
+        return list;
     }
 
     private static String getSKU(String skuId) {

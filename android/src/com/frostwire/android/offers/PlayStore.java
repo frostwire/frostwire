@@ -209,19 +209,6 @@ public final class PlayStore extends StoreBase {
         return super.enabled(code);
     }
 
-    public Collection<Product> purchasedProducts() {
-        Collection<Product> allAvailableProducts = products().values();
-        Collection<Product> purchasedProducts = new ArrayList<>();
-        final Iterator<Product> iterator = allAvailableProducts.iterator();
-        while (iterator.hasNext()) {
-            Product product = iterator.next();
-            if (product.enabled(Products.DISABLE_ADS_FEATURE) && product.purchased()) {
-                purchasedProducts.add(product);
-            }
-        }
-        return purchasedProducts;
-    }
-
     public void consumePurchasedProduct(Product product) {
         try {
             final Inventory inventory = helper.queryInventory();

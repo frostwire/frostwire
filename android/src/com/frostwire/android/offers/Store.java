@@ -58,6 +58,4 @@ public interface Store {
      * @param p
      */
     void purchase(Activity activity, Product p);
-
-    Collection<Product> purchasedProducts();
 }
