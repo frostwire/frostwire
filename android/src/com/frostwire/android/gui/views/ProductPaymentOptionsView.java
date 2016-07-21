@@ -56,29 +56,9 @@ public class ProductPaymentOptionsView extends LinearLayout {
     private void initClickListeners() {
         BuyButtonClickListener clickListener = new BuyButtonClickListener();
         final View automaticRenewalLayout = findViewById(R.id.view_product_payment_options_buy_automatic_renewal_layout);
-        final View automaticRenewalButton = findViewById(R.id.view_product_payment_options_buy_automatic_renewal_button);
-        final View automaticRenewalText = findViewById(R.id.view_product_payment_options_buy_automatic_renewal_text);
-        final View automaticRenewalRemark = findViewById(R.id.view_product_payment_options_buy_automatic_renewal_trial_remark);
-        automaticRenewalLayout.setClickable(true);
-        automaticRenewalButton.setClickable(true);
-        automaticRenewalText.setClickable(true);
-        automaticRenewalRemark.setClickable(true);
         automaticRenewalLayout.setOnClickListener(clickListener);
-        automaticRenewalButton.setOnClickListener(clickListener);
-        automaticRenewalText.setOnClickListener(clickListener);
-        automaticRenewalRemark.setOnClickListener(clickListener);
         final View oneTimeBuyLayout = findViewById(R.id.view_product_payment_options_buy_one_time_layout);
-        final View oneTimeBuyButton = findViewById(R.id.view_product_payment_options_buy_one_time_button);
-        final View oneTimeBuyText = findViewById(R.id.view_product_payment_options_buy_one_time_text);
-        final View oneTimeBuyRemark = findViewById(R.id.view_product_payment_options_buy_one_time_trial_remark);
-        oneTimeBuyLayout.setClickable(true);
-        oneTimeBuyButton.setClickable(true);
-        oneTimeBuyText.setClickable(true);
-        oneTimeBuyRemark.setClickable(true);
         oneTimeBuyLayout.setOnClickListener(clickListener);
-        oneTimeBuyButton.setOnClickListener(clickListener);
-        oneTimeBuyText.setOnClickListener(clickListener);
-        oneTimeBuyRemark.setOnClickListener(clickListener);
     }
 
     public void setBuyButtonsListener(ProductPaymentOptionsViewListener listener) {
@@ -117,16 +97,10 @@ public class ProductPaymentOptionsView extends LinearLayout {
             if (listener != null) {
                 switch (v.getId()) {
                     case R.id.view_product_payment_options_buy_automatic_renewal_layout:
-                    case R.id.view_product_payment_options_buy_automatic_renewal_button:
-                    case R.id.view_product_payment_options_buy_automatic_renewal_text:
-                    case R.id.view_product_payment_options_buy_automatic_renewal_trial_remark:
                         showProgressBarOnButton(PurchaseButton.AutomaticRenewal);
                         listener.onBuyAutomaticRenewal();
                         break;
                     case R.id.view_product_payment_options_buy_one_time_layout:
-                    case R.id.view_product_payment_options_buy_one_time_button:
-                    case R.id.view_product_payment_options_buy_one_time_text:
-                    case R.id.view_product_payment_options_buy_one_time_trial_remark:
                         showProgressBarOnButton(PurchaseButton.OneTimePurchase);
                         listener.onBuyOneTime();
                         break;

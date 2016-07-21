@@ -29,7 +29,9 @@
                   android:layout_height="match_parent"
                   android:orientation="vertical"
                   android:background="@color/basic_blue_highlight"
-                  android:weightSum="1">
+                  android:weightSum="1"
+                  android:clickable="true"
+                  android:focusable="true">
 
         <ImageButton android:id="@+id/activity_buy_interstitial_dismiss_button"
                      android:src="@drawable/full_screen_close"

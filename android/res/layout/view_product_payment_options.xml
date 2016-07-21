@@ -45,7 +45,9 @@
                   android:layout_marginTop="15dp"
                   android:orientation="horizontal"
                   android:layout_weight="1"
-                  android:baselineAligned="false">
+                  android:baselineAligned="false"
+                  android:clickable="true"
+                  android:focusable="true">
 
         <RelativeLayout android:layout_width="0dp"
                         android:layout_weight="0.3"
@@ -76,14 +78,12 @@
                       android:paddingLeft="20dp"
                       android:layout_weight="0.7">
 
-            <TextView android:id="@+id/view_product_payment_options_buy_automatic_renewal_text"
-                      style="@style/BuyNoAdsCardTitle.Purchase"
+            <TextView style="@style/BuyNoAdsCardTitle.Purchase"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/automatic_renewal"/>
 
-            <TextView android:id="@+id/view_product_payment_options_buy_automatic_renewal_trial_remark"
-                      style="@style/BuyNoAdsCardDescription"
+            <TextView style="@style/BuyNoAdsCardDescription"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/includes_3_day_free_trial"/>
@@ -100,7 +100,9 @@
                   android:orientation="horizontal"
                   android:layout_weight="1"
                   android:layout_marginBottom="10dp"
-                  android:baselineAligned="false">
+                  android:baselineAligned="false"
+                  android:clickable="true"
+                  android:focusable="true">
 
         <RelativeLayout android:layout_width="0dp"
                         android:layout_weight="0.3"
@@ -130,14 +132,12 @@
                       android:paddingLeft="20dp"
                       android:layout_weight="0.7">
 
-            <TextView android:id="@+id/view_product_payment_options_buy_one_time_text"
-                      style="@style/BuyNoAdsCardTitle.Purchase"
+            <TextView style="@style/BuyNoAdsCardTitle.Purchase"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/one_time_purchase"/>
 
-            <TextView android:id="@+id/view_product_payment_options_buy_one_time_trial_remark"
-                      style="@style/BuyNoAdsCardDescription"
+            <TextView style="@style/BuyNoAdsCardDescription"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/no_trial_period_included"/>
