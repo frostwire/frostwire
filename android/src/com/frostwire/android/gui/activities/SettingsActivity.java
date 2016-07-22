@@ -664,7 +664,7 @@ public class SettingsActivity extends PreferenceActivity {
                     if (0 >= clicksLeftToConsumeProducts && clicksLeftToConsumeProducts < 11) {
                         if (clicksLeftToConsumeProducts == 0) {
                             for (Product p : purchasedProducts) {
-                                PlayStore.getInstance().consumePurchasedProduct(p);
+                                PlayStore.getInstance().consume(p);
                                 LOG.info(" - " + p.description() + " (" + p.sku() + ") force-consumed!");
                                 UIUtils.showToastMessage(preference.getContext(),
                                         "Product " + p.sku() + " forced-consumed.",

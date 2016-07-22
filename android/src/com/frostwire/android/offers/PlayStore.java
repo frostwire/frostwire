@@ -55,6 +55,7 @@ public final class PlayStore extends StoreBase {
     private IabHelper.OnIabPurchaseFinishedListener purchaseFinishedListener;
     private IabHelper.OnConsumeFinishedListener consumeFinishedListener;
 
+    private Inventory inventory;
     private long lastRefreshTime;
 
     private String lastSkuPurchased;
@@ -78,6 +79,7 @@ public final class PlayStore extends StoreBase {
                 }
 
                 products = buildProducts(inventory);
+                PlayStore.this.inventory = inventory;
             }
         };
 
@@ -209,23 +211,25 @@ public final class PlayStore extends StoreBase {
         return super.enabled(code);
     }
 
-    public void consumePurchasedProduct(Product product) {
+    /**
+     * This method is used only for internal tests.
+     *
+     * @param product
+     */
+    public final void consume(Product product) {
+        if (product.subscription() || !product.purchased()) {
+            throw new IllegalArgumentException("Only inapp purchases can be consumed");
+        }
         try {
-            final Inventory inventory = helper.queryInventory();
             final Purchase purchase = inventory.getPurchase(product.sku());
             helper.consumeAsync(purchase, consumeFinishedListener);
-            LOG.info("product " + product.sku() + " consumed.");
-        } catch (IabException e) {
-            LOG.error(e.getMessage(), e);
-            e.printStackTrace();
+            LOG.info("product " + product.sku() + " consumed (async).");
         } catch (IabHelper.IabAsyncInProgressException e) {
-            LOG.error(e.getMessage(), e);
-            e.printStackTrace();
+            LOG.error("Error consuming purchase. Another async operation in progress.", e);
         } catch (Throwable e) {
-            LOG.error(e.getMessage(), e);
+            LOG.error("Error consuming purchase.", e);
         }
     }
-
 
     public void dispose() {
         if (helper == null) {
