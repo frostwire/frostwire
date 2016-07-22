@@ -35,11 +35,6 @@ import com.frostwire.android.R;
  */
 public class ProductPaymentOptionsView extends LinearLayout {
 
-    public enum PurchaseButton {
-        AutomaticRenewal,
-        OneTimePurchase
-    }
-
     private ProductPaymentOptionsViewListener listener;
 
     public ProductPaymentOptionsView(Context context, AttributeSet attrs) {
@@ -65,8 +60,13 @@ public class ProductPaymentOptionsView extends LinearLayout {
         this.listener = listener;
     }
 
-    public void hideProgressBarOnButton(PurchaseButton button) {
-        View[] views = getButtonAndProgressBarViews(button == PurchaseButton.AutomaticRenewal);
+    public void stopProgressBar() {
+        stopProgressBar(true);
+        stopProgressBar(false);
+    }
+
+    private void stopProgressBar(boolean subscription) {
+        View[] views = getButtonAndProgressBarViews(subscription);
         views[0].setVisibility(View.VISIBLE);
         views[1].setVisibility(View.GONE);
     }

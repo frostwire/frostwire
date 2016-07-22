@@ -410,8 +410,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
             // RESPONSE_CODE = 0 -> Payment Successful
             // user clicked outside of the PlayStore purchase dialog
             if (data != null && data.hasExtra("RESPONSE_CODE") && data.getIntExtra("RESPONSE_CODE", 0) != 0) {
-                paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.AutomaticRenewal);
-                paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.OneTimePurchase);
+                paymentOptionsView.stopProgressBar();
                 return;
             }
 
