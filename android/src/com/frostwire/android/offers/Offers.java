@@ -123,24 +123,14 @@ public final class Offers {
         }
     }
 
-    private static void stopAdNetworksIfPurchasedRemoveAds(Context ctx) {
-        final WeakReference<Context> ctxRef = Ref.weak(ctx);
-        THREAD_POOL.execute(new Runnable() {
-            @Override
-            public void run() {
-                if (!Ref.alive(ctxRef)) {
-                    return;
-                }
-                final Context context = ctxRef.get();
-                final ConfigurationManager CM = ConfigurationManager.instance();
-                final PlayStore playStore = PlayStore.getInstance();
-                final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
-                if (purchasedProducts != null && purchasedProducts.size() > 0) {
-                    LOG.info("Turning off ads, user previously purchased AdRemoval");
-                    CM.setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
-                    Offers.stopAdNetworks(context);
-                }
-            }
-        });
+    private static void stopAdNetworksIfPurchasedRemoveAds(Context context) {
+        final ConfigurationManager CM = ConfigurationManager.instance();
+        final PlayStore playStore = PlayStore.getInstance();
+        final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
+        if (purchasedProducts != null && purchasedProducts.size() > 0) {
+            CM.setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
+            Offers.stopAdNetworks(context);
+            LOG.info("Turning off ads, user previously purchased AdRemoval");
+        }
     }
 }
