@@ -34,7 +34,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
-import com.frostwire.android.gui.views.ProductPaymentOptionsViewListener;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
@@ -46,7 +45,7 @@ import java.util.Random;
  * @author gubatron
  * @author aldenml
  */
-public class BuyActivity extends AbstractActivity implements ProductPaymentOptionsViewListener {
+public class BuyActivity extends AbstractActivity {
 
     public static final String INTERSTITIAL_MODE = "interstitialMode";
     private static final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
@@ -62,16 +61,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     public BuyActivity() {
         super(R.layout.activity_buy);
-    }
-
-    @Override
-    public void onBuyAutomaticRenewal() {
-        purchaseProduct(R.id.SUBS_PRODUCT_KEY);
-    }
-
-    @Override
-    public void onBuyOneTime() {
-        purchaseProduct(R.id.INAPP_PRODUCT_KEY);
     }
 
     private void purchaseProduct(int tagId) {
@@ -258,8 +247,18 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     private void initPaymentOptionsView(int paymentOptionsVisibility) {
         paymentOptionsView = findView(R.id.activity_buy_product_payment_options_view);
-        paymentOptionsView.setBuyButtonsListener(this);
         paymentOptionsView.setVisibility(paymentOptionsVisibility);
+        paymentOptionsView.setOnBuyListener(new ProductPaymentOptionsView.OnBuyListener() {
+            @Override
+            public void onAutomaticRenewal() {
+                purchaseProduct(R.id.SUBS_PRODUCT_KEY);
+            }
+
+            @Override
+            public void onOneTime() {
+                purchaseProduct(R.id.INAPP_PRODUCT_KEY);
+            }
+        });
 
         if (paymentOptionsVisibility == View.VISIBLE) {
             showPaymentOptionsBelowSelectedCard();

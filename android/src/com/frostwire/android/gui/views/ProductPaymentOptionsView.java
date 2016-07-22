@@ -35,7 +35,7 @@ import com.frostwire.android.R;
  */
 public class ProductPaymentOptionsView extends LinearLayout {
 
-    private ProductPaymentOptionsViewListener listener;
+    private OnBuyListener listener;
 
     public ProductPaymentOptionsView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -56,7 +56,11 @@ public class ProductPaymentOptionsView extends LinearLayout {
         oneTimeBuyLayout.setOnClickListener(clickListener);
     }
 
-    public void setBuyButtonsListener(ProductPaymentOptionsViewListener listener) {
+    public OnBuyListener getOnBuyListener() {
+        return listener;
+    }
+
+    public void setOnBuyListener(OnBuyListener listener) {
         this.listener = listener;
     }
 
@@ -98,14 +102,21 @@ public class ProductPaymentOptionsView extends LinearLayout {
                 switch (v.getId()) {
                     case R.id.view_product_payment_options_buy_automatic_renewal_layout:
                         startProgressBar(true);
-                        listener.onBuyAutomaticRenewal();
+                        listener.onAutomaticRenewal();
                         break;
                     case R.id.view_product_payment_options_buy_one_time_layout:
                         startProgressBar(false);
-                        listener.onBuyOneTime();
+                        listener.onOneTime();
                         break;
                 }
             }
         }
+    }
+
+    public interface OnBuyListener {
+
+        void onAutomaticRenewal();
+
+        void onOneTime();
     }
 }
