@@ -71,8 +71,8 @@ public class ProductPaymentOptionsView extends LinearLayout {
         views[1].setVisibility(View.GONE);
     }
 
-    private void showProgressBarOnButton(PurchaseButton button) {
-        View[] views = getButtonAndProgressBarViews(button == PurchaseButton.AutomaticRenewal);
+    private void startProgressBar(boolean subscription) {
+        View[] views = getButtonAndProgressBarViews(subscription);
         views[0].setVisibility(View.GONE);
         views[1].setVisibility(View.VISIBLE);
     }
@@ -97,11 +97,11 @@ public class ProductPaymentOptionsView extends LinearLayout {
             if (listener != null) {
                 switch (v.getId()) {
                     case R.id.view_product_payment_options_buy_automatic_renewal_layout:
-                        showProgressBarOnButton(PurchaseButton.AutomaticRenewal);
+                        startProgressBar(true);
                         listener.onBuyAutomaticRenewal();
                         break;
                     case R.id.view_product_payment_options_buy_one_time_layout:
-                        showProgressBarOnButton(PurchaseButton.OneTimePurchase);
+                        startProgressBar(false);
                         listener.onBuyOneTime();
                         break;
                 }
