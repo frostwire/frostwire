@@ -32,6 +32,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
@@ -124,15 +125,11 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         boolean showSingleOptions = showSingleOptions(checked, fd);
 
-        if (TransferManager.canSeedFromMyFilesTempHACK()) {
-            if (showSingleOptions) {
-                items.add(new SeedAction(context, fd));
-            } else {
-                items.add(new SeedAction(context, checked));
-            }
-        }
-
         if (showSingleOptions) {
+            if (AndroidPlatform.saf(new File(fd.filePath))) {
+                items.add(new SeedAction(context, fd));
+            }
+
             if (canOpenFile) {
                 items.add(new OpenMenuAction(context, fd.filePath, fd.mime));
             }
