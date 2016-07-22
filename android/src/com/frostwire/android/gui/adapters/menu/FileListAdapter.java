@@ -126,7 +126,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         boolean showSingleOptions = showSingleOptions(checked, fd);
 
         if (showSingleOptions) {
-            if (AndroidPlatform.saf(new File(fd.filePath))) {
+            if (!AndroidPlatform.saf(new File(fd.filePath))) {
                 items.add(new SeedAction(context, fd));
             }
 

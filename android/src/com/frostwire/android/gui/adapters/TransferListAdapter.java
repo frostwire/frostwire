@@ -281,7 +281,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
-            if (files != null && files.size() == 1 && AndroidPlatform.saf(new File(files.get(0).filePath))) {
+            if (files != null && files.size() == 1 && !AndroidPlatform.saf(new File(files.get(0).filePath))) {
                 items.add(new SeedAction(context.get(), files.get(0),download));
             }
             items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
