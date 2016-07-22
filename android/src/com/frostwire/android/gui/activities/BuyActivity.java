@@ -251,12 +251,12 @@ public class BuyActivity extends AbstractActivity {
         paymentOptionsView.setOnBuyListener(new ProductPaymentOptionsView.OnBuyListener() {
             @Override
             public void onAutomaticRenewal() {
-                purchaseProduct(R.id.SUBS_PRODUCT_KEY);
+                purchaseProduct(R.id.subs_product_tag_id);
             }
 
             @Override
             public void onOneTime() {
-                purchaseProduct(R.id.INAPP_PRODUCT_KEY);
+                purchaseProduct(R.id.inapp_product_tag_id);
             }
         });
 
@@ -282,8 +282,8 @@ public class BuyActivity extends AbstractActivity {
         Product prodSubs = store.product(subsSKU);
         Product prodInApp = store.product(inappSKU);
 
-        card.setTag(R.id.SUBS_PRODUCT_KEY, prodSubs);
-        card.setTag(R.id.INAPP_PRODUCT_KEY, prodInApp);
+        card.setTag(R.id.subs_product_tag_id, prodSubs);
+        card.setTag(R.id.inapp_product_tag_id, prodInApp);
 
         if (prodSubs != null) {
             card.updateData(prodSubs);
