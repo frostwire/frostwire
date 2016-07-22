@@ -99,9 +99,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     @Override
     protected MenuAdapter getMenuAdapter(View view) {
-        Handler h = new Handler(Looper.getMainLooper());
-        h.sendEmptyMessage(5011105);
-
         Context context = getContext();
 
         List<MenuAction> items = new ArrayList<>();
