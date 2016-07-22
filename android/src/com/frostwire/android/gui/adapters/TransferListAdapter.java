@@ -27,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -36,7 +37,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.adapters.menu.*;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.transfers.*;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.android.gui.views.MenuAction;
@@ -48,7 +49,6 @@ import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.WebSearchPerformer;
 import com.frostwire.transfers.*;
-import com.frostwire.transfers.YouTubeDownload;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -281,7 +281,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
-            if (TransferManager.canSeedFromMyFilesTempHACK() && files != null && files.size() == 1) {
+            if (files != null && files.size() == 1 && AndroidPlatform.saf(new File(files.get(0).filePath))) {
                 items.add(new SeedAction(context.get(), files.get(0),download));
             }
             items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));

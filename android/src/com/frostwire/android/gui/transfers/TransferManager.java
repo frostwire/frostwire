@@ -80,19 +80,6 @@ public final class TransferManager {
     }
 
     /**
-     * TEMPORARY HACK.
-     * @return true if the save path is not the SD Card.
-     */
-    public static boolean canSeedFromMyFilesTempHACK() {
-        // TODO: Remove this hack when we can create .torrents from My Files
-        // by going through the ridiculous hoops Android has imposed to access
-        // the SD card. For now, let's make the feature available only to files
-        // on internal storage.
-
-        return !TransferManager.isUsingSDCardPrivateStorage();
-    }
-
-    /**
      * Is it using the SD Card's private (non-persistent after uninstall) app folder to save
      * downloaded files?
      */
