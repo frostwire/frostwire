@@ -248,12 +248,23 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void setupSupportFrostWireOption() {
-        if (Constants.IS_STORE_ENABLED) {
+        final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
+        if (Constants.IS_STORE_ENABLED && preference != null) {
+            preference.setOnPreferenceClickListener(null);
             PreferenceScreen category = (PreferenceScreen) findPreference(Constants.PREF_KEY_OTHER_PREFERENCE_CATEGORY);
-            final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
             if (category != null && preference != null) {
                 category.removePreference(preference);
             }
+        } else if (preference != null){
+            preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    if(!((CheckBoxPreference) preference).isChecked()) {
+                        UIUtils.openURL(preference.getContext(), Constants.FROSTWIRE_GIVE_URL + "plus-unsupport-fw");
+                    }
+                    return true;
+                }
+            });
         }
     }
 
@@ -466,7 +477,7 @@ public class SettingsActivity extends PreferenceActivity {
         if (p != null && !Constants.IS_STORE_ENABLED) {
             PreferenceScreen s = getPreferenceScreen();
             s.removePreference(p);
-        } else if (p != null) {
+          } else if (p != null) {
             final PlayStore playStore = PlayStore.getInstance();
             final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
             if (purchasedProducts != null && purchasedProducts.size() > 0) {

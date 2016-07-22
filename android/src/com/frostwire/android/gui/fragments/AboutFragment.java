@@ -107,7 +107,7 @@ public class AboutFragment extends Fragment implements MainFragment {
     }
 
     private void onLoveFrostWire() {
-        UIUtils.openURL(getActivity(), "http://www.frostwire.com/give");
+        UIUtils.openURL(getActivity(), Constants.FROSTWIRE_GIVE_URL + "plus-about");
     }
 
     @Override

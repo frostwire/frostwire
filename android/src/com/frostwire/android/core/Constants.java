@@ -188,4 +188,6 @@ public final class Constants {
     public static final String EXPRESSVPN_URL_BASIC = "http://www.frostwire.com/vpn.expressvpn";
     public static final String EXPRESSVPN_URL_PLUS = "http://www.frostwire.com/vpn.expressvpn";
     public static final float EXPRESSVPN_STARTING_USD_PRICE = 8.32f;
+
+    public static final String FROSTWIRE_GIVE_URL = "http://www.frostwire.com/give/?from=";
 }
