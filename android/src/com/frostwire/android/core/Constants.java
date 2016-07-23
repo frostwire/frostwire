@@ -122,7 +122,6 @@ public final class Constants {
 
     public static final String PREF_KEY_UXSTATS_ENABLED = "frostwire.prefs.uxstats.enabled";
 
-    public static final String ACTION_OPEN_TORRENT_URL = "android.intent.action.VIEW";
     public static final String ACTION_REQUEST_SHUTDOWN = "com.frostwire.android.ACTION_REQUEST_SHUTDOWN";
     public static final String ACTION_SHOW_TRANSFERS = "com.frostwire.android.ACTION_SHOW_TRANSFERS";
     public static final String ACTION_SHOW_VPN_STATUS_PROTECTED = "com.frostwire.android.ACTION_SHOW_VPN_STATUS_PROTECTED";

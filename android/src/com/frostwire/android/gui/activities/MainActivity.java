@@ -21,6 +21,7 @@ package com.frostwire.android.gui.activities;
 import android.app.*;
 import android.content.*;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -48,7 +49,6 @@ import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.MainMenuAdapter;
-import com.frostwire.android.offers.Offers;
 import com.frostwire.android.gui.dialogs.*;
 import com.frostwire.android.gui.fragments.BrowsePeerFragment;
 import com.frostwire.android.gui.fragments.MainFragment;
@@ -62,14 +62,19 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.preference.StoragePreference;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -239,7 +244,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             if (action.equals(Constants.ACTION_SHOW_TRANSFERS)) {
                 intent.setAction(null);
                 controller.showTransfers(TransferStatus.ALL);
-            } else if (action.equals(Constants.ACTION_OPEN_TORRENT_URL)) {
+            } else if (action.equals(Intent.ACTION_VIEW)) {
                 openTorrentUrl(intent);
             } else if (action.equals(Constants.ACTION_START_TRANSFER_FROM_PREVIEW)) {
                 if (Ref.alive(NewTransferDialog.srRef)) {
@@ -275,22 +280,36 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void openTorrentUrl(Intent intent) {
-        //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
+        try {
+            //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
 
-        //Show me the transfer tab
-        Intent i = new Intent(this, MainActivity.class);
-        i.setAction(Constants.ACTION_SHOW_TRANSFERS);
-        i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivity(i);
+            //Show me the transfer tab
+            Intent i = new Intent(this, MainActivity.class);
+            i.setAction(Constants.ACTION_SHOW_TRANSFERS);
+            i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(i);
 
-        //go!
-        final String uri = intent.getDataString();
-        intent.setAction(null);
-        if (uri != null) {
-            TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this));
-        } else {
-            LOG.warn("MainActivity.onNewIntent(): Couldn't start torrent download from Intent's URI, intent.getDataString() -> null");
-            LOG.warn("(maybe URI is coming in another property of the intent object - #fragmentation)");
+            //go!
+            final String uri = intent.getDataString();
+            intent.setAction(null);
+            if (uri != null) {
+                if (uri.startsWith("file") ||
+                        uri.startsWith("http") ||
+                        uri.startsWith("https") ||
+                        uri.startsWith("magnet")) {
+                    TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this));
+                } else if (uri.startsWith("content")) {
+                    String newUri = saveViewContent(this, Uri.parse(uri), "content-intent.torrent");
+                    if (newUri != null) {
+                        TransferManager.instance().downloadTorrent(newUri, new HandpickedTorrentDownloadDialogOnFetch(this));
+                    }
+                }
+            } else {
+                LOG.warn("MainActivity.onNewIntent(): Couldn't start torrent download from Intent's URI, intent.getDataString() -> null");
+                LOG.warn("(maybe URI is coming in another property of the intent object - #fragmentation)");
+            }
+        } catch (Throwable e) {
+            LOG.error("Error opening torrent from intent", e);
         }
     }
 
@@ -856,5 +875,34 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         SearchFragment searchFragment = (SearchFragment) getFragmentByMenuId(R.id.menu_main_search);
         searchFragment.performYTSearch(ytUrl);
         switchContent(searchFragment);
+    }
+
+    // TODO: refactor and move this method for a common place when needed
+    private static String saveViewContent(Context context, Uri uri, String name) {
+        InputStream inStream = null;
+        OutputStream outStream = null;
+        if (!Platforms.temp().exists()) {
+            Platforms.temp().mkdirs();
+        }
+        File target = new File(Platforms.temp(), name);
+        try {
+            inStream = context.getContentResolver().openInputStream(uri);
+            outStream = new FileOutputStream(target);
+
+            byte[] buffer = new byte[16384]; // MAGIC_NUMBER
+            int bytesRead;
+            while ((bytesRead = inStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+
+        } catch (Throwable e) {
+            LOG.error("Error when copying file from " + uri + " to temp/" + name, e);
+            return null;
+        } finally {
+            IOUtils.closeQuietly(inStream);
+            IOUtils.closeQuietly(outStream);
+        }
+
+        return "file://" + target.getAbsolutePath();
     }
 }

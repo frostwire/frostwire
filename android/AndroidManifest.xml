@@ -75,71 +75,39 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="http" android:host="*" android:pathPattern=".*\\.torrent"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https" android:host="*" android:pathPattern=".*\\.torrent"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:mimeType="*/*" android:scheme="http" android:host="*" android:pathPattern=".*\\.torrent"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:mimeType="*/*" android:scheme="https" android:host="*"
-                      android:pathPattern=".*\\.torrent"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:mimeType="application/x-bittorrent" android:scheme="http" android:host="*"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:mimeType="application/x-bittorrent" android:scheme="https" android:host="*"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="magnet"/>
+                <data android:host="*"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="application/x-bittorrent"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:scheme="file"/>
+                <data android:scheme="content"/>
+                <data android:host="*"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:mimeType="*/*"/>
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.torrent"/>
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\.torrent"/>
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\.torrent"/>
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\.torrent"/>
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\..*\\..*\\..*\\..*\\.torrent"/>
-                <data android:scheme="file" android:host="*"
-                      android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
-                <data android:scheme="file" android:host="*"
-                      android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
-                <data android:scheme="file" android:host="*"
-                      android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
-                <data android:scheme="file" android:host="*"
-                      android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
-                <data android:scheme="file" android:host="*"
-                      android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="file" android:pathPattern=".*\\.torrent"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:scheme="file"/>
+                <data android:scheme="content"/>
+                <data android:host="*"/>
+                <data android:pathPattern=".*\\.torrent"/>
+                <data android:pathPattern=".*\\..*\\.torrent"/>
+                <data android:pathPattern=".*\\..*\\..*\\.torrent"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.torrent"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.torrent"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
             </intent-filter>
         </activity>
         <activity android:name="com.frostwire.android.gui.activities.WizardActivity"
