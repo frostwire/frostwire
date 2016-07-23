@@ -72,6 +72,7 @@ public final class Offers {
                 adNetwork.stop(context);
             }
         }
+        LOG.info("Ad networks stopped");
     }
 
     public static void showInterstitial(final Activity activity,

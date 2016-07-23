@@ -540,6 +540,7 @@ public class SettingsActivity extends PreferenceActivity {
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()
             removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
+            PlayStore.getInstance().refresh();
             LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime="+removeAdsPurchaseTime);
         }
         else {
@@ -709,6 +710,7 @@ public class SettingsActivity extends PreferenceActivity {
                                         Toast.LENGTH_SHORT);
                             }
                             if (Ref.alive(activityRef)) {
+                                PlayStore.getInstance().refresh();
                                 activityRef.get().finish();
                             }
                         }

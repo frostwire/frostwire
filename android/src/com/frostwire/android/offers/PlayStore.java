@@ -166,6 +166,7 @@ public final class PlayStore extends StoreBase {
             List<String> items = Products.itemSkus();
             List<String> subs = Products.subsSkus();
             helper.queryInventoryAsync(true, items, subs, inventoryListener);
+            LOG.info("Refreshing inventory...");
         } catch (IabHelper.IabAsyncInProgressException e) {
             LOG.error("Error querying inventory. Another async operation in progress.", e);
         } catch (Throwable t) {
