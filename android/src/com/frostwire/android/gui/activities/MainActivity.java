@@ -241,13 +241,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 controller.showTransfers(TransferStatus.ALL);
             } else if (action.equals(Constants.ACTION_OPEN_TORRENT_URL)) {
                 openTorrentUrl(intent);
-            }
-            // When another application wants to "Share" a file and has chosen FrostWire to do so.
-            // We make the file "Shared" so it's visible for other FrostWire devices on the local network.
-            else if (action.equals(Intent.ACTION_SEND) ||
-                    action.equals(Intent.ACTION_SEND_MULTIPLE)) {
-                controller.handleSendAction(intent);
-                intent.setAction(null);
             } else if (action.equals(Constants.ACTION_START_TRANSFER_FROM_PREVIEW)) {
                 if (Ref.alive(NewTransferDialog.srRef)) {
                     SearchFragment.startDownload(this, NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
@@ -814,7 +807,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         mService = null;
     }
 
-    @Override
+    //@Override commented override since we are in API 16, but it will in API 23
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         DangerousPermissionsChecker checker = permissionsCheckers.get(requestCode);
         if (checker != null) {

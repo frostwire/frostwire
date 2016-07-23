@@ -141,16 +141,6 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="file" android:pathPattern=".*\\.torrent"/>
             </intent-filter>
-
-            <!-- share a file sent by another app -->
-            <intent-filter>
-                <!--this might come back if we figure out DHT messaging -->
-                <!--<action android:name="android.intent.action.SEND" />-->
-
-                <category android:name="android.intent.category.DEFAULT"/>
-
-                <data android:mimeType="*/*"/>
-            </intent-filter>
         </activity>
         <activity android:name="com.frostwire.android.gui.activities.WizardActivity"
                   android:label="@string/application_label" android:screenOrientation="portrait"/>
