@@ -1,4 +1,5 @@
-FrostWire 1.7.8 - JUL/22/2016
+FrostWire 1.7.8 - JUL/23/2016
+ - Removes KAT search.
  - Refactoring, cleanup, optimizations.
  - Remove Ads (Basic only)
  - Crash fixes
