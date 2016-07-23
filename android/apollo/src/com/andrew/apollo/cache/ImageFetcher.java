@@ -14,24 +14,12 @@ package com.andrew.apollo.cache;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.text.TextUtils;
 import android.widget.ImageView;
-
 import com.andrew.apollo.Config;
 import com.andrew.apollo.MusicPlaybackService;
-import com.andrew.apollo.lastfm.Album;
-import com.andrew.apollo.lastfm.Artist;
-import com.andrew.apollo.lastfm.MusicEntry;
-import com.andrew.apollo.lastfm.ImageSize;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.PreferenceUtils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -88,55 +76,6 @@ public class ImageFetcher extends ImageWorker {
             if (bitmap != null) {
                 return bitmap;
             }
-        }
-        return null;
-    }
-
-    private static String getBestImage(MusicEntry e) {
-        final ImageSize[] QUALITY = {ImageSize.EXTRALARGE, ImageSize.LARGE, ImageSize.MEDIUM,
-                ImageSize.SMALL, ImageSize.UNKNOWN};
-        for(ImageSize q : QUALITY) {
-            String url = e.getImageURL(q);
-            if (url != null) {
-                return url;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String processImageUrl(final String artistName, final String albumName,
-            final ImageType imageType) {
-        switch (imageType) {
-            case ARTIST:
-                if (!TextUtils.isEmpty(artistName)) {
-                    if (PreferenceUtils.getInstance(mContext).downloadMissingArtistImages()) {
-                        final Artist artist = Artist.getInfo(mContext, artistName);
-                        if (artist != null) {
-                            return getBestImage(artist);
-                        }
-                    }
-                }
-                break;
-            case ALBUM:
-                if (!TextUtils.isEmpty(artistName) && !TextUtils.isEmpty(albumName)) {
-                    if (PreferenceUtils.getInstance(mContext).downloadMissingArtwork()) {
-                        final Artist correction = Artist.getCorrection(mContext, artistName);
-                        if (correction != null) {
-                            final Album album = Album.getInfo(mContext, correction.getName(),
-                                    albumName);
-                            if (album != null) {
-                                return getBestImage(album);
-                            }
-                        }
-                    }
-                }
-                break;
-            default:
-                break;
         }
         return null;
     }

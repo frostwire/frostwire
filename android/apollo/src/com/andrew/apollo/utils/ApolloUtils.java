@@ -106,63 +106,6 @@ public final class ApolloUtils {
     }
 
     /**
-     * Used to determine if there is an active data connection and what type of
-     * connection it is if there is one
-     * 
-     * @param context The {@link Context} to use
-     * @return True if there is an active data connection, false otherwise.
-     *         Also, if the user has checked to only download via Wi-Fi in the
-     *         settings, the mobile data and other network connections aren't
-     *         returned at all
-     */
-    public static final boolean isOnline(final Context context) {
-        // aldenml: this nulls the feature of online download of music data
-        if (true) {
-            return false;
-        }
-        /*
-         * This sort of handles a sudden configuration change, but I think it
-         * should be dealt with in a more professional way.
-         */
-        if (context == null) {
-            return false;
-        }
-
-        boolean state = false;
-        final boolean onlyOnWifi = PreferenceUtils.getInstance(context).onlyOnWifi();
-
-        /* Monitor network connections */
-        final ConnectivityManager connectivityManager = (ConnectivityManager)context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        /* Wi-Fi connection */
-        final NetworkInfo wifiNetwork = connectivityManager
-                .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if (wifiNetwork != null) {
-            state = wifiNetwork.isConnectedOrConnecting();
-        }
-
-        /* Mobile data connection */
-        final NetworkInfo mbobileNetwork = connectivityManager
-                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-        if (mbobileNetwork != null) {
-            if (!onlyOnWifi) {
-                state = mbobileNetwork.isConnectedOrConnecting();
-            }
-        }
-
-        /* Other networks */
-        final NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        if (activeNetwork != null) {
-            if (!onlyOnWifi) {
-                state = activeNetwork.isConnectedOrConnecting();
-            }
-        }
-
-        return state;
-    }
-
-    /**
      * Display a {@link Toast} letting the user know what an item does when long
      * pressed.
      * 
