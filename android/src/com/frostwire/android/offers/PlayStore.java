@@ -78,8 +78,8 @@ public final class PlayStore extends StoreBase {
                     return;
                 }
 
-                products = buildProducts(inventory);
                 PlayStore.this.inventory = inventory;
+                products = buildProducts(inventory);
             }
         };
 
@@ -95,9 +95,24 @@ public final class PlayStore extends StoreBase {
                     return;
                 }
 
+                if (purchase == null) {
+                    LOG.warn("Wrong state, result is not failure and purchase is null");
+                    return;
+                }
+
                 String sku = purchase.getSku();
                 lastSkuPurchased = sku;
                 LOG.info("Purchased sku " + sku);
+
+                if (inventory != null) {
+                    try {
+                        inventory.addPurchase(purchase);
+                        products = buildProducts(inventory);
+                        LOG.info("Inventory updated");
+                    } catch (Throwable e) {
+                        LOG.error("Error updating internal inventory after purchase", e);
+                    }
+                }
             }
         };
 

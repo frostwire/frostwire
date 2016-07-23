@@ -85,7 +85,9 @@ public class Inventory {
         mSkuMap.put(d.getSku(), d);
     }
 
-    void addPurchase(Purchase p) {
+    // custom change for instant update
+    // sync on each billing code update
+    public void addPurchase(Purchase p) {
         mPurchaseMap.put(p.getSku(), p);
     }
 }
