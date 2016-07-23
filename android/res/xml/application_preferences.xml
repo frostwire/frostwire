@@ -202,11 +202,6 @@
             android:key="frostwire.prefs.offers.buy_no_ads"
             android:summary="@string/remove_ads_description"
             android:title="@string/remove_ads">
-        <intent
-                android:action="android.intent.action.VIEW"
-                android:targetPackage="com.frostwire.android"
-                android:targetClass="com.frostwire.android.gui.activities.BuyActivity"
-        />
     </Preference>
 
     <Preference

@@ -482,13 +482,23 @@ public class SettingsActivity extends PreferenceActivity {
           } else if (p != null) {
             final PlayStore playStore = PlayStore.getInstance();
             final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
-            if (purchasedProducts != null && purchasedProducts.size() > 0) {
+            if (purchaseTimestamp == 0 && purchasedProducts != null && purchasedProducts.size() > 0) {
                 initRemoveAdsSummaryWithPurchaseInfo(p, purchasedProducts);
                 //otherwise, a BuyActivity intent has been configured on application_preferences.xml
             } else if (purchaseTimestamp > 0 &&
                     (System.currentTimeMillis()-purchaseTimestamp) < 30000) {
                 p.setSummary(getString(R.string.processing_payment)+"...");
-                p.setOnPreferenceClickListener(new RefreshSetupStoreClickListener());
+                p.setOnPreferenceClickListener(null);
+            } else {
+                p.setSummary(R.string.remove_ads_description);
+                p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        Intent intent = new Intent(SettingsActivity.this, BuyActivity.class);
+                        startActivityForResult(intent, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
+                        return true;
+                    }
+                });
             }
         }
     }
@@ -500,7 +510,7 @@ public class SettingsActivity extends PreferenceActivity {
         if (!product.subscription() && product.purchased()) {
             int daysBought = Products.toDays(product.sku());
             if (daysBought > 0) {
-                final int MILLISECONDS_IN_A_DAY = 86400;
+                final int MILLISECONDS_IN_A_DAY = 86400000;
                 long timePassed = System.currentTimeMillis() - product.purchaseTime();
                 int daysPassed = (int) timePassed / MILLISECONDS_IN_A_DAY;
                 if (daysPassed > 0 && daysPassed < daysBought) {
@@ -530,6 +540,7 @@ public class SettingsActivity extends PreferenceActivity {
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()
             removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
+            LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime="+removeAdsPurchaseTime);
         }
         else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -709,14 +720,6 @@ public class SettingsActivity extends PreferenceActivity {
                 LOG.info("Couldn't find any purchases.");
             }
             return false;
-        }
-    }
-
-    private class RefreshSetupStoreClickListener implements Preference.OnPreferenceClickListener {
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-            setupStore(removeAdsPurchaseTime);
-            return true;
         }
     }
 }
