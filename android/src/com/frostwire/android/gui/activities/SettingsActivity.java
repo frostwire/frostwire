@@ -73,11 +73,11 @@ import java.util.Collection;
  * @author sssemil
  */
 public class SettingsActivity extends PreferenceActivity {
-
     private static final Logger LOG = Logger.getLogger(SettingsActivity.class);
     private static final boolean INTERNAL_BUILD = true;
     private static String currentPreferenceKey = null;
     private boolean finishOnBack = false;
+    private long removeAdsPurchaseTime = 0;
 
     @Override
     protected void onResume() {
@@ -114,6 +114,8 @@ public class SettingsActivity extends PreferenceActivity {
         updateConnectSwitch();
     }
 
+
+
     private void hideActionBarIcon(ActionBar bar) {
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
@@ -132,7 +134,7 @@ public class SettingsActivity extends PreferenceActivity {
         setupClearIndex();
         setupSearchEngines();
         setupUXStatsOption();
-        setupStore();
+        setupStore(removeAdsPurchaseTime);
     }
 
     private void setupTorrentOptions() {
@@ -472,7 +474,7 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
-    private void setupStore() {
+    private void setupStore(long purchaseTimestamp) {
         Preference p = findPreference("frostwire.prefs.offers.buy_no_ads");
         if (p != null && !Constants.IS_STORE_ENABLED) {
             PreferenceScreen s = getPreferenceScreen();
@@ -481,25 +483,33 @@ public class SettingsActivity extends PreferenceActivity {
             final PlayStore playStore = PlayStore.getInstance();
             final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
             if (purchasedProducts != null && purchasedProducts.size() > 0) {
-                final Product product = purchasedProducts.iterator().next();
-                String daysLeft = "";
-                // if it's a one time purchase, show user how many days left she has.
-                if (!product.subscription() && product.purchased()) {
-                    int daysBought = Products.toDays(product.sku());
-                    if (daysBought > 0) {
-                        final int MILLISECONDS_IN_A_DAY = 86400;
-                        long timePassed = System.currentTimeMillis() - product.purchaseTime();
-                        int daysPassed = (int) timePassed / MILLISECONDS_IN_A_DAY;
-                        if (daysPassed > 0 && daysPassed < daysBought) {
-                            daysLeft = " (" + getString(R.string.days_left) + ": " + String.valueOf(daysBought - daysPassed) + ")";
-                        }
-                    }
-                }
-                p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
-                p.setOnPreferenceClickListener(new RemoveAdsOnPreferenceClickListener(this, purchasedProducts));
+                initRemoveAdsSummaryWithPurchaseInfo(p, purchasedProducts);
                 //otherwise, a BuyActivity intent has been configured on application_preferences.xml
+            } else if (purchaseTimestamp > 0 &&
+                    (System.currentTimeMillis()-purchaseTimestamp) < 30000) {
+                p.setSummary(getString(R.string.processing_payment)+"...");
+                p.setOnPreferenceClickListener(new RefreshSetupStoreClickListener());
             }
         }
+    }
+
+    private void initRemoveAdsSummaryWithPurchaseInfo(Preference p, Collection<Product> purchasedProducts) {
+        final Product product = purchasedProducts.iterator().next();
+        String daysLeft = "";
+        // if it's a one time purchase, show user how many days left she has.
+        if (!product.subscription() && product.purchased()) {
+            int daysBought = Products.toDays(product.sku());
+            if (daysBought > 0) {
+                final int MILLISECONDS_IN_A_DAY = 86400;
+                long timePassed = System.currentTimeMillis() - product.purchaseTime();
+                int daysPassed = (int) timePassed / MILLISECONDS_IN_A_DAY;
+                if (daysPassed > 0 && daysPassed < daysBought) {
+                    daysLeft = " (" + getString(R.string.days_left) + ": " + String.valueOf(daysBought - daysPassed) + ")";
+                }
+            }
+        }
+        p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
+        p.setOnPreferenceClickListener(new RemoveAdsOnPreferenceClickListener(this, purchasedProducts));
     }
 
     @Override
@@ -515,7 +525,13 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
-        } else {
+        } else if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
+                data != null &&
+                data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
+            // We (onActivityResult) are invoked before onResume()
+            removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
+        }
+        else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -693,6 +709,14 @@ public class SettingsActivity extends PreferenceActivity {
                 LOG.info("Couldn't find any purchases.");
             }
             return false;
+        }
+    }
+
+    private class RefreshSetupStoreClickListener implements Preference.OnPreferenceClickListener {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            setupStore(removeAdsPurchaseTime);
+            return true;
         }
     }
 }

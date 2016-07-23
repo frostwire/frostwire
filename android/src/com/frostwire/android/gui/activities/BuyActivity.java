@@ -48,10 +48,11 @@ import java.util.Random;
 public class BuyActivity extends AbstractActivity {
 
     public static final String INTERSTITIAL_MODE = "interstitialMode";
+    static final int PURCHASE_SUCCESSFUL_RESULT_CODE = 989898;
+    static final String EXTRA_KEY_PURCHASE_TIMESTAMP = "purchase_timestamp";
     private static final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
     private static final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
     private static final String OFFER_ACCEPTED = "offer_accepted";
-
     private ProductCardView card30days;
     private ProductCardView card1year;
     private ProductCardView card6months;
@@ -417,6 +418,12 @@ public class BuyActivity extends AbstractActivity {
             Offers.stopAdNetworks(this);
             // in case user gets plus
             ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
+
+            // now we prepare a result for SettingsActivity since it won't know right away
+            // given the purchase process is asynchronous
+            Intent result = new Intent();
+            result.putExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, System.currentTimeMillis());
+            setResult(BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE, result);
             finish();
         }
     }
