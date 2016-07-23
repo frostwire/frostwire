@@ -121,10 +121,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         this.permissionsCheckers = initPermissionsCheckers();
     }
 
-    public void switchFragment(int itemId) {
-        controller.switchFragment(itemId);
-    }
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_SEARCH) {
