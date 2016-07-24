@@ -61,8 +61,6 @@ public final class Offers {
             adNetwork.initialize(activity);
         }
 
-        // I do this afterwards because the Products.listEnabled() method shouldn't be done on the UI thread.
-        // also the network.stop() method shouldn't have any thread-safety issues.
         stopAdNetworksIfPurchasedRemoveAds(activity);
     }
 
