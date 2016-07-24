@@ -167,6 +167,7 @@ public final class PlayStore extends StoreBase {
     public void refresh() {
         long now = System.currentTimeMillis();
         if ((now - lastRefreshTime) < REFRESH_RESOLUTION_MILLIS) {
+            LOG.info("refresh() aborted, too early.");
             return;
         }
 

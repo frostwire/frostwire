@@ -481,6 +481,7 @@ public class SettingsActivity extends PreferenceActivity {
             s.removePreference(p);
           } else if (p != null) {
             final PlayStore playStore = PlayStore.getInstance();
+            playStore.refresh();
             final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
             if (purchaseTimestamp == 0 && purchasedProducts != null && purchasedProducts.size() > 0) {
                 initRemoveAdsSummaryWithPurchaseInfo(p, purchasedProducts);
@@ -709,7 +710,6 @@ public class SettingsActivity extends PreferenceActivity {
                                         Toast.LENGTH_SHORT);
                             }
                             if (Ref.alive(activityRef)) {
-                                PlayStore.getInstance().refresh();
                                 activityRef.get().finish();
                             }
                         }
