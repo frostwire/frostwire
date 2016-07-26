@@ -1,47 +1,46 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.activities.internal;
 
 import android.content.Context;
-import android.view.*;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractAdapter;
-import com.frostwire.android.gui.views.menu.MenuBuilder;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class MainMenuAdapter extends AbstractAdapter<MenuItem> {
+public final class MainMenuAdapter extends AbstractAdapter<MainMenuAdapter.MenuItem> {
 
     public MainMenuAdapter(Context context) {
         super(context, R.layout.slidemenu_listitem);
 
-        addItems(context);
+        addItems();
     }
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).getItemId();
+        return getItem(position).itemId();
     }
 
     @Override
@@ -49,29 +48,29 @@ public final class MainMenuAdapter extends AbstractAdapter<MenuItem> {
         TextView label = findView(view, R.id.slidemenu_listitem_label);
         ImageView icon = findView(view, R.id.slidemenu_listitem_icon);
 
-        label.setText(item.getTitle());
+        label.setText(item.titleResId());
 
         if (((Checkable) view).isChecked()) {
             icon.setImageResource(getOverIcon(item));
             view.setBackgroundResource(R.drawable.slidemenu_listitem_background_selected);
         } else {
-            icon.setImageDrawable(item.getIcon());
+            icon.setImageResource(item.iconResId());
             view.setBackgroundResource(android.R.color.transparent);
         }
     }
 
-    private void addItems(Context context) {
-        MenuInflater menuInflater = new MenuInflater(context);
-        Menu menu = new MenuBuilder(context);
-        menuInflater.inflate(R.menu.main, menu);
-
-        for (int i = 0; i < menu.size(); i++) {
-            add(menu.getItem(i));
-        }
+    private void addItems() {
+        add(new MenuItem(R.id.menu_main_search, R.string.search, R.drawable.menu_icon_search));
+        add(new MenuItem(R.id.menu_main_my_music, R.string.my_music, R.drawable.menu_icon_my_music));
+        add(new MenuItem(R.id.menu_main_library, R.string.my_files, R.drawable.menu_icon_library));
+        add(new MenuItem(R.id.menu_main_transfers, R.string.transfers, R.drawable.menu_icon_transfers));
+        add(new MenuItem(R.id.menu_main_support, R.string.help, R.drawable.menu_icon_support));
+        add(new MenuItem(R.id.menu_main_settings, R.string.settings, R.drawable.menu_icon_settings));
+        add(new MenuItem(R.id.menu_main_shutdown, R.string.exit, R.drawable.menu_icon_exit));
     }
 
     private int getOverIcon(MenuItem item) {
-        switch (item.getItemId()) {
+        switch (item.itemId()) {
             case R.id.menu_main_search:
                 return R.drawable.menu_icon_search_over;
             case R.id.menu_main_my_music:
@@ -87,7 +86,32 @@ public final class MainMenuAdapter extends AbstractAdapter<MenuItem> {
             case R.id.menu_main_shutdown:
                 return R.drawable.menu_icon_exit_over;
             default:
-                return 0;
+                throw new IllegalArgumentException("Item id not supported");
+        }
+    }
+
+    public static final class MenuItem {
+
+        private int itemId;
+        private int titleResId;
+        private int iconResId;
+
+        public MenuItem(int itemId, int titleResId, int iconResId) {
+            this.itemId = itemId;
+            this.titleResId = titleResId;
+            this.iconResId = iconResId;
+        }
+
+        public int itemId() {
+            return itemId;
+        }
+
+        public int titleResId() {
+            return titleResId;
+        }
+
+        public int iconResId() {
+            return iconResId;
         }
     }
 }
