@@ -62,11 +62,6 @@ public final class AndroidPlatform extends AbstractPlatform {
     }
 
     @Override
-    public boolean experimental() {
-        return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_CORE_EXPERIMENTAL);
-    }
-
-    @Override
     public NetworkType networkType() {
         if (NetworkManager.instance().isDataMobileUp()) {
             return NetworkType.MOBILE;

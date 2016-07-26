@@ -70,11 +70,6 @@ public abstract class AbstractPlatform implements Platform {
     }
 
     @Override
-    public boolean experimental() {
-        return false;
-    }
-
-    @Override
     public NetworkType networkType() {
         return NetworkType.UNKNOWN;
     }

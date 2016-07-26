@@ -185,9 +185,6 @@
         <CheckBoxPreference
                 android:key="frostwire.prefs.gui.vibrate_on_finished_download"
                 android:title="@string/vibrate_on_finished_download"/>
-        <!--<CheckBoxPreference
-                android:key="frostwire.prefs.core.enable_experimental"
-                android:title="@string/enable_experimental" />-->
         <CheckBoxPreference
                 android:key="frostwire.prefs.uxstats.enabled"
                 android:summary="@string/anonymous_usage_statistics_summary"
