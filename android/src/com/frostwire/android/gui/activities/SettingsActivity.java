@@ -495,6 +495,7 @@ public class SettingsActivity extends PreferenceActivity {
                 p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
+                        PlayStore.getInstance().endAsync();
                         Intent intent = new Intent(SettingsActivity.this, BuyActivity.class);
                         startActivityForResult(intent, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
                         return true;

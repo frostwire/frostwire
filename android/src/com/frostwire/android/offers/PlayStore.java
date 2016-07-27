@@ -96,7 +96,7 @@ public final class PlayStore extends StoreBase {
                 }
 
                 if (purchase == null) {
-                    LOG.warn("Wrong state, result is not failure and purchase is null");
+                    // could be the result of a call to endAsync
                     return;
                 }
 
@@ -245,6 +245,20 @@ public final class PlayStore extends StoreBase {
             LOG.error("Error consuming purchase. Another async operation in progress.", e);
         } catch (Throwable e) {
             LOG.error("Error consuming purchase.", e);
+        }
+    }
+
+    public void endAsync() {
+        if (helper == null) {
+            LOG.warn("Helper has been disposed or not initialized");
+            return;
+        }
+
+        try {
+            helper.handleActivityResult(RC_NO_ADS_SUBS_REQUEST, 0, null);
+            helper.handleActivityResult(RC_NO_ADS_INAPP_REQUEST, 0, null);
+        } catch (Throwable e) {
+            LOG.error("Error ending async operation in the internal helper (review your logic)", e);
         }
     }
 
