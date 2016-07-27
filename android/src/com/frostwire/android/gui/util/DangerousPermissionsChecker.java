@@ -21,6 +21,7 @@ package com.frostwire.android.gui.util;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -29,9 +30,11 @@ import android.support.v4.app.ActivityCompat;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.logging.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 
 /**
  * @author gubatron
@@ -42,6 +45,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         void onPermissionsGranted();
     }
 
+    private static final Logger LOG = Logger.getLogger(Logger.class);
     public static final int EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE = 0x000A;
     public static final int WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE = 0x000B;
 
@@ -65,6 +69,21 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         // simplified until otherwise necessary.
         return requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE && noExternalStorageAccess();
     }
+
+    public static boolean canWriteSettingsAPILevel23(Context context) {
+        if (Build.VERSION.SDK_INT < 23) {
+            return false;
+        }
+        try {
+            final Class<?> SystemClass = Class.forName("android.provider.Settings$System");
+            final Method canWriteMethod = SystemClass.getMethod("canWrite", Context.class);
+            return (boolean) canWriteMethod.invoke(null, context);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
+        return false;
+    }
+
 
     private boolean noExternalStorageAccess() {
         if (!Ref.alive(activityRef)) {
@@ -91,7 +110,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
                 break;
             case WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE:
                 if (Build.VERSION.SDK_INT >= 23) {
-                    requestWriteSettingsPermissionsOnSDKLevel23(activity);
+                    requestWriteSettingsPermissionsAPILevel23(activity);
                     return;
                 }
                 // this didn't fly on my Android with API Level 23
@@ -127,6 +146,9 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
     }
 
     /**
+     * This method will invoke an activity that shows the WRITE_SETTINGS capabilities
+     * of our app.
+     *
      * More unnecessary distractions and time wasting for developers
      * courtesy of Google.
      *
@@ -142,7 +164,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
      *
      * Google geniuses, Make up your minds please.
      */
-    private void requestWriteSettingsPermissionsOnSDKLevel23(Activity activity) {
+    private void requestWriteSettingsPermissionsAPILevel23(Activity activity) {
         // Settings.ACTION_MANAGE_WRITE_SETTINGS - won't build if the
         // intellij sdk is set to API 16 Platform, so I'll just hardcode
         // the value.

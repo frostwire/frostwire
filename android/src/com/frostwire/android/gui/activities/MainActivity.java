@@ -22,13 +22,11 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.*;
 import android.content.*;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
@@ -516,9 +514,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(23)
     private void onRequestPermissionsResultOnSDKLevel23(@NonNull DangerousPermissionsChecker writeSettingsPermissionChecker) {
-        int permissionCheckResult = Settings.System.canWrite(this) ? PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED;
+        int permissionCheckResult = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_SETTINGS);
+                //Settings.System.canWrite(this) ? PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED;
         // use the existing mechanism on DangerousPermissionsChecker
         writeSettingsPermissionChecker.
                 onRequestPermissionsResult(

@@ -25,7 +25,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore.Audio;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
@@ -33,6 +32,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+//import com.frostwire.logging.Logger;
 
 /**
  * @author gubatron
@@ -40,7 +40,7 @@ import com.frostwire.android.gui.views.MenuAction;
  *
  */
 class SetAsRingtoneMenuAction extends MenuAction {
-
+    //private static final Logger LOG = Logger.getLogger(SetAsRingtoneMenuAction.class);
     private final FileDescriptor fd;
     private final DangerousPermissionsChecker writeSettingsPermissionChecker;
 
@@ -60,14 +60,16 @@ class SetAsRingtoneMenuAction extends MenuAction {
     }
 
     private boolean checkForPermissionToWriteSettings(Context context) {
-        if (Build.VERSION.SDK_INT >= 23) { // M == 23
-            return Settings.System.canWrite(context);
-        } else {
-            return ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_SETTINGS) == PackageManager.PERMISSION_GRANTED;
-        }
+        return (Build.VERSION.SDK_INT >= 23) ? // M == 23
+                DangerousPermissionsChecker.canWriteSettingsAPILevel23(context) :
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_SETTINGS) == PackageManager.PERMISSION_GRANTED;
     }
 
+
+
     private void requestPermissionToWriteSettings(final Context context) {
+        // this callback is executed when the system activity returns by
+        // MainActivity.onActivityResult(requestCode=DangerousPermissionChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE,...)
         writeSettingsPermissionChecker.setPermissionsGrantedCallback(() -> {
             if (context != null) {
                 setNewRingtone(context);
