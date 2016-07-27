@@ -18,13 +18,19 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore.Audio;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 
@@ -33,18 +39,41 @@ import com.frostwire.android.gui.views.MenuAction;
  * @author aldenml
  *
  */
-public class SetAsRingtoneMenuAction extends MenuAction {
+class SetAsRingtoneMenuAction extends MenuAction {
 
     private final FileDescriptor fd;
+    private final DangerousPermissionsChecker writeSettingsPermissionChecker;
 
-    public SetAsRingtoneMenuAction(final Context context, FileDescriptor fd) {
+    SetAsRingtoneMenuAction(final Context context, FileDescriptor fd, DangerousPermissionsChecker writeSettingsPermissionChecker) {
         super(context, R.drawable.contextmenu_icon_ringtone, R.string.context_menu_use_as_ringtone);
         this.fd = fd;
+        this.writeSettingsPermissionChecker = writeSettingsPermissionChecker;
     }
 
     @Override
     protected void onClick(Context context) {
-        setNewRingtone(context);
+        if (checkForPermissionToWriteSettings(context)) {
+            setNewRingtone(context);
+        } else {
+            requestPermissionToWriteSettings(context);
+        }
+    }
+
+    private boolean checkForPermissionToWriteSettings(Context context) {
+        if (Build.VERSION.SDK_INT >= 23) { // M == 23
+            return Settings.System.canWrite(context);
+        } else {
+            return ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_SETTINGS) == PackageManager.PERMISSION_GRANTED;
+        }
+    }
+
+    private void requestPermissionToWriteSettings(final Context context) {
+        writeSettingsPermissionChecker.setPermissionsGrantedCallback(() -> {
+            if (context != null) {
+                setNewRingtone(context);
+            }
+        });
+        writeSettingsPermissionChecker.requestPermissions();
     }
 
     private void setNewRingtone(Context context) {

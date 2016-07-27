@@ -22,8 +22,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
@@ -37,14 +35,15 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.bittorrent.MagnetUriBuilder;
+import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.MagnetUriBuilder;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.logging.Logger;
 import com.frostwire.uxstats.UXAction;
@@ -70,6 +69,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private final ImageLoader thumbnailLoader;
     private final DownloadButtonClickListener downloadButtonClickListener;
     private final FileListFilter fileListFilter;
+    private final DangerousPermissionsChecker writeSettingsPermissionChecker;
 
     protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType) {
         super(context, getViewItemId(fileType), convertFiles(files));
@@ -83,6 +83,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         this.downloadButtonClickListener = new DownloadButtonClickListener();
 
         checkSDStatus();
+
+        // always the case but #futureProofing
+        if (context instanceof MainActivity) {
+            writeSettingsPermissionChecker = ((MainActivity) context).getWriteSettingsPermissionChecker();
+        } else {
+            writeSettingsPermissionChecker = null;
+        }
     }
 
     public byte getFileType() {
@@ -135,7 +142,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
 
             if ((fd.fileType == Constants.FILE_TYPE_RINGTONES || fd.fileType == Constants.FILE_TYPE_AUDIO) && numChecked <= 1) {
-                items.add(new SetAsRingtoneMenuAction(context, fd));
+                items.add(new SetAsRingtoneMenuAction(context, fd, writeSettingsPermissionChecker));
             }
 
             if (fd.fileType == Constants.FILE_TYPE_PICTURES && numChecked <= 1) {

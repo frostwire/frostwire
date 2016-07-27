@@ -18,12 +18,18 @@
 
 package com.frostwire.android.gui.activities;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.*;
 import android.content.*;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -33,8 +39,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import com.andrew.apollo.IApolloService;
@@ -197,11 +201,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void initPlayerItemListener() {
         playerItem = findView(R.id.slidemenu_player_menuitem);
-        playerItem.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                controller.launchPlayerActivity();
-            }
-        });
+        playerItem.setOnClickListener(v -> controller.launchPlayerActivity());
     }
 
     private void initDrawerListener() {
@@ -363,28 +363,16 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         // EXTERNAL STORAGE ACCESS CHECKER.
         final DangerousPermissionsChecker externalStorageChecker =
                 new DangerousPermissionsChecker(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        externalStorageChecker.setPermissionsGrantedCallback(new DangerousPermissionsChecker.OnPermissionsGrantedCallback() {
-            @Override
-            public void onPermissionsGranted() {
-                // TODO: is the restart necessary?
-                /*
-                UIUtils.showInformationDialog(MainActivity.this,
-                        R.string.restarting_summary,
-                        R.string.restarting,
-                        false,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                externalStorageChecker.restartFrostWire(2000);
-                            }
-                        });
-                        */
-            }
-        });
+        externalStorageChecker.setPermissionsGrantedCallback(() -> {});
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
 
-        // add more permissions checkers if needed...
+        // WRITE SETTINGS (Setting the default ringtone requires this)
+        final DangerousPermissionsChecker writeSettingsChecker =
+                new DangerousPermissionsChecker(this, DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
+        checkers.put(DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE, writeSettingsChecker);
+        // the permissionGrantedCallBack will be set by whoever uses this during runtime.
 
+        // add more permissions checkers if needed...
         return checkers;
     }
 
@@ -518,9 +506,25 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
+        } else if (requestCode == DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE) {
+            final DangerousPermissionsChecker writeSettingsPermissionChecker = getWriteSettingsPermissionChecker();
+            if (writeSettingsPermissionChecker != null && Build.VERSION.SDK_INT >= 23) {
+                onRequestPermissionsResultOnSDKLevel23(writeSettingsPermissionChecker);
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void onRequestPermissionsResultOnSDKLevel23(@NonNull DangerousPermissionsChecker writeSettingsPermissionChecker) {
+        int permissionCheckResult = Settings.System.canWrite(this) ? PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED;
+        // use the existing mechanism on DangerousPermissionsChecker
+        writeSettingsPermissionChecker.
+                onRequestPermissionsResult(
+                        DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE,
+                        new String[]{Manifest.permission.WRITE_SETTINGS},
+                        new int[]{permissionCheckResult});
     }
 
     private void checkLastSeenVersion() {
@@ -641,26 +645,25 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void setupMenuItems() {
         listMenu.setAdapter(new MainMenuAdapter(this));
         listMenu.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-        listMenu.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                syncSlideMenu();
-                controller.closeSlideMenu();
-                try {
-                    if (id == R.id.menu_main_settings) {
-                        controller.showPreferences();
-                    } else if (id == R.id.menu_main_shutdown) {
-                        showShutdownDialog();
-                    } else if (id == R.id.menu_main_my_music) {
-                        controller.launchMyMusic();
-                    } else if (id == R.id.menu_main_support) {
-                        UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
-                    } else {
-                        listMenu.setItemChecked(position, true);
-                        controller.switchFragment((int) id);
-                    }
-                } catch (Throwable e) { // protecting from weird android UI engine issues
-                    LOG.error("Error clicking slide menu item", e);
+        listMenu.setOnItemClickListener((parent, view, position, id) -> {
+            //onItemClick(AdapterView<?> parent, View view, int position, long id)
+            syncSlideMenu();
+            controller.closeSlideMenu();
+            try {
+                if (id == R.id.menu_main_settings) {
+                    controller.showPreferences();
+                } else if (id == R.id.menu_main_shutdown) {
+                    showShutdownDialog();
+                } else if (id == R.id.menu_main_my_music) {
+                    controller.launchMyMusic();
+                } else if (id == R.id.menu_main_support) {
+                    UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
+                } else {
+                    listMenu.setItemChecked(position, true);
+                    controller.switchFragment((int) id);
                 }
+            } catch (Throwable e) { // protecting from weird android UI engine issues
+                LOG.error("Error clicking slide menu item", e);
             }
         });
     }
@@ -669,7 +672,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
         library = (BrowsePeerFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_browse_peer);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
-
         hideFragments(getFragmentManager().beginTransaction()).commit();
     }
 
@@ -758,6 +760,13 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             default:
                 return null;
         }
+    }
+
+    public DangerousPermissionsChecker getWriteSettingsPermissionChecker() {
+        if (permissionsCheckers == null) {
+            return null;
+        }
+        return permissionsCheckers.get(DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
     }
 
     public void switchContent(Fragment fragment) {
