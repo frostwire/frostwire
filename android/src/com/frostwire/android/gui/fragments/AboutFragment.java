@@ -20,6 +20,7 @@ package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -62,7 +63,7 @@ public class AboutFragment extends Fragment implements MainFragment {
         title.setText("FrostWire " + basicOrPlus + " v" + Constants.FROSTWIRE_VERSION_STRING);
 
         final TextView buildNumber = (TextView) view.findViewById(R.id.fragment_about_build_number);
-        buildNumber.setText("\nbuild " + BuildConfig.VERSION_CODE);
+        buildNumber.setText("\nbuild " + BuildConfig.VERSION_CODE + " - sdk level " + Build.VERSION.SDK_INT);
 
         final TextView content = (TextView) view.findViewById(R.id.fragment_about_content);
         content.setText(Html.fromHtml(getAboutText()));
