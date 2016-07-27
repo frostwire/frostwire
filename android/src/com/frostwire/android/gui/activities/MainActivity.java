@@ -18,16 +18,12 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.Manifest;
 import android.app.*;
 import android.content.*;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -91,7 +87,8 @@ import static com.andrew.apollo.utils.MusicUtils.mService;
 public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
         OnDialogClickListener,
         ServiceConnection,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        ActivityCompat.OnRequestPermissionsResultCallback,
+        DangerousPermissionsChecker.WritePermissionsChecker {
 
     private static final Logger LOG = Logger.getLogger(MainActivity.class);
     private static final String FRAGMENTS_STACK_KEY = "fragments_stack";
@@ -504,27 +501,9 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
-        } else if (requestCode == DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE) {
-            final DangerousPermissionsChecker writeSettingsPermissionChecker = getWriteSettingsPermissionChecker();
-            if (writeSettingsPermissionChecker != null && Build.VERSION.SDK_INT >= 23) {
-                onRequestPermissionsResultOnSDKLevel23(writeSettingsPermissionChecker);
-            }
-        } else {
+        } else if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this, requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-
-    private void onRequestPermissionsResultOnSDKLevel23(@NonNull DangerousPermissionsChecker writeSettingsPermissionChecker) {
-        int permissionCheckResult = DangerousPermissionsChecker.canWriteSettingsAPILevel23(this) ?
-                PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED;
-
-        // use the existing mechanism on DangerousPermissionsChecker
-        writeSettingsPermissionChecker.
-                onRequestPermissionsResult(
-                        DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE,
-                        new String[]{Manifest.permission.WRITE_SETTINGS},
-                        new int[]{permissionCheckResult});
     }
 
     private void checkLastSeenVersion() {
@@ -762,6 +741,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
+    // DangerousPermissionsChecker.WritePermissionsChecker
+    @Override
     public DangerousPermissionsChecker getWriteSettingsPermissionChecker() {
         if (permissionsCheckers == null) {
             return null;

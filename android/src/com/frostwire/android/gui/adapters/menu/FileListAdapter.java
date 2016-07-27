@@ -34,7 +34,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
@@ -68,7 +67,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private final ImageLoader thumbnailLoader;
     private final DownloadButtonClickListener downloadButtonClickListener;
     private final FileListFilter fileListFilter;
-    private final DangerousPermissionsChecker writeSettingsPermissionChecker;
 
     protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType) {
         super(context, getViewItemId(fileType), convertFiles(files));
@@ -82,13 +80,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         this.downloadButtonClickListener = new DownloadButtonClickListener();
 
         checkSDStatus();
-
-        // always the case but #futureProofing
-        if (context instanceof MainActivity) {
-            writeSettingsPermissionChecker = ((MainActivity) context).getWriteSettingsPermissionChecker();
-        } else {
-            writeSettingsPermissionChecker = null;
-        }
     }
 
     public byte getFileType() {
@@ -141,7 +132,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
 
             if ((fd.fileType == Constants.FILE_TYPE_RINGTONES || fd.fileType == Constants.FILE_TYPE_AUDIO) && numChecked <= 1) {
-                items.add(new SetAsRingtoneMenuAction(context, fd, writeSettingsPermissionChecker));
+                items.add(new SetAsRingtoneMenuAction(context, fd, ((DangerousPermissionsChecker.WritePermissionsChecker) context).getWriteSettingsPermissionChecker()));
             }
 
             if (fd.fileType == Constants.FILE_TYPE_PICTURES && numChecked <= 1) {

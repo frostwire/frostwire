@@ -17,14 +17,10 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore.Audio;
-import android.support.v4.app.ActivityCompat;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
@@ -41,7 +37,7 @@ class SetAsRingtoneMenuAction extends MenuAction {
     private final FileDescriptor fd;
     private final DangerousPermissionsChecker writeSettingsPermissionChecker;
 
-    SetAsRingtoneMenuAction(final Context context, FileDescriptor fd, DangerousPermissionsChecker writeSettingsPermissionChecker) {
+    SetAsRingtoneMenuAction(final Context context, FileDescriptor fd, final DangerousPermissionsChecker writeSettingsPermissionChecker) {
         super(context, R.drawable.contextmenu_icon_ringtone, R.string.context_menu_use_as_ringtone);
         this.fd = fd;
         this.writeSettingsPermissionChecker = writeSettingsPermissionChecker;
@@ -49,28 +45,19 @@ class SetAsRingtoneMenuAction extends MenuAction {
 
     @Override
     protected void onClick(Context context) {
-        if (checkForPermissionToWriteSettings(context)) {
+        if (DangerousPermissionsChecker.hasPermissionToWriteSettings(context)) {
             setNewRingtone(context);
         } else {
-            requestPermissionToWriteSettings(context);
+            DangerousPermissionsChecker.requestPermissionToWriteSettings(writeSettingsPermissionChecker,
+                    () -> {
+                        // This callback is executed by (MainActivity|AudioPlayerActivity).onActivityResult(requestCode=DangerousPermissionChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE,...)
+                        // when the new System's Write Settings activity is finished and the permissions
+                        // have been granted by the user.
+                        if (context != null) {
+                            setNewRingtone(context);
+                        }
+                    });
         }
-    }
-
-    private boolean checkForPermissionToWriteSettings(Context context) {
-        return (Build.VERSION.SDK_INT >= 23) ?
-                DangerousPermissionsChecker.canWriteSettingsAPILevel23(context) :
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_SETTINGS) == PackageManager.PERMISSION_GRANTED;
-    }
-
-
-
-    private void requestPermissionToWriteSettings(final Context context) {
-        // This callback is executed by MainActivity.onActivityResult(requestCode=DangerousPermissionChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE,...)
-        // when the new System's Write Settings activity is finished and the permissions
-        // have been granted by the user.
-        writeSettingsPermissionChecker.
-            setPermissionsGrantedCallback(() -> { if (context != null) { setNewRingtone(context); } });
-        writeSettingsPermissionChecker.requestPermissions();
     }
 
     private void setNewRingtone(Context context) {

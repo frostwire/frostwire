@@ -40,8 +40,13 @@ import java.lang.reflect.Method;
  * @author aldenml
  */
 public final class DangerousPermissionsChecker implements ActivityCompat.OnRequestPermissionsResultCallback {
+
     public interface OnPermissionsGrantedCallback {
         void onPermissionsGranted();
+    }
+
+    public interface WritePermissionsChecker {
+        DangerousPermissionsChecker getWriteSettingsPermissionChecker();
     }
 
     private static final Logger LOG = Logger.getLogger(Logger.class);
@@ -58,39 +63,6 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             this.activityRef = Ref.weak(activity);
         } else
             throw new IllegalArgumentException("The activity must implement ActivityCompat.OnRequestPermissionsResultCallback");
-    }
-
-    public void setPermissionsGrantedCallback(OnPermissionsGrantedCallback onPermissionsGrantedCallback) {
-        this.onPermissionsGrantedCallback = onPermissionsGrantedCallback;
-    }
-
-    public boolean noAccess() {
-        // simplified until otherwise necessary.
-        return requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE && noExternalStorageAccess();
-    }
-
-    public static boolean canWriteSettingsAPILevel23(Context context) {
-        if (Build.VERSION.SDK_INT < 23) {
-            return false;
-        }
-        try {
-            final Class<?> SystemClass = Class.forName("android.provider.Settings$System");
-            final Method canWriteMethod = SystemClass.getMethod("canWrite", Context.class);
-            return (boolean) canWriteMethod.invoke(null, context);
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-        }
-        return false;
-    }
-
-
-    private boolean noExternalStorageAccess() {
-        if (!Ref.alive(activityRef)) {
-            return true;
-        }
-        Activity activity = activityRef.get();
-        return ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
-                ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
     }
 
     public void requestPermissions() {
@@ -142,6 +114,81 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         if (this.onPermissionsGrantedCallback != null && permissionWasGranted) {
             onPermissionsGrantedCallback.onPermissionsGranted();
         }
+    }
+
+    public void setPermissionsGrantedCallback(OnPermissionsGrantedCallback onPermissionsGrantedCallback) {
+        this.onPermissionsGrantedCallback = onPermissionsGrantedCallback;
+    }
+
+    // EXTERNAL STORAGE PERMISSIONS
+
+    public boolean noAccess() {
+        // simplified until otherwise necessary.
+        return requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE && noExternalStorageAccess();
+    }
+
+    private boolean noExternalStorageAccess() {
+        if (!Ref.alive(activityRef)) {
+            return true;
+        }
+        Activity activity = activityRef.get();
+        return ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
+                ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
+    }
+
+    // WRITE SETTINGS (Ringtone setting)
+
+    public static void requestPermissionToWriteSettings(final DangerousPermissionsChecker writeSettingsPermissionChecker,
+                                                        final OnPermissionsGrantedCallback onPermissionsGrantedCallback) {
+        writeSettingsPermissionChecker.setPermissionsGrantedCallback(onPermissionsGrantedCallback);
+        writeSettingsPermissionChecker.requestPermissions();
+    }
+
+    public static boolean handleOnWriteSettingsActivityResult(Activity handlerActivity, int requestCode, int resultCode, Intent data) {
+        if (requestCode == DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE &&
+            handlerActivity instanceof DangerousPermissionsChecker.WritePermissionsChecker) {
+
+            final DangerousPermissionsChecker writeSettingsPermissionChecker =
+                    ((DangerousPermissionsChecker.WritePermissionsChecker) handlerActivity).getWriteSettingsPermissionChecker();
+
+            if (writeSettingsPermissionChecker != null) {
+                boolean hasWriteSettings =
+                        DangerousPermissionsChecker.hasPermissionToWriteSettings(handlerActivity);
+
+                int permissionCheckResult = hasWriteSettings ?
+                        PackageManager.PERMISSION_GRANTED :
+                        PackageManager.PERMISSION_DENIED;
+
+                // use the existing mechanism on DangerousPermissionsChecker
+                writeSettingsPermissionChecker.
+                        onRequestPermissionsResult(
+                                DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE,
+                                new String[]{Manifest.permission.WRITE_SETTINGS},
+                                new int[]{permissionCheckResult});
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean hasPermissionToWriteSettings(Context context) {
+        return (Build.VERSION.SDK_INT >= 23) ?
+                DangerousPermissionsChecker.canWriteSettingsAPILevel23(context) :
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_SETTINGS) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private static boolean canWriteSettingsAPILevel23(Context context) {
+        if (context == null || Build.VERSION.SDK_INT < 23) {
+            return false;
+        }
+        try {
+            final Class<?> SystemClass = Class.forName("android.provider.Settings$System");
+            final Method canWriteMethod = SystemClass.getMethod("canWrite", Context.class);
+            return (boolean) canWriteMethod.invoke(null, context);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
+        return false;
     }
 
     /**

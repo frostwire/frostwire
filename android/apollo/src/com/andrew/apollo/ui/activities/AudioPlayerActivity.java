@@ -50,6 +50,8 @@ import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractSwipeDetector;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.uxstats.UXAction;
@@ -68,7 +70,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
         ServiceConnection,
         OnSeekBarChangeListener,
         DeleteDialog.DeleteDialogCallback,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        ActivityCompat.OnRequestPermissionsResultCallback,
+        DangerousPermissionsChecker.WritePermissionsChecker {
 
     // Message to refresh the time
     private static final int REFRESH_TIME = 1;
@@ -150,6 +153,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     private boolean mIsPaused = false;
 
     private boolean mFromTouch = false;
+    private DangerousPermissionsChecker writeSettingsPermissionsChecker;
 
     /**
      * {@inheritDoc}
@@ -200,6 +204,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
         findViewById(R.id.audio_player_album_art).setOnTouchListener(new PlayerGesturesDetector(this));
+
+        writeSettingsPermissionsChecker = new DangerousPermissionsChecker(this, DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
     }
 
     /**
@@ -362,7 +368,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 return true;
             case R.id.menu_audio_player_ringtone:
                 // Set the current track as a ringtone
-                MusicUtils.setRingtone(this, MusicUtils.getCurrentAudioId());
+                onSetRingtoneOption();
                 return true;
             case R.id.menu_audio_player_share:
                 // Share the current meta data
@@ -401,11 +407,38 @@ public class AudioPlayerActivity extends FragmentActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    private void onSetRingtoneOption() {
+        final DangerousPermissionsChecker writeSettingsPermissionChecker = getWriteSettingsPermissionChecker();
+        if (writeSettingsPermissionChecker == null) {
+            UIUtils.showLongMessage(this, R.string.ringtone_not_set);
+            return;
+        }
+
+        if (DangerousPermissionsChecker.hasPermissionToWriteSettings(this)) {
+            MusicUtils.setRingtone(this, MusicUtils.getCurrentAudioId());
+        } else {
+            DangerousPermissionsChecker.requestPermissionToWriteSettings(writeSettingsPermissionChecker,
+                    () -> {
+                        // This callback is executed by (MainActivity|AudioPlayerActivity).onActivityResult(requestCode=DangerousPermissionChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE,...)
+                        // when the new System's Write Settings activity is finished and the permissions
+                        // have been granted by the user.
+                        MusicUtils.setRingtone(this, MusicUtils.getCurrentAudioId());
+                    });
+        }
+    }
+
     @Override
     public void onDelete(long[] ids) {
         ((QueueFragment)mPagerAdapter.getFragment(0)).refreshQueue();
         if (MusicUtils.getQueue().length == 0) {
             finish();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this, requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -963,6 +996,12 @@ public class AudioPlayerActivity extends FragmentActivity implements
             ((QueueFragment)mPagerAdapter.getFragment(0)).scrollToCurrentSong();
         }
     };
+
+    // DangerousPermissionsChecker.WritePermissionsChecker
+    @Override
+    public DangerousPermissionsChecker getWriteSettingsPermissionChecker() {
+        return writeSettingsPermissionsChecker;
+    }
 
     /**
      * Used to update the current time string
