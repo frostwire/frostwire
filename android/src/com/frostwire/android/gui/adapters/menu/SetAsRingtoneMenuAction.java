@@ -32,7 +32,6 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
-//import com.frostwire.logging.Logger;
 
 /**
  * @author gubatron
@@ -40,7 +39,6 @@ import com.frostwire.android.gui.views.MenuAction;
  *
  */
 class SetAsRingtoneMenuAction extends MenuAction {
-    //private static final Logger LOG = Logger.getLogger(SetAsRingtoneMenuAction.class);
     private final FileDescriptor fd;
     private final DangerousPermissionsChecker writeSettingsPermissionChecker;
 
@@ -60,7 +58,7 @@ class SetAsRingtoneMenuAction extends MenuAction {
     }
 
     private boolean checkForPermissionToWriteSettings(Context context) {
-        return (Build.VERSION.SDK_INT >= 23) ? // M == 23
+        return (Build.VERSION.SDK_INT >= 23) ?
                 DangerousPermissionsChecker.canWriteSettingsAPILevel23(context) :
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_SETTINGS) == PackageManager.PERMISSION_GRANTED;
     }
@@ -68,13 +66,11 @@ class SetAsRingtoneMenuAction extends MenuAction {
 
 
     private void requestPermissionToWriteSettings(final Context context) {
-        // this callback is executed when the system activity returns by
-        // MainActivity.onActivityResult(requestCode=DangerousPermissionChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE,...)
-        writeSettingsPermissionChecker.setPermissionsGrantedCallback(() -> {
-            if (context != null) {
-                setNewRingtone(context);
-            }
-        });
+        // This callback is executed by MainActivity.onActivityResult(requestCode=DangerousPermissionChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE,...)
+        // when the new System's Write Settings activity is finished and the permissions
+        // have been granted by the user.
+        writeSettingsPermissionChecker.
+            setPermissionsGrantedCallback(() -> { if (context != null) { setNewRingtone(context); } });
         writeSettingsPermissionChecker.requestPermissions();
     }
 
@@ -89,7 +85,6 @@ class SetAsRingtoneMenuAction extends MenuAction {
 
         if (uri != null) {
             try {
-                //Settings.System.putString(context.getContentResolver(), Settings.System.RINGTONE, uri);
                 RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, Uri.parse(uri));
                 final String message = context.getString(R.string.set_as_ringtone, fd.title);
                 UIUtils.showLongMessage(context, message);
