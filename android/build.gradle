@@ -81,7 +81,7 @@ project.ext.versionName = manifestVersionName()
 
 android {
 
-    compileSdkVersion 23 //16
+    compileSdkVersion 16
     buildToolsVersion '24.0.1'
 
     defaultConfig {
@@ -147,12 +147,14 @@ android {
             applicationId 'com.frostwire.android'
             versionCode 9050000 + project.ext.versionCode
         }
+
         store {
             // this is basic plus store enable
             // for a while the versionCode is the basic + 1
             applicationId 'com.frostwire.android'
             versionCode 9010000 + project.ext.versionCode + 5
         }
+
     }
 
     applicationVariants.all { variant ->
