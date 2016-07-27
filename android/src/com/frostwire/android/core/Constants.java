@@ -31,16 +31,16 @@ public final class Constants {
     private Constants() {
     }
 
-    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = (BuildConfig.FLAVOR.equals("basic") || BuildConfig.FLAVOR.equals("store")) && !BuildConfig.DEBUG;
-
-    public static final boolean IS_FREE_DISTRIBUTION = true;
-
-    public static final String BUILD_PREFIX = !IS_GOOGLE_PLAY_DISTRIBUTION ? "1000" : "";
-
     /**
      * This occurs when developing on IDEA, but we want to treat it as a plus build.
      */
     public static final boolean IS_BASIC_DEBUG = (BuildConfig.FLAVOR.equals("basic") || BuildConfig.FLAVOR.equals("store")) && BuildConfig.DEBUG;
+
+    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic") || BuildConfig.FLAVOR.equals("store") || IS_BASIC_DEBUG;
+
+    public static final boolean IS_FREE_DISTRIBUTION = true;
+
+    public static final String BUILD_PREFIX = !IS_GOOGLE_PLAY_DISTRIBUTION ? "1000" : "";
 
     /**
      * should manually match the manifest, here for convenience so we can ask for it from static contexts without
