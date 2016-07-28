@@ -514,6 +514,7 @@
     </style>
     <style name="BuyNoAdsAdText.AdFree">
         <item name="android:textSize">@dimen/text_x_large</item>
+        <item name="android:textColor">@color/app_dark_blue</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:paddingBottom">16dp</item>
