@@ -55,48 +55,42 @@ import java.util.List;
  * @author aldenml
  */
 public class SeedAction extends MenuAction implements AbstractDialog.OnDialogClickListener {
-    @SuppressWarnings("unused")
+
     private static final Logger LOG = Logger.getLogger(SeedAction.class);
+
+    private static final String DLG_SEEDING_OFF_TAG = "DLG_SEEDING_OFF_TAG";
+    private static final String DLG_TURN_BITTORRENT_BACK_ON = "DLG_TURN_BITTORRENT_BACK_ON";
+
     private final FileDescriptor fd;
-    private final List<FileDescriptor> fds;
     private final BittorrentDownload btDownload;
     private final Transfer transferToClear;
-    private static String DLG_SEEDING_OFF_TAG = "DLG_SEEDING_OFF_TAG";
-    private static String DLG_TURN_BITTORRENT_BACK_ON = "DLG_TURN_BITTORRENT_BACK_ON";
 
     // TODO: Receive extra metadata that could be put/used in the torrent for
     // enriched announcement.
 
     private SeedAction(Context context,
                        FileDescriptor fd,
-                       List<FileDescriptor> fds,
                        BittorrentDownload existingBittorrentDownload,
                        Transfer transferToClear) {
         super(context, R.drawable.contextmenu_icon_play_transfer, R.string.seed);
         this.fd = fd;
-        this.fds = fds;
         this.btDownload = existingBittorrentDownload;
         this.transferToClear = transferToClear;
     }
 
     // Reminder: Currently disabled when using SD Card.
     SeedAction(Context context, FileDescriptor fd) {
-        this(context, fd, null, null, null);
+        this(context, fd, null, null);
     }
 
     // Reminder: Currently disabled when using SD Card.
     public SeedAction(Context context, FileDescriptor fd, Transfer transferToClear) {
-        this(context, fd, null, null, transferToClear);
-    }
-
-    // Reminder: Currently disabled when using SD Card.
-    SeedAction(Context context, List<FileDescriptor> checked) {
-        this(context, null, checked, null, null);
+        this(context, fd, null, transferToClear);
     }
 
     // This one is not disabled as it's meant for existing torrent transfers.
     public SeedAction(Context context, BittorrentDownload download) {
-        this(context, null, null, download,null);
+        this(context, null, download, null);
     }
 
     @Override
@@ -139,10 +133,10 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     private void showBittorrentDisconnectedDialog() {
         YesNoDialog dlg = YesNoDialog.newInstance(
-            DLG_TURN_BITTORRENT_BACK_ON,
-             R.string.bittorrent_off,
-             R.string.bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you,
-             YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
+                DLG_TURN_BITTORRENT_BACK_ON,
+                R.string.bittorrent_off,
+                R.string.bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you,
+                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.setOnDialogClickListener(this);
         dlg.show(((Activity) getContext()).getFragmentManager());
     }
@@ -185,8 +179,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private void seedEm() {
         if (fd != null) {
             seedFileDescriptor(fd);
-        } else if (fds != null) {
-            seedFileDescriptors();
         } else if (btDownload != null) {
             seedBTDownload();
         }
@@ -208,12 +200,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             }
         } else {
             buildTorrentAndSeedIt(fd);
-        }
-    }
-
-    private void seedFileDescriptors() {
-        for (FileDescriptor f : fds) {
-            seedFileDescriptor(f);
         }
     }
 
@@ -277,7 +263,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 h.post(new Runnable() {
                     @Override
                     public void run() {
-                         onClick(getContext());
+                        onClick(getContext());
                     }
                 });
             }
@@ -287,9 +273,10 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.
-    private static class ShowNoWifiInformationDialog extends AbstractDialog {
+    public static class ShowNoWifiInformationDialog extends AbstractDialog {
+
         public static ShowNoWifiInformationDialog newInstance() {
-             return new ShowNoWifiInformationDialog();
+            return new ShowNoWifiInformationDialog();
         }
 
         // Important to keep this guy 'public', even if IntelliJ thinks you shouldn't.
