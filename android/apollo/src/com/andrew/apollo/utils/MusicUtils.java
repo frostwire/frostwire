@@ -1061,7 +1061,7 @@ public final class MusicUtils {
             values.put(AudioColumns.IS_ALARM, "1");
             resolver.update(uri, values, null, null);
         } catch (final UnsupportedOperationException ignored) {
-            return;
+            //return;
         }
 
         final String[] projection = new String[] {

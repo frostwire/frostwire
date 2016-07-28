@@ -37,6 +37,7 @@ import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.ui.activities.BaseActivity;
+import com.andrew.apollo.ui.activities.WriteSettingsPermissionActivityHelper;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
@@ -51,7 +52,7 @@ import com.viewpagerindicator.TitlePageIndicator;
 import java.util.List;
 
 /**
- * Created by gubatron on 1/26/16 on a plane.
+ * Created on 1/26/16 in a plane.
  *
  * @author gubatron
  * @author aldenml
@@ -122,6 +123,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     protected abstract String getLayoutTypeName();
 
+    private WriteSettingsPermissionActivityHelper writeSettingsHelper;
+
     public abstract void onItemClick(final AdapterView<?> parent, final View view, final int position,
                                      final long id);
 
@@ -134,6 +137,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
+        writeSettingsHelper = new WriteSettingsPermissionActivityHelper(activity);
         mProfileTabCarousel = (ProfileTabCarousel) activity.findViewById(R.id.activity_profile_base_tab_carousel);
 
         if (activity instanceof BaseActivity) {
@@ -280,7 +284,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     refresh();
                     return true;
                 case FragmentMenuItems.USE_AS_RINGTONE:
-                    MusicUtils.setRingtone(getActivity(), mSelectedId);
+                    writeSettingsHelper.onSetRingtoneOption(getActivity());
                     return true;
                 case FragmentMenuItems.DELETE:
                     return onDelete(songList);

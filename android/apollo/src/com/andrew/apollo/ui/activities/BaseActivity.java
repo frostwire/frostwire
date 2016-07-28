@@ -41,6 +41,7 @@ import com.andrew.apollo.widgets.ShuffleButton;
 import com.andrew.apollo.widgets.theme.BottomActionBar;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ClickAdapter;
 
@@ -57,7 +58,9 @@ import static com.andrew.apollo.utils.MusicUtils.mService;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public abstract class BaseActivity extends FragmentActivity implements ServiceConnection {
+public abstract class BaseActivity extends FragmentActivity
+        implements ServiceConnection,
+        DangerousPermissionsChecker.WritePermissionsChecker {
 
     /**
      * Play state and meta change listener
@@ -109,6 +112,8 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
      */
     protected ThemeUtils mResources;
 
+    private WriteSettingsPermissionActivityHelper writeSettingsHelper;
+
     /**
      * {@inheritDoc}
      */
@@ -132,6 +137,14 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
         setContentView(setContentView());
         // Initialize the bottom action bar
         initBottomActionBar();
+        writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
+    }
+
+    public DangerousPermissionsChecker getWriteSettingsPermissionChecker() {
+        if (writeSettingsHelper == null) {
+            return null;
+        }
+        return writeSettingsHelper.getWriteSettingsPermissionChecker();
     }
 
     private void prepareActionBar() {
@@ -144,7 +157,6 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
             actionBar.setIcon(R.color.transparent);
             actionBar.setDisplayShowTitleEnabled(false);
         }
-
 
         TextView actionBarTitleTextView = (TextView) findViewById(R.id.action_bar_title);
         if (actionBarTitleTextView != null) {
@@ -221,6 +233,9 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
                 return true;
             case R.id.menu_new_playlist:
                 onOptionsItemNewPlaylistSelected();
+                return true;
+            case R.id.menu_audio_player_ringtone:
+                writeSettingsHelper.onSetRingtoneOption(this);
                 return true;
             default:
                 break;
@@ -303,6 +318,13 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!writeSettingsHelper.onActivityResult(this, requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     /**
