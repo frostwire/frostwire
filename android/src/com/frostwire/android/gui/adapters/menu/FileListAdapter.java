@@ -126,7 +126,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         boolean showSingleOptions = showSingleOptions(checked, fd);
 
         if (showSingleOptions) {
-            if (!AndroidPlatform.saf(new File(fd.filePath))) {
+            if (!AndroidPlatform.saf(new File(fd.filePath)) &&
+                    fd.fileType != Constants.FILE_TYPE_RINGTONES) {
                 items.add(new SeedAction(context, fd));
             }
 
@@ -142,7 +143,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 items.add(new SetAsWallpaperMenuAction(context, fd));
             }
 
-            if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS && numChecked <= 1) {
+            if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS && numChecked <= 1 &&
+                    fd.fileType != Constants.FILE_TYPE_RINGTONES) {
                 items.add(new RenameFileMenuAction(context, this, fd));
             }
 
@@ -172,7 +174,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             items.add(new AddToPlaylistMenuAction(context, list));
         }
 
-        if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS) {
+        if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS &&
+                fd.fileType != Constants.FILE_TYPE_RINGTONES) {
             items.add(new SendFileMenuAction(context, fd));
             items.add(new DeleteFileMenuAction(context, this, list));
         }
@@ -481,7 +484,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         return false;
     }
-
 
 
     private static final class InfoHashBuilder {
