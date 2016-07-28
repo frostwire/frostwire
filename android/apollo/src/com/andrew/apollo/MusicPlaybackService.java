@@ -35,10 +35,6 @@ import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import com.andrew.apollo.appwidgets.AppWidgetLarge;
-import com.andrew.apollo.appwidgets.AppWidgetLargeAlternate;
-import com.andrew.apollo.appwidgets.AppWidgetSmall;
-import com.andrew.apollo.appwidgets.RecentWidgetProvider;
 import com.andrew.apollo.cache.ImageCache;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.provider.FavoritesStore;
@@ -323,27 +319,6 @@ public class MusicPlaybackService extends Service {
      * Service stub
      */
     private final IBinder mBinder = new ServiceStub(this);
-
-    /**
-     * 4x1 widget
-     */
-    private final AppWidgetSmall mAppWidgetSmall = AppWidgetSmall.getInstance();
-
-    /**
-     * 4x2 widget
-     */
-    private final AppWidgetLarge mAppWidgetLarge = AppWidgetLarge.getInstance();
-
-    /**
-     * 4x2 alternate widget
-     */
-    private final AppWidgetLargeAlternate mAppWidgetLargeAlternate = AppWidgetLargeAlternate
-            .getInstance();
-
-    /**
-     * Recently listened widget
-     */
-    private final RecentWidgetProvider mRecentWidgetProvider = RecentWidgetProvider.getInstance();
 
     /**
      * The media player
@@ -1437,12 +1412,6 @@ public class MusicPlaybackService extends Service {
         if (what.equals(PLAYSTATE_CHANGED)) {
             mNotificationHelper.updatePlayState(isPlaying());
         }
-
-        // Update the app-widgets
-        mAppWidgetSmall.notifyChange(this, what);
-        mAppWidgetLarge.notifyChange(this, what);
-        mAppWidgetLargeAlternate.notifyChange(this, what);
-        mRecentWidgetProvider.notifyChange(this, what);
     }
 
     /**
@@ -2451,22 +2420,7 @@ public class MusicPlaybackService extends Service {
         public void onReceive(final Context context, final Intent intent) {
             final String command = intent.getStringExtra(CMDNAME);
 
-            if (AppWidgetSmall.CMDAPPWIDGETUPDATE.equals(command)) {
-                final int[] small = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mAppWidgetSmall.performUpdate(MusicPlaybackService.this, small);
-            } else if (AppWidgetLarge.CMDAPPWIDGETUPDATE.equals(command)) {
-                final int[] large = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mAppWidgetLarge.performUpdate(MusicPlaybackService.this, large);
-            } else if (AppWidgetLargeAlternate.CMDAPPWIDGETUPDATE.equals(command)) {
-                final int[] largeAlt = intent
-                        .getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mAppWidgetLargeAlternate.performUpdate(MusicPlaybackService.this, largeAlt);
-            } else if (RecentWidgetProvider.CMDAPPWIDGETUPDATE.equals(command)) {
-                final int[] recent = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mRecentWidgetProvider.performUpdate(MusicPlaybackService.this, recent);
-            } else {
-                handleCommandIntent(intent);
-            }
+            handleCommandIntent(intent);
         }
     };
 
