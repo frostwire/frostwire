@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-def JLIBTORRENT_VERSION='1.1.0.35'
+def JLIBTORRENT_VERSION = '1.1.0.35'
 
 import groovy.swing.SwingBuilder
 
@@ -98,7 +98,7 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            res.srcDirs = ['res', 'apollo/res', ]
+            res.srcDirs = ['res', 'apollo/res']
             aidl.srcDirs = ['src', 'apollo/src']
             assets.srcDirs = ['assets']
             java {
@@ -163,6 +163,50 @@ dependencies {
     compile 'com.frostwire:jlibtorrent-android-x86:' + JLIBTORRENT_VERSION
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+class DeployRelease extends DefaultTask {
+
+    String flavor = 'unknown'
+
+    def version = project.ext.versionName
+    def build = project.ext.versionCode
+
+    def runCmd(cmd) {
+        println(cmd)
+
+        def p = Runtime.getRuntime().exec(cmd)
+        def stdOut = new BufferedReader(new InputStreamReader(p.getInputStream()))
+
+        def s
+        while ((s = stdOut.readLine()) != null) {
+            println(s)
+        }
+    }
+
+    @TaskAction
+    def run() {
+
+        println "Building and installing..."
+        println "VERSION: $version"
+        println "BUILD: $build"
+        println "FLAVOR: $flavor"
+
+        def suffix = version + '-b' + build + '-' + flavor
+        def filename = "$project.buildDir/frostwire-android-release-" + suffix + '.apk'
+
+        runCmd("adb uninstall com.frostwire.android")
+        runCmd("./gradlew clean assembleRelease")
+        runCmd("adb install $filename")
+    }
+}
+
+task deployBasic(type: DeployRelease) {
+    flavor = 'basic'
+}
+
+task deployPlus(type: DeployRelease) {
+    flavor = 'plus'
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
