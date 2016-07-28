@@ -31,14 +31,10 @@ public final class Constants {
     private Constants() {
     }
 
-    /**
-     * This occurs when developing on IDEA, but we want to treat it as a plus build.
-     */
-    public static final boolean IS_BASIC_DEBUG = (BuildConfig.FLAVOR.equals("basic") || BuildConfig.FLAVOR.equals("store")) && BuildConfig.DEBUG;
+    public static final boolean IS_BASIC_AND_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
+    public static final boolean IS_BASIC_OR_DEBUG = BuildConfig.FLAVOR.equals("basic") || BuildConfig.DEBUG;
 
-    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic") || BuildConfig.FLAVOR.equals("store") || IS_BASIC_DEBUG;
-
-    public static final boolean IS_FREE_DISTRIBUTION = true;
+    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = IS_BASIC_OR_DEBUG;
 
     public static final String BUILD_PREFIX = !IS_GOOGLE_PLAY_DISTRIBUTION ? "1000" : "";
 
@@ -49,7 +45,7 @@ public final class Constants {
     public static final String FROSTWIRE_BUILD = BUILD_PREFIX + (BuildConfig.VERSION_CODE % 1000);
 
     // change it to a constant true when the test phase is done
-    public static final boolean IS_STORE_ENABLED = BuildConfig.FLAVOR.equals("basic") || BuildConfig.DEBUG;
+    public static final boolean IS_STORE_ENABLED = IS_BASIC_OR_DEBUG;
 
     public static final String APP_PACKAGE_NAME = "com.frostwire.android";
 
