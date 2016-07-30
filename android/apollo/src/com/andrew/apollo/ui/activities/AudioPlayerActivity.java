@@ -50,6 +50,8 @@ import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
+import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractSwipeDetector;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.uxstats.UXAction;
@@ -68,7 +70,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
         ServiceConnection,
         OnSeekBarChangeListener,
         DeleteDialog.DeleteDialogCallback,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        ActivityCompat.OnRequestPermissionsResultCallback,
+        DangerousPermissionsChecker.WritePermissionsChecker {
 
     // Message to refresh the time
     private static final int REFRESH_TIME = 1;
@@ -150,6 +153,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     private boolean mIsPaused = false;
 
     private boolean mFromTouch = false;
+    private WriteSettingsPermissionActivityHelper writeSettingsHelper;
 
     /**
      * {@inheritDoc}
@@ -200,6 +204,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
         findViewById(R.id.audio_player_album_art).setOnTouchListener(new PlayerGesturesDetector(this));
+
+        writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
     }
 
     /**
@@ -362,7 +368,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 return true;
             case R.id.menu_audio_player_ringtone:
                 // Set the current track as a ringtone
-                MusicUtils.setRingtone(this, MusicUtils.getCurrentAudioId());
+
+                writeSettingsHelper.onSetRingtoneOption(this, MusicUtils.getCurrentAudioId());
                 return true;
             case R.id.menu_audio_player_share:
                 // Share the current meta data
@@ -372,10 +379,10 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 // Sound effects
                 NavUtils.openEffectsPanel(this);
                 return true;
-            /*case R.id.menu_settings:
+            case R.id.menu_main_settings:
                 // Settings
                 NavUtils.openSettings(this);
-                return true;*/
+                return true;
             case R.id.menu_audio_player_stop:
                 try {
                     MusicUtils.mService.stop();
@@ -401,11 +408,21 @@ public class AudioPlayerActivity extends FragmentActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+
+
     @Override
     public void onDelete(long[] ids) {
         ((QueueFragment)mPagerAdapter.getFragment(0)).refreshQueue();
         if (MusicUtils.getQueue().length == 0) {
             finish();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -547,9 +564,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
         // Progress
         mProgress = (SeekBar)findViewById(android.R.id.progress);
 
-        // Set the repeat listner for the previous button
+        // Set the repeat listener for the previous button
         mPreviousButton.setRepeatListener(mRewindListener);
-        // Set the repeat listner for the next button
+        // Set the repeat listener for the next button
         mNextButton.setRepeatListener(mFastForwardListener);
         // Update the progress
         mProgress.setOnSeekBarChangeListener(this);
@@ -684,16 +701,16 @@ public class AudioPlayerActivity extends FragmentActivity implements
     }
 
     /**
-     * Used to scan backwards in time through the curren track
+     * Used to scan backwards in time through the current track
      * 
-     * @param repcnt The repeat count
+     * @param repcount The repeat count
      * @param delta The long press duration
      */
-    private void scanBackward(final int repcnt, long delta) {
+    private void scanBackward(final int repcount, long delta) {
         if (mService == null) {
             return;
         }
-        if (repcnt == 0) {
+        if (repcount == 0) {
             mStartSeekPos = MusicUtils.position();
             mLastSeekEventTime = 0;
         } else {
@@ -712,11 +729,11 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 mStartSeekPos += duration;
                 newpos += duration;
             }
-            if (delta - mLastSeekEventTime > 250 || repcnt < 0) {
+            if (delta - mLastSeekEventTime > 250 || repcount < 0) {
                 MusicUtils.seek(newpos);
                 mLastSeekEventTime = delta;
             }
-            if (repcnt >= 0) {
+            if (repcount >= 0) {
                 mPosOverride = newpos;
             } else {
                 mPosOverride = -1;
@@ -728,14 +745,14 @@ public class AudioPlayerActivity extends FragmentActivity implements
     /**
      * Used to scan forwards in time through the current track
      * 
-     * @param repcnt The repeat count
+     * @param repcount The repeat count
      * @param delta The long press duration
      */
-    private void scanForward(final int repcnt, long delta) {
+    private void scanForward(final int repcount, long delta) {
         if (mService == null) {
             return;
         }
-        if (repcnt == 0) {
+        if (repcount == 0) {
             mStartSeekPos = MusicUtils.position();
             mLastSeekEventTime = 0;
         } else {
@@ -754,11 +771,11 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 mStartSeekPos -= duration; // is OK to go negative
                 newpos -= duration;
             }
-            if (delta - mLastSeekEventTime > 250 || repcnt < 0) {
+            if (delta - mLastSeekEventTime > 250 || repcount < 0) {
                 MusicUtils.seek(newpos);
                 mLastSeekEventTime = delta;
             }
-            if (repcnt >= 0) {
+            if (repcount >= 0) {
                 mPosOverride = newpos;
             } else {
                 mPosOverride = -1;
@@ -850,7 +867,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     /**
      * Called to hide the album art and show the queue
      */
-    public void hideAlbumArt() {
+    private void hideAlbumArt() {
         mPageContainer.setVisibility(View.VISIBLE);
         mQueueSwitch.setVisibility(View.GONE);
         mAlbumArtSmall.setVisibility(View.VISIBLE);
@@ -936,20 +953,16 @@ public class AudioPlayerActivity extends FragmentActivity implements
     /**
      * Opens to the current album profile
      */
-    private final OnClickListener mOpenAlbumProfile = new OnClickListener() {
-
-        @Override
-        public void onClick(final View v) {
-            long albumId = MusicUtils.getCurrentAlbumId();
-            try {
-                NavUtils.openAlbumProfile(AudioPlayerActivity.this,
-                        MusicUtils.getAlbumName(),
-                        MusicUtils.getArtistName(),
-                        albumId,
-                        MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
-            } catch (Throwable ignored) {
-                ignored.printStackTrace();
-            }
+    private final OnClickListener mOpenAlbumProfile = v -> {
+        long albumId = MusicUtils.getCurrentAlbumId();
+        try {
+            NavUtils.openAlbumProfile(AudioPlayerActivity.this,
+                    MusicUtils.getAlbumName(),
+                    MusicUtils.getArtistName(),
+                    albumId,
+                    MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
+        } catch (Throwable ignored) {
+            ignored.printStackTrace();
         }
     };
 
@@ -964,6 +977,12 @@ public class AudioPlayerActivity extends FragmentActivity implements
         }
     };
 
+    // DangerousPermissionsChecker.WritePermissionsChecker
+    @Override
+    public DangerousPermissionsChecker getWriteSettingsPermissionChecker() {
+        return writeSettingsHelper.getWriteSettingsPermissionChecker();
+    }
+
     /**
      * Used to update the current time string
      */
@@ -975,7 +994,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
          * Constructor of <code>TimeHandler</code>
          */
         public TimeHandler(final AudioPlayerActivity player) {
-            mAudioPlayer = new WeakReference<AudioPlayerActivity>(player);
+            mAudioPlayer = new WeakReference<>(player);
         }
 
         @Override
@@ -989,7 +1008,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
                     break;
             }
         }
-    };
+    }
 
     /**
      * Used to monitor the state of playback
@@ -1002,7 +1021,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
          * Constructor of <code>PlaybackStatus</code>
          */
         public PlaybackStatus(final AudioPlayerActivity activity) {
-            mReference = new WeakReference<AudioPlayerActivity>(activity);
+            mReference = new WeakReference<>(activity);
         }
 
         /**
@@ -1034,7 +1053,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         private final WeakReference<AudioPlayerActivity> audioPlayerActivityRef;
 
         public PlayerGesturesDetector(AudioPlayerActivity audioPlayerActivity) {
-             audioPlayerActivityRef = new WeakReference<AudioPlayerActivity>(audioPlayerActivity);
+             audioPlayerActivityRef = new WeakReference<>(audioPlayerActivity);
         }
         @Override
         public void onLeftToRightSwipe() {

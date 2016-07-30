@@ -41,7 +41,9 @@ import com.andrew.apollo.widgets.ShuffleButton;
 import com.andrew.apollo.widgets.theme.BottomActionBar;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.ClickAdapter;
 
 import java.lang.ref.WeakReference;
@@ -57,8 +59,8 @@ import static com.andrew.apollo.utils.MusicUtils.mService;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public abstract class BaseActivity extends FragmentActivity implements ServiceConnection {
-
+public abstract class BaseActivity extends FragmentActivity
+        implements ServiceConnection {
     /**
      * Play state and meta change listener
      */
@@ -134,6 +136,18 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
         initBottomActionBar();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE) {
+            WriteSettingsPermissionActivityHelper helper = new WriteSettingsPermissionActivityHelper(this);
+            if (helper.onActivityResult(this,requestCode)) {
+                return;
+            }
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     private void prepareActionBar() {
         final ActionBar actionBar = getActionBar();
         if (actionBar != null) {
@@ -144,7 +158,6 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
             actionBar.setIcon(R.color.transparent);
             actionBar.setDisplayShowTitleEnabled(false);
         }
-
 
         TextView actionBarTitleTextView = (TextView) findViewById(R.id.action_bar_title);
         if (actionBarTitleTextView != null) {

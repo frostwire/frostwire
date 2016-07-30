@@ -33,8 +33,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import com.andrew.apollo.IApolloService;
@@ -89,7 +87,8 @@ import static com.andrew.apollo.utils.MusicUtils.mService;
 public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
         OnDialogClickListener,
         ServiceConnection,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        ActivityCompat.OnRequestPermissionsResultCallback,
+        DangerousPermissionsChecker.WritePermissionsChecker {
 
     private static final Logger LOG = Logger.getLogger(MainActivity.class);
     private static final String FRAGMENTS_STACK_KEY = "fragments_stack";
@@ -197,11 +196,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void initPlayerItemListener() {
         playerItem = findView(R.id.slidemenu_player_menuitem);
-        playerItem.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                controller.launchPlayerActivity();
-            }
-        });
+        playerItem.setOnClickListener(v -> controller.launchPlayerActivity());
     }
 
     private void initDrawerListener() {
@@ -363,28 +358,16 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         // EXTERNAL STORAGE ACCESS CHECKER.
         final DangerousPermissionsChecker externalStorageChecker =
                 new DangerousPermissionsChecker(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        externalStorageChecker.setPermissionsGrantedCallback(new DangerousPermissionsChecker.OnPermissionsGrantedCallback() {
-            @Override
-            public void onPermissionsGranted() {
-                // TODO: is the restart necessary?
-                /*
-                UIUtils.showInformationDialog(MainActivity.this,
-                        R.string.restarting_summary,
-                        R.string.restarting,
-                        false,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                externalStorageChecker.restartFrostWire(2000);
-                            }
-                        });
-                        */
-            }
-        });
+        externalStorageChecker.setPermissionsGrantedCallback(() -> {});
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
 
-        // add more permissions checkers if needed...
+        // WRITE SETTINGS (Setting the default ringtone requires this)
+        final DangerousPermissionsChecker writeSettingsChecker =
+                new DangerousPermissionsChecker(this, DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
+        checkers.put(DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE, writeSettingsChecker);
+        // the permissionGrantedCallBack will be set by whoever uses this during runtime.
 
+        // add more permissions checkers if needed...
         return checkers;
     }
 
@@ -518,7 +501,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
-        } else {
+        } else if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -641,26 +624,25 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void setupMenuItems() {
         listMenu.setAdapter(new MainMenuAdapter(this));
         listMenu.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-        listMenu.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                syncSlideMenu();
-                controller.closeSlideMenu();
-                try {
-                    if (id == R.id.menu_main_settings) {
-                        controller.showPreferences();
-                    } else if (id == R.id.menu_main_shutdown) {
-                        showShutdownDialog();
-                    } else if (id == R.id.menu_main_my_music) {
-                        controller.launchMyMusic();
-                    } else if (id == R.id.menu_main_support) {
-                        UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
-                    } else {
-                        listMenu.setItemChecked(position, true);
-                        controller.switchFragment((int) id);
-                    }
-                } catch (Throwable e) { // protecting from weird android UI engine issues
-                    LOG.error("Error clicking slide menu item", e);
+        listMenu.setOnItemClickListener((parent, view, position, id) -> {
+            //onItemClick(AdapterView<?> parent, View view, int position, long id)
+            syncSlideMenu();
+            controller.closeSlideMenu();
+            try {
+                if (id == R.id.menu_main_settings) {
+                    controller.showPreferences();
+                } else if (id == R.id.menu_main_shutdown) {
+                    showShutdownDialog();
+                } else if (id == R.id.menu_main_my_music) {
+                    controller.launchMyMusic();
+                } else if (id == R.id.menu_main_support) {
+                    UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
+                } else {
+                    listMenu.setItemChecked(position, true);
+                    controller.switchFragment((int) id);
                 }
+            } catch (Throwable e) { // protecting from weird android UI engine issues
+                LOG.error("Error clicking slide menu item", e);
             }
         });
     }
@@ -669,7 +651,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
         library = (BrowsePeerFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_browse_peer);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
-
         hideFragments(getFragmentManager().beginTransaction()).commit();
     }
 
@@ -758,6 +739,15 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             default:
                 return null;
         }
+    }
+
+    // DangerousPermissionsChecker.WritePermissionsChecker
+    @Override
+    public DangerousPermissionsChecker getWriteSettingsPermissionChecker() {
+        if (permissionsCheckers == null) {
+            return null;
+        }
+        return permissionsCheckers.get(DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
     }
 
     public void switchContent(Fragment fragment) {

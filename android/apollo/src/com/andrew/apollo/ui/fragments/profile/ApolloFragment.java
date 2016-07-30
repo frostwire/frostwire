@@ -45,13 +45,14 @@ import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.logging.Logger;
 import com.viewpagerindicator.TitlePageIndicator;
 
 import java.util.List;
 
 /**
- * Created by gubatron on 1/26/16 on a plane.
+ * Created on 1/26/16 in a plane.
  *
  * @author gubatron
  * @author aldenml
@@ -280,8 +281,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     refresh();
                     return true;
                 case FragmentMenuItems.USE_AS_RINGTONE:
-                    MusicUtils.setRingtone(getActivity(), mSelectedId);
-                    return true;
+                    if (onUseAsRingtone()) {
+                        return true;
+                    }
                 case FragmentMenuItems.DELETE:
                     return onDelete(songList);
                 case FragmentMenuItems.MORE_BY_ARTIST:
@@ -298,6 +300,21 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             }
         }
         return super.onContextItemSelected(item);
+    }
+
+    private boolean onUseAsRingtone() {
+        Activity activity = getActivity();
+        if (activity == null) {
+            return false;
+        }
+
+        if (mSelectedId == -1) {
+            return false;
+        }
+
+        WriteSettingsPermissionActivityHelper helper = new WriteSettingsPermissionActivityHelper(getActivity());
+        helper.onSetRingtoneOption(getActivity(), mSelectedId);
+        return true;
     }
 
     private boolean onRemoveFromRecent()  {
