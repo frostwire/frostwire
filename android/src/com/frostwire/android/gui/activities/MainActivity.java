@@ -87,8 +87,7 @@ import static com.andrew.apollo.utils.MusicUtils.mService;
 public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
         OnDialogClickListener,
         ServiceConnection,
-        ActivityCompat.OnRequestPermissionsResultCallback,
-        DangerousPermissionsChecker.WritePermissionsChecker {
+        ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final Logger LOG = Logger.getLogger(MainActivity.class);
     private static final String FRAGMENTS_STACK_KEY = "fragments_stack";
@@ -739,15 +738,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             default:
                 return null;
         }
-    }
-
-    // DangerousPermissionsChecker.WritePermissionsChecker
-    @Override
-    public DangerousPermissionsChecker getWriteSettingsPermissionChecker() {
-        if (permissionsCheckers == null) {
-            return null;
-        }
-        return permissionsCheckers.get(DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
     }
 
     public void switchContent(Fragment fragment) {

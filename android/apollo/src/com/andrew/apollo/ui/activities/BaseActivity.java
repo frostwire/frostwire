@@ -516,7 +516,7 @@ public abstract class BaseActivity extends FragmentActivity
 
     private class StopAndHideBottomActionBarListener extends StopListener {
 
-        public StopAndHideBottomActionBarListener(Activity activity, boolean finishOnStop) {
+        StopAndHideBottomActionBarListener(Activity activity, boolean finishOnStop) {
             super(activity, finishOnStop);
         }
 
@@ -530,7 +530,7 @@ public abstract class BaseActivity extends FragmentActivity
 
     private final static class ActionBarTextViewClickListener extends ClickAdapter<BaseActivity> {
 
-        public ActionBarTextViewClickListener(BaseActivity owner) {
+        ActionBarTextViewClickListener(BaseActivity owner) {
             super(owner);
         }
 

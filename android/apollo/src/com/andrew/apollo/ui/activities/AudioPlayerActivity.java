@@ -50,7 +50,6 @@ import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
-import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractSwipeDetector;
 import com.frostwire.android.gui.views.ClickAdapter;
@@ -70,8 +69,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         ServiceConnection,
         OnSeekBarChangeListener,
         DeleteDialog.DeleteDialogCallback,
-        ActivityCompat.OnRequestPermissionsResultCallback,
-        DangerousPermissionsChecker.WritePermissionsChecker {
+        ActivityCompat.OnRequestPermissionsResultCallback {
 
     // Message to refresh the time
     private static final int REFRESH_TIME = 1;
@@ -976,12 +974,6 @@ public class AudioPlayerActivity extends FragmentActivity implements
             ((QueueFragment)mPagerAdapter.getFragment(0)).scrollToCurrentSong();
         }
     };
-
-    // DangerousPermissionsChecker.WritePermissionsChecker
-    @Override
-    public DangerousPermissionsChecker getWriteSettingsPermissionChecker() {
-        return writeSettingsHelper.getWriteSettingsPermissionChecker();
-    }
 
     /**
      * Used to update the current time string
