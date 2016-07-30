@@ -41,6 +41,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
@@ -375,11 +376,17 @@ public final class SoftwareUpdater {
             }
         }
 
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_APPLOVIN, update.config.appLovin);
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_INMOBI, update.config.inmobi);
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS, update.config.removeads);
+        LOG.info("Waterfall from JSON ("+ update.config.waterfall.getClass().getSimpleName() +".class)");
+        for (String sc : update.config.waterfall) {
+            LOG.info("updateConfiguration: waterfall -> " + sc);
+        }
+
+        ConfigurationManager.instance().setStringSet(Constants.PREF_KEY_GUI_OFFERS_WATERFALL, update.config.waterfall);
         ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
         ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
+
+        // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
+        Offers.initAdNetworks((Activity) activityContext);
 
         if (update.config.uxEnabled && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_UXSTATS_ENABLED)) {
             String url = "http://ux.frostwire.com/aux";
@@ -447,9 +454,7 @@ public final class SoftwareUpdater {
     @SuppressWarnings("CanBeFinal")
     private static class Config {
         Map<String, Boolean> activeSearchEngines;
-        boolean appLovin = false;
-        boolean inmobi = false;
-        boolean removeads = true;
+        LinkedHashSet<String> waterfall;
         int interstitialOffersTransferStarts = 5;
         int interstitialTransferOffersTimeoutInMinutes = 15;
 

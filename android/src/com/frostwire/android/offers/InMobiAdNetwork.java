@@ -43,7 +43,13 @@ public class InMobiAdNetwork implements AdNetwork {
 
     public void initialize(final Activity activity) {
         if (!enabled()) {
-            LOG.info("InMobi initialize(): aborted. not enabled.");
+            if (!started()) {
+                LOG.info("InMobi initialize(): aborted. not enabled.");
+            } else {
+                // initialize can be called multiple times, we may have to stop
+                // this network if we started it using a default value.
+                stop(activity);
+            }
             return;
         }
 
@@ -136,5 +142,15 @@ public class InMobiAdNetwork implements AdNetwork {
                 }
             }
         });
+    }
+
+    @Override
+    public String getShortCode() {
+        return Constants.AD_NETWORK_SHORTCODE_INMOBI;
+    }
+
+    @Override
+    public String getInUsePreferenceKey() {
+        return Constants.PREF_KEY_GUI_USE_INMOBI;
     }
 }

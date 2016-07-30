@@ -36,12 +36,18 @@ public class AppLovinAdNetwork implements AdNetwork {
     private AppLovinInterstitialAdapter interstitialAdapter = null;
     private boolean started = false;
 
-    public AppLovinAdNetwork() {
+    AppLovinAdNetwork() {
     }
 
     public void initialize(final Activity activity) {
         if (!enabled()) {
-            LOG.info("AppLovin initialize(): aborted. not enabled.");
+            if (!started()) {
+                LOG.info("AppLovin initialize(): aborted. not enabled.");
+            } else {
+                // initialize can be called multiple times, we may have to stop
+                // this network if we started it using a default value.
+                stop(activity);
+            }
             return;
         }
 
@@ -76,6 +82,16 @@ public class AppLovinAdNetwork implements AdNetwork {
         AppLovinSdk.getInstance(activity).getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, interstitialAdapter);
     }
 
+    @Override
+    public String getShortCode() {
+        return Constants.AD_NETWORK_SHORTCODE_APPLOVIN;
+    }
+
+    @Override
+    public String getInUsePreferenceKey() {
+        return Constants.PREF_KEY_GUI_USE_APPLOVIN;
+    }
+
     public boolean started() {
         return started;
     }
@@ -89,7 +105,7 @@ public class AppLovinAdNetwork implements AdNetwork {
         boolean enabled = false;
         try {
             config = ConfigurationManager.instance();
-            enabled = config.getBoolean(Constants.PREF_KEY_GUI_USE_APPLOVIN);
+            enabled = config.getBoolean(getInUsePreferenceKey());
         } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
         }

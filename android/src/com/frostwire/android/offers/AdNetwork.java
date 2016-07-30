@@ -22,7 +22,7 @@ import android.content.Context;
 
 import java.lang.ref.WeakReference;
 
-public interface AdNetwork {
+interface AdNetwork {
     void initialize(final Activity activity);
     void stop(Context context);
     boolean enabled();
@@ -31,4 +31,6 @@ public interface AdNetwork {
                              final boolean shutdownActivityAfterwards,
                              final boolean dismissActivityAfterward);
     void loadNewInterstitial(Activity activity);
+    String getShortCode();
+    String getInUsePreferenceKey();
 }

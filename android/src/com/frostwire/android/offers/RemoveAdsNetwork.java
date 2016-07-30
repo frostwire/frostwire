@@ -51,7 +51,6 @@ class RemoveAdsNetwork implements AdNetwork {
                 LOG.info("RemoveAds initialize(): not available for plus.");
             }
             started = false;
-            return;
         }
     }
 
@@ -70,8 +69,8 @@ class RemoveAdsNetwork implements AdNetwork {
                 enabled = false;
             } else {
                 config = ConfigurationManager.instance();
-                LOG.info("config use removeAds -> " + config.getBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS));
-                enabled = config.getBoolean(Constants.PREF_KEY_GUI_USE_REMOVEADS);
+                LOG.info("config use removeAds -> " + config.getBoolean(getInUsePreferenceKey()));
+                enabled = config.getBoolean(getInUsePreferenceKey());
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -102,5 +101,15 @@ class RemoveAdsNetwork implements AdNetwork {
     @Override
     public void loadNewInterstitial(Activity activity) {
         // do nothing
+    }
+
+    @Override
+    public String getShortCode() {
+        return Constants.AD_NETWORK_SHORTCODE_REMOVEADS;
+    }
+
+    @Override
+    public String getInUsePreferenceKey() {
+        return Constants.PREF_KEY_GUI_USE_REMOVEADS;
     }
 }

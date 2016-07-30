@@ -64,7 +64,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 5);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, 15);
         defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
-                new HashSet<>(Arrays.asList(new String[]{
+                new LinkedHashSet<>(Arrays.asList(new String[]{
                         Constants.AD_NETWORK_SHORTCODE_APPLOVIN,
                         Constants.AD_NETWORK_SHORTCODE_INMOBI,
                         Constants.AD_NETWORK_SHORTCODE_REMOVEADS

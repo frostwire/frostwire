@@ -1,6 +1,7 @@
-FrostWire 1.7.9 - JUL/29/2016
+FrostWire 1.7.9 - JUL/30/2016
  - Use audio as ringtone fixed for Android 6 devices.
  - Optimizations, cleanup, crash fixes.
+ - Fixes bug where app wouldn't shutdown.
 
 FrostWire 1.7.8 - JUL/23/2016
  - Removes KAT search.
