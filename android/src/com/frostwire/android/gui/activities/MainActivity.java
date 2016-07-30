@@ -166,7 +166,13 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private boolean isShutdown() {
-        Intent intent = getIntent();
+        return isShutdown(null);
+    }
+
+    private boolean isShutdown(Intent intent) {
+        if (intent == null) {
+            intent = getIntent();
+        }
         boolean result = intent != null && intent.getBooleanExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), false);
         if (result) {
             shutdown();
@@ -228,6 +234,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             return;
         }
 
+        if (isShutdown(intent)) {
+            return;
+        }
+
         String action = intent.getAction();
 
         if (action != null) {
@@ -265,6 +275,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
+            LOG.info("Intent had EXTRA_FINISH_MAIN_ACTIVITY");
             finish();
         }
     }

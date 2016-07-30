@@ -46,7 +46,6 @@ import java.util.Random;
  * @author aldenml
  */
 public class BuyActivity extends AbstractActivity {
-
     public static final String INTERSTITIAL_MODE = "interstitialMode";
     static final int PURCHASE_SUCCESSFUL_RESULT_CODE = 989898;
     static final String EXTRA_KEY_PURCHASE_TIMESTAMP = "purchase_timestamp";
@@ -185,18 +184,19 @@ public class BuyActivity extends AbstractActivity {
             boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
 
             if (dismissActivityAfterward) {
-                Intent i = new Intent(getApplication(), MainActivity.class);
+                Intent i = new Intent(this, MainActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 i.putExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY, true);
-                getApplication().startActivity(i);
+                startActivity(i);
                 return;
             }
 
             if (shutdownActivityAfterwards) {
-                Intent i = new Intent(getApplication(), MainActivity.class);
+                Intent i = new Intent(this, MainActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 i.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
-                getApplication().startActivity(i);
+                startActivity(i);
+                return;
             }
 
             finish();
