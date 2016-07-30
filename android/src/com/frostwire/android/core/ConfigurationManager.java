@@ -29,6 +29,7 @@ import com.frostwire.util.StringUtils;
 import java.io.File;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}
@@ -64,9 +65,10 @@ public class ConfigurationManager {
         editor = preferences.edit();
 
         defaults = new ConfigurationDefaults();
-
         initPreferences();
     }
+
+
 
     public String getString(String key) {
         return preferences.getString(key, null);
@@ -161,6 +163,15 @@ public class ConfigurationManager {
         return getBoolean(Constants.PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD);
     }
 
+    public Set<String> getStringSet(String key) {
+        return preferences.getStringSet(key, null);
+    }
+
+    public void setStringSet(String key, Set<String> values) {
+        editor.putStringSet(key, values);
+        editor.commit();
+    }
+
     public int maxConcurrentUploads() {
         return getInt(Constants.PREF_KEY_NETWORK_MAX_CONCURRENT_UPLOADS);
     }
@@ -211,6 +222,8 @@ public class ConfigurationManager {
             initByteArrayPreference(key, (byte[]) value, force);
         } else if (value instanceof File) {
             initFilePreference(key, (File) value, force);
+        } else if (value instanceof Set) {
+            initStringSetPreference(key, (Set<String>) value, force);
         }
     }
 
@@ -250,6 +263,12 @@ public class ConfigurationManager {
         }
     }
 
+    private void initStringSetPreference(String prefKeyName, Set<String> defaultValue, boolean force) {
+        if (!preferences.contains(prefKeyName) || force) {
+            setStringSet(prefKeyName, defaultValue);
+        }
+    }
+
     private void resetToDefaults(Map<String, Object> map) {
         for (Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() instanceof String) {
@@ -264,6 +283,8 @@ public class ConfigurationManager {
                 setByteArray(entry.getKey(), (byte[]) entry.getValue());
             } else if (entry.getValue() instanceof File) {
                 setFile(entry.getKey(), (File) entry.getValue());
+            } else if (entry.getValue() instanceof Set) {
+                setStringSet(entry.getKey(), (Set<String>) entry.getValue());
             }
         }
     }
