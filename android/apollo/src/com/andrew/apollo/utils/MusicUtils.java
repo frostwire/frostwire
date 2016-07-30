@@ -59,7 +59,7 @@ import java.util.*;
  */
 public final class MusicUtils {
 
-    private static Logger LOG = Logger.getLogger(MusicUtils.class);
+    private static Logger LOGGER = Logger.getLogger(MusicUtils.class);
 
     public static IApolloService mService = null;
 
@@ -902,7 +902,7 @@ public final class MusicUtils {
                 cursor.close();
             }
         } catch (Throwable e) {
-            LOG.error("Could not fetch playlists", e);
+            LOGGER.error("Could not fetch playlists", e);
         }
 
         return result;
@@ -957,12 +957,12 @@ public final class MusicUtils {
      */
     public static void addToPlaylist(final Context context, final long[] ids, final long playlistid) {
         if (ids == null) {
-            LOG.warn("song ids given null, not adding anything to playlist.");
+            LOGGER.warn("song ids given null, not adding anything to playlist.");
             return;
         }
 
         if (ids == sEmptyList) {
-            LOG.warn("song ids was empty, not adding anything to playlist.");
+            LOGGER.warn("song ids was empty, not adding anything to playlist.");
             return;
         }
 
@@ -991,7 +991,7 @@ public final class MusicUtils {
             AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
             refresh();
         } else {
-            LOG.warn("Unable to complete addToPlaylist, review the logic");
+            LOGGER.warn("Unable to complete addToPlaylist, review the logic");
         }
     }
 
@@ -1062,6 +1062,7 @@ public final class MusicUtils {
             resolver.update(uri, values, null, null);
         } catch (final UnsupportedOperationException ignored) {
             //return;
+            LOGGER.error(ignored.getMessage(), ignored);
         }
 
         final String[] projection = new String[] {
@@ -1141,7 +1142,7 @@ public final class MusicUtils {
             return getFirstStringResult(cursor, true);
         } catch (Throwable e) {
             // ignore this error since it's not critical
-            LOG.error("Error getting release date for album", e);
+            LOGGER.error("Error getting release date for album", e);
             return null;
         }
     }
@@ -1331,7 +1332,7 @@ public final class MusicUtils {
             while (!cursor.isAfterLast()) {
                 final Intent intent = new Intent();
                 String name = cursor.getString(1);
-                //LOG.info("makePlaylistMenu - add ["+name+"]");
+                //LOGGER.info("makePlaylistMenu - add ["+name+"]");
                 if (name != null) {
                     intent.putExtra("playlist", getIdForPlaylist(context, name));
                     subMenu.add(groupId, FragmentMenuItems.PLAYLIST_SELECTED, Menu.NONE,

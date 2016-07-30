@@ -36,7 +36,6 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.util.ImageLoader;
@@ -132,7 +131,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
 
             if ((fd.fileType == Constants.FILE_TYPE_RINGTONES || fd.fileType == Constants.FILE_TYPE_AUDIO) && numChecked <= 1) {
-                items.add(new SetAsRingtoneMenuAction(context, fd, ((DangerousPermissionsChecker.WritePermissionsChecker) context).getWriteSettingsPermissionChecker()));
+                items.add(new SetAsRingtoneMenuAction(context, fd));
             }
 
             if (fd.fileType == Constants.FILE_TYPE_PICTURES && numChecked <= 1) {

@@ -37,7 +37,6 @@ import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.ui.activities.BaseActivity;
-import com.andrew.apollo.ui.activities.WriteSettingsPermissionActivityHelper;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
@@ -46,6 +45,7 @@ import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.logging.Logger;
 import com.viewpagerindicator.TitlePageIndicator;
 
@@ -123,8 +123,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     protected abstract String getLayoutTypeName();
 
-    private WriteSettingsPermissionActivityHelper writeSettingsHelper;
-
     public abstract void onItemClick(final AdapterView<?> parent, final View view, final int position,
                                      final long id);
 
@@ -137,7 +135,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
-        writeSettingsHelper = new WriteSettingsPermissionActivityHelper(activity);
         mProfileTabCarousel = (ProfileTabCarousel) activity.findViewById(R.id.activity_profile_base_tab_carousel);
 
         if (activity instanceof BaseActivity) {
@@ -284,8 +281,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     refresh();
                     return true;
                 case FragmentMenuItems.USE_AS_RINGTONE:
-                    writeSettingsHelper.onSetRingtoneOption(getActivity());
-                    return true;
+                    if (onUseAsRingtone()) {
+                        return true;
+                    }
                 case FragmentMenuItems.DELETE:
                     return onDelete(songList);
                 case FragmentMenuItems.MORE_BY_ARTIST:
@@ -302,6 +300,21 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             }
         }
         return super.onContextItemSelected(item);
+    }
+
+    private boolean onUseAsRingtone() {
+        Activity activity = getActivity();
+        if (activity == null) {
+            return false;
+        }
+
+        if (mSelectedId == -1) {
+            return false;
+        }
+
+        WriteSettingsPermissionActivityHelper helper = new WriteSettingsPermissionActivityHelper(getActivity());
+        helper.onSetRingtoneOption(getActivity(), mSelectedId);
+        return true;
     }
 
     private boolean onRemoveFromRecent()  {

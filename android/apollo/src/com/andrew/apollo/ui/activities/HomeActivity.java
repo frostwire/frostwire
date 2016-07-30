@@ -14,9 +14,8 @@ package com.andrew.apollo.ui.activities;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
+import com.frostwire.android.R;
 
 /**
  * This class is used to display the {@link ViewPager} used to swipe between the
@@ -25,13 +24,13 @@ import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class HomeActivity extends BaseActivity {
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // Load the music browser fragment
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

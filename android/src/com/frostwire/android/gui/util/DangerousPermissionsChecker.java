@@ -26,6 +26,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.offers.Offers;
@@ -45,13 +46,12 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         void onPermissionsGranted();
     }
 
-    public interface WritePermissionsChecker {
-        DangerousPermissionsChecker getWriteSettingsPermissionChecker();
-    }
-
-    private static final Logger LOG = Logger.getLogger(Logger.class);
+    private static final Logger LOGGER = Logger.getLogger(DangerousPermissionsChecker.class);
     public static final int EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE = 0x000A;
     public static final int WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE = 0x000B;
+
+    // HACK: just couldn't find another way, and this saved a lot of overcomplicated logic in the onActivityResult handling activities.
+    static long AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
 
     private final WeakReference<Activity> activityRef;
     private final int requestCode;
@@ -61,8 +61,16 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         if (activity instanceof ActivityCompat.OnRequestPermissionsResultCallback) {
             this.requestCode = requestCode;
             this.activityRef = Ref.weak(activity);
-        } else
+        } else {
             throw new IllegalArgumentException("The activity must implement ActivityCompat.OnRequestPermissionsResultCallback");
+        }
+    }
+
+    public Activity getActivity() {
+        if (Ref.alive(activityRef)) {
+            return activityRef.get();
+        }
+        return null;
     }
 
     public void requestPermissions() {
@@ -136,39 +144,23 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
                 ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
     }
 
-    // WRITE SETTINGS (Ringtone setting)
+    public static boolean handleOnWriteSettingsActivityResult(Activity handlerActivity) {
+        boolean hasWriteSettings = DangerousPermissionsChecker.hasPermissionToWriteSettings(handlerActivity);
 
-    public static void requestPermissionToWriteSettings(final DangerousPermissionsChecker writeSettingsPermissionChecker,
-                                                        final OnPermissionsGrantedCallback onPermissionsGrantedCallback) {
-        writeSettingsPermissionChecker.setPermissionsGrantedCallback(onPermissionsGrantedCallback);
-        writeSettingsPermissionChecker.requestPermissions();
-    }
-
-    public static boolean handleOnWriteSettingsActivityResult(Activity handlerActivity, int requestCode, int resultCode, Intent data) {
-        if (requestCode == DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE &&
-            handlerActivity instanceof DangerousPermissionsChecker.WritePermissionsChecker) {
-
-            final DangerousPermissionsChecker writeSettingsPermissionChecker =
-                    ((DangerousPermissionsChecker.WritePermissionsChecker) handlerActivity).getWriteSettingsPermissionChecker();
-
-            if (writeSettingsPermissionChecker != null) {
-                boolean hasWriteSettings =
-                        DangerousPermissionsChecker.hasPermissionToWriteSettings(handlerActivity);
-
-                int permissionCheckResult = hasWriteSettings ?
-                        PackageManager.PERMISSION_GRANTED :
-                        PackageManager.PERMISSION_DENIED;
-
-                // use the existing mechanism on DangerousPermissionsChecker
-                writeSettingsPermissionChecker.
-                        onRequestPermissionsResult(
-                                DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE,
-                                new String[]{Manifest.permission.WRITE_SETTINGS},
-                                new int[]{permissionCheckResult});
-            }
-            return true;
+        if (!hasWriteSettings) {
+            LOGGER.warn("handleOnWriteSettingsActivityResult! had no permission to write settings");
+            AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
+            return false;
         }
-        return false;
+
+        if (AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK == -1) {
+            LOGGER.warn("handleOnWriteSettingsActivityResult! AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK not set");
+            return false;
+        }
+
+        MusicUtils.setRingtone(handlerActivity, AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK);
+        AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
+        return true;
     }
 
     public static boolean hasPermissionToWriteSettings(Context context) {
@@ -186,7 +178,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             final Method canWriteMethod = SystemClass.getMethod("canWrite", Context.class);
             return (boolean) canWriteMethod.invoke(null, context);
         } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
+            LOGGER.error(t.getMessage(), t);
         }
         return false;
     }

@@ -51,6 +51,7 @@ import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
+import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractSwipeDetector;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.uxstats.UXAction;
@@ -367,7 +368,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 return true;
             case R.id.menu_audio_player_ringtone:
                 // Set the current track as a ringtone
-                writeSettingsHelper.onSetRingtoneOption(this);
+
+                writeSettingsHelper.onSetRingtoneOption(this, MusicUtils.getCurrentAudioId());
                 return true;
             case R.id.menu_audio_player_share:
                 // Share the current meta data
@@ -377,10 +379,10 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 // Sound effects
                 NavUtils.openEffectsPanel(this);
                 return true;
-            /*case R.id.menu_settings:
+            case R.id.menu_main_settings:
                 // Settings
                 NavUtils.openSettings(this);
-                return true;*/
+                return true;
             case R.id.menu_audio_player_stop:
                 try {
                     MusicUtils.mService.stop();
@@ -418,7 +420,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!writeSettingsHelper.onActivityResult(this, requestCode, resultCode, data)) {
+
+        if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }

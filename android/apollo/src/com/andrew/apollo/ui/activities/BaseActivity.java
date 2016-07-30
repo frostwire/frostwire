@@ -43,6 +43,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.ClickAdapter;
 
 import java.lang.ref.WeakReference;
@@ -59,9 +60,7 @@ import static com.andrew.apollo.utils.MusicUtils.mService;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public abstract class BaseActivity extends FragmentActivity
-        implements ServiceConnection,
-        DangerousPermissionsChecker.WritePermissionsChecker {
-
+        implements ServiceConnection {
     /**
      * Play state and meta change listener
      */
@@ -112,8 +111,6 @@ public abstract class BaseActivity extends FragmentActivity
      */
     protected ThemeUtils mResources;
 
-    private WriteSettingsPermissionActivityHelper writeSettingsHelper;
-
     /**
      * {@inheritDoc}
      */
@@ -137,14 +134,18 @@ public abstract class BaseActivity extends FragmentActivity
         setContentView(setContentView());
         // Initialize the bottom action bar
         initBottomActionBar();
-        writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
     }
 
-    public DangerousPermissionsChecker getWriteSettingsPermissionChecker() {
-        if (writeSettingsHelper == null) {
-            return null;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE) {
+            WriteSettingsPermissionActivityHelper helper = new WriteSettingsPermissionActivityHelper(this);
+            if (helper.onActivityResult(this,requestCode)) {
+                return;
+            }
         }
-        return writeSettingsHelper.getWriteSettingsPermissionChecker();
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void prepareActionBar() {
@@ -234,9 +235,6 @@ public abstract class BaseActivity extends FragmentActivity
             case R.id.menu_new_playlist:
                 onOptionsItemNewPlaylistSelected();
                 return true;
-            case R.id.menu_audio_player_ringtone:
-                writeSettingsHelper.onSetRingtoneOption(this);
-                return true;
             default:
                 break;
         }
@@ -318,13 +316,6 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!writeSettingsHelper.onActivityResult(this, requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     /**

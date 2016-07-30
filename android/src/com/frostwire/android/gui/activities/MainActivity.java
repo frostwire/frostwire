@@ -501,7 +501,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
-        } else if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this, requestCode, resultCode, data)) {
+        } else if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
