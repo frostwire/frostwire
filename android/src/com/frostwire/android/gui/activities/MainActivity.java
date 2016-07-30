@@ -275,7 +275,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
-            LOG.info("Intent had EXTRA_FINISH_MAIN_ACTIVITY");
             finish();
         }
     }
