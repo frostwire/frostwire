@@ -19,10 +19,7 @@ package com.frostwire.android.core;
 
 import android.os.Environment;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author gubatron
@@ -66,6 +63,12 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 5);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, 15);
+        defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
+                new HashSet<>(Arrays.asList(new String[]{
+                        Constants.AD_NETWORK_SHORTCODE_APPLOVIN,
+                        Constants.AD_NETWORK_SHORTCODE_INMOBI,
+                        Constants.AD_NETWORK_SHORTCODE_REMOVEADS
+                })));
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN, 20);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN, 10);
         defaultValues.put(Constants.PREF_KEY_SEARCH_INTERVAL_MS_FOR_TORRENT_DEEP_SCAN, 2000);
