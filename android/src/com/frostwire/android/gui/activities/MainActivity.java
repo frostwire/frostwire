@@ -33,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import com.andrew.apollo.IApolloService;
@@ -201,7 +202,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void initPlayerItemListener() {
         playerItem = findView(R.id.slidemenu_player_menuitem);
-        playerItem.setOnClickListener(v -> controller.launchPlayerActivity());
+        playerItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                controller.launchPlayerActivity();
+            }
+        });
     }
 
     private void initDrawerListener() {
@@ -367,7 +373,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         // EXTERNAL STORAGE ACCESS CHECKER.
         final DangerousPermissionsChecker externalStorageChecker =
                 new DangerousPermissionsChecker(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        externalStorageChecker.setPermissionsGrantedCallback(() -> {});
+        //externalStorageChecker.setPermissionsGrantedCallback(() -> {});
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
 
         // WRITE SETTINGS (Setting the default ringtone requires this)
@@ -633,25 +639,28 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void setupMenuItems() {
         listMenu.setAdapter(new MainMenuAdapter(this));
         listMenu.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-        listMenu.setOnItemClickListener((parent, view, position, id) -> {
-            //onItemClick(AdapterView<?> parent, View view, int position, long id)
-            syncSlideMenu();
-            controller.closeSlideMenu();
-            try {
-                if (id == R.id.menu_main_settings) {
-                    controller.showPreferences();
-                } else if (id == R.id.menu_main_shutdown) {
-                    showShutdownDialog();
-                } else if (id == R.id.menu_main_my_music) {
-                    controller.launchMyMusic();
-                } else if (id == R.id.menu_main_support) {
-                    UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
-                } else {
-                    listMenu.setItemChecked(position, true);
-                    controller.switchFragment((int) id);
+        listMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //onItemClick(AdapterView<?> parent, View view, int position, long id)
+                syncSlideMenu();
+                controller.closeSlideMenu();
+                try {
+                    if (id == R.id.menu_main_settings) {
+                        controller.showPreferences();
+                    } else if (id == R.id.menu_main_shutdown) {
+                        showShutdownDialog();
+                    } else if (id == R.id.menu_main_my_music) {
+                        controller.launchMyMusic();
+                    } else if (id == R.id.menu_main_support) {
+                        UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
+                    } else {
+                        listMenu.setItemChecked(position, true);
+                        controller.switchFragment((int) id);
+                    }
+                } catch (Throwable e) { // protecting from weird android UI engine issues
+                    LOG.error("Error clicking slide menu item", e);
                 }
-            } catch (Throwable e) { // protecting from weird android UI engine issues
-                LOG.error("Error clicking slide menu item", e);
             }
         });
     }

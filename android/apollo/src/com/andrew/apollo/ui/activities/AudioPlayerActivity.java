@@ -947,16 +947,19 @@ public class AudioPlayerActivity extends FragmentActivity implements
     /**
      * Opens to the current album profile
      */
-    private final OnClickListener mOpenAlbumProfile = v -> {
-        long albumId = MusicUtils.getCurrentAlbumId();
-        try {
-            NavUtils.openAlbumProfile(AudioPlayerActivity.this,
-                    MusicUtils.getAlbumName(),
-                    MusicUtils.getArtistName(),
-                    albumId,
-                    MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
-        } catch (Throwable ignored) {
-            ignored.printStackTrace();
+    private final OnClickListener mOpenAlbumProfile = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            long albumId = MusicUtils.getCurrentAlbumId();
+            try {
+                NavUtils.openAlbumProfile(AudioPlayerActivity.this,
+                        MusicUtils.getAlbumName(),
+                        MusicUtils.getArtistName(),
+                        albumId,
+                        MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
+            } catch (Throwable ignored) {
+                ignored.printStackTrace();
+            }
         }
     };
 
