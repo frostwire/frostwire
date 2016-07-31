@@ -156,7 +156,7 @@ public final class Constants {
     /**
      * URL where FrostWire checks for software updates
      */
-    public static final String SERVER_UPDATE_URL = "http://update1.frostwire.com/android";
+    public static final String SERVER_UPDATE_URL = "http://update.frostwire.com/android";
 
     private static final String FROM_URL_PARAMETERS = "from=android&basic=" + (IS_GOOGLE_PLAY_DISTRIBUTION ? "1" : "0") + "&version=" + FROSTWIRE_VERSION_STRING + "&build=" + FROSTWIRE_BUILD;
 
