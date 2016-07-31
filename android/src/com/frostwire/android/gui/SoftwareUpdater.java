@@ -376,12 +376,7 @@ public final class SoftwareUpdater {
             }
         }
 
-        LOG.info("Waterfall from JSON ("+ update.config.waterfall.getClass().getSimpleName() +".class)");
-        for (String sc : update.config.waterfall) {
-            LOG.info("updateConfiguration: waterfall -> " + sc);
-        }
-
-        ConfigurationManager.instance().setStringSet(Constants.PREF_KEY_GUI_OFFERS_WATERFALL, update.config.waterfall);
+        ConfigurationManager.instance().setStringArray(Constants.PREF_KEY_GUI_OFFERS_WATERFALL, update.config.waterfall);
         ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
         ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
 
@@ -454,7 +449,7 @@ public final class SoftwareUpdater {
     @SuppressWarnings("CanBeFinal")
     private static class Config {
         Map<String, Boolean> activeSearchEngines;
-        LinkedHashSet<String> waterfall;
+        String[] waterfall;
         int interstitialOffersTransferStarts = 5;
         int interstitialTransferOffersTimeoutInMinutes = 15;
 

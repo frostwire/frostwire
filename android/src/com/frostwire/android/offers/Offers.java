@@ -28,7 +28,9 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -50,7 +52,9 @@ public final class Offers {
 
     public static void initAdNetworks(Activity activity) {
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
-            adNetwork.initialize(activity);
+            if (adNetwork != null) { // because of a typo on config file this can happen
+                adNetwork.initialize(activity);
+            }
         }
 
         stopAdNetworksIfPurchasedRemoveAds(activity);
@@ -59,16 +63,16 @@ public final class Offers {
     private static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {
             AD_NETWORKS = new HashMap<>();
-            AD_NETWORKS.put(Constants.AD_NETWORK_SHORTCODE_APPLOVIN, APP_LOVIN);
-            AD_NETWORKS.put(Constants.AD_NETWORK_SHORTCODE_INMOBI, IN_MOBI);
-            AD_NETWORKS.put(Constants.AD_NETWORK_SHORTCODE_REMOVEADS, REMOVE_ADS);
+            AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
+            AD_NETWORKS.put(IN_MOBI.getShortCode(), IN_MOBI);
+            AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
         }
         return AD_NETWORKS;
     }
 
     public static void stopAdNetworks(Context context) {
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
-            if (adNetwork.started()) {
+            if (adNetwork != null && adNetwork.started()) {
                 adNetwork.stop(context);
             }
         }
@@ -89,7 +93,7 @@ public final class Offers {
             final WeakReference<Activity> activityRef = Ref.weak(activity);
             for (AdNetwork adNetwork : getActiveAdNetworks()) {
                 LOG.info("showInterstitial: AdNetwork " + adNetwork.getClass().getSimpleName() + " started? " + adNetwork.started());
-                if (!interstitialShown && adNetwork.started()) {
+                if (!interstitialShown && adNetwork != null && adNetwork.started()) {
                     interstitialShown = adNetwork.showInterstitial(activityRef, shutdownAfterwards, dismissAfterwards);
                 }
             }
@@ -140,55 +144,43 @@ public final class Offers {
      * the networks that have not been specified there.
      * @return The Array of Active AdNetworks.
      */
-    public static AdNetwork[] getActiveAdNetworks() {
+    private static AdNetwork[] getActiveAdNetworks() {
         final ConfigurationManager CM = ConfigurationManager.instance();
         final Map<String, AdNetwork> allAdNetworks = getAllAdNetworks();
-        final Set<String> waterfallShortcodes = CM.getStringSet(Constants.PREF_KEY_GUI_OFFERS_WATERFALL);
+        final String[] waterfallShortcodes = CM.getStringArray(Constants.PREF_KEY_GUI_OFFERS_WATERFALL);
 
-        final AdNetwork[] activeAdNetworks = new AdNetwork[waterfallShortcodes.size()];
+        if (waterfallShortcodes == null) {
+            return new AdNetwork[] {};
+        }
 
+        final AdNetwork[] activeAdNetworks = new AdNetwork[waterfallShortcodes.length];
+
+        int i = 0;
+        for (String shortCode : waterfallShortcodes) {
+            activeAdNetworks[i++] = allAdNetworks.get(shortCode);
+        }
+
+        // turn on/off all the networks not on activeAdNetworks if any.
         for (String shortCode : allAdNetworks.keySet()) {
-            boolean networkInUse = waterfallShortcodes.contains(shortCode);
+            int shortCodeOffsetInWaterfall = getKeyOffset(shortCode, waterfallShortcodes);
+            boolean networkInUse = shortCodeOffsetInWaterfall != -1;
             AdNetwork network = allAdNetworks.get(shortCode);
-
             // turn on/off the in use preference for that network.
             CM.setBoolean(network.getInUsePreferenceKey(), networkInUse);
-
-            if (networkInUse) {
-                activeAdNetworks[getKeyOffset(shortCode, waterfallShortcodes)]=network;
-            }
-        }
-
-        int i=0;
-
-        for (String code : waterfallShortcodes) {
-            LOG.info("waterfall[" + i + "] " + " = " + code);
-            i++;
-        }
-
-        i=0;
-        for (AdNetwork network : activeAdNetworks) {
-            LOG.info("activeAdNetworks[" + i + "] " + " = " + network);
-            i++;
         }
 
         return activeAdNetworks;
     }
 
-    private static int getKeyOffset(String key, Set<String> keySet) {
-        if (!keySet.contains(key)) {
-            return -1;
-        }
-
+    private static int getKeyOffset(String key, String[] keys) {
         int i=0;
-        for (String k : keySet) {
+        for (String k : keys) {
             if (k.equals(key)) {
                 System.out.println("Offers.getKeyOffset(): " + k + " in index " + i);
                 return i;
             }
             i++;
         }
-
-        return i;
+        return -1;
     }
 }

@@ -24,12 +24,12 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import com.frostwire.util.Hex;
+import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}
@@ -163,14 +163,20 @@ public class ConfigurationManager {
         return getBoolean(Constants.PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD);
     }
 
-    public Set<String> getStringSet(String key) {
-        return preferences.getStringSet(key, null);
+    public String[] getStringArray(String key) {
+        String jsonStringArray = preferences.getString(key, null);
+        if (jsonStringArray == null) {
+            return null;
+        }
+        return JsonUtils.toObject(jsonStringArray, String[].class);
     }
 
-    public void setStringSet(String key, Set<String> values) {
-        editor.putStringSet(key, values);
+
+    public void setStringArray(String key, String[] values) {
+        editor.putString(key, JsonUtils.toJson(values));
         editor.commit();
     }
+
 
     public int maxConcurrentUploads() {
         return getInt(Constants.PREF_KEY_NETWORK_MAX_CONCURRENT_UPLOADS);
@@ -222,8 +228,8 @@ public class ConfigurationManager {
             initByteArrayPreference(key, (byte[]) value, force);
         } else if (value instanceof File) {
             initFilePreference(key, (File) value, force);
-        } else if (value instanceof Set) {
-            initStringSetPreference(key, (Set<String>) value, force);
+        } else if (value instanceof String[]) {
+            initStringArrayPreference(key, (String[]) value, force);
         }
     }
 
@@ -263,9 +269,9 @@ public class ConfigurationManager {
         }
     }
 
-    private void initStringSetPreference(String prefKeyName, Set<String> defaultValue, boolean force) {
+    private void initStringArrayPreference(String prefKeyName, String[] defaultValue, boolean force) {
         if (!preferences.contains(prefKeyName) || force) {
-            setStringSet(prefKeyName, defaultValue);
+            setStringArray(prefKeyName, defaultValue);
         }
     }
 
@@ -283,8 +289,8 @@ public class ConfigurationManager {
                 setByteArray(entry.getKey(), (byte[]) entry.getValue());
             } else if (entry.getValue() instanceof File) {
                 setFile(entry.getKey(), (File) entry.getValue());
-            } else if (entry.getValue() instanceof Set) {
-                setStringSet(entry.getKey(), (Set<String>) entry.getValue());
+            } else if (entry.getValue() instanceof String[]) {
+                setStringArray(entry.getKey(), (String[]) entry.getValue());
             }
         }
     }
