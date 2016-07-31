@@ -18,620 +18,620 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
-    <string name="your_privacy_is_a_fundamental_right_html" tools:ignore="MissingTranslation">Your privacy is a fundamental human right.</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html" tools:ignore="MissingTranslation"><![CDATA[* Although recommended for your downloads, <b>you do not need a VPN to use FrostWire. </b>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html" tools:ignore="MissingTranslation"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
-    <string name="protected_connections_visibility_bullet_html" tools:ignore="MissingTranslation"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
+    <string name="your_privacy_is_a_fundamental_right_html">Your privacy is a fundamental human right.</string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you do not need a VPN to use FrostWire. </b>]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
 
     <!-- non HTML tags. -->
-    <string name="application_label" tools:ignore="MissingTranslation">FrostWire</string>
-    <string name="activity_preferences_name" tools:ignore="MissingTranslation">Settings</string>
-    <string name="activity_browse_peer_name" tools:ignore="MissingTranslation">Browse Host</string>
-    <string name="activity_browse_peers_name" tools:ignore="MissingTranslation">People Nearby</string>
-    <string name="activity_chat_name" tools:ignore="MissingTranslation">Chat</string>
-    <string name="activity_downloads_name" tools:ignore="MissingTranslation">Active Downloads</string>
-    <string name="activity_uploads_name" tools:ignore="MissingTranslation">Active Uploads</string>
-    <string name="activity_about" tools:ignore="MissingTranslation">About</string>
-    <string name="activity_debug_name" tools:ignore="MissingTranslation">Debug</string>
-    <string name="activity_VPN" tools:ignore="MissingTranslation">Connection</string>
-    <string name="disconnected" tools:ignore="MissingTranslation">Disconnected</string>
-    <string name="all_transfers_will_stop_are_you_sure" tools:ignore="MissingTranslation">All transfers will stop.\nAre you sure?</string>
-    <string name="connect" tools:ignore="MissingTranslation">Connect</string>
-    <string name="connecting" tools:ignore="MissingTranslation">Connecting</string>
-    <string name="disconnect" tools:ignore="MissingTranslation">Disconnect</string>
-    <string name="disconnecting" tools:ignore="MissingTranslation">Disconnecting</string>
-    <string name="wait" tools:ignore="MissingTranslation">Wait</string>
-    <string name="exit" tools:ignore="MissingTranslation">Exit</string>
-    <string name="no_wifi_want_to_fix_it_question" tools:ignore="MissingTranslation">You\'re not connected to a Wi-Fi network.\n\nHow do you want to connect?</string>
-    <string name="your_connection_has_dropped_stopping_services" tools:ignore="MissingTranslation">Your Wi-Fi connection has dropped. Stopping services.</string>
-    <string name="wifi_network_changed_restarting_services" tools:ignore="MissingTranslation">The Wi-Fi network has changed. Restarting Services.</string>
-    <string name="no_network_connection" tools:ignore="MissingTranslation">No Network Connection</string>
-    <string name="leaving_already" tools:ignore="MissingTranslation">Leaving Already?</string>
-    <string name="search_label" tools:ignore="MissingTranslation">Search</string>
-    <string name="settings_description" tools:ignore="MissingTranslation">Search Settings</string>
-    <string name="clear_finished" tools:ignore="MissingTranslation">Clear Finished</string>
-    <string name="support_free_software" tools:ignore="MissingTranslation">Support Free Software</string>
-    <string name="show_love" tools:ignore="MissingTranslation">Love FrostWire?</string>
-    <string name="waiting" tools:ignore="MissingTranslation">Waiting…</string>
-    <string name="use_icons_to_browse" tools:ignore="MissingTranslation">Use the icons to browse files.</string>
-    <string name="type_to_filter_results" tools:ignore="MissingTranslation">Type to filter results.</string>
-    <string name="fetching_file_list" tools:ignore="MissingTranslation">Fetching list of shared</string>
-    <string name="not_sharing_files" tools:ignore="MissingTranslation">is not sharing any files.</string>
-    <string name="browse_peer" tools:ignore="MissingTranslation">Browse Peer</string>
-    <string name="peer" tools:ignore="MissingTranslation">Peer</string>
-    <string name="peers" tools:ignore="MissingTranslation">Peers</string>
-    <string name="copy" tools:ignore="MissingTranslation">Copy</string>
-    <string name="audio" tools:ignore="MissingTranslation">Audio</string>
-    <string name="audio_music" tools:ignore="MissingTranslation">Audio/Music</string>
-    <string name="video" tools:ignore="MissingTranslation">Video</string>
-    <string name="application" tools:ignore="MissingTranslation">Application</string>
-    <string name="applications" tools:ignore="MissingTranslation">Apps</string>
-    <string name="picture" tools:ignore="MissingTranslation">Picture</string>
-    <string name="pictures" tools:ignore="MissingTranslation">Pictures</string>
-    <string name="ringtone" tools:ignore="MissingTranslation">Ringtone</string>
-    <string name="ringtones" tools:ignore="MissingTranslation">Ringtones</string>
-    <string name="document" tools:ignore="MissingTranslation">Document</string>
-    <string name="documents" tools:ignore="MissingTranslation">Documents</string>
-    <string name="share" tools:ignore="MissingTranslation">Share</string>
-    <string name="unshare" tools:ignore="MissingTranslation">Unshare</string>
-    <string name="sharing" tools:ignore="MissingTranslation">Sharing</string>
-    <string name="send_pm" tools:ignore="MissingTranslation">Send Private Message</string>
-    <string name="me" tools:ignore="MissingTranslation">Me</string>
-    <string name="delete" tools:ignore="MissingTranslation">Delete</string>
-    <string name="rename" tools:ignore="MissingTranslation">Rename</string>
-    <string name="download" tools:ignore="MissingTranslation">Download</string>
-    <string name="download_selected_files" tools:ignore="MissingTranslation">Download Selected</string>
-    <string name="toggle_sharing_selected_files" tools:ignore="MissingTranslation">Toggle Sharing</string>
-    <string name="change_manual_listening_port" tools:ignore="MissingTranslation">Set Listening Port 1000 and 65535</string>
-    <string name="is_not_responding" tools:ignore="MissingTranslation">%s is not responding</string>
-    <string name="max_concurrent_uploads" tools:ignore="MissingTranslation">Maximum Simultaneous Uploads</string>
-    <string name="search_no_keywords" tools:ignore="MissingTranslation">Please enter search keywords</string>
-    <string name="search_select_filetype" tools:ignore="MissingTranslation">Please select a file type</string>
-    <string name="select_all" tools:ignore="MissingTranslation">Select All</string>
-    <string name="searching_for" tools:ignore="MissingTranslation">Searching for</string>
-    <string name="search_for_type_files" tools:ignore="MissingTranslation">Search for %s files</string>
-    <string name="update_title" tools:ignore="MissingTranslation">Update time!</string>
-    <string name="update_message" tools:ignore="MissingTranslation">FrostWire has downloaded a new PERFORMANCE UPDATE for you, please go ahead and touch the OK button if you want to install it now.</string>
-    <string name="next_time" tools:ignore="MissingTranslation">Next Time</string>
-    <string name="change_my_nickname" tools:ignore="MissingTranslation">Change my nickname</string>
-    <string name="try_changing_your_nickname" tools:ignore="MissingTranslation">Enter your nickname</string>
-    <string name="reconnecting" tools:ignore="MissingTranslation">Reconnecting</string>
-    <string name="go_to" tools:ignore="MissingTranslation">Go To</string>
-    <string name="done" tools:ignore="MissingTranslation">Done</string>
-    <string name="home" tools:ignore="MissingTranslation">Home</string>
-    <string name="about" tools:ignore="MissingTranslation">About</string>
-    <string name="remove_ads" tools:ignore="MissingTranslation">Remove Ads</string>
-    <string name="remove_ads_description" tools:ignore="MissingTranslation">Enjoy the ad-free experience, support FrostWire</string>
-    <string name="send_to_third_party" tools:ignore="MissingTranslation">Send/Upload</string>
-    <string name="send_file_using" tools:ignore="MissingTranslation">Send file using</string>
-    <string name="my_files" tools:ignore="MissingTranslation">My Files</string>
-    <string name="clear_messages" tools:ignore="MissingTranslation">Clear messages</string>
-    <string name="chat_actions" tools:ignore="MissingTranslation">Chat Actions</string>
-    <string name="settings" tools:ignore="MissingTranslation">Settings</string>
-    <string name="please_connect" tools:ignore="MissingTranslation">Please connect to use this feature</string>
-    <string name="remove" tools:ignore="MissingTranslation">Remove</string>
-    <string name="try_valid_port_next_time" tools:ignore="MissingTranslation">Try a valid port next time 1000 and 65500</string>
-    <string name="still_listening_on_port" tools:ignore="MissingTranslation">Still listening on port</string>
-    <string name="uh_still_listening_on_port" tools:ignore="MissingTranslation">Uh? I\'m still listening on port</string>
-    <string name="new_port_saved" tools:ignore="MissingTranslation">New Port saved</string>
-    <string name="now_on_port" tools:ignore="MissingTranslation">Now on port</string>
-    <string name="stop_all_transfers_message" tools:ignore="MissingTranslation">This will cancel all ongoing and queued downloads. All transferred data will be lost. Are you sure?</string>
-    <string name="files" tools:ignore="MissingTranslation">files</string>
-    <string name="touch_filetype_icon" tools:ignore="MissingTranslation">Touch icon to change file type</string>
-    <string name="tos_title" tools:ignore="MissingTranslation">Terms of Use</string>
-    <string name="tos_accept" tools:ignore="MissingTranslation">Accept</string>
-    <string name="tos_refuse" tools:ignore="MissingTranslation">Refuse</string>
-    <string name="downloads" tools:ignore="MissingTranslation">Downloads</string>
-    <string name="minimize_frostwire" tools:ignore="MissingTranslation">Minimize FrostWire</string>
-    <string name="are_you_sure_you_wanna_leave" tools:ignore="MissingTranslation">Are you sure you want to go back to the home screen?</string>
-    <string name="set_as_wallpaper" tools:ignore="MissingTranslation">Set as Wallpaper</string>
-    <string name="failed_to_set_wallpaper" tools:ignore="MissingTranslation">Failed to set Wallpaper</string>
-    <string name="tell_others_chooser" tools:ignore="MissingTranslation">Tweet / SMS / Email</string>
-    <string name="tell_others_subject" tools:ignore="MissingTranslation">Got FrostWire for Android yet?</string>
-    <string name="and_choose_what_filetypes_to_share" tools:ignore="MissingTranslation">Check what types of files you\'d like to enable for sharing on the FrostWire Mobile Network and nearby Wi-Fi enabled Desktops.</string>
-    <string name="before_getting_started" tools:ignore="MissingTranslation">Before you get started</string>
-    <string name="user_connecting" tools:ignore="MissingTranslation">User connecting</string>
-    <string name="accept_connection_from" tools:ignore="MissingTranslation">Accept connection from</string>
-    <string name="please_enter_a_number" tools:ignore="MissingTranslation">Please enter a number</string>
-    <string name="gotta_have_at_least_one_upload_slot" tools:ignore="MissingTranslation">Gotta have at least one upload slot</string>
-    <string name="only_up_to_n_uploads_at_the_same_time" tools:ignore="MissingTranslation">Only up to %s uploads at the same time</string>
-    <string name="max_simultaneous_uploads_saved_n" tools:ignore="MissingTranslation">Max Simultaneous Uploads Saved (%s)</string>
-    <string name="unknown" tools:ignore="MissingTranslation">Unknown</string>
-    <string name="browse" tools:ignore="MissingTranslation">Browse</string>
-    <string name="files_shared_by" tools:ignore="MissingTranslation">files shared by</string>
-    <string name="mark_your_territory" tools:ignore="MissingTranslation">Mark your Territory</string>
-    <string name="get_a_frostwire_tshirt" tools:ignore="MissingTranslation">Get a FrostWire T-Shirt</string>
-    <string name="internal_port" tools:ignore="MissingTranslation">Internal Port</string>
-    <string name="external_port" tools:ignore="MissingTranslation">External Port</string>
-    <string name="device" tools:ignore="MissingTranslation">Device</string>
-    <string name="manufacturer" tools:ignore="MissingTranslation">Manufacturer</string>
-    <string name="name" tools:ignore="MissingTranslation">Name</string>
-    <string name="product" tools:ignore="MissingTranslation">Product</string>
-    <string name="model" tools:ignore="MissingTranslation">Model</string>
-    <string name="release" tools:ignore="MissingTranslation">Release</string>
-    <string name="alpha_tests_team" tools:ignore="MissingTranslation">Alpha Tests Team</string>
-    <string name="alpha_tests_team_thanks" tools:ignore="MissingTranslation">Thanks to all our voluntary alpha testers for the patience and great feedback, special thanks to</string>
-    <string name="pending" tools:ignore="MissingTranslation">pending</string>
-    <string name="manual" tools:ignore="MissingTranslation">manual</string>
-    <string name="disabled" tools:ignore="MissingTranslation">disabled</string>
-    <string name="open" tools:ignore="MissingTranslation">Open</string>
-    <string name="connected_to" tools:ignore="MissingTranslation">Connected to</string>
-    <string name="sharing_preferences" tools:ignore="MissingTranslation">Sharing Settings</string>
-    <string name="nickname" tools:ignore="MissingTranslation">Nickname</string>
-    <string name="how_other_users_will_see_you" tools:ignore="MissingTranslation">How other users will see you</string>
-    <string name="networking_preferences" tools:ignore="MissingTranslation">Networking Settings</string>
-    <string name="simultaneous_uploads" tools:ignore="MissingTranslation">Simultaneous Wi-fi Uploads</string>
-    <string name="simultaneous_uploads_summary" tools:ignore="MissingTranslation">Set how many Wi-fi sharing uploads you want to allow at the same time.</string>
-    <string name="send_my_geo_location" tools:ignore="MissingTranslation">Send my Geo-Location</string>
-    <string name="send_my_geo_location_summary" tools:ignore="MissingTranslation">Pings will send your approximate Geo Location to find closest peers.</string>
-    <string name="use_upnp_port_mapping" tools:ignore="MissingTranslation">Use automatic Port mapping (UPnP)</string>
-    <string name="use_upnp_port_mapping_summary" tools:ignore="MissingTranslation">Long Press here to set the manual port number</string>
-    <string name="multicast_discovery" tools:ignore="MissingTranslation">Multicast Discovery</string>
-    <string name="multicast_discovery_summary" tools:ignore="MissingTranslation">Connect to local Wi-Fi peers via multicast (recommended)</string>
-    <string name="broadcast_discovery" tools:ignore="MissingTranslation">Broadcast Discovery</string>
-    <string name="broadcast_discovery_summary" tools:ignore="MissingTranslation">Connect to local Wi-Fi peers via broadcast (more traffic on router)</string>
-    <string name="internet_discovery" tools:ignore="MissingTranslation">Internet Discovery</string>
-    <string name="internet_discovery_summary" tools:ignore="MissingTranslation">Connect to remote peers on the Internet.</string>
-    <string name="meter" tools:ignore="MissingTranslation">m</string>
-    <string name="kilometer" tools:ignore="MissingTranslation">Km</string>
-    <string name="from" tools:ignore="MissingTranslation">From</string>
-    <string name="wants_to_share_a_file" tools:ignore="MissingTranslation">wants to share a file</string>
-    <string name="translators" tools:ignore="MissingTranslation">Translators</string>
-    <string name="tip_rename_your_files" tools:ignore="MissingTranslation">Tip: Rename files so they can be found</string>
-    <string name="other_settings" tools:ignore="MissingTranslation">Other Settings</string>
-    <string name="vibrate_on_finished_download" tools:ignore="MissingTranslation">Vibrate when download finishes</string>
-    <string name="use_mobile_data" tools:ignore="MissingTranslation">Use 3G/4G for BitTorrent</string>
-    <string name="use_mobile_data_summary" tools:ignore="MissingTranslation">Use mobile network for BitTorrent downloads. Data Overage charges may apply. Use carefully.</string>
-    <string name="connected_using_dataplan" tools:ignore="MissingTranslation">Connected using Data Plan</string>
-    <string name="send_to_chat" tools:ignore="MissingTranslation">Send to Chat</string>
-    <string name="sent_file_to_chat" tools:ignore="MissingTranslation">Sent file to Chat</string>
-    <string name="sent_files_to_chat" tools:ignore="MissingTranslation">Sent %d files to Chat</string>
-    <string name="choose_wifi_network" tools:ignore="MissingTranslation">Choose a Wi-Fi network</string>
-    <string name="please_update_to_v" tools:ignore="MissingTranslation">Please Update to v. %s</string>
-    <string name="cant_open_file" tools:ignore="MissingTranslation">Sorry, don\'t know how to open this file.</string>
-    <string name="downloading_from_desktop" tools:ignore="MissingTranslation">Downloading file(s) from desktop</string>
-    <string name="download_added_to_queue" tools:ignore="MissingTranslation">1 file will start downloading</string>
-    <string name="downloads_added_to_queue" tools:ignore="MissingTranslation">%s files will start downloading</string>
-    <string name="activity_downloads_title_text" tools:ignore="MissingTranslation">Downloads</string>
-    <string name="activity_uploads_title_text" tools:ignore="MissingTranslation">Uploads</string>
-    <string name="updating" tools:ignore="MissingTranslation">Updating</string>
-    <string name="loading_all" tools:ignore="MissingTranslation">Loading All</string>
-    <string name="sharing_num_files" tools:ignore="MissingTranslation">Sharing %1$s files of type %2$s</string>
-    <string name="share_selected_files" tools:ignore="MissingTranslation">Share selected files</string>
-    <string name="unshare_selected_files" tools:ignore="MissingTranslation">Unshare selected files</string>
-    <string name="long_press_for_batch_actions" tools:ignore="MissingTranslation">Touch any file title for batch actions</string>
-    <string name="files_shared" tools:ignore="MissingTranslation">files shared</string>
-    <string name="share_finished_downloads" tools:ignore="MissingTranslation">Share finished downloads on Wi-Fi</string>
-    <string name="share_finished_downloads_summary" tools:ignore="MissingTranslation">Finished downloads will be available to other FrostWire users on your Wi-Fi network.</string>
-    <string name="are_you_sure_delete_files" tools:ignore="MissingTranslation">Are you sure you want to PERMANENTLY DELETE the selected files from your device?</string>
-    <string name="are_you_sure_delete_playlist" tools:ignore="MissingTranslation">Are you sure you want to delete the %s playlist</string>
-    <string name="delete_files" tools:ignore="MissingTranslation">Delete files</string>
-    <string name="searchable_activity_label" tools:ignore="MissingTranslation">Searchable Activity</string>
-    <string name="search_hint" tools:ignore="MissingTranslation">Search Content</string>
-    <string name="search_settings_description" tools:ignore="MissingTranslation">Search for Torrents</string>
-    <string name="delete_file_menu_action" tools:ignore="MissingTranslation">Delete</string>
-    <string name="delete_file_menu_action_count" tools:ignore="MissingTranslation">Delete (%s)</string>
-    <string name="open_menu_action" tools:ignore="MissingTranslation">Open %s</string>
-    <string name="cancel_menu_action" tools:ignore="MissingTranslation">Stop Transfer</string>
-    <string name="cancel_delete_menu_action" tools:ignore="MissingTranslation">Stop and Delete Data</string>
-    <string name="remove_torrent_and_data" tools:ignore="MissingTranslation">Remove Torrent and Data</string>
-    <string name="wanna_download_question" tools:ignore="MissingTranslation">Want to download?</string>
-    <string name="summary_files_shared" tools:ignore="MissingTranslation">Sharing %s files locally</string>
-    <string name="media_type_all_types" tools:ignore="MissingTranslation">All Types</string>
-    <string name="media_type_documents" tools:ignore="MissingTranslation">Books/Docs</string>
-    <string name="media_type_applications" tools:ignore="MissingTranslation">Applications</string>
-    <string name="media_type_audio" tools:ignore="MissingTranslation">Audio</string>
-    <string name="media_type_video" tools:ignore="MissingTranslation">Video</string>
-    <string name="media_type_images" tools:ignore="MissingTranslation">Images</string>
-    <string name="media_type_torrents" tools:ignore="MissingTranslation">Torrents</string>
-    <string name="torrent_fetcher_download_status_downloading_torrent" tools:ignore="MissingTranslation">Downloading torrent</string>
-    <string name="torrent_fetcher_download_status_error" tools:ignore="MissingTranslation">Error</string>
-    <string name="torrent_fetcher_download_status_canceled" tools:ignore="MissingTranslation">Canceled</string>
-    <string name="failed_to_add_download" tools:ignore="MissingTranslation">Failed to add download</string>
-    <string name="file_is_already_downloading" tools:ignore="MissingTranslation">File is already downloading</string>
-    <string name="not_connected" tools:ignore="MissingTranslation">Not Connected</string>
-    <string name="mobile_data" tools:ignore="MissingTranslation">Mobile Data</string>
-    <string name="media_player_failed" tools:ignore="MissingTranslation">Media player failed</string>
-    <string name="activity_media_player_name" tools:ignore="MissingTranslation">Media Player</string>
-    <string name="search_settings" tools:ignore="MissingTranslation">Search Settings</string>
-    <string name="use_clearbits" tools:ignore="MissingTranslation">Use ClearBits.net</string>
-    <string name="use_tpb" tools:ignore="MissingTranslation">Use TPB</string>
-    <string name="use_tpb_summary" tools:ignore="MissingTranslation">TPB is magnet based, works only on Wi-Fi</string>
-    <string name="use_monova" tools:ignore="MissingTranslation">Use Monova</string>
-    <string name="use_monova_summary" tools:ignore="MissingTranslation">Monova is magnet based, works only on Wi-Fi</string>
-    <string name="use_kat" tools:ignore="MissingTranslation">Use KAT</string>
-    <string name="use_kat_summary" tools:ignore="MissingTranslation">KAT is magnet based, works only on Wi-Fi</string>
-    <string name="use_extratorrent" tools:ignore="MissingTranslation">Use ExtraTorrent.com</string>
-    <string name="use_isohunt" tools:ignore="MissingTranslation">Use ISOHunt.com</string>
-    <string name="use_mininova" tools:ignore="MissingTranslation">Use Mininova.org</string>
-    <string name="use_vertor" tools:ignore="MissingTranslation">Use Vertor.com</string>
-    <string name="use_yify" tools:ignore="MissingTranslation">Use Yify</string>
-    <string name="use_yify_summary" tools:ignore="MissingTranslation">Yify is magnet based, works only on Wi-Fi</string>
-    <string name="activity_media_player_image_description" tools:ignore="MissingTranslation">Media image</string>
-    <string name="ringtone_set" tools:ignore="MissingTranslation">Ringtone Set</string>
-    <string name="ringtone_not_set" tools:ignore="MissingTranslation">Ringtone could not be set</string>
-    <string name="search" tools:ignore="MissingTranslation">Search</string>
-    <string name="transfers" tools:ignore="MissingTranslation">Transfers</string>
-    <string name="dummy_title" translatable="false" tools:ignore="MissingTranslation">[Title]</string>
-    <string name="dummy_status" translatable="false" tools:ignore="MissingTranslation">[Status]</string>
-    <string name="dummy_speed" translatable="false" tools:ignore="MissingTranslation">[Speed]</string>
-    <string name="dummy_size" translatable="false" tools:ignore="MissingTranslation">[Size]</string>
-    <string name="dummy_extra" translatable="false" tools:ignore="MissingTranslation">[Extra]</string>
-    <string name="dummy_seeds" translatable="false" tools:ignore="MissingTranslation">[Seeds]</string>
-    <string name="dummy_peers" translatable="false" tools:ignore="MissingTranslation">[Peers]</string>
-    <string name="view_transfer_item_list_item_icon" tools:ignore="MissingTranslation">Icon for file type</string>
-    <string name="nickname_sharing_count_files" tools:ignore="MissingTranslation">%1$s - Sharing %2$d files</string>
-    <string name="play_image_description" tools:ignore="MissingTranslation">Play</string>
-    <string name="view_transfer_list_item_button_action_description" tools:ignore="MissingTranslation">Action</string>
-    <string name="yes_no_cancel_transfer_question" tools:ignore="MissingTranslation">Are you sure you want to stop and remove this download from the list (no data will be erased)?</string>
-    <string name="yes_no_cancel_transfer_question_cloud" tools:ignore="MissingTranslation">Are you sure you want to stop and remove this download from the list?</string>
-    <string name="yes_no_cancel_delete_transfer_question" tools:ignore="MissingTranslation">Are you sure you want to cancel this download (downloaded data so far will be erased)?</string>
-    <string name="cancel_transfer" tools:ignore="MissingTranslation">Cancel Transfer</string>
-    <string name="view_transfer_list_item_group_indicator_description" tools:ignore="MissingTranslation">More/Less information</string>
-    <string name="view_transfer_list_item_icon_description" tools:ignore="MissingTranslation">File type icon</string>
-    <string name="azureus_peer_manager_status_finished" tools:ignore="MissingTranslation">Finished</string>
-    <string name="azureus_peer_manager_status_finishedin" tools:ignore="MissingTranslation">Finished in</string>
-    <string name="azureus_formats_units_alot" tools:ignore="MissingTranslation">A lot !!!</string>
-    <string name="azureus_discarded" tools:ignore="MissingTranslation">discarded</string>
-    <string name="azureus_manager_item_waiting" tools:ignore="MissingTranslation">Waiting</string>
-    <string name="azureus_manager_item_initializing" tools:ignore="MissingTranslation">Initializing</string>
-    <string name="azureus_manager_item_allocating" tools:ignore="MissingTranslation">Allocating</string>
-    <string name="azureus_manager_item_checking" tools:ignore="MissingTranslation">Checking</string>
-    <string name="azureus_manager_item_finishing" tools:ignore="MissingTranslation">Finishing</string>
-    <string name="azureus_manager_item_ready" tools:ignore="MissingTranslation">Waiting for other torrent(s) to Queue</string>
-    <string name="azureus_manager_item_downloading" tools:ignore="MissingTranslation">Downloading</string>
-    <string name="azureus_manager_item_seeding" tools:ignore="MissingTranslation">Seeding</string>
-    <string name="azureus_manager_item_superseeding" tools:ignore="MissingTranslation">Super-Seeding</string>
-    <string name="azureus_manager_item_stopping" tools:ignore="MissingTranslation">Stopping</string>
-    <string name="azureus_manager_item_stopped" tools:ignore="MissingTranslation">Stopped</string>
-    <string name="azureus_manager_item_paused" tools:ignore="MissingTranslation">Paused</string>
-    <string name="azureus_manager_item_queued" tools:ignore="MissingTranslation">Queued</string>
-    <string name="azureus_manager_item_error" tools:ignore="MissingTranslation">Error</string>
-    <string name="azureus_manager_item_forced" tools:ignore="MissingTranslation">Forced</string>
-    <string name="azureus_general_view_yes" tools:ignore="MissingTranslation">Yes</string>
-    <string name="azureus_general_view_no" tools:ignore="MissingTranslation">No</string>
-    <string name="pause_torrent_menu_action" tools:ignore="MissingTranslation">Pause</string>
-    <string name="resume_torrent_menu_action" tools:ignore="MissingTranslation">Resume</string>
-    <string name="peer_http_download_status_downloading" tools:ignore="MissingTranslation">Downloading</string>
-    <string name="peer_http_download_status_complete" tools:ignore="MissingTranslation">Complete</string>
-    <string name="peer_http_download_status_error" tools:ignore="MissingTranslation">Error</string>
-    <string name="peer_http_download_status_cancelled" tools:ignore="MissingTranslation">Cancelled</string>
-    <string name="peer_http_download_status_waiting" tools:ignore="MissingTranslation">Waiting</string>
-    <string name="peer_http_download_status_unknown" tools:ignore="MissingTranslation">Unknown</string>
-    <string name="peer_http_upload_status_uploading" tools:ignore="MissingTranslation">Uploading</string>
-    <string name="peer_http_upload_status_streaming" tools:ignore="MissingTranslation">Streaming</string>
-    <string name="peer_http_upload_status_complete" tools:ignore="MissingTranslation">Complete</string>
-    <string name="peer_http_upload_status_error" tools:ignore="MissingTranslation">Error</string>
-    <string name="peer_http_upload_status_cancelled" tools:ignore="MissingTranslation">Cancelled</string>
-    <string name="peer_http_upload_status_unknown" tools:ignore="MissingTranslation">Unknown</string>
-    <string name="loading_indeterminate" tools:ignore="MissingTranslation">Loading…</string>
-    <string name="searching_indeterminate" tools:ignore="MissingTranslation">Searching…</string>
-    <string name="show_exit_button" tools:ignore="MissingTranslation">Show Exit button</string>
-    <string name="download_finished" tools:ignore="MissingTranslation">Download Finished</string>
-    <string name="clear_complete" tools:ignore="MissingTranslation">Clear Complete</string>
-    <string name="downloading_promotion" tools:ignore="MissingTranslation">Downloading %s</string>
-    <string name="activity_about_droidwire_description" tools:ignore="MissingTranslation">FrostWire for Android</string>
-    <string name="dummy_hint" translatable="false" tools:ignore="MissingTranslation">[Hint]</string>
-    <string name="dummy_peer_file_count" translatable="false" tools:ignore="MissingTranslation">[Peer/File count]</string>
-    <string name="download_type_not_supported" tools:ignore="MissingTranslation">Download Type not supported</string>
-    <string name="im_on_it" tools:ignore="MissingTranslation">I\'m on it…</string>
-    <string name="hint_transfers" tools:ignore="MissingTranslation">Use "menu" for bulk actions</string>
-    <string name="torrent_settings" tools:ignore="MissingTranslation">Torrent Settings</string>
-    <string name="torrent_max_download_speed_summary" tools:ignore="MissingTranslation">Max Download Speed (0 means unlimited)</string>
-    <string name="torrent_max_download_speed" tools:ignore="MissingTranslation">Max Download Speed</string>
-    <string name="torrent_max_upload_speed_summary" tools:ignore="MissingTranslation">Max Upload Speed (0 means unlimited)</string>
-    <string name="torrent_max_upload_speed" tools:ignore="MissingTranslation">Max Upload Speed</string>
-    <string name="torrent_max_downloads_summary" tools:ignore="MissingTranslation">Max Downloads</string>
-    <string name="torrent_max_downloads" tools:ignore="MissingTranslation">Max Downloads</string>
-    <string name="torrent_max_uploads_summary" tools:ignore="MissingTranslation">Max Uploads</string>
-    <string name="torrent_max_uploads" tools:ignore="MissingTranslation">Max Uploads</string>
-    <string name="torrent_max_total_connections_summary" tools:ignore="MissingTranslation">Max Total Connections</string>
-    <string name="torrent_max_total_connections" tools:ignore="MissingTranslation">Max Total Connections</string>
-    <string name="torrent_max_peers_summary" tools:ignore="MissingTranslation">Max Peers</string>
-    <string name="torrent_max_peers" tools:ignore="MissingTranslation">Max Peers</string>
-    <string name="dummy_summary" translatable="false" tools:ignore="MissingTranslation">[Summary]</string>
-    <string name="dummy_version" translatable="false" tools:ignore="MissingTranslation">[Version]</string>
-    <string name="dummy_engine" translatable="false" tools:ignore="MissingTranslation">[Engine]</string>
-    <string name="dummy_sources" translatable="false" tools:ignore="MissingTranslation">[Sources]</string>
+    <string name="application_label">FrostWire</string>
+    <string name="activity_preferences_name">Settings</string>
+    <string name="activity_browse_peer_name">Browse Host</string>
+    <string name="activity_browse_peers_name">People Nearby</string>
+    <string name="activity_chat_name">Chat</string>
+    <string name="activity_downloads_name">Active Downloads</string>
+    <string name="activity_uploads_name">Active Uploads</string>
+    <string name="activity_about">About</string>
+    <string name="activity_debug_name">Debug</string>
+    <string name="activity_VPN">Connection</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="all_transfers_will_stop_are_you_sure">All transfers will stop.\nAre you sure?</string>
+    <string name="connect">Connect</string>
+    <string name="connecting">Connecting</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="disconnecting">Disconnecting</string>
+    <string name="wait">Wait</string>
+    <string name="exit">Exit</string>
+    <string name="no_wifi_want_to_fix_it_question">You\'re not connected to a Wi-Fi network.\n\nHow do you want to connect?</string>
+    <string name="your_connection_has_dropped_stopping_services">Your Wi-Fi connection has dropped. Stopping services.</string>
+    <string name="wifi_network_changed_restarting_services">The Wi-Fi network has changed. Restarting Services.</string>
+    <string name="no_network_connection">No Network Connection</string>
+    <string name="leaving_already">Leaving Already?</string>
+    <string name="search_label">Search</string>
+    <string name="settings_description">Search Settings</string>
+    <string name="clear_finished">Clear Finished</string>
+    <string name="support_free_software">Support Free Software</string>
+    <string name="show_love">Love FrostWire?</string>
+    <string name="waiting">Waiting…</string>
+    <string name="use_icons_to_browse">Use the icons to browse files.</string>
+    <string name="type_to_filter_results">Type to filter results.</string>
+    <string name="fetching_file_list">Fetching list of shared</string>
+    <string name="not_sharing_files">is not sharing any files.</string>
+    <string name="browse_peer">Browse Peer</string>
+    <string name="peer">Peer</string>
+    <string name="peers">Peers</string>
+    <string name="copy">Copy</string>
+    <string name="audio">Audio</string>
+    <string name="audio_music">Audio/Music</string>
+    <string name="video">Video</string>
+    <string name="application">Application</string>
+    <string name="applications">Apps</string>
+    <string name="picture">Picture</string>
+    <string name="pictures">Pictures</string>
+    <string name="ringtone">Ringtone</string>
+    <string name="ringtones">Ringtones</string>
+    <string name="document">Document</string>
+    <string name="documents">Documents</string>
+    <string name="share">Share</string>
+    <string name="unshare">Unshare</string>
+    <string name="sharing">Sharing</string>
+    <string name="send_pm">Send Private Message</string>
+    <string name="me">Me</string>
+    <string name="delete">Delete</string>
+    <string name="rename">Rename</string>
+    <string name="download">Download</string>
+    <string name="download_selected_files">Download Selected</string>
+    <string name="toggle_sharing_selected_files">Toggle Sharing</string>
+    <string name="change_manual_listening_port">Set Listening Port 1000 and 65535</string>
+    <string name="is_not_responding">%s is not responding</string>
+    <string name="max_concurrent_uploads">Maximum Simultaneous Uploads</string>
+    <string name="search_no_keywords">Please enter search keywords</string>
+    <string name="search_select_filetype">Please select a file type</string>
+    <string name="select_all">Select All</string>
+    <string name="searching_for">Searching for</string>
+    <string name="search_for_type_files">Search for %s files</string>
+    <string name="update_title">Update time!</string>
+    <string name="update_message">FrostWire has downloaded a new PERFORMANCE UPDATE for you, please go ahead and touch the OK button if you want to install it now.</string>
+    <string name="next_time">Next Time</string>
+    <string name="change_my_nickname">Change my nickname</string>
+    <string name="try_changing_your_nickname">Enter your nickname</string>
+    <string name="reconnecting">Reconnecting</string>
+    <string name="go_to">Go To</string>
+    <string name="done">Done</string>
+    <string name="home">Home</string>
+    <string name="about">About</string>
+    <string name="remove_ads">Remove Ads</string>
+    <string name="remove_ads_description">Enjoy the ad-free experience, support FrostWire</string>
+    <string name="send_to_third_party">Send/Upload</string>
+    <string name="send_file_using">Send file using</string>
+    <string name="my_files">My Files</string>
+    <string name="clear_messages">Clear messages</string>
+    <string name="chat_actions">Chat Actions</string>
+    <string name="settings">Settings</string>
+    <string name="please_connect">Please connect to use this feature</string>
+    <string name="remove">Remove</string>
+    <string name="try_valid_port_next_time">Try a valid port next time 1000 and 65500</string>
+    <string name="still_listening_on_port">Still listening on port</string>
+    <string name="uh_still_listening_on_port">Uh? I\'m still listening on port</string>
+    <string name="new_port_saved">New Port saved</string>
+    <string name="now_on_port">Now on port</string>
+    <string name="stop_all_transfers_message">This will cancel all ongoing and queued downloads. All transferred data will be lost. Are you sure?</string>
+    <string name="files">files</string>
+    <string name="touch_filetype_icon">Touch icon to change file type</string>
+    <string name="tos_title">Terms of Use</string>
+    <string name="tos_accept">Accept</string>
+    <string name="tos_refuse">Refuse</string>
+    <string name="downloads">Downloads</string>
+    <string name="minimize_frostwire">Minimize FrostWire</string>
+    <string name="are_you_sure_you_wanna_leave">Are you sure you want to go back to the home screen?</string>
+    <string name="set_as_wallpaper">Set as Wallpaper</string>
+    <string name="failed_to_set_wallpaper">Failed to set Wallpaper</string>
+    <string name="tell_others_chooser">Tweet / SMS / Email</string>
+    <string name="tell_others_subject">Got FrostWire for Android yet?</string>
+    <string name="and_choose_what_filetypes_to_share">Check what types of files you\'d like to enable for sharing on the FrostWire Mobile Network and nearby Wi-Fi enabled Desktops.</string>
+    <string name="before_getting_started">Before you get started</string>
+    <string name="user_connecting">User connecting</string>
+    <string name="accept_connection_from">Accept connection from</string>
+    <string name="please_enter_a_number">Please enter a number</string>
+    <string name="gotta_have_at_least_one_upload_slot">Gotta have at least one upload slot</string>
+    <string name="only_up_to_n_uploads_at_the_same_time">Only up to %s uploads at the same time</string>
+    <string name="max_simultaneous_uploads_saved_n">Max Simultaneous Uploads Saved (%s)</string>
+    <string name="unknown">Unknown</string>
+    <string name="browse">Browse</string>
+    <string name="files_shared_by">files shared by</string>
+    <string name="mark_your_territory">Mark your Territory</string>
+    <string name="get_a_frostwire_tshirt">Get a FrostWire T-Shirt</string>
+    <string name="internal_port">Internal Port</string>
+    <string name="external_port">External Port</string>
+    <string name="device">Device</string>
+    <string name="manufacturer">Manufacturer</string>
+    <string name="name">Name</string>
+    <string name="product">Product</string>
+    <string name="model">Model</string>
+    <string name="release">Release</string>
+    <string name="alpha_tests_team">Alpha Tests Team</string>
+    <string name="alpha_tests_team_thanks">Thanks to all our voluntary alpha testers for the patience and great feedback, special thanks to</string>
+    <string name="pending">pending</string>
+    <string name="manual">manual</string>
+    <string name="disabled">disabled</string>
+    <string name="open">Open</string>
+    <string name="connected_to">Connected to</string>
+    <string name="sharing_preferences">Sharing Settings</string>
+    <string name="nickname">Nickname</string>
+    <string name="how_other_users_will_see_you">How other users will see you</string>
+    <string name="networking_preferences">Networking Settings</string>
+    <string name="simultaneous_uploads">Simultaneous Wi-fi Uploads</string>
+    <string name="simultaneous_uploads_summary">Set how many Wi-fi sharing uploads you want to allow at the same time.</string>
+    <string name="send_my_geo_location">Send my Geo-Location</string>
+    <string name="send_my_geo_location_summary">Pings will send your approximate Geo Location to find closest peers.</string>
+    <string name="use_upnp_port_mapping">Use automatic Port mapping (UPnP)</string>
+    <string name="use_upnp_port_mapping_summary">Long Press here to set the manual port number</string>
+    <string name="multicast_discovery">Multicast Discovery</string>
+    <string name="multicast_discovery_summary">Connect to local Wi-Fi peers via multicast (recommended)</string>
+    <string name="broadcast_discovery">Broadcast Discovery</string>
+    <string name="broadcast_discovery_summary">Connect to local Wi-Fi peers via broadcast (more traffic on router)</string>
+    <string name="internet_discovery">Internet Discovery</string>
+    <string name="internet_discovery_summary">Connect to remote peers on the Internet.</string>
+    <string name="meter">m</string>
+    <string name="kilometer">Km</string>
+    <string name="from">From</string>
+    <string name="wants_to_share_a_file">wants to share a file</string>
+    <string name="translators">Translators</string>
+    <string name="tip_rename_your_files">Tip: Rename files so they can be found</string>
+    <string name="other_settings">Other Settings</string>
+    <string name="vibrate_on_finished_download">Vibrate when download finishes</string>
+    <string name="use_mobile_data">Use 3G/4G for BitTorrent</string>
+    <string name="use_mobile_data_summary">Use mobile network for BitTorrent downloads. Data Overage charges may apply. Use carefully.</string>
+    <string name="connected_using_dataplan">Connected using Data Plan</string>
+    <string name="send_to_chat">Send to Chat</string>
+    <string name="sent_file_to_chat">Sent file to Chat</string>
+    <string name="sent_files_to_chat">Sent %d files to Chat</string>
+    <string name="choose_wifi_network">Choose a Wi-Fi network</string>
+    <string name="please_update_to_v">Please Update to v. %s</string>
+    <string name="cant_open_file">Sorry, don\'t know how to open this file.</string>
+    <string name="downloading_from_desktop">Downloading file(s) from desktop</string>
+    <string name="download_added_to_queue">1 file will start downloading</string>
+    <string name="downloads_added_to_queue">%s files will start downloading</string>
+    <string name="activity_downloads_title_text">Downloads</string>
+    <string name="activity_uploads_title_text">Uploads</string>
+    <string name="updating">Updating</string>
+    <string name="loading_all">Loading All</string>
+    <string name="sharing_num_files">Sharing %1$s files of type %2$s</string>
+    <string name="share_selected_files">Share selected files</string>
+    <string name="unshare_selected_files">Unshare selected files</string>
+    <string name="long_press_for_batch_actions">Touch any file title for batch actions</string>
+    <string name="files_shared">files shared</string>
+    <string name="share_finished_downloads">Share finished downloads on Wi-Fi</string>
+    <string name="share_finished_downloads_summary">Finished downloads will be available to other FrostWire users on your Wi-Fi network.</string>
+    <string name="are_you_sure_delete_files">Are you sure you want to PERMANENTLY DELETE the selected files from your device?</string>
+    <string name="are_you_sure_delete_playlist">Are you sure you want to delete the %s playlist</string>
+    <string name="delete_files">Delete files</string>
+    <string name="searchable_activity_label">Searchable Activity</string>
+    <string name="search_hint">Search Content</string>
+    <string name="search_settings_description">Search for Torrents</string>
+    <string name="delete_file_menu_action">Delete</string>
+    <string name="delete_file_menu_action_count">Delete (%s)</string>
+    <string name="open_menu_action">Open %s</string>
+    <string name="cancel_menu_action">Stop Transfer</string>
+    <string name="cancel_delete_menu_action">Stop and Delete Data</string>
+    <string name="remove_torrent_and_data">Remove Torrent and Data</string>
+    <string name="wanna_download_question">Want to download?</string>
+    <string name="summary_files_shared">Sharing %s files locally</string>
+    <string name="media_type_all_types">All Types</string>
+    <string name="media_type_documents">Books/Docs</string>
+    <string name="media_type_applications">Applications</string>
+    <string name="media_type_audio">Audio</string>
+    <string name="media_type_video">Video</string>
+    <string name="media_type_images">Images</string>
+    <string name="media_type_torrents">Torrents</string>
+    <string name="torrent_fetcher_download_status_downloading_torrent">Downloading torrent</string>
+    <string name="torrent_fetcher_download_status_error">Error</string>
+    <string name="torrent_fetcher_download_status_canceled">Canceled</string>
+    <string name="failed_to_add_download">Failed to add download</string>
+    <string name="file_is_already_downloading">File is already downloading</string>
+    <string name="not_connected">Not Connected</string>
+    <string name="mobile_data">Mobile Data</string>
+    <string name="media_player_failed">Media player failed</string>
+    <string name="activity_media_player_name">Media Player</string>
+    <string name="search_settings">Search Settings</string>
+    <string name="use_clearbits">Use ClearBits.net</string>
+    <string name="use_tpb">Use TPB</string>
+    <string name="use_tpb_summary">TPB is magnet based, works only on Wi-Fi</string>
+    <string name="use_monova">Use Monova</string>
+    <string name="use_monova_summary">Monova is magnet based, works only on Wi-Fi</string>
+    <string name="use_kat">Use KAT</string>
+    <string name="use_kat_summary">KAT is magnet based, works only on Wi-Fi</string>
+    <string name="use_extratorrent">Use ExtraTorrent.com</string>
+    <string name="use_isohunt">Use ISOHunt.com</string>
+    <string name="use_mininova">Use Mininova.org</string>
+    <string name="use_vertor">Use Vertor.com</string>
+    <string name="use_yify">Use Yify</string>
+    <string name="use_yify_summary">Yify is magnet based, works only on Wi-Fi</string>
+    <string name="activity_media_player_image_description">Media image</string>
+    <string name="ringtone_set">Ringtone Set</string>
+    <string name="ringtone_not_set">Ringtone could not be set</string>
+    <string name="search">Search</string>
+    <string name="transfers">Transfers</string>
+    <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_status" translatable="false">[Status]</string>
+    <string name="dummy_speed" translatable="false">[Speed]</string>
+    <string name="dummy_size" translatable="false">[Size]</string>
+    <string name="dummy_extra" translatable="false">[Extra]</string>
+    <string name="dummy_seeds" translatable="false">[Seeds]</string>
+    <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="view_transfer_item_list_item_icon">Icon for file type</string>
+    <string name="nickname_sharing_count_files">%1$s - Sharing %2$d files</string>
+    <string name="play_image_description">Play</string>
+    <string name="view_transfer_list_item_button_action_description">Action</string>
+    <string name="yes_no_cancel_transfer_question">Are you sure you want to stop and remove this download from the list (no data will be erased)?</string>
+    <string name="yes_no_cancel_transfer_question_cloud">Are you sure you want to stop and remove this download from the list?</string>
+    <string name="yes_no_cancel_delete_transfer_question">Are you sure you want to cancel this download (downloaded data so far will be erased)?</string>
+    <string name="cancel_transfer">Cancel Transfer</string>
+    <string name="view_transfer_list_item_group_indicator_description">More/Less information</string>
+    <string name="view_transfer_list_item_icon_description">File type icon</string>
+    <string name="azureus_peer_manager_status_finished">Finished</string>
+    <string name="azureus_peer_manager_status_finishedin">Finished in</string>
+    <string name="azureus_formats_units_alot">A lot !!!</string>
+    <string name="azureus_discarded">discarded</string>
+    <string name="azureus_manager_item_waiting">Waiting</string>
+    <string name="azureus_manager_item_initializing">Initializing</string>
+    <string name="azureus_manager_item_allocating">Allocating</string>
+    <string name="azureus_manager_item_checking">Checking</string>
+    <string name="azureus_manager_item_finishing">Finishing</string>
+    <string name="azureus_manager_item_ready">Waiting for other torrent(s) to Queue</string>
+    <string name="azureus_manager_item_downloading">Downloading</string>
+    <string name="azureus_manager_item_seeding">Seeding</string>
+    <string name="azureus_manager_item_superseeding">Super-Seeding</string>
+    <string name="azureus_manager_item_stopping">Stopping</string>
+    <string name="azureus_manager_item_stopped">Stopped</string>
+    <string name="azureus_manager_item_paused">Paused</string>
+    <string name="azureus_manager_item_queued">Queued</string>
+    <string name="azureus_manager_item_error">Error</string>
+    <string name="azureus_manager_item_forced">Forced</string>
+    <string name="azureus_general_view_yes">Yes</string>
+    <string name="azureus_general_view_no">No</string>
+    <string name="pause_torrent_menu_action">Pause</string>
+    <string name="resume_torrent_menu_action">Resume</string>
+    <string name="peer_http_download_status_downloading">Downloading</string>
+    <string name="peer_http_download_status_complete">Complete</string>
+    <string name="peer_http_download_status_error">Error</string>
+    <string name="peer_http_download_status_cancelled">Cancelled</string>
+    <string name="peer_http_download_status_waiting">Waiting</string>
+    <string name="peer_http_download_status_unknown">Unknown</string>
+    <string name="peer_http_upload_status_uploading">Uploading</string>
+    <string name="peer_http_upload_status_streaming">Streaming</string>
+    <string name="peer_http_upload_status_complete">Complete</string>
+    <string name="peer_http_upload_status_error">Error</string>
+    <string name="peer_http_upload_status_cancelled">Cancelled</string>
+    <string name="peer_http_upload_status_unknown">Unknown</string>
+    <string name="loading_indeterminate">Loading…</string>
+    <string name="searching_indeterminate">Searching…</string>
+    <string name="show_exit_button">Show Exit button</string>
+    <string name="download_finished">Download Finished</string>
+    <string name="clear_complete">Clear Complete</string>
+    <string name="downloading_promotion">Downloading %s</string>
+    <string name="activity_about_droidwire_description">FrostWire for Android</string>
+    <string name="dummy_hint" translatable="false">[Hint]</string>
+    <string name="dummy_peer_file_count" translatable="false">[Peer/File count]</string>
+    <string name="download_type_not_supported">Download Type not supported</string>
+    <string name="im_on_it">I\'m on it…</string>
+    <string name="hint_transfers">Use "menu" for bulk actions</string>
+    <string name="torrent_settings">Torrent Settings</string>
+    <string name="torrent_max_download_speed_summary">Max Download Speed (0 means unlimited)</string>
+    <string name="torrent_max_download_speed">Max Download Speed</string>
+    <string name="torrent_max_upload_speed_summary">Max Upload Speed (0 means unlimited)</string>
+    <string name="torrent_max_upload_speed">Max Upload Speed</string>
+    <string name="torrent_max_downloads_summary">Max Downloads</string>
+    <string name="torrent_max_downloads">Max Downloads</string>
+    <string name="torrent_max_uploads_summary">Max Uploads</string>
+    <string name="torrent_max_uploads">Max Uploads</string>
+    <string name="torrent_max_total_connections_summary">Max Total Connections</string>
+    <string name="torrent_max_total_connections">Max Total Connections</string>
+    <string name="torrent_max_peers_summary">Max Peers</string>
+    <string name="torrent_max_peers">Max Peers</string>
+    <string name="dummy_summary" translatable="false">[Summary]</string>
+    <string name="dummy_version" translatable="false">[Version]</string>
+    <string name="dummy_engine" translatable="false">[Engine]</string>
+    <string name="dummy_sources" translatable="false">[Sources]</string>
     <string name="empty_string" translatable="false"/>
-    <string name="seed_finished_torrents" tools:ignore="MissingTranslation">Seed Finished Torrents</string>
-    <string name="seed_finished_torrents_summary" tools:ignore="MissingTranslation">Share pieces of torrent downloads with anybody on the internet via BitTorrent</string>
-    <string name="seed_finished_torrents_wifi_only" tools:ignore="MissingTranslation">Seed only on Wi-Fi</string>
-    <string name="seed_finished_torrents_wifi_only_summary" tools:ignore="MissingTranslation">Seeds only when connected via Wi-Fi to save bandwidth on your data plan</string>
-    <string name="dummy_downloads_indicator" translatable="false" tools:ignore="MissingTranslation">0 @ 0 KB/s</string>
-    <string name="dummy_uploads_indicator" translatable="false" tools:ignore="MissingTranslation">0 @ 0 KB/s</string>
-    <string name="seeding_has_been_turned_off" tools:ignore="MissingTranslation">Seeding has been turned off</string>
-    <string name="wifi_seeding_has_been_turned_off" tools:ignore="MissingTranslation">No Wi-fi available, Seeding has been turned off</string>
-    <string name="nickname_hint" tools:ignore="MissingTranslation">Nickname</string>
-    <string name="show_transfers_on_download_start" tools:ignore="MissingTranslation">Show Transfers On Download Start</string>
-    <string name="dialog_new_transfer_title" tools:ignore="MissingTranslation">Start this Download?</string>
-    <string name="dialog_new_transfer_text_text" tools:ignore="MissingTranslation">Are you sure you want to download %1$s (%2$s)</string>
-    <string name="dialog_new_transfer_check_text" tools:ignore="MissingTranslation">Show this next time</string>
-    <string name="show_new_transfer_dialog" tools:ignore="MissingTranslation">Show New Transfer dialog</string>
-    <string name="dummy_action" translatable="false" tools:ignore="MissingTranslation">[Action]</string>
-    <string name="clear_torrent_index" tools:ignore="MissingTranslation">Clear Torrent Index</string>
-    <string name="clear_torrent_index_summary" tools:ignore="MissingTranslation">Clear Torrent Index</string>
-    <string name="clear" tools:ignore="MissingTranslation">Clear</string>
-    <string name="delete_n_torrents_indexed" tools:ignore="MissingTranslation">Deleted %d torrents indexed</string>
-    <string name="there_is_n_torrents_indexed" tools:ignore="MissingTranslation">There is %d torrents indexed</string>
-    <string name="wizard_previous" tools:ignore="MissingTranslation">Previous</string>
-    <string name="wizard_next" tools:ignore="MissingTranslation">Next</string>
-    <string name="wizard_finish" tools:ignore="MissingTranslation">Finish</string>
-    <string name="dummy_content_description" translatable="false" tools:ignore="MissingTranslation">[dummy description]</string>
-    <string name="welcome_to_frostwire" tools:ignore="MissingTranslation">Welcome to FrostWire %s</string>
-    <string name="let_apos_s_set_you_up_before_we_begin_" tools:ignore="MissingTranslation">Let\'s set you up before we begin.</string>
-    <string name="how_others_see_you_on_the_local_network_wifi_" tools:ignore="MissingTranslation">How others see you on the local network (Wi-Fi)</string>
-    <string name="seeding_settings" tools:ignore="MissingTranslation">Seeding Settings</string>
-    <string name="seeding_settings_explanation" tools:ignore="MissingTranslation">BitTorrent users on the internet will be able to download file chunks of the data your torrents seed.</string>
-    <string name="seeding_wifi_settings_explanation" tools:ignore="MissingTranslation">Seed only when using a Wi-Fi connection. Avoid extra charges from your carrier.</string>
-    <string name="intent_text" tools:ignore="MissingTranslation">FrostWire is a peer-to-peer program for sharing authorized files only. Installing and using the program does not constitute a license for obtaining or distributing unauthorized content.</string>
-    <string name="accept_intent" tools:ignore="MissingTranslation">I will not use FrostWire for copyright infringement</string>
-    <string name="toast_on_disconnect" tools:ignore="MissingTranslation">Disconnected from BitTorrent. All BitTorrent transfers have stopped.</string>
-    <string name="toast_on_connect" tools:ignore="MissingTranslation">BitTorrent core started.</string>
-    <string name="seeds" tools:ignore="MissingTranslation">Seeds</string>
-    <string name="seeds_n" tools:ignore="MissingTranslation">Seeds: %s</string>
-    <string name="peers_n" tools:ignore="MissingTranslation">Peers: %s</string>
-    <string name="size_unknown" tools:ignore="MissingTranslation">size unknown</string>
-    <string name="playing" tools:ignore="MissingTranslation">Playing</string>
-    <string name="back" tools:ignore="MissingTranslation">Back</string>
-    <string name="input_text_hint" tools:ignore="MissingTranslation">What are you looking for? (hints by Google)</string>
-    <string name="are_you_sure" tools:ignore="MissingTranslation">Are you sure?</string>
-    <string name="stop_all_transfers" tools:ignore="MissingTranslation">This will stop all transfers</string>
-    <string name="clear_complete_transfers" tools:ignore="MissingTranslation">This will clear out all the finished transfers</string>
-    <string name="dummy_media_controller_time" translatable="false" tools:ignore="MissingTranslation">00:00</string>
-    <string name="playing_song_name" tools:ignore="MissingTranslation">Playing %s</string>
-    <string name="dummy_nickname" translatable="false" tools:ignore="MissingTranslation">[Nickname]</string>
-    <string name="invalid_torrent_file" tools:ignore="MissingTranslation">Invalid Torrent File</string>
-    <string name="type_here_to_filter" tools:ignore="MissingTranslation">Type here to filter</string>
-    <string name="type_here_to_search" tools:ignore="MissingTranslation">Type here to Search</string>
-    <string name="hints_by_google" tools:ignore="MissingTranslation">Hints by Google</string>
-    <string name="azureus_manager_not_created" tools:ignore="MissingTranslation">Download can\'t be created with SD card mounted</string>
-    <string name="http_download_status_uncompressing" tools:ignore="MissingTranslation">Uncompressing</string>
-    <string name="dialog_desktop_upload_request_title" tools:ignore="MissingTranslation">Upload Request</string>
-    <string name="dialog_desktop_upload_request_text_text" tools:ignore="MissingTranslation">%1$s wants to send you %2$s totalling %3$s</string>
-    <string name="accept" tools:ignore="MissingTranslation">Accept</string>
-    <string name="reject" tools:ignore="MissingTranslation">Reject</string>
-    <string name="block" tools:ignore="MissingTranslation">Block</string>
-    <string name="block_computer" tools:ignore="MissingTranslation">Block Computer</string>
-    <string name="desktop_transfer_status_transferring" tools:ignore="MissingTranslation">Transferring</string>
-    <string name="desktop_transfer_status_complete" tools:ignore="MissingTranslation">Complete</string>
-    <string name="desktop_transfer_status_cancelled" tools:ignore="MissingTranslation">Cancelled</string>
-    <string name="desktop_transfer_status_unknown" tools:ignore="MissingTranslation">Unknown</string>
-    <string name="support_frostwire" tools:ignore="MissingTranslation">Support FrostWire</string>
-    <string name="support_frostwire_summary" tools:ignore="MissingTranslation">Show ads to support the development of this app.</string>
-    <string name="storage_preference_title" tools:ignore="MissingTranslation">Select Storage Location</string>
-    <string name="storage_preference_summary" tools:ignore="MissingTranslation">The default storage location where files will be saved.</string>
-    <string name="bittorrent" tools:ignore="MissingTranslation">BitTorrent</string>
-    <string name="bittorrent_network_summary" tools:ignore="MissingTranslation">Connection status</string>
-    <string name="loading" tools:ignore="MissingTranslation">Loading</string>
-    <string name="wifi_sharing" tools:ignore="MissingTranslation">Wi-Fi Sharing</string>
-    <string name="activity_mediaplayer_name" tools:ignore="MissingTranslation">Media Player</string>
-    <string name="stop" tools:ignore="MissingTranslation">Stop</string>
-    <string name="donate_1" tools:ignore="MissingTranslation">Donate $1</string>
-    <string name="donate_5" tools:ignore="MissingTranslation">Donate $5</string>
-    <string name="donate_10" tools:ignore="MissingTranslation">Donate $10</string>
-    <string name="donate_25" tools:ignore="MissingTranslation">Donate $25</string>
-    <string name="couldnt_share_file" tools:ignore="MissingTranslation">Could not share the file. Weird path found.</string>
+    <string name="seed_finished_torrents">Seed Finished Torrents</string>
+    <string name="seed_finished_torrents_summary">Share pieces of torrent downloads with anybody on the internet via BitTorrent</string>
+    <string name="seed_finished_torrents_wifi_only">Seed only on Wi-Fi</string>
+    <string name="seed_finished_torrents_wifi_only_summary">Seeds only when connected via Wi-Fi to save bandwidth on your data plan</string>
+    <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
+    <string name="seeding_has_been_turned_off">Seeding has been turned off</string>
+    <string name="wifi_seeding_has_been_turned_off">No Wi-fi available, Seeding has been turned off</string>
+    <string name="nickname_hint">Nickname</string>
+    <string name="show_transfers_on_download_start">Show Transfers On Download Start</string>
+    <string name="dialog_new_transfer_title">Start this Download?</string>
+    <string name="dialog_new_transfer_text_text">Are you sure you want to download %1$s (%2$s)</string>
+    <string name="dialog_new_transfer_check_text">Show this next time</string>
+    <string name="show_new_transfer_dialog">Show New Transfer dialog</string>
+    <string name="dummy_action" translatable="false">[Action]</string>
+    <string name="clear_torrent_index">Clear Torrent Index</string>
+    <string name="clear_torrent_index_summary">Clear Torrent Index</string>
+    <string name="clear">Clear</string>
+    <string name="delete_n_torrents_indexed">Deleted %d torrents indexed</string>
+    <string name="there_is_n_torrents_indexed">There is %d torrents indexed</string>
+    <string name="wizard_previous">Previous</string>
+    <string name="wizard_next">Next</string>
+    <string name="wizard_finish">Finish</string>
+    <string name="dummy_content_description" translatable="false">[dummy description]</string>
+    <string name="welcome_to_frostwire">Welcome to FrostWire %s</string>
+    <string name="let_apos_s_set_you_up_before_we_begin_">Let\'s set you up before we begin.</string>
+    <string name="how_others_see_you_on_the_local_network_wifi_">How others see you on the local network (Wi-Fi)</string>
+    <string name="seeding_settings">Seeding Settings</string>
+    <string name="seeding_settings_explanation">BitTorrent users on the internet will be able to download file chunks of the data your torrents seed.</string>
+    <string name="seeding_wifi_settings_explanation">Seed only when using a Wi-Fi connection. Avoid extra charges from your carrier.</string>
+    <string name="intent_text">FrostWire is a peer-to-peer program for sharing authorized files only. Installing and using the program does not constitute a license for obtaining or distributing unauthorized content.</string>
+    <string name="accept_intent">I will not use FrostWire for copyright infringement</string>
+    <string name="toast_on_disconnect">Disconnected from BitTorrent. All BitTorrent transfers have stopped.</string>
+    <string name="toast_on_connect">BitTorrent core started.</string>
+    <string name="seeds">Seeds</string>
+    <string name="seeds_n">Seeds: %s</string>
+    <string name="peers_n">Peers: %s</string>
+    <string name="size_unknown">size unknown</string>
+    <string name="playing">Playing</string>
+    <string name="back">Back</string>
+    <string name="input_text_hint">What are you looking for? (hints by Google)</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="stop_all_transfers">This will stop all transfers</string>
+    <string name="clear_complete_transfers">This will clear out all the finished transfers</string>
+    <string name="dummy_media_controller_time" translatable="false">00:00</string>
+    <string name="playing_song_name">Playing %s</string>
+    <string name="dummy_nickname" translatable="false">[Nickname]</string>
+    <string name="invalid_torrent_file">Invalid Torrent File</string>
+    <string name="type_here_to_filter">Type here to filter</string>
+    <string name="type_here_to_search">Type here to Search</string>
+    <string name="hints_by_google">Hints by Google</string>
+    <string name="azureus_manager_not_created">Download can\'t be created with SD card mounted</string>
+    <string name="http_download_status_uncompressing">Uncompressing</string>
+    <string name="dialog_desktop_upload_request_title">Upload Request</string>
+    <string name="dialog_desktop_upload_request_text_text">%1$s wants to send you %2$s totalling %3$s</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
+    <string name="block">Block</string>
+    <string name="block_computer">Block Computer</string>
+    <string name="desktop_transfer_status_transferring">Transferring</string>
+    <string name="desktop_transfer_status_complete">Complete</string>
+    <string name="desktop_transfer_status_cancelled">Cancelled</string>
+    <string name="desktop_transfer_status_unknown">Unknown</string>
+    <string name="support_frostwire">Support FrostWire</string>
+    <string name="support_frostwire_summary">Show ads to support the development of this app.</string>
+    <string name="storage_preference_title">Select Storage Location</string>
+    <string name="storage_preference_summary">The default storage location where files will be saved.</string>
+    <string name="bittorrent">BitTorrent</string>
+    <string name="bittorrent_network_summary">Connection status</string>
+    <string name="loading">Loading</string>
+    <string name="wifi_sharing">Wi-Fi Sharing</string>
+    <string name="activity_mediaplayer_name">Media Player</string>
+    <string name="stop">Stop</string>
+    <string name="donate_1">Donate $1</string>
+    <string name="donate_5">Donate $5</string>
+    <string name="donate_10">Donate $10</string>
+    <string name="donate_25">Donate $25</string>
+    <string name="couldnt_share_file">Could not share the file. Weird path found.</string>
     <string name="one_file_shared" >One file has been shared to FrostWire devices on the same Wi-Fi network.</string>
     <string name="n_files_shared" >%d files has been shared to FrostWire devices on the same Wi-Fi network.</string>
-    <string name="playing_now_colon" tools:ignore="MissingTranslation">Playing now:</string>
-    <string name="my_filetype" tools:ignore="MissingTranslation">My %s</string>
-    <string name="paused" tools:ignore="MissingTranslation">Paused</string>
-    <string name="use_youtube" tools:ignore="MissingTranslation">Use YouTube.com</string>
-    <string name="use_soundcloud" tools:ignore="MissingTranslation">Use Soundcloud.com</string>
-    <string name="enable_wifi_sharing" tools:ignore="MissingTranslation">Wi-Fi Sharing</string>
-    <string name="enable_wifi_sharing_summary" tools:ignore="MissingTranslation">Share files with peers on the local Wi-Fi network.</string>
-    <string name="youtube_download_status_verifying" tools:ignore="MissingTranslation">Verifying</string>
-    <string name="donation_thanks" tools:ignore="MissingTranslation">Thank you so much for Supporting FrostWire</string>
-    <string name="torrent_scheme_download_not_supported" tools:ignore="MissingTranslation">Download not supported</string>
-    <string name="retry_search" tools:ignore="MissingTranslation">Retry</string>
-    <string name="use_archiveorg" tools:ignore="MissingTranslation">Use Archive.org</string>
-    <string name="crawl_cache_size" tools:ignore="MissingTranslation">Crawl cache %1$.2fMB</string>
-    <string name="deleted_crawl_cache" tools:ignore="MissingTranslation">Deleted crawl cache</string>
-    <string name="clear_search_cache" tools:ignore="MissingTranslation">Clear search cache</string>
-    <string name="clear_search_cache_summary" tools:ignore="MissingTranslation">Clear search cache entries</string>
-    <string name="no_results_feedback" tools:ignore="MissingTranslation">No results were found.</string>
-    <string name="donate" tools:ignore="MissingTranslation">Donate</string>
-    <string name="one_dollar" tools:ignore="MissingTranslation">$1</string>
-    <string name="five_dollars" tools:ignore="MissingTranslation">$5</string>
-    <string name="ten_dollars" tools:ignore="MissingTranslation">$10</string>
-    <string name="twenty_five_dollars" tools:ignore="MissingTranslation">$25</string>
-    <string name="watch_tv" tools:ignore="MissingTranslation">Watch TV</string>
-    <string name="free_apps" tools:ignore="MissingTranslation">Free Apps</string>
-    <string name="use_frostclick" tools:ignore="MissingTranslation">Use FrostClick</string>
-    <string name="delete_this_track" tools:ignore="MissingTranslation">Delete this track</string>
-    <string name="are_you_sure_delete_current_track" tools:ignore="MissingTranslation">Are you sure you want to delete the current track?</string>
-    <string name="wifi_sharing_disabled" tools:ignore="MissingTranslation">Wi-fi sharing is off.\n\nWi-fi sharing can be used to share files locally between FrostWire powered devices connected to the same Wi-Fi network.\n\n&lt;a href=\"http://bit.ly/1tVReSt\"&gt;Learn more.&lt;/a&gt;</string>
-    <string name="turn_on_wifi_sharing" tools:ignore="MissingTranslation">Turn on Wi-fi Sharing</string>    
-    <string name="are_you_sure_wifi_sharing_off" tools:ignore="MissingTranslation">Turning off Wi-Fi sharing will make all your locally shared files unavailable to other users on the nearby Wi-Fi network.</string>
-    <string name="anonymous_usage_statistics" tools:ignore="MissingTranslation">Anonymous Usage Statistics</string>
-    <string name="anonymous_usage_statistics_summary" tools:ignore="MissingTranslation">Send anonymous usage statistics. No information that can personally identify you will be stored on disk or sent through the network.</string>
-    <string name="paused_song_name" tools:ignore="MissingTranslation">Paused %s</string>
-    <string name="use_bitsnoop" tools:ignore="MissingTranslation">Use BitSnoop</string>
-    <string name="use_torlock" tools:ignore="MissingTranslation">Use TorLock</string>
-    <string name="use_torrentdownloads" tools:ignore="MissingTranslation">Use TorrentDownloads</string>
-    <string name="use_eztv" tools:ignore="MissingTranslation">Use Eztv</string>
-    <string name="transfer_status_demuxing" tools:ignore="MissingTranslation">Demuxing</string>
-    <string name="player_paused_press_and_hold_to_stop" tools:ignore="MissingTranslation">Player paused. (Tip: Press and hold to stop)</string>
-    <string name="btc" tools:ignore="MissingTranslation">BTC</string>
-    <string name="you_need_a_bitcoin_wallet_app" tools:ignore="MissingTranslation">You need a Bitcoin wallet installed on you device to submit a BTC donation.</string>
-    <string name="transfers_select_all" tools:ignore="MissingTranslation">all</string>
-    <string name="transfers_select_downloading" tools:ignore="MissingTranslation">downloading</string>
-    <string name="transfers_select_completed" tools:ignore="MissingTranslation">completed</string>
-    <string name="transfers_context_menu_clear_finished" tools:ignore="MissingTranslation">Clear all finished transfers</string>
-    <string name="transfers_context_menu_stop_delete_data" tools:ignore="MissingTranslation">Stop and delete data</string>
-    <string name="transfers_context_menu_copy_infohash_copied" tools:ignore="MissingTranslation">Infohash copied to clipboard</string>
-    <string name="transfers_context_menu_copy_magnet_copied" tools:ignore="MissingTranslation">Magnet copied to clipboard</string>
-    <string name="transfers_context_menu_copy_magnet" tools:ignore="MissingTranslation">Copy Magnet</string>
-    <string name="transfers_context_menu_copy_infohash" tools:ignore="MissingTranslation">Copy InfoHash</string>
-    <string name="transfers_context_menu_pause_stop_all_transfers" tools:ignore="MissingTranslation">Pause/Stop all transfers</string>
-    <string name="transfers_context_resume_all_torrent_transfers" tools:ignore="MissingTranslation">Resume all torrent transfers</string>
-    <string name="drawer_open" tools:ignore="MissingTranslation">Open navigation drawer</string>
-    <string name="drawer_close" tools:ignore="MissingTranslation">Close navigation drawer</string>
-    <string name="please_check_connection_status_before_resuming_download" tools:ignore="MissingTranslation">Please check the status of your internet connection before resuming.</string>
-    <string name="donate_in_btc" tools:ignore="MissingTranslation">Donate in bitcoins</string>
-    <string name="torrent_transfer_enqueued_on_mobile_data" tools:ignore="MissingTranslation">The torrent transfer will start downloading automatically when you connect to a Wi-Fi network.(Check your Network Settings regarding 3G/4G data usage)</string>
-    <string name="torrent_transfer_aborted_on_mobile_data" tools:ignore="MissingTranslation">Torrent transfers will not start until you connect to a Wi-Fi network.(Check your Network Settings regarding 3G/4G data usage)</string>
-    <string name="torrent_transfer_consuming_mobile_data" tools:ignore="MissingTranslation">Warning: This torrent transfer is using your 3G/4G data. (Check your Network Settings if you wish to use BitTorrent only on WiFi)</string>
-    <string name="add_transfer_label" tools:ignore="MissingTranslation">Paste a magnet or torrent URL</string>
-    <string name="please_enter_valid_url" tools:ignore="MissingTranslation">Please enter a valid URL</string>
-    <string name="magnet_url_added" tools:ignore="MissingTranslation">Magnet URL added to transfers. (Magnets work best on Wi-Fi)</string>
-    <string name="torrent_url_added" tools:ignore="MissingTranslation">Torrent URL added to transfers.</string>
-    <string name="cloud_downloads_coming" tools:ignore="MissingTranslation">Sorry: Starting cloud downloads from here will be available on further updates.</string>
-    <string name="seed" tools:ignore="MissingTranslation">Seed</string>
-    <string name="torrent_transfer_paused_disconnected_from_bittorrent" tools:ignore="MissingTranslation">The transfer has been paused because you are Disconnected. (Check your BitTorrent connection in Settings)</string>
-    <string name="remove_from_recent" tools:ignore="MissingTranslation">Remove from recent</string>
-    <string name="now_playing" tools:ignore="MissingTranslation">Now playing</string>
-    <string name="dummy_author" translatable="false" tools:ignore="MissingTranslation">[Author]</string>
-    <string name="install_bitcoin_wallet" tools:ignore="MissingTranslation">Install Bitcoin Wallet</string>
-    <string name="cant_resume_torrent_transfers" tools:ignore="MissingTranslation">Cannot resume torrent transfers. Check status of "Settings" > "BitTorrent Connection Status"</string>
-    <string name="or_enter_url" tools:ignore="MissingTranslation">or enter URL</string>
-    <string name="confirm_download" tools:ignore="MissingTranslation">Confirm Download</string>
-    <string name="track" tools:ignore="MissingTranslation">track</string>
-    <string name="playlist" tools:ignore="MissingTranslation">playlist</string>
-    <string name="are_you_sure_you_want_to_download_the_following" tools:ignore="MissingTranslation">Are you sure you want to download the following %1$s (%2$s)?</string>
+    <string name="playing_now_colon">Playing now:</string>
+    <string name="my_filetype">My %s</string>
+    <string name="paused">Paused</string>
+    <string name="use_youtube">Use YouTube.com</string>
+    <string name="use_soundcloud">Use Soundcloud.com</string>
+    <string name="enable_wifi_sharing">Wi-Fi Sharing</string>
+    <string name="enable_wifi_sharing_summary">Share files with peers on the local Wi-Fi network.</string>
+    <string name="youtube_download_status_verifying">Verifying</string>
+    <string name="donation_thanks">Thank you so much for Supporting FrostWire</string>
+    <string name="torrent_scheme_download_not_supported">Download not supported</string>
+    <string name="retry_search">Retry</string>
+    <string name="use_archiveorg">Use Archive.org</string>
+    <string name="crawl_cache_size">Crawl cache %1$.2fMB</string>
+    <string name="deleted_crawl_cache">Deleted crawl cache</string>
+    <string name="clear_search_cache">Clear search cache</string>
+    <string name="clear_search_cache_summary">Clear search cache entries</string>
+    <string name="no_results_feedback">No results were found.</string>
+    <string name="donate">Donate</string>
+    <string name="one_dollar">$1</string>
+    <string name="five_dollars">$5</string>
+    <string name="ten_dollars">$10</string>
+    <string name="twenty_five_dollars">$25</string>
+    <string name="watch_tv">Watch TV</string>
+    <string name="free_apps">Free Apps</string>
+    <string name="use_frostclick">Use FrostClick</string>
+    <string name="delete_this_track">Delete this track</string>
+    <string name="are_you_sure_delete_current_track">Are you sure you want to delete the current track?</string>
+    <string name="wifi_sharing_disabled">Wi-fi sharing is off.\n\nWi-fi sharing can be used to share files locally between FrostWire powered devices connected to the same Wi-Fi network.\n\n&lt;a href=\"http://bit.ly/1tVReSt\"&gt;Learn more.&lt;/a&gt;</string>
+    <string name="turn_on_wifi_sharing">Turn on Wi-fi Sharing</string>
+    <string name="are_you_sure_wifi_sharing_off">Turning off Wi-Fi sharing will make all your locally shared files unavailable to other users on the nearby Wi-Fi network.</string>
+    <string name="anonymous_usage_statistics">Anonymous Usage Statistics</string>
+    <string name="anonymous_usage_statistics_summary">Send anonymous usage statistics. No information that can personally identify you will be stored on disk or sent through the network.</string>
+    <string name="paused_song_name">Paused %s</string>
+    <string name="use_bitsnoop">Use BitSnoop</string>
+    <string name="use_torlock">Use TorLock</string>
+    <string name="use_torrentdownloads">Use TorrentDownloads</string>
+    <string name="use_eztv">Use Eztv</string>
+    <string name="transfer_status_demuxing">Demuxing</string>
+    <string name="player_paused_press_and_hold_to_stop">Player paused. (Tip: Press and hold to stop)</string>
+    <string name="btc">BTC</string>
+    <string name="you_need_a_bitcoin_wallet_app">You need a Bitcoin wallet installed on you device to submit a BTC donation.</string>
+    <string name="transfers_select_all">all</string>
+    <string name="transfers_select_downloading">downloading</string>
+    <string name="transfers_select_completed">completed</string>
+    <string name="transfers_context_menu_clear_finished">Clear all finished transfers</string>
+    <string name="transfers_context_menu_stop_delete_data">Stop and delete data</string>
+    <string name="transfers_context_menu_copy_infohash_copied">Infohash copied to clipboard</string>
+    <string name="transfers_context_menu_copy_magnet_copied">Magnet copied to clipboard</string>
+    <string name="transfers_context_menu_copy_magnet">Copy Magnet</string>
+    <string name="transfers_context_menu_copy_infohash">Copy InfoHash</string>
+    <string name="transfers_context_menu_pause_stop_all_transfers">Pause/Stop all transfers</string>
+    <string name="transfers_context_resume_all_torrent_transfers">Resume all torrent transfers</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="please_check_connection_status_before_resuming_download">Please check the status of your internet connection before resuming.</string>
+    <string name="donate_in_btc">Donate in bitcoins</string>
+    <string name="torrent_transfer_enqueued_on_mobile_data">The torrent transfer will start downloading automatically when you connect to a Wi-Fi network.(Check your Network Settings regarding 3G/4G data usage)</string>
+    <string name="torrent_transfer_aborted_on_mobile_data">Torrent transfers will not start until you connect to a Wi-Fi network.(Check your Network Settings regarding 3G/4G data usage)</string>
+    <string name="torrent_transfer_consuming_mobile_data">Warning: This torrent transfer is using your 3G/4G data. (Check your Network Settings if you wish to use BitTorrent only on WiFi)</string>
+    <string name="add_transfer_label">Paste a magnet or torrent URL</string>
+    <string name="please_enter_valid_url">Please enter a valid URL</string>
+    <string name="magnet_url_added">Magnet URL added to transfers. (Magnets work best on Wi-Fi)</string>
+    <string name="torrent_url_added">Torrent URL added to transfers.</string>
+    <string name="cloud_downloads_coming">Sorry: Starting cloud downloads from here will be available on further updates.</string>
+    <string name="seed">Seed</string>
+    <string name="torrent_transfer_paused_disconnected_from_bittorrent">The transfer has been paused because you are Disconnected. (Check your BitTorrent connection in Settings)</string>
+    <string name="remove_from_recent">Remove from recent</string>
+    <string name="now_playing">Now playing</string>
+    <string name="dummy_author" translatable="false">[Author]</string>
+    <string name="install_bitcoin_wallet">Install Bitcoin Wallet</string>
+    <string name="cant_resume_torrent_transfers">Cannot resume torrent transfers. Check status of "Settings" > "BitTorrent Connection Status"</string>
+    <string name="or_enter_url">or enter URL</string>
+    <string name="confirm_download">Confirm Download</string>
+    <string name="track">track</string>
+    <string name="playlist">playlist</string>
+    <string name="are_you_sure_you_want_to_download_the_following">Are you sure you want to download the following %1$s (%2$s)?</string>
     <string name="prepend_shortcut_label" translatable="false"/>
-    <string name="menu_enter_shortcut_label" tools:ignore="MissingTranslation">Enter</string>
-    <string name="menu_delete_shortcut_label" tools:ignore="MissingTranslation">Del</string>
-    <string name="menu_space_shortcut_label" tools:ignore="MissingTranslation">Space</string>
-    <string name="cant_open_file_does_not_exist" tools:ignore="MissingTranslation">I can\'t open %1$s, the file does not exist.</string>
-    <string name="saving_to_sd_card" tools:ignore="MissingTranslation">Saving to SD card.</string>
-    <string name="android_will_erase_files_if_frostwire_is_uninstalled" tools:ignore="MissingTranslation">Android will erase downloaded files if FrostWire is uninstalled.</string>
-    <string name="saving_to_internal_memory" tools:ignore="MissingTranslation">Saving to Internal Memory</string>
-    <string name="saving_to_internal_memory_description" tools:ignore="MissingTranslation">You also have an SD card (%1$s free)</string>
-    <string name="device_memory" tools:ignore="MissingTranslation">Device\'s Memory</string>
-    <string name="device_storage" tools:ignore="MissingTranslation">Device\'s Storage</string>
-    <string name="sdcard_storage" tools:ignore="MissingTranslation">SD\'s Storage</string>
-    <string name="storage_setting_warning" tools:ignore="MissingTranslation">WARNING: All files saved by FrostWire onto the SD card will be deleted BY ANDROID, not FrostWire, if you uninstall the app.</string>
-    <string name="storage_setting_confirm_dialog_title" tools:ignore="MissingTranslation">SD CARD</string>
-    <string name="storage_setting_confirm_dialog_text" tools:ignore="MissingTranslation">I understand that all files downloaded to the SD Card by FrostWire will be deleted BY ANDROID the moment the FrostWire application is uninstalled from this device and I will not hold FrostWire LLC liable for any files lost.</string>
-    <string name="available" tools:ignore="MissingTranslation">available</string>
-    <string name="file_descriptor_sd_mounted" tools:ignore="MissingTranslation">This file was deleted from the SD card, or the SD card you have inserted is a different one.</string>
-    <string name="file_descriptor_sd_unmounted" tools:ignore="MissingTranslation">This file belongs to an SD card, please insert it on your device.</string>
-    <string name="help_translate_frostwire" tools:ignore="MissingTranslation">Help translate FrostWire</string>
-    <string name="finishing" tools:ignore="MissingTranslation">Finishing</string>
-    <string name="scanning" tools:ignore="MissingTranslation">Finishing - Scanning</string>
-    <string name="queued_for_checking" tools:ignore="MissingTranslation">Queued for checking</string>
-    <string name="checking_ellipsis" tools:ignore="MissingTranslation">Checking&#8230;</string>
-    <string name="downloading_metadata" tools:ignore="MissingTranslation">Downloading metadata</string>
-    <string name="error_moving_incomplete" tools:ignore="MissingTranslation">Error: Moving Incomplete</string>
-    <string name="error_wrong_md5_hash" tools:ignore="MissingTranslation">Error: Wrong MD5 hash</string>
-    <string name="error_wrong_signature" tools:ignore="MissingTranslation">Error: Wrong signature</string>
-    <string name="pausing" tools:ignore="MissingTranslation">Pausing</string>
-    <string name="canceling" tools:ignore="MissingTranslation">Canceling</string>
-    <string name="app_shutdown_dlg_title" tools:ignore="MissingTranslation">Shutdown</string>
-    <string name="app_shutdown_dlg_message" tools:ignore="MissingTranslation">This will shutdown all transfers and background services. Are you sure?</string>
-    <string name="error_not_enough_peers" tools:ignore="MissingTranslation">Try again, not enough peers</string>
-    <string name="http_download_status_save_dir_error" tools:ignore="MissingTranslation">Save directory does not exist or can\'t be created</string>
-    <string name="http_download_status_temp_dir_error" tools:ignore="MissingTranslation">Temporary directory does not exist or can\'t be created</string>
-    <string name="my_music" tools:ignore="MissingTranslation">My Music</string>
-    <string name="support" tools:ignore="MissingTranslation">Support</string>
-    <string name="wifi_sharing_settings" tools:ignore="MissingTranslation">Wi-Fi Sharing Settings</string>
-    <string name="use_btjunkie" tools:ignore="MissingTranslation">Use BTJunkie</string>
-    <string name="free_download" tools:ignore="MissingTranslation">Free Download</string>
-    <string name="error_no_space_left_on_device" tools:ignore="MissingTranslation">Error: No space left to save file</string>
-    <string name="free_sponsored_app" tools:ignore="MissingTranslation">Free Sponsored App</string>
-    <string name="send_bitcoin_tip" tools:ignore="MissingTranslation">Send Bitcoin Tip</string>
-    <string name="send_tip_donation" tools:ignore="MissingTranslation">Send Tip/Donation</string>
-    <string name="issue_with_tip_donation_uri" tools:ignore="MissingTranslation">There\'s something wrong with the Tip/Donation web address</string>
-    <string name="enable_dht" tools:ignore="MissingTranslation">Enable DHT</string>
-    <string name="enable_dht_summary" tools:ignore="MissingTranslation">Use the Distributed Hash Table to announce/search torrent peers</string>
-    <string name="dummy_build" translatable="false" tools:ignore="MissingTranslation">[build number]</string>
-    <string name="basic" tools:ignore="MissingTranslation">Basic</string>
-    <string name="plus" tools:ignore="MissingTranslation">Plus</string>
-    <string name="try_other_keywords" tools:ignore="MissingTranslation">Try fewer/different keywords</string>
-    <string name="try_frostwire_plus_for_more_results" tools:ignore="MissingTranslation">Try FrostWire Plus for more results</string>
-    <string name="action_menu_overflow_description" tools:ignore="MissingTranslation">More options</string>
-    <string name="rate_our_app" tools:ignore="MissingTranslation">Rate our App</string>
-    <string name="rating_reminder_description" tools:ignore="MissingTranslation">If you love FrostWire please take a moment to rate us.</string>
-    <string name="love_frostwire" tools:ignore="MissingTranslation">Love FrostWire</string>
-    <string name="send_feedback" tools:ignore="MissingTranslation">Send Feedback</string>
-    <string name="choose_email_app" tools:ignore="MissingTranslation">Choose an Email App…</string>
-    <string name="media_preview" tools:ignore="MissingTranslation">%s preview</string>
-    <string name="your_installation_is_complete" tools:ignore="MissingTranslation">Your installation is complete.</string>
-    <string name="thank_you" tools:ignore="MissingTranslation">Thank you!</string>
-    <string name="keep_in_touch" tools:ignore="MissingTranslation">Keep in touch!</string>
-    <string name="frostwire_shutting_down_no_permissions" tools:ignore="MissingTranslation">Sorry, FrostWire can\'t continue without your permission to access disk.</string>
-    <string name="restarting" tools:ignore="MissingTranslation">Restarting…</string>
-    <string name="restarting_summary" tools:ignore="MissingTranslation">FrostWire will now restart for granted permissions to take effect</string>
-    <string name="why_we_need_storage_permissions" tools:ignore="MissingTranslation">Why we need storage permissions.</string>
-    <string name="why_we_need_storage_permissions_summary" tools:ignore="MissingTranslation">FrostWire is a file browser and downloader app, therefore it needs to be able to access your disk.\n\nWithout your permissions FrostWire cannot work.\n\nWant to try again?</string>
-    <string name="shutting_down" tools:ignore="MissingTranslation">Shutting down…</string>
-    <string name="help" tools:ignore="MissingTranslation">Help</string>
-    <string name="request_again" tools:ignore="MissingTranslation">Request Again</string>
-    <string name="frostwire_is_running" tools:ignore="MissingTranslation">FrostWire is running</string>
-    <string name="vpn_found" tools:ignore="MissingTranslation">VPN found. Connection encrypted.</string>
-    <string name="vpn_not_found" tools:ignore="MissingTranslation">No VPN. Consider encrypting connection.</string>
-    <string name="connection_header_title" tools:ignore="MissingTranslation">Connection status:</string>
-    <string name="unprotected_connection" tools:ignore="MissingTranslation">unprotected</string>
-    <string name="protected_connection" tools:ignore="MissingTranslation">VPN-protected</string>
-    <string name="protect_my_privacy" tools:ignore="MissingTranslation">Protect my privacy</string>
-    <string name="get_express_VPN" tools:ignore="MissingTranslation">Get ExpressVPN</string>
-    <string name="vpn_money_back" tools:ignore="MissingTranslation">30-day money-back guarantee</string>
-    <string name="vpn_price" tools:ignore="MissingTranslation">from $%1$.2f per month</string>
-    <string name="vpn_what_you_get_with" tools:ignore="MissingTranslation">What do you get with </string>
-    <string name="vpn_client" tools:ignore="MissingTranslation">ExpressVPN</string>
-    <string name="get_vpn_client" tools:ignore="MissingTranslation">Get ExpressVPN</string>
-    <string name="visit_vpn_client" tools:ignore="MissingTranslation">Visit ExpressVPN</string>
-    <string name="vpn_client_feature_1" tools:ignore="MissingTranslation">Military-grade encryption</string>
-    <string name="vpn_client_feature_2" tools:ignore="MissingTranslation">Unlimited download speed</string>
-    <string name="vpn_client_feature_3" tools:ignore="MissingTranslation">Private and logless browsing</string>
-    <string name="vpn_client_feature_4" tools:ignore="MissingTranslation">24/7 customer support</string>
-    <string name="vpn_on_toast_notification" tools:ignore="MissingTranslation">You\'re connected to a VPN.</string>
-    <string name="vpn_off_toast_notification" tools:ignore="MissingTranslation">Your connection may not be private.</string>
-    <string name="dht_contacts" tools:ignore="MissingTranslation">DHT contacts</string>
-    <string name="notify_frostwire_is_running" tools:ignore="MissingTranslation">Notify if FrostWire is running</string>
-    <string name="notify_frostwire_is_running_summary" tools:ignore="MissingTranslation">Show a permanent Android notification with status of transfers</string>
-    <string name="invalid_filename" tools:ignore="MissingTranslation">Invalid file name</string>
-    <string name="storage_picker_treeuri_null" tools:ignore="MissingTranslation">No storage path was selected</string>
-    <string name="storage_picker_treeuri_not_directory" tools:ignore="MissingTranslation">The selected path is not a directory</string>
-    <string name="storage_picker_treeuri_cant_write" tools:ignore="MissingTranslation">FrostWire can\'t write on the selected storage path</string>
-    <string name="storage_picker_treeuri_error" tools:ignore="MissingTranslation">Unexpected error picking storage path</string>
-    <string name="storage_path" tools:ignore="MissingTranslation">Storage Path</string>
-    <string name="learn_more" tools:ignore="MissingTranslation">Learn more</string>
-    <string name="enable_experimental" tools:ignore="MissingTranslation">Experimental Features</string>
-    <string name="selected" tools:ignore="MissingTranslation">selected</string>
-    <string name="check_internet_connection" tools:ignore="MissingTranslation">Check Internet connection</string>
-    <string name="bittorrent_off_data_saver_on" tools:ignore="MissingTranslation">"BitTorrent off (Data Saver On)"</string>
-    <string name="bittorrent_off" tools:ignore="MissingTranslation">BitTorrent off</string>
-    <string name="error_no_internet_connection" tools:ignore="MissingTranslation">Error: Check Internet connection</string>
-    <string name="pick_the_files_you_want_to_download_from_this_torrent" tools:ignore="MissingTranslation">Pick the files you want to download from this torrent</string>
-    <string name="enable_seeding" tools:ignore="MissingTranslation">Enable Seeding</string>
-    <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you" tools:ignore="MissingTranslation">Bittorrent is disconnected. Would you like me to start it for you?</string>
-    <string name="seeding_is_currently_disabled" tools:ignore="MissingTranslation">Seeding is currently disabled in your settings. Would you like me to enable seeding for you to share this file?</string>
-    <string name="wifi_network_unavailable" tools:ignore="MissingTranslation">Wifi Network Unavailable</string>
-    <string name="according_to_settings_i_cant_seed_unless_wifi" tools:ignore="MissingTranslation">According to your settings I can\'t start seeding unless you are on Wi-Fi. The file will be ready for seeding automatically when you get back to an internet enabled Wi-Fi network.</string>
-    <string name="the_file_could_not_be_seeded_enable_seeding" tools:ignore="MissingTranslation">The file could not be seeded. Enable seeding on settings.</string>
-    <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected" tools:ignore="MissingTranslation">The file could not be seeded. BitTorrent will remain disconnected.</string>
-    <string name="fetching_torrent_ellipsis" tools:ignore="MissingTranslation">Fetching torrent…</string>
-    <string name="sd_permission_no_accessible_path" tools:ignore="MissingTranslation">The path you selected in the SD is not accessible any more. Press OK to select again.</string>
-    <string name="dummy_price" tools:ignore="MissingTranslation">$ 99.99</string>
-    <string name="dummy_title_bold" tools:ignore="MissingTranslation">[Bold Title]</string>
-    <string name="thirty_days" tools:ignore="MissingTranslation">30 days</string>
-    <string name="one_year" tools:ignore="MissingTranslation">1 year</string>
-    <string name="six_months" tools:ignore="MissingTranslation">6 months</string>
-    <string name="ad_free" tools:ignore="MissingTranslation">Ad-free</string>
-    <string name="best_value" tools:ignore="MissingTranslation">Best Value</string>
-    <string name="select_option_below" tools:ignore="MissingTranslation">Select option below:</string>
-    <string name="buy_uppercase" tools:ignore="MissingTranslation">BUY</string>
-    <string name="automatic_renewal" tools:ignore="MissingTranslation">Automatic Renewal</string>
-    <string name="includes_3_day_free_trial" tools:ignore="MissingTranslation">Includes 3 day free-trial. Recommended</string>
-    <string name="one_time_purchase" tools:ignore="MissingTranslation">One Time Purchase</string>
-    <string name="no_trial_period_included" tools:ignore="MissingTranslation">No trial period included</string>
-    <string name="error_connection_timed_out" tools:ignore="MissingTranslation">Error: connection timed out/dropped. Try again.</string>
-    <string name="current_plan" tools:ignore="MissingTranslation">Current plan</string>
-    <string name="days_left" tools:ignore="MissingTranslation">days left</string>
-    <string name="save_bandwidth" tools:ignore="MissingTranslation">Save Bandwidth</string>
-    <string name="cheaper_than_lattes" tools:ignore="MissingTranslation">Cheaper than Lattes</string>
-    <string name="cheaper_than_drinks" tools:ignore="MissingTranslation">Cheaper than Drinks</string>
-    <string name="cheaper_than_parking" tools:ignore="MissingTranslation">Cheaper than Parking</string>
-    <string name="cheaper_than_cigarettes" tools:ignore="MissingTranslation">Cheaper than Cigarettes</string>
-    <string name="cheaper_than_beer" tools:ignore="MissingTranslation">Cheaper than Beer</string>
-    <string name="cheaper_than_coffee" tools:ignore="MissingTranslation">Cheaper than Coffee</string>
-    <string name="cheaper_than_gas" tools:ignore="MissingTranslation">Cheaper than Gas</string>
-    <string name="no_interruptions" tools:ignore="MissingTranslation">No Interruptions</string>
-    <string name="keep_the_project_alive" tools:ignore="MissingTranslation">Keep the Project Alive</string>
-    <string name="processing_payment" tools:ignore="MissingTranslation">Processing payment, refresh in a few seconds</string>
+    <string name="menu_enter_shortcut_label">Enter</string>
+    <string name="menu_delete_shortcut_label">Del</string>
+    <string name="menu_space_shortcut_label">Space</string>
+    <string name="cant_open_file_does_not_exist">I can\'t open %1$s, the file does not exist.</string>
+    <string name="saving_to_sd_card">Saving to SD card.</string>
+    <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android will erase downloaded files if FrostWire is uninstalled.</string>
+    <string name="saving_to_internal_memory">Saving to Internal Memory</string>
+    <string name="saving_to_internal_memory_description">You also have an SD card (%1$s free)</string>
+    <string name="device_memory">Device\'s Memory</string>
+    <string name="device_storage">Device\'s Storage</string>
+    <string name="sdcard_storage">SD\'s Storage</string>
+    <string name="storage_setting_warning">WARNING: All files saved by FrostWire onto the SD card will be deleted BY ANDROID, not FrostWire, if you uninstall the app.</string>
+    <string name="storage_setting_confirm_dialog_title">SD CARD</string>
+    <string name="storage_setting_confirm_dialog_text">I understand that all files downloaded to the SD Card by FrostWire will be deleted BY ANDROID the moment the FrostWire application is uninstalled from this device and I will not hold FrostWire LLC liable for any files lost.</string>
+    <string name="available">available</string>
+    <string name="file_descriptor_sd_mounted">This file was deleted from the SD card, or the SD card you have inserted is a different one.</string>
+    <string name="file_descriptor_sd_unmounted">This file belongs to an SD card, please insert it on your device.</string>
+    <string name="help_translate_frostwire">Help translate FrostWire</string>
+    <string name="finishing">Finishing</string>
+    <string name="scanning">Finishing - Scanning</string>
+    <string name="queued_for_checking">Queued for checking</string>
+    <string name="checking_ellipsis">Checking&#8230;</string>
+    <string name="downloading_metadata">Downloading metadata</string>
+    <string name="error_moving_incomplete">Error: Moving Incomplete</string>
+    <string name="error_wrong_md5_hash">Error: Wrong MD5 hash</string>
+    <string name="error_wrong_signature">Error: Wrong signature</string>
+    <string name="pausing">Pausing</string>
+    <string name="canceling">Canceling</string>
+    <string name="app_shutdown_dlg_title">Shutdown</string>
+    <string name="app_shutdown_dlg_message">This will shutdown all transfers and background services. Are you sure?</string>
+    <string name="error_not_enough_peers">Try again, not enough peers</string>
+    <string name="http_download_status_save_dir_error">Save directory does not exist or can\'t be created</string>
+    <string name="http_download_status_temp_dir_error">Temporary directory does not exist or can\'t be created</string>
+    <string name="my_music">My Music</string>
+    <string name="support">Support</string>
+    <string name="wifi_sharing_settings">Wi-Fi Sharing Settings</string>
+    <string name="use_btjunkie">Use BTJunkie</string>
+    <string name="free_download">Free Download</string>
+    <string name="error_no_space_left_on_device">Error: No space left to save file</string>
+    <string name="free_sponsored_app">Free Sponsored App</string>
+    <string name="send_bitcoin_tip">Send Bitcoin Tip</string>
+    <string name="send_tip_donation">Send Tip/Donation</string>
+    <string name="issue_with_tip_donation_uri">There\'s something wrong with the Tip/Donation web address</string>
+    <string name="enable_dht">Enable DHT</string>
+    <string name="enable_dht_summary">Use the Distributed Hash Table to announce/search torrent peers</string>
+    <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="basic">Basic</string>
+    <string name="plus">Plus</string>
+    <string name="try_other_keywords">Try fewer/different keywords</string>
+    <string name="try_frostwire_plus_for_more_results">Try FrostWire Plus for more results</string>
+    <string name="action_menu_overflow_description">More options</string>
+    <string name="rate_our_app">Rate our App</string>
+    <string name="rating_reminder_description">If you love FrostWire please take a moment to rate us.</string>
+    <string name="love_frostwire">Love FrostWire</string>
+    <string name="send_feedback">Send Feedback</string>
+    <string name="choose_email_app">Choose an Email App…</string>
+    <string name="media_preview">%s preview</string>
+    <string name="your_installation_is_complete">Your installation is complete.</string>
+    <string name="thank_you">Thank you!</string>
+    <string name="keep_in_touch">Keep in touch!</string>
+    <string name="frostwire_shutting_down_no_permissions">Sorry, FrostWire can\'t continue without your permission to access disk.</string>
+    <string name="restarting">Restarting…</string>
+    <string name="restarting_summary">FrostWire will now restart for granted permissions to take effect</string>
+    <string name="why_we_need_storage_permissions">Why we need storage permissions.</string>
+    <string name="why_we_need_storage_permissions_summary">FrostWire is a file browser and downloader app, therefore it needs to be able to access your disk.\n\nWithout your permissions FrostWire cannot work.\n\nWant to try again?</string>
+    <string name="shutting_down">Shutting down…</string>
+    <string name="help">Help</string>
+    <string name="request_again">Request Again</string>
+    <string name="frostwire_is_running">FrostWire is running</string>
+    <string name="vpn_found">VPN found. Connection encrypted.</string>
+    <string name="vpn_not_found">No VPN. Consider encrypting connection.</string>
+    <string name="connection_header_title">Connection status:</string>
+    <string name="unprotected_connection">unprotected</string>
+    <string name="protected_connection">VPN-protected</string>
+    <string name="protect_my_privacy">Protect my privacy</string>
+    <string name="get_express_VPN">Get ExpressVPN</string>
+    <string name="vpn_money_back">30-day money-back guarantee</string>
+    <string name="vpn_price">from $%1$.2f per month</string>
+    <string name="vpn_what_you_get_with">What do you get with </string>
+    <string name="vpn_client">ExpressVPN</string>
+    <string name="get_vpn_client">Get ExpressVPN</string>
+    <string name="visit_vpn_client">Visit ExpressVPN</string>
+    <string name="vpn_client_feature_1">Military-grade encryption</string>
+    <string name="vpn_client_feature_2">Unlimited download speed</string>
+    <string name="vpn_client_feature_3">Private and logless browsing</string>
+    <string name="vpn_client_feature_4">24/7 customer support</string>
+    <string name="vpn_on_toast_notification">You\'re connected to a VPN.</string>
+    <string name="vpn_off_toast_notification">Your connection may not be private.</string>
+    <string name="dht_contacts">DHT contacts</string>
+    <string name="notify_frostwire_is_running">Notify if FrostWire is running</string>
+    <string name="notify_frostwire_is_running_summary">Show a permanent Android notification with status of transfers</string>
+    <string name="invalid_filename">Invalid file name</string>
+    <string name="storage_picker_treeuri_null">No storage path was selected</string>
+    <string name="storage_picker_treeuri_not_directory">The selected path is not a directory</string>
+    <string name="storage_picker_treeuri_cant_write">FrostWire can\'t write on the selected storage path</string>
+    <string name="storage_picker_treeuri_error">Unexpected error picking storage path</string>
+    <string name="storage_path">Storage Path</string>
+    <string name="learn_more">Learn more</string>
+    <string name="enable_experimental">Experimental Features</string>
+    <string name="selected">selected</string>
+    <string name="check_internet_connection">Check Internet connection</string>
+    <string name="bittorrent_off_data_saver_on">"BitTorrent off (Data Saver On)"</string>
+    <string name="bittorrent_off">BitTorrent off</string>
+    <string name="error_no_internet_connection">Error: Check Internet connection</string>
+    <string name="pick_the_files_you_want_to_download_from_this_torrent">Pick the files you want to download from this torrent</string>
+    <string name="enable_seeding">Enable Seeding</string>
+    <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent is disconnected. Would you like me to start it for you?</string>
+    <string name="seeding_is_currently_disabled">Seeding is currently disabled in your settings. Would you like me to enable seeding for you to share this file?</string>
+    <string name="wifi_network_unavailable">Wifi Network Unavailable</string>
+    <string name="according_to_settings_i_cant_seed_unless_wifi">According to your settings I can\'t start seeding unless you are on Wi-Fi. The file will be ready for seeding automatically when you get back to an internet enabled Wi-Fi network.</string>
+    <string name="the_file_could_not_be_seeded_enable_seeding">The file could not be seeded. Enable seeding on settings.</string>
+    <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">The file could not be seeded. BitTorrent will remain disconnected.</string>
+    <string name="fetching_torrent_ellipsis">Fetching torrent…</string>
+    <string name="sd_permission_no_accessible_path">The path you selected in the SD is not accessible any more. Press OK to select again.</string>
+    <string name="dummy_price">$ 99.99</string>
+    <string name="dummy_title_bold">[Bold Title]</string>
+    <string name="thirty_days">30 days</string>
+    <string name="one_year">1 year</string>
+    <string name="six_months">6 months</string>
+    <string name="ad_free">Ad-free</string>
+    <string name="best_value">Best Value</string>
+    <string name="select_option_below">Select option below:</string>
+    <string name="buy_uppercase">BUY</string>
+    <string name="automatic_renewal">Automatic Renewal</string>
+    <string name="includes_3_day_free_trial">Includes 3 day free-trial. Recommended</string>
+    <string name="one_time_purchase">One Time Purchase</string>
+    <string name="no_trial_period_included">No trial period included</string>
+    <string name="error_connection_timed_out">Error: connection timed out/dropped. Try again.</string>
+    <string name="current_plan">Current plan</string>
+    <string name="days_left">days left</string>
+    <string name="save_bandwidth">Save Bandwidth</string>
+    <string name="cheaper_than_lattes">Cheaper than Lattes</string>
+    <string name="cheaper_than_drinks">Cheaper than Drinks</string>
+    <string name="cheaper_than_parking">Cheaper than Parking</string>
+    <string name="cheaper_than_cigarettes">Cheaper than Cigarettes</string>
+    <string name="cheaper_than_beer">Cheaper than Beer</string>
+    <string name="cheaper_than_coffee">Cheaper than Coffee</string>
+    <string name="cheaper_than_gas">Cheaper than Gas</string>
+    <string name="no_interruptions">No Interruptions</string>
+    <string name="keep_the_project_alive">Keep the Project Alive</string>
+    <string name="processing_payment">Processing payment, refresh in a few seconds</string>
 </resources>
