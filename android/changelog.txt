@@ -1,4 +1,5 @@
 FrostWire 1.7.9 - JUL/30/2016
+ - Faster app shutdown.
  - Use audio as ringtone fixed for Android 6 devices.
  - Optimizations, cleanup, crash fixes.
  - Fixes bug where app wouldn't shutdown.
