@@ -377,10 +377,6 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 // Sound effects
                 NavUtils.openEffectsPanel(this);
                 return true;
-            case R.id.menu_main_settings:
-                // Settings
-                NavUtils.openSettings(this);
-                return true;
             case R.id.menu_audio_player_stop:
                 try {
                     MusicUtils.mService.stop();
