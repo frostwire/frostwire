@@ -75,7 +75,7 @@ class RemoveAdsNetwork implements AdNetwork {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        LOG.info("enabled() -> " + enabled);
+        //LOG.info("enabled() -> " + enabled);
         return enabled;
     }
 

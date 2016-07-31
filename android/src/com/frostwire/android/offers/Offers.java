@@ -31,6 +31,7 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -60,7 +61,7 @@ public final class Offers {
         stopAdNetworksIfPurchasedRemoveAds(activity);
     }
 
-    private static Map<String, AdNetwork> getAllAdNetworks() {
+    public static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {
             AD_NETWORKS = new HashMap<>();
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
@@ -128,6 +129,18 @@ public final class Offers {
         }
     }
 
+    static void tryBackToBackInterstitial(WeakReference<Activity> activityRef) {
+        if (REMOVE_ADS == null || !REMOVE_ADS.enabled() || !REMOVE_ADS.started()) {
+            return;
+        }
+        final int b2bThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD);
+        final int r = new Random().nextInt(101);
+        LOG.info("threshold: " + b2bThreshold + " - dice roll: " + r + " (" + (r < b2bThreshold) + ")");
+        if (r < b2bThreshold) {
+            REMOVE_ADS.showInterstitial(activityRef, false, false);
+        }
+    }
+
     private static void stopAdNetworksIfPurchasedRemoveAds(Context context) {
         final ConfigurationManager CM = ConfigurationManager.instance();
         final PlayStore playStore = PlayStore.getInstance();
@@ -176,7 +189,6 @@ public final class Offers {
         int i=0;
         for (String k : keys) {
             if (k.equals(key)) {
-                System.out.println("Offers.getKeyOffset(): " + k + " in index " + i);
                 return i;
             }
             i++;

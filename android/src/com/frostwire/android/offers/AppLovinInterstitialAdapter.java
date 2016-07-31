@@ -130,6 +130,10 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
                     ((MainActivity) callerActivity).shutdown();
                 }
             }
+
+            if (!dismissAfter && !shutdownAfter) {
+                Offers.tryBackToBackInterstitial(activityRef);
+            }
         } else {
             if (shutdownAfter) {
                 Intent i = new Intent(app, MainActivity.class);

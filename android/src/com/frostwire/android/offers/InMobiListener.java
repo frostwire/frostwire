@@ -53,6 +53,9 @@ class InMobiListener implements InterstitialListener, InMobiInterstitial.Interst
     public void onAdDismissed(InMobiInterstitial imInterstitial) {
         //LOG.info("InMobiListener.onAdDismissed");
         wrapItUp(imInterstitial);
+        if (!finishAfterDismiss && !shutdownAfterDismiss) {
+            Offers.tryBackToBackInterstitial(activityRef);
+        }
     }
 
     @Override

@@ -376,9 +376,11 @@ public final class SoftwareUpdater {
             }
         }
 
-        ConfigurationManager.instance().setStringArray(Constants.PREF_KEY_GUI_OFFERS_WATERFALL, update.config.waterfall);
-        ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
-        ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
+        ConfigurationManager CM = ConfigurationManager.instance();
+        CM.setStringArray(Constants.PREF_KEY_GUI_OFFERS_WATERFALL, update.config.waterfall);
+        CM.setInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, update.config.removeAdsB2bThreshold);
+        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
+        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
 
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks((Activity) activityContext);
@@ -450,6 +452,7 @@ public final class SoftwareUpdater {
     private static class Config {
         Map<String, Boolean> activeSearchEngines;
         String[] waterfall;
+        int removeAdsB2bThreshold = 50;
         int interstitialOffersTransferStarts = 5;
         int interstitialTransferOffersTimeoutInMinutes = 15;
 

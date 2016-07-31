@@ -61,6 +61,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_INMOBI, false);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
+        defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 5);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, 15);
         defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
