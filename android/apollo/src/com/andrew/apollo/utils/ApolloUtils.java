@@ -15,16 +15,12 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -34,15 +30,12 @@ import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.webkit.WebView;
 import android.widget.Toast;
-
 import com.andrew.apollo.Config;
-import com.frostwire.android.R;
 import com.andrew.apollo.cache.ImageCache;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.ui.activities.ShortcutActivity;
-import com.andrew.apollo.widgets.ColorPickerView;
-import com.andrew.apollo.widgets.ColorSchemeDialog;
 import com.devspark.appmsg.AppMsg;
+import com.frostwire.android.R;
 
 /**
  * Mostly general and UI helpers.
@@ -256,27 +249,6 @@ public final class ApolloUtils {
                     context.getString(R.string.could_not_be_pinned_to_home_screen, displayName),
                     AppMsg.STYLE_ALERT).show();
         }
-    }
-
-    /**
-     * Shows the {@link ColorPickerView}
-     * 
-     * @param context The {@link Context} to use.
-     */
-    public static void showColorPicker(final Context context) {
-        final ColorSchemeDialog colorPickerView = new ColorSchemeDialog(context);
-        colorPickerView.setButton(AlertDialog.BUTTON_POSITIVE,
-                context.getString(android.R.string.ok), new OnClickListener() {
-
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        PreferenceUtils.getInstance(context).setDefaultThemeColor(
-                                colorPickerView.getColor());
-                    }
-                });
-        colorPickerView.setButton(AlertDialog.BUTTON_NEGATIVE,
-                context.getString(R.string.cancel), (OnClickListener) null);
-        colorPickerView.show();
     }
 
     /**
