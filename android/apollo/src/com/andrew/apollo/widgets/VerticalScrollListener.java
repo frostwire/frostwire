@@ -11,16 +11,11 @@
 
 package com.andrew.apollo.widgets;
 
-import android.annotation.SuppressLint;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import com.frostwire.logging.Logger;
 
-@SuppressLint("NewApi")
 public class VerticalScrollListener implements OnScrollListener {
-
-    private static final Logger LOGGER = Logger.getLogger(VerticalScrollListener.class);
 
     /* Used to determine the off set to scroll the header */
     private final ScrollableHeader mHeader;
