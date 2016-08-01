@@ -494,13 +494,6 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
         mFirstTab.fetchAlbumPhoto(context, albumName, artistName);
     }
 
-    /**
-     * @return The main {@link ImageView} for the first tab
-     */
-    public ImageView getHeaderPhoto() {
-        return mFirstTab.getPhoto();
-    }
-
     /** When clicked, selects the corresponding tab. */
     private final class TabClickListener implements OnClickListener {
         private final int mTab;

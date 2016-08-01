@@ -46,7 +46,6 @@ import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
-import com.frostwire.logging.Logger;
 import com.viewpagerindicator.TitlePageIndicator;
 
 import java.util.List;
@@ -62,9 +61,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         LoaderManager.LoaderCallbacks<List<I>>,
         AdapterView.OnItemClickListener,
         MusicStateListener {
-
-    @SuppressWarnings("unused")
-    private static Logger LOGGER = Logger.getLogger(ApolloFragment.class);
 
     private final int GROUP_ID;
     /**

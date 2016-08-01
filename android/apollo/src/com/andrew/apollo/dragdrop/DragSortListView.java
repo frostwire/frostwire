@@ -351,20 +351,10 @@ public class DragSortListView extends ListView {
 
     /**
      * Wraps the user-provided ListAdapter. This is used to wrap each item View
-     * given by the user inside another View (currenly a RelativeLayout) which
+     * given by the user inside another View (currently a RelativeLayout) which
      * expands and collapses to simulate the item shuffling.
      */
     private AdapterWrapper mAdapterWrapper;
-
-    /**
-     * Turn on custom debugger.
-     */
-    private final boolean mTrackDragSort = false;
-
-    /**
-     * Debugging class.
-     */
-    private DragSortTracker mDragSortTracker;
 
     /**
      * Needed for adjusting item heights from within layoutChildren
@@ -948,18 +938,6 @@ public class DragSortListView extends ListView {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onDraw(final Canvas canvas) {
-        super.onDraw(canvas);
-
-        if (mTrackDragSort) {
-            mDragSortTracker.appendState();
-        }
-    }
-
-    /**
      * Stop a drag in progress. Pass <code>true</code> if you would like to
      * remove the dragged item from the list.
      * 
@@ -1246,10 +1224,6 @@ public class DragSortListView extends ListView {
         mFloatPos = -1;
 
         removeFloatView();
-
-        if (mTrackDragSort) {
-            mDragSortTracker.stopTracking();
-        }
     }
 
     private void adjustAllItems() {
@@ -1584,10 +1558,6 @@ public class DragSortListView extends ListView {
         final View srcItem = getChildAt(mSrcPos - getFirstVisiblePosition());
         if (srcItem != null) {
             srcItem.setVisibility(View.INVISIBLE);
-        }
-
-        if (mTrackDragSort) {
-            mDragSortTracker.startTracking();
         }
 
         // once float view is created, events are no longer passed
@@ -2005,114 +1975,4 @@ public class DragSortListView extends ListView {
         }
 
     }
-
-    private class DragSortTracker {
-        StringBuilder mBuilder = new StringBuilder();
-
-        File mFile;
-
-        private int mNumInBuffer = 0;
-
-        private int mNumFlushes = 0;
-
-        private boolean mTracking = false;
-
-        public void startTracking() {
-            mBuilder.append("<DSLVStates>\n");
-            mNumFlushes = 0;
-            mTracking = true;
-        }
-
-        public void appendState() {
-            if (!mTracking) {
-                return;
-            }
-
-            mBuilder.append("<DSLVState>\n");
-            final int children = getChildCount();
-            final int first = getFirstVisiblePosition();
-            final ItemHeights itemHeights = new ItemHeights();
-            mBuilder.append("    <Positions>");
-            for (int i = 0; i < children; ++i) {
-                mBuilder.append(first + i).append(",");
-            }
-            mBuilder.append("</Positions>\n");
-
-            mBuilder.append("    <Tops>");
-            for (int i = 0; i < children; ++i) {
-                mBuilder.append(getChildAt(i).getTop()).append(",");
-            }
-            mBuilder.append("</Tops>\n");
-            mBuilder.append("    <Bottoms>");
-            for (int i = 0; i < children; ++i) {
-                mBuilder.append(getChildAt(i).getBottom()).append(",");
-            }
-            mBuilder.append("</Bottoms>\n");
-
-            mBuilder.append("    <FirstExpPos>").append(mFirstExpPos).append("</FirstExpPos>\n");
-            getItemHeights(mFirstExpPos, itemHeights);
-            mBuilder.append("    <FirstExpBlankHeight>")
-                    .append(itemHeights.item - itemHeights.child)
-                    .append("</FirstExpBlankHeight>\n");
-            mBuilder.append("    <SecondExpPos>").append(mSecondExpPos).append("</SecondExpPos>\n");
-            getItemHeights(mSecondExpPos, itemHeights);
-            mBuilder.append("    <SecondExpBlankHeight>")
-                    .append(itemHeights.item - itemHeights.child)
-                    .append("</SecondExpBlankHeight>\n");
-            mBuilder.append("    <SrcPos>").append(mSrcPos).append("</SrcPos>\n");
-            mBuilder.append("    <SrcHeight>").append(mFloatViewHeight + getDividerHeight())
-                    .append("</SrcHeight>\n");
-            mBuilder.append("    <ViewHeight>").append(getHeight()).append("</ViewHeight>\n");
-            mBuilder.append("    <LastY>").append(mLastY).append("</LastY>\n");
-            mBuilder.append("    <FloatY>").append(mFloatViewMid).append("</FloatY>\n");
-            mBuilder.append("    <ShuffleEdges>");
-            for (int i = 0; i < children; ++i) {
-                mBuilder.append(getShuffleEdge(first + i, getChildAt(i).getTop())).append(",");
-            }
-            mBuilder.append("</ShuffleEdges>\n");
-
-            mBuilder.append("</DSLVState>\n");
-            mNumInBuffer++;
-
-            if (mNumInBuffer > 1000) {
-                flush();
-                mNumInBuffer = 0;
-            }
-        }
-
-        public void flush() {
-            if (!mTracking) {
-                return;
-            }
-
-            // save to file on sdcard
-            try {
-                boolean append = true;
-                if (mNumFlushes == 0) {
-                    append = false;
-                }
-                final FileWriter writer = new FileWriter(mFile, append);
-
-                writer.write(mBuilder.toString());
-                mBuilder.delete(0, mBuilder.length());
-
-                writer.flush();
-                writer.close();
-
-                mNumFlushes++;
-            } catch (final IOException e) {
-                // do nothing
-            }
-        }
-
-        public void stopTracking() {
-            if (mTracking) {
-                mBuilder.append("</DSLVStates>\n");
-                flush();
-                mTracking = false;
-            }
-        }
-
-    }
-
 }
