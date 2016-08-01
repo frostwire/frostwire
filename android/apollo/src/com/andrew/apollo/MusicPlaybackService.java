@@ -615,27 +615,26 @@ public class MusicPlaybackService extends Service {
                 | RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
                 | RemoteControlClient.FLAG_KEY_MEDIA_STOP;
 
-        if (ApolloUtils.hasJellyBeanMR2()) {
-            // aldenml: Commented due to the nature of the needed refactor
-            /*
-            flags |= RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE;
+        // aldenml: Commented due to the nature of the needed refactor
+        // enable when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
+        /*
+        flags |= RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE;
 
-            mRemoteControlClient.setOnGetPlaybackPositionListener(
-                    new RemoteControlClient.OnGetPlaybackPositionListener() {
-                @Override
-                public long onGetPlaybackPosition() {
-                    return position();
-                }
-            });
-            mRemoteControlClient.setPlaybackPositionUpdateListener(
-                    new RemoteControlClient.OnPlaybackPositionUpdateListener() {
-                @Override
-                public void onPlaybackPositionUpdate(long newPositionMs) {
-                    seek(newPositionMs);
-                }
-            });
-            */
-        }
+        mRemoteControlClient.setOnGetPlaybackPositionListener(
+                new RemoteControlClient.OnGetPlaybackPositionListener() {
+            @Override
+            public long onGetPlaybackPosition() {
+                return position();
+            }
+        });
+        mRemoteControlClient.setPlaybackPositionUpdateListener(
+                new RemoteControlClient.OnPlaybackPositionUpdateListener() {
+            @Override
+            public void onPlaybackPositionUpdate(long newPositionMs) {
+                seek(newPositionMs);
+            }
+        });
+        */
 
         mRemoteControlClient.setTransportControlFlags(flags);
     }
@@ -1436,9 +1435,9 @@ public class MusicPlaybackService extends Service {
             }
         }
 
-        if (ApolloUtils.hasJellyBeanMR2()
-                && (what.equals(PLAYSTATE_CHANGED) || what.equals(POSITION_CHANGED))) {
-            //mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
+        if (what.equals(PLAYSTATE_CHANGED) || what.equals(POSITION_CHANGED)) {
+            // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
+            // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
             mRemoteControlClient.setPlaybackState(playState);
         } else if (what.equals(PLAYSTATE_CHANGED) || what.equals(PLAYSTATE_STOPPED)) {
             mRemoteControlClient.setPlaybackState(playState);
@@ -1464,10 +1463,9 @@ public class MusicPlaybackService extends Service {
                     .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArt)
                     .apply();
 
-            if (ApolloUtils.hasJellyBeanMR2()) {
-                //mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
-                mRemoteControlClient.setPlaybackState(playState);
-            }
+            // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
+            // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
+            mRemoteControlClient.setPlaybackState(playState);
         }
     }
 

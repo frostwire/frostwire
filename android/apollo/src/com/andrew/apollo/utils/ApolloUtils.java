@@ -54,17 +54,6 @@ public final class ApolloUtils {
     }
 
     /**
-     * Used to determine if the device is running
-     * Jelly Bean MR2 (Android 4.3) or greater
-     *
-     * @return True if the device is running Jelly Bean MR2 or greater,
-     *         false otherwise
-     */
-    public static final boolean hasJellyBeanMR2() {
-        return Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
-    }
-
-    /**
      * Used to determine if the device is currently in landscape mode
      * 
      * @param context The {@link Context} to use.
