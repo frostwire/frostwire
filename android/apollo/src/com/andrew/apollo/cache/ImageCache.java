@@ -120,7 +120,7 @@ public final class ImageCache {
      * @param cacheParams The cache parameters to initialize the cache
      */
     private void init(final Context context) {
-        ApolloUtils.execute(false, new AsyncTask<Void, Void, Void>() {
+        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected Void doInBackground(final Void... unused) {
@@ -469,7 +469,7 @@ public final class ImageCache {
      * cache first
      */
     public void flush() {
-        ApolloUtils.execute(false, new AsyncTask<Void, Void, Void>() {
+        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected Void doInBackground(final Void... unused) {
@@ -491,8 +491,7 @@ public final class ImageCache {
      * Clears the disk and memory caches
      */
     public void clearCaches() {
-        ApolloUtils.execute(false, new AsyncTask<Void, Void, Void>() {
-
+        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(final Void... unused) {
                 // Clear the disk cache
@@ -517,7 +516,7 @@ public final class ImageCache {
      * thread.
      */
     public void close() {
-        ApolloUtils.execute(false, new AsyncTask<Void, Void, Void>() {
+        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected Void doInBackground(final Void... unused) {

@@ -131,7 +131,7 @@ public class ThemeUtils {
      * @param packageName The package name of the theme to be set.
      */
     public void setThemePackageName(final String packageName) {
-        ApolloUtils.execute(false, new AsyncTask<Void, Void, Void>() {
+        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(final Void... unused) {
                 final SharedPreferences.Editor editor = mPreferences.edit();
@@ -194,17 +194,7 @@ public class ThemeUtils {
     }
 
     /**
-     * Used to tell if the action bar's backgrond color is dark or light and
-     * depending on which the proper overflow icon is set from a style.
-     * 
-     * @return True if the action bar color is dark, false if light.
-     */
-    public boolean isActionBarDark() {
-        return ApolloUtils.isColorDark(getColor("action_bar"));
-    }
-
-    /**
-     * Sets the corret overflow icon in the action bar depending on whether or
+     * Sets the correct overflow icon in the action bar depending on whether or
      * not the current action bar color is dark or light.
      * 
      * @param app The {@link Activity} used to set the theme.
