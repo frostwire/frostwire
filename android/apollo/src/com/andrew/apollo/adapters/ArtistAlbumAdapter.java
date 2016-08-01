@@ -23,8 +23,8 @@ import com.andrew.apollo.model.Album;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
+import com.frostwire.util.Ref;
 
 
 /**

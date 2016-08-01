@@ -21,7 +21,7 @@ import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.QueueFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.Ref;
+import com.frostwire.util.Ref;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the songs on a user's

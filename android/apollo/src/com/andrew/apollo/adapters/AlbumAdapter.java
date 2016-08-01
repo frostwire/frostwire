@@ -19,9 +19,9 @@ import com.andrew.apollo.model.Album;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
 import com.frostwire.logging.Logger;
+import com.frostwire.util.Ref;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the albums on a user's

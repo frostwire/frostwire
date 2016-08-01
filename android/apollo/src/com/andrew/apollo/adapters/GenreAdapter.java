@@ -20,8 +20,8 @@ import com.andrew.apollo.model.Genre;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.GenreFragment;
-import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
+import com.frostwire.util.Ref;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the genres on a user's

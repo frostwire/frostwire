@@ -21,7 +21,6 @@ import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
-import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
 
 /**
