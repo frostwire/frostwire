@@ -185,15 +185,17 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         // Theme the action bar
         final ActionBar actionBar = getActionBar();
-        mResources.themeActionBar(actionBar, getString(R.string.frostwire_player), getWindow());
+        mResources.themeActionBar(actionBar, getString(R.string.frostwire_player));
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setIcon(R.color.transparent);
 
         TextView actionBarTitleTextView = (TextView) findViewById(R.id.action_bar_title);
-        actionBarTitleTextView.setText(R.string.frostwire_player);
-        if (actionBarTitleTextView != null) {
-            actionBarTitleTextView.setOnClickListener(new ActionBarTextViewClickListener(this));
-        }
+        actionBarTitleTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         // Set the layout
         setContentView(R.layout.activity_player_base);
@@ -1095,17 +1097,5 @@ public class AudioPlayerActivity extends FragmentActivity implements
     private void toggleFavorite() {
         MusicUtils.toggleFavorite();
         invalidateOptionsMenu();
-    }
-
-    private final static class ActionBarTextViewClickListener extends ClickAdapter<AudioPlayerActivity> {
-
-        public ActionBarTextViewClickListener(AudioPlayerActivity owner) {
-            super(owner);
-        }
-
-            @Override
-        public void onClick(AudioPlayerActivity owner, View v) {
-            owner.finish();
-        }
     }
 }

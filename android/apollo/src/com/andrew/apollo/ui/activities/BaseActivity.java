@@ -151,7 +151,7 @@ public abstract class BaseActivity extends FragmentActivity
     private void prepareActionBar() {
         final ActionBar actionBar = getActionBar();
         if (actionBar != null) {
-            mResources.themeActionBar(actionBar, getString(R.string.app_name), getWindow());
+            mResources.themeActionBar(actionBar, getString(R.string.app_name));
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
@@ -160,9 +160,12 @@ public abstract class BaseActivity extends FragmentActivity
         }
 
         TextView actionBarTitleTextView = (TextView) findViewById(R.id.action_bar_title);
-        if (actionBarTitleTextView != null) {
-            actionBarTitleTextView.setOnClickListener(new ActionBarTextViewClickListener(this));
-        }
+        actionBarTitleTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getBackHome();
+            }
+        });
     }
 
     /**
@@ -230,7 +233,7 @@ public abstract class BaseActivity extends FragmentActivity
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                getBackHome(this);
+                getBackHome();
                 return true;
             case R.id.menu_new_playlist:
                 onOptionsItemNewPlaylistSelected();
@@ -501,11 +504,11 @@ public abstract class BaseActivity extends FragmentActivity
         }
     }
 
-    private static void getBackHome(Activity activity) {
-        if (activity.isTaskRoot()) {
-            UIUtils.goToFrostWireMainActivity(activity);
+    private void getBackHome() {
+        if (isTaskRoot()) {
+            UIUtils.goToFrostWireMainActivity(this);
         } else {
-            activity.finish();
+            finish();
         }
     }
 
@@ -525,18 +528,6 @@ public abstract class BaseActivity extends FragmentActivity
             super.onLongClick(v);
             setBottomActionBarVisible(false);
             return true;
-        }
-    }
-
-    private final static class ActionBarTextViewClickListener extends ClickAdapter<BaseActivity> {
-
-        ActionBarTextViewClickListener(BaseActivity owner) {
-            super(owner);
-        }
-
-        @Override
-        public void onClick(BaseActivity owner, View v) {
-            getBackHome(owner);
         }
     }
 }

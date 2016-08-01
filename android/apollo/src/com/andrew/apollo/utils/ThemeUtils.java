@@ -109,7 +109,7 @@ public class ThemeUtils {
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         // Get the theme package name
         mThemePackage = getThemePackageName();
-        // Initialze the package manager
+        // Initialize the package manager
         mPackageManager = context.getPackageManager();
         try {
             // Find the theme resources
@@ -299,7 +299,7 @@ public class ThemeUtils {
      * @param title The title for the action bar
      * @param subtitle The subtitle for the action bar.
      */
-    public void themeActionBar(final ActionBar actionBar, final String title, Window window) {
+    public void themeActionBar(final ActionBar actionBar, final String title) {
         // Set the custom layout
         actionBar.setCustomView(mActionBarLayout);
         actionBar.setDisplayShowCustomEnabled(true);
