@@ -21,7 +21,6 @@ import com.frostwire.gui.theme.SkinCheckBoxMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.jlibtorrent.Session;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
-import com.limegroup.gnutella.gui.util.Constants;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.StatusBarSettings;
@@ -177,18 +176,18 @@ public final class StatusLine {
 
     private void createTwitterButton() {
         _twitterButton = new IconButton("TWITTER");
-        initSocialButton(_twitterButton, I18n.tr("Follow us @frostwire"), Constants.TWITTER_FROSTWIRE_URL);
+        initSocialButton(_twitterButton, I18n.tr("Follow us @frostwire"), GUIConstants.TWITTER_FROSTWIRE_URL);
     }
 
     private void createFacebookButton() {
         _facebookButton = new IconButton("FACEBOOK");
-        initSocialButton(_facebookButton, I18n.tr("Like FrostWire on Facebook and stay in touch with the community. Get Help and Help Others."), Constants.FACEBOOK_FROSTWIRE_URL);
+        initSocialButton(_facebookButton, I18n.tr("Like FrostWire on Facebook and stay in touch with the community. Get Help and Help Others."), GUIConstants.FACEBOOK_FROSTWIRE_URL);
     }
 
     private void createGooglePlusButton() {
         _googlePlusButton = new IconButton("GOOGLEPLUS");
         _googlePlusButton.setPreferredSize(new Dimension(19, 16));
-        initSocialButton(_googlePlusButton, I18n.tr("Circle FrostWire on G+"), Constants.GPLUS_FROSTWIRE_URL);
+        initSocialButton(_googlePlusButton, I18n.tr("Circle FrostWire on G+"), GUIConstants.GPLUS_FROSTWIRE_URL);
     }
 
     private void initSocialButton(IconButton socialButton, String toolTipText, final String url) {

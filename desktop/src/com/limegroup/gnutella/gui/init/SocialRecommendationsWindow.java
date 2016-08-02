@@ -17,29 +17,15 @@
 
 package com.limegroup.gnutella.gui.init;
 
-import com.frostwire.gui.bittorrent.TorrentSaveFolderComponent;
-import com.frostwire.gui.bittorrent.TorrentSeedingSettingComponent;
-import com.frostwire.gui.theme.ThemeMediator;
+import com.limegroup.gnutella.gui.GUIConstants;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
-import com.limegroup.gnutella.gui.ImageManipulator;
-import com.limegroup.gnutella.gui.util.Constants;
-import com.limegroup.gnutella.settings.LibrarySettings;
-import com.limegroup.gnutella.settings.SharingSettings;
 import net.miginfocom.swing.MigLayout;
-import org.limewire.util.StringUtils;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.ImageConsumer;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class displays a setup window that recommends users to
@@ -61,9 +47,9 @@ class SocialRecommendationsWindow extends SetupWindow {
         mainPanel.add(new IconButton("SOCIAL_MEDIA_CHECK", 150, 150), "growx, center, span, wrap");
         mainPanel.add(new JLabel(I18n.tr("<html><b>Keep in Touch!</b></html>")),"center, span, wrap, height 40px");
         int socialButtonW = 100;
-        mainPanel.add(createSocialButton("SOCIAL_WIZARD_FACEBOOK", Constants.FACEBOOK_FROSTWIRE_URL, socialButtonW), "alignx center");
-        mainPanel.add(createSocialButton("SOCIAL_WIZARD_REDDIT"  , Constants.REDDIT_FROSTWIRE_URL  , socialButtonW), "alignx center");
-        mainPanel.add(createSocialButton("SOCIAL_WIZARD_TWITTER" , Constants.TWITTER_FROSTWIRE_URL , socialButtonW), "alignx center");
+        mainPanel.add(createSocialButton("SOCIAL_WIZARD_FACEBOOK", GUIConstants.FACEBOOK_FROSTWIRE_URL, socialButtonW), "alignx center");
+        mainPanel.add(createSocialButton("SOCIAL_WIZARD_REDDIT"  , GUIConstants.REDDIT_FROSTWIRE_URL  , socialButtonW), "alignx center");
+        mainPanel.add(createSocialButton("SOCIAL_WIZARD_TWITTER" , GUIConstants.TWITTER_FROSTWIRE_URL , socialButtonW), "alignx center");
 
         setSetupComponent(mainPanel);
     }

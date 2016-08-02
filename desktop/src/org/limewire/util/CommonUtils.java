@@ -69,8 +69,6 @@ public class CommonUtils {
 
     public static final String FROSTWIRE_420_PREFS_DIR_NAME = ".frostwire4.20";
 
-    public static final String FROSTWIRE_418_PREFS_DIR_NAME = ".frostwire4.18";
-
     public static final String FROSTWIRE_500_PREFS_DIR_NAME = ".frostwire5";
 
     public static final String META_SETTINGS_KEY_USER_SETTINGS_WINDOWS = "user.settings.dir.windows";
