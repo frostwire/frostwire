@@ -17,7 +17,7 @@
 
 package com.frostwire.search.torrent;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.*;

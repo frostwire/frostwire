@@ -44,7 +44,7 @@ import org.limewire.util.StringUtils;
 import org.limewire.util.Version;
 import org.limewire.util.VersionFormatException;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.HttpClientFactory;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;

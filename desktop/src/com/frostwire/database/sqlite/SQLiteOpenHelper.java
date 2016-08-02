@@ -24,7 +24,7 @@ import java.sql.DriverManager;
 
 import com.frostwire.content.Context;
 import com.frostwire.database.sqlite.SQLiteDatabase.CursorFactory;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * @author gubatron

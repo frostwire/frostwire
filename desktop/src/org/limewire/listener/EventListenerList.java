@@ -13,7 +13,7 @@ import org.limewire.concurrent.ExecutorsHelper;
 import org.limewire.concurrent.ThreadExecutor;
 import org.limewire.util.ExceptionUtils;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * Maintains event listeners and broadcasts events to all listeners.

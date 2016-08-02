@@ -22,14 +22,13 @@ import android.app.Application;
 import android.content.*;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.util.BloomFilter;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.io.*;
 import java.util.BitSet;

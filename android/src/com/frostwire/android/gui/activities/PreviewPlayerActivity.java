@@ -42,7 +42,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.util.ImageLoader;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.youtube.YouTubePackageSearchResult;
 import com.frostwire.util.Ref;

@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.Map;
 
 import com.frostwire.gui.mplayer.MPlayer;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * 

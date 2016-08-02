@@ -18,7 +18,7 @@
 
 package com.frostwire.search.frostclick;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.PagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
 

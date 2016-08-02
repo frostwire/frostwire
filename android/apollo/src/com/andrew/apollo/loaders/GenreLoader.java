@@ -18,7 +18,7 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.GenresColumns;
 import com.andrew.apollo.model.Genre;
 import com.andrew.apollo.utils.Lists;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;

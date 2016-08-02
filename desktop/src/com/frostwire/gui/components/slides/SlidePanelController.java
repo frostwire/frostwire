@@ -24,7 +24,7 @@ import org.limewire.util.StringUtils;
 
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.gui.player.StreamMediaSource;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 
 /**

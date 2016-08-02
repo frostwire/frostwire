@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.frostwire.content.ContentValues;
 import com.frostwire.database.Cursor;
 import com.frostwire.database.SQLException;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import org.apache.commons.lang3.StringUtils;
 
 /**

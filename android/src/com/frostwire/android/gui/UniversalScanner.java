@@ -25,7 +25,7 @@ import android.net.Uri;
 import android.os.SystemClock;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.platform.FileFilter;
 import com.frostwire.platform.Platforms;
 import org.apache.commons.io.FilenameUtils;

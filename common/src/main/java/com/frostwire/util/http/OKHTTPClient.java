@@ -18,7 +18,7 @@
 
 package com.frostwire.util.http;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import com.squareup.okhttp.*;

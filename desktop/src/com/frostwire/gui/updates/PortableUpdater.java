@@ -35,7 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.OSUtils;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.ZipUtils;
 import com.frostwire.util.ZipUtils.ZipListener;
 import com.limegroup.gnutella.gui.GUIMediator;

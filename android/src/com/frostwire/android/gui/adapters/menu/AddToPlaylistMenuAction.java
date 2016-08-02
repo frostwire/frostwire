@@ -26,7 +26,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;

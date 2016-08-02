@@ -54,7 +54,7 @@ import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Session;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.transfers.*;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;

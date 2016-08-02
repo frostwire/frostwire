@@ -31,7 +31,7 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * Created by gubatron on 12/18/14.

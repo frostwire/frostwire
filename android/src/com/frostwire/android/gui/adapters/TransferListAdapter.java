@@ -46,7 +46,7 @@ import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.MagnetUriBuilder;
 import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.WebSearchPerformer;
 import com.frostwire.transfers.*;
 import org.apache.commons.io.FilenameUtils;

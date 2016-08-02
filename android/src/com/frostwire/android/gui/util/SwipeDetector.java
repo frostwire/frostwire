@@ -20,7 +20,7 @@ package com.frostwire.android.gui.util;
 
 import android.view.MotionEvent;
 import android.view.View;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * Created on 4/26/16.

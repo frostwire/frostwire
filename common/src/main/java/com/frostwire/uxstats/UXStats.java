@@ -17,7 +17,7 @@
 
 package com.frostwire.uxstats;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.http.HttpClient;

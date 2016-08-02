@@ -24,7 +24,7 @@ import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.lang.ref.WeakReference;
 

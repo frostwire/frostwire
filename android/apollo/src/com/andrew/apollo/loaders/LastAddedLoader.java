@@ -17,12 +17,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
 
-import com.andrew.apollo.model.Song;
-import com.andrew.apollo.utils.Lists;
-import com.frostwire.logging.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.frostwire.util.Logger;
 
 /**
  * Used to query {MediaStore.Audio.Media.EXTERNAL_CONTENT_URI} and return

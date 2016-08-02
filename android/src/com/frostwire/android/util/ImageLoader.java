@@ -32,7 +32,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.squareup.picasso.*;
 import com.squareup.picasso.Picasso.Builder;
 

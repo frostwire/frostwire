@@ -25,7 +25,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.os.EnvironmentCompat;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.io.File;
 import java.util.LinkedList;

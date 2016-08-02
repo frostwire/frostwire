@@ -2,7 +2,7 @@ package com.limegroup.gnutella.gui.shell;
 
 import org.limewire.util.SystemUtils;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.filetypes.Action;
 import com.frostwire.util.filetypes.Association;
 import com.frostwire.util.filetypes.AssociationAlreadyRegisteredException;

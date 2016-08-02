@@ -41,12 +41,11 @@ import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.swig.*;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * Created on 4/22/16.

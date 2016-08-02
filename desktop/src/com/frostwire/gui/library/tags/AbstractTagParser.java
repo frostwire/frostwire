@@ -25,7 +25,7 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 
 import com.frostwire.jpeg.JPEGImageIO;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import org.apache.commons.io.FilenameUtils;
 
 /**

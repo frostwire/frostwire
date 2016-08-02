@@ -30,7 +30,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import com.frostwire.android.R;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.util.*;
 

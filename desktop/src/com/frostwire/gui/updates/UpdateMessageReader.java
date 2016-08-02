@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import org.limewire.util.OSUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;

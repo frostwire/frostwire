@@ -19,7 +19,7 @@ import android.provider.MediaStore.Audio.AlbumColumns;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;

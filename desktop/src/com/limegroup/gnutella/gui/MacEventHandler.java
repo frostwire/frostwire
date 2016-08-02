@@ -16,7 +16,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.apple.eawt.*;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.io.File;
 import java.util.List;

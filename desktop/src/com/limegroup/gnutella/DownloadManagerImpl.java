@@ -18,7 +18,7 @@ package com.limegroup.gnutella;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineAdapter;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.UpdateSettings;
 
 import java.io.File;

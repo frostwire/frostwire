@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 import org.limewire.concurrent.ThreadExecutor;
 import org.limewire.util.VersionUtils;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.bugs.DeadlockBugManager;
 import com.limegroup.gnutella.gui.bugs.DeadlockException;
 

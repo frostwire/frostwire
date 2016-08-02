@@ -23,7 +23,7 @@ import android.content.Intent;
 import com.android.vending.billing.*;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;

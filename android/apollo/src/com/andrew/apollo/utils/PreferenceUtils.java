@@ -24,7 +24,7 @@ import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * A collection of helpers designed to get and set various preferences across

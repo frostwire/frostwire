@@ -23,7 +23,7 @@ import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.BlockFinishedAlert;
 import com.frostwire.jlibtorrent.alerts.FileErrorAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.gui.DigestUtils;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpRangeException;

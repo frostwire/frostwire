@@ -20,7 +20,7 @@ package com.frostwire.gui.library.tags;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * 

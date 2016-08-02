@@ -18,7 +18,6 @@
 
 package com.frostwire.util;
 
-import com.frostwire.logging.Logger;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;

@@ -46,7 +46,7 @@ import javax.swing.JWindow;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 public class AnimatedWindow extends JWindow {
 

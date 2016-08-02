@@ -17,7 +17,7 @@
 
 package com.frostwire.util.http;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;

@@ -27,7 +27,7 @@ import org.jaudiotagger.audio.flac.FlacFileReader;
 import org.jaudiotagger.audio.flac.metadatablock.MetadataBlockDataPicture;
 import org.jaudiotagger.tag.flac.FlacTag;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * 

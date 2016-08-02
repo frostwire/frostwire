@@ -21,7 +21,7 @@ package com.frostwire.bittorrent;
 import com.frostwire.jlibtorrent.Address;
 import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.transfers.BittorrentDownload;
 
 import java.io.File;

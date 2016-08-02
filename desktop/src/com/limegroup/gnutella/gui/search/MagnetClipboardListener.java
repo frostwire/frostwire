@@ -16,7 +16,7 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.tabs.TransfersTab;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.MagnetOptions;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;

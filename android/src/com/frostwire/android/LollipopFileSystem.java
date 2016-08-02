@@ -29,7 +29,7 @@ import android.support.v4.provider.DocumentFile;
 import android.util.LruCache;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.FileFilter;
 import com.frostwire.platform.FileSystem;

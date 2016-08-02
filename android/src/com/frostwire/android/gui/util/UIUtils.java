@@ -42,7 +42,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;

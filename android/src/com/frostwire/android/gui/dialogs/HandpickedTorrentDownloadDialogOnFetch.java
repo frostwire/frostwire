@@ -24,7 +24,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import com.frostwire.android.gui.transfers.TorrentFetcherListener;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;

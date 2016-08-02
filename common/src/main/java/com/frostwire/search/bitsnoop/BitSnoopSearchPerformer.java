@@ -18,7 +18,7 @@
 
 package com.frostwire.search.bitsnoop;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.*;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 import com.frostwire.util.HtmlManipulator;

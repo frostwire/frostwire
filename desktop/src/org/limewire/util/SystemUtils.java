@@ -19,7 +19,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 
 /**

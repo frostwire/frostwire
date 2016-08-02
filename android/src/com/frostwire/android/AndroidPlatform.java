@@ -21,14 +21,12 @@ package com.frostwire.android;
 import android.app.Application;
 import android.os.Build;
 import android.support.v4.provider.DocumentFile;
-import com.frostwire.android.core.ConfigurationManager;
-import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.jlibtorrent.swig.posix_stat;
 import com.frostwire.jlibtorrent.swig.posix_wrapper;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.platform.*;
 
 import java.io.File;

@@ -18,7 +18,7 @@
 
 package com.frostwire.android.util;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.squareup.okhttp.internal.DiskLruCache;
 import com.squareup.okhttp.internal.DiskLruCache.Editor;
 import com.squareup.okhttp.internal.DiskLruCache.Snapshot;

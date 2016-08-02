@@ -18,7 +18,7 @@
 
 package com.frostwire.search;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.torrent.TorrentSearchResult;
 
 import java.util.Collections;

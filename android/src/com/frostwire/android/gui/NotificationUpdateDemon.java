@@ -19,7 +19,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 public class NotificationUpdateDemon implements TimerObserver {
 

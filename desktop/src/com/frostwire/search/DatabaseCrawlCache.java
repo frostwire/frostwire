@@ -19,7 +19,7 @@ package com.frostwire.search;
 
 import com.frostwire.content.ContentValues;
 import com.frostwire.database.Cursor;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.CrawlCacheDB.Columns;
 import com.limegroup.gnutella.settings.SearchSettings;
 
