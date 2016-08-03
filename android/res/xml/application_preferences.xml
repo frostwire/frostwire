@@ -190,7 +190,7 @@
                 android:summary="@string/anonymous_usage_statistics_summary"
                 android:title="@string/anonymous_usage_statistics"/>
         <CheckBoxPreference
-                android:key="frostwire.prefs.gui.support_fw"
+                android:key="frostwire.prefs.gui.support_fw2"
                 android:summary="@string/support_frostwire_summary"
                 android:title="@string/support_frostwire"/>
     </PreferenceScreen>
