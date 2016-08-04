@@ -49,7 +49,21 @@ public class SwipeLayout extends LinearLayout {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (detector == null) {
-            detector = new GestureDetector(getContext(), new GestureListener());
+            detector = new GestureDetector(getContext(), new SwipeGestureAdapter() {
+                @Override
+                public void onSwipeLeft() {
+                    if (listener != null) {
+                        listener.onSwipeLeft();
+                    }
+                }
+
+                @Override
+                public void onSwipeRight() {
+                    if (listener != null) {
+                        listener.onSwipeRight();
+                    }
+                }
+            });
         }
 
         return detector.onTouchEvent(ev) || super.dispatchTouchEvent(ev);
@@ -63,11 +77,11 @@ public class SwipeLayout extends LinearLayout {
         this.listener = listener;
     }
 
-    private final class GestureListener extends SimpleOnGestureListener {
+    public static class SwipeGestureAdapter extends SimpleOnGestureListener {
 
         private MotionEvent lastOnDownEvent = null;
 
-        public GestureListener() {
+        public SwipeGestureAdapter() {
         }
 
         @Override
@@ -85,10 +99,6 @@ public class SwipeLayout extends LinearLayout {
                 return false;
             }
 
-            if (listener == null) {
-                return false;
-            }
-
             float dx = e2.getX() - e1.getX();
             float dy = e2.getY() - e1.getY();
 
@@ -96,15 +106,21 @@ public class SwipeLayout extends LinearLayout {
                 if (Math.abs(dx) > DELTA_THRESHOLD && Math.abs(velocityX) > VELOCITY_THRESHOLD) {
                     if (dx > 0) {
                         if (e1.getX() >= LEFT_MARGIN) {
-                            listener.onSwipeRight();
+                            onSwipeRight();
                         }
                     } else {
-                        listener.onSwipeLeft();
+                        onSwipeLeft();
                     }
                 }
             }
 
             return false;
+        }
+
+        public void onSwipeLeft() {
+        }
+
+        public void onSwipeRight() {
         }
     }
 
