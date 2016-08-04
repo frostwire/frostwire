@@ -187,7 +187,7 @@ public final class SearchFragment extends AbstractFragment implements
         });
 
         list = findView(view, R.id.fragment_search_list);
-        SwipeLayout swipe = findView(view, R.id.fragment_transfers_swipe);
+        SwipeLayout swipe = findView(view, R.id.fragment_search_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override
             public void onSwipeLeft() {
