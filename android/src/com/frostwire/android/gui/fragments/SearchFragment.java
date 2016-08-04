@@ -46,8 +46,6 @@ import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.util.SwipeDetector;
-import com.frostwire.android.gui.util.SwipeListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
@@ -80,8 +78,7 @@ import java.util.regex.Pattern;
 public final class SearchFragment extends AbstractFragment implements
         MainFragment,
         OnDialogClickListener,
-        SearchProgressView.CurrentQueryReporter,
-        SwipeListener {
+        SearchProgressView.CurrentQueryReporter {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
     private SearchResultListAdapter adapter;
     private List<Slide> slides;
@@ -91,7 +88,6 @@ public final class SearchFragment extends AbstractFragment implements
     private PromotionsView promotions;
     private SearchProgressView searchProgress;
     private ListView list;
-    private final SwipeDetector viewSwipeDetector;
     private String currentQuery;
     private final FileTypeCounter fileTypeCounter;
     private final SparseArray<Byte> toTheRightOf = new SparseArray<>(6);
@@ -101,13 +97,13 @@ public final class SearchFragment extends AbstractFragment implements
         super(R.layout.fragment_search);
         fileTypeCounter = new FileTypeCounter();
         currentQuery = null;
-        viewSwipeDetector = new SwipeDetector(this, 50);
+
         toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS);
-        toTheRightOf.put(Constants.FILE_TYPE_VIDEOS,Constants.FILE_TYPE_PICTURES);
-        toTheRightOf.put(Constants.FILE_TYPE_PICTURES,Constants.FILE_TYPE_APPLICATIONS);
-        toTheRightOf.put(Constants.FILE_TYPE_APPLICATIONS,Constants.FILE_TYPE_DOCUMENTS);
-        toTheRightOf.put(Constants.FILE_TYPE_DOCUMENTS,Constants.FILE_TYPE_TORRENTS);
-        toTheRightOf.put(Constants.FILE_TYPE_TORRENTS,Constants.FILE_TYPE_AUDIO);
+        toTheRightOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_PICTURES);
+        toTheRightOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_APPLICATIONS);
+        toTheRightOf.put(Constants.FILE_TYPE_APPLICATIONS, Constants.FILE_TYPE_DOCUMENTS);
+        toTheRightOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_TORRENTS);
+        toTheRightOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_AUDIO);
         toTheLeftOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_TORRENTS);
         toTheLeftOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_AUDIO);
         toTheLeftOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_VIDEOS);
@@ -189,10 +185,20 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             }
         });
-        searchProgress.setOnTouchListener(viewSwipeDetector);
 
         list = findView(view, R.id.fragment_search_list);
-        list.setOnTouchListener(viewSwipeDetector);
+        SwipeLayout swipe = findView(view, R.id.fragment_transfers_swipe);
+        swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
+            @Override
+            public void onSwipeLeft() {
+                switchToThe(true);
+            }
+
+            @Override
+            public void onSwipeRight() {
+                switchToThe(false);
+            }
+        });
 
         showSearchView(view);
         showRatingsReminder(view);
@@ -346,7 +352,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void startTransfer(final SearchResult sr, final String toastMessage) {
         if (!(sr instanceof AbstractTorrentSearchResult || sr instanceof TorrentPromotionSearchResult) &&
-            ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
+                ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
             if (sr instanceof FileSearchResult && !(sr instanceof YouTubeSearchResult)) {
                 try {
                     NewTransferDialog dlg = NewTransferDialog.newInstance((FileSearchResult) sr, false);
@@ -481,18 +487,6 @@ public final class SearchFragment extends AbstractFragment implements
         return currentQuery;
     }
 
-    @Override
-    public void onSwipeLeft() {
-        // move to the right
-        switchToThe(true);
-    }
-
-    @Override
-    public void onSwipeRight() {
-        // move to the left
-        switchToThe(false);
-    }
-
     private void switchToThe(boolean right) {
         if (adapter == null) {
             return;
@@ -507,6 +501,7 @@ public final class SearchFragment extends AbstractFragment implements
     private static class SearchInputOnSearchListener implements SearchInputView.OnSearchListener {
         private final LinearLayout parentView;
         private final SearchFragment fragment;
+
         SearchInputOnSearchListener(LinearLayout parentView, SearchFragment fragment) {
             this.parentView = parentView;
             this.fragment = fragment;
@@ -629,6 +624,7 @@ public final class SearchFragment extends AbstractFragment implements
             ratingReminderRef = Ref.weak(ratingReminder);
             this.CM = CM;
         }
+
         @Override
         public void onClick(SearchFragment owner, View v) {
             Intent intent = new Intent(Intent.ACTION_SEND);

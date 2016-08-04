@@ -20,9 +20,9 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:frostwire="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <ProgressBar
             android:id="@+id/fragment_search_deepsearch_progress"
@@ -30,12 +30,12 @@
             android:layout_width="match_parent"
             android:layout_height="5dip"
             android:indeterminate="true"
-            android:progress="25" />
+            android:progress="25"/>
 
     <com.frostwire.android.gui.views.SearchInputView
-        android:id="@+id/fragment_search_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+            android:id="@+id/fragment_search_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     <com.frostwire.android.gui.views.RichNotification
             android:id="@+id/fragment_search_rating_reminder_notification"
@@ -48,39 +48,45 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            />
+    />
 
     <LinearLayout
-        android:id="@+id/fragment_search_adview_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/black"
-        android:orientation="horizontal" >
+            android:id="@+id/fragment_search_adview_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/black"
+            android:orientation="horizontal">
     </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/fragment_search_framelayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clickable="true">
+            android:id="@+id/fragment_search_framelayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true">
 
         <com.frostwire.android.gui.views.PromotionsView
-            android:id="@+id/fragment_search_promos"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+                android:id="@+id/fragment_search_promos"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
         <com.frostwire.android.gui.views.SearchProgressView
-            android:id="@+id/fragment_search_search_progress"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clickable="true"/>
+                android:id="@+id/fragment_search_search_progress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"/>
 
-        <ListView
-            android:id="@+id/fragment_search_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/basic_white"
-            android:fastScrollEnabled="true" />
+        <com.frostwire.android.gui.views.SwipeLayout
+                android:id="@+id/fragment_search_swipe"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+            <ListView
+                    android:id="@+id/fragment_search_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/basic_white"
+                    android:fastScrollEnabled="true"/>
+        </com.frostwire.android.gui.views.SwipeLayout>
     </FrameLayout>
 
 </LinearLayout>
