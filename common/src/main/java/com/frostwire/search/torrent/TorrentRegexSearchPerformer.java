@@ -84,6 +84,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
                 Matcher matcher = htmlDetailPagePattern.matcher(html);
     
                 try {
+                    // BOOKMARK: this is a good spot to put a break point in-order to test your search performer's regex
                     if (matcher.find()) {
                         T searchResult = fromHtmlMatcher(sr, SearchMatcher.from(matcher));
                         if (searchResult != null) {
