@@ -52,7 +52,7 @@ public class SwipeLayout extends LinearLayout {
             detector = new GestureDetector(getContext(), new GestureListener());
         }
 
-        return detector.onTouchEvent(ev) ? true : super.dispatchTouchEvent(ev);
+        return detector.onTouchEvent(ev) || super.dispatchTouchEvent(ev);
     }
 
     public OnSwipeListener getOnSwipeListener() {
