@@ -1,9 +1,10 @@
 frostwire (6.3.5) stable; urgency=high
+  * Fixes download issues with BitSnoop search results.
   * KAT search removed
   * Updated Java Runtime Environment (1.8-b102)
   * Codebase cleanup
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 02 Aug 2016 15:09:05 -0500
+ -- FrostWire Team <contact@frostwire.com>  Wed, 03 Aug 2016 18:19:20 -0500
 
 
 frostwire (6.3.4) stable; urgency=high

@@ -1,3 +1,6 @@
+FrostWire 1.8.0 - AUG/03/2016
+ - Fixes download issues with BitSnoop search results.
+
 FrostWire 1.7.9 - JUL/30/2016
  - Faster app shutdown.
  - Use audio as ringtone fixed for Android 6 devices.
