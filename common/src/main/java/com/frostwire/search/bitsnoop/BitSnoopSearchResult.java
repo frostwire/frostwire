@@ -46,7 +46,13 @@ public class BitSnoopSearchResult extends AbstractTorrentSearchResult {
         this.detailsUrl = detailsUrl;
         this.infoHash = matcher.group("infohash");
         this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl));
-        this.torrentUrl = matcher.group("torrenturl").contains("torcache.net") ? matcher.group("magneturl") : matcher.group("torrenturl");
+
+        String magneturl = matcher.group("magneturl");
+        try {
+            magneturl = URLDecoder.decode(magneturl, "UTF-8");
+        } catch (Throwable ignored) { ignored.printStackTrace(); }
+
+        this.torrentUrl = matcher.group("torrenturl").contains("torcache.net") ? magneturl : matcher.group("torrenturl");
         this.size = parseSize(matcher.group("size"));
         this.seeds = parseSeeds(matcher.group("seeds"));
         this.creationTime = parseCreationTime(matcher.group("creationtime"));
