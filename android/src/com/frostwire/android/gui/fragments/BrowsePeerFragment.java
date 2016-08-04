@@ -41,13 +41,12 @@ import com.frostwire.android.gui.Finger;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter;
-import com.frostwire.android.gui.util.SwipeDetector;
-import com.frostwire.android.gui.util.SwipeListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.BrowsePeerSearchBarView;
 import com.frostwire.android.gui.views.BrowsePeerSearchBarView.OnActionListener;
 import com.frostwire.android.gui.views.FileTypeRadioButtonSelectorFactory;
+import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
@@ -59,14 +58,13 @@ import java.util.*;
  * @author gubatron
  * @author aldenml
  */
-public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment, SwipeListener {
+public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment {
     private static final Logger LOG = Logger.getLogger(BrowsePeerFragment.class);
     private static final int LOADER_FILES_ID = 0;
     private final BroadcastReceiver broadcastReceiver;
     private BrowsePeerSearchBarView filesBar;
     private SwipeRefreshLayout swipeRefresh;
     private ListView list;
-    private final SwipeDetector viewSwipeDetector;
     private FileListAdapter adapter;
     private Peer peer;
     private View header;
@@ -94,13 +92,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         super(R.layout.fragment_browse_peer);
         broadcastReceiver = new LocalBroadcastReceiver();
         this.peer = new Peer();
-        viewSwipeDetector = new SwipeDetector(this, 50);
+
         toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_RINGTONES);   //0x00 - Audio -> Ringtones
-        toTheRightOf.put(Constants.FILE_TYPE_PICTURES,Constants.FILE_TYPE_DOCUMENTS); //0x01 - Pictures -> Documents
-        toTheRightOf.put(Constants.FILE_TYPE_VIDEOS,Constants.FILE_TYPE_PICTURES);    //0x02 - Videos -> Pictures
-        toTheRightOf.put(Constants.FILE_TYPE_DOCUMENTS,Constants.FILE_TYPE_TORRENTS); //0x03 - Documents -> Torrents
-        toTheRightOf.put(Constants.FILE_TYPE_RINGTONES,Constants.FILE_TYPE_VIDEOS);   //0x05 - Ringtones -> Videos
-        toTheRightOf.put(Constants.FILE_TYPE_TORRENTS,Constants.FILE_TYPE_AUDIO);     //0x06 - Torrents -> Audio
+        toTheRightOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_DOCUMENTS); //0x01 - Pictures -> Documents
+        toTheRightOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_PICTURES);    //0x02 - Videos -> Pictures
+        toTheRightOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_TORRENTS); //0x03 - Documents -> Torrents
+        toTheRightOf.put(Constants.FILE_TYPE_RINGTONES, Constants.FILE_TYPE_VIDEOS);   //0x05 - Ringtones -> Videos
+        toTheRightOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_AUDIO);     //0x06 - Torrents -> Audio
 
         toTheLeftOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_TORRENTS);     //0x00 - Audio <- Torrents
         toTheLeftOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_VIDEOS);    //0x01 - Pictures <- Video
@@ -168,7 +166,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private void restorePreviousFilter() {
         if (previousFilter != null && filesBar != null) {
-           filesBar.setText(previousFilter);
+            filesBar.setText(previousFilter);
         }
     }
 
@@ -267,7 +265,18 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
         });
         list = findView(v, R.id.fragment_browse_peer_list);
-        list.setOnTouchListener(viewSwipeDetector);
+        SwipeLayout swipe = findView(v, R.id.fragment_browse_peer_swipe);
+        swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
+            @Override
+            public void onSwipeLeft() {
+                switchToThe(true);
+            }
+
+            @Override
+            public void onSwipeRight() {
+                switchToThe(false);
+            }
+        });
 
         initRadioButton(v, R.id.fragment_browse_peer_radio_audio, Constants.FILE_TYPE_AUDIO);
         initRadioButton(v, R.id.fragment_browse_peer_radio_ringtones, Constants.FILE_TYPE_RINGTONES);
@@ -290,7 +299,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         button.setOnClickListener(rbListener);
         button.setOnCheckedChangeListener(rbListener);
         button.setChecked(fileType == Constants.FILE_TYPE_AUDIO);
-        radioButtonFileTypeMap.put(fileType,button);
+        radioButtonFileTypeMap.put(fileType, button);
         return button;
     }
 
@@ -309,7 +318,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private void logBrowseAction(byte fileType) {
         try {
             UXStats.instance().log(browseUXActions[fileType]);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
     }
 
     private void reloadFiles(byte fileType) {
@@ -442,18 +452,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private RadioButton getRadioButton(byte fileType) {
         return radioButtonFileTypeMap.get(fileType);
-    }
-
-    @Override
-    public void onSwipeLeft() {
-        // move to the right
-        switchToThe(true);
-    }
-
-    @Override
-    public void onSwipeRight() {
-        // move to the left
-        switchToThe(false);
     }
 
     private void switchToThe(boolean right) {
