@@ -93,7 +93,7 @@ public class IntentWizardPage extends RelativeLayout implements WizardPageView {
         Resources r = getResources();
         TextView tosTextView = (TextView) findViewById(R.id.view_intent_wizard_page_text_tos);
         tosTextView.setMovementMethod(LinkMovementMethod.getInstance());
-        final String tou = r.getString(R.string.tou);
+        final String tou = r.getString(R.string.terms_of_use);
         tosTextView.setText(Html.fromHtml("<a href='" + Constants.TERMS_OF_USE_URL + "'>" + tou + "</a>"));
     }
 

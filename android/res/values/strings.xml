@@ -635,5 +635,5 @@
     <string name="keep_the_project_alive">Keep the Project Alive</string>
     <string name="processing_payment">Processing payment, refresh in a few seconds</string>
     <string name="i_have_read_and_agree_to_the">I have read and agree to the</string>
-    <string name="tou">Terms of Use</string>
+    <string name="terms_of_use">Terms of Use</string>
 </resources>
