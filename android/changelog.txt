@@ -1,6 +1,7 @@
 FrostWire 1.8.0 - AUG/04/2016
  - Fixes download issues with BitSnoop search results.
  - Improved swipe gesture detection.
+ - Bug fix: ringtones can be set as ringtones.
 
 FrostWire 1.7.9 - JUL/30/2016
  - Faster app shutdown.
