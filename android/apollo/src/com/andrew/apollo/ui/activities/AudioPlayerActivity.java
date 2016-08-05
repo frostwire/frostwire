@@ -49,6 +49,7 @@ import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.SwipeLayout;
@@ -372,8 +373,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 return true;
             case R.id.menu_audio_player_ringtone:
                 // Set the current track as a ringtone
-
-                writeSettingsHelper.onSetRingtoneOption(this, MusicUtils.getCurrentAudioId());
+                writeSettingsHelper.onSetRingtoneOption(this, MusicUtils.getCurrentAudioId(), Constants.FILE_TYPE_AUDIO);
                 return true;
             case R.id.menu_audio_player_share:
                 // Share the current meta data

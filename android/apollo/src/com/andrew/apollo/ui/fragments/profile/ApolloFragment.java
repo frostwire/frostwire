@@ -45,6 +45,7 @@ import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.viewpagerindicator.TitlePageIndicator;
 
@@ -309,7 +310,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         }
 
         WriteSettingsPermissionActivityHelper helper = new WriteSettingsPermissionActivityHelper(getActivity());
-        helper.onSetRingtoneOption(getActivity(), mSelectedId);
+        helper.onSetRingtoneOption(getActivity(), mSelectedId, Constants.FILE_TYPE_AUDIO);
         return true;
     }
 

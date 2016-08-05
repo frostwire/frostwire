@@ -53,6 +53,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
 
     // HACK: just couldn't find another way, and this saved a lot of overcomplicated logic in the onActivityResult handling activities.
     static long AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
+    static byte FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
 
     private final WeakReference<Activity> activityRef;
     private final int requestCode;
@@ -151,6 +152,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         if (!hasWriteSettings) {
             LOGGER.warn("handleOnWriteSettingsActivityResult! had no permission to write settings");
             AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
+            FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
             return false;
         }
 
@@ -159,8 +161,9 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             return false;
         }
 
-        MusicUtils.setRingtone(handlerActivity, AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK);
+        MusicUtils.setRingtone(handlerActivity, AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK, FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK);
         AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
+        FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
         return true;
     }
 

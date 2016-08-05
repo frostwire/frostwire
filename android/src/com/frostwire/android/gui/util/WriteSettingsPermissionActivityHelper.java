@@ -32,13 +32,14 @@ public class WriteSettingsPermissionActivityHelper {
         writeSettingsPermissionChecker = new DangerousPermissionsChecker(activity, DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
     }
 
-    public void onSetRingtoneOption(final Activity activity, long audioId) {
+    public void onSetRingtoneOption(final Activity activity, long audioId, byte fileType) {
         if (DangerousPermissionsChecker.hasPermissionToWriteSettings(activity)) {
-            MusicUtils.setRingtone(activity, audioId);
+            MusicUtils.setRingtone(activity, audioId, fileType);
         } else {
             // HACK: found no other way to pass this back, tried sending it on the intent that opens the permission screen
             // but the intent that comes back doesn't keep the extra data in it.
             DangerousPermissionsChecker.AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = audioId;
+            DangerousPermissionsChecker.FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = fileType;
             writeSettingsPermissionChecker.requestPermissions();
         }
     }

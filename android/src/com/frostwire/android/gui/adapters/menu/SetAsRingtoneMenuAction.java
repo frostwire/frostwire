@@ -42,10 +42,10 @@ class SetAsRingtoneMenuAction extends MenuAction {
     @Override
     protected void onClick(Context context) {
         if (DangerousPermissionsChecker.hasPermissionToWriteSettings(context)) {
-            MusicUtils.setRingtone(context, fd.id);
+            MusicUtils.setRingtone(context, fd.id, fd.fileType);
         } else {
             WriteSettingsPermissionActivityHelper helper = new WriteSettingsPermissionActivityHelper((Activity) context);
-            helper.onSetRingtoneOption((Activity) context, fd.id);
+            helper.onSetRingtoneOption((Activity) context, fd.id, fd.fileType);
         }
     }
 }

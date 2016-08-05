@@ -43,9 +43,9 @@ import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.util.Logger;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
+import com.frostwire.util.Logger;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
@@ -1051,10 +1051,17 @@ public final class MusicUtils {
     /**
      * @param context The {@link Context} to use
      * @param id The song ID.
+     * @param fileType
      */
-    public static void setRingtone(final Context context, final long id) {
+    public static void setRingtone(final Context context, final long id, byte fileType) {
         final ContentResolver resolver = context.getContentResolver();
-        final Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+
+        Uri contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        if (fileType == Constants.FILE_TYPE_RINGTONES) {
+            contentUri = Media.INTERNAL_CONTENT_URI;
+        }
+
+        final Uri uri = ContentUris.withAppendedId(contentUri, id);
         try {
             final ContentValues values = new ContentValues(2);
             values.put(AudioColumns.IS_RINGTONE, "1");
@@ -1070,7 +1077,7 @@ public final class MusicUtils {
         };
 
         final String selection = BaseColumns._ID + "=" + id;
-        Cursor cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection,
+        Cursor cursor = resolver.query(contentUri, projection,
                 selection, null, null);
         try {
             if (cursor != null && cursor.getCount() == 1) {
@@ -1079,6 +1086,8 @@ public final class MusicUtils {
                 final String message = context.getString(R.string.set_as_ringtone,
                         cursor.getString(2));
                 AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
+            } else {
+                UIUtils.showLongMessage(context, R.string.ringtone_not_set);
             }
         } catch (Throwable ignored) {
             UIUtils.showLongMessage(context, R.string.ringtone_not_set);
