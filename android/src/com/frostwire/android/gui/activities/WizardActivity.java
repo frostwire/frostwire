@@ -26,13 +26,12 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ViewFlipper;
 import com.frostwire.android.R;
+import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.StoragePicker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.GeneralWizardPage;
-import com.frostwire.android.gui.views.IntentWizardPage;
 import com.frostwire.android.gui.views.WizardPageView;
 import com.frostwire.android.gui.views.WizardPageView.OnCompleteListener;
 import com.frostwire.android.gui.views.preference.StoragePreference;
@@ -156,10 +155,10 @@ public class WizardActivity extends AbstractActivity {
     @Override
     public void onBackPressed() {
         final View view = viewFlipper.getCurrentView();
-        if (view instanceof GeneralWizardPage) {
+        if (view instanceof WizardPageView && !((WizardPageView) view).hasPrevious()) {
             UIUtils.sendShutdownIntent(this);
             finish();
-        } else if (view instanceof IntentWizardPage) {
+        } else {
             previousPage();
         }
     }
