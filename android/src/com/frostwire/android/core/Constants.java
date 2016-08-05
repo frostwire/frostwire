@@ -52,7 +52,7 @@ public final class Constants {
     public static final String FROSTWIRE_VERSION_STRING = BuildConfig.VERSION_NAME;
 
     // preference keys
-    public static final String PREF_KEY_CORE_UUID = "frostwire.prefs.core.uuid";
+    static final String PREF_KEY_CORE_UUID = "frostwire.prefs.core.uuid";
     public static final String PREF_KEY_CORE_LAST_SEEN_VERSION = "frostwire.prefs.core.last_seen_version";
 
     public static final String PREF_KEY_NETWORK_ENABLE_DHT = "froswire.prefs.network.enable_dht";
@@ -157,14 +157,12 @@ public final class Constants {
      * URL where FrostWire checks for software updates
      */
     public static final String SERVER_UPDATE_URL = "http://update.frostwire.com/android";
-
     private static final String FROM_URL_PARAMETERS = "from=android&basic=" + (IS_GOOGLE_PLAY_DISTRIBUTION ? "1" : "0") + "&version=" + FROSTWIRE_VERSION_STRING + "&build=" + FROSTWIRE_BUILD;
-
     public static final String FROSTWIRE_PLUS_URL = "http://www.frostwire.com/android?" + FROM_URL_PARAMETERS;
-
     public static final String SERVER_PROMOTIONS_URL = "http://update.frostwire.com/o.php?" + FROM_URL_PARAMETERS;
-
     public static final String SUPPORT_URL = "http://support.frostwire.com/hc/en-us/categories/200014385-FrostWire-for-Android";
+    public static final String TERMS_OF_USE_URL = "http://www.frostwire.com/terms";
+
 
     public static final long LIBRARIAN_FILE_COUNT_CACHE_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 

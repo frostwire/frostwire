@@ -329,16 +329,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
         refreshPlayerItem();
 
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
-            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
-                mainResume();
-                Offers.initAdNetworks(this);
-            } else {
-                controller.startWizardActivity();
-            }
-        } else {
-            TermsUseDialog dlg = new TermsUseDialog();
-            dlg.show(getFragmentManager());
+        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
+            mainResume();
+            Offers.initAdNetworks(this);
+        } else if (!isShutdown()){
+            controller.startWizardActivity();
         }
 
         checkLastSeenVersion();
@@ -569,8 +564,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             onLastDialogButtonPositive();
         } else if (tag.equals(SHUTDOWN_DIALOG_ID) && which == Dialog.BUTTON_POSITIVE) {
             onShutdownDialogButtonPositive();
-        } else if (tag.equals(TermsUseDialog.TAG)) {
-            controller.startWizardActivity();
         } else if (tag.equals(SDPermissionDialog.TAG)) {
             handleSDPermissionDialogClick(which);
         }

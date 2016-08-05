@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
@@ -192,10 +193,7 @@ public class BuyActivity extends AbstractActivity {
             }
 
             if (shutdownActivityAfterwards) {
-                Intent i = new Intent(this, MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
-                startActivity(i);
+                UIUtils.sendShutdownIntent(this);
                 return;
             }
 

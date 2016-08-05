@@ -87,6 +87,13 @@ public final class UIUtils {
         }
     }
 
+    public static void sendShutdownIntent(Context ctx) {
+        Intent i = new Intent(ctx, MainActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
+        ctx.startActivity(i);
+    }
+
     public static void showToastMessage(Context context, String message, int duration) {
         showToastMessage(context, message, duration, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM, 0, 0);
     }

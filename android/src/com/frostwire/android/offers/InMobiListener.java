@@ -20,11 +20,10 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.inmobi.ads.InMobiAdRequestStatus;
@@ -125,10 +124,7 @@ class InMobiListener implements InterstitialListener, InMobiInterstitial.Interst
                 MainActivity mainActivity = (MainActivity) callerActivity;
                 mainActivity.shutdown();
             } else {
-                Intent i = new Intent(app, MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
-                app.startActivity(i);
+                UIUtils.sendShutdownIntent(app);
             }
         }
     }

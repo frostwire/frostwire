@@ -20,15 +20,14 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Intent;
 import com.applovin.adview.AppLovinInterstitialAd;
 import com.applovin.adview.AppLovinInterstitialAdDialog;
 import com.applovin.sdk.AppLovinAd;
 import com.applovin.sdk.AppLovinAdDisplayListener;
 import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinSdk;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -136,10 +135,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
             }
         } else {
             if (shutdownAfter) {
-                Intent i = new Intent(app, MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
-                app.startActivity(i);
+                UIUtils.sendShutdownIntent(app);
             }
         }
     }

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.GeneralWizardPage;
+import com.frostwire.android.gui.views.IntentWizardPage;
 import com.frostwire.android.gui.views.WizardPageView;
 import com.frostwire.android.gui.views.WizardPageView.OnCompleteListener;
 import com.frostwire.android.gui.views.preference.StoragePreference;
@@ -41,18 +42,14 @@ import com.frostwire.android.gui.views.preference.StoragePreference;
  *
  */
 public class WizardActivity extends AbstractActivity {
-
     private final OnCompleteListener completeListener;
-
     private Button buttonPrevious;
     private Button buttonNext;
     private ViewFlipper viewFlipper;
-
     private View currentPageView;
 
     public WizardActivity() {
         super(R.layout.activity_wizard);
-
         completeListener = new OnCompleteListener() {
             public void onComplete(WizardPageView pageView, boolean complete) {
                 if (pageView == currentPageView) {
@@ -126,6 +123,7 @@ public class WizardActivity extends AbstractActivity {
             WizardPageView pageView = (WizardPageView) view;
             pageView.finish();
             if (!pageView.hasNext()) {
+                ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED, true);
                 ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE, true);
             } else {
                 viewFlipper.showNext();
@@ -151,6 +149,20 @@ public class WizardActivity extends AbstractActivity {
         } else {
             buttonPrevious.setVisibility(View.VISIBLE);
             buttonNext.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        final View view = viewFlipper.getCurrentView();
+        if (view instanceof GeneralWizardPage) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivity(intent);
+            finish();
+        } else if (view instanceof IntentWizardPage) {
+            previousPage();
         }
     }
 }
