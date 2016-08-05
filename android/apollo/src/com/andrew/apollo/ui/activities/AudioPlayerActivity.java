@@ -63,7 +63,7 @@ import static com.andrew.apollo.utils.MusicUtils.mService;
 
 /**
  * Apollo's "now playing" interface.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class AudioPlayerActivity extends FragmentActivity implements
@@ -314,9 +314,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
         // Theme the search icon
         mResources.setSearchIcon(menu);
 
-        final SearchView searchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
+        final SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
         // Add voice search
-        final SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
         searchView.setSearchableInfo(searchableInfo);
         // Perform the search
@@ -360,7 +360,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 // Shuffle all the songs
                 MusicUtils.shuffleAll(this);
                 // Refresh the queue
-                ((QueueFragment)mPagerAdapter.getFragment(0)).refreshQueue();
+                ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
                 return true;
             case R.id.menu_favorite:
                 // Toggle the current track as a favorite and update the menu
@@ -390,12 +390,12 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 return true;
             case R.id.menu_audio_player_delete:
                 // Delete current song
-                DeleteDialog.newInstance(MusicUtils.getTrackName(), new long[] {
-                    MusicUtils.getCurrentAudioId()
+                DeleteDialog.newInstance(MusicUtils.getTrackName(), new long[]{
+                        MusicUtils.getCurrentAudioId()
                 }, null).show(getSupportFragmentManager(), "DeleteDialog");
                 return true;
             case R.id.menu_audio_player_add_to_playlist:
-                AddToPlaylistMenuAction menuAction = new AddToPlaylistMenuAction(this, new long[] {
+                AddToPlaylistMenuAction menuAction = new AddToPlaylistMenuAction(this, new long[]{
                         MusicUtils.getCurrentAudioId()
                 });
                 menuAction.onClick();
@@ -406,10 +406,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
     }
 
 
-
     @Override
     public void onDelete(long[] ids) {
-        ((QueueFragment)mPagerAdapter.getFragment(0)).refreshQueue();
+        ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
         if (MusicUtils.getQueue().length == 0) {
             finish();
         }
@@ -443,7 +442,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         // Current info
         updateNowPlayingInfo();
         // Refresh the queue
-        ((QueueFragment)mPagerAdapter.getFragment(0)).refreshQueue();
+        ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
     }
 
     /**
@@ -507,18 +506,18 @@ public class AudioPlayerActivity extends FragmentActivity implements
     @SuppressWarnings("deprecation")
     private void initPlaybackControls() {
         // ViewPager container
-        mPageContainer = (FrameLayout)findViewById(R.id.audio_player_pager_container);
+        mPageContainer = (FrameLayout) findViewById(R.id.audio_player_pager_container);
         // Theme the pager container background
         mPageContainer
                 .setBackgroundDrawable(mResources.getDrawable("audio_player_pager_container"));
 
         // Now playing header
-        mAudioPlayerHeader = (LinearLayout)findViewById(R.id.audio_player_header);
+        mAudioPlayerHeader = (LinearLayout) findViewById(R.id.audio_player_header);
         // Opens the currently playing album profile
         mAudioPlayerHeader.setOnClickListener(mOpenAlbumProfile);
 
         // Used to hide the artwork and show the queue
-        final FrameLayout mSwitch = (FrameLayout)findViewById(R.id.audio_player_switch);
+        final FrameLayout mSwitch = (FrameLayout) findViewById(R.id.audio_player_switch);
         mSwitch.setOnClickListener(mToggleHiddenPanel);
 
         // Initialize the pager adapter
@@ -527,39 +526,39 @@ public class AudioPlayerActivity extends FragmentActivity implements
         mPagerAdapter.add(QueueFragment.class, null);
 
         // Initialize the ViewPager
-        mViewPager = (ViewPager)findViewById(R.id.audio_player_pager);
+        mViewPager = (ViewPager) findViewById(R.id.audio_player_pager);
         // Attach the adapter
         mViewPager.setAdapter(mPagerAdapter);
         // Offscreen pager loading limit
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
         // Play and pause button
-        mPlayPauseButton = (PlayPauseButton)findViewById(R.id.action_button_play);
+        mPlayPauseButton = (PlayPauseButton) findViewById(R.id.action_button_play);
         // Shuffle button
-        mShuffleButton = (ShuffleButton)findViewById(R.id.action_button_shuffle);
+        mShuffleButton = (ShuffleButton) findViewById(R.id.action_button_shuffle);
         // Repeat button
-        mRepeatButton = (RepeatButton)findViewById(R.id.action_button_repeat);
+        mRepeatButton = (RepeatButton) findViewById(R.id.action_button_repeat);
         // Previous button
-        mPreviousButton = (RepeatingImageButton)findViewById(R.id.action_button_previous);
+        mPreviousButton = (RepeatingImageButton) findViewById(R.id.action_button_previous);
         // Next button
-        mNextButton = (RepeatingImageButton)findViewById(R.id.action_button_next);
+        mNextButton = (RepeatingImageButton) findViewById(R.id.action_button_next);
         // Track name
-        mTrackName = (TextView)findViewById(R.id.audio_player_track_name);
+        mTrackName = (TextView) findViewById(R.id.audio_player_track_name);
         // Artist name
-        mArtistName = (TextView)findViewById(R.id.audio_player_artist_name);
+        mArtistName = (TextView) findViewById(R.id.audio_player_artist_name);
         // Album art
-        mAlbumArt = (ImageView)findViewById(R.id.audio_player_album_art);
+        mAlbumArt = (ImageView) findViewById(R.id.audio_player_album_art);
         // Small album art
-        mAlbumArtSmall = (ImageView)findViewById(R.id.audio_player_switch_album_art);
+        mAlbumArtSmall = (ImageView) findViewById(R.id.audio_player_switch_album_art);
         // Current time
-        mCurrentTime = (TextView)findViewById(R.id.audio_player_current_time);
+        mCurrentTime = (TextView) findViewById(R.id.audio_player_current_time);
         // Total time
-        mTotalTime = (TextView)findViewById(R.id.audio_player_total_time);
+        mTotalTime = (TextView) findViewById(R.id.audio_player_total_time);
         // Used to show and hide the queue fragment
-        mQueueSwitch = (ImageView)findViewById(R.id.audio_player_switch_queue);
+        mQueueSwitch = (ImageView) findViewById(R.id.audio_player_switch_queue);
         // Theme the queue switch icon
         mQueueSwitch.setImageDrawable(mResources.getDrawable("btn_switch_queue"));
         // Progress
-        mProgress = (SeekBar)findViewById(android.R.id.progress);
+        mProgress = (SeekBar) findViewById(android.R.id.progress);
 
         // Set the repeat listener for the previous button
         mPreviousButton.setRepeatListener(mRewindListener);
@@ -606,7 +605,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     }
 
     private long parseIdFromIntent(Intent intent, String longKey,
-        String stringKey, long defaultId) {
+                                   String stringKey, long defaultId) {
         long id = intent.getLongExtra(longKey, -1);
         if (id < 0) {
             String idString = intent.getStringExtra(stringKey);
@@ -665,7 +664,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
             // Make sure to process intent only once
             setIntent(new Intent());
             // Refresh the queue
-            ((QueueFragment)mPagerAdapter.getFragment(0)).refreshQueue();
+            ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
         }
     }
 
@@ -699,9 +698,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     /**
      * Used to scan backwards in time through the current track
-     * 
+     *
      * @param repcount The repeat count
-     * @param delta The long press duration
+     * @param delta    The long press duration
      */
     private void scanBackward(final int repcount, long delta) {
         if (mService == null) {
@@ -741,9 +740,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     /**
      * Used to scan forwards in time through the current track
-     * 
+     *
      * @param repcount The repeat count
-     * @param delta The long press duration
+     * @param delta    The long press duration
      */
     private void scanForward(final int repcount, long delta) {
         if (mService == null) {
@@ -794,7 +793,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
             final long pos = mPosOverride < 0 ? MusicUtils.position() : mPosOverride;
             if (pos >= 0 && MusicUtils.duration() > 0) {
                 refreshCurrentTimeText(pos);
-                final int progress = (int)(1000 * pos / MusicUtils.duration());
+                final int progress = (int) (1000 * pos / MusicUtils.duration());
                 mProgress.setProgress(progress);
 
                 if (mFromTouch) {
@@ -837,7 +836,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     }
 
     /**
-     * @param v The view to animate
+     * @param v     The view to animate
      * @param alpha The alpha to apply
      */
     private void fade(final View v, final float alpha) {
@@ -973,7 +972,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         @Override
         public void onClick(final View v) {
-            ((QueueFragment)mPagerAdapter.getFragment(0)).scrollToCurrentSong();
+            ((QueueFragment) mPagerAdapter.getFragment(0)).scrollToCurrentSong();
         }
     };
 
@@ -1047,8 +1046,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
         private final WeakReference<AudioPlayerActivity> audioPlayerActivityRef;
 
         public PlayerGesturesDetector(AudioPlayerActivity audioPlayerActivity) {
-             audioPlayerActivityRef = new WeakReference<>(audioPlayerActivity);
+            audioPlayerActivityRef = new WeakReference<>(audioPlayerActivity);
         }
+
         @Override
         public void onLeftToRightSwipe() {
             try {
