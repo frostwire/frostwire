@@ -251,7 +251,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupSupportFrostWireOption() {
         final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
-        if (!Constants.IS_BASIC_AND_DEBUG && Constants.IS_STORE_ENABLED && preference != null) {
+        if (!Constants.IS_BASIC_AND_DEBUG && Constants.IS_GOOGLE_PLAY_DISTRIBUTION && preference != null) {
             preference.setOnPreferenceClickListener(null);
             PreferenceScreen category = (PreferenceScreen) findPreference(Constants.PREF_KEY_OTHER_PREFERENCE_CATEGORY);
             if (category != null && preference != null) {
@@ -476,7 +476,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupStore(long purchaseTimestamp) {
         Preference p = findPreference("frostwire.prefs.offers.buy_no_ads");
-        if (p != null && !Constants.IS_STORE_ENABLED) {
+        if (p != null && !Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
             PreferenceScreen s = getPreferenceScreen();
             s.removePreference(p);
         } else if (p != null) {

@@ -32,9 +32,8 @@ public final class Constants {
     }
 
     public static final boolean IS_BASIC_AND_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
-    private static final boolean IS_BASIC_OR_DEBUG = BuildConfig.FLAVOR.equals("basic") || BuildConfig.DEBUG;
-
-    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = IS_BASIC_OR_DEBUG;
+    public static final boolean IS_PLUS_OR_DEBUG = BuildConfig.FLAVOR.equals("plus") || BuildConfig.BUILD_TYPE.equals("debug");
+    public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic");
 
     private static final String BUILD_PREFIX = !IS_GOOGLE_PLAY_DISTRIBUTION ? "1000" : "";
 
@@ -43,9 +42,6 @@ public final class Constants {
      * needing to pass the Android app context to obtain the PackageManager instance.
      */
     public static final String FROSTWIRE_BUILD = BUILD_PREFIX + (BuildConfig.VERSION_CODE % 1000);
-
-    // change it to a constant true when the test phase is done
-    public static final boolean IS_STORE_ENABLED = IS_BASIC_OR_DEBUG;
 
     public static final String APP_PACKAGE_NAME = "com.frostwire.android";
 
