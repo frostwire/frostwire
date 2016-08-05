@@ -29,6 +29,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.StoragePicker;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.GeneralWizardPage;
 import com.frostwire.android.gui.views.IntentWizardPage;
@@ -156,10 +157,7 @@ public class WizardActivity extends AbstractActivity {
     public void onBackPressed() {
         final View view = viewFlipper.getCurrentView();
         if (view instanceof GeneralWizardPage) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NO_HISTORY);
-            startActivity(intent);
+            UIUtils.sendShutdownIntent(this);
             finish();
         } else if (view instanceof IntentWizardPage) {
             previousPage();
