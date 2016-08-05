@@ -27,10 +27,7 @@ import android.provider.MediaStore.Audio.Playlists;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
 import android.view.animation.AnimationUtils;
 import android.widget.*;
@@ -42,8 +39,11 @@ import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.ui.fragments.QueueFragment;
-import com.andrew.apollo.utils.*;
+import com.andrew.apollo.utils.ApolloUtils;
+import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
+import com.andrew.apollo.utils.NavUtils;
+import com.andrew.apollo.utils.ThemeUtils;
 import com.andrew.apollo.widgets.PlayPauseButton;
 import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
@@ -51,9 +51,7 @@ import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
-import com.frostwire.android.gui.views.AbstractSwipeDetector;
-import com.frostwire.android.gui.views.ClickAdapter;
-import com.frostwire.util.Ref;
+import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
@@ -153,6 +151,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     private boolean mFromTouch = false;
     private WriteSettingsPermissionActivityHelper writeSettingsHelper;
+    private GestureDetector gestureDetector;
 
     /**
      * {@inheritDoc}
@@ -204,7 +203,11 @@ public class AudioPlayerActivity extends FragmentActivity implements
         initPlaybackControls();
 
         mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
-        findViewById(R.id.audio_player_album_art).setOnTouchListener(new PlayerGesturesDetector(this));
+
+        PlayerGestureListener gestureListener = new PlayerGestureListener();
+        gestureDetector = new GestureDetector(this, gestureListener);
+        gestureDetector.setOnDoubleTapListener(gestureListener);
+        findViewById(R.id.audio_player_album_art).setOnTouchListener(gestureListener);
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
     }
@@ -1042,25 +1045,28 @@ public class AudioPlayerActivity extends FragmentActivity implements
         }
     }
 
-    private static final class PlayerGesturesDetector extends AbstractSwipeDetector {
-        private final WeakReference<AudioPlayerActivity> audioPlayerActivityRef;
-
-        public PlayerGesturesDetector(AudioPlayerActivity audioPlayerActivity) {
-            audioPlayerActivityRef = new WeakReference<>(audioPlayerActivity);
-        }
+    private final class PlayerGestureListener extends SwipeLayout.SwipeGestureAdapter
+            implements View.OnTouchListener {
 
         @Override
-        public void onLeftToRightSwipe() {
-            try {
-                MusicUtils.mService.prev();
-                UXStats.instance().log(UXAction.PLAYER_GESTURE_SWIPE_SONG);
-            } catch (Throwable e) {
-                // ignore
+        public boolean onTouch(View v, MotionEvent event) {
+            gestureDetector.onTouchEvent(event);
+
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                return true;
             }
+
+            if (event.getPointerCount() == 2 &&
+                    event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN) {
+                onMultiTouchEvent();
+                return true;
+            }
+
+            return false;
         }
 
         @Override
-        public void onRightToLeftSwipe() {
+        public void onSwipeLeft() {
             try {
                 MusicUtils.mService.next();
                 UXStats.instance().log(UXAction.PLAYER_GESTURE_SWIPE_SONG);
@@ -1070,27 +1076,33 @@ public class AudioPlayerActivity extends FragmentActivity implements
         }
 
         @Override
-        public boolean onMultiTouchEvent(View v, MotionEvent event) {
+        public void onSwipeRight() {
+            try {
+                MusicUtils.mService.prev();
+                UXStats.instance().log(UXAction.PLAYER_GESTURE_SWIPE_SONG);
+            } catch (Throwable e) {
+                // ignore
+            }
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            try {
+                toggleFavorite();
+                UXStats.instance().log(UXAction.PLAYER_TOGGLE_FAVORITE);
+            } catch (Throwable t) {
+                return false;
+            }
+            return true;
+        }
+
+        private void onMultiTouchEvent() {
             try {
                 MusicUtils.playOrPause();
                 UXStats.instance().log(UXAction.PLAYER_GESTURE_PAUSE_RESUME);
             } catch (Throwable e) {
                 // ignore
             }
-            return true;
-        }
-
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            try {
-                if (Ref.alive(audioPlayerActivityRef)) {
-                    audioPlayerActivityRef.get().toggleFavorite();
-                }
-                UXStats.instance().log(UXAction.PLAYER_TOGGLE_FAVORITE);
-            } catch (Throwable t) {
-                return false;
-            }
-            return true;
         }
     }
 
