@@ -23,18 +23,8 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.BaseAdapter;
-import android.widget.HeaderViewListAdapter;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-
+import android.widget.*;
 import com.frostwire.android.R;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 /**
  * ListView subclass that mediates drag and drop resorting of items.
@@ -601,16 +591,18 @@ public class DragSortListView extends ListView {
                 heights.child = 0;
             } else {
                 final View child = ((ViewGroup)item).getChildAt(0);
-                lp = child.getLayoutParams();
-                height = lp == null ? 0 : lp.height;
-                if (height > 0) {
-                    heights.child = height;
-                } else {
-                    final int hspec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
-                    final int wspec = ViewGroup.getChildMeasureSpec(mWidthMeasureSpec,
-                            getListPaddingLeft() + getListPaddingRight(), lp.width);
-                    child.measure(wspec, hspec);
-                    heights.child = child.getMeasuredHeight();
+                if (child != null) {
+                    lp = child.getLayoutParams();
+                    height = lp == null ? 0 : lp.height;
+                    if (height > 0) {
+                        heights.child = height;
+                    } else {
+                        final int hspec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+                        final int wspec = ViewGroup.getChildMeasureSpec(mWidthMeasureSpec,
+                                getListPaddingLeft() + getListPaddingRight(), lp.width);
+                        child.measure(wspec, hspec);
+                        heights.child = child.getMeasuredHeight();
+                    }
                 }
             }
         } else {
