@@ -18,12 +18,12 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JTable;
-
 import com.frostwire.gui.LocaleLabel;
 import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 
 /**
  * 
@@ -41,6 +41,7 @@ public final class NameHolderRenderer extends FWAbstractJPanelTableCellRenderer 
 
     private void setupUI() {
         setLayout(new BorderLayout());
+        setBorder(new EmptyBorder(1,5,1,5));
         labelText = new LocaleLabel();
         add(labelText, BorderLayout.CENTER);
     }

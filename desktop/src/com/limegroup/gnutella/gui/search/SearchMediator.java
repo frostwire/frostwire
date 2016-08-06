@@ -42,7 +42,7 @@ import java.util.*;
 /**
  * This class acts as a mediator between the various search components --
  * the hub that all traffic passes through.  This allows the decoupling of
- * the various search packages and simplfies the responsibilities of the
+ * the various search packages and simplifies the responsibilities of the
  * underlying classes.
  */
 public final class SearchMediator {
