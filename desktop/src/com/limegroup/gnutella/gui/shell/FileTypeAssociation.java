@@ -17,23 +17,23 @@ public class FileTypeAssociation implements ShellAssociation {
 
 	private static final AssociationService SERVICE = new AssociationService();
 	
-	private final String extention;
+	private final String extension;
 	private final String mimeType;
 	private final String executable;
 	private final String verb;
 
 	private final Association association = new Association();
 
-	public FileTypeAssociation(String extention, 
+	public FileTypeAssociation(String extension,
 			String mimeType, String executable, String verb, 
 			String description, String iconPath) {
-		this.extention = extention;
+		this.extension = extension;
 		this.mimeType = mimeType;
 		this.executable = executable;
 		this.verb = verb;
 		Action action = new Action(verb, executable);
 		association.addAction(action);
-		association.addFileExtension(extention);
+		association.addFileExtension(extension);
 		association.setMimeType(mimeType);
 		association.setName(description); // only used on unix
 		association.setDescription(description);
@@ -44,7 +44,7 @@ public class FileTypeAssociation implements ShellAssociation {
 	public boolean isAvailable() {
 	    try {
     		// if no association at all, then it is available
-    		Association f = SERVICE.getFileExtensionAssociation(extention); 
+    		Association f = SERVICE.getFileExtensionAssociation(extension);
     		if (f != null && f == SERVICE.getMimeTypeAssociation(mimeType))
     			return true;
 	    } catch(IllegalArgumentException iae) {
@@ -56,7 +56,7 @@ public class FileTypeAssociation implements ShellAssociation {
 	    }
 		
 		// still check for a default handler.
-		String extHandler = SystemUtils.getDefaultExtentionHandler(extention);
+		String extHandler = SystemUtils.getDefaultExtentionHandler(extension);
 		return ("".equals(extHandler) && 
 				"".equals(SystemUtils.getDefaultMimeHandler(mimeType)));
 	}
@@ -64,7 +64,7 @@ public class FileTypeAssociation implements ShellAssociation {
 	public boolean isRegistered() {
 		Association f;
 		try {
-		    f = SERVICE.getFileExtensionAssociation(extention);
+		    f = SERVICE.getFileExtensionAssociation(extension);
 		} catch(IllegalArgumentException iae) {
             // SEE: LWC-1170
 		    LOG.warn("Can't check registration!", iae);
@@ -77,7 +77,7 @@ public class FileTypeAssociation implements ShellAssociation {
 			return false;
 		if (executable.equals(open.getCommand()))
 			return true;
-		return executable.equals(SystemUtils.getDefaultExtentionHandler(extention)) &&
+		return executable.equals(SystemUtils.getDefaultExtentionHandler(extension)) &&
 				executable.equals(SystemUtils.getDefaultMimeHandler(mimeType));
 	}
 
@@ -95,8 +95,8 @@ public class FileTypeAssociation implements ShellAssociation {
 
 	public void unregister() {
 	    try {
-    		forceUnregister(SERVICE.getFileExtensionAssociation(extention));
-    		forceUnregister(SERVICE.getMimeTypeAssociation(extention));
+    		forceUnregister(SERVICE.getFileExtensionAssociation(extension));
+    		forceUnregister(SERVICE.getMimeTypeAssociation(extension));
 	    } catch(IllegalArgumentException ignored) {
 	        //SEE: LWC-1170
 	        LOG.warn("Can't unregister!", ignored);
@@ -117,6 +117,6 @@ public class FileTypeAssociation implements ShellAssociation {
 	}
 	
 	public String toString() {
-		return extention+":"+mimeType+":"+executable+":"+verb;
+		return extension +":"+mimeType+":"+executable+":"+verb;
 	}
 }
