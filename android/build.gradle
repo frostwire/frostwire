@@ -153,6 +153,7 @@ dependencies {
     compile "com.frostwire:jlibtorrent-android-arm:1.1.1.37"
     compile "com.frostwire:jlibtorrent-android-x86:1.1.1.37"
 
+    compile files('libs/MobFox-Android-SDK-Core-2.+.jar')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
