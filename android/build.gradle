@@ -81,7 +81,7 @@ project.ext.versionName = manifestVersionName()
 
 android {
 
-    compileSdkVersion 16
+    compileSdkVersion 23
     buildToolsVersion '24.0.1'
 
     defaultConfig {
@@ -115,7 +115,7 @@ android {
     }
 
     lintOptions {
-        abortOnError false
+        abortOnError true
     }
 
     dexOptions {

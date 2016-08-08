@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
           package="com.frostwire.android" android:installLocation="auto"
           android:versionCode="294" android:versionName="1.7.9">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
@@ -56,6 +56,7 @@
 
     <application android:name="com.frostwire.android.gui.MainApplication"
                  android:allowBackup="true" android:icon="@mipmap/ic_launcher"
+                 tools:replace="android:label"
                  android:label="@string/application_label" android:theme="@style/Theme.FrostWire">
 
         <meta-data android:name="com.google.android.gms.version"
