@@ -54,45 +54,4 @@ public class ThemeableTextView extends TextView {
         // Recyle the attrs
         typedArray.recycle();
     }
-
-    /**
-     * A small class that holds a weak cache for any typefaces applied to the
-     * text.
-     */
-    public static final class TypefaceCache {
-
-        private static final WeakHashMap<String, Typeface> MAP = new WeakHashMap<String, Typeface>();
-
-        private static TypefaceCache sInstance;
-
-        /**
-         * Constructor for <code>TypefaceCache</code>
-         */
-        public TypefaceCache() {
-        }
-
-        /**
-         * @return A singleton of {@linkTypefaceCache}.
-         */
-        public static final TypefaceCache getInstance() {
-            if (sInstance == null) {
-                sInstance = new TypefaceCache();
-            }
-            return sInstance;
-        }
-
-        /**
-         * @param file The name of the type face asset.
-         * @param context The {@link Context} to use.
-         * @return A new type face.
-         */
-        public Typeface getTypeface(final String file, final Context context) {
-            Typeface result = MAP.get(file);
-            if (result == null) {
-                result = Typeface.createFromAsset(context.getAssets(), file);
-                MAP.put(file, result);
-            }
-            return result;
-        }
-    }
 }

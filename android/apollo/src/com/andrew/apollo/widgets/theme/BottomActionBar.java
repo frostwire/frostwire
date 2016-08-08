@@ -23,7 +23,6 @@ import com.andrew.apollo.utils.ThemeUtils;
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-@SuppressWarnings("deprecation")
 public class BottomActionBar extends RelativeLayout {
 
     /**
@@ -33,7 +32,7 @@ public class BottomActionBar extends RelativeLayout {
 
     /**
      * @param context The {@link Context} to use
-     * @param attrs The attributes of the XML tag that is inflating the view.
+     * @param attrs   The attributes of the XML tag that is inflating the view.
      * @throws NameNotFoundException
      */
     public BottomActionBar(final Context context, final AttributeSet attrs) {
@@ -41,7 +40,7 @@ public class BottomActionBar extends RelativeLayout {
         // Initialze the theme resources
         final ThemeUtils resources = new ThemeUtils(context);
         // Theme the bottom action bar
-        setBackgroundDrawable(resources.getDrawable(BOTTOM_ACTION_BAR));
+        setBackground(resources.getDrawable(BOTTOM_ACTION_BAR));
     }
 
     /**
@@ -51,7 +50,7 @@ public class BottomActionBar extends RelativeLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         // Theme the selector
-        final LinearLayout bottomActionBar = (LinearLayout)findViewById(R.id.bottom_action_bar);
-        bottomActionBar.setBackgroundDrawable(new HoloSelector(getContext()));
+        final LinearLayout bottomActionBar = (LinearLayout) findViewById(R.id.bottom_action_bar);
+        bottomActionBar.setBackground(new HoloSelector(getContext()));
     }
 }

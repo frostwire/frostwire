@@ -66,9 +66,6 @@ public class Fragments {
     public static final int ALBUM_FRAGMENT_GROUP_ID = TabFragmentOrder.ALBUMS_POSITION;
     public static final int ALBUM_FRAGMENT_LOADER_ID = 0;
 
-    public static final int GENRE_FRAGMENT_GROUP_ID = TabFragmentOrder.GENRES_POSITION;
-    public static final int GENRE_FRAGMENT_LOADER_ID = 0;
-
     public static final int QUEUE_FRAGMENT_GROUP_ID = 13;
     public static final int QUEUE_FRAGMENT_LOADER_ID = 0;
 }

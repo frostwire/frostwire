@@ -25,5 +25,4 @@ public final class TabFragmentOrder {
     public static final int ARTISTS_POSITION = 3;
     public static final int SONGS_POSITION = 4;
     public static final int ALBUMS_POSITION = 5;
-    public static final int GENRES_POSITION = 6;
 }

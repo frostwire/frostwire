@@ -21,7 +21,7 @@ import com.andrew.apollo.utils.ThemeUtils;
  * This is a custom {@link FrameLayout} that is used as the main conent when
  * transacting fragments that is made themeable by allowing developers to change
  * the background.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class ThemeableFrameLayout extends FrameLayout {
@@ -33,15 +33,13 @@ public class ThemeableFrameLayout extends FrameLayout {
 
     /**
      * @param context The {@link Context} to use
-     * @param attrs The attributes of the XML tag that is inflating the view.
+     * @param attrs   The attributes of the XML tag that is inflating the view.
      */
-    @SuppressWarnings("deprecation")
     public ThemeableFrameLayout(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         // Initialze the theme resources
         final ThemeUtils resources = new ThemeUtils(context);
         // Theme the layout
-        setBackgroundDrawable(resources.getDrawable(BACKGROUND));
+        setBackground(resources.getDrawable(BACKGROUND));
     }
-
 }

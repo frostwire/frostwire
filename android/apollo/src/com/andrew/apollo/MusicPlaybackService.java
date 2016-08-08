@@ -294,7 +294,7 @@ public class MusicPlaybackService extends Service {
     /**
      * Keeps a mapping of the track history
      */
-    private static final LinkedList<Integer> mHistory = Lists.newLinkedList();
+    private static final LinkedList<Integer> mHistory =  new LinkedList<>();
 
     /**
      * Used to shuffle the tracks

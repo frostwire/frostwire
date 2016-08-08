@@ -49,7 +49,6 @@ public class HoloSelector extends StateListDrawable {
      * 
      * @param context The {@link Context} to use.
      */
-    @SuppressLint("NewApi")
     public HoloSelector(final Context context) {
         final ThemeUtils resources = new ThemeUtils(context);
         final int themeColor = resources.getColor(RESOURCE_NAME);
@@ -71,6 +70,7 @@ public class HoloSelector extends StateListDrawable {
      * @return A new {@link ColorDrawable}.
      */
     private static final ColorDrawable makeColorDrawable(final int color) {
-        return new WeakReference<ColorDrawable>(new ColorDrawable(color)).get();
+        // aldenml: what is this?
+        return new WeakReference<>(new ColorDrawable(color)).get();
     }
 }
