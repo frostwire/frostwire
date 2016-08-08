@@ -36,6 +36,7 @@ buildscript {
 repositories {
     mavenCentral()
     jcenter()
+    maven { url "https://jitpack.io" }
 }
 
 def manifestVersionCode() {
@@ -161,12 +162,12 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:9.4.0'
     compile 'com.inmobi.monetization:inmobi-ads:5.3.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.github.mobfox:MobFox-Android-SDK-Core:2.1.2'
 
     compile 'com.frostwire:jlibtorrent:' + JLIBTORRENT_VERSION
     compile 'com.frostwire:jlibtorrent-android-arm:' + JLIBTORRENT_VERSION
     compile 'com.frostwire:jlibtorrent-android-x86:' + JLIBTORRENT_VERSION
 
-    compile files('libs/MobFox-Android-SDK-Core-2.+.jar')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
