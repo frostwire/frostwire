@@ -12,11 +12,9 @@
 package com.andrew.apollo;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.appwidget.AppWidgetManager;
 import android.content.*;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -40,7 +38,6 @@ import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
-import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.util.Ref;
@@ -55,7 +52,6 @@ import java.util.TreeSet;
  * A background {@link Service} used to keep music playing between activities
  * and when the user moves Apollo into the background.
  */
-@SuppressLint("NewApi")
 public class MusicPlaybackService extends Service {
     private static final String TAG = "MusicPlaybackService";
     private static final boolean D = false;
@@ -280,7 +276,7 @@ public class MusicPlaybackService extends Service {
     /**
      * The columns used to retrieve any info from the current track
      */
-    private static final String[] PROJECTION = new String[] {
+    private static final String[] PROJECTION = new String[]{
             "audio._id AS _id", MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.MIME_TYPE, MediaStore.Audio.Media.ALBUM_ID,
@@ -290,7 +286,7 @@ public class MusicPlaybackService extends Service {
     /**
      * The columns used to retrieve any info from the current album
      */
-    private static final String[] ALBUM_PROJECTION = new String[] {
+    private static final String[] ALBUM_PROJECTION = new String[]{
             MediaStore.Audio.Albums.ALBUM, MediaStore.Audio.Albums.ARTIST,
             MediaStore.Audio.Albums.LAST_YEAR
     };
@@ -311,7 +307,7 @@ public class MusicPlaybackService extends Service {
      * turn allows us to save the playlist more often without worrying too
      * much about performance
      */
-    private static final char HEX_DIGITS[] = new char[] {
+    private static final char HEX_DIGITS[] = new char[]{
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     };
 
@@ -505,7 +501,7 @@ public class MusicPlaybackService extends Service {
         super.onCreate();
 
         if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
-            PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             initService();
         }
     }
@@ -654,7 +650,8 @@ public class MusicPlaybackService extends Service {
             audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, getAudioSessionId());
             audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
             sendBroadcast(audioEffectsIntent);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
 
         // remove any pending alarms
         if (mAlarmManager != null) {
@@ -1273,7 +1270,8 @@ public class MusicPlaybackService extends Service {
             }
             mAutoShuffleList = list;
             return true;
-        } catch (final RuntimeException ignored) {} finally {
+        } catch (final RuntimeException ignored) {
+        } finally {
             if (cursor != null) {
                 cursor.close();
             }
@@ -2929,7 +2927,8 @@ public class MusicPlaybackService extends Service {
                     mHandler.sendEmptyMessage(TRACK_ENDED);
                     mHandler.sendEmptyMessage(RELEASE_WAKELOCK);
                 }
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
         }
     }
 
