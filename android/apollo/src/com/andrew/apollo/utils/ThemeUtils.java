@@ -14,14 +14,10 @@ package com.andrew.apollo.utils;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,34 +40,9 @@ import com.frostwire.android.R;
 public class ThemeUtils {
 
     /**
-     * Default package name.
-     */
-    public static final String APOLLO_PACKAGE = BuildConfig.APPLICATION_ID;
-
-    /**
-     * Current theme package name.
-     */
-    public static final String PACKAGE_NAME = "theme_package_name";
-
-    /**
-     * Used to get and set the theme package name.
-     */
-    private final SharedPreferences mPreferences;
-
-    /**
-     * The theme package name.
-     */
-    private final String mThemePackage;
-
-    /**
      * This is the current theme color as set by the color picker.
      */
     private final int mCurrentThemeColor;
-
-    /**
-     * Package manager
-     */
-    private final PackageManager mPackageManager;
 
     /**
      * Custom action bar layout
@@ -89,50 +60,12 @@ public class ThemeUtils {
      * @param context The {@link Context} to use.
      */
     public ThemeUtils(final Context context) {
-        // Get the preferences
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        // Get the theme package name
-        mThemePackage = getThemePackageName();
-        // Initialize the package manager
-        mPackageManager = context.getPackageManager();
-        try {
-            // Find the theme resources
-            mResources = mPackageManager.getResourcesForApplication(mThemePackage);
-        } catch (Throwable e) {
-            // If the user isn't using a theme, then the resources should be
-            // Apollo's.
-            setThemePackageName(APOLLO_PACKAGE);
-        }
+        // Find the theme resources
+        mResources = context.getResources();
         // Get the current theme color
         mCurrentThemeColor = PreferenceUtils.getInstance(context).getDefaultThemeColor(context);
         // Inflate the custom layout
         mActionBarLayout = LayoutInflater.from(context).inflate(R.layout.action_bar, null);
-    }
-
-    /**
-     * Set the new theme package name.
-     *
-     * @param packageName The package name of the theme to be set.
-     */
-    public void setThemePackageName(final String packageName) {
-        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(final Void... unused) {
-                final SharedPreferences.Editor editor = mPreferences.edit();
-                editor.putString(PACKAGE_NAME, packageName);
-                editor.apply();
-                return null;
-            }
-        }, (Void[]) null);
-    }
-
-    /**
-     * Return the current theme package name.
-     *
-     * @return The default theme package name.
-     */
-    public final String getThemePackageName() {
-        return mPreferences.getString(PACKAGE_NAME, APOLLO_PACKAGE);
     }
 
     /**
@@ -145,7 +78,7 @@ public class ThemeUtils {
     public int getColor(final String resourceName) {
         if (mResources != null) {
             try {
-                final int resourceId = mResources.getIdentifier(resourceName, "color", mThemePackage);
+                final int resourceId = mResources.getIdentifier(resourceName, "color", BuildConfig.APPLICATION_ID);
                 if (resourceId != 0) { // if not, the color is not here
                     return mResources.getColor(resourceId);
                 }
@@ -167,7 +100,7 @@ public class ThemeUtils {
      */
     public Drawable getDrawable(final String resourceName) {
         if (mResources != null) {
-            final int resourceId = mResources.getIdentifier(resourceName, "drawable", mThemePackage);
+            final int resourceId = mResources.getIdentifier(resourceName, "drawable", BuildConfig.APPLICATION_ID);
             try {
                 return mResources.getDrawable(resourceId);
             } catch (final Resources.NotFoundException e) {
