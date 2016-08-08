@@ -18,10 +18,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
-
 import com.andrew.apollo.ui.fragments.*;
-import com.frostwire.android.R;
 import com.andrew.apollo.utils.Lists;
+import com.frostwire.android.R;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -39,13 +38,11 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     private final FragmentActivity mFragmentActivity;
 
-    private int mCurrentPage;
-
     /**
      * Constructor of <code>PagerAdapter<code>
-     * 
+     *
      * @param fragmentActivity The {@link Activity} of the
-     *            {@link Fragment}.
+     *                         {@link Fragment}.
      */
     public PagerAdapter(final FragmentActivity fragmentActivity) {
         super(fragmentActivity.getSupportFragmentManager());
@@ -55,9 +52,9 @@ public class PagerAdapter extends FragmentPagerAdapter {
     /**
      * Method that adds a new fragment class to the viewer (the fragment is
      * internally instantiate)
-     * 
+     *
      * @param className The full qualified name of fragment class.
-     * @param params The instantiate params.
+     * @param params    The instantiate params.
      */
     @SuppressWarnings("synthetic-access")
     public void add(final Class<? extends Fragment> className, final Bundle params) {
@@ -73,7 +70,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
     /**
      * Method that returns the {@link Fragment} in the argument
      * position.
-     * 
+     *
      * @param position The position of the fragment to return.
      * @return Fragment The {@link Fragment} in the argument position.
      */
@@ -90,7 +87,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
      */
     @Override
     public Object instantiateItem(final ViewGroup container, final int position) {
-        final Fragment mFragment = (Fragment)super.instantiateItem(container, position);
+        final Fragment mFragment = (Fragment) super.instantiateItem(container, position);
         final WeakReference<Fragment> mWeakFragment = mFragmentArray.get(position);
         if (mWeakFragment != null) {
             mWeakFragment.clear();
@@ -139,24 +136,6 @@ public class PagerAdapter extends FragmentPagerAdapter {
     }
 
     /**
-     * Method that returns the current page position.
-     * 
-     * @return int The current page.
-     */
-    public int getCurrentPage() {
-        return mCurrentPage;
-    }
-
-    /**
-     * Method that sets the current page position.
-     * 
-     * @param currentPage The current page.
-     */
-    protected void setCurrentPage(final int currentPage) {
-        mCurrentPage = currentPage;
-    }
-
-    /**
      * An enumeration of all the main fragments supported.
      */
     public enum MusicFragments {
@@ -184,16 +163,12 @@ public class PagerAdapter extends FragmentPagerAdapter {
          * The album fragment
          */
         ALBUM(AlbumFragment.class);
-        /**
-         * The genre fragment: On its way out if nobody complains. This isn't working properly. Let's empower playlists instead.
-         */
-        //GENRE(GenreFragment.class);
 
         private Class<? extends Fragment> mFragmentClass;
 
         /**
          * Constructor of <code>MusicFragments</code>
-         * 
+         *
          * @param fragmentClass The fragment class
          */
         MusicFragments(final Class<? extends Fragment> fragmentClass) {
@@ -202,7 +177,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
         /**
          * Method that returns the fragment class.
-         * 
+         *
          * @return Class<? extends Fragment> The fragment class.
          */
         public Class<? extends Fragment> getFragmentClass() {

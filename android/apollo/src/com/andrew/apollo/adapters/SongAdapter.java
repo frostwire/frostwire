@@ -27,7 +27,7 @@ import com.frostwire.util.Ref;
  * This {@link ArrayAdapter} is used to display all of the songs on a user's
  * device for {@link SongFragment}. It is also used to show the queue in
  * {@link QueueFragment}.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFragmentAdapter.Cacheable {

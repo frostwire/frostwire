@@ -48,8 +48,6 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         void buildCache();
     }
 
-    static Logger LOGGER = Logger.getLogger(ApolloFragmentAdapter.class);
-
     /**
      * The header view
      */
@@ -208,18 +206,18 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      */
     @Override
     public int getCount() {
-        int count = super.getCount();;
+        int count = super.getCount();
         if (mDataList != null) {
             int size = mDataList.size();
-            count = size==0 ? 0 : size + getOffset();
+            count = size == 0 ? 0 : size + getOffset();
         }
         return count;
     }
 
     /**
      * @param position - The ACTUAL position in the model container.
-     * If you're using an offset based on a list view that has a header element at 0,
-     * you must subtract to the position you might have.
+     *                 If you're using an offset based on a list view that has a header element at 0,
+     *                 you must subtract to the position you might have.
      * @return The element at the indexed position in the model container (not the view). null if position is out of bounds.
      */
     public I getItem(int position) {
@@ -230,7 +228,6 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     }
 
     /**
-     *
      * @param position The ACTUAL position in the model container.
      *                 If you have an extra header element, subtract the offset before invoking this method.
      * @return the object id. if out of bound, returns -1.

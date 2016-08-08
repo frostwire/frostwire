@@ -14,7 +14,6 @@ import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
@@ -26,12 +25,12 @@ import com.frostwire.util.Ref;
 /**
  * This {@link ArrayAdapter} is used to display all of the albums on a user's
  * device for RecentsFragment and AlbumsFragment.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements ApolloFragmentAdapter.Cacheable {
 
-    static Logger LOGGER = Logger.getLogger(AlbumAdapter.class);
+    private static final Logger LOG = Logger.getLogger(AlbumAdapter.class);
 
     /**
      * Number of views (ImageView and TextView)
@@ -73,7 +72,7 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
         updateFirstTwoArtistLines(holder, dataHolder);
 
         if (mImageFetcher == null) {
-            LOGGER.warn("ArtistAdapter has null image fetcher");
+            LOG.warn("ArtistAdapter has null image fetcher");
         }
 
         if (mImageFetcher != null && dataHolder != null && Ref.alive(holder.mImage)) {
@@ -97,7 +96,7 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
                 if (mLayoutId == R.layout.list_item_detailed_no_background) {
                     holder.mBackground.get().setBackground(null);
                     holder.mBackground.get().setBackgroundColor(convertView.getResources().getColor(R.color.app_light_background));
-                }  else {
+                } else {
                     // Asynchronously load the artist image on the background view
                     mImageFetcher.loadArtistImage(dataHolder.mLineTwo, holder.mBackground.get());
                 }
@@ -167,18 +166,8 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
     }
 
     /**
-     * @param album The key used to find the cached album to remove
-     */
-    public void removeFromCache(final Album album) {
-        if (mImageFetcher != null) {
-            mImageFetcher.removeFromCache(
-                    ImageFetcher.generateAlbumCacheKey(album.mAlbumName, album.mArtistName));
-        }
-    }
-
-    /**
      * @param extra True to load line three and the background image, false
-     *            otherwise.
+     *              otherwise.
      */
     public void setLoadExtraData(final boolean extra) {
         mLoadExtraData = extra;
@@ -187,7 +176,7 @@ public class AlbumAdapter extends ApolloFragmentAdapter<Album> implements Apollo
 
     /**
      * @param play True to play the album when the artwork is touched, false
-     *            otherwise.
+     *             otherwise.
      */
     public void setTouchPlay(final boolean play) {
         mTouchPlay = play;

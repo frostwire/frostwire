@@ -30,7 +30,7 @@ import com.frostwire.util.Ref;
 /**
  * This {@link ArrayAdapter} is used to display the albums for a particular
  * artist for {@link ArtistAlbumFragment} .
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
@@ -52,8 +52,8 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
 
     /**
      * Constructor of <code>ArtistAlbumAdapter</code>
-     * 
-     * @param context The {@link Context} to use
+     *
+     * @param context  The {@link Context} to use
      * @param layoutId The resource Id of the view to inflate.
      */
     public ArtistAlbumAdapter(final Activity context, final int layoutId) {
@@ -139,9 +139,9 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
 
     /**
      * Starts playing an album if the user touches the artwork in the list.
-     * 
+     *
      * @param album The {@link ImageView} holding the album
-     * @param pos The position of the album to play.
+     * @param pos   The position of the album to play.
      */
     protected void initAlbumPlayOnClick(final ImageView album, final int pos) {
         if (album != null) {
