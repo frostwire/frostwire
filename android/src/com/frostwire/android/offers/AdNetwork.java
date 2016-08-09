@@ -24,13 +24,27 @@ import java.lang.ref.WeakReference;
 
 interface AdNetwork {
     void initialize(final Activity activity);
+
+    /** Stops the network, any calls to started() should return false after this has been invoked */
     void stop(Context context);
+
+    /** Enables or disables the ad network */
+    void enable(boolean enabled);
+
+    /** Returns whether the ad network is enabled or not */
     boolean enabled();
+
+    /** Returns true if the network is enabled and initialized */
     boolean started();
+
     boolean showInterstitial(final WeakReference<Activity> activityRef,
                              final boolean shutdownActivityAfterwards,
                              final boolean dismissActivityAfterward);
+
     void loadNewInterstitial(Activity activity);
+
     String getShortCode();
     String getInUsePreferenceKey();
+
+    boolean isDebugOn();
 }

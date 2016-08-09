@@ -20,7 +20,6 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.util.Logger;
@@ -61,21 +60,22 @@ class RemoveAdsNetwork implements AdNetwork {
     }
 
     @Override
+    public void enable(boolean enabled) {
+        Offers.AdNetworkHelper.enable(this, enabled);
+    }
+
+    @Override
     public boolean enabled() {
-        ConfigurationManager config;
         boolean enabled = false;
         try {
             if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Products.disabledAds(PlayStore.getInstance())) {
                 enabled = false;
             } else {
-                config = ConfigurationManager.instance();
-                LOG.info("config use removeAds -> " + config.getBoolean(getInUsePreferenceKey()));
-                enabled = config.getBoolean(getInUsePreferenceKey());
+                enabled = Offers.AdNetworkHelper.enabled(this);
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        //LOG.info("enabled() -> " + enabled);
         return enabled;
     }
 
@@ -111,5 +111,10 @@ class RemoveAdsNetwork implements AdNetwork {
     @Override
     public String getInUsePreferenceKey() {
         return Constants.PREF_KEY_GUI_USE_REMOVEADS;
+    }
+
+    @Override
+    public boolean isDebugOn() {
+        return false;
     }
 }

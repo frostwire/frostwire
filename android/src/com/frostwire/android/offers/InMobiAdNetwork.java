@@ -19,7 +19,6 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 import com.inmobi.ads.InMobiInterstitial;
@@ -27,7 +26,7 @@ import com.inmobi.sdk.InMobiSdk;
 
 import java.lang.ref.WeakReference;
 
-public class InMobiAdNetwork implements AdNetwork {
+class InMobiAdNetwork implements AdNetwork {
 
     private static final Logger LOG = Logger.getLogger(InMobiAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
@@ -35,10 +34,9 @@ public class InMobiAdNetwork implements AdNetwork {
     private InMobiListener inmobiListener;
     private InMobiInterstitial inmobiInterstitial;
     private boolean started = false;
-    private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150l;
+    private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150L;
 
-
-    public InMobiAdNetwork() {
+    InMobiAdNetwork() {
     }
 
     public void initialize(final Activity activity) {
@@ -78,22 +76,17 @@ public class InMobiAdNetwork implements AdNetwork {
         LOG.info("stopped");
     }
 
-    public boolean enabled() {
-        if (DEBUG_MODE) {
-            return true;
-        }
-
-        ConfigurationManager config;
-        boolean isInMobiEnabled = false;
-        try {
-            config = ConfigurationManager.instance();
-            isInMobiEnabled = config.getBoolean(Constants.PREF_KEY_GUI_USE_INMOBI);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        return isInMobiEnabled;
+    @Override
+    public void enable(boolean enabled) {
+        Offers.AdNetworkHelper.enable(this, enabled);
     }
 
+    @Override
+    public boolean enabled() {
+        return Offers.AdNetworkHelper.enabled(this);
+    }
+
+    @Override
     public boolean showInterstitial(final WeakReference<Activity> activityWeakReference,
                                     boolean shutdownActivityAfterwards,
                                     boolean dismissActivityAfterward) {
@@ -152,5 +145,10 @@ public class InMobiAdNetwork implements AdNetwork {
     @Override
     public String getInUsePreferenceKey() {
         return Constants.PREF_KEY_GUI_USE_INMOBI;
+    }
+
+    @Override
+    public boolean isDebugOn() {
+        return DEBUG_MODE;
     }
 }

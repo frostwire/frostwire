@@ -49,6 +49,8 @@ public final class Offers {
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
+
+
     private static Map<String,AdNetwork> AD_NETWORKS;
 
     public static void initAdNetworks(Activity activity) {
@@ -61,12 +63,13 @@ public final class Offers {
         stopAdNetworksIfPurchasedRemoveAds(activity);
     }
 
-    public static Map<String, AdNetwork> getAllAdNetworks() {
+    private static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {
             AD_NETWORKS = new HashMap<>();
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
             AD_NETWORKS.put(IN_MOBI.getShortCode(), IN_MOBI);
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
+
         }
         return AD_NETWORKS;
     }
@@ -178,8 +181,7 @@ public final class Offers {
             int shortCodeOffsetInWaterfall = getKeyOffset(shortCode, waterfallShortcodes);
             boolean networkInUse = shortCodeOffsetInWaterfall != -1;
             AdNetwork network = allAdNetworks.get(shortCode);
-            // turn on/off the in use preference for that network.
-            CM.setBoolean(network.getInUsePreferenceKey(), networkInUse);
+            network.enable(networkInUse);
         }
 
         return activeAdNetworks;
@@ -194,5 +196,32 @@ public final class Offers {
             i++;
         }
         return -1;
+    }
+
+    static class AdNetworkHelper {
+        public static boolean enabled(AdNetwork network) {
+            if (network.isDebugOn()) {
+                return true;
+            }
+
+            ConfigurationManager config;
+            boolean enabled = false;
+            try {
+                config = ConfigurationManager.instance();
+                enabled = config.getBoolean(network.getInUsePreferenceKey());
+            } catch (Throwable e) {
+                LOG.error(e.getMessage(), e);
+            }
+            return enabled;
+        }
+
+        public static void enable(AdNetwork network, boolean enabled) {
+            ConfigurationManager config = ConfigurationManager.instance();
+            try {
+                config.setBoolean(network.getInUsePreferenceKey(), enabled);
+            } catch (Throwable e) {
+                LOG.error(e.getMessage(), e);
+            }
+        }
     }
 }

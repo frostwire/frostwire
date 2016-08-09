@@ -22,13 +22,12 @@ import android.content.Context;
 import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 
 import java.lang.ref.WeakReference;
 
-public class AppLovinAdNetwork implements AdNetwork {
+class AppLovinAdNetwork implements AdNetwork {
 
     private static final Logger LOG = Logger.getLogger(AppLovinAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
@@ -39,6 +38,7 @@ public class AppLovinAdNetwork implements AdNetwork {
     AppLovinAdNetwork() {
     }
 
+    @Override
     public void initialize(final Activity activity) {
         if (!enabled()) {
             if (!started()) {
@@ -77,6 +77,7 @@ public class AppLovinAdNetwork implements AdNetwork {
         LOG.info("stopped");
     }
 
+    @Override
     public void loadNewInterstitial(Activity activity) {
         interstitialAdapter = new AppLovinInterstitialAdapter(activity, this);
         AppLovinSdk.getInstance(activity).getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, interstitialAdapter);
@@ -92,26 +93,27 @@ public class AppLovinAdNetwork implements AdNetwork {
         return Constants.PREF_KEY_GUI_USE_APPLOVIN;
     }
 
+    @Override
+    public boolean isDebugOn() {
+        return DEBUG_MODE;
+    }
+
+    @Override
     public boolean started() {
         return started;
     }
 
-    public boolean enabled() {
-        if (DEBUG_MODE) {
-            return true;
-        }
-
-        ConfigurationManager config;
-        boolean enabled = false;
-        try {
-            config = ConfigurationManager.instance();
-            enabled = config.getBoolean(getInUsePreferenceKey());
-        } catch (Throwable e) {
-            LOG.error(e.getMessage(), e);
-        }
-        return enabled;
+    @Override
+    public void enable(boolean enabled) {
+        Offers.AdNetworkHelper.enable(this, enabled);
     }
 
+    @Override
+    public boolean enabled() {
+        return Offers.AdNetworkHelper.enabled(this);
+    }
+
+    @Override
     public boolean showInterstitial(final WeakReference<Activity> activityWeakReference,
                                     final boolean shutdownAfterwards,
                                     final boolean dismissAfterward) {
