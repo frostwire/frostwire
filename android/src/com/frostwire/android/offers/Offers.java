@@ -18,20 +18,19 @@
 package com.frostwire.android.offers;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
 
 import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +48,10 @@ public final class Offers {
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
+<<<<<<< HEAD
 
+=======
+>>>>>>> b2262dc... [android] finish or shutdown on dismiss DRY refactor
 
     private static Map<String,AdNetwork> AD_NETWORKS;
 
@@ -69,7 +71,10 @@ public final class Offers {
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
             AD_NETWORKS.put(IN_MOBI.getShortCode(), IN_MOBI);
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
+<<<<<<< HEAD
 
+=======
+>>>>>>> b2262dc... [android] finish or shutdown on dismiss DRY refactor
         }
         return AD_NETWORKS;
     }
@@ -99,6 +104,9 @@ public final class Offers {
                 LOG.info("showInterstitial: AdNetwork " + adNetwork.getClass().getSimpleName() + " started? " + adNetwork.started());
                 if (!interstitialShown && adNetwork != null && adNetwork.started()) {
                     interstitialShown = adNetwork.showInterstitial(activityRef, shutdownAfterwards, dismissAfterwards);
+                    if (interstitialShown) {
+                        LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial shown");
+                    }
                 }
             }
         }
@@ -132,7 +140,7 @@ public final class Offers {
         }
     }
 
-    static void tryBackToBackInterstitial(WeakReference<Activity> activityRef) {
+    private static void tryBackToBackInterstitial(WeakReference<? extends Activity> activityRef) {
         if (REMOVE_ADS == null || !REMOVE_ADS.enabled() || !REMOVE_ADS.started()) {
             return;
         }
@@ -156,7 +164,7 @@ public final class Offers {
     }
 
     /**
-     * Checks the preference values under Constants.PREF_KEY_GUI_OFFERS_WATERFALL to deactivate
+     * Also checks the preference values under Constants.PREF_KEY_GUI_OFFERS_WATERFALL and deactivates
      * the networks that have not been specified there.
      * @return The Array of Active AdNetworks.
      */
@@ -169,22 +177,29 @@ public final class Offers {
             return new AdNetwork[] {};
         }
 
-        final AdNetwork[] activeAdNetworks = new AdNetwork[waterfallShortcodes.length];
+        final List<AdNetwork> activeAdNetworksList = new ArrayList<>(waterfallShortcodes.length);
 
-        int i = 0;
         for (String shortCode : waterfallShortcodes) {
-            activeAdNetworks[i++] = allAdNetworks.get(shortCode);
+            if (allAdNetworks.containsKey(shortCode)) {
+                final AdNetwork adNetwork = allAdNetworks.get(shortCode);
+                adNetwork.enable(true);
+                activeAdNetworksList.add(adNetwork);
+            } else {
+                LOG.warn("unknown ad network shortcode '" + shortCode + "'");
+            }
         }
 
-        // turn on/off all the networks not on activeAdNetworks if any.
+        // turn off all the networks not on activeAdNetworks if any.
         for (String shortCode : allAdNetworks.keySet()) {
             int shortCodeOffsetInWaterfall = getKeyOffset(shortCode, waterfallShortcodes);
             boolean networkInUse = shortCodeOffsetInWaterfall != -1;
-            AdNetwork network = allAdNetworks.get(shortCode);
-            network.enable(networkInUse);
+            AdNetwork adNetwork = allAdNetworks.get(shortCode);
+            // can be null if there's a typo or it's a new network unknown to this client
+            if (adNetwork != null && !networkInUse) {
+                adNetwork.enable(false);
+            }
         }
-
-        return activeAdNetworks;
+        return activeAdNetworksList.toArray(new AdNetwork[activeAdNetworksList.size()]);
     }
 
     private static int getKeyOffset(String key, String[] keys) {
@@ -198,7 +213,7 @@ public final class Offers {
         return -1;
     }
 
-    static class AdNetworkHelper {
+    public static class AdNetworkHelper {
         public static boolean enabled(AdNetwork network) {
             if (network.isDebugOn()) {
                 return true;
@@ -221,6 +236,34 @@ public final class Offers {
                 config.setBoolean(network.getInUsePreferenceKey(), enabled);
             } catch (Throwable e) {
                 LOG.error(e.getMessage(), e);
+            }
+        }
+
+        public static void dismissAndOrShutdownIfNecessary(WeakReference<? extends Activity> activityRef,
+                                                           boolean finishAfterDismiss,
+                                                           boolean shutdownAfter,
+                                                           boolean tryBack2BackRemoveAdsOffer,
+                                                           Application fallbackContext) {
+            if (Ref.alive(activityRef)) {
+                Activity callerActivity = activityRef.get();
+                if (finishAfterDismiss) {
+                    callerActivity.finish();
+                }
+                if (shutdownAfter) {
+                    if (callerActivity instanceof MainActivity) {
+                        ((MainActivity) callerActivity).shutdown();
+                    } else {
+                        UIUtils.sendShutdownIntent(callerActivity);
+                    }
+                }
+
+                if (!finishAfterDismiss && !shutdownAfter && tryBack2BackRemoveAdsOffer) {
+                    Offers.tryBackToBackInterstitial(activityRef);
+                }
+            } else {
+                if (shutdownAfter) {
+                    UIUtils.sendShutdownIntent(fallbackContext);
+                }
             }
         }
     }

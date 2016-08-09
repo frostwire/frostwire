@@ -24,7 +24,7 @@ import java.lang.ref.WeakReference;
 interface InterstitialListener {
     boolean isAdReadyToDisplay();
     boolean isVideoAd();
-    boolean show(WeakReference<Activity> activityWeakReference);
+    boolean show(WeakReference<? extends Activity> activityWeakReference);
     void shutdownAppAfter(boolean shutdown);
     void dismissActivityAfterwards(boolean dismiss);
 }

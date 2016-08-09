@@ -114,7 +114,7 @@ class AppLovinAdNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean showInterstitial(final WeakReference<Activity> activityWeakReference,
+    public boolean showInterstitial(final WeakReference<? extends Activity> activityWeakReference,
                                     final boolean shutdownAfterwards,
                                     final boolean dismissAfterward) {
         if (enabled() && started) {

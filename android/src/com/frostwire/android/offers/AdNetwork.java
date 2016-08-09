@@ -37,7 +37,7 @@ interface AdNetwork {
     /** Returns true if the network is enabled and initialized */
     boolean started();
 
-    boolean showInterstitial(final WeakReference<Activity> activityRef,
+    boolean showInterstitial(final WeakReference<? extends Activity> activityRef,
                              final boolean shutdownActivityAfterwards,
                              final boolean dismissActivityAfterward);
 

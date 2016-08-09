@@ -86,7 +86,7 @@ class RemoveAdsNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean showInterstitial(WeakReference<Activity> activityRef, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward) {
+    public boolean showInterstitial(WeakReference<? extends Activity> activityRef, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward) {
         if (started() && enabled() && Ref.alive(activityRef)) {
             Intent intent = new Intent(activityRef.get(), BuyActivity.class);
             intent.putExtra(BuyActivity.INTERSTITIAL_MODE, true);
