@@ -92,6 +92,7 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
         LOG.info("onInterstitialLoaded");
         ready = true;
         interstitialShowSuccess = true;
+        ad = interstitialAd;
     }
 
     @Override
@@ -102,6 +103,7 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
             showSuccessLatch.countDown();
         }
         ready = false;
+        ad = null;
         // TODO: Reload logic.
     }
 
