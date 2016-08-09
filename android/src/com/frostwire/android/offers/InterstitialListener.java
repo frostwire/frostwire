@@ -21,7 +21,7 @@ import android.app.Activity;
 
 import java.lang.ref.WeakReference;
 
-public interface InterstitialListener {
+interface InterstitialListener {
     boolean isAdReadyToDisplay();
     boolean isVideoAd();
     boolean show(WeakReference<Activity> activityWeakReference);
