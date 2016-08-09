@@ -26,8 +26,6 @@ import com.applovin.sdk.AppLovinAd;
 import com.applovin.sdk.AppLovinAdDisplayListener;
 import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinSdk;
-import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -35,7 +33,7 @@ import java.lang.ref.WeakReference;
 
 class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDisplayListener, AppLovinAdLoadListener {
     private static final Logger LOG = Logger.getLogger(AppLovinInterstitialAdapter.class);
-    private WeakReference<Activity> activityRef;
+    private WeakReference<? extends Activity> activityRef;
     private final Application app;
     private AppLovinAdNetwork appLovinAdNetwork;
     private AppLovinAd ad;
@@ -47,7 +45,6 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
     AppLovinInterstitialAdapter(Activity parentActivity, AppLovinAdNetwork appLovinAdNetwork) {
         this.activityRef = Ref.weak(parentActivity);
         this.appLovinAdNetwork = appLovinAdNetwork;
-
         this.app = parentActivity.getApplication();
     }
 
@@ -73,7 +70,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
         return isVideoAd;
     }
 
-    public boolean show(WeakReference<Activity> activityWeakReference) {
+    public boolean show(WeakReference<? extends Activity> activityWeakReference) {
         boolean result = false;
         if (ad != null && Ref.alive(activityWeakReference)) {
             try {
@@ -114,30 +111,8 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
 
     @Override
     public void adHidden(AppLovinAd appLovinAd) {
-        dismissAndOrShutdownIfNecessary();
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, dismissAfter, shutdownAfter, true, app);
         reloadInterstitial(appLovinAd);
-    }
-
-    private void dismissAndOrShutdownIfNecessary() {
-        if (Ref.alive(activityRef)) {
-            Activity callerActivity = activityRef.get();
-            if (dismissAfter) {
-                callerActivity.finish();
-            }
-            if (shutdownAfter) {
-                if (callerActivity instanceof MainActivity) {
-                    ((MainActivity) callerActivity).shutdown();
-                }
-            }
-
-            if (!dismissAfter && !shutdownAfter) {
-                Offers.tryBackToBackInterstitial(activityRef);
-            }
-        } else {
-            if (shutdownAfter) {
-                UIUtils.sendShutdownIntent(app);
-            }
-        }
     }
 
     private void reloadInterstitial(AppLovinAd appLovinAd) {

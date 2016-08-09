@@ -31,7 +31,6 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
@@ -39,6 +38,7 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
+import com.frostwire.util.Ref;
 
 import java.util.Random;
 
@@ -184,18 +184,12 @@ public class BuyActivity extends AbstractActivity {
             boolean dismissActivityAfterward = intent.getBooleanExtra("dismissActivityAfterward", false);
             boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
 
-            if (dismissActivityAfterward) {
-                Intent i = new Intent(this, MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.putExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY, true);
-                startActivity(i);
-                return;
-            }
-
-            if (shutdownActivityAfterwards) {
-                UIUtils.sendShutdownIntent(this);
-                return;
-            }
+            Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(
+                    Ref.weak(this),
+                    dismissActivityAfterward,
+                    shutdownActivityAfterwards,
+                    false,
+                    getApplication());
 
             finish();
         }
