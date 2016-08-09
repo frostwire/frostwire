@@ -153,7 +153,7 @@ public final class Constants {
     /**
      * URL where FrostWire checks for software updates
      */
-    public static final String SERVER_UPDATE_URL = "http://update.frostwire.com/android";
+    public static final String SERVER_UPDATE_URL = "http://update1.frostwire.com/android";
     private static final String FROM_URL_PARAMETERS = "from=android&basic=" + (IS_GOOGLE_PLAY_DISTRIBUTION ? "1" : "0") + "&version=" + FROSTWIRE_VERSION_STRING + "&build=" + FROSTWIRE_BUILD;
     public static final String FROSTWIRE_PLUS_URL = "http://www.frostwire.com/android?" + FROM_URL_PARAMETERS;
     public static final String SERVER_PROMOTIONS_URL = "http://update.frostwire.com/o.php?" + FROM_URL_PARAMETERS;
@@ -164,6 +164,7 @@ public final class Constants {
     public static final long LIBRARIAN_FILE_COUNT_CACHE_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
     public static final String INMOBI_INTERSTITIAL_PROPERTY_ID = "c1e6be702d614523b725af8b86f99e8f";
+    public static final String MOBFOX_INVENTORY_HASH = "cc73727fabc4235d769120f8a1d0635d";
 
     public static final int NOTIFIED_BLOOM_FILTER_BITSET_SIZE = 320000; //40 kilobytes
     public static final int NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS = 10000;

@@ -48,7 +48,10 @@ import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.MainMenuAdapter;
-import com.frostwire.android.gui.dialogs.*;
+import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
+import com.frostwire.android.gui.dialogs.NewTransferDialog;
+import com.frostwire.android.gui.dialogs.SDPermissionDialog;
+import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.fragments.BrowsePeerFragment;
 import com.frostwire.android.gui.fragments.MainFragment;
 import com.frostwire.android.gui.fragments.SearchFragment;
@@ -62,8 +65,8 @@ import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.util.Logger;
 import com.frostwire.platform.Platforms;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
@@ -820,6 +823,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (checker != null) {
             checker.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+        Offers.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private static final class MenuDrawerToggle extends ActionBarDrawerToggle {

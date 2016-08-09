@@ -28,6 +28,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
+import com.mobfox.sdk.interstitialads.InterstitialAd;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -47,6 +48,7 @@ public final class Offers {
 
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
+    private final static MobFoxAdNetwork MOBFOX = new MobFoxAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
 
     private static Map<String,AdNetwork> AD_NETWORKS;
@@ -61,12 +63,26 @@ public final class Offers {
         stopAdNetworksIfPurchasedRemoveAds(activity);
     }
 
+    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (AD_NETWORKS == null) {
+            return;
+        }
+        final MobFoxAdNetwork adNetwork = (MobFoxAdNetwork) AD_NETWORKS.get(Constants.AD_NETWORK_SHORTCODE_MOBFOX);
+        if (adNetwork != null && adNetwork.enabled() && adNetwork.started()) {
+            final InterstitialAd interstitialAd = adNetwork.getInterstitialAd();
+            if (interstitialAd != null) {
+                interstitialAd.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
+    }
+
     private static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {
             AD_NETWORKS = new HashMap<>();
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
             AD_NETWORKS.put(IN_MOBI.getShortCode(), IN_MOBI);
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
+            AD_NETWORKS.put(MOBFOX.getShortCode(), MOBFOX);
         }
         return AD_NETWORKS;
     }

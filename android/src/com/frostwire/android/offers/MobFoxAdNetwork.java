@@ -19,8 +19,10 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
+import com.mobfox.sdk.interstitialads.InterstitialAd;
 
 import java.lang.ref.WeakReference;
 
@@ -29,12 +31,19 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  * @author aldenml
  */
-class MobFoxAdNetwork implements AdNetwork {
+final class MobFoxAdNetwork implements AdNetwork {
     private static final Logger LOG = Logger.getLogger(MobFoxAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
 
-    private final String inventoryHash = "cc73727fabc4235d769120f8a1d0635d";
     private boolean started = false;
+    private MobFoxInterstitialListener interstitialAdListener = null;
+    private InterstitialAd interstitialAd;
+
+    // these guys want you to handle permission handling, so MainActivity will need
+    // this reference to invoke onPermissionsGranted on the ad.
+    InterstitialAd getInterstitialAd() {
+        return interstitialAd;
+    }
 
     @Override
     public void initialize(Activity activity) {
@@ -48,6 +57,7 @@ class MobFoxAdNetwork implements AdNetwork {
             }
             return;
         }
+        loadNewInterstitial(activity);
         started = true;
     }
 
@@ -72,13 +82,52 @@ class MobFoxAdNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean showInterstitial(WeakReference<Activity> activityRef, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward) {
-        return false;
+    public boolean showInterstitial(WeakReference<? extends Activity> activityRef, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward) {
+        if (enabled() && started) {
+            interstitialAdListener.shutdownAppAfter(shutdownActivityAfterwards);
+            interstitialAdListener.dismissActivityAfterwards(dismissActivityAfterward);
+            try {
+                return interstitialAdListener.isAdReadyToDisplay() && interstitialAdListener.show(activityRef);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     @Override
     public void loadNewInterstitial(Activity activity) {
+        LOG.info("loadNewInterstitial");
+        interstitialAdListener = new MobFoxInterstitialListener(activity);
+        interstitialAd = new InterstitialAd(activity);
 
+// failed reflection attempt to suppress asking for location permissions.
+//        final BannerInitTasks initTasks = interstitialAd.getBanner().getInitTasks();
+//        try {
+//            final Field tasksField = initTasks.getClass().getDeclaredField("tasks");
+//            tasksField.setAccessible(true);
+//            Map<BannerInitTasks.Tasks, Boolean> tasks = (Map<BannerInitTasks.Tasks, Boolean>) tasksField.get(initTasks);
+//            if (tasks != null) {
+//                tasks.remove(BannerInitTasks.Tasks.GET_LOCATION);
+//                LOG.info("Removed GET_LOCATION task");
+//            }
+//        } catch (Throwable t) {
+//            t.printStackTrace();
+//        }
+
+        interstitialAd.setInventoryHash(Constants.MOBFOX_INVENTORY_HASH);
+        interstitialAd.setListener(interstitialAdListener);
+
+        // make sure this happens on the UI thread.
+        Handler handler = new Handler(activity.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                interstitialAd.load();
+            }
+        });
     }
 
     @Override
