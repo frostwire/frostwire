@@ -49,7 +49,7 @@ public final class Offers {
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
-
+    private final static MobFoxAdNetwork MOBFOX = new MobFoxAdNetwork();
 
     private static Map<String,AdNetwork> AD_NETWORKS;
 
@@ -69,7 +69,7 @@ public final class Offers {
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
             AD_NETWORKS.put(IN_MOBI.getShortCode(), IN_MOBI);
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
-
+            AD_NETWORKS.put(MOBFOX.getShortCode(), MOBFOX);
         }
         return AD_NETWORKS;
     }
