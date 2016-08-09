@@ -60,6 +60,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, true);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_INMOBI, false);
+        defaultValues.put(Constants.PREF_KEY_GUI_USE_MOBFOX, false);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
         defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 5);
