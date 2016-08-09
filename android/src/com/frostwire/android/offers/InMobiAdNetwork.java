@@ -31,7 +31,7 @@ class InMobiAdNetwork implements AdNetwork {
     private static final Logger LOG = Logger.getLogger(InMobiAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
 
-    private InMobiListener inmobiListener;
+    private InMobiInterstitialListener inmobiListener;
     private InMobiInterstitial inmobiInterstitial;
     private boolean started = false;
     private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150L;
@@ -87,7 +87,7 @@ class InMobiAdNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean showInterstitial(final WeakReference<Activity> activityWeakReference,
+    public boolean showInterstitial(final WeakReference<? extends Activity> activityWeakReference,
                                     boolean shutdownActivityAfterwards,
                                     boolean dismissActivityAfterward) {
         if (!started || !enabled() || inmobiInterstitial == null || inmobiListener == null) {
@@ -125,7 +125,7 @@ class InMobiAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 try {
-                    inmobiListener = new InMobiListener(activity);
+                    inmobiListener = new InMobiInterstitialListener(activity);
                     inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
                     inmobiInterstitial.load();
                 } catch (Throwable t) {
