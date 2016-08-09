@@ -26,6 +26,7 @@ import com.mobfox.sdk.interstitialads.InterstitialAdListener;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 8/9/16.
@@ -68,7 +69,7 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
                 showSuccessLatch = new CountDownLatch(1);
                 ad.show();
                 // TODO: fine tune this maximum wait to the minimum possible.
-                showSuccessLatch.wait(2000);
+                showSuccessLatch.await(2, TimeUnit.SECONDS);
                 result = interstitialShowSuccess;
             } catch (Throwable t) {
                 result = false;
