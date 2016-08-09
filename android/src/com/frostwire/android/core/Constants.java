@@ -95,6 +95,7 @@ public final class Constants {
     public static final String PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG = "frostwire.prefs.gui.show_new_transfer_dialog";
     public static final String PREF_KEY_GUI_USE_APPLOVIN = "frostwire.prefs.gui.use_applovin";
     public static final String PREF_KEY_GUI_USE_INMOBI = "frostwire.prefs.gui.use_inmobi";
+    public static final String PREF_KEY_GUI_USE_MOBFOX = "frostwire.prefs.gui.use_mobfox";
     public static final String PREF_KEY_GUI_USE_REMOVEADS = "frostwire.prefs.gui.removeads";
     public static final String PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD = "frostwire.prefs.gui.removeads_back_to_back_threshold";
     public static final String PREF_KEY_GUI_SUPPORT_FROSTWIRE = "frostwire.prefs.gui.support_fw2";
@@ -184,4 +185,5 @@ public final class Constants {
     public static final String AD_NETWORK_SHORTCODE_APPLOVIN = "AL";
     public static final String AD_NETWORK_SHORTCODE_INMOBI = "IM";
     public static final String AD_NETWORK_SHORTCODE_REMOVEADS = "RA";
+    public static final String AD_NETWORK_SHORTCODE_MOBFOX = "MF";
 }
