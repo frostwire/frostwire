@@ -24,6 +24,5 @@ package com.frostwire.android.gui.transfers;
  *
  */
 public interface InvalidTransfer {
-
-    public int getReasonResId();
+    int getReasonResId();
 }

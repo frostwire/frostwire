@@ -367,7 +367,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             }
         }
 
-        return canDelete ? directory.delete() : false;
+        return canDelete && directory.delete();
     }
 
     private long calculateSize(BTDownload dl) {

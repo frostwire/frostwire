@@ -630,7 +630,6 @@ public class SettingsActivity extends PreferenceActivity {
                     dialog.dismiss();
                     if (finishOnBack) {
                         finish();
-                        return;
                     }
                 }
             });

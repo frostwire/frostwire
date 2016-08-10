@@ -78,7 +78,7 @@ public final class ImageLoader {
 
     private static ImageLoader instance;
 
-    public final static ImageLoader getInstance(Context context) {
+    public static ImageLoader getInstance(Context context) {
         if (instance == null) {
             instance = new ImageLoader(context);
         }
@@ -283,7 +283,7 @@ public final class ImageLoader {
          * @param artistName The name of the artist
          * @return The ID for an album.
          */
-        private static final long getFirstAlbumIdForArtist(final Context context, final String artistName) {
+        private static long getFirstAlbumIdForArtist(final Context context, final String artistName) {
             int id = -1;
             try {
                 Cursor cursor = context.getContentResolver().query(

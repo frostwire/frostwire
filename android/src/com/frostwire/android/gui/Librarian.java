@@ -463,6 +463,7 @@ public final class Librarian {
                 query.moveToFirst();
                 fileDescriptor.filePath = query.getString(pathColumn);
                 fileDescriptor.fileType = (byte) MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(fileDescriptor.filePath)).getId();
+                query.close();
             } catch (Throwable t) {
             }
         }

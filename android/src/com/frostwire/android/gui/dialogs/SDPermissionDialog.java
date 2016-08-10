@@ -19,7 +19,6 @@
 package com.frostwire.android.gui.dialogs;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
@@ -36,8 +35,6 @@ import com.frostwire.android.gui.views.ClickAdapter;
 public final class SDPermissionDialog extends AbstractDialog {
 
     public static final String TAG = getSuggestedTAG(SDPermissionDialog.class);
-
-    private Button buttonYes;
 
     public SDPermissionDialog() {
         super(R.layout.dialog_default_checkbox);
@@ -60,7 +57,7 @@ public final class SDPermissionDialog extends AbstractDialog {
 
         DialogListener yes = new DialogListener(this, true);
 
-        buttonYes = findView(dlg, R.id.dialog_default_checkbox_button_yes);
+        Button buttonYes = findView(dlg, R.id.dialog_default_checkbox_button_yes);
         buttonYes.setText(android.R.string.yes);
         buttonYes.setOnClickListener(yes);
 
@@ -83,7 +80,7 @@ public final class SDPermissionDialog extends AbstractDialog {
 
         private final boolean positive;
 
-        public DialogListener(SDPermissionDialog owner, boolean positive) {
+        DialogListener(SDPermissionDialog owner, boolean positive) {
             super(owner);
             this.positive = positive;
         }
