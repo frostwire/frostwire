@@ -31,10 +31,10 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 
 class InMobiInterstitialListener implements InterstitialListener, InMobiInterstitial.InterstitialAdListener {
-    private final Logger LOG = Logger.getLogger(InMobiInterstitial.InterstitialAdListener.class);
+    private static final Logger LOG = Logger.getLogger(InMobiInterstitial.InterstitialAdListener.class);
     private final WeakReference<? extends Activity> activityRef;
     private final Application app;
-    private boolean shutdownAfterDismiss = false;
+    private boolean shutDownAfter = false;
     private boolean finishAfterDismiss = false;
     private boolean ready;
     private static final int MAX_INTERSTITIAL_LOAD_RETRIES = 5;
@@ -103,7 +103,7 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
 
     @Override
     public void shutdownAppAfter(boolean shutdown) {
-        shutdownAfterDismiss = shutdown;
+        shutDownAfter = shutdown;
     }
 
     @Override
@@ -122,8 +122,8 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     }
 
     private void wrapItUp(InMobiInterstitial imInterstitial) {
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutdownAfterDismiss, true, app);
-        if (!shutdownAfterDismiss) {
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutDownAfter, true, app);
+        if (!shutDownAfter) {
             reloadInterstitialLater(imInterstitial, INTERSTITIAL_RELOAD_WAIT_IN_SECS);
         }
     }
