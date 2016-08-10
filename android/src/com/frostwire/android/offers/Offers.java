@@ -98,8 +98,8 @@ public final class Offers {
         } else {
             final WeakReference<Activity> activityRef = Ref.weak(activity);
             for (AdNetwork adNetwork : getActiveAdNetworks()) {
-                LOG.info("showInterstitial: AdNetwork " + adNetwork.getClass().getSimpleName() + " started? " + adNetwork.started());
                 if (!interstitialShown && adNetwork != null && adNetwork.started()) {
+                    LOG.info("showInterstitial: AdNetwork " + adNetwork.getClass().getSimpleName() + " started? " + adNetwork.started());
                     interstitialShown = adNetwork.showInterstitial(activityRef, shutdownAfterwards, dismissAfterwards);
                     if (interstitialShown) {
                         LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial shown");
