@@ -19,7 +19,6 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Handler;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 import com.mobfox.sdk.interstitialads.InterstitialAd;
@@ -64,6 +63,8 @@ final class MobFoxAdNetwork implements AdNetwork {
     @Override
     public void stop(Context context) {
         started = false;
+        interstitialAd = null;
+        interstitialAdListener = null;
     }
 
     @Override
@@ -84,6 +85,12 @@ final class MobFoxAdNetwork implements AdNetwork {
     @Override
     public boolean showInterstitial(WeakReference<? extends Activity> activityRef, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward) {
         if (enabled() && started) {
+
+            if (interstitialAdListener == null) {
+                LOG.warn("showInterstitial() aborted. interstitial ad listener wasn't created yet, check your logic.");
+                return false;
+            }
+
             interstitialAdListener.shutdownAppAfter(shutdownActivityAfterwards);
             interstitialAdListener.dismissActivityAfterwards(dismissActivityAfterward);
             try {
@@ -102,27 +109,10 @@ final class MobFoxAdNetwork implements AdNetwork {
         LOG.info("loadNewInterstitial");
         interstitialAdListener = new MobFoxInterstitialListener(activity);
         interstitialAd = new InterstitialAd(activity);
-
-// failed reflection attempt to suppress asking for location permissions.
-//        final BannerInitTasks initTasks = interstitialAd.getBanner().getInitTasks();
-//        try {
-//            final Field tasksField = initTasks.getClass().getDeclaredField("tasks");
-//            tasksField.setAccessible(true);
-//            Map<BannerInitTasks.Tasks, Boolean> tasks = (Map<BannerInitTasks.Tasks, Boolean>) tasksField.get(initTasks);
-//            if (tasks != null) {
-//                tasks.remove(BannerInitTasks.Tasks.GET_LOCATION);
-//                LOG.info("Removed GET_LOCATION task");
-//            }
-//        } catch (Throwable t) {
-//            t.printStackTrace();
-//        }
-
         interstitialAd.setInventoryHash(Constants.MOBFOX_INVENTORY_HASH);
         interstitialAd.setListener(interstitialAdListener);
 
-        // make sure this happens on the UI thread.
-        Handler handler = new Handler(activity.getMainLooper());
-        handler.post(new Runnable() {
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 interstitialAd.load();
