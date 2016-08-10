@@ -30,11 +30,7 @@
 
     <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="23"/>
 
-    <!-- TODO:
-      This is a dangerous permission, so it will require a bit more work if we want to do this.
-      Hopefully we can work without it at the beginning.
-      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
-      -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
