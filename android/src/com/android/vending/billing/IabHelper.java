@@ -1043,7 +1043,7 @@ public class IabHelper {
             Bundle skuDetails = mService.getSkuDetails(3, mContext.getPackageName(),
                     itemType, querySkus);
 
-            if (!skuDetails.containsKey(RESPONSE_GET_SKU_DETAILS_LIST)) {
+            if (skuDetails != null && !skuDetails.containsKey(RESPONSE_GET_SKU_DETAILS_LIST)) {
                 int response = getResponseCodeFromBundle(skuDetails);
                 if (response != BILLING_RESPONSE_RESULT_OK) {
                     logDebug("getSkuDetails() failed: " + getResponseDesc(response));

@@ -65,13 +65,12 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private final byte fileType;
     private final ImageLoader thumbnailLoader;
     private final DownloadButtonClickListener downloadButtonClickListener;
-    private final FileListFilter fileListFilter;
 
     protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType) {
         super(context, getViewItemId(fileType), convertFiles(files));
         setShowMenuOnClick(true);
 
-        fileListFilter = new FileListFilter();
+        FileListFilter fileListFilter = new FileListFilter();
         setAdapterFilter(fileListFilter);
 
         this.fileType = fileType;

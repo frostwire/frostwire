@@ -32,5 +32,5 @@ public interface ListAdapterFilter<T> {
      * @param obj
      * @return
      */
-    public boolean accept(T obj, CharSequence constraint);
+    boolean accept(T obj, CharSequence constraint);
 }

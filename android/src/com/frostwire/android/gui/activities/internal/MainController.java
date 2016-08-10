@@ -18,21 +18,16 @@
 package com.frostwire.android.gui.activities.internal;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.frostwire.android.R;
-import com.frostwire.android.core.FileDescriptor;
-import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.WizardActivity;
-import com.frostwire.android.offers.Offers;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.transfers.TransferManager;
 
 /**
  * @author gubatron
@@ -81,6 +76,7 @@ public final class MainController {
     }
 
     public void startWizardActivity() {
+        ConfigurationManager.instance().resetToDefaults();
         Intent i = new Intent(activity, WizardActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         activity.startActivity(i);

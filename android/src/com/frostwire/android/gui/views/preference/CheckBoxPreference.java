@@ -51,7 +51,7 @@ public class CheckBoxPreference extends android.preference.CheckBoxPreference {
             public void onClick(View v) {
                 CheckBoxPreference.this.setChecked(checkbox.isChecked());
                 CheckBoxPreference.this.getOnPreferenceChangeListener().onPreferenceChange(CheckBoxPreference.this,
-                        new Boolean(checkbox.isChecked()));
+                        Boolean.valueOf(checkbox.isChecked()));
             }
         });
 

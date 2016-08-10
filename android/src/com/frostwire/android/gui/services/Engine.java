@@ -133,19 +133,19 @@ public final class Engine implements IEngineService {
     }
 
     public boolean isStarting() {
-        return service != null ? service.isStarting() : false;
+        return service != null && service.isStarting();
     }
 
     public boolean isStopped() {
-        return service != null ? service.isStopped() : false;
+        return service != null && service.isStopped();
     }
 
     public boolean isStopping() {
-        return service != null ? service.isStopping() : false;
+        return service != null && service.isStopping();
     }
 
     public boolean isDisconnected() {
-        return service != null ? service.isDisconnected() : false;
+        return service != null && service.isDisconnected();
     }
 
     public void startServices() {

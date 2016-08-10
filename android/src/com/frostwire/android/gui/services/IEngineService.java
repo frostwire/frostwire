@@ -18,12 +18,11 @@
 
 package com.frostwire.android.gui.services;
 
+import android.app.Application;
+import com.frostwire.android.core.player.CoreMediaPlayer;
+
 import java.io.File;
 import java.util.concurrent.ExecutorService;
-
-import android.app.Application;
-
-import com.frostwire.android.core.player.CoreMediaPlayer;
 
 /**
  * @author gubatron
@@ -32,36 +31,36 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
  */
 public interface IEngineService {
 
-    public static final byte STATE_INVALID = -1;
-    public static final byte STATE_STARTED = 10;
-    public static final byte STATE_STARTING = 11;
-    public static final byte STATE_STOPPED = 12;
-    public static final byte STATE_STOPPING = 13;
-    public static final byte STATE_DISCONNECTED = 14;
+    byte STATE_INVALID = -1;
+    byte STATE_STARTED = 10;
+    byte STATE_STARTING = 11;
+    byte STATE_STOPPED = 12;
+    byte STATE_STOPPING = 13;
+    byte STATE_DISCONNECTED = 14;
 
-    public CoreMediaPlayer getMediaPlayer();
+    CoreMediaPlayer getMediaPlayer();
 
-    public byte getState();
+    byte getState();
 
-    public boolean isStarted();
+    boolean isStarted();
 
-    public boolean isStarting();
+    boolean isStarting();
 
-    public boolean isStopped();
+    boolean isStopped();
 
-    public boolean isStopping();
+    boolean isStopping();
 
-    public boolean isDisconnected();
+    boolean isDisconnected();
 
-    public void startServices();
+    void startServices();
 
-    public void stopServices(boolean disconnected);
+    void stopServices(boolean disconnected);
 
-    public ExecutorService getThreadPool();
+    ExecutorService getThreadPool();
 
-    public void notifyDownloadFinished(String displayName, File file);
+    void notifyDownloadFinished(String displayName, File file);
     
-    public Application getApplication();
+    Application getApplication();
 
-    public void shutdown();
+    void shutdown();
 }
