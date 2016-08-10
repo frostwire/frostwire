@@ -54,6 +54,12 @@ public final class Offers {
     private static Map<String,AdNetwork> AD_NETWORKS;
 
     public static void initAdNetworks(Activity activity) {
+        boolean supportFrostWire = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
+        if (!supportFrostWire) {
+            LOG.info("initAdNetworks(). Aborting, PREF_KEY_GUI_SUPPORT_FROSTWIRE = false");
+            return;
+        }
+
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
             if (adNetwork != null) { // because of a typo on config file this can happen
                 adNetwork.initialize(activity);
@@ -257,12 +263,14 @@ public final class Offers {
                 if (finishAfterDismiss) {
                     callerActivity.finish();
                 }
+
                 if (shutdownAfter) {
                     if (callerActivity instanceof MainActivity) {
                         ((MainActivity) callerActivity).shutdown();
                     } else {
                         UIUtils.sendShutdownIntent(callerActivity);
                     }
+                    return;
                 }
 
                 if (!finishAfterDismiss && !shutdownAfter && tryBack2BackRemoveAdsOffer) {
