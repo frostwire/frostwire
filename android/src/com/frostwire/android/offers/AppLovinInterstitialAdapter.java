@@ -38,7 +38,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
     private AppLovinAdNetwork appLovinAdNetwork;
     private AppLovinAd ad;
 
-    private boolean dismissAfter = false;
+    private boolean finishAfterDismiss = false;
     private boolean shutdownAfter = false;
     private boolean isVideoAd = false;
 
@@ -102,7 +102,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
     }
 
     public void dismissActivityAfterwards(boolean dismiss) {
-        dismissAfter = dismiss;
+        finishAfterDismiss = dismiss;
     }
 
     @Override
@@ -111,7 +111,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
 
     @Override
     public void adHidden(AppLovinAd appLovinAd) {
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, dismissAfter, shutdownAfter, true, app);
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutdownAfter, true, app);
         reloadInterstitial(appLovinAd);
     }
 
