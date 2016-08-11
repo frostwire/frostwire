@@ -109,6 +109,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private Fragment currentFragment;
     private final Stack<Integer> fragmentsStack;
     private PlayerMenuItemView playerItem;
+    private AdMenuItemView menuAdItem;
     private TimerSubscription playerSubscription;
     private BroadcastReceiver mainBroadcastReceiver;
     private boolean externalStoragePermissionsRequested = false;
@@ -190,6 +191,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         leftDrawer = findView(R.id.activity_main_left_drawer);
         listMenu = findView(R.id.left_drawer);
         initPlayerItemListener();
+        initAdMenuItemListener();
         setupFragments();
         setupMenuItems();
         setupInitialFragment(savedInstanceState);
@@ -210,12 +212,23 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         });
     }
 
+    private void initAdMenuItemListener() {
+        menuAdItem = findView(R.id.slidermenu_ad_menuitem);
+//        menuAdItem.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                controller.launchPlayerActivity();
+//            }
+//        });
+    }
+
     private void initDrawerListener() {
         drawerLayout = findView(R.id.drawer_layout);
         drawerLayout.setDrawerListener(new SimpleDrawerListener() {
             @Override
             public void onDrawerStateChanged(int newState) {
                 refreshPlayerItem();
+                refreshMenuAdItem();
             }
 
             @Override
@@ -326,8 +339,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         initDrawerListener();
         setupDrawer();
         initPlayerItemListener();
+        initAdMenuItemListener();
 
         refreshPlayerItem();
+        refreshMenuAdItem();
 
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
@@ -629,6 +644,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
+    private void refreshMenuAdItem() {
+        if (playerItem == null || playerItem.getVisibility() == View.GONE) {
+            menuAdItem.setVisibility(View.VISIBLE);
+        } else {
+            menuAdItem.setVisibility(View.GONE);
+        }
+    }
+
     private void setupMenuItems() {
         listMenu.setAdapter(new MainMenuAdapter(this));
         listMenu.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
@@ -854,6 +877,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             if (Ref.alive(activityRef)) {
                 MainActivity activity = activityRef.get();
                 activity.refreshPlayerItem();
+                activity.refreshMenuAdItem();
                 activity.syncSlideMenu();
             }
         }
