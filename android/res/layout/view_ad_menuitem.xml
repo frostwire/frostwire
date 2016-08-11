@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2013, FrostWire(TM). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +19,10 @@
  */
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/view_ad_menu_item_ad"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/app_dark_blue"
     android:clickable="true">
 
     <View
@@ -35,8 +38,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="30dp"
         android:text="@string/ad_free"
         android:textColor="@color/app_highlight_text"
         android:paddingBottom="8dp"
@@ -50,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/view_ad_menu_item_thumbnail"
-        android:paddingLeft="15dp">
+        android:paddingLeft="12dp">
 
         <TextView
             android:id="@+id/view_ad_menu_item_headline"
