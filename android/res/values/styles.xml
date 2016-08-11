@@ -158,6 +158,24 @@
 
     <!-- SlideMenu end -->
 
+    <!-- SlideMenu Ad begin -->
+
+    <style name="SlideMenuAdSubtitle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/text_medium</item>
+    </style>
+    <style name="SlideMenuAdHeader">
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/text_x_small</item>
+    </style>
+
+
+
+
+    <!-- SlideMenu Ad end -->
 
     <!-- Main Fragment Simple Header begin -->
 

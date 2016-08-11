@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2013, FrostWire(TM). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true">
+
+    <View
+        android:id="@+id/view_ad_menu_item_top_divider"
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_alignParentRight="true"
+        android:background="#ff1d2934" />
+
+    <TextView
+        android:id="@+id/view_ad_menu_item_thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="25dp"
+        android:text="@string/ad_free"
+        android:textColor="@color/app_highlight_text"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@drawable/ad_menu_item_background" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/view_ad_menu_item_thumbnail"
+        android:paddingLeft="15dp">
+
+        <TextView
+            android:id="@+id/view_ad_menu_item_headline"
+            style="@style/SlideMenuAdHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/support_frostwire"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true" />
+
+        <TextView
+            android:id="@+id/view_ad_menu_item_subtitle"
+            style="@style/SlideMenuAdSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/view_ad_menu_item_headline"
+            android:text="@string/save_bandwidth" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/view_ad_menu_item_thumbnail"
+        android:background="#ff1d2934" />
+
+</RelativeLayout>
