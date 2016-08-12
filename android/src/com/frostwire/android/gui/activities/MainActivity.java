@@ -214,12 +214,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void initAdMenuItemListener() {
         menuAdItem = findView(R.id.slidermenu_ad_menuitem);
-//        menuAdItem.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                controller.launchPlayerActivity();
-//            }
-//        });
+        RelativeLayout menuAd = findView(R.id.view_ad_menu_item_ad);
+        menuAd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, BuyActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void initDrawerListener() {
