@@ -20,12 +20,11 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
+
 
 /**
  * @author gubatron
@@ -37,7 +36,6 @@ public class AdMenuItemView extends RelativeLayout {
     private TextView textThumbnail;
     private TextView textHeadline;
     private TextView textSubtitle;
-    private RelativeLayout menuAd;
 
     public AdMenuItemView(Context context, AttributeSet set) {
         super(context, set);
@@ -53,7 +51,6 @@ public class AdMenuItemView extends RelativeLayout {
             return;
         }
 
-        menuAd = (RelativeLayout) findViewById(R.id.view_ad_menu_item_ad);
         textHeadline = (TextView) findViewById(R.id.view_ad_menu_item_headline);
         textSubtitle = (TextView) findViewById(R.id.view_ad_menu_item_subtitle);
         textThumbnail = (TextView) findViewById(R.id.view_ad_menu_item_thumbnail);
@@ -61,6 +58,7 @@ public class AdMenuItemView extends RelativeLayout {
         textHeadline.setText(R.string.support_frostwire);
         textSubtitle.setText(R.string.save_bandwidth);
         textThumbnail.setText(R.string.ad_free);
+
     }
 }
 
