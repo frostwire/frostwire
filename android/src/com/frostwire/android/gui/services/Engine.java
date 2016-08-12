@@ -81,7 +81,7 @@ public final class Engine implements IEngineService {
      * new 20 bytes of the new hash.
      */
     private void loadNotifiedDownloads() {
-        notifiedDownloads = new BloomFilter<String>(Constants.NOTIFIED_BLOOM_FILTER_BITSET_SIZE,
+        notifiedDownloads = new BloomFilter<>(Constants.NOTIFIED_BLOOM_FILTER_BITSET_SIZE,
                 Constants.NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS);
 
         if (!notifiedDat.exists()) {
@@ -97,7 +97,7 @@ public final class Engine implements IEngineService {
                 int numberOfElements = ois.readInt();
                 BitSet bs = (BitSet) ois.readObject();
                 ois.close();
-                notifiedDownloads = new BloomFilter<String>(
+                notifiedDownloads = new BloomFilter<>(
                         Constants.NOTIFIED_BLOOM_FILTER_BITSET_SIZE,
                         Constants.NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS,
                         numberOfElements,
