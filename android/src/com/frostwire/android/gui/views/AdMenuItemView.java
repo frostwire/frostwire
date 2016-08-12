@@ -21,6 +21,7 @@ package com.frostwire.android.gui.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.frostwire.android.R;
@@ -34,6 +35,7 @@ import com.frostwire.android.R;
 public class AdMenuItemView extends RelativeLayout {
 
     private TextView textThumbnail;
+    private ImageView imageThumbnail;
     private TextView textHeadline;
     private TextView textSubtitle;
 
@@ -47,18 +49,17 @@ public class AdMenuItemView extends RelativeLayout {
 
         View.inflate(getContext(), R.layout.view_ad_menuitem, this);
 
-        if (isInEditMode()) {
-            return;
-        }
-
         textHeadline = (TextView) findViewById(R.id.view_ad_menu_item_headline);
         textSubtitle = (TextView) findViewById(R.id.view_ad_menu_item_subtitle);
         textThumbnail = (TextView) findViewById(R.id.view_ad_menu_item_thumbnail);
+        imageThumbnail = (ImageView) findViewById(R.id.view_ad_menu_item_thumbnail_image);
 
         textHeadline.setText(R.string.support_frostwire);
         textSubtitle.setText(R.string.save_bandwidth);
         textThumbnail.setText(R.string.ad_free);
+        imageThumbnail.setImageResource(R.drawable.ad_menu_speaker);
 
     }
+
 }
 
