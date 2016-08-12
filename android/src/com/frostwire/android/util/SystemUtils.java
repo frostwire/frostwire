@@ -177,7 +177,7 @@ public final class SystemUtils {
         }
     }
 
-    public static boolean hasSdkOrNewer(int versionCode) {
+    private static boolean hasSdkOrNewer(int versionCode) {
         return Build.VERSION.SDK_INT >= versionCode;
     }
 
@@ -190,5 +190,16 @@ public final class SystemUtils {
      */
     public static boolean hasKitKatOrNewer() {
         return hasSdkOrNewer(VERSION_CODE_KITKAT);
+    }
+
+    public static void printStackTrace(Logger logger, String contextTitle) {
+        final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        logger.info("================================================================================");
+        logger.info(contextTitle + " stacktrace");
+        logger.info("================================================================================");
+        for (StackTraceElement e : stackTrace) {
+            logger.info(e.toString());
+        }
+        logger.info("================================================================================");
     }
 }
