@@ -97,9 +97,6 @@ public class ConfigurationManager {
     }
 
     public boolean getBoolean(String key) {
-        if (!preferences.contains(key)) {
-            resetToDefault(key);
-        }
         return preferences.getBoolean(key, false);
     }
 
@@ -136,8 +133,6 @@ public class ConfigurationManager {
     }
 
     public void resetToDefaults() {
-        editor.clear();
-        editor.commit();
         resetToDefaults(defaults.getDefaultValues());
     }
 
