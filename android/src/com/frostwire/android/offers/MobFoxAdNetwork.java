@@ -83,11 +83,18 @@ final class MobFoxAdNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean showInterstitial(WeakReference<? extends Activity> activityRef, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward) {
+    public boolean showInterstitial(WeakReference<? extends Activity> activityRef,
+                                    boolean shutdownActivityAfterwards,
+                                    boolean dismissActivityAfterward) {
         if (enabled() && started) {
 
             if (interstitialAdListener == null) {
                 LOG.warn("showInterstitial() aborted. interstitial ad listener wasn't created yet, check your logic.");
+                return false;
+            }
+
+            if (interstitialAdListener.isAfterBehaviorConfigured()) {
+                LOG.warn("showInterstitial() aborted. after behavior was already configured, ad was just displayed or still being displayed, check your logic.");
                 return false;
             }
 
@@ -106,9 +113,17 @@ final class MobFoxAdNetwork implements AdNetwork {
 
     @Override
     public void loadNewInterstitial(Activity activity) {
+        if (interstitialAd != null &&
+            interstitialAdListener != null &&
+            interstitialAdListener.isAfterBehaviorConfigured()) {
+            LOG.info("loadNewInterstitial aborted. Ad is good to go already.");
+            return;
+        }
+
         LOG.info("loadNewInterstitial");
         interstitialAdListener = new MobFoxInterstitialListener(activity);
         interstitialAd = new InterstitialAd(activity);
+        interstitialAd.getBanner().setGetLocation(false);
         interstitialAd.setInventoryHash(Constants.MOBFOX_INVENTORY_HASH);
         interstitialAd.setListener(interstitialAdListener);
 

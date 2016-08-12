@@ -26,7 +26,6 @@ import com.mobfox.sdk.interstitialads.InterstitialAdListener;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 8/9/16.
@@ -34,13 +33,14 @@ import java.util.concurrent.TimeUnit;
  * @author aldenml
  */
 final class MobFoxInterstitialListener implements InterstitialListener, InterstitialAdListener {
-    private static final Logger LOG = Logger.getLogger(MobFoxInterstitialListener.class);
-    private boolean ready;
+    private static final Logger LOG = Logger.getLogger(Offers.class);
+    private boolean loaded;
     private boolean interstitialShowSuccess;
     private WeakReference<? extends Activity> activityRef;
     private InterstitialAd ad = null;
     private final Application app;
     private CountDownLatch showSuccessLatch;
+    private boolean afterBehaviorConfigured;
     private boolean shutdownAfter;
     private boolean finishAfterDismiss;
 
@@ -51,7 +51,7 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
 
     @Override
     public boolean isAdReadyToDisplay() {
-        return ready;
+        return ad != null && loaded;
     }
 
     @Override
@@ -61,39 +61,45 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
 
     @Override
     public boolean show(WeakReference<? extends Activity> activityWeakReference) {
-        boolean result = false;
+
         if (ad != null && Ref.alive(activityWeakReference)) {
             try {
                 this.activityRef = activityWeakReference;
-
                 showSuccessLatch = new CountDownLatch(1);
                 ad.show();
-                // TODO: fine tune this maximum wait to the minimum possible.
-                showSuccessLatch.await(2, TimeUnit.SECONDS);
-                result = interstitialShowSuccess;
+                showSuccessLatch.await();//2, TimeUnit.SECONDS);
+                showSuccessLatch = null;
             } catch (Throwable t) {
-                result = false;
+                LOG.error(t.getMessage(), t);
+                ad = null;
+                interstitialShowSuccess = false;
+                afterBehaviorConfigured = false;
+                loaded = false;
             }
         }
-        return result;
+        LOG.info("show() -> success? " + interstitialShowSuccess);
+        return interstitialShowSuccess;
     }
 
     @Override
     public void shutdownAppAfter(boolean shutdown) {
         shutdownAfter = shutdown;
+        afterBehaviorConfigured = true;
     }
 
     @Override
     public void dismissActivityAfterwards(boolean dismiss) {
         finishAfterDismiss = dismiss;
+        afterBehaviorConfigured = true;
     }
 
     @Override
     public void onInterstitialLoaded(InterstitialAd interstitialAd) {
         LOG.info("onInterstitialLoaded");
-        ready = true;
-        interstitialShowSuccess = true;
+        loaded = true;
         ad = interstitialAd;
+        ad.setListener(this);
+        afterBehaviorConfigured = false;
     }
 
     @Override
@@ -103,7 +109,7 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
         if (showSuccessLatch != null && showSuccessLatch.getCount() > 0) {
             showSuccessLatch.countDown();
         }
-        ready = false;
+        loaded = false;
         ad = null;
         // TODO: Reload logic.
     }
@@ -111,22 +117,22 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
     @Override
     public void onInterstitialClosed(InterstitialAd interstitialAd) {
         LOG.info("onInterstitialClosed");
-        ready = false;
         Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutdownAfter, true, app);
-        // TODO: Reload logic.
+        loaded = false;
+        afterBehaviorConfigured = false;
     }
 
     @Override
     public void onInterstitialFinished() {
         LOG.info("onInterstitialFinished");
-        ready = false;
-        //TODO: decide to have this onInterstitialClosed or here.
-        //Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutdownAfter, true, app);
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutdownAfter, true, app);
+        loaded = false;
+        afterBehaviorConfigured = false;
     }
 
     @Override
     public void onInterstitialClicked(InterstitialAd interstitialAd) {
-        ready = false;
+        loaded = false;
         LOG.info("onInterstitialClicked");
     }
 
@@ -136,6 +142,10 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
         if (showSuccessLatch != null) {
             showSuccessLatch.countDown();
         }
-        ready = false;
+        loaded = false;
+    }
+
+    boolean isAfterBehaviorConfigured() {
+        return afterBehaviorConfigured;
     }
 }
