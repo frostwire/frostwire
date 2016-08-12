@@ -53,15 +53,21 @@ class InMobiAdNetwork implements AdNetwork {
 
         if (!started) {
             try {
-                // this initialize call is very expensive, this is why we should be invoked in a thread.
-                LOG.info("InMobi.initialize()...");
-                InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
-                if (DEBUG_MODE) {
-                    InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
-                }
-                LOG.info("InMobi.initialized.");
-                started = true;
-                LOG.info("Load InmobiInterstitial.");
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LOG.info("InMobi.initialize()...");
+                        InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
+                        if (DEBUG_MODE) {
+                            InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
+                        }
+                        LOG.info("InMobi.initialized.");
+                        started = true;
+                        LOG.info("Load InmobiInterstitial.");
+                    }
+                });
+
+                // this one makes sure it runs on the UI thread, enqueued after
                 loadNewInterstitial(activity);
             } catch (Throwable t) {
                 t.printStackTrace();
