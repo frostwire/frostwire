@@ -19,6 +19,8 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 import com.mobfox.sdk.interstitialads.InterstitialAd;
@@ -31,15 +33,22 @@ import java.lang.ref.WeakReference;
  * @author aldenml
  */
 final class MobFoxAdNetwork implements AdNetwork {
+    static final int INTERSTITIAL_RELOAD_MAX_RETRIES = 5;
+    static int INTERSTITIAL_RELOAD_RETRIES_LEFT = INTERSTITIAL_RELOAD_MAX_RETRIES;
     private static final Logger LOG = Logger.getLogger(MobFoxAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
+    private static final long INTERSTITIAL_RELOAD_INTERVAL_IN_SECONDS = 20;
 
     private boolean started = false;
     private MobFoxInterstitialListener interstitialAdListener = null;
     private InterstitialAd interstitialAd;
+    private long lastInterstitialLoadTimestamp;
 
-    // these guys want you to handle permission handling, so MainActivity will need
-    // this reference to invoke onPermissionsGranted on the ad.
+
+    // MobFox ads require location permissions, the answer from the user is handled on
+    // MainActivity.onRequestPermissionsResult() which invokes Offers.onRequestPermissionsResult()
+    // This utility method needs to invoke interstitialAd.onRequestPermissionsResult() provided
+    // by MobFox. If the user denies us permissions we should not try again.
     InterstitialAd getInterstitialAd() {
         return interstitialAd;
     }
@@ -55,6 +64,9 @@ final class MobFoxAdNetwork implements AdNetwork {
                 stop(activity);
             }
             return;
+        }
+        if (interstitialAdListener == null) {
+            interstitialAdListener = new MobFoxInterstitialListener(this, activity.getApplication());
         }
         loadNewInterstitial(activity);
         started = true;
@@ -121,9 +133,8 @@ final class MobFoxAdNetwork implements AdNetwork {
         }
 
         LOG.info("loadNewInterstitial");
-        interstitialAdListener = new MobFoxInterstitialListener(activity);
         interstitialAd = new InterstitialAd(activity);
-        interstitialAd.getBanner().setGetLocation(false);
+        interstitialAd.getBanner().setGetLocation(askForLocationPermissions());
         interstitialAd.setInventoryHash(Constants.MOBFOX_INVENTORY_HASH);
         interstitialAd.setListener(interstitialAdListener);
 
@@ -131,6 +142,8 @@ final class MobFoxAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 interstitialAd.load();
+                INTERSTITIAL_RELOAD_RETRIES_LEFT--;
+                lastInterstitialLoadTimestamp = System.currentTimeMillis();
             }
         });
     }
@@ -148,5 +161,39 @@ final class MobFoxAdNetwork implements AdNetwork {
     @Override
     public boolean isDebugOn() {
         return DEBUG_MODE;
+    }
+
+    void dontAskForLocationPermissions() {
+        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION, false);
+    }
+
+    private boolean askForLocationPermissions() {
+        return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION);
+    }
+
+    void reloadInterstitial(final Activity activity) {
+        if (INTERSTITIAL_RELOAD_RETRIES_LEFT == 0) {
+            LOG.info("reloadInterstitial() aborted. Exhausted retry attempts.");
+            return;
+        }
+
+        final long RELOAD_INTERVAL_IN_MILLIS = (INTERSTITIAL_RELOAD_INTERVAL_IN_SECONDS*1000);
+        long timeSinceLastReload = System.currentTimeMillis() - lastInterstitialLoadTimestamp;
+
+        // wait 20 seconds to reload an ad.
+        if (timeSinceLastReload > RELOAD_INTERVAL_IN_MILLIS) {
+            // let's do it right away
+            loadNewInterstitial(activity);
+        } else {
+            // let's do it when 20 seconds have passed.
+            long timeLeft = RELOAD_INTERVAL_IN_MILLIS - timeSinceLastReload;
+            Handler h = new Handler(activity.getMainLooper());
+            h.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    loadNewInterstitial(activity);
+                }
+            }, timeLeft);
+        }
     }
 }

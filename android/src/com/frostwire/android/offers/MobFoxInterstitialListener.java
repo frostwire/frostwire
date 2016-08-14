@@ -39,15 +39,17 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
     private boolean interstitialShowSuccess;
     private WeakReference<? extends Activity> activityRef;
     private InterstitialAd ad = null;
+    private final MobFoxAdNetwork adNetwork;
     private final Application app;
     private CountDownLatch showSuccessLatch;
     private boolean afterBehaviorConfigured;
     private boolean shutdownAfter;
     private boolean finishAfterDismiss;
 
-    MobFoxInterstitialListener(Activity activity) {
-        activityRef = Ref.weak(activity);
-        app = activity.getApplication();
+    MobFoxInterstitialListener(MobFoxAdNetwork adNetwork, Application application) {
+        this.adNetwork = adNetwork;
+        app = application;
+        reset();
     }
 
     @Override
@@ -72,10 +74,7 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
                 showSuccessLatch = null;
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
-                ad = null;
-                interstitialShowSuccess = false;
-                afterBehaviorConfigured = false;
-                loaded = false;
+                reset();
             }
         }
         LOG.info("show() -> success? " + interstitialShowSuccess);
@@ -98,55 +97,73 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
     public void onInterstitialLoaded(InterstitialAd interstitialAd) {
         LOG.info("onInterstitialLoaded");
         loaded = true;
+        afterBehaviorConfigured = false;
         ad = interstitialAd;
         ad.setListener(this);
-        afterBehaviorConfigured = false;
-    }
-
-    @Override
-    public void onInterstitialFailed(InterstitialAd interstitialAd, Exception e) {
-        LOG.info("onInterstitialFailed");
-        interstitialShowSuccess = false;
-        if (showSuccessLatch != null && showSuccessLatch.getCount() > 0) {
-            showSuccessLatch.countDown();
-        }
-        loaded = false;
-        ad = null;
-        // TODO: Reload logic.
+        MobFoxAdNetwork.INTERSTITIAL_RELOAD_RETRIES_LEFT = MobFoxAdNetwork.INTERSTITIAL_RELOAD_MAX_RETRIES;
     }
 
     @Override
     public void onInterstitialClosed(InterstitialAd interstitialAd) {
         LOG.info("onInterstitialClosed");
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutdownAfter, true, app);
-        loaded = false;
-        afterBehaviorConfigured = false;
+        wrapItUp();
     }
 
     @Override
     public void onInterstitialFinished() {
         LOG.info("onInterstitialFinished");
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutdownAfter, true, app);
-        loaded = false;
-        afterBehaviorConfigured = false;
+        wrapItUp();
     }
 
     @Override
     public void onInterstitialClicked(InterstitialAd interstitialAd) {
-        loaded = false;
         LOG.info("onInterstitialClicked");
+        reset();
     }
 
     @Override
     public void onInterstitialShown(InterstitialAd interstitialAd) {
+        reset(false); // keep the ad reference
         interstitialShowSuccess = true;
         if (showSuccessLatch != null) {
             showSuccessLatch.countDown();
         }
-        loaded = false;
+    }
+
+    @Override
+    public void onInterstitialFailed(InterstitialAd interstitialAd, Exception e) {
+        LOG.info("onInterstitialFailed");
+        reset(); // this does interstitialShowSuccess = false;
+        if (showSuccessLatch != null && showSuccessLatch.getCount() > 0) {
+            showSuccessLatch.countDown();
+        }
+        if (!shutdownAfter && Ref.alive(activityRef)) {
+            adNetwork.reloadInterstitial(activityRef.get());
+        }
     }
 
     boolean isAfterBehaviorConfigured() {
         return afterBehaviorConfigured;
+    }
+
+    private void reset() {
+        reset(true);
+    }
+
+    private void reset(boolean resetAd) {
+        if (resetAd) {
+            ad = null;
+        }
+        loaded = false;
+        afterBehaviorConfigured = false;
+        interstitialShowSuccess = false;
+    }
+
+    private void wrapItUp() {
+        reset();
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutdownAfter, !shutdownAfter, app);
+        if (!shutdownAfter && Ref.alive(activityRef)) {
+            adNetwork.reloadInterstitial(activityRef.get());
+        }
     }
 }
