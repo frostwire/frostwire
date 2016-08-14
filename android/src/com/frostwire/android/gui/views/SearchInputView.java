@@ -118,7 +118,7 @@ public class SearchInputView extends LinearLayout {
         textInput.setOnActionListener(textInputListener);
         textInput.setOnItemClickListener(textInputListener);
 
-        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
             textInput.setAdapter(adapter);
         }
 
