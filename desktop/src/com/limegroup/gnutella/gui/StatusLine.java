@@ -647,7 +647,8 @@ public final class StatusLine {
             processMouseEvent(me);
         }
 
-        public void processMouseEvent(MouseEvent me) {
+        void processMouseEvent(MouseEvent me) {
+            final Component clickedComponent = me.getComponent();
             if (me.isPopupTrigger()) {
                 JPopupMenu jpm = new SkinPopupMenu();
 
@@ -681,7 +682,14 @@ public final class StatusLine {
                 jpm.add(jcbmi);
 
                 jpm.pack();
-                jpm.show(me.getComponent(), me.getX(), me.getY());
+                jpm.show(clickedComponent, me.getX(), me.getY());
+            } else {
+                // if they click on the speed indicators show them the active transfers.
+                if (clickedComponent == _bandwidthUsageUp || clickedComponent == _bandwidthUsageDown) {
+                    final GUIMediator.Tabs transfersTab = GUIMediator.Tabs.TRANSFERS.isEnabled() ?
+                            GUIMediator.Tabs.TRANSFERS : GUIMediator.Tabs.SEARCH_TRANSFERS;
+                    GUIMediator.instance().setWindow(transfersTab);
+                }
             }
         }
     };

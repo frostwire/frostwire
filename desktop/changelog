@@ -4,8 +4,9 @@ frostwire (6.3.5) stable; urgency=high
   * Updated Java Runtime Environment (1.8-b102)
   * Codebase cleanup
   * Search result table cells have more padding for readability
+  * Clicking on the status bar speed indicator shows active transfers
 	
- -- FrostWire Team <contact@frostwire.com>  Sat, 06 Aug 2016 01:41:18 -0500
+ -- FrostWire Team <contact@frostwire.com>  Sun, 14 Aug 2016 10:14:08 -0500
 
 
 frostwire (6.3.4) stable; urgency=high
