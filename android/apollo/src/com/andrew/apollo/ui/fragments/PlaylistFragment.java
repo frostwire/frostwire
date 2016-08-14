@@ -11,6 +11,7 @@
 
 package com.andrew.apollo.ui.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -50,6 +51,7 @@ import java.util.List;
  * @author Alden Torres (@aldenml)
  * @author Marcelina Knitter (@marcelinkaaa)
  */
+@SuppressLint("ValidFragment")
 public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> {
     //private static Logger LOG = Logger.getLogger(PlaylistFragment.class);
     public PlaylistFragment() {
