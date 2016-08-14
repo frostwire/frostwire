@@ -177,6 +177,11 @@ final class MobFoxAdNetwork implements AdNetwork {
             return;
         }
 
+        if (!started()) {
+            LOG.info("reloadInterstitial() aborted. Network stopped.");
+            return;
+        }
+
         final long RELOAD_INTERVAL_IN_MILLIS = (INTERSTITIAL_RELOAD_INTERVAL_IN_SECONDS*1000);
         long timeSinceLastReload = System.currentTimeMillis() - lastInterstitialLoadTimestamp;
 
