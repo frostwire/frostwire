@@ -18,22 +18,23 @@
 
 package com.frostwire.android.gui.dialogs;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import com.frostwire.android.R;
-import com.frostwire.android.offers.Offers;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.util.Logger;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledStreamableSearchResult;
 import com.frostwire.search.youtube.YouTubePackageSearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -47,6 +48,7 @@ import java.util.*;
  *
  */
 @SuppressWarnings("WeakerAccess") // We need the class to be public so that the dialog can be rotated (via Reflection)
+@SuppressLint("ValidFragment")
 public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResult> {
     private static Logger LOG = Logger.getLogger(YouTubeDownloadDialog.class);
     private static WeakReference<YouTubePackageSearchResult> youTubePackageSearchResultWeakReference;
@@ -67,14 +69,17 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         YouTubeDownloadDialog dlg = new YouTubeDownloadDialog(sr);
 
         dlg.onAttach((Activity) ctx);
+
         dlg.prepareArguments(R.drawable.download_icon,
                 sr.getDisplayName(),
                 ctx.getString(R.string.pick_the_files_you_want_to_download_from_this_torrent),
                 null, // use the static weak reference object
                 SelectionMode.SINGLE_SELECTION);
+
         // dlg.getArguments().putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, checked);
         dlg.getArguments().putInt(BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX, 0);
         dlg.setOnYesListener(new OnStartDownloadsClickListener(ctx, dlg));
+
         return dlg;
     }
 
