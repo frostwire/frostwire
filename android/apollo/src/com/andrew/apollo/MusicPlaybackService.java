@@ -38,7 +38,6 @@ import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.util.Ref;
 
@@ -2064,7 +2063,7 @@ public class MusicPlaybackService extends Service {
      * Stops playback.
      */
     public void stop() {
-        stop(true);
+        stop(false);
     }
 
     /**
