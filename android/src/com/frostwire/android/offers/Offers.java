@@ -77,7 +77,15 @@ public final class Offers {
         if (adNetwork != null && adNetwork.enabled() && adNetwork.started()) {
             final InterstitialAd interstitialAd = adNetwork.getInterstitialAd();
             if (interstitialAd != null) {
+
+                // if permissions were not granted...
+                if (grantResults.length > 0 && grantResults[0] != 0) {
+                    interstitialAd.getBanner().setGetLocation(false);
+                    adNetwork.dontAskForLocationPermissions();
+                }
+
                 interstitialAd.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
             }
         }
     }
@@ -120,6 +128,9 @@ public final class Offers {
                     interstitialShown = adNetwork.showInterstitial(activityRef, shutdownAfterwards, dismissAfterwards);
                     if (interstitialShown) {
                         LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial shown");
+                        return;
+                    } else {
+                        LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial NOT shown");
                     }
                 }
             }
@@ -167,11 +178,11 @@ public final class Offers {
     }
 
     private static void stopAdNetworksIfPurchasedRemoveAds(Context context) {
-        final ConfigurationManager CM = ConfigurationManager.instance();
+        //final ConfigurationManager CM = ConfigurationManager.instance();
         final PlayStore playStore = PlayStore.getInstance();
         final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
         if (purchasedProducts != null && purchasedProducts.size() > 0) {
-            CM.setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
+            //CM.setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
             Offers.stopAdNetworks(context);
             LOG.info("Turning off ads, user previously purchased AdRemoval");
         }
@@ -258,6 +269,7 @@ public final class Offers {
                                                            boolean shutdownAfter,
                                                            boolean tryBack2BackRemoveAdsOffer,
                                                            Application fallbackContext) {
+            LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + finishAfterDismiss + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
             if (Ref.alive(activityRef)) {
                 Activity callerActivity = activityRef.get();
                 if (finishAfterDismiss) {
@@ -266,18 +278,22 @@ public final class Offers {
 
                 if (shutdownAfter) {
                     if (callerActivity instanceof MainActivity) {
+                        LOG.info("dismissAndOrShutdownIfNecessary: MainActivity.shutdown()");
                         ((MainActivity) callerActivity).shutdown();
                     } else {
+                        LOG.info("dismissAndOrShutdownIfNecessary: UIUtils.sendShutdownIntent(callerActivity)");
                         UIUtils.sendShutdownIntent(callerActivity);
                     }
                     return;
                 }
 
                 if (!finishAfterDismiss && !shutdownAfter && tryBack2BackRemoveAdsOffer) {
+                    LOG.info("dismissAndOrShutdownIfNecessary: Offers.tryBackToBackInterstitial(activityRef);");
                     Offers.tryBackToBackInterstitial(activityRef);
                 }
             } else {
                 if (shutdownAfter) {
+                    LOG.info("dismissAndOrShutdownIfNecessary: shutdown() [no activity ref]");
                     UIUtils.sendShutdownIntent(fallbackContext);
                 }
             }
