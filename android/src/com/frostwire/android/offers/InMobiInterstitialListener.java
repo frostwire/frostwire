@@ -129,7 +129,6 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     }
 
     private static class InterstitialReloader implements Runnable {
-        private static Logger LOG = Logger.getLogger(InterstitialReloader.class);
         private final WeakReference<InMobiInterstitial> interstitialRef;
 
         InterstitialReloader(InMobiInterstitial interstitial) {
