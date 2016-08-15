@@ -167,7 +167,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     public void shutdown() {
         Offers.stopAdNetworks(this);
-        PlayStore.getInstance().dispose();
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
         Engine.instance().shutdown();
