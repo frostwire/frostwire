@@ -224,7 +224,7 @@ public final class Offers {
                 adNetwork.enable(false);
             }
         }
-        return activeAdNetworksList.toArray(new AdNetwork[activeAdNetworksList.size()]);
+        return activeAdNetworksList.toArray(new AdNetwork[0]);
     }
 
     private static int getKeyOffset(String key, String[] keys) {
