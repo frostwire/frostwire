@@ -65,7 +65,6 @@ import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -165,7 +164,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     public void shutdown() {
         Offers.stopAdNetworks(this);
-        PlayStore.getInstance().dispose();
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
         Engine.instance().shutdown();
