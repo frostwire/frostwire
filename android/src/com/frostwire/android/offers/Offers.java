@@ -121,11 +121,10 @@ public final class Offers {
         } else if (Constants.IS_PLUS_OR_DEBUG && !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE)) {
             LOG.info("Skipping interstitial ads display, Plus instance not supporting FrostWire development");
         } else {
-            final WeakReference<Activity> activityRef = Ref.weak(activity);
             for (AdNetwork adNetwork : getActiveAdNetworks()) {
                 if (!interstitialShown && adNetwork != null && adNetwork.started()) {
                     LOG.info("showInterstitial: AdNetwork " + adNetwork.getClass().getSimpleName() + " started? " + adNetwork.started());
-                    interstitialShown = adNetwork.showInterstitial(activityRef, shutdownAfterwards, dismissAfterwards);
+                    interstitialShown = adNetwork.showInterstitial(activity, shutdownAfterwards, dismissAfterwards);
                     if (interstitialShown) {
                         LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial shown");
                         return;
@@ -173,7 +172,7 @@ public final class Offers {
         final int r = new Random().nextInt(101);
         LOG.info("threshold: " + b2bThreshold + " - dice roll: " + r + " (" + (r < b2bThreshold) + ")");
         if (r < b2bThreshold) {
-            REMOVE_ADS.showInterstitial(activityRef, false, false);
+            REMOVE_ADS.showInterstitial(activityRef.get(), false, false);
         }
     }
 

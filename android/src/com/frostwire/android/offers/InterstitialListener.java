@@ -19,12 +19,10 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 
-import java.lang.ref.WeakReference;
-
 interface InterstitialListener {
     boolean isAdReadyToDisplay();
     boolean isVideoAd();
-    boolean show(WeakReference<? extends Activity> activityWeakReference);
+    boolean show(Activity activity);
     void shutdownAppAfter(boolean shutdown);
     void dismissActivityAfterwards(boolean dismiss);
 }

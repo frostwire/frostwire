@@ -24,8 +24,6 @@ import com.frostwire.util.Logger;
 import com.inmobi.ads.InMobiInterstitial;
 import com.inmobi.sdk.InMobiSdk;
 
-import java.lang.ref.WeakReference;
-
 class InMobiAdNetwork implements AdNetwork {
 
     private static final Logger LOG = Logger.getLogger(InMobiAdNetwork.class);
@@ -93,7 +91,7 @@ class InMobiAdNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean showInterstitial(final WeakReference<? extends Activity> activityWeakReference,
+    public boolean showInterstitial(Activity activity,
                                     boolean shutdownActivityAfterwards,
                                     boolean dismissActivityAfterward) {
         if (!started || !enabled() || inmobiInterstitial == null || inmobiListener == null) {
