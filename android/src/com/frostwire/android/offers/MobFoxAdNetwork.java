@@ -25,8 +25,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 import com.mobfox.sdk.interstitialads.InterstitialAd;
 
-import java.lang.ref.WeakReference;
-
 /**
  * Created on 8/8/16.
  * @author gubatron
@@ -95,7 +93,7 @@ final class MobFoxAdNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean showInterstitial(WeakReference<? extends Activity> activityRef,
+    public boolean showInterstitial(Activity activity,
                                     boolean shutdownActivityAfterwards,
                                     boolean dismissActivityAfterward) {
         if (enabled() && started) {
@@ -113,7 +111,7 @@ final class MobFoxAdNetwork implements AdNetwork {
             interstitialAdListener.shutdownAppAfter(shutdownActivityAfterwards);
             interstitialAdListener.dismissActivityAfterwards(dismissActivityAfterward);
             try {
-                return interstitialAdListener.isAdReadyToDisplay() && interstitialAdListener.show(activityRef);
+                return interstitialAdListener.isAdReadyToDisplay() && interstitialAdListener.show(activity);
             } catch (Throwable e) {
                 e.printStackTrace();
                 return false;

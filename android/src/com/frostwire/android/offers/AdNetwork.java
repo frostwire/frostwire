@@ -20,8 +20,6 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.content.Context;
 
-import java.lang.ref.WeakReference;
-
 interface AdNetwork {
     void initialize(final Activity activity);
 
@@ -37,7 +35,7 @@ interface AdNetwork {
     /** Returns true if the network is enabled and initialized */
     boolean started();
 
-    boolean showInterstitial(final WeakReference<? extends Activity> activityRef,
+    boolean showInterstitial(Activity activity,
                              final boolean shutdownActivityAfterwards,
                              final boolean dismissActivityAfterward);
 

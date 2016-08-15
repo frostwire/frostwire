@@ -25,8 +25,6 @@ import com.applovin.sdk.AppLovinSdk;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 
-import java.lang.ref.WeakReference;
-
 class AppLovinAdNetwork implements AdNetwork {
 
     private static final Logger LOG = Logger.getLogger(AppLovinAdNetwork.class);
@@ -114,7 +112,7 @@ class AppLovinAdNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean showInterstitial(final WeakReference<? extends Activity> activityWeakReference,
+    public boolean showInterstitial(Activity activity,
                                     final boolean shutdownAfterwards,
                                     final boolean dismissAfterward) {
         if (enabled() && started) {
@@ -124,7 +122,7 @@ class AppLovinAdNetwork implements AdNetwork {
                 if (interstitialAdapter.isVideoAd() && MusicUtils.isPlaying()) {
                     return false;
                 }
-                return interstitialAdapter.isAdReadyToDisplay() && interstitialAdapter.show(activityWeakReference);
+                return interstitialAdapter.isAdReadyToDisplay() && interstitialAdapter.show(activity);
             } catch (Throwable e) {
                 e.printStackTrace();
                 return false;

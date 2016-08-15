@@ -63,11 +63,11 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
     }
 
     @Override
-    public boolean show(WeakReference<? extends Activity> activityWeakReference) {
+    public boolean show(Activity activity) {
 
-        if (ad != null && Ref.alive(activityWeakReference)) {
+        if (ad != null && activity != null) {
             try {
-                this.activityRef = activityWeakReference;
+                this.activityRef = Ref.weak(activity);
                 showSuccessLatch = new CountDownLatch(1);
                 ad.show();
                 showSuccessLatch.await(3, TimeUnit.SECONDS);

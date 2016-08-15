@@ -23,9 +23,6 @@ import android.content.Intent;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
-
-import java.lang.ref.WeakReference;
 
 /**
  * Created on 7/14/16.
@@ -68,6 +65,7 @@ class RemoveAdsNetwork implements AdNetwork {
     public boolean enabled() {
         boolean enabled = false;
         try {
+            //noinspection SimplifiableIfStatement (done like this on purpose for readability)
             if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Products.disabledAds(PlayStore.getInstance())) {
                 enabled = false;
             } else {
@@ -86,15 +84,15 @@ class RemoveAdsNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean showInterstitial(WeakReference<? extends Activity> activityRef,
+    public boolean showInterstitial(Activity activity,
                                     boolean shutdownActivityAfterwards,
                                     boolean dismissActivityAfterward) {
-        if (started() && enabled() && Ref.alive(activityRef)) {
-            Intent intent = new Intent(activityRef.get(), BuyActivity.class);
+        if (started() && enabled() && activity != null) {
+            Intent intent = new Intent(activity, BuyActivity.class);
             intent.putExtra(BuyActivity.INTERSTITIAL_MODE, true);
             intent.putExtra("shutdownActivityAfterwards", shutdownActivityAfterwards);
             intent.putExtra("dismissActivityAfterward", dismissActivityAfterward);
-            activityRef.get().startActivity(intent);
+            activity.startActivity(intent);
             return true;
         }
         return false;

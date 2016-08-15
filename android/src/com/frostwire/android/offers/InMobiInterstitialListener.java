@@ -96,7 +96,7 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     }
 
     @Override
-    public boolean show(WeakReference<? extends Activity> activityWeakReference) {
+    public boolean show(Activity activity) {
         //unused.
         return false;
     }
