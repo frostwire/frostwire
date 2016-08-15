@@ -16,10 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-def JLIBTORRENT_VERSION = '1.1.0.35'
-
-import groovy.swing.SwingBuilder
-
 apply plugin: 'com.android.application'
 apply from: '../common/dependencies.gradle'
 
@@ -154,9 +150,8 @@ dependencies {
     compile 'com.inmobi.monetization:inmobi-ads:5.3.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    compile 'com.frostwire:jlibtorrent:' + JLIBTORRENT_VERSION
-    compile 'com.frostwire:jlibtorrent-android-arm:' + JLIBTORRENT_VERSION
-    compile 'com.frostwire:jlibtorrent-android-x86:' + JLIBTORRENT_VERSION
+    compile "com.frostwire:jlibtorrent-android-arm:1.1.1.37"
+    compile "com.frostwire:jlibtorrent-android-x86:1.1.1.37"
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
@@ -212,7 +207,7 @@ gradle.taskGraph.whenReady { taskGraph ->
         def myKeyPassword = ""
 
         if (System.console() == null) {
-            new SwingBuilder().edt {
+            new groovy.swing.SwingBuilder().edt {
                 dialog(modal: true,
                         title: 'Enter keystore data',
                         alwaysOnTop: true,
