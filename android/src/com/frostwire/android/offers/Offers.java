@@ -263,7 +263,8 @@ public final class Offers {
             }
         }
 
-        public static void dismissAndOrShutdownIfNecessary(AdNetwork adNetwork, WeakReference<? extends Activity> activityRef,
+        public static void dismissAndOrShutdownIfNecessary(AdNetwork adNetwork,
+                                                           WeakReference<? extends Activity> activityRef,
                                                            boolean finishAfterDismiss,
                                                            boolean shutdownAfter,
                                                            boolean tryBack2BackRemoveAdsOffer,

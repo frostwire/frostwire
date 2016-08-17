@@ -185,13 +185,17 @@ public class BuyActivity extends AbstractActivity {
             boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
 
             Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(
-                    null, Ref.weak(this),
+                    null,
+                    Ref.weak(this),
                     dismissActivityAfterward,
                     shutdownActivityAfterwards,
                     false,
                     getApplication());
 
-            finish();
+            if (!dismissActivityAfterward) {
+                // make sure that we are dismissed, but not twice.
+                finish();
+            }
         }
     }
 
