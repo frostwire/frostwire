@@ -105,7 +105,17 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
 
     @Override
     public void onInterstitialClosed(InterstitialAd interstitialAd) {
-        LOG.info("onInterstitialClosed -> wrapItUp() MobFoxInterstitialListener@" + hashCode() + " on ad@" + interstitialAd.hashCode() +  "(==@"+ad.hashCode());
+        if (interstitialAd == null || ad == null || interstitialAd != ad) {
+            // this happens when the onInterstitialClosed is called again after the first time by MobFox
+            if (interstitialAd != ad) {
+                LOG.info("onInterstitialClosed() aborted. interstitialAd != ad");
+            } else {
+                LOG.info("onInterstitialClosed() aborted. interstitialAd == null");
+            }
+            return;
+        }
+        LOG.info("onInterstitialClosed(this=MobFoxInterstitialListener@" + hashCode() +
+                ", InterstitialAd@" + interstitialAd.hashCode() +  ") [listening to InterstitialAd@"+ad.hashCode()+"]");
         wrapItUp();
     }
 
@@ -163,7 +173,7 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
 
     private void wrapItUp() {
         reset();
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutdownAfter, !shutdownAfter, app);
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(adNetwork, activityRef, finishAfterDismiss, shutdownAfter, !shutdownAfter, app);
         if (!shutdownAfter && Ref.alive(activityRef)) {
             adNetwork.reloadInterstitial(activityRef.get());
         }

@@ -34,6 +34,7 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     private static final Logger LOG = Logger.getLogger(InMobiInterstitial.InterstitialAdListener.class);
     private final WeakReference<? extends Activity> activityRef;
     private final Application app;
+    private final InMobiAdNetwork adNetwork;
     private boolean shutDownAfter = false;
     private boolean finishAfterDismiss = false;
     private boolean ready;
@@ -41,8 +42,9 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     private static int INTERSTITIAL_RETRIES_LEFT = MAX_INTERSTITIAL_LOAD_RETRIES;
     private static int INTERSTITIAL_RELOAD_WAIT_IN_SECS = 20;
 
-    InMobiInterstitialListener(Activity hostActivity) {
+    InMobiInterstitialListener(InMobiAdNetwork adNetwork, Activity hostActivity) {
         activityRef = new WeakReference<>(hostActivity);
+        this.adNetwork = adNetwork;
         this.app = hostActivity.getApplication();
     }
 
@@ -122,7 +124,7 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     }
 
     private void wrapItUp(InMobiInterstitial imInterstitial) {
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutDownAfter, true, app);
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(adNetwork, activityRef, finishAfterDismiss, shutDownAfter, true, app);
         if (!shutDownAfter) {
             reloadInterstitialLater(imInterstitial, INTERSTITIAL_RELOAD_WAIT_IN_SECS);
         }
