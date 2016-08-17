@@ -108,7 +108,7 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
         if (interstitialAd == null || ad == null || interstitialAd != ad) {
             // this happens when the onInterstitialClosed is called again after the first time by MobFox
             if (interstitialAd != ad) {
-                LOG.info("onInterstitialClosed() aborted. interstitialAd != ad");
+                LOG.info("onInterstitialClosed() aborted. interstitialAd@" + interstitialAd.hashCode() + " != ad@" + ad.hashCode());
             } else {
                 LOG.info("onInterstitialClosed() aborted. interstitialAd == null");
             }
