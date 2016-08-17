@@ -71,7 +71,7 @@ public class EngineService extends Service implements IEngineService {
     public EngineService() {
         binder = new EngineServiceBinder();
 
-        mediaPlayer = new ApolloMediaPlayer(this);
+        mediaPlayer = new ApolloMediaPlayer();
 
         state = STATE_DISCONNECTED;
     }

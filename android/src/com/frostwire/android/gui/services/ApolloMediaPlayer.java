@@ -16,12 +16,9 @@ import com.frostwire.android.gui.Librarian;
 
 public class ApolloMediaPlayer implements CoreMediaPlayer {
 
-    private final Service service;
+    private Map<Long, FileDescriptor> idMap = new HashMap<>();
 
-    private Map<Long, FileDescriptor> idMap = new HashMap<Long, FileDescriptor>();
-
-    public ApolloMediaPlayer(Service service) {
-        this.service = service;
+    public ApolloMediaPlayer() {
     }
 
     @Override
