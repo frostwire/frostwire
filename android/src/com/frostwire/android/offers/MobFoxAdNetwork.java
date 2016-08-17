@@ -41,6 +41,7 @@ final class MobFoxAdNetwork implements AdNetwork {
     private MobFoxInterstitialListener interstitialAdListener = null;
     private InterstitialAd interstitialAd;
     private long lastInterstitialLoadTimestamp;
+    private Runnable reloadTask;
 
 
     // MobFox ads require location permissions, the answer from the user is handled on
@@ -123,6 +124,7 @@ final class MobFoxAdNetwork implements AdNetwork {
 
     @Override
     public void loadNewInterstitial(Activity activity) {
+        LOG.info("loadNewInterstitial invoked by thread (@"+ Thread.currentThread().hashCode() +") " + Thread.currentThread().getName());
         if (interstitialAd != null &&
             interstitialAdListener != null &&
             interstitialAdListener.isAfterBehaviorConfigured()) {
@@ -130,7 +132,15 @@ final class MobFoxAdNetwork implements AdNetwork {
             return;
         }
 
-        LOG.info("loadNewInterstitial");
+        long timeSinceLastLoad = System.currentTimeMillis() - lastInterstitialLoadTimestamp;
+        if (timeSinceLastLoad < INTERSTITIAL_RELOAD_INTERVAL_IN_SECONDS*1000) {
+            LOG.info("loadNewInterstitial aborted. too early for a load.");
+            return;
+        }
+        LOG.info("loadNewInterstitial - time since last load: " + timeSinceLastLoad + "ms");
+        lastInterstitialLoadTimestamp = System.currentTimeMillis();
+
+        LOG.info("loadNewInterstitial - (MobFoxAdnetwork@" + this.hashCode());
         interstitialAd = new InterstitialAd(activity);
         interstitialAd.getBanner().setGetLocation(askForLocationPermissions());
         interstitialAd.setInventoryHash(Constants.MOBFOX_INVENTORY_HASH);
@@ -141,7 +151,6 @@ final class MobFoxAdNetwork implements AdNetwork {
             public void run() {
                 interstitialAd.load();
                 INTERSTITIAL_RELOAD_RETRIES_LEFT--;
-                lastInterstitialLoadTimestamp = System.currentTimeMillis();
             }
         });
     }
@@ -186,17 +195,30 @@ final class MobFoxAdNetwork implements AdNetwork {
         // wait 20 seconds to reload an ad.
         if (timeSinceLastReload > RELOAD_INTERVAL_IN_MILLIS) {
             // let's do it right away
+            LOG.info("reloadInterstitial() reloading right away.");
             loadNewInterstitial(activity);
         } else {
             // let's do it when 20 seconds have passed.
             long timeLeft = RELOAD_INTERVAL_IN_MILLIS - timeSinceLastReload;
-            Handler h = new Handler(activity.getMainLooper());
-            h.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    loadNewInterstitial(activity);
-                }
-            }, timeLeft);
+
+            if (reloadTask == null) {
+                LOG.info("reloadInterstitial() reloading in " + timeLeft + "ms");
+                reloadTask = new Runnable() {
+                    @Override
+                    public void run() {
+                        loadNewInterstitial(activity);
+                    }
+                };
+                Handler h = new Handler(activity.getMainLooper());
+                h.postDelayed(reloadTask, timeLeft);
+            } else {
+                LOG.info("reloadInterstitial() reload task already scheduled.");
+            }
         }
+    }
+
+    void resetReloadTasks() {
+        MobFoxAdNetwork.INTERSTITIAL_RELOAD_RETRIES_LEFT = MobFoxAdNetwork.INTERSTITIAL_RELOAD_MAX_RETRIES;
+        reloadTask = null;
     }
 }

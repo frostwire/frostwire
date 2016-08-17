@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @author aldenml
  */
 final class MobFoxInterstitialListener implements InterstitialListener, InterstitialAdListener {
-    private static final Logger LOG = Logger.getLogger(Offers.class);
+    private static final Logger LOG = Logger.getLogger(MobFoxInterstitialListener.class);
     private boolean loaded;
     private boolean interstitialShowSuccess;
     private WeakReference<? extends Activity> activityRef;
@@ -96,33 +96,35 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
     @Override
     public void onInterstitialLoaded(InterstitialAd interstitialAd) {
         LOG.info("onInterstitialLoaded");
+        reset();
         loaded = true;
-        afterBehaviorConfigured = false;
         ad = interstitialAd;
         ad.setListener(this);
-        MobFoxAdNetwork.INTERSTITIAL_RELOAD_RETRIES_LEFT = MobFoxAdNetwork.INTERSTITIAL_RELOAD_MAX_RETRIES;
+        adNetwork.resetReloadTasks();
     }
 
     @Override
     public void onInterstitialClosed(InterstitialAd interstitialAd) {
-        LOG.info("onInterstitialClosed");
+        LOG.info("onInterstitialClosed -> wrapItUp() MobFoxInterstitialListener@" + hashCode() + " on ad@" + interstitialAd.hashCode() +  "(==@"+ad.hashCode());
         wrapItUp();
     }
 
     @Override
     public void onInterstitialFinished() {
-        LOG.info("onInterstitialFinished");
-        wrapItUp();
+        // This method never gets invoked
+        // LOG.info("onInterstitialFinished -> wrapItUp() MobFoxInterstitialListener@" + hashCode());
+        // wrapItUp();
     }
 
     @Override
     public void onInterstitialClicked(InterstitialAd interstitialAd) {
-        LOG.info("onInterstitialClicked");
+        LOG.info("onInterstitialClicked MobFoxInterstitialListener@" + hashCode());
         reset();
     }
 
     @Override
     public void onInterstitialShown(InterstitialAd interstitialAd) {
+        LOG.info("onInterstitialShown MobFoxInterstitialListener@" + hashCode());
         reset(false); // keep the ad reference
         interstitialShowSuccess = true;
         if (showSuccessLatch != null) {
@@ -132,7 +134,7 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
 
     @Override
     public void onInterstitialFailed(InterstitialAd interstitialAd, Exception e) {
-        LOG.info("onInterstitialFailed");
+        LOG.info("onInterstitialFailed MobFoxInterstitialListener@" + hashCode());
         reset(); // this does interstitialShowSuccess = false;
         if (showSuccessLatch != null && showSuccessLatch.getCount() > 0) {
             showSuccessLatch.countDown();
