@@ -129,7 +129,7 @@ class InMobiAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 try {
-                    inmobiListener = new InMobiInterstitialListener(activity);
+                    inmobiListener = new InMobiInterstitialListener(InMobiAdNetwork.this, activity);
                     inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
                     inmobiInterstitial.load();
                 } catch (Throwable t) {

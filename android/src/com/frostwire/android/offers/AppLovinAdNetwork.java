@@ -77,7 +77,7 @@ class AppLovinAdNetwork implements AdNetwork {
 
     @Override
     public void loadNewInterstitial(Activity activity) {
-        interstitialAdapter = new AppLovinInterstitialAdapter(activity, this);
+        interstitialAdapter = new AppLovinInterstitialAdapter(this, activity);
         AppLovinSdk.getInstance(activity).getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, interstitialAdapter);
     }
 
