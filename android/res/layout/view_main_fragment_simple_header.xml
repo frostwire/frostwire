@@ -20,6 +20,7 @@
 -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/MainFragmentSimpleHeader"
+    android:id="@+id/view_main_fragment_simple_header_title"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:paddingRight="40dp"
