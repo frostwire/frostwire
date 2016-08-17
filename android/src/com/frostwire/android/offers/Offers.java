@@ -26,11 +26,9 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
 import com.mobfox.sdk.interstitialads.InterstitialAd;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -164,7 +162,7 @@ public final class Offers {
         }
     }
 
-    private static void tryBackToBackInterstitial(WeakReference<? extends Activity> activityRef) {
+    private static void tryBackToBackInterstitial(Activity activity) {
         if (REMOVE_ADS == null || !REMOVE_ADS.enabled() || !REMOVE_ADS.started()) {
             return;
         }
@@ -172,7 +170,7 @@ public final class Offers {
         final int r = new Random().nextInt(101);
         LOG.info("threshold: " + b2bThreshold + " - dice roll: " + r + " (" + (r < b2bThreshold) + ")");
         if (r < b2bThreshold) {
-            REMOVE_ADS.showInterstitial(activityRef.get(), false, false);
+            REMOVE_ADS.showInterstitial(activity, false, false);
         }
     }
 
@@ -264,7 +262,7 @@ public final class Offers {
         }
 
         public static void dismissAndOrShutdownIfNecessary(AdNetwork adNetwork,
-                                                           WeakReference<? extends Activity> activityRef,
+                                                           Activity activity,
                                                            boolean finishAfterDismiss,
                                                            boolean shutdownAfter,
                                                            boolean tryBack2BackRemoveAdsOffer,
@@ -287,26 +285,25 @@ public final class Offers {
             }
 
             LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + finishAfterDismiss + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
-            if (Ref.alive(activityRef)) {
-                Activity callerActivity = activityRef.get();
+            if (activity != null) {
                 if (finishAfterDismiss) {
-                    callerActivity.finish();
+                    activity.finish();
                 }
 
                 if (shutdownAfter) {
-                    if (callerActivity instanceof MainActivity) {
+                    if (activity instanceof MainActivity) {
                         LOG.info("dismissAndOrShutdownIfNecessary: MainActivity.shutdown()");
-                        ((MainActivity) callerActivity).shutdown();
+                        ((MainActivity) activity).shutdown();
                     } else {
                         LOG.info("dismissAndOrShutdownIfNecessary: UIUtils.sendShutdownIntent(callerActivity)");
-                        UIUtils.sendShutdownIntent(callerActivity);
+                        UIUtils.sendShutdownIntent(activity);
                     }
                     return;
                 }
 
                 if (!finishAfterDismiss && !shutdownAfter && tryBack2BackRemoveAdsOffer) {
                     LOG.info("dismissAndOrShutdownIfNecessary: Offers.tryBackToBackInterstitial(activityRef);");
-                    Offers.tryBackToBackInterstitial(activityRef);
+                    Offers.tryBackToBackInterstitial(activity);
                 }
             } else {
                 if (shutdownAfter) {

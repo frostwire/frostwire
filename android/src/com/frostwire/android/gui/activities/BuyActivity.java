@@ -38,7 +38,6 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
-import com.frostwire.util.Ref;
 
 import java.util.Random;
 
@@ -186,7 +185,7 @@ public class BuyActivity extends AbstractActivity {
 
             Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(
                     null,
-                    Ref.weak(this),
+                    this,
                     dismissActivityAfterward,
                     shutdownActivityAfterwards,
                     false,
