@@ -173,7 +173,7 @@ final class MobFoxInterstitialListener implements InterstitialListener, Intersti
 
     private void wrapItUp() {
         reset();
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(adNetwork, activityRef, finishAfterDismiss, shutdownAfter, !shutdownAfter, app);
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(adNetwork, activityRef.get(), finishAfterDismiss, shutdownAfter, !shutdownAfter, app);
         if (!shutdownAfter && Ref.alive(activityRef)) {
             adNetwork.reloadInterstitial(activityRef.get());
         }

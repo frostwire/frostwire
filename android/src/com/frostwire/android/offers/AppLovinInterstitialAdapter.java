@@ -110,7 +110,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
 
     @Override
     public void adHidden(AppLovinAd appLovinAd) {
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(appLovinAdNetwork, activityRef, finishAfterDismiss, shutdownAfter, true, app);
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(appLovinAdNetwork, activityRef.get(), finishAfterDismiss, shutdownAfter, true, app);
         reloadInterstitial(appLovinAd);
     }
 

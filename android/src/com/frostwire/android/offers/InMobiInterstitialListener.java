@@ -124,7 +124,7 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     }
 
     private void wrapItUp(InMobiInterstitial imInterstitial) {
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(adNetwork, activityRef, finishAfterDismiss, shutDownAfter, true, app);
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(adNetwork, activityRef.get(), finishAfterDismiss, shutDownAfter, true, app);
         if (!shutDownAfter) {
             reloadInterstitialLater(imInterstitial, INTERSTITIAL_RELOAD_WAIT_IN_SECS);
         }
