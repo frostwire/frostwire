@@ -50,6 +50,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.PromotionsView.OnPromotionClickListener;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
@@ -132,7 +133,17 @@ public final class SearchFragment extends AbstractFragment implements
         LayoutInflater inflater = LayoutInflater.from(activity);
         @SuppressLint("InflateParams") TextView header = (TextView) inflater.inflate(R.layout.view_main_fragment_simple_header, null);
         header.setText(R.string.search);
-
+        header.setOnClickListener(new OnClickListener() {
+            private int clickCount = 0;
+            @Override
+            public void onClick(View v) {
+                clickCount++;
+                LOG.info("header.onClick() - clickCount => " + clickCount);
+                if (clickCount % 5 == 0) {
+                    Offers.showInterstitial(getActivity(), false, false);
+                }
+            }
+        });
         return header;
     }
 
