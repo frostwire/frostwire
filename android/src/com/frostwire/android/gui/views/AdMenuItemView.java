@@ -57,17 +57,16 @@ public class AdMenuItemView extends RelativeLayout {
         textThumbnail = (TextView) findViewById(R.id.view_ad_menu_item_thumbnail);
         imageThumbnail = (ImageView) findViewById(R.id.view_ad_menu_item_thumbnail_image);
 
+        textHeadline.setText(R.string.support_frostwire);
+
         Random myRand = new Random();
-        myRand.nextInt();
         boolean isEven = (myRand.nextInt() % 2) == 0;
 
-        if (isEven == true) {
-            textHeadline.setText(R.string.support_frostwire);
+        if (isEven) {
             textSubtitle.setText(R.string.save_bandwidth);
             textThumbnail.setVisibility(VISIBLE);
             textThumbnail.setText(R.string.ad_free);
         } else {
-            textHeadline.setText(R.string.support_frostwire);
             textSubtitle.setText(R.string.remove_ads);
             imageThumbnail.setVisibility(VISIBLE);
             imageThumbnail.setImageResource(R.drawable.ad_menu_speaker);
