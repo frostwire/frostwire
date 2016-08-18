@@ -1,6 +1,7 @@
 /*
 
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +26,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.frostwire.android.R;
+
+import java.util.Random;
 
 
 /**
@@ -54,12 +57,21 @@ public class AdMenuItemView extends RelativeLayout {
         textThumbnail = (TextView) findViewById(R.id.view_ad_menu_item_thumbnail);
         imageThumbnail = (ImageView) findViewById(R.id.view_ad_menu_item_thumbnail_image);
 
-        textHeadline.setText(R.string.support_frostwire);
-        textSubtitle.setText(R.string.save_bandwidth);
-        textThumbnail.setText(R.string.ad_free);
-        imageThumbnail.setImageResource(R.drawable.ad_menu_speaker);
+        Random myRand = new Random();
+        myRand.nextInt();
+        boolean isEven = (myRand.nextInt() % 2) == 0;
 
+        if (isEven == true) {
+            textHeadline.setText(R.string.support_frostwire);
+            textSubtitle.setText(R.string.save_bandwidth);
+            textThumbnail.setVisibility(VISIBLE);
+            textThumbnail.setText(R.string.ad_free);
+        } else {
+            textHeadline.setText(R.string.support_frostwire);
+            textSubtitle.setText(R.string.remove_ads);
+            imageThumbnail.setVisibility(VISIBLE);
+            imageThumbnail.setImageResource(R.drawable.ad_menu_speaker);
+        }
     }
-
 }
 
