@@ -63,7 +63,7 @@ public final class DownloadManagerImpl implements DownloadManager {
 
                     File savePath = dl.getSavePath();
 
-                    if (savePath != null && savePath.toString().contains("fetch_magnet/")) {
+                    if (savePath != null && savePath.toString().contains("fetch_magnet")) {
                         return;
                     }
 
