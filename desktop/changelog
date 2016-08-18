@@ -6,8 +6,9 @@ frostwire (6.3.5) stable; urgency=high
   * Codebase cleanup
   * Search result table cells have more padding for readability
   * Clicking on the status bar speed indicator shows active transfers
+  * Fixed internal magnet downloads showing up in transfers (windows only)
 	
- -- FrostWire Team <contact@frostwire.com>  Mon, 15 Aug 2016 17:47:35 -0500
+ -- FrostWire Team <contact@frostwire.com>  Thu, 18 Aug 2016 12:07:47 -0500
 
 
 frostwire (6.3.4) stable; urgency=high
