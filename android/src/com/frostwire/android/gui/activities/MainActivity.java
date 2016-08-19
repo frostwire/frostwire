@@ -48,7 +48,10 @@ import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.MainMenuAdapter;
-import com.frostwire.android.gui.dialogs.*;
+import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
+import com.frostwire.android.gui.dialogs.NewTransferDialog;
+import com.frostwire.android.gui.dialogs.SDPermissionDialog;
+import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.fragments.BrowsePeerFragment;
 import com.frostwire.android.gui.fragments.MainFragment;
 import com.frostwire.android.gui.fragments.SearchFragment;
@@ -62,8 +65,10 @@ import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.util.Logger;
+import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.offers.Products;
 import com.frostwire.platform.Platforms;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
@@ -109,7 +114,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private Fragment currentFragment;
     private final Stack<Integer> fragmentsStack;
     private PlayerMenuItemView playerItem;
-    private AdMenuItemView menuAdItem;
+    private AdMenuItemView menuRemoveAdsItem;
     private TimerSubscription playerSubscription;
     private BroadcastReceiver mainBroadcastReceiver;
     private boolean externalStoragePermissionsRequested = false;
@@ -213,7 +218,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void initAdMenuItemListener() {
-        menuAdItem = findView(R.id.slidermenu_ad_menuitem);
+        menuRemoveAdsItem = findView(R.id.slidermenu_ad_menuitem);
         RelativeLayout menuAd = findView(R.id.view_ad_menu_item_ad);
         menuAd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -230,7 +235,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             @Override
             public void onDrawerStateChanged(int newState) {
                 refreshPlayerItem();
-                refreshMenuAdItem();
+                refreshMenuRemoveAdsItem();
             }
 
             @Override
@@ -344,7 +349,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         initAdMenuItemListener();
 
         refreshPlayerItem();
-        refreshMenuAdItem();
+        refreshMenuRemoveAdsItem();
 
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
@@ -646,12 +651,17 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
-    private void refreshMenuAdItem() {
-        if (playerItem == null || playerItem.getVisibility() == View.GONE) {
-            menuAdItem.setVisibility(View.VISIBLE);
-        } else {
-            menuAdItem.setVisibility(View.GONE);
+    private void refreshMenuRemoveAdsItem() {
+        // only visible for basic or debug build
+        int visibility = View.GONE;
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
+            // if they haven't paid for ads
+            if (!Products.disabledAds(PlayStore.getInstance()) &&
+                (playerItem == null || playerItem.getVisibility() == View.GONE)) {
+                visibility = View.VISIBLE;
+            }
         }
+        menuRemoveAdsItem.setVisibility(visibility);
     }
 
     private void setupMenuItems() {
@@ -879,7 +889,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             if (Ref.alive(activityRef)) {
                 MainActivity activity = activityRef.get();
                 activity.refreshPlayerItem();
-                activity.refreshMenuAdItem();
+                activity.refreshMenuRemoveAdsItem();
                 activity.syncSlideMenu();
             }
         }
