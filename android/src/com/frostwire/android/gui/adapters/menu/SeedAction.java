@@ -192,9 +192,9 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             try {
                 BTEngine.getInstance().download(new File(fd.filePath), null, new boolean[]{true});
             } catch (Throwable e) {
-                // TODO: better notify the user
+                // TODO: better user notification
                 LOG.error("Error starting download from file descriptor", e);
-                // sometimes a file descriptor could be visible in the UI but not exists
+                // sometimes a file descriptor could be visible in the UI but does not exist
                 // due to the android providers getting out of sync.
             }
         } else {
@@ -236,7 +236,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                     // so the TorrentHandle object is created and added to the libtorrent session.
                     BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
                 } catch (Throwable e) {
-                    // TODO: better handle this error
+                    // TODO: better handling of this error
                     LOG.error("Error creating torrent for seed", e);
                 }
             }

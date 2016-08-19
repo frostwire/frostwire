@@ -26,10 +26,9 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
+import com.mobfox.sdk.interstitialads.InterstitialAd;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +46,9 @@ public final class Offers {
 
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
+    private final static MobFoxAdNetwork MOBFOX = new MobFoxAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
+
     private static Map<String,AdNetwork> AD_NETWORKS;
 
     public static void initAdNetworks(Activity activity) {
@@ -66,12 +67,34 @@ public final class Offers {
         stopAdNetworksIfPurchasedRemoveAds(activity);
     }
 
+    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (AD_NETWORKS == null) {
+            return;
+        }
+        final MobFoxAdNetwork adNetwork = (MobFoxAdNetwork) AD_NETWORKS.get(Constants.AD_NETWORK_SHORTCODE_MOBFOX);
+        if (adNetwork != null && adNetwork.enabled() && adNetwork.started()) {
+            final InterstitialAd interstitialAd = adNetwork.getInterstitialAd();
+            if (interstitialAd != null) {
+
+                // if permissions were not granted...
+                if (grantResults.length > 0 && grantResults[0] != 0) {
+                    interstitialAd.getBanner().setGetLocation(false);
+                    adNetwork.dontAskForLocationPermissions();
+                }
+
+                interstitialAd.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+            }
+        }
+    }
+
     private static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {
             AD_NETWORKS = new HashMap<>();
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
             AD_NETWORKS.put(IN_MOBI.getShortCode(), IN_MOBI);
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
+            AD_NETWORKS.put(MOBFOX.getShortCode(), MOBFOX);
         }
         return AD_NETWORKS;
     }
@@ -96,13 +119,15 @@ public final class Offers {
         } else if (Constants.IS_PLUS_OR_DEBUG && !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE)) {
             LOG.info("Skipping interstitial ads display, Plus instance not supporting FrostWire development");
         } else {
-            final WeakReference<Activity> activityRef = Ref.weak(activity);
             for (AdNetwork adNetwork : getActiveAdNetworks()) {
                 if (!interstitialShown && adNetwork != null && adNetwork.started()) {
                     LOG.info("showInterstitial: AdNetwork " + adNetwork.getClass().getSimpleName() + " started? " + adNetwork.started());
-                    interstitialShown = adNetwork.showInterstitial(activityRef, shutdownAfterwards, dismissAfterwards);
+                    interstitialShown = adNetwork.showInterstitial(activity, shutdownAfterwards, dismissAfterwards);
                     if (interstitialShown) {
                         LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial shown");
+                        return;
+                    } else {
+                        LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial NOT shown");
                     }
                 }
             }
@@ -137,7 +162,7 @@ public final class Offers {
         }
     }
 
-    private static void tryBackToBackInterstitial(WeakReference<? extends Activity> activityRef) {
+    private static void tryBackToBackInterstitial(Activity activity) {
         if (REMOVE_ADS == null || !REMOVE_ADS.enabled() || !REMOVE_ADS.started()) {
             return;
         }
@@ -145,16 +170,16 @@ public final class Offers {
         final int r = new Random().nextInt(101);
         LOG.info("threshold: " + b2bThreshold + " - dice roll: " + r + " (" + (r < b2bThreshold) + ")");
         if (r < b2bThreshold) {
-            REMOVE_ADS.showInterstitial(activityRef, false, false);
+            REMOVE_ADS.showInterstitial(activity, false, false);
         }
     }
 
     private static void stopAdNetworksIfPurchasedRemoveAds(Context context) {
-        final ConfigurationManager CM = ConfigurationManager.instance();
+        //final ConfigurationManager CM = ConfigurationManager.instance();
         final PlayStore playStore = PlayStore.getInstance();
         final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
         if (purchasedProducts != null && purchasedProducts.size() > 0) {
-            CM.setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
+            //CM.setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
             Offers.stopAdNetworks(context);
             LOG.info("Turning off ads, user previously purchased AdRemoval");
         }
@@ -196,7 +221,7 @@ public final class Offers {
                 adNetwork.enable(false);
             }
         }
-        return activeAdNetworksList.toArray(new AdNetwork[activeAdNetworksList.size()]);
+        return activeAdNetworksList.toArray(new AdNetwork[0]);
     }
 
     private static int getKeyOffset(String key, String[] keys) {
@@ -236,31 +261,36 @@ public final class Offers {
             }
         }
 
-        public static void dismissAndOrShutdownIfNecessary(WeakReference<? extends Activity> activityRef,
+        public static void dismissAndOrShutdownIfNecessary(AdNetwork adNetwork,
+                                                           Activity activity,
                                                            boolean finishAfterDismiss,
                                                            boolean shutdownAfter,
                                                            boolean tryBack2BackRemoveAdsOffer,
                                                            Application fallbackContext) {
-            if (Ref.alive(activityRef)) {
-                Activity callerActivity = activityRef.get();
+            LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + finishAfterDismiss + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
+            if (activity != null) {
                 if (finishAfterDismiss) {
-                    callerActivity.finish();
+                    activity.finish();
                 }
 
                 if (shutdownAfter) {
-                    if (callerActivity instanceof MainActivity) {
-                        ((MainActivity) callerActivity).shutdown();
+                    if (activity instanceof MainActivity) {
+                        LOG.info("dismissAndOrShutdownIfNecessary: MainActivity.shutdown()");
+                        ((MainActivity) activity).shutdown();
                     } else {
-                        UIUtils.sendShutdownIntent(callerActivity);
+                        LOG.info("dismissAndOrShutdownIfNecessary: UIUtils.sendShutdownIntent(callerActivity)");
+                        UIUtils.sendShutdownIntent(activity);
                     }
                     return;
                 }
 
                 if (!finishAfterDismiss && !shutdownAfter && tryBack2BackRemoveAdsOffer) {
-                    Offers.tryBackToBackInterstitial(activityRef);
+                    LOG.info("dismissAndOrShutdownIfNecessary: Offers.tryBackToBackInterstitial(activityRef);");
+                    Offers.tryBackToBackInterstitial(activity);
                 }
             } else {
                 if (shutdownAfter) {
+                    LOG.info("dismissAndOrShutdownIfNecessary: shutdown() [no activity ref]");
                     UIUtils.sendShutdownIntent(fallbackContext);
                 }
             }

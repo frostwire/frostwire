@@ -24,8 +24,6 @@ import com.frostwire.util.Logger;
 import com.inmobi.ads.InMobiInterstitial;
 import com.inmobi.sdk.InMobiSdk;
 
-import java.lang.ref.WeakReference;
-
 class InMobiAdNetwork implements AdNetwork {
 
     private static final Logger LOG = Logger.getLogger(InMobiAdNetwork.class);
@@ -53,15 +51,21 @@ class InMobiAdNetwork implements AdNetwork {
 
         if (!started) {
             try {
-                // this initialize call is very expensive, this is why we should be invoked in a thread.
-                LOG.info("InMobi.initialize()...");
-                InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
-                if (DEBUG_MODE) {
-                    InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
-                }
-                LOG.info("InMobi.initialized.");
-                started = true;
-                LOG.info("Load InmobiInterstitial.");
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LOG.info("InMobi.initialize()...");
+                        InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
+                        if (DEBUG_MODE) {
+                            InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
+                        }
+                        LOG.info("InMobi.initialized.");
+                        started = true;
+                        LOG.info("Load InmobiInterstitial.");
+                    }
+                });
+
+                // this one makes sure it runs on the UI thread, enqueued after
                 loadNewInterstitial(activity);
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -87,7 +91,7 @@ class InMobiAdNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean showInterstitial(final WeakReference<? extends Activity> activityWeakReference,
+    public boolean showInterstitial(Activity activity,
                                     boolean shutdownActivityAfterwards,
                                     boolean dismissActivityAfterward) {
         if (!started || !enabled() || inmobiInterstitial == null || inmobiListener == null) {
@@ -125,7 +129,7 @@ class InMobiAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 try {
-                    inmobiListener = new InMobiInterstitialListener(activity);
+                    inmobiListener = new InMobiInterstitialListener(InMobiAdNetwork.this, activity);
                     inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
                     inmobiInterstitial.load();
                 } catch (Throwable t) {

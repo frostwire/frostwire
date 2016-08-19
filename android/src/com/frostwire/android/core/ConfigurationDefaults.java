@@ -60,6 +60,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, true);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_INMOBI, false);
+        defaultValues.put(Constants.PREF_KEY_GUI_USE_MOBFOX, false);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
         defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 5);
@@ -70,6 +71,7 @@ final class ConfigurationDefaults {
                         Constants.AD_NETWORK_SHORTCODE_INMOBI,
                         Constants.AD_NETWORK_SHORTCODE_REMOVEADS
                 });
+        defaultValues.put(Constants.PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN, 20);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN, 10);
         defaultValues.put(Constants.PREF_KEY_SEARCH_INTERVAL_MS_FOR_TORRENT_DEEP_SCAN, 2000);

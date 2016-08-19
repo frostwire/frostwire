@@ -42,7 +42,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
     private boolean shutdownAfter = false;
     private boolean isVideoAd = false;
 
-    AppLovinInterstitialAdapter(Activity parentActivity, AppLovinAdNetwork appLovinAdNetwork) {
+    AppLovinInterstitialAdapter(AppLovinAdNetwork appLovinAdNetwork, Activity parentActivity) {
         this.activityRef = Ref.weak(parentActivity);
         this.appLovinAdNetwork = appLovinAdNetwork;
         this.app = parentActivity.getApplication();
@@ -70,12 +70,11 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
         return isVideoAd;
     }
 
-    public boolean show(WeakReference<? extends Activity> activityWeakReference) {
+    public boolean show(Activity activity) {
         boolean result = false;
-        if (ad != null && Ref.alive(activityWeakReference)) {
+        if (ad != null && activity != null) {
             try {
-                this.activityRef = activityWeakReference;
-                final AppLovinInterstitialAdDialog adDialog = AppLovinInterstitialAd.create(AppLovinSdk.getInstance(activityRef.get()), activityRef.get());
+                final AppLovinInterstitialAdDialog adDialog = AppLovinInterstitialAd.create(AppLovinSdk.getInstance(activity), activity);
 
                 if (adDialog.isShowing()) {
                     // this could happen because a previous ad failed to be properly dismissed
@@ -111,7 +110,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
 
     @Override
     public void adHidden(AppLovinAd appLovinAd) {
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef, finishAfterDismiss, shutdownAfter, true, app);
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(appLovinAdNetwork, activityRef.get(), finishAfterDismiss, shutdownAfter, true, app);
         reloadInterstitial(appLovinAd);
     }
 

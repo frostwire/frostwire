@@ -38,7 +38,6 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
-import com.frostwire.util.Ref;
 
 import java.util.Random;
 
@@ -185,13 +184,12 @@ public class BuyActivity extends AbstractActivity {
             boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
 
             Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(
-                    Ref.weak(this),
+                    null,
+                    this,
                     dismissActivityAfterward,
                     shutdownActivityAfterwards,
                     false,
                     getApplication());
-
-            finish();
         }
     }
 
@@ -444,6 +442,7 @@ public class BuyActivity extends AbstractActivity {
         public void onClick(View v) {
             offerAccepted = false;
             onInterstitialActionBarDismiss();
+            finish();
         }
     }
 

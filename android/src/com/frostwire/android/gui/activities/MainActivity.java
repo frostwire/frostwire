@@ -855,6 +855,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (checker != null) {
             checker.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+        Offers.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private static final class MenuDrawerToggle extends ActionBarDrawerToggle {

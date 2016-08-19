@@ -38,7 +38,6 @@ import java.util.Map.Entry;
  * @author aldenml
  */
 public class ConfigurationManager {
-
     private final SharedPreferences preferences;
     private final Editor editor;
 
@@ -110,7 +109,7 @@ public class ConfigurationManager {
         return new File(preferences.getString(key, ""));
     }
 
-    public void setFile(String key, File value) {
+    private void setFile(String key, File value) {
         editor.putString(key, value.getAbsolutePath());
         editor.commit();
     }
@@ -129,7 +128,7 @@ public class ConfigurationManager {
         }
     }
 
-    public void setByteArray(String key, byte[] value) {
+    private void setByteArray(String key, byte[] value) {
         setString(key, new String(Hex.encode(value)));
     }
 
@@ -137,7 +136,7 @@ public class ConfigurationManager {
         resetToDefaults(defaults.getDefaultValues());
     }
 
-    public void resetToDefault(String key) {
+    private void resetToDefault(String key) {
         if (defaults != null) {
             Map<String, Object> defaultValues = defaults.getDefaultValues();
             if (defaultValues != null && defaultValues.containsKey(key)) {

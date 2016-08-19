@@ -177,7 +177,7 @@ public final class SystemUtils {
         }
     }
 
-    public static boolean hasSdkOrNewer(int versionCode) {
+    private static boolean hasSdkOrNewer(int versionCode) {
         return Build.VERSION.SDK_INT >= versionCode;
     }
 
