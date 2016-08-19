@@ -267,23 +267,6 @@ public final class Offers {
                                                            boolean shutdownAfter,
                                                            boolean tryBack2BackRemoveAdsOffer,
                                                            Application fallbackContext) {
-            // TEMPORARY HACK: This should not be necessary.
-            // The MobFox banner invokes listener.onInterstitialClosed() too many times.
-            // Therefore, we're going to let the adNetwork object time when
-            // was the last time we tried to do this, so it tell us if
-            // it it's too early to do our job once again.
-
-            // Ideally this code will go away as soon as the issue with the
-            // onInterstitialClosed callbacks is resolved by MobFox.
-            // https://github.com/mobfox/MobFox-Android-SDK-Core-Lib/issues/39
-            if (adNetwork != null && adNetwork instanceof MobFoxAdNetwork) {
-                MobFoxAdNetwork mbAdNetwork = (MobFoxAdNetwork) adNetwork;
-                if (mbAdNetwork.shouldAbortDismissAndOrShutdown()) {
-                    LOG.info("dismissAndOrShutdownIfNecessary() aborted. already called.");
-                    return;
-                }
-            }
-
             LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + finishAfterDismiss + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
             if (activity != null) {
                 if (finishAfterDismiss) {

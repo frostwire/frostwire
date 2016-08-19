@@ -42,8 +42,6 @@ final class MobFoxAdNetwork implements AdNetwork {
     private InterstitialAd interstitialAd;
     private long lastInterstitialLoadTimestamp;
     private Runnable reloadTask;
-    private long lastOnAdClosedTimestamp;
-
 
     // MobFox ads require location permissions, the answer from the user is handled on
     // MainActivity.onRequestPermissionsResult() which invokes Offers.onRequestPermissionsResult()
@@ -221,10 +219,5 @@ final class MobFoxAdNetwork implements AdNetwork {
     void resetReloadTasks() {
         MobFoxAdNetwork.INTERSTITIAL_RELOAD_RETRIES_LEFT = MobFoxAdNetwork.INTERSTITIAL_RELOAD_MAX_RETRIES;
         reloadTask = null;
-    }
-
-    boolean shouldAbortDismissAndOrShutdown() {
-        long newTime = System.currentTimeMillis();
-        return newTime - lastOnAdClosedTimestamp < INTERSTITIAL_RELOAD_INTERVAL_IN_SECONDS * 3;
     }
 }

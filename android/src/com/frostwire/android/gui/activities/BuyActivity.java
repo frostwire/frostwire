@@ -190,11 +190,6 @@ public class BuyActivity extends AbstractActivity {
                     shutdownActivityAfterwards,
                     false,
                     getApplication());
-
-            if (!dismissActivityAfterward) {
-                // make sure that we are dismissed, but not twice.
-                finish();
-            }
         }
     }
 
@@ -447,6 +442,7 @@ public class BuyActivity extends AbstractActivity {
         public void onClick(View v) {
             offerAccepted = false;
             onInterstitialActionBarDismiss();
+            finish();
         }
     }
 
