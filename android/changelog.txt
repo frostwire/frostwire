@@ -1,4 +1,6 @@
-FrostWire 1.8.0 - AUG/05/2016
+FrostWire 1.8.0 - AUG/19/2016
+ - New jlibtorrent 1.1.0.37
+ - Speed and stability improvements.
  - Fixes download issues with BitSnoop search results.
  - Improved swipe gesture detection.
  - Replaced Terms of Use dialog for checkbox on final wizard screen.
