@@ -148,8 +148,11 @@ final class MobFoxAdNetwork implements AdNetwork {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                interstitialAd.load();
-                INTERSTITIAL_RELOAD_RETRIES_LEFT--;
+                // it can happen that the network is stopped right before this call
+                if (interstitialAd != null) {
+                    interstitialAd.load();
+                    INTERSTITIAL_RELOAD_RETRIES_LEFT--;
+                }
             }
         });
     }
