@@ -801,8 +801,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
+        if (drawerToggle != null && drawerToggle.onOptionsItemSelected(item)) {
             return true;
+        }
+
+        if (item == null) {
+            return false;
         }
 
         switch (item.getItemId()) {
