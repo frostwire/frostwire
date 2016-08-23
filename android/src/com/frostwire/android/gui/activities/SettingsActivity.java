@@ -251,13 +251,13 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupSupportFrostWireOption() {
         final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
-        if (!Constants.IS_BASIC_AND_DEBUG && Constants.IS_GOOGLE_PLAY_DISTRIBUTION && preference != null) {
-            preference.setOnPreferenceClickListener(null);
-            PreferenceScreen category = (PreferenceScreen) findPreference(Constants.PREF_KEY_OTHER_PREFERENCE_CATEGORY);
-            if (category != null && preference != null) {
-                category.removePreference(preference);
-            }
-        } else if (preference != null){
+        if (!Constants.IS_BASIC_AND_DEBUG && Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            removeSupportFrostWirePreference(preference);
+        }
+        else if (!Constants.IS_BASIC_AND_DEBUG && Products.disabledAds(PlayStore.getInstance())) {
+            removeSupportFrostWirePreference(preference);
+        }
+        else if (preference != null){
             preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -267,6 +267,17 @@ public class SettingsActivity extends PreferenceActivity {
                     return true;
                 }
             });
+        }
+    }
+
+    private void removeSupportFrostWirePreference(CheckBoxPreference preference) {
+        if (preference == null) {
+            return;
+        }
+        preference.setOnPreferenceClickListener(null);
+        PreferenceScreen category = (PreferenceScreen) findPreference(Constants.PREF_KEY_OTHER_PREFERENCE_CATEGORY);
+        if (category != null && preference != null) {
+            category.removePreference(preference);
         }
     }
 
