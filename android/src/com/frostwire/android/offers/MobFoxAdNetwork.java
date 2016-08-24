@@ -23,6 +23,7 @@ import android.os.Handler;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
+import com.mobfox.sdk.bannerads.Banner;
 import com.mobfox.sdk.interstitialads.InterstitialAd;
 
 /**
@@ -31,8 +32,8 @@ import com.mobfox.sdk.interstitialads.InterstitialAd;
  * @author aldenml
  */
 final class MobFoxAdNetwork implements AdNetwork {
-    static final int INTERSTITIAL_RELOAD_MAX_RETRIES = 5;
-    static int INTERSTITIAL_RELOAD_RETRIES_LEFT = INTERSTITIAL_RELOAD_MAX_RETRIES;
+    private static final int INTERSTITIAL_RELOAD_MAX_RETRIES = 5;
+    private static int INTERSTITIAL_RELOAD_RETRIES_LEFT = INTERSTITIAL_RELOAD_MAX_RETRIES;
     private static final Logger LOG = Logger.getLogger(MobFoxAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
     private static final long INTERSTITIAL_RELOAD_INTERVAL_IN_SECONDS = 20;
@@ -75,6 +76,8 @@ final class MobFoxAdNetwork implements AdNetwork {
         started = false;
         interstitialAd = null;
         interstitialAdListener = null;
+        reloadTask = null;
+        MobFoxAdNetwork.INTERSTITIAL_RELOAD_RETRIES_LEFT = 0;
     }
 
     @Override
@@ -141,7 +144,7 @@ final class MobFoxAdNetwork implements AdNetwork {
 
         LOG.info("loadNewInterstitial - (MobFoxAdnetwork@" + this.hashCode());
         interstitialAd = new InterstitialAd(activity);
-        interstitialAd.getBanner().setGetLocation(askForLocationPermissions());
+        Banner.setGetLocation(askForLocationPermissions());
         interstitialAd.setInventoryHash(Constants.MOBFOX_INVENTORY_HASH);
         interstitialAd.setListener(interstitialAdListener);
 
