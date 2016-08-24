@@ -192,30 +192,46 @@ public final class UpdateMediator {
     }
 
     static void installUbuntu(File executableFile) throws IOException {
-        boolean success = trySoftwareCenter(executableFile) || tryGdebiGtk(executableFile);
+        boolean success = tryGnomeSoftware(executableFile) || tryGdebiGtk(executableFile) || trySoftwareCenter(executableFile);
 
         if (!success) {
             throw new IOException("Unable to install update");
         }
     }
 
-    private static boolean trySoftwareCenter(File executableFile) {
-        return tryUbuntuInstallCmd("/usr/bin/software-center", executableFile);
+    private static boolean tryGnomeSoftware(File executableFile) {
+        return tryUbuntuInstallCmd("/usr/bin/gnome-software", "--local-filename="+executableFile.getAbsolutePath(), "--verbose");
     }
-
+    
     private static boolean tryGdebiGtk(File executableFile) {
         return tryUbuntuInstallCmd("gdebi-gtk", executableFile);
     }
 
+    private static boolean trySoftwareCenter(File executableFile) {
+        return tryUbuntuInstallCmd("/usr/bin/software-center", executableFile);
+    }
+    
     private static boolean tryUbuntuInstallCmd(String cmd, File executableFile) {
+        return tryUbuntuInstallCmd(cmd, executableFile.getAbsolutePath());
+    }
+    
+    private static boolean tryUbuntuInstallCmd(String cmd, String ... options) {
         try {
-            String[] commands = new String[] { cmd, executableFile.getAbsolutePath() };
+	    int options_length = (options == null || options.length == 0) ? 0 : options.length;
+	    
+            String[] commands = new String[1 + options_length];
+	    commands[0] = cmd;
+	    for (int i=1; i <= options_length; i++) {
+                commands[i] = options[i-1];
+	    }
+
 
             ProcessBuilder pbuilder = new ProcessBuilder(commands);
             pbuilder.start();
 
             return true;
         } catch (Throwable e) {
+	    e.printStackTrace();
             return false;
         }
     }
