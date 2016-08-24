@@ -209,15 +209,23 @@ public final class UpdateManager implements Serializable {
         if (updateMessage != null) {
             UpdateMediator.instance().setUpdateMessage(updateMessage);
         }
-        
+
+        // we might be testing and want to force the update message
+        boolean forceUpdateMessage = System.getenv().get("FROSTWIRE_FORCE_UPDATE_MESSAGE") != null;
+
         // attempt to show system Update Message if needed
         if (umr.hasUpdateMessage() && updateMessage.getVersion() != null && !updateMessage.getVersion().trim().equals("")
-                && UpdateManager.isFrostWireOld(updateMessage.getVersion())) {
+	    && (forceUpdateMessage || UpdateManager.isFrostWireOld(updateMessage.getVersion()))) {
 
             boolean hasUrl = updateMessage.getUrl() != null;
             boolean hasTorrent = updateMessage.getTorrent() != null;
             boolean hasInstallerUrl = updateMessage.getInstallerUrl() != null;
 
+	    if (forceUpdateMessage) {
+               System.out.println("FROSTWIRE_FORCE_UPDATE_MESSAGE env found, testing update message. (turn off with `unset FROSTWIRE_FORCE_UPDATE_MESSAGE`)");
+            }
+
+	    
             // Logic for Windows or Mac Update
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
                 if (hasUrl && !hasTorrent && !hasInstallerUrl) {
