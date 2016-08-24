@@ -56,6 +56,7 @@ class AppLovinAdNetwork implements AdNetwork {
                     if (!started) {
                         final Context applicationContext = activity.getApplicationContext();
                         AppLovinSdk.initializeSdk(applicationContext);
+                        AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
                         if (DEBUG_MODE) {
                             AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(true);
                         }
@@ -115,20 +116,26 @@ class AppLovinAdNetwork implements AdNetwork {
     public boolean showInterstitial(Activity activity,
                                     final boolean shutdownAfterwards,
                                     final boolean dismissAfterward) {
+        boolean result = false;
         if (enabled() && started) {
+            final boolean wasPlaying = MusicUtils.isPlaying();
+            // make sure video ads are always muted, it's very annoying (regardless of playback status)
+            AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
             interstitialAdapter.shutdownAppAfter(shutdownAfterwards);
             interstitialAdapter.dismissActivityAfterwards(dismissAfterward);
             try {
-                if (interstitialAdapter.isVideoAd() && MusicUtils.isPlaying()) {
-                    return false;
-                }
-                return interstitialAdapter.isAdReadyToDisplay() && interstitialAdapter.show(activity);
+                result = interstitialAdapter.isAdReadyToDisplay() && interstitialAdapter.show(activity);
             } catch (Throwable e) {
                 e.printStackTrace();
-                return false;
+                result = false;
             }
-        } else {
-            return false;
+            if (result && wasPlaying && interstitialAdapter.isVideoAd() && !shutdownAfterwards) {
+                // Since AppLovin, even if muted will pause the player, we'll un-pause it.
+                LOG.info("wasPlaying and not shutting down, resuming player playback");
+                MusicUtils.playOrPause();
+            }
         }
+
+        return result;
     }
 }
