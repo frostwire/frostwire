@@ -394,9 +394,11 @@ public final class BTEngine {
                 priorities = Priority.array(Priority.IGNORE, ti.numFiles());
             }
 
-            for (int i = 0; i < selection.length; i++) {
-                if (selection[i]) {
-                    priorities[i] = Priority.NORMAL;
+            if (priorities != null) {
+                for (int i = 0; i < selection.length; i++) {
+                    if (selection[i]) {
+                        priorities[i] = Priority.NORMAL;
+                    }
                 }
             }
         }
