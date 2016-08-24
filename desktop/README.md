@@ -72,34 +72,32 @@ We recommend using [IntelliJ Idea](http://www.jetbrains.com/idea/) as your devel
 
 # Git cloning instructions
 
-We recommend you first clone the repository to your machine from the `origin` repository at https://github.com/frostwire/frostwire-desktop
+We recommend you first clone the repository to your machine from the `origin` repository at https://github.com/frostwire/frostwire
 
 ```
-git clone https://github.com/frostwire/frostwire-desktop
-cd frostwire-desktop
-git submodule update —init
+git clone https://github.com/frostwire/frostwire
+cd frostwire/desktop
 ```
 
 **If you plan on hacking FrostWire**, fork the repository on github, and then add your fork's uri as a remote
 
-`git remote add myGithubAccount https://github.com/myGithubAccount/frostwire-desktop`
+`git remote add myGithubAccount https://github.com/myGithubAccount/frostwire`
 
 If you issue a `git remote -v` it should look something like this (where `myGithubAccount` is your user account):
 ```
 $ git remote -v
-origin          https://github.com/frostwire/frostwire-desktop (fetch)
-origin          https://github.com/frostwire/frostwire-desktop (push)
-myGithubAccount https://github.com/myGithubAccount/frostwire-desktop (fetch)
-myGithubAccount https://github.com/myGithubAccount/frostwire-desktop (push)
+origin          https://github.com/frostwire/frostwire (fetch)
+origin          https://github.com/frostwire/frostwire (push)
+myGithubAccount https://github.com/myGithubAccount/frostwire (fetch)
+myGithubAccount https://github.com/myGithubAccount/frostwire (push)
 ```
 
 # Build Instructions
 
 Be sure that you're in the project root, else then execute:
 
-    cd frostwire-desktop
-    gradle clean
-    gradle build
+    cd frostwire/desktop
+    gradle clean build
 
 Then run the project with:
 
@@ -140,7 +138,7 @@ If the build is not broken, hit us up at the [Developer Forum](http://forum.fros
 
 * Keep it simple. ([KISS](https://en.wikipedia.org/wiki/KISS_principle))
 * Do not repeat yourself. ([DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)) Re-use your own code and our code. It'll be faster to code, and easier to maintain.
-* If you want to help, the [Issue tracker](https://github.com/frostwire/frostwire-desktop/issues) is a good place to take a look at.
+* If you want to help, the [Issue tracker](https://github.com/frostwire/frostwire/issues) is a good place to take a look at.
 * Try to follow our coding style and formatting before submitting a patch.
 * **All pull requests should come from a feature branch created on your git fork**. We'll review your code and will only merge it to the master branch if it doesn't break the build. If you can include tests for your pull request you get extra bonus points ;)
 * When you submit a pull request try to explain what issue you're fixing in detail and how you're fixing in detail it so it's easier for us to read your patches. If it's too hard to explain what you're doing, you're probably making things more complex than they already are. Look and test your code well before submitting patches.
@@ -153,7 +151,7 @@ Every countribution merged to the master branch will automatically receive a tip
 
 Tip for next commit: [![see here](http://tip4commit.com/projects/538.svg)](http://tip4commit.com/projects/538)
 
-If you want to contribute code, start by looking at the [open issues on github.com](https://github.com/frostwire/frostwire-desktop/issues).
+If you want to contribute code, start by looking at the [open issues on github.com](https://github.com/frostwire/frostwire/issues).
 
 If you want to fix a new issue that's not listed there, create the issue, see if
 we can discuss a solution.
@@ -191,6 +189,10 @@ _Repeat and rinse, if you send enough patches to demonstrate you have a good
 coding skills, we'll just give you commit access on the real repo and you will
 be part of the development team._
 
+### Environment Variables for Runtime Configuration
+
+ **FROSTWIRE_FORCE_UPDATE_MESSAGE** if this env variable is set FrostWire will always show the update dialog for testing purposes
+
 ### License
 
 Frostwire Desktop is offered under the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html). Available [here](LICENSE.txt).
@@ -204,4 +206,4 @@ Frostwire Desktop is offered under the [GNU General Public License](http://www.g
 [Twitter @frostwire](https://twitter.com/frostwire) |
 [Tumblr](http://tumblr.frostwire.com)
 
-[Git Repository at GitHub.com](https://github.com/frostwire/frostwire-desktop.git)
+[Git Repository at GitHub.com](https://github.com/frostwire/frostwire.git)
