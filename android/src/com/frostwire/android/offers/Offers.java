@@ -274,6 +274,10 @@ public final class Offers {
                 }
 
                 if (shutdownAfter) {
+                    if (adNetwork != null) {
+                        adNetwork.stop(activity);
+                    }
+
                     if (activity instanceof MainActivity) {
                         LOG.info("dismissAndOrShutdownIfNecessary: MainActivity.shutdown()");
                         ((MainActivity) activity).shutdown();
