@@ -57,9 +57,11 @@ public class ShareTorrentDialog extends JDialog {
     private String info_hash;
     private String torrent_name;
 
-    public ShareTorrentDialog(TorrentInfo torrent) {
+    public ShareTorrentDialog(JFrame frame, TorrentInfo torrent) {
+        super(frame);
         this.torrent = torrent;
         setupUI();
+        setLocationRelativeTo(frame);
     }
 
     private void initURLShortenerListeners() {
@@ -281,7 +283,6 @@ public class ShareTorrentDialog extends JDialog {
         setMinimumSize(prefDimension);
         setPreferredSize(prefDimension);
         setResizable(false);
-        setLocationRelativeTo(null);
 
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setModalityType(ModalityType.APPLICATION_MODAL);
