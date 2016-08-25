@@ -1,7 +1,9 @@
 frostwire (6.3.6) stable; urgency=high
   * Fixes upgrade bug for Ubuntu 16.04 installs w/o gdebi/software-center
+  * Send to friend dialog now appears on the same screen as the main
+    FrostWire window, and centered relative to it.
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 24 Aug 2016 16:44:34 -0500
+ -- FrostWire Team <contact@frostwire.com>  Wed, 24 Aug 2016 21:20:20 -0600
 
 
 frostwire (6.3.5) stable; urgency=high
@@ -14,7 +16,7 @@ frostwire (6.3.5) stable; urgency=high
   * Clicking on the status bar speed indicator shows active transfers
   * Fixed internal magnet downloads showing up in transfers (windows only)
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 18 Aug 2016 12:07:47 -0500
+ -- FrostWire Team <contact@frostwire.com>  Thu, 18 Aug 2016 12:07:47 -0600
 
 
 frostwire (6.3.4) stable; urgency=high
@@ -22,20 +24,20 @@ frostwire (6.3.4) stable; urgency=high
   * New media player based on mplayer 1.3.0 and ffmpeg 3.0 fixes
     YT audio preview issues, video playback issues. VP8, VP9, HEVC support
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 18 Jul 2016 20:59:05 -0500
+ -- FrostWire Team <contact@frostwire.com>  Mon, 18 Jul 2016 20:59:05 -0600
 
 frostwire (6.3.3) stable; urgency=high
   * Fixes freeze issue
   * Fixes YT search issues
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 05 Jul 2016 13:39:05 -0500
+ -- FrostWire Team <contact@frostwire.com>  Tue, 05 Jul 2016 13:39:05 -0600
 
 frostwire (6.3.2) stable; urgency=high
   * Fixes YT search issues
   * New jlibtorrent 1.1.0.35
   * Crash fixes
 
- -- FrostWire Team <contact@frostwire.com>  Sat, 25 Jun 2016 04:21:39 -0500
+ -- FrostWire Team <contact@frostwire.com>  Sat, 25 Jun 2016 04:21:39 -0600
 
 frostwire (6.3.1) stable; urgency=high
   * New: "View > Search/Transfers split screen" option.
@@ -50,7 +52,7 @@ frostwire (6.3.1) stable; urgency=high
   * EZTV fixes
   * New icon for TorrentDownloads search results
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 16 Jun 2016 18:42:00 -0500
+ -- FrostWire Team <contact@frostwire.com>  Thu, 16 Jun 2016 18:42:00 -0600
 
 frostwire (6.3.0) stable; urgency=high
   * Greatly improved seeding connectivity. Seed and share magnets!
