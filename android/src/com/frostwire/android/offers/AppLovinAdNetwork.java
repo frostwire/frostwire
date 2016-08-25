@@ -19,7 +19,6 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
-import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
 import com.frostwire.android.core.Constants;
@@ -118,7 +117,6 @@ class AppLovinAdNetwork implements AdNetwork {
                                     final boolean dismissAfterward) {
         boolean result = false;
         if (enabled() && started) {
-            final boolean wasPlaying = MusicUtils.isPlaying();
             // make sure video ads are always muted, it's very annoying (regardless of playback status)
             AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
             interstitialAdapter.shutdownAppAfter(shutdownAfterwards);
@@ -128,11 +126,6 @@ class AppLovinAdNetwork implements AdNetwork {
             } catch (Throwable e) {
                 e.printStackTrace();
                 result = false;
-            }
-            if (result && wasPlaying && interstitialAdapter.isVideoAd() && !shutdownAfterwards) {
-                // Since AppLovin, even if muted will pause the player, we'll un-pause it.
-                LOG.info("wasPlaying and not shutting down, resuming player playback");
-                MusicUtils.playOrPause();
             }
         }
 

@@ -20,6 +20,7 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.app.Application;
+import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.adview.AppLovinInterstitialAd;
 import com.applovin.adview.AppLovinInterstitialAdDialog;
 import com.applovin.sdk.AppLovinAd;
@@ -41,6 +42,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
     private boolean finishAfterDismiss = false;
     private boolean shutdownAfter = false;
     private boolean isVideoAd = false;
+    private boolean wasPlayingMusic = false;
 
     AppLovinInterstitialAdapter(AppLovinAdNetwork appLovinAdNetwork, Activity parentActivity) {
         this.activityRef = Ref.weak(parentActivity);
@@ -85,7 +87,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
                     adDialog.dismiss();
                     return false;
                 }
-
+                wasPlayingMusic = MusicUtils.isPlaying();
                 adDialog.setAdDisplayListener(this);
                 adDialog.showAndRender(ad);
                 result = true;
@@ -106,6 +108,10 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
 
     @Override
     public void adDisplayed(AppLovinAd appLovinAd) {
+        if (isVideoAd() && wasPlayingMusic && !shutdownAfter) {
+            LOG.info("adDisplayed(): wasPlaying and not shutting down, resuming player playback");
+            MusicUtils.play();
+        }
     }
 
     @Override

@@ -131,6 +131,10 @@ public final class MusicUtils {
         return deleted;
     }
 
+    public static boolean isPaused() {
+        return !MusicUtils.isPlaying() && !MusicUtils.isStopped();
+    }
+
     public static final class ServiceBinder implements ServiceConnection {
         private final ServiceConnection mCallback;
 
@@ -254,6 +258,18 @@ public final class MusicUtils {
                 }
             }
         } catch (final Exception ignored) {
+        }
+    }
+
+    /**
+     * Gets back to playing whatever it was playing before.
+     */
+    public static void play() {
+        if (mService != null) {
+            try {
+                mService.play();
+            } catch (Throwable ignored) {
+            }
         }
     }
 
