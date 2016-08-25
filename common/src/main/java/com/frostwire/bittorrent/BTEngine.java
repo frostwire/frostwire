@@ -396,7 +396,7 @@ public final class BTEngine {
 
             if (priorities != null) {
                 for (int i = 0; i < selection.length; i++) {
-                    if (selection[i]) {
+                    if (selection[i] && i < priorities.length) {
                         priorities[i] = Priority.NORMAL;
                     }
                 }
