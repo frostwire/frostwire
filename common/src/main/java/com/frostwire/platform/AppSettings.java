@@ -57,4 +57,5 @@ public interface AppSettings {
     String SEARCH_BTJUNKIE_ENABLED = "search_btjunkie_enabled";
     String SEARCH_KAT_ENABLED = "search_kat_enabled";
     String SEARCH_TORRENTDOWNLOADS_ENABLED = "search_torrentdownloads_enabled";
+    String SEARCH_LIMETORRENTS_ENABLED = "search_limetorrents_enabled";
 }
