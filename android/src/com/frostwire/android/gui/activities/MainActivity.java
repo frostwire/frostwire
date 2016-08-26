@@ -801,7 +801,13 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle != null && drawerToggle.onOptionsItemSelected(item)) {
+        if (drawerToggle != null) {
+            try {
+                drawerToggle.onOptionsItemSelected(item);
+            } catch (Throwable t) {
+                // usually java.lang.IllegalArgumentException: No drawer view found with gravity LEFT
+                return false;
+            }
             return true;
         }
 
