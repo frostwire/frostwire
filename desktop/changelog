@@ -1,9 +1,10 @@
 frostwire (6.3.6) stable; urgency=high
+  * Fixes issues opening torrent files with extension names not in lowercase.
   * Fixes upgrade bug for Ubuntu 16.04 installs w/o gdebi/software-center
   * Send to friend dialog now appears on the same screen as the main
     FrostWire window, and centered relative to it.
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 24 Aug 2016 21:20:20 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 29 Aug 2016 15:53:25 -0600
 
 
 frostwire (6.3.5) stable; urgency=high
