@@ -526,7 +526,7 @@ public final class GUIUtils {
      */
     private static boolean launchFile(final File file, boolean playOneTime, boolean isPlaying ) {
         String extension = FilenameUtils.getExtension(file.getName());
-        if(extension != null && extension.equals("torrent")) {
+        if(extension != null && extension.toLowerCase().contains("torrent")) {
             GUIMediator.instance().openTorrentFile(file, true);
             return false;
         }

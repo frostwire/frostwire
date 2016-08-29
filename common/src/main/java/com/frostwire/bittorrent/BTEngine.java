@@ -533,7 +533,7 @@ public final class BTEngine {
         File[] torrents = ctx.homeDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                return name != null && FilenameUtils.getExtension(name).equals("torrent");
+                return name != null && FilenameUtils.getExtension(name).toLowerCase().equals("torrent");
             }
         });
 

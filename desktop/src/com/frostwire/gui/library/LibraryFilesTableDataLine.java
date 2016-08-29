@@ -190,7 +190,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         if (initializer != null && 
             initializer.isFile() && 
             FilenameUtils.getExtension(initializer.getName()) != null &&
-            FilenameUtils.getExtension(initializer.getName()).endsWith("torrent")) {
+            FilenameUtils.getExtension(initializer.getName()).toLowerCase().endsWith("torrent")) {
 
             BTInfoAdditionalMetadataHolder additionalMetadataHolder = null;
 

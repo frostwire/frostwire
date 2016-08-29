@@ -52,6 +52,7 @@ import com.limegroup.gnutella.settings.BittorrentSettings;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 import com.limegroup.gnutella.settings.TablesHandlerSettings;
 import com.limegroup.gnutella.settings.iTunesSettings;
+import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
@@ -665,7 +666,8 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
                     // Check if there's a file named like the torrent in the same folder
                     // then that means the user wants to seed
-                    String seedDataFilename = torrentFile.getName().replace(".torrent", "");
+                    String seedDataFilename = FilenameUtils.removeExtension(torrentFile.getName());
+
                     File seedDataFile = new File(torrentFile.getParentFile(), seedDataFilename);
                     if (seedDataFile.exists()) {
                         saveDir = torrentFile.getParentFile();
