@@ -66,7 +66,7 @@ public class MacEventHandler {
                 if (files != null && files.size() > 0) {
                     File file = files.get(0);
                     LOG.debug("File: " + file);
-                    if (file.getName().endsWith(".torrent")) {
+                    if (file.getName().toLowerCase().endsWith(".torrent")) {
                         GUIMediator.instance().openTorrentFile(file, false);
                     }
                 }
