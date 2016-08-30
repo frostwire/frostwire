@@ -851,7 +851,7 @@ public final class GUIMediator {
             tabEnum = Tabs.SEARCH_TRANSFERS;
         }
         setWindow(tabEnum);
-        ((TransfersTab) getTab(tabEnum)).showTransfers(mode);
+        ((TransfersTab) getMainFrame().getTab(Tabs.TRANSFERS)).showTransfers(mode);
     }
 
     /**
