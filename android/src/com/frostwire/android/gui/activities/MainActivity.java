@@ -22,6 +22,7 @@ import android.app.*;
 import android.content.*;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -80,6 +81,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -168,8 +170,27 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     public void shutdown() {
         Offers.stopAdNetworks(this);
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
-        finish();
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            finishAndRemoveTaskViaReflection();
+        } else {
+            finish();
+        }
+
         Engine.instance().shutdown();
+    }
+
+    private void finishAndRemoveTaskViaReflection() {
+        final Class<? extends MainActivity> clazz = getClass();
+        try {
+            final Method finishAndRemoveTaskMethod = clazz.getMethod("finishAndRemoveTask");
+            if (finishAndRemoveTaskMethod != null) {
+                finishAndRemoveTaskMethod.invoke(this);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            finish();
+        }
     }
 
     private boolean isShutdown() {
