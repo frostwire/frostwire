@@ -656,10 +656,10 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                         if (filesSelection == null) {
                             return;
                         }
+                    }
 
-                        if (onOpenRunnableForUIThread != null) {
-                            onOpenRunnableForUIThread.run();
-                        }
+                    if (onOpenRunnableForUIThread != null) {
+                        onOpenRunnableForUIThread.run();
                     }
 
                     File saveDir = null;

@@ -873,8 +873,14 @@ public final class GUIMediator {
     }
 
     public void showTransfers(TransfersTab.FilterMode mode) {
-        setWindow(GUIMediator.Tabs.TRANSFERS);
-        ((TransfersTab) getTab(Tabs.TRANSFERS)).showTransfers(mode);
+        Tabs tabEnum = Tabs.TRANSFERS;;
+        if (Tabs.TRANSFERS.isEnabled()) {
+            tabEnum = Tabs.TRANSFERS;
+        } else if (Tabs.SEARCH_TRANSFERS.isEnabled()) {
+            tabEnum = Tabs.SEARCH_TRANSFERS;
+        }
+        setWindow(tabEnum);
+        ((TransfersTab) getTab(tabEnum)).showTransfers(mode);
     }
 
     /**
