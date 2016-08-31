@@ -170,14 +170,17 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     public void shutdown() {
         Offers.stopAdNetworks(this);
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
+        finish();
+        Engine.instance().shutdown();
+    }
 
+    @Override
+    public void finish() {
         if (Build.VERSION.SDK_INT >= 21) {
             finishAndRemoveTaskViaReflection();
         } else {
-            finish();
+            super.finish();
         }
-
-        Engine.instance().shutdown();
     }
 
     private void finishAndRemoveTaskViaReflection() {
@@ -189,7 +192,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            finish();
+            super.finish();
         }
     }
 
