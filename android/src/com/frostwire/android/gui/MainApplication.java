@@ -54,6 +54,7 @@ public class MainApplication extends Application {
         super.onCreate();
 
         try {
+            //android.os.Debug.waitForDebugger();
             PlayStore.getInstance().initialize(this); // as early as possible
 
             ignoreHardwareMenu();
