@@ -27,6 +27,7 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
+import com.mobfox.sdk.bannerads.Banner;
 import com.mobfox.sdk.interstitialads.InterstitialAd;
 
 import java.util.*;
@@ -78,12 +79,10 @@ public final class Offers {
 
                 // if permissions were not granted...
                 if (grantResults.length > 0 && grantResults[0] != 0) {
-                    interstitialAd.getBanner().setGetLocation(false);
+                    Banner.setGetLocation(false);
                     adNetwork.dontAskForLocationPermissions();
                 }
-
                 interstitialAd.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
             }
         }
     }
@@ -102,7 +101,9 @@ public final class Offers {
     public static void stopAdNetworks(Context context) {
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
             if (adNetwork != null && adNetwork.started()) {
-                adNetwork.stop(context);
+                try {
+                    adNetwork.stop(context);
+                } catch (Throwable ignored) {}
             }
         }
         LOG.info("Ad networks stopped");
@@ -261,18 +262,14 @@ public final class Offers {
             }
         }
 
-        public static void dismissAndOrShutdownIfNecessary(AdNetwork adNetwork,
-                                                           Activity activity,
-                                                           boolean finishAfterDismiss,
-                                                           boolean shutdownAfter,
-                                                           boolean tryBack2BackRemoveAdsOffer,
-                                                           Application fallbackContext) {
+        public static void dismissAndOrShutdownIfNecessary(final AdNetwork adNetwork,
+                                                           final Activity activity,
+                                                           final boolean finishAfterDismiss,
+                                                           final boolean shutdownAfter,
+                                                           final boolean tryBack2BackRemoveAdsOffer,
+                                                           final Application fallbackContext) {
             LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + finishAfterDismiss + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
             if (activity != null) {
-                if (finishAfterDismiss) {
-                    activity.finish();
-                }
-
                 if (shutdownAfter) {
                     if (adNetwork != null) {
                         adNetwork.stop(activity);
@@ -288,12 +285,16 @@ public final class Offers {
                     return;
                 }
 
+                if (finishAfterDismiss) {
+                    activity.finish();
+                }
+
                 if (!finishAfterDismiss && !shutdownAfter && tryBack2BackRemoveAdsOffer) {
                     LOG.info("dismissAndOrShutdownIfNecessary: Offers.tryBackToBackInterstitial(activityRef);");
                     Offers.tryBackToBackInterstitial(activity);
                 }
             } else {
-                if (shutdownAfter) {
+                if (shutdownAfter && fallbackContext != null) {
                     LOG.info("dismissAndOrShutdownIfNecessary: shutdown() [no activity ref]");
                     UIUtils.sendShutdownIntent(fallbackContext);
                 }
