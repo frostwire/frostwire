@@ -153,8 +153,12 @@ final class MobFoxAdNetwork implements AdNetwork {
             public void run() {
                 // it can happen that the network is stopped right before this call
                 if (interstitialAd != null) {
-                    interstitialAd.load();
-                    INTERSTITIAL_RELOAD_RETRIES_LEFT--;
+                    try {
+                        interstitialAd.load();
+                        INTERSTITIAL_RELOAD_RETRIES_LEFT--;
+                    } catch (Throwable t) {
+                        LOG.error("[IGNORED] MobFox Interstitial Load Error: " + t.getMessage(), t);
+                    }
                 }
             }
         });
