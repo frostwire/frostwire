@@ -23,11 +23,11 @@ import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
 import com.frostwire.jlibtorrent.swig.string_vector;
-import com.frostwire.util.Logger;
 import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
+import com.frostwire.util.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -38,7 +38,7 @@ import java.util.*;
  * @author gubatron
  * @author aldenml
  */
-public final class BTDownload extends TorrentAlertAdapter implements BittorrentDownload {
+public final class BTDownload implements BittorrentDownload {
 
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
 
@@ -70,8 +70,9 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private long lastSaveResumeTime;
     private final PaymentOptions paymentOptions;
 
+    private final InnerListener innerListener;
+
     public BTDownload(BTEngine engine, TorrentHandle th) {
-        super(th);
         this.engine = engine;
         this.th = th;
         this.savePath = new File(th.getSavePath());
@@ -82,7 +83,9 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         this.extra = createExtra();
         this.paymentOptions = loadPaymentOptions(ti);
-        engine.session().addListener(this);
+
+        this.innerListener = new InnerListener();
+        engine.session().addListener(innerListener);
     }
 
     public Map<String, String> getExtra() {
@@ -387,13 +390,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.listener = listener;
     }
 
-    @Override
-    public int[] types() {
-        return ALERT_TYPES;
-    }
-
-    @Override
-    public void torrentFinished(TorrentFinishedAlert alert) {
+    private void torrentFinished(TorrentFinishedAlert alert) {
         if (listener != null) {
             try {
                 listener.finished(this);
@@ -405,9 +402,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         th.saveResumeData();
     }
 
-    @Override
-    public void torrentRemoved(TorrentRemovedAlert alert) {
-        engine.session().removeListener(this);
+    private void torrentRemoved(TorrentRemovedAlert alert) {
+        engine.session().removeListener(innerListener);
 
         if (parts != null) {
             parts.delete();
@@ -416,8 +412,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         fireRemoved(incompleteFilesToRemove);
     }
 
-    @Override
-    public void torrentChecked(TorrentCheckedAlert alert) {
+    private void torrentChecked(TorrentCheckedAlert alert) {
         try {
             if (th.isValid()) {
                 // trigger items calculation
@@ -429,8 +424,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         }
     }
 
-    @Override
-    public void saveResumeData(SaveResumeDataAlert alert) {
+    private void saveResumeData(SaveResumeDataAlert alert) {
         long now = System.currentTimeMillis();
         final TorrentStatus status = th.getStatus();
         boolean forceSerialization = status.isFinished() || status.isPaused();
@@ -443,8 +437,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         serializeResumeData(alert);
     }
 
-    @Override
-    public void pieceFinished(PieceFinishedAlert alert) {
+    private void pieceFinished(PieceFinishedAlert alert) {
         try {
             if (piecesTracker != null) {
                 piecesTracker.setComplete(alert.pieceIndex(), true);
@@ -689,6 +682,37 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 listener.removed(this, incompleteFiles);
             } catch (Throwable e) {
                 LOG.error("Error calling listener", e);
+            }
+        }
+    }
+
+    private final class InnerListener implements AlertListener {
+
+        @Override
+        public int[] types() {
+            return ALERT_TYPES;
+        }
+
+        @Override
+        public void alert(Alert<?> alert) {
+            AlertType type = alert.type();
+
+            switch (type) {
+                case TORRENT_FINISHED:
+                    torrentFinished((TorrentFinishedAlert) alert);
+                    break;
+                case TORRENT_REMOVED:
+                    torrentRemoved((TorrentRemovedAlert) alert);
+                    break;
+                case TORRENT_CHECKED:
+                    torrentChecked((TorrentCheckedAlert) alert);
+                    break;
+                case SAVE_RESUME_DATA:
+                    saveResumeData((SaveResumeDataAlert) alert);
+                    break;
+                case PIECE_FINISHED:
+                    pieceFinished((PieceFinishedAlert) alert);
+                    break;
             }
         }
     }
