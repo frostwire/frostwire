@@ -477,7 +477,7 @@ public final class Initializer {
         BTEngine.getInstance().start();
 
         if (!SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue()) {
-            Dht dht = new Dht(BTEngine.getInstance().getSession());
+            Dht dht = new Dht(BTEngine.getInstance().session());
             dht.stop();
         }
     }

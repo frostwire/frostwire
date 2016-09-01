@@ -204,7 +204,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     private void seedBTDownload() {
         btDownload.resume();
-        final TorrentHandle torrentHandle = BTEngine.getInstance().getSession().findTorrent(new Sha1Hash(btDownload.getInfoHash()));
+        final TorrentHandle torrentHandle = BTEngine.getInstance().session().findTorrent(new Sha1Hash(btDownload.getInfoHash()));
         if (torrentHandle == null) {
             LOG.warn("seedBTDownload() could not find torrentHandle for existing torrent.");
         }

@@ -98,39 +98,39 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     public boolean isDirty() {
         final BTEngine btEngine = BTEngine.getInstance();
 
-        return (btEngine.getSession().isDHTRunning() == ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected() ||
-                btEngine.getMaxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()) ||
-                (btEngine.getMaxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()) ||
-                (btEngine.getMaxPeers() != MAX_PEERS_FIELD.getValue()) ||
-                (btEngine.getMaxActiveSeeds() != MAX_ACTIVE_SEEDS_FIELD.getValue());
+        return (btEngine.session().isDHTRunning() == ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected() ||
+                btEngine.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()) ||
+                (btEngine.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()) ||
+                (btEngine.maxPeers() != MAX_PEERS_FIELD.getValue()) ||
+                (btEngine.maxActiveSeeds() != MAX_ACTIVE_SEEDS_FIELD.getValue());
     }
 
     @Override
     public void initOptions() {
         final BTEngine btEngine = BTEngine.getInstance();
-        ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(btEngine.getSession().isDHTRunning());
-        MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.getMaxConnections());
-        MAX_PEERS_FIELD.setValue(btEngine.getMaxPeers());
-        MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.getMaxActiveDownloads());
-        MAX_ACTIVE_SEEDS_FIELD.setValue(btEngine.getMaxActiveSeeds());
+        ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(btEngine.session().isDHTRunning());
+        MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.maxConnections());
+        MAX_PEERS_FIELD.setValue(btEngine.maxPeers());
+        MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.maxActiveDownloads());
+        MAX_ACTIVE_SEEDS_FIELD.setValue(btEngine.maxActiveSeeds());
     }
 
     @Override
     public boolean applyOptions() throws IOException {
         BTEngine btEngine = BTEngine.getInstance();
         applyDHTOptions(btEngine);
-        btEngine.setMaxConnections(MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue());
-        btEngine.setMaxPeers(MAX_PEERS_FIELD.getValue());
-        btEngine.setMaxActiveDownloads(MAX_ACTIVE_DOWNLOADS_FIELD.getValue());
-        btEngine.setMaxActiveSeeds(MAX_ACTIVE_SEEDS_FIELD.getValue());
+        btEngine.maxConnections(MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue());
+        btEngine.maxPeers(MAX_PEERS_FIELD.getValue());
+        btEngine.maxActiveDownloads(MAX_ACTIVE_DOWNLOADS_FIELD.getValue());
+        btEngine.maxActiveSeeds(MAX_ACTIVE_SEEDS_FIELD.getValue());
 
         return false;
     }
 
     private void applyDHTOptions(BTEngine btEngine) {
         boolean dhtExpectedValue = ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected();
-        boolean dhtCurrentStatus = btEngine.getSession().isDHTRunning();
-        Dht dht = new Dht(btEngine.getSession());
+        boolean dhtCurrentStatus = btEngine.session().isDHTRunning();
+        Dht dht = new Dht(btEngine.session());
         if (dhtCurrentStatus && !dhtExpectedValue) {
             dht.stop();
             SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(false);

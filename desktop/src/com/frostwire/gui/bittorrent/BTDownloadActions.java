@@ -320,7 +320,7 @@ final class BTDownloadActions {
                     BittorrentDownload btDownload = (BittorrentDownload) d;
                     String magnetUri = btDownload.makeMagnetUri();
                     str += magnetUri;
-                    str += "&" + TorrentUtil.getMagnetURLParameters(btDownload.getTorrentInfo(), BTEngine.getInstance().getSession());
+                    str += "&" + TorrentUtil.getMagnetURLParameters(btDownload.getTorrentInfo(), BTEngine.getInstance().session());
 
                     if (i < downloaders.length - 1) {
                         str += System.lineSeparator();

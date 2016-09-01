@@ -192,7 +192,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
         }
 
         String if_string = String.format(iface, port0);
-        BTEngine.getInstance().setListenInterfaces(if_string);
+        BTEngine.getInstance().listenInterfaces(if_string);
 
         return isDirty;
     }

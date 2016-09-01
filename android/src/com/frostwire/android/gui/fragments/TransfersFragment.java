@@ -185,10 +185,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private void checkDHTPeers() {
         try {
             BTEngine engine = BTEngine.getInstance();
-            final Session session = engine.getSession();
+            final Session session = engine.session();
             if (session != null && session.isDHTRunning()) {
                 session.postDHTStats();
-                final int totalDHTNodes = engine.getTotalDHTNodes();
+                final int totalDHTNodes = engine.dhtNodes();
                 if (totalDHTNodes > 0) {
                     onCheckDHT(true, totalDHTNodes);
 

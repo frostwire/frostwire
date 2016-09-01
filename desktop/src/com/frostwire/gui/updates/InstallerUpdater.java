@@ -189,7 +189,7 @@ public class InstallerUpdater implements Runnable {
     }
 
     private final TorrentHandle startTorrentDownload(String torrentFile, String saveDataPath) throws Exception {
-        final Session session = BTEngine.getInstance().getSession();
+        final Session session = BTEngine.getInstance().session();
 
         TorrentHandle th = session.addTorrent(new File(torrentFile), new File(saveDataPath));
 
@@ -362,7 +362,7 @@ public class InstallerUpdater implements Runnable {
             //try to restart the download. delete torrent and data
             //manager.stopIt(DownloadManager.STATE_READY, false, true);
             try {
-                BTEngine.getInstance().getSession().removeTorrent(manager, Session.Options.DELETE_FILES);
+                BTEngine.getInstance().session().removeTorrent(manager, Session.Options.DELETE_FILES);
                 //processMessage(_updateMessage);
             } catch (Throwable e) {
                 LOG.error("Error removing download manager on error", e);

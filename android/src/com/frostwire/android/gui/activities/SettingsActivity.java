@@ -154,8 +154,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setDownloadSpeedLimit((int) newValue);
-                        return e.getDownloadSpeedLimit() == (int) newValue;
+                        e.downloadSpeedLimit((int) newValue);
+                        return e.downloadSpeedLimit() == (int) newValue;
                     }
                     return false;
                 }
@@ -170,8 +170,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setUploadSpeedLimit((int) newValue);
-                        return e.getUploadSpeedLimit() == (int) newValue;
+                        e.uploadSpeedLimit((int) newValue);
+                        return e.uploadSpeedLimit() == (int) newValue;
                     }
                     return false;
                 }
@@ -186,8 +186,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setMaxActiveDownloads((int) newValue);
-                        return e.getMaxActiveDownloads() == (int) newValue;
+                        e.maxActiveDownloads((int) newValue);
+                        return e.maxActiveDownloads() == (int) newValue;
                     }
                     return false;
                 }
@@ -202,8 +202,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setMaxActiveSeeds((int) newValue);
-                        return e.getMaxActiveSeeds() == (int) newValue;
+                        e.maxActiveSeeds((int) newValue);
+                        return e.maxActiveSeeds() == (int) newValue;
                     }
                     return false;
                 }
@@ -218,8 +218,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setMaxConnections((int) newValue);
-                        return e.getMaxConnections() == (int) newValue;
+                        e.maxConnections((int) newValue);
+                        return e.maxConnections() == (int) newValue;
                     }
                     return false;
                 }
@@ -234,8 +234,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setMaxPeers((int) newValue);
-                        return e.getMaxPeers() == (int) newValue;
+                        e.maxPeers((int) newValue);
+                        return e.maxPeers() == (int) newValue;
                     }
                     return false;
                 }

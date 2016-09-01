@@ -82,7 +82,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         this.extra = createExtra();
         this.paymentOptions = loadPaymentOptions(ti);
-        engine.getSession().addListener(this);
+        engine.session().addListener(this);
     }
 
     public Map<String, String> getExtra() {
@@ -356,7 +356,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     public void remove(boolean deleteTorrent, boolean deleteData) {
         String infoHash = this.getInfoHash();
 
-        Session s = engine.getSession();
+        Session s = engine.session();
 
         incompleteFilesToRemove = getIncompleteFiles();
 
@@ -407,7 +407,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public void torrentRemoved(TorrentRemovedAlert alert) {
-        engine.getSession().removeListener(this);
+        engine.session().removeListener(this);
 
         if (parts != null) {
             parts.delete();

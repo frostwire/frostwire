@@ -253,7 +253,7 @@ public class ShareTorrentDialog extends JDialog {
 
     private String getLink() {
         if (link == null) {
-            link = "http://maglnk.com/" + info_hash + "/?" + TorrentUtil.getMagnetURLParameters(torrent, BTEngine.getInstance().getSession());
+            link = "http://maglnk.com/" + info_hash + "/?" + TorrentUtil.getMagnetURLParameters(torrent, BTEngine.getInstance().session());
         }
         return link;
     }
@@ -458,7 +458,7 @@ public class ShareTorrentDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            GUIMediator.setClipboardContent(TorrentUtil.getMagnet(info_hash) + "&" + TorrentUtil.getMagnetURLParameters(torrent, BTEngine.getInstance().getSession()));
+            GUIMediator.setClipboardContent(TorrentUtil.getMagnet(info_hash) + "&" + TorrentUtil.getMagnetURLParameters(torrent, BTEngine.getInstance().session()));
             setTitle(I18n.tr("Magnet copied to clipboard."));
 
             JButton source = (JButton) e.getSource();

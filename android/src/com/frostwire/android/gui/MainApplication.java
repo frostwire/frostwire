@@ -127,7 +127,7 @@ public class MainApplication extends Application {
         BTEngine.getInstance().start();
 
         boolean enable_dht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-        Dht dht = new Dht(BTEngine.getInstance().getSession());
+        Dht dht = new Dht(BTEngine.getInstance().session());
         if (!enable_dht) {
             dht.stop();
         } else {

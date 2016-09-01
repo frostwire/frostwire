@@ -157,7 +157,7 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         ConnectionSettings.CONNECTION_METHOD.setValue(connectionMethod);
         ConnectionSettings.PROXY_HOST.setValue(proxyHost);
 
-        Session session = BTEngine.getInstance().getSession();
+        Session session = BTEngine.getInstance().session();
         SettingsPack settings = new SettingsPack();
         if (connectionMethod == ConnectionSettings.C_NO_PROXY) {
             settings.setInteger(settings_pack.int_types.proxy_type.swigValue(), settings_pack.proxy_type_t.none.swigValue());

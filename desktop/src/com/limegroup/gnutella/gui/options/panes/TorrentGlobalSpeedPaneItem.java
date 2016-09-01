@@ -143,7 +143,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
 
     @Override
     public void initOptions() {
-        storedDownloadSpeed = BTEngine.getInstance().getDownloadSpeedLimit() / 1024;
+        storedDownloadSpeed = BTEngine.getInstance().downloadSpeedLimit() / 1024;
 
         if (storedDownloadSpeed == 0) {
             DOWNLOAD_SLIDER.setValue(101 * 1024);
@@ -154,7 +154,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
 
         updateSpeedLabel(DOWNLOAD_SLIDER, DOWNLOAD_SLIDER_LABEL);
 
-        storedUploadSpeed = BTEngine.getInstance().getUploadSpeedLimit() / 1024;
+        storedUploadSpeed = BTEngine.getInstance().uploadSpeedLimit() / 1024;
 
         if (storedUploadSpeed == 0) {
             UPLOAD_SLIDER.setValue(101 * 1024);
@@ -193,8 +193,8 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
          }
          */
 
-        BTEngine.getInstance().setDownloadSpeedLimit(newDownload * 1024);
-        BTEngine.getInstance().setUploadSpeedLimit(newUpload * 1024);
+        BTEngine.getInstance().downloadSpeedLimit(newDownload * 1024);
+        BTEngine.getInstance().uploadSpeedLimit(newUpload * 1024);
 
         DOWNLOAD_SLIDER.setValue((newDownload == 0) ? MAX_SLIDER_VALUE : newDownload);
         UPLOAD_SLIDER.setValue((newUpload == 0) ? MAX_SLIDER_VALUE : newUpload);

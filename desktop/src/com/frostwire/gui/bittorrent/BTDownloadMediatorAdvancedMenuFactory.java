@@ -113,8 +113,8 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         // advanced > Download Speed Menu //
 
         BTEngine engine = BTEngine.getInstance();
-        long maxDownload = engine.getDownloadRateLimit();
-        long maxUpload = engine.getUploadRateLimit();
+        long maxDownload = engine.downloadRateLimit();
+        long maxUpload = engine.uploadRateLimit();
 
         addSpeedMenu(menuAdvanced, true, true, downSpeedDisabled, downSpeedUnlimited, totalDownSpeed, downSpeedSetMax, maxDownload, upSpeedDisabled, upSpeedUnlimited, totalUpSpeed, upSpeedSetMax,
                 maxUpload, dms.length, new SpeedAdapter() {

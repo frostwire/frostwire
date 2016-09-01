@@ -93,7 +93,7 @@ public final class BTEngine {
         return Loader.INSTANCE;
     }
 
-    public Session getSession() {
+    public Session session() {
         return session;
     }
 
@@ -109,42 +109,42 @@ public final class BTEngine {
         return firewalled;
     }
 
-    public long getDownloadRate() {
+    public long downloadRate() {
         if (session == null) {
             return 0;
         }
         return session.getStats().downloadRate();
     }
 
-    public long getUploadRate() {
+    public long uploadRate() {
         if (session == null) {
             return 0;
         }
         return session.getStats().uploadRate();
     }
 
-    public long getTotalDownload() {
+    public long totalDownload() {
         if (session == null) {
             return 0;
         }
         return session.getStats().download();
     }
 
-    public long getTotalUpload() {
+    public long totalUpload() {
         if (session == null) {
             return 0;
         }
         return session.getStats().upload();
     }
 
-    public int getDownloadRateLimit() {
+    public int downloadRateLimit() {
         if (session == null) {
             return 0;
         }
         return session.getSettingsPack().downloadRateLimit();
     }
 
-    public int getUploadRateLimit() {
+    public int uploadRateLimit() {
         if (session == null) {
             return 0;
         }
@@ -1025,14 +1025,14 @@ public final class BTEngine {
     // Settings methods
     //--------------------------------------------------
 
-    public int getDownloadSpeedLimit() {
+    public int downloadSpeedLimit() {
         if (session == null) {
             return 0;
         }
         return session.getSettingsPack().downloadRateLimit();
     }
 
-    public void setDownloadSpeedLimit(int limit) {
+    public void downloadSpeedLimit(int limit) {
         if (session == null) {
             return;
         }
@@ -1041,14 +1041,14 @@ public final class BTEngine {
         saveSettings(settingsPack);
     }
 
-    public int getUploadSpeedLimit() {
+    public int uploadSpeedLimit() {
         if (session == null) {
             return 0;
         }
         return session.getSettingsPack().uploadRateLimit();
     }
 
-    public void setUploadSpeedLimit(int limit) {
+    public void uploadSpeedLimit(int limit) {
         if (session == null) {
             return;
         }
@@ -1058,14 +1058,14 @@ public final class BTEngine {
         saveSettings(settingsPack);
     }
 
-    public int getMaxActiveDownloads() {
+    public int maxActiveDownloads() {
         if (session == null) {
             return 0;
         }
         return session.getSettingsPack().activeDownloads();
     }
 
-    public void setMaxActiveDownloads(int limit) {
+    public void maxActiveDownloads(int limit) {
         if (session == null) {
             return;
         }
@@ -1075,14 +1075,14 @@ public final class BTEngine {
         saveSettings(settingsPack);
     }
 
-    public int getMaxActiveSeeds() {
+    public int maxActiveSeeds() {
         if (session == null) {
             return 0;
         }
         return session.getSettingsPack().activeSeeds();
     }
 
-    public void setMaxActiveSeeds(int limit) {
+    public void maxActiveSeeds(int limit) {
         if (session == null) {
             return;
         }
@@ -1092,14 +1092,14 @@ public final class BTEngine {
         saveSettings(settingsPack);
     }
 
-    public int getMaxConnections() {
+    public int maxConnections() {
         if (session == null) {
             return 0;
         }
         return session.getSettingsPack().connectionsLimit();
     }
 
-    public void setMaxConnections(int limit) {
+    public void maxConnections(int limit) {
         if (session == null) {
             return;
         }
@@ -1109,14 +1109,14 @@ public final class BTEngine {
         saveSettings(settingsPack);
     }
 
-    public int getMaxPeers() {
+    public int maxPeers() {
         if (session == null) {
             return 0;
         }
         return session.getSettingsPack().maxPeerlistSize();
     }
 
-    public void setMaxPeers(int limit) {
+    public void maxPeers(int limit) {
         if (session == null) {
             return;
         }
@@ -1126,14 +1126,14 @@ public final class BTEngine {
         saveSettings(settingsPack);
     }
 
-    public String getListenInterfaces() {
+    public String listenInterfaces() {
         if (session == null) {
             return null;
         }
         return session.getSettingsPack().getString(settings_pack.string_types.listen_interfaces.swigValue());
     }
 
-    public void setListenInterfaces(String value) {
+    public void listenInterfaces(String value) {
         if (session == null) {
             return;
         }
@@ -1142,7 +1142,7 @@ public final class BTEngine {
         saveSettings(sp);
     }
 
-    public int getTotalDHTNodes() {
+    public int dhtNodes() {
         return totalDHTNodes;
     }
 

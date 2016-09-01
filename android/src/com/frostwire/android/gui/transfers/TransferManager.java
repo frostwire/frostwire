@@ -199,7 +199,7 @@ public final class TransferManager {
     }
 
     public long getDownloadsBandwidth() {
-        long torrentDownloadsBandwidth = BTEngine.getInstance().getDownloadRate();
+        long torrentDownloadsBandwidth = BTEngine.getInstance().downloadRate();
         long peerDownloadsBandwidth = 0;
         for (Transfer d : httpDownloads) {
             peerDownloadsBandwidth += d.getDownloadSpeed();
@@ -208,7 +208,7 @@ public final class TransferManager {
     }
 
     public double getUploadsBandwidth() {
-        return BTEngine.getInstance().getUploadRate();
+        return BTEngine.getInstance().uploadRate();
     }
 
     public int getDownloadsToReview() {
@@ -506,17 +506,17 @@ public final class TransferManager {
                 BTEngine e = BTEngine.getInstance();
 
                 if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED)) {
-                    e.setDownloadSpeedLimit((int) ConfigurationManager.instance().getLong(key));
+                    e.downloadSpeedLimit((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED)) {
-                    e.setUploadSpeedLimit((int) ConfigurationManager.instance().getLong(key));
+                    e.uploadSpeedLimit((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS)) {
-                    e.setMaxActiveDownloads((int) ConfigurationManager.instance().getLong(key));
+                    e.maxActiveDownloads((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOADS)) {
-                    e.setMaxActiveSeeds((int) ConfigurationManager.instance().getLong(key));
+                    e.maxActiveSeeds((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS)) {
-                    e.setMaxConnections((int) ConfigurationManager.instance().getLong(key));
+                    e.maxConnections((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_PEERS)) {
-                    e.setMaxPeers((int) ConfigurationManager.instance().getLong(key));
+                    e.maxPeers((int) ConfigurationManager.instance().getLong(key));
                 }
             }
         };

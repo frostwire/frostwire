@@ -590,10 +590,10 @@ public final class StatusLine {
 
         try {
             BTEngine engine = BTEngine.getInstance();
-            final Session session = engine.getSession();
+            final Session session = engine.session();
             if (session != null && session.isDHTRunning()) {
                 session.postDHTStats();
-                int totalDHTNodes = engine.getTotalDHTNodes();
+                int totalDHTNodes = engine.dhtNodes();
                 if (totalDHTNodes != -1) {
                     final String updatedToolTip = tip + ". (DHT: " + totalDHTNodes + " " + I18n.tr("nodes") + ")";
                     GUIMediator.safeInvokeAndWait(new Runnable() {
