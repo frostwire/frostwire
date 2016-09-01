@@ -15,8 +15,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.ui.fragments.AlbumFragment;
 import com.andrew.apollo.ui.fragments.ArtistFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
@@ -24,7 +22,7 @@ import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
-import com.frostwire.util.Logger;
+import com.frostwire.android.R;
 
 /**
  * A collection of helpers designed to get and set various preferences across
@@ -136,31 +134,12 @@ public final class PreferenceUtils {
     }
 
     /**
-     * Saves the sort order for a list.
-     *
-     * @param key   Which sort order to change
-     * @param value The new sort order
-     */
-    private void setSortOrder(final String key, final String value) {
-        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(final Void... unused) {
-                final SharedPreferences.Editor editor = mPreferences.edit();
-                editor.putString(key, value);
-                editor.apply();
-
-                return null;
-            }
-        }, (Void[]) null);
-    }
-
-    /**
      * Sets the sort order for the artist list.
      *
      * @param value The new sort order
      */
     public void setArtistSortOrder(final String value) {
-        setSortOrder(ARTIST_SORT_ORDER, value);
+        setPreference(ARTIST_SORT_ORDER, value);
     }
 
     /**
@@ -182,7 +161,7 @@ public final class PreferenceUtils {
      * @param value The new sort order
      */
     public void setArtistSongSortOrder(final String value) {
-        setSortOrder(ARTIST_SONG_SORT_ORDER, value);
+        setPreference(ARTIST_SONG_SORT_ORDER, value);
     }
 
     /**
@@ -200,7 +179,7 @@ public final class PreferenceUtils {
      * @param value The new sort order
      */
     public void setArtistAlbumSortOrder(final String value) {
-        setSortOrder(ARTIST_ALBUM_SORT_ORDER, value);
+        setPreference(ARTIST_ALBUM_SORT_ORDER, value);
     }
 
     /**
@@ -218,7 +197,7 @@ public final class PreferenceUtils {
      * @param value The new sort order
      */
     public void setAlbumSortOrder(final String value) {
-        setSortOrder(ALBUM_SORT_ORDER, value);
+        setPreference(ALBUM_SORT_ORDER, value);
     }
 
     /**
@@ -234,7 +213,7 @@ public final class PreferenceUtils {
      * @param value The new sort order
      */
     public void setAlbumSongSortOrder(final String value) {
-        setSortOrder(ALBUM_SONG_SORT_ORDER, value);
+        setPreference(ALBUM_SONG_SORT_ORDER, value);
     }
 
     /**
@@ -252,7 +231,7 @@ public final class PreferenceUtils {
      * @param value The new sort order
      */
     public void setSongSortOrder(final String value) {
-        setSortOrder(SONG_SORT_ORDER, value);
+        setPreference(SONG_SORT_ORDER, value);
     }
 
     /**
@@ -268,7 +247,7 @@ public final class PreferenceUtils {
      * @param key   Which layout to change
      * @param value The new layout type
      */
-    private void setLayoutType(final String key, final String value) {
+    private void setPreference(final String key, final String value) {
         ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(final Void... unused) {
@@ -287,7 +266,7 @@ public final class PreferenceUtils {
      * @param value The new layout type
      */
     public void setArtistLayout(final String value) {
-        setLayoutType(ARTIST_LAYOUT, value);
+        setPreference(ARTIST_LAYOUT, value);
     }
 
     /**
@@ -296,7 +275,7 @@ public final class PreferenceUtils {
      * @param value The new layout type
      */
     public void setAlbumLayout(final String value) {
-        setLayoutType(ALBUM_LAYOUT, value);
+        setPreference(ALBUM_LAYOUT, value);
     }
 
     /**
@@ -305,7 +284,7 @@ public final class PreferenceUtils {
      * @param value The new layout type
      */
     public void setRecentLayout(final String value) {
-        setLayoutType(RECENT_LAYOUT, value);
+        setPreference(RECENT_LAYOUT, value);
     }
 
     /**
