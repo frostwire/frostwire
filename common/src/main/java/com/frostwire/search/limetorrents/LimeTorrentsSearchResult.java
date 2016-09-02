@@ -26,15 +26,16 @@ import java.util.Locale;
 
 
     LimeTorrentsSearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
-    this.detailsUrl = detailsUrl;
-    this.infoHash = null;
-    this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl));
-    this.size = parseSize(matcher.group("filesize") + " " + matcher.group("unit"));
-    this.creationTime = parseCreationTime(matcher.group("time"));
-    this.seeds = parseSeeds(matcher.group("seeds"));
-    this.torrentUrl = "http://itorrents.org/torrent/" + matcher.group("torrentid") + ".torrent";
-    this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
-}
+        this.detailsUrl = detailsUrl;
+        this.infoHash = null;
+        this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl));
+        this.size = parseSize(matcher.group("filesize") + " " + matcher.group("unit"));
+        this.creationTime = parseCreationTime(matcher.group("time"));
+        this.seeds = parseSeeds(matcher.group("seeds"));
+        this.torrentUrl = "http://itorrents.org/torrent/" + matcher.group("torrentid") + ".torrent";
+        this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
+    }
+
     @Override
     public long getSize() {
         return size;
