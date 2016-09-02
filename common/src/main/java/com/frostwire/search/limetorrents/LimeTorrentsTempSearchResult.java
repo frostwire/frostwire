@@ -11,7 +11,7 @@ public final class LimeTorrentsTempSearchResult extends AbstractSearchResult imp
     private final String itemId;
     private final String detailsUrl;
 
-   LimeTorrentsTempSearchResult(String domainName, String itemId) {
+    LimeTorrentsTempSearchResult(String domainName, String itemId) {
         this.itemId = itemId;
         this.detailsUrl = "https://" + domainName + "/torrent/" + itemId + ".html";
     }

@@ -14,7 +14,7 @@ import java.util.Locale;
 /**
  * Created by alejandroarturom on 26-08-16.
  */
-public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult {
+    public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult {
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
