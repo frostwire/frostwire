@@ -18,13 +18,9 @@
 
 package com.frostwire.search.limetorrents;
 
-import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
 
 /**
  * @author alejandroarturom
@@ -35,7 +31,7 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
     private static final String REGEX = "(?is)<a href=\"http://itorrents.org/torrent/(.*?).torrent?(.*?)\" rel=\"nofollow\" class=\"csprite_dl14\"></a><a href=\"(?<itemid>.*?).html?(.*?)\">.*?</a></div>.*?";
     private static final String HTML_REGEX =
                     "(?is)<h1>(?<filename>.*?)</h1>.*?" + // +
-                    "&nbsp;&nbsp;&nbsp;&nbsp;<span class=\"greenish\">Seeders : (?<seeds>\\d*?)</span>.*?" +
+                    "<span class=\"greenish\">Seeders : (?<seeds>\\d*?)</span>.*?" +
                     "<tr><td align=\"right\"><b>Hash</b> :</td><td>(?<torrentid>.*?)</td></tr>.*?" +
                     "<tr><td align=\"right\"><b>Added</b> :</td><td>(?<time>.*?)  in.*?" +
                     "<tr><td align=\"right\"><b>Size</b> :</td><td>(?<filesize>.*?) (?<unit>[A-Z]+)</td></tr>.*?"; // +
@@ -61,7 +57,7 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
 
         @Override
         protected int htmlPrefixOffset(String html) {
-            int offset = html.indexOf("<h2>Search Results for : ");
+            int offset = html.indexOf("FREE</a>");
             return offset > 0 ? offset : 0;
         }
 
@@ -70,12 +66,12 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
             int offset = html.indexOf("<div><h3>Latest Searches</h3>");
             return offset > 0 ? offset : 0;
         }
-    
+
     @Override
     protected LimeTorrentsSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         return new LimeTorrentsSearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
     }
-
+/*
  public static void main(String[] args) throws Exception {
  //REGEX TEST CODE
 
@@ -105,8 +101,8 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
  } else {
  System.out.println("No detail matched.");
  }
-*/
- }
 
+ }
+*/
 }
 
