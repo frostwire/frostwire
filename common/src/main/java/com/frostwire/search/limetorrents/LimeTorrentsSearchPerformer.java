@@ -18,9 +18,13 @@
 
 package com.frostwire.search.limetorrents;
 
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
 
 /**
  * @author alejandroarturom
@@ -28,9 +32,9 @@ import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<LimeTorrentsSearchResult> {
 
     private static final int MAX_RESULTS = 20;
-    private static final String REGEX = "(?is)<td class=\"tdleft\"><div class=\"tt-name\"><a href=\"http://itorrents.org/torrent/(.*?).torrent?(.*?)\" rel=\"nofollow\" class=\"csprite_dl14\"></a><a href=\"(?<itemid>.*?).html?(.*?)\">.*?</a></div>.*?";
+    private static final String REGEX = "(?is)<a href=\"http://itorrents.org/torrent/(.*?).torrent?(.*?)\" rel=\"nofollow\" class=\"csprite_dl14\"></a><a href=\"(?<itemid>.*?).html?(.*?)\">.*?</a></div>.*?";
     private static final String HTML_REGEX =
-                    "(?is).*?<div id=\"content\">.*?<h1>(?<filename>.*?)</h1>.*?" + // +
+                    "(?is)<h1>(?<filename>.*?)</h1>.*?" + // +
                     "&nbsp;&nbsp;&nbsp;&nbsp;<span class=\"greenish\">Seeders : (?<seeds>\\d*?)</span>.*?" +
                     "<tr><td align=\"right\"><b>Hash</b> :</td><td>(?<torrentid>.*?)</td></tr>.*?" +
                     "<tr><td align=\"right\"><b>Added</b> :</td><td>(?<time>.*?)  in.*?" +
@@ -51,41 +55,41 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
     @Override
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
         String itemId = matcher.group("itemid");
-        return new LimeTorrentsTempSearchResult(getDomainName(), itemId);
+        String transformedId = itemId.replaceFirst("/", "");
+        return new LimeTorrentsTempSearchResult(getDomainName(), transformedId);
     }
 
-    @Override
-    protected int htmlPrefixOffset(String html) {
-        int offset = html.indexOf("<h2>Search Results for : ");
-        return offset > 0 ? offset : 0;
-    }
+        @Override
+        protected int htmlPrefixOffset(String html) {
+            int offset = html.indexOf("<h2>Search Results for : ");
+            return offset > 0 ? offset : 0;
+        }
 
-    @Override
-    protected int htmlSuffixOffset(String html) {
-        int offset = html.indexOf("<div><h3>Latest Searches</h3>");
-        return offset > 0 ? offset : 0;
-    }
-
+        @Override
+        protected int htmlSuffixOffset(String html) {
+            int offset = html.indexOf("<div><h3>Latest Searches</h3>");
+            return offset > 0 ? offset : 0;
+        }
+    
     @Override
     protected LimeTorrentsSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         return new LimeTorrentsSearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
     }
-/*
 
  public static void main(String[] args) throws Exception {
  //REGEX TEST CODE
 
 
-   //     String resultsHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/testa.html"));
- //      final Pattern resultsPattern = Pattern.compile(REGEX);
+        String resultsHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/testa.html"));
+       final Pattern resultsPattern = Pattern.compile(REGEX);
 
-   //       final SearchMatcher matcher = SearchMatcher.from(resultsPattern.matcher(resultsHTML));
-   //       while (matcher.find()) {
-   //       System.out.println(matcher.group(1));
-    //         System.out.println("TorrentID: " + matcher.group("itemid"));
-    //      }
+         final SearchMatcher matcher = SearchMatcher.from(resultsPattern.matcher(resultsHTML));
+          while (matcher.find()) {
+          System.out.println(matcher.group(1));
+             System.out.println("TorrentID: " + matcher.group("itemid"));
+          }
 
-
+/*
  String resultHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/single.html"));
  final Pattern detailPattern = Pattern.compile(HTML_REGEX);
  final SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(resultHTML));
@@ -101,8 +105,8 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
  } else {
  System.out.println("No detail matched.");
  }
-
- }
 */
+ }
+
 }
 
