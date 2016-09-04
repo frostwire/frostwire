@@ -695,6 +695,14 @@ public final class BTDownload implements BittorrentDownload {
 
         @Override
         public void alert(Alert<?> alert) {
+            if (!(alert instanceof TorrentAlert<?>)) {
+                return;
+            }
+
+            if (!((TorrentAlert<?>) alert).handle().swig().op_eq(th.swig())) {
+                return;
+            }
+
             AlertType type = alert.type();
 
             switch (type) {
