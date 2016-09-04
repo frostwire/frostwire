@@ -27,8 +27,8 @@ import java.util.Locale;
 
     LimeTorrentsSearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-        this.infoHash = null;
-        this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl));
+        this.infoHash = matcher.group("torrentid");
+        this.filename = parseFileName(matcher.group("filename"));
         this.size = parseSize(matcher.group("filesize") + " " + matcher.group("unit"));
         this.creationTime = parseCreationTime(matcher.group("time"));
         this.seeds = parseSeeds(matcher.group("seeds"));
@@ -81,16 +81,8 @@ import java.util.Locale;
         return torrentUrl;
     }
 
-    private String parseFileName(String urlEncodedFileName, String fallbackName) {
-        String decodedFileName = fallbackName;
-        try {
-            if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
-                decodedFileName = URLDecoder.decode(urlEncodedFileName, "UTF-8");
-                decodedFileName.replace("&amp;", "and");
-            }
-        } catch (UnsupportedEncodingException e) {
-        }
-        return decodedFileName + ".torrent";
+    private String parseFileName(String decodedFileName) {
+        return HtmlManipulator.replaceHtmlEntities(decodedFileName) + ".torrent";
     }
 
     private int parseSeeds(String group) {

@@ -45,7 +45,7 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
     @Override
     protected String getUrl(int page, String encodedKeywords) {
         String transformedKeywords = encodedKeywords.replace("0%20", "-");
-        return "https://" + getDomainName() + "/search/all/" + transformedKeywords;
+        return "https://" + getDomainName() + "/search/all/" + transformedKeywords + "/seeds/1/";
     }
 
     @Override
