@@ -415,7 +415,7 @@ public final class SearchManager {
         }
     };
 
-    public static final SearchEngine TORRENTDOWNLOADS = new SearchEngine("TorrentDownloads.me", AppSettings.SEARCH_TORRENTDOWNLOADS_ENABLED) {
+    public static final SearchEngine TORRENTDOWNLOADS = new SearchEngine("TorrentDownloads", AppSettings.SEARCH_TORRENTDOWNLOADS_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new TorrentDownloadsSearchPerformer("www.torrentdownloads.me", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
