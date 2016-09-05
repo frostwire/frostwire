@@ -73,6 +73,7 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_BITSNOOP = "frostwire.prefs.search.use_bitsnoop";
     public static final String PREF_KEY_SEARCH_USE_TORLOCK = "frostwire.prefs.search.use_torlock";
     public static final String PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS = "frostwire.prefs.search.use_torrentdownloads";
+    public static final String PREF_KEY_SEARCH_USE_LIMETORRENTS = "frostwire.prefs.search.use_limetorrents";
     public static final String PREF_KEY_SEARCH_USE_EZTV = "frostwire.prefs.search.use_eztv";
     public static final String PREF_KEY_SEARCH_USE_APPIA = "frostwire.prefs.search.use_appia";
     public static final String PREF_KEY_SEARCH_USE_TPB = "frostwire.prefs.search.use_tpb";

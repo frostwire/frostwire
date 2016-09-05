@@ -31,6 +31,7 @@ import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
+import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.youtube.YouTubeSearchPerformer;
@@ -424,7 +425,7 @@ public final class SearchManager {
     public static final SearchEngine LIMETORRENTS = new SearchEngine("LimeTorrents", AppSettings.SEARCH_LIMETORRENTS_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
-            return new TorrentDownloadsSearchPerformer("www.limetorrents.cc", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+            return new LimeTorrentsSearchPerformer("www.limetorrents.cc", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
