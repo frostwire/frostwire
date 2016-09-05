@@ -55,6 +55,7 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             sourceIcons.put("bitsnoop", GUIMediator.getThemeImage("bitsnoop_off"));
             sourceIcons.put("torlock", GUIMediator.getThemeImage("torlock_off"));
             sourceIcons.put("torrentdownloads", GUIMediator.getThemeImage("torrentdownloads_source"));
+            sourceIcons.put("limetorrents", GUIMediator.getThemeImage("torrentdownloads_source")); // TO-DO: @Marcelina
             sourceIcons.put("eztv", GUIMediator.getThemeImage("eztv_off"));
             sourceIcons.put("default", GUIMediator.getThemeImage("seeding_small_source"));
         } catch (Throwable e) {

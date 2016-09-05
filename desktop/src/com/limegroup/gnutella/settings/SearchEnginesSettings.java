@@ -55,6 +55,8 @@ public class SearchEnginesSettings extends LimeProps {
 
     public static final BooleanSetting TORRENTDOWNLOADS_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORRENTDOWNLOADS_SEARCH_ENABLED", true);
 
+    public static final BooleanSetting LIMETORRENTS_SEARCH_ENABLED = FACTORY.createBooleanSetting("LIMETORRENTS_SEARCH_ENABLED", true);
+
     public static final BooleanSetting EZTV_SEARCH_ENABLED = FACTORY.createBooleanSetting("EZTV_SEARCH_ENABLED", true);
 
     public static final BooleanSetting TORRENTS_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORRENTS_SEARCH_ENABLED", true);
