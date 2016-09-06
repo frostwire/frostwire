@@ -188,9 +188,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             final Session session = engine.session();
             if (session != null && session.isDHTRunning()) {
                 session.postDHTStats();
-                final int totalDHTNodes = engine.dhtNodes();
+                long totalDHTNodes = engine.dhtNodes();
                 if (totalDHTNodes > 0) {
-                    onCheckDHT(true, totalDHTNodes);
+                    onCheckDHT(true, (int) totalDHTNodes);
 
                 }
             } else {

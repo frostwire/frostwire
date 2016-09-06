@@ -18,6 +18,7 @@
 
 package com.frostwire.bittorrent;
 
+import com.frostwire.bittorrent.jlibtorrent.SessionManager;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.*;
@@ -39,7 +40,7 @@ import static com.frostwire.jlibtorrent.alerts.AlertType.*;
  * @author gubatron
  * @author aldenml
  */
-public final class BTEngine {
+public final class BTEngine extends SessionManager {
 
     private static final Logger LOGGER = Logger.getLogger(BTEngine.class);
 
@@ -1142,7 +1143,7 @@ public final class BTEngine {
         saveSettings(sp);
     }
 
-    public int dhtNodes() {
+    public long dhtNodes() {
         return totalDHTNodes;
     }
 

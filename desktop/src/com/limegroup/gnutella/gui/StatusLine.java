@@ -593,7 +593,7 @@ public final class StatusLine {
             final Session session = engine.session();
             if (session != null && session.isDHTRunning()) {
                 session.postDHTStats();
-                int totalDHTNodes = engine.dhtNodes();
+                long totalDHTNodes = engine.dhtNodes();
                 if (totalDHTNodes != -1) {
                     final String updatedToolTip = tip + ". (DHT: " + totalDHTNodes + " " + I18n.tr("nodes") + ")";
                     GUIMediator.safeInvokeAndWait(new Runnable() {
