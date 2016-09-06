@@ -1,11 +1,12 @@
 frostwire (6.3.6) stable; urgency=high
+  * New Search Engine: LimeTorrents
+  * Fixes Monova search
   * Fixes issues opening torrent files with extension names not in lowercase.
   * Fixes upgrade bug for Ubuntu 16.04 installs w/o gdebi/software-center
   * Send to friend dialog now appears on the same screen as the main
     FrostWire window, and centered relative to it.
-  * New Search Engine: LimeTorrents
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 5 Sep 2016 10:35:25 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 6 Sep 2016 12:11:15 -0600
 
 
 frostwire (6.3.5) stable; urgency=high
