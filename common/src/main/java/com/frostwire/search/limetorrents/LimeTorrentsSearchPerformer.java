@@ -1,5 +1,5 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), alejandroarturom
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -105,4 +105,3 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
  }
 */
 }
-
