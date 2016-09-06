@@ -22,10 +22,10 @@ import com.frostwire.bittorrent.jlibtorrent.SessionManager;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.*;
-import com.frostwire.util.Logger;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
+import com.frostwire.util.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -173,6 +173,7 @@ public final class BTEngine extends SessionManager {
             externalAddress = null;
 
             session = new Session(ctx.interfaces, ctx.retries, false, innerListener);
+            super.session = (session) this.session.swig();
             downloader = new Downloader(session);
             loadSettings();
             fireStarted();
@@ -197,6 +198,7 @@ public final class BTEngine extends SessionManager {
 
             downloader = null;
 
+            super.session = null;
             session.abort();
             session = null;
 
@@ -278,6 +280,11 @@ public final class BTEngine extends SessionManager {
         }
     }
 
+    @Override
+    protected void onApplySettings(SettingsPack sp) {
+        saveSettings();
+    }
+
     public void saveSettings() {
         if (session == null) {
             return;
@@ -289,14 +296,6 @@ public final class BTEngine extends SessionManager {
         } catch (Throwable e) {
             LOGGER.error("Error saving session state", e);
         }
-    }
-
-    private void saveSettings(SettingsPack sp) {
-        if (session == null) {
-            return;
-        }
-        session.applySettings(sp);
-        saveSettings();
     }
 
     public void revertToDefaultConfiguration() {
@@ -885,38 +884,6 @@ public final class BTEngine extends SessionManager {
         return s.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
     }
 
-    // NOTE: don't delete, new API
-    /*
-    private static SettingsPack settingsToPack(SessionSettings s) {
-        string_entry_map map = new string_entry_map();
-        libtorrent.save_settings_to_dict(s.getSwig(), map);
-        entry e = new entry(map);
-        bdecode_node le = new bdecode_node();
-        error_code ec = new error_code();
-        bdecode_node.bdecode(e.bencode(), le, ec);
-        if (ec.value() != 0) {
-            throw new IllegalStateException("Can't create settings pack");
-        }
-
-        return new SettingsPack(libtorrent.load_pack_from_dict(le));
-    }*/
-
-    /*
-    private void updateAverageSpeeds() {
-        long now = System.currentTimeMillis();
-
-        bytesRecv = session.getStats().getPayloadDownload();
-        bytesSent = session.getStats().getPayloadUpload();
-
-        if (now - speedMarkTimestamp > SPEED_AVERAGE_CALCULATION_INTERVAL_MILLISECONDS) {
-            averageRecvSpeed = ((bytesRecv - totalRecvSinceLastSpeedStamp) * 1000) / (now - speedMarkTimestamp);
-            averageSentSpeed = ((bytesSent - totalSentSinceLastSpeedStamp) * 1000) / (now - speedMarkTimestamp);
-            speedMarkTimestamp = now;
-            totalRecvSinceLastSpeedStamp = bytesRecv;
-            totalSentSinceLastSpeedStamp = bytesSent;
-        }
-    }*/
-
     private final class InnerListener implements AlertListener {
         @Override
         public int[] types() {
@@ -1020,127 +987,6 @@ public final class BTEngine extends SessionManager {
                 LOGGER.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
             }
         }
-    }
-
-    //--------------------------------------------------
-    // Settings methods
-    //--------------------------------------------------
-
-    public int downloadSpeedLimit() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getSettingsPack().downloadRateLimit();
-    }
-
-    public void downloadSpeedLimit(int limit) {
-        if (session == null) {
-            return;
-        }
-        SettingsPack settingsPack = session.getSettingsPack();
-        settingsPack.setDownloadRateLimit(limit);
-        saveSettings(settingsPack);
-    }
-
-    public int uploadSpeedLimit() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getSettingsPack().uploadRateLimit();
-    }
-
-    public void uploadSpeedLimit(int limit) {
-        if (session == null) {
-            return;
-        }
-        SettingsPack settingsPack = session.getSettingsPack();
-        settingsPack.setUploadRateLimit(limit);
-        session.applySettings(settingsPack);
-        saveSettings(settingsPack);
-    }
-
-    public int maxActiveDownloads() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getSettingsPack().activeDownloads();
-    }
-
-    public void maxActiveDownloads(int limit) {
-        if (session == null) {
-            return;
-        }
-        SettingsPack settingsPack = session.getSettingsPack();
-        settingsPack.activeDownloads(limit);
-        session.applySettings(settingsPack);
-        saveSettings(settingsPack);
-    }
-
-    public int maxActiveSeeds() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getSettingsPack().activeSeeds();
-    }
-
-    public void maxActiveSeeds(int limit) {
-        if (session == null) {
-            return;
-        }
-        SettingsPack settingsPack = session.getSettingsPack();
-        settingsPack.activeSeeds(limit);
-        session.applySettings(settingsPack);
-        saveSettings(settingsPack);
-    }
-
-    public int maxConnections() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getSettingsPack().connectionsLimit();
-    }
-
-    public void maxConnections(int limit) {
-        if (session == null) {
-            return;
-        }
-        SettingsPack settingsPack = session.getSettingsPack();
-        settingsPack.setConnectionsLimit(limit);
-        session.applySettings(settingsPack);
-        saveSettings(settingsPack);
-    }
-
-    public int maxPeers() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getSettingsPack().maxPeerlistSize();
-    }
-
-    public void maxPeers(int limit) {
-        if (session == null) {
-            return;
-        }
-        SettingsPack settingsPack = session.getSettingsPack();
-        settingsPack.setMaxPeerlistSize(limit);
-        session.applySettings(settingsPack);
-        saveSettings(settingsPack);
-    }
-
-    public String listenInterfaces() {
-        if (session == null) {
-            return null;
-        }
-        return session.getSettingsPack().getString(settings_pack.string_types.listen_interfaces.swigValue());
-    }
-
-    public void listenInterfaces(String value) {
-        if (session == null) {
-            return;
-        }
-        SettingsPack sp = new SettingsPack();
-        sp.setString(settings_pack.string_types.listen_interfaces.swigValue(), value);
-        saveSettings(sp);
     }
 
     public long dhtNodes() {

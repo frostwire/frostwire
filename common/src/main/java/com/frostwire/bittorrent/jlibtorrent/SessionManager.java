@@ -32,7 +32,7 @@ public class SessionManager {
     private final ReentrantLock sync;
     private final ReentrantLock syncMagnet;
 
-    private com.frostwire.jlibtorrent.swig.session session;
+    protected com.frostwire.jlibtorrent.swig.session session;
 
     private final SessionStats stats;
     private long lastStatsRequestTime;
@@ -298,7 +298,7 @@ public class SessionManager {
             return;
         }
         SettingsPack sp = new SettingsPack();
-        sp.activeDownloads(limit);
+        sp.activeSeeds(limit);
         applySettings(sp);
     }
 

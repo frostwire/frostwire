@@ -181,7 +181,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-
     private void checkDHTPeers() {
         try {
             BTEngine engine = BTEngine.getInstance();
