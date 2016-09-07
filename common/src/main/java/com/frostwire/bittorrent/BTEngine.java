@@ -48,7 +48,6 @@ public final class BTEngine extends SessionManager {
             PIECE_FINISHED.swig(),
             PORTMAP.swig(),
             PORTMAP_ERROR.swig(),
-            DHT_STATS.swig(),
             STORAGE_MOVED.swig(),
             LISTEN_SUCCEEDED.swig(),
             LISTEN_FAILED.swig(),
@@ -66,7 +65,6 @@ public final class BTEngine extends SessionManager {
     private Session session;
     private Downloader downloader;
     private BTEngineListener listener;
-    private int totalDHTNodes;
 
     private boolean firewalled;
     private List<TcpEndpoint> listenEndpoints;
@@ -910,9 +908,6 @@ public final class BTEngine extends SessionManager {
                 case PORTMAP_ERROR:
                     firewalled = true;
                     break;
-                case DHT_STATS:
-                    totalDHTNodes = (int) session.getStats().dhtNodes();
-                    break;
                 case STORAGE_MOVED:
                     doResumeData((TorrentAlert<?>) alert, true);
                     break;
@@ -990,7 +985,7 @@ public final class BTEngine extends SessionManager {
     }
 
     public long dhtNodes() {
-        return totalDHTNodes;
+        return session != null ? session.getStats().dhtNodes() : 0;
     }
 
     private static final class LruCache<K, V> extends LinkedHashMap<K, V> {

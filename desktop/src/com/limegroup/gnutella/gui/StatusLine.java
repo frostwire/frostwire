@@ -19,7 +19,6 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.theme.SkinCheckBoxMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
-import com.frostwire.jlibtorrent.Session;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
@@ -89,7 +88,6 @@ public final class StatusLine {
     private StatusComponent STATUS_COMPONENT;
     private JPanel _centerPanel;
     private Component _centerComponent;
-    private long _lastOnTotalNodesUpdate;
 
     ///////////////////////////////////////////////////////////////////////////
     //  Construction
@@ -573,40 +571,14 @@ public final class StatusLine {
             break;
         }
 
-        updateTotalDHTNodesInTooltip(tip);
+        long dhtNodes = BTEngine.getInstance().dhtNodes();
+        if (dhtNodes > 0) {
+            String updatedToolTip = tip + ". (DHT: " + dhtNodes + " " + I18n.tr("nodes") + ")";
+            _connectionQualityMeter.setToolTipText(updatedToolTip);
+        } else {
+            _connectionQualityMeter.setToolTipText(tip);
+        }
         _connectionQualityMeter.setText(status);
-    }
-
-    /**
-     *  Adds a DhtStatsAlert listener to the session, has the session post the DHTStatsAlert
-     *  when it receives it, it removes the listener, calculates the node count from all
-     *  the routing buckets, then calls onTotalNodes(int) which safely updates
-     *  the tooltip of the connection quality meter on the UI thread.
-     */
-    private void updateTotalDHTNodesInTooltip(String tip) {
-        if (System.currentTimeMillis() - _lastOnTotalNodesUpdate < 5000) {
-            return;
-        }
-
-        try {
-            BTEngine engine = BTEngine.getInstance();
-            final Session session = engine.session();
-            if (session != null && session.isDHTRunning()) {
-                session.postDHTStats();
-                long totalDHTNodes = engine.dhtNodes();
-                if (totalDHTNodes != -1) {
-                    final String updatedToolTip = tip + ". (DHT: " + totalDHTNodes + " " + I18n.tr("nodes") + ")";
-                    GUIMediator.safeInvokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            _lastOnTotalNodesUpdate = System.currentTimeMillis();
-                            _connectionQualityMeter.setToolTipText(updatedToolTip);
-                        }
-                    });
-                }
-            }
-        } catch (Throwable ignored) {
-        }
     }
 
     /**
@@ -699,11 +671,6 @@ public final class StatusLine {
      */
     private class ShowConnectionQualityAction extends AbstractAction {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 7922422377962473634L;
-
         public ShowConnectionQualityAction() {
             putValue(Action.NAME, I18n.tr("Show Connection Quality"));
         }
@@ -734,11 +701,6 @@ public final class StatusLine {
      */
     private class ShowLanguageStatusAction extends AbstractAction {
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 726208491122581283L;
-
         public ShowLanguageStatusAction() {
             putValue(Action.NAME, I18n.tr("Show Language Status"));
         }
@@ -758,11 +720,6 @@ public final class StatusLine {
      */
     private class ShowFirewallStatusAction extends AbstractAction {
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -8489901794229005217L;
-
         public ShowFirewallStatusAction() {
             putValue(Action.NAME, I18n.tr("Show Firewall Status"));
         }
@@ -778,11 +735,6 @@ public final class StatusLine {
      */
     private class ShowBandwidthConsumptionAction extends AbstractAction {
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 1455679943975682049L;
-
         public ShowBandwidthConsumptionAction() {
             putValue(Action.NAME, I18n.tr("Show Bandwidth Consumption"));
         }
@@ -795,11 +747,6 @@ public final class StatusLine {
 
     private class ShowDonationButtonsAction extends AbstractAction {
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 1455679943975682049L;
-
         public ShowDonationButtonsAction() {
             putValue(Action.NAME, I18n.tr("Show Donation Buttons"));
         }
@@ -811,11 +758,6 @@ public final class StatusLine {
     }
 
     private class LazyTooltip extends JLabel {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -5759748801999410032L;
 
         LazyTooltip(ImageIcon icon) {
             super(icon);
