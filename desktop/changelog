@@ -5,8 +5,10 @@ frostwire (6.3.6) stable; urgency=high
   * Fixes upgrade bug for Ubuntu 16.04 installs w/o gdebi/software-center
   * Send to friend dialog now appears on the same screen as the main
     FrostWire window, and centered relative to it.
+  * Fixes bug in media player where share button wasn't hidden when playback
+    stopped.
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 6 Sep 2016 12:11:15 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 7 Sep 2016 15:46:28 -0600
 
 
 frostwire (6.3.5) stable; urgency=high
