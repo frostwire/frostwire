@@ -67,8 +67,6 @@ public final class BTEngine extends SessionManager {
     private BTEngineListener listener;
 
     private boolean firewalled;
-    private List<TcpEndpoint> listenEndpoints;
-    private Address externalAddress;
 
     private static final LruCache<String, byte[]> MAGNET_CACHE = new LruCache<String, byte[]>(50);
     private static final Object MAGNET_LOCK = new Object();
@@ -77,8 +75,6 @@ public final class BTEngine extends SessionManager {
         this.sync = new ReentrantLock();
         this.innerListener = new InnerListener();
         this.restoreDownloadsQueue = new LinkedList<>();
-
-        this.listenEndpoints = new LinkedList<>();
     }
 
     private static class Loader {

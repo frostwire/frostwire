@@ -42,6 +42,7 @@
  */
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.MagnetUriBuilder;
 import com.frostwire.jlibtorrent.AnnounceEntry;
 import com.frostwire.jlibtorrent.Session;
@@ -129,7 +130,7 @@ public final class TorrentUtil {
         return "magnet:?xt=urn:btih:" + hash;
     }
 
-    static String getMagnetURLParameters(TorrentInfo torrent, Session session) {
+    static String getMagnetURLParameters(TorrentInfo torrent) {
         StringBuilder sb = new StringBuilder();
 
         //dn (display name)
@@ -145,9 +146,7 @@ public final class TorrentUtil {
         }
 
         //x.pe (bootstrapping peer(s) ip:port)
-        if (session != null) {
-            return new MagnetUriBuilder(sb.toString()).getMagnet();
-        }
+        sb.append(BTEngine.getInstance().magnetPeers());
 
         return sb.toString();
     }

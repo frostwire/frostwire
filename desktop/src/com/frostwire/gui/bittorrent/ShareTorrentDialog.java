@@ -253,7 +253,7 @@ public class ShareTorrentDialog extends JDialog {
 
     private String getLink() {
         if (link == null) {
-            link = "http://maglnk.com/" + info_hash + "/?" + TorrentUtil.getMagnetURLParameters(torrent, BTEngine.getInstance().session());
+            link = "http://maglnk.com/" + info_hash + "/?" + TorrentUtil.getMagnetURLParameters(torrent);
         }
         return link;
     }
@@ -388,8 +388,6 @@ public class ShareTorrentDialog extends JDialog {
 
     private class TwitterAction extends AbstractAction {
 
-        private static final long serialVersionUID = -2035234758115291468L;
-
         public TwitterAction() {
             putValue(Action.NAME, I18n.tr("Twitter it"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Send the message above to Twitter"));
@@ -405,8 +403,6 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private class CopyToClipboardAction extends AbstractAction {
-
-        private static final long serialVersionUID = 2130811125951128397L;
 
         public CopyToClipboardAction() {
             putValue(Action.NAME, I18n.tr("Copy Text"));
@@ -425,8 +421,6 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     public class CopyLinkAction extends AbstractAction {
-
-        private static final long serialVersionUID = 5396173442291772242L;
 
         public CopyLinkAction() {
             putValue(Action.NAME, I18n.tr("Copy Link"));
@@ -448,8 +442,6 @@ public class ShareTorrentDialog extends JDialog {
 
     private class CopyMagnetAction extends AbstractAction {
 
-        private static final long serialVersionUID = 4972170728829407730L;
-
         public CopyMagnetAction() {
             putValue(Action.NAME, I18n.tr("Copy Magnet"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy Magnet URL to Clipboard"));
@@ -458,13 +450,11 @@ public class ShareTorrentDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            GUIMediator.setClipboardContent(TorrentUtil.getMagnet(info_hash) + "&" + TorrentUtil.getMagnetURLParameters(torrent, BTEngine.getInstance().session()));
+            GUIMediator.setClipboardContent(TorrentUtil.getMagnet(info_hash) + BTEngine.getInstance().magnetPeers());
             setTitle(I18n.tr("Magnet copied to clipboard."));
 
             JButton source = (JButton) e.getSource();
             showFeedback(getTitle(), source.getLocationOnScreen().getX(), source.getLocationOnScreen().getY());
         }
     }
-
-
 }
