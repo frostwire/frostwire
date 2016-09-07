@@ -143,7 +143,6 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
         ConnectionSettings.PROXY_PASS.setValue(password);
         ConnectionSettings.PROXY_AUTHENTICATE.setValue(authenticate);
 
-        Session session = BTEngine.getInstance().session();
         SettingsPack settings = new SettingsPack();
         if (authenticate) {
             int connectionMethod = ConnectionSettings.CONNECTION_METHOD.getValue();
@@ -157,8 +156,7 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
         }
         settings.setString(settings_pack.string_types.proxy_username.swigValue(), username);
         settings.setString(settings_pack.string_types.proxy_password.swigValue(), password);
-        session.applySettings(settings);
-        BTEngine.getInstance().saveSettings();
+        BTEngine.getInstance().applySettings(settings);
 
         return false;
     }
