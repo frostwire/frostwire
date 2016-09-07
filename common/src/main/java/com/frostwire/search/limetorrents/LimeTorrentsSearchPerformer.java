@@ -36,8 +36,6 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
                     "<tr><td align=\"right\"><b>Added</b> :</td><td>(?<time>.*?)  in.*?" +
                     "<tr><td align=\"right\"><b>Size</b> :</td><td>(?<filesize>.*?) (?<unit>[A-Z]+)</td></tr>.*?"; // +
 
-
-
     public LimeTorrentsSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
     }
