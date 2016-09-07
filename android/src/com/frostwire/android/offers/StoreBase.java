@@ -56,7 +56,11 @@ abstract class StoreBase implements Store {
         while (!r && it.hasNext()) {
             Product p = it.next();
             // protection for faulty implementations of products
-            r = !p.available() && p.purchased() && p.enabled(code);
+            if (p.subscription()) {
+                r = p.purchased() && p.enabled(code);
+            } else {
+                r = !p.available() && p.purchased() && p.enabled(code);
+            }
         }
 
         return r;
