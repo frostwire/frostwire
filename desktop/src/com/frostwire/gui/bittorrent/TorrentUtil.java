@@ -43,9 +43,7 @@
 package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.bittorrent.MagnetUriBuilder;
 import com.frostwire.jlibtorrent.AnnounceEntry;
-import com.frostwire.jlibtorrent.Session;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.*;
@@ -60,7 +58,6 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
-import javax.swing.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;

@@ -40,7 +40,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.bittorrent.MagnetUriBuilder;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
@@ -148,14 +148,14 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                         R.drawable.contextmenu_icon_magnet,
                         R.string.transfers_context_menu_copy_magnet,
                         R.string.transfers_context_menu_copy_magnet_copied,
-                        new MagnetUriBuilder(fd.filePath).getMagnet()
+                        readInfoFromTorrent(fd.filePath, true)
                 ));
 
                 items.add(new CopyToClipboardMenuAction(context,
                         R.drawable.contextmenu_icon_copy,
                         R.string.transfers_context_menu_copy_infohash,
                         R.string.transfers_context_menu_copy_infohash_copied,
-                        new InfoHashBuilder(fd.filePath)
+                        readInfoFromTorrent(fd.filePath, false)
                 ));
             }
         }
@@ -480,26 +480,26 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return false;
     }
 
-
-    private static final class InfoHashBuilder {
-
-        private final String torrentFilePath;
-
-        InfoHashBuilder(String torrentFilePath) {
-            this.torrentFilePath = torrentFilePath;
+    private static String readInfoFromTorrent(String torrent, boolean magnet) {
+        if (torrent == null) {
+            return "";
         }
 
-        @Override
-        public String toString() {
-            if (this.torrentFilePath != null) {
-                try {
-                    return new TorrentInfo(new File(this.torrentFilePath)).infoHash().toString();
-                } catch (Throwable e) {
-                    LOG.warn("Error trying to get infohash", e);
-                }
+        String result = "";
+
+        try {
+            TorrentInfo ti = new TorrentInfo(new File(torrent));
+
+            if (magnet) {
+                result = ti.makeMagnetUri() + BTEngine.getInstance().magnetPeers();
+            } else {
+                result = ti.infoHash().toString();
             }
-            return super.toString();
+        } catch (Throwable e) {
+            LOG.warn("Error trying read torrent: " + torrent, e);
         }
+
+        return result;
     }
 
     private static class FileListFilter implements ListAdapterFilter<FileDescriptorItem> {

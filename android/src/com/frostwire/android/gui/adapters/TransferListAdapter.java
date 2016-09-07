@@ -44,11 +44,11 @@ import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.bittorrent.BTDownloadItem;
-import com.frostwire.bittorrent.MagnetUriBuilder;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.util.Logger;
 import com.frostwire.search.WebSearchPerformer;
 import com.frostwire.transfers.*;
+import com.frostwire.util.Logger;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -282,7 +282,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         if (finishedSuccessfully) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
             if (files != null && files.size() == 1 && !AndroidPlatform.saf(new File(files.get(0).filePath))) {
-                items.add(new SeedAction(context.get(), files.get(0),download));
+                items.add(new SeedAction(context.get(), files.get(0), download));
             }
             items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
         }
@@ -339,7 +339,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 R.drawable.contextmenu_icon_magnet,
                 R.string.transfers_context_menu_copy_magnet,
                 R.string.transfers_context_menu_copy_magnet_copied,
-                new MagnetUriBuilder(download).getMagnet()
+                download.magnetUri() + BTEngine.getInstance().magnetPeers()
         ));
 
         items.add(new CopyToClipboardMenuAction(context.get(),
