@@ -25,7 +25,6 @@ import org.limewire.util.SystemUtils.SpecialLocations;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -100,21 +99,6 @@ public final class FrostWireUtils {
             root = CommonUtils.getUserHomeDir().getPath();
 
         return new File(root, "FrostWire");
-    }
-
-    public interface IndexedMapFunction<T> {
-        void map(int i, T obj);
-    }
-
-    /**
-     * Make sure your List implements RandomAccess.
-     *
-     */
-    public static <T> void map(List<T> list, IndexedMapFunction<T> mapFunction) {
-        int size = list.size();
-        for (int i = 0; i < size; i++) {
-            mapFunction.map(i, list.get(i));
-        }
     }
 
     public static Set<File> getFrostWire4SaveDirectories() {
