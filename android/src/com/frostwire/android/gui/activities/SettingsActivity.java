@@ -154,8 +154,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.downloadSpeedLimit((int) newValue);
-                        return e.downloadSpeedLimit() == (int) newValue;
+                        e.downloadRateLimit((int) newValue);
+                        return e.downloadRateLimit() == (int) newValue;
                     }
                     return false;
                 }
@@ -170,8 +170,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.uploadSpeedLimit((int) newValue);
-                        return e.uploadSpeedLimit() == (int) newValue;
+                        e.uploadRateLimit((int) newValue);
+                        return e.uploadRateLimit() == (int) newValue;
                     }
                     return false;
                 }

@@ -506,9 +506,9 @@ public final class TransferManager {
                 BTEngine e = BTEngine.getInstance();
 
                 if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED)) {
-                    e.downloadSpeedLimit((int) ConfigurationManager.instance().getLong(key));
+                    e.downloadRateLimit((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED)) {
-                    e.uploadSpeedLimit((int) ConfigurationManager.instance().getLong(key));
+                    e.uploadRateLimit((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS)) {
                     e.maxActiveDownloads((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOADS)) {

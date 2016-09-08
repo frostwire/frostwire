@@ -192,29 +192,15 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    public void updateSavePath(File dataDir) {
+    @Override
+    public void moveStorage(File dataDir) {
         if (session == null) {
             return;
         }
 
         ctx.dataDir = dataDir; // this will be removed when we start using platform
 
-        try {
-            torrent_handle_vector v = session.swig().get_torrents();
-            long size = v.size();
-
-            String path = dataDir.getAbsolutePath();
-            for (int i = 0; i < size; i++) {
-                torrent_handle th = v.get(i);
-                torrent_status ts = th.status();
-                boolean incomplete = !ts.getIs_seeding() && !ts.getIs_finished();
-                if (th.is_valid() && incomplete) {
-                    th.move_storage(path);
-                }
-            }
-        } catch (Throwable e) {
-            LOGGER.error("Error changing save path for session", e);
-        }
+        super.moveStorage(dataDir);
     }
 
     public void loadSettings() {
