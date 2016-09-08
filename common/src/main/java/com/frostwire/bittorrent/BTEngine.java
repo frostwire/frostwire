@@ -127,20 +127,6 @@ public final class BTEngine extends SessionManager {
         return session.getStats().upload();
     }
 
-    public int downloadRateLimit() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getSettingsPack().downloadRateLimit();
-    }
-
-    public int uploadRateLimit() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getSettingsPack().uploadRateLimit();
-    }
-
     public void start() {
         sync.lock();
 

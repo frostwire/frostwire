@@ -240,14 +240,14 @@ public class SessionManager {
         }
     }
 
-    public int downloadSpeedLimit() {
+    public int downloadRateLimit() {
         if (session == null) {
             return 0;
         }
         return settings().downloadRateLimit();
     }
 
-    public void downloadSpeedLimit(int limit) {
+    public void downloadRateLimit(int limit) {
         if (session == null) {
             return;
         }
@@ -256,14 +256,14 @@ public class SessionManager {
         applySettings(sp);
     }
 
-    public int uploadSpeedLimit() {
+    public int uploadRateLimit() {
         if (session == null) {
             return 0;
         }
         return settings().uploadRateLimit();
     }
 
-    public void uploadSpeedLimit(int limit) {
+    public void uploadRateLimit(int limit) {
         if (session == null) {
             return;
         }
