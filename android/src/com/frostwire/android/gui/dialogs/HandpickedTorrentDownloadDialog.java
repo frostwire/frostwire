@@ -306,11 +306,13 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
             Engine.instance().getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                    BTEngine.getInstance().download(theDialog.getTorrentInfo(),
-                            null,
-                            selection,
-                            theDialog.getMagnetUri());
-                    UIUtils.showTransfersOnDownloadStart(context);
+                    try {
+                        BTEngine.getInstance().download(theDialog.getTorrentInfo(),
+                                null,
+                                selection,
+                                theDialog.getMagnetUri());
+                        UIUtils.showTransfersOnDownloadStart(context);
+                    } catch (Throwable ignored) {}
                 }
             });
 
