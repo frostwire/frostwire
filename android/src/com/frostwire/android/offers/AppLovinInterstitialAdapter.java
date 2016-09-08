@@ -128,10 +128,12 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
                 Offers.THREAD_POOL.execute(new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            appLovinAdNetwork.loadNewInterstitial(activityRef.get());
-                        } catch (Throwable e) {
-                            LOG.error(e.getMessage(), e);
+                        if (appLovinAdNetwork.enabled() && appLovinAdNetwork.started()) {
+                            try {
+                                appLovinAdNetwork.loadNewInterstitial(activityRef.get());
+                            } catch (Throwable e) {
+                                LOG.error(e.getMessage(), e);
+                            }
                         }
                     }
                 });
