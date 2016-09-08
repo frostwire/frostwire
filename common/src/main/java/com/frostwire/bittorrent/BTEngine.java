@@ -100,10 +100,6 @@ public final class BTEngine extends SessionManager {
         this.listener = listener;
     }
 
-    public boolean isFirewalled() {
-        return firewalled;
-    }
-
     public long downloadRate() {
         if (session == null) {
             return 0;
@@ -144,14 +140,6 @@ public final class BTEngine extends SessionManager {
             return 0;
         }
         return session.getSettingsPack().uploadRateLimit();
-    }
-
-    public boolean isStarted() {
-        return session != null;
-    }
-
-    public boolean isPaused() {
-        return session != null && session.isPaused();
     }
 
     public void start() {
@@ -216,18 +204,6 @@ public final class BTEngine extends SessionManager {
             // ignore
         } finally {
             sync.unlock();
-        }
-    }
-
-    public void pause() {
-        if (session != null && !session.isPaused()) {
-            session.pause();
-        }
-    }
-
-    public void resume() {
-        if (session != null) {
-            session.resume();
         }
     }
 

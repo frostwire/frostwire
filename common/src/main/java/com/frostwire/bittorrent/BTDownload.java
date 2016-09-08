@@ -126,7 +126,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isPaused() {
-        return th.getStatus().isPaused() || engine.isPaused() || !engine.isStarted();
+        return th.getStatus().isPaused() || engine.isPaused() || !engine.isRunning();
     }
 
     public boolean isSeeding() {
@@ -138,7 +138,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public TransferState getState() {
-        if (!engine.isStarted()) {
+        if (!engine.isRunning()) {
             return TransferState.STOPPED;
         }
 
