@@ -17,7 +17,6 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.Dht;
 import com.frostwire.util.UserAgentGenerator;
 import com.limegroup.gnutella.ExternalControl;
 import com.limegroup.gnutella.LimeCoreGlue;
@@ -477,8 +476,7 @@ public final class Initializer {
         BTEngine.getInstance().start();
 
         if (!SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue()) {
-            Dht dht = new Dht(BTEngine.getInstance().session());
-            dht.stop();
+            BTEngine.getInstance().stopDht();
         }
     }
 

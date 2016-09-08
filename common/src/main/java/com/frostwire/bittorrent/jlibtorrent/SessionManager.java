@@ -375,8 +375,25 @@ public class SessionManager {
         }
     }
 
-    public boolean isDHTRunning() {
+    public boolean isDhtRunning() {
         return session != null ? session.is_dht_running() : false;
+    }
+
+    public void startDht() {
+        toggleDht(true);
+    }
+
+    public void stopDht() {
+        toggleDht(false);
+    }
+
+    private void toggleDht(boolean on) {
+        if (session == null || isDhtRunning() == on) {
+            return;
+        }
+        SettingsPack sp = new SettingsPack();
+        sp.enableDht(on);
+        applySettings(sp);
     }
 
     /**

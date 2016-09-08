@@ -16,7 +16,6 @@
 package com.limegroup.gnutella.gui.options.panes;
 
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.Dht;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.settings.SharingSettings;
 
@@ -98,7 +97,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     public boolean isDirty() {
         final BTEngine btEngine = BTEngine.getInstance();
 
-        return (btEngine.isDHTRunning() == ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected() ||
+        return (btEngine.isDhtRunning() == ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected() ||
                 btEngine.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()) ||
                 (btEngine.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()) ||
                 (btEngine.maxPeers() != MAX_PEERS_FIELD.getValue()) ||
@@ -108,7 +107,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     @Override
     public void initOptions() {
         final BTEngine btEngine = BTEngine.getInstance();
-        ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(btEngine.isDHTRunning());
+        ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(btEngine.isDhtRunning());
         MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.maxConnections());
         MAX_PEERS_FIELD.setValue(btEngine.maxPeers());
         MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.maxActiveDownloads());
@@ -129,13 +128,12 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
 
     private void applyDHTOptions(BTEngine btEngine) {
         boolean dhtExpectedValue = ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected();
-        boolean dhtCurrentStatus = btEngine.isDHTRunning();
-        Dht dht = new Dht(btEngine.session());
+        boolean dhtCurrentStatus = btEngine.isDhtRunning();
         if (dhtCurrentStatus && !dhtExpectedValue) {
-            dht.stop();
+            btEngine.stopDht();
             SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(false);
         } else if (!dhtCurrentStatus && dhtExpectedValue) {
-            dht.start();
+            btEngine.startDht();
             SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(true);
         }
     }
