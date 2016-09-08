@@ -38,7 +38,7 @@ public class SessionManager {
 
     private final SessionStats stats;
     private long lastStatsRequestTime;
-    private boolean firewalled;
+    protected boolean firewalled;
     protected final List<TcpEndpoint> listenEndpoints;
     protected Address externalAddress;
 
@@ -490,6 +490,18 @@ public class SessionManager {
      */
     public void download(TorrentInfo ti, File saveDir) {
         download(ti, saveDir, null, null, null);
+    }
+
+    public void remove(TorrentHandle th, Session.Options options) {
+        if (session != null && th.isValid()) {
+            session.remove_torrent(th.swig(), options.swig());
+        }
+    }
+
+    public void remove(TorrentHandle th) {
+        if (session != null && th.isValid()) {
+            session.remove_torrent(th.swig());
+        }
     }
 
     /**

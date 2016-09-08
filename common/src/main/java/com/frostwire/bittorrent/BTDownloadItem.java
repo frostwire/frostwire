@@ -18,9 +18,9 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.PiecesTracker;
+import com.frostwire.bittorrent.jlibtorrent.PiecesTracker;
+import com.frostwire.bittorrent.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.Priority;
-import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.TransferItem;
 
 import java.io.File;

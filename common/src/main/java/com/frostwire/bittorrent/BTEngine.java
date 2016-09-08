@@ -19,6 +19,7 @@
 package com.frostwire.bittorrent;
 
 import com.frostwire.bittorrent.jlibtorrent.SessionManager;
+import com.frostwire.bittorrent.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.*;
@@ -65,8 +66,6 @@ public final class BTEngine extends SessionManager {
     private Session session;
     private Downloader downloader;
     private BTEngineListener listener;
-
-    private boolean firewalled;
 
     private static final LruCache<String, byte[]> MAGNET_CACHE = new LruCache<String, byte[]>(50);
     private static final Object MAGNET_LOCK = new Object();
@@ -318,12 +317,12 @@ public final class BTEngine extends SessionManager {
 
         Priority[] priorities = null;
 
-        TorrentHandle th = downloader.find(ti.infoHash());
+        TorrentHandle th = convert(downloader.find(ti.infoHash()));
         boolean exists = th != null;
 
         if (selection != null) {
             if (th != null) {
-                priorities = th.getFilePriorities();
+                priorities = th.filePriorities();
             } else {
                 priorities = Priority.array(Priority.IGNORE, ti.numFiles());
             }
@@ -354,12 +353,12 @@ public final class BTEngine extends SessionManager {
 
         Priority[] priorities = null;
 
-        TorrentHandle th = downloader.find(ti.infoHash());
+        TorrentHandle th = convert(downloader.find(ti.infoHash()));
         boolean torrentHandleExists = th != null;
 
         if (selection != null) {
             if (torrentHandleExists) {
-                priorities = th.getFilePriorities();
+                priorities = th.filePriorities();
             } else {
                 priorities = Priority.array(Priority.IGNORE, ti.numFiles());
             }
@@ -394,11 +393,11 @@ public final class BTEngine extends SessionManager {
         TorrentInfo ti = sr.getTorrentInfo();
         int fileIndex = sr.getFileIndex();
 
-        TorrentHandle th = downloader.find(ti.infoHash());
+        TorrentHandle th = convert(downloader.find(ti.infoHash()));
         boolean exists = th != null;
 
         if (th != null) {
-            Priority[] priorities = th.getFilePriorities();
+            Priority[] priorities = th.filePriorities();
             if (priorities[fileIndex] == Priority.IGNORE) {
                 priorities[fileIndex] = Priority.NORMAL;
                 download(ti, saveDir, priorities, null, null);
@@ -617,7 +616,7 @@ public final class BTEngine extends SessionManager {
                     return;
                 }
             }
-            TorrentHandle th = session.findTorrent(alert.handle().getInfoHash());
+            TorrentHandle th = convert(session.findTorrent(alert.handle().getInfoHash()));
             if (th != null && th.isValid()) {
                 th.saveResumeData();
             }
@@ -640,7 +639,7 @@ public final class BTEngine extends SessionManager {
 
     private void fireDownloadAdded(TorrentAlert<?> alert) {
         try {
-            TorrentHandle th = session.findTorrent(alert.handle().getInfoHash());
+            TorrentHandle th = convert(session.findTorrent(alert.handle().getInfoHash()));
             BTDownload dl = new BTDownload(this, th);
             if (listener != null) {
                 listener.downloadAdded(this, dl);
@@ -768,7 +767,7 @@ public final class BTEngine extends SessionManager {
 
     public void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, String magnetUrlParams) {
 
-        TorrentHandle th = session.findTorrent(ti.infoHash());
+        TorrentHandle th = convert(session.findTorrent(ti.infoHash()));
 
         if (th != null) {
             // found a download with the same hash, just adjust the priorities if needed
@@ -972,5 +971,9 @@ public final class BTEngine extends SessionManager {
         protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
             return size() > maxSize;
         }
+    }
+
+    private TorrentHandle convert(com.frostwire.jlibtorrent.TorrentHandle th) {
+        return th != null ? new TorrentHandle(th.swig()) : null;
     }
 }
