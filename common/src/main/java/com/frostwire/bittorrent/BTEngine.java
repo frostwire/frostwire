@@ -212,7 +212,7 @@ public final class BTEngine extends SessionManager {
             File f = settingsFile();
             if (f.exists()) {
                 byte[] data = FileUtils.readFileToByteArray(f);
-                session.loadState(data);
+                loadState(data);
             } else {
                 revertToDefaultConfiguration();
             }
@@ -232,7 +232,7 @@ public final class BTEngine extends SessionManager {
         }
 
         try {
-            byte[] data = session.saveState();
+            byte[] data = saveState();
             FileUtils.writeByteArrayToFile(settingsFile(), data);
         } catch (Throwable e) {
             LOGGER.error("Error saving session state", e);
@@ -244,7 +244,7 @@ public final class BTEngine extends SessionManager {
             return;
         }
 
-        SettingsPack sp = session.getSettingsPack();
+        SettingsPack sp = settings();
 
         sp.broadcastLSD(true);
 
@@ -267,8 +267,7 @@ public final class BTEngine extends SessionManager {
             sp.activeSeeds(10);
         }
 
-        session.applySettings(sp);
-        saveSettings();
+        applySettings(sp);
     }
 
     public void download(File torrent, File saveDir) {
@@ -868,14 +867,6 @@ public final class BTEngine extends SessionManager {
                     break;
             }
         }
-    }
-
-    public Address externalAddress() {
-        return this.externalAddress;
-    }
-
-    public List<TcpEndpoint> listenEndpoints() {
-        return new LinkedList<>(listenEndpoints);
     }
 
     private void onExternalIpAlert(ExternalIpAlert alert) {
