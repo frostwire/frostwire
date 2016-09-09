@@ -17,8 +17,6 @@
 
 package com.frostwire.android.offers;
 
-import com.frostwire.android.BuildConfig;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,10 +106,10 @@ public final class Products {
     }
 
     private static String getSKU(String skuId) {
-        if (!BuildConfig.DEBUG) {
-            return skuId;
-        }
-        return skuId + ".test";
+        //if (!BuildConfig.DEBUG) {
+        return skuId;
+        //}
+        //return skuId + ".test";
     }
 
     static class ProductBase implements Product {

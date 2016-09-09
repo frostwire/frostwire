@@ -25,7 +25,10 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.frostwire.android.offers.Products.toDays;
@@ -224,7 +227,6 @@ public final class PlayStore extends StoreBase {
                 return true;
             }
         }
-
         return super.enabled(code);
     }
 
