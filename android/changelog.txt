@@ -3,6 +3,7 @@ FrostWire 1.8.1 - SEP/9/2016
  - Fixes shutdown and auto-restart bug.
  - Music Player will not bring back last song played paused on the next session.
  - FrostWire is cleared from the android task list on Exit on Android 21+
+ - Fixes Monova search
  - android support v4.23.4.0.
 
 FrostWire 1.8.0 - AUG/19/2016
