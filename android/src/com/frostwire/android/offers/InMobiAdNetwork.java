@@ -126,7 +126,7 @@ class InMobiAdNetwork implements AdNetwork {
 
     @Override
     public void loadNewInterstitial(final Activity activity) {
-        if (!started) {
+        if (!started || !enabled()) {
             return; //not ready
         }
 
