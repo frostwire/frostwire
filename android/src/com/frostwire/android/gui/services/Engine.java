@@ -228,6 +228,7 @@ public final class Engine implements IEngineService {
                 try {
                     getApplication().unbindService(connection);
                 } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -235,6 +236,7 @@ public final class Engine implements IEngineService {
                 try {
                     getApplication().unregisterReceiver(receiver);
                 } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
                 }
             }
 

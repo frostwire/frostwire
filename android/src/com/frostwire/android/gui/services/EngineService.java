@@ -128,6 +128,7 @@ public class EngineService extends Service implements IEngineService {
                 } catch (InterruptedException e) {
                     // ignore
                 }
+                LOG.info("EngineService::onDestroy()/shutdown-halt thread: android.os.Process.killProcess(" + android.os.Process.myPid() + ")");
                 android.os.Process.killProcess(android.os.Process.myPid());
             }
         }.start();
@@ -151,9 +152,10 @@ public class EngineService extends Service implements IEngineService {
         }
     }
 
+
+
     private void enableReceivers(boolean enable) {
         PackageManager pm = getPackageManager();
-
         enableReceiver(pm, ImIdShareBroadCastReceiver.class, enable);
         enableReceiver(pm, EngineBroadcastReceiver.class, enable);
         enableReceiver(pm, MediaButtonIntentReceiver.class, enable);

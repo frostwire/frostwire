@@ -171,6 +171,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         Offers.stopAdNetworks(this);
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
+        finishAffinity();
         Engine.instance().shutdown();
     }
 
