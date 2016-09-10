@@ -49,7 +49,7 @@ import com.frostwire.android.R;
 
 import java.util.Locale;
 
-import static com.andrew.apollo.utils.MusicUtils.mService;
+import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * Provides the search interface for Apollo.
@@ -217,7 +217,7 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
     protected void onDestroy() {
         super.onDestroy();
         // Unbind from the service
-        if (mService != null) {
+        if (musicPlaybackService != null) {
             MusicUtils.unbindFromService(mToken);
             mToken = null;
         }
@@ -382,7 +382,7 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
      */
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        mService = IApolloService.Stub.asInterface(service);
+        musicPlaybackService = IApolloService.Stub.asInterface(service);
     }
 
     /**
@@ -390,7 +390,7 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
      */
     @Override
     public void onServiceDisconnected(final ComponentName name) {
-        mService = null;
+        musicPlaybackService = null;
     }
 
     /**

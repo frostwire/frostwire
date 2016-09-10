@@ -38,6 +38,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import com.andrew.apollo.IApolloService;
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.AndroidPlatform;
@@ -59,6 +60,7 @@ import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
@@ -82,11 +84,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
-import static com.andrew.apollo.utils.MusicUtils.mService;
+import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * @author gubatron
@@ -172,7 +172,70 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
         finishAffinity();
+        tellMusicPlaybackServiceToShutDown(MainActivity.this);
         Engine.instance().shutdown();
+        // we make sure all services have finished shutting down before we kill our own process.
+        new Thread("shutdown-halt") {
+            @Override
+            public void run() {
+                waitWhileServicesAreRunning(MainActivity.this,
+                        Arrays.<Class<?>>asList(MusicPlaybackService.class,
+                                EngineService.class));
+                LOG.info("MainActivity::shutdown()/shutdown-halt thread: android.os.Process.killProcess(" + android.os.Process.myPid() + ")");
+                android.os.Process.killProcess(android.os.Process.myPid());
+            }
+        }.start();
+    }
+
+    private static void tellMusicPlaybackServiceToShutDown(Context context) {
+        try {
+            final Intent shutdownIntent = new Intent(context, MusicPlaybackService.class);
+            shutdownIntent.setAction(MusicPlaybackService.SHUTDOWN_ACTION);
+            shutdownIntent.putExtra("force",true);
+            PendingIntent pendingShutdownIntent = PendingIntent.getService(context, 0, shutdownIntent, 0);
+            LOG.info("MainActivity.tellMusicPlaybackServiceToShutDown() -> sending shut down intent now");
+            pendingShutdownIntent.send();
+        } catch (PendingIntent.CanceledException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void waitWhileServicesAreRunning(Context context, List<Class<?>> serviceClasses) {
+        Set<Class<?>> serviceClassesNotRunningAnymore = new HashSet<>();
+        while (serviceClasses.size() != serviceClassesNotRunningAnymore.size()) {
+
+            for (Class serviceClass : serviceClasses) {
+                if (isServiceRunning(context, serviceClass)) {
+                    LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is still running.");
+                    break;
+                } else {
+                    LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is shutdown.");
+                    serviceClassesNotRunningAnymore.add(serviceClass);
+                }
+            }
+
+            try {
+                if (serviceClasses.size() != serviceClassesNotRunningAnymore.size()) {
+                    LOG.info("waitWhileServicesAreRunning(...) zzz... zzz... (150ms)");
+                    Thread.sleep(150);
+                } else {
+                    LOG.info("waitWhileServicesAreRunning(...) no more wait, all services shutdown!");
+                    break;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static boolean isServiceRunning(Context context, Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -874,14 +937,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        mService = IApolloService.Stub.asInterface(service);
+        musicPlaybackService = IApolloService.Stub.asInterface(service);
     }
 
     /**
      * {@inheritDoc}
      */
     public void onServiceDisconnected(final ComponentName name) {
-        mService = null;
+        musicPlaybackService = null;
     }
 
     //@Override commented override since we are in API 16, but it will in API 23

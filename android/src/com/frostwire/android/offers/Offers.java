@@ -268,7 +268,7 @@ public final class Offers {
                                                            final boolean shutdownAfter,
                                                            final boolean tryBack2BackRemoveAdsOffer,
                                                            final Application fallbackContext) {
-            LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + finishAfterDismiss + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
+            LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + shutdownAfter + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
             if (activity != null) {
                 if (shutdownAfter) {
                     if (adNetwork != null) {

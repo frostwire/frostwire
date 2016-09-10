@@ -28,7 +28,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 import com.andrew.apollo.MediaButtonIntentReceiver;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -58,7 +57,6 @@ public class EngineService extends Service implements IEngineService {
 
     public final static int FROSTWIRE_STATUS_NOTIFICATION = 0x4ac4642a; // just a random number
     private static final Logger LOG = Logger.getLogger(EngineService.class);
-    private static final String TAG = "FW.EngineService";
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
 
     private final IBinder binder;
@@ -119,19 +117,6 @@ public class EngineService extends Service implements IEngineService {
         PlayStore.getInstance().dispose();
 
         stopOkHttp();
-
-        new Thread("shutdown-halt") {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    // ignore
-                }
-                LOG.info("EngineService::onDestroy()/shutdown-halt thread: android.os.Process.killProcess(" + android.os.Process.myPid() + ")");
-                android.os.Process.killProcess(android.os.Process.myPid());
-            }
-        }.start();
     }
 
     // what a bad design to properly shutdown the framework threads!
@@ -151,8 +136,6 @@ public class EngineService extends Service implements IEngineService {
             e.printStackTrace();
         }
     }
-
-
 
     private void enableReceivers(boolean enable) {
         PackageManager pm = getPackageManager();
@@ -235,7 +218,7 @@ public class EngineService extends Service implements IEngineService {
 
         state = STATE_STARTED;
 
-        Log.v(TAG, "Engine started");
+        LOG.info("Engine started");
     }
 
     public synchronized void stopServices(boolean disconnected) {
@@ -248,7 +231,7 @@ public class EngineService extends Service implements IEngineService {
         BTEngine.getInstance().pause();
 
         state = disconnected ? STATE_DISCONNECTED : STATE_STOPPED;
-        Log.v(TAG, "Engine stopped, state: " + state);
+        LOG.info("Engine stopped, state: " + state);
     }
 
     public ExecutorService getThreadPool() {
@@ -276,12 +259,13 @@ public class EngineService extends Service implements IEngineService {
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             manager.notify(Constants.NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED, notification);
         } catch (Throwable e) {
-            Log.e(TAG, "Error creating notification for download finished", e);
+            LOG.error("Error creating notification for download finished", e);
         }
     }
 
     @Override
     public void shutdown() {
+        LOG.info("shutdown()");
         stopForeground(true);
         stopSelf();
     }

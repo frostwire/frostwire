@@ -1,8 +1,6 @@
 
 package com.andrew.apollo.loaders;
 
-import static com.andrew.apollo.utils.MusicUtils.mService;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.AbstractCursor;
@@ -11,11 +9,11 @@ import android.os.RemoteException;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
-
-import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 
 import java.util.Arrays;
+
+import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * A custom {@link Cursor} used to return the queue and allow for easy dragging
@@ -54,7 +52,7 @@ public class NowPlayingCursor extends AbstractCursor {
      * 
      * @param context The {@link Context} to use
      */
-    public NowPlayingCursor(final Context context) {
+    NowPlayingCursor(final Context context) {
         mContext = context;
         makeNowPlayingCursor();
     }
@@ -204,10 +202,9 @@ public class NowPlayingCursor extends AbstractCursor {
                 mQueueCursor.close();
                 mQueueCursor = null;
             }
-        } catch (final Exception close) {
-        }
+        } catch (Throwable ignored) {}
         super.close();
-    };
+    }
 
     /**
      * Actually makes the queue
@@ -268,7 +265,6 @@ public class NowPlayingCursor extends AbstractCursor {
             mSize = mNowPlaying.length;
             if (mSize == 0) {
                 mCursorIndexes = null;
-                return;
             }
         }
     }
@@ -279,7 +275,7 @@ public class NowPlayingCursor extends AbstractCursor {
      */
     public boolean removeItem(final int which) {
         try {
-            if (mService.removeTracks(which, which) == 0) {
+            if (musicPlaybackService.removeTracks(which, which) == 0) {
                 return false;
             }
             int i = which;

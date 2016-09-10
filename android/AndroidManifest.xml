@@ -261,14 +261,15 @@
         <!-- end of AppLovin -->
 
         <!-- MobFox -->
-        <activity android:name="com.mobfox.sdk.interstitialads.InterstitialActivity"></activity>
+        <!--<activity android:name="com.mobfox.sdk.interstitialads.InterstitialActivity"></activity>-->
         <!-- end of MobFox -->
 
         <!-- services -->
 
         <service android:name="com.frostwire.android.gui.services.EngineService"
                  android:exported="false"/>
-        <service android:name="com.andrew.apollo.MusicPlaybackService" android:protectionLevel="dangerous"/>
+        <service android:name="com.andrew.apollo.MusicPlaybackService"
+                 android:protectionLevel="dangerous"/>
 
         <receiver android:name="com.frostwire.android.gui.services.EngineBroadcastReceiver">
             <intent-filter>

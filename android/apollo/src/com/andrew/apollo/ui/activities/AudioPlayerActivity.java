@@ -58,7 +58,7 @@ import com.frostwire.uxstats.UXStats;
 
 import java.lang.ref.WeakReference;
 
-import static com.andrew.apollo.utils.MusicUtils.mService;
+import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * Apollo's "now playing" interface.
@@ -227,7 +227,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
      */
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        mService = IApolloService.Stub.asInterface(service);
+        musicPlaybackService = IApolloService.Stub.asInterface(service);
         // Check whether we were asked to start any playback
         startPlayback();
         // Set the playback drawables
@@ -243,7 +243,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
      */
     @Override
     public void onServiceDisconnected(final ComponentName name) {
-        mService = null;
+        musicPlaybackService = null;
     }
 
     /**
@@ -251,7 +251,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
      */
     @Override
     public void onProgressChanged(final SeekBar bar, final int progress, final boolean fromuser) {
-        if (!fromuser || mService == null) {
+        if (!fromuser || musicPlaybackService == null) {
             return;
         }
         final long now = SystemClock.elapsedRealtime();
@@ -385,7 +385,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 return true;
             case R.id.menu_audio_player_stop:
                 try {
-                    MusicUtils.mService.stop();
+                    MusicUtils.musicPlaybackService.stop();
                 } catch (Throwable e) {
                     // ignore
                 }
@@ -490,7 +490,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         mIsPaused = false;
         mTimeHandler.removeMessages(REFRESH_TIME);
         // Unbind from the service
-        if (mService != null) {
+        if (musicPlaybackService != null) {
             MusicUtils.unbindFromService(mToken);
             mToken = null;
         }
@@ -630,7 +630,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     private void startPlayback() {
         Intent intent = getIntent();
 
-        if (intent == null || mService == null) {
+        if (intent == null || musicPlaybackService == null) {
             return;
         }
 
@@ -706,7 +706,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
      * @param delta    The long press duration
      */
     private void scanBackward(final int repcount, long delta) {
-        if (mService == null) {
+        if (musicPlaybackService == null) {
             return;
         }
         if (repcount == 0) {
@@ -748,7 +748,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
      * @param delta    The long press duration
      */
     private void scanForward(final int repcount, long delta) {
-        if (mService == null) {
+        if (musicPlaybackService == null) {
             return;
         }
         if (repcount == 0) {
@@ -789,7 +789,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     /* Used to update the current time string */
     private long refreshCurrentTime() {
-        if (mService == null) {
+        if (musicPlaybackService == null) {
             return 500;
         }
         try {
@@ -1068,7 +1068,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         @Override
         public void onSwipeLeft() {
             try {
-                MusicUtils.mService.next();
+                MusicUtils.musicPlaybackService.next();
                 UXStats.instance().log(UXAction.PLAYER_GESTURE_SWIPE_SONG);
             } catch (Throwable e) {
                 // ignore
@@ -1078,7 +1078,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         @Override
         public void onSwipeRight() {
             try {
-                MusicUtils.mService.prev();
+                MusicUtils.musicPlaybackService.prev();
                 UXStats.instance().log(UXAction.PLAYER_GESTURE_SWIPE_SONG);
             } catch (Throwable e) {
                 // ignore

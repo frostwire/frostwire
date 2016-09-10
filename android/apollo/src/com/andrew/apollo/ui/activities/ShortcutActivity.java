@@ -11,9 +11,6 @@
 
 package com.andrew.apollo.ui.activities;
 
-import static com.andrew.apollo.Config.MIME_TYPE;
-import static com.andrew.apollo.utils.MusicUtils.mService;
-
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -25,10 +22,8 @@ import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-
 import com.andrew.apollo.Config;
 import com.andrew.apollo.IApolloService;
-import com.frostwire.android.R;
 import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.loaders.AsyncHandler;
 import com.andrew.apollo.loaders.LastAddedLoader;
@@ -37,9 +32,13 @@ import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
+import com.frostwire.android.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.andrew.apollo.Config.MIME_TYPE;
+import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * This class is opened when the user touches a Home screen shortcut or album
@@ -57,7 +56,7 @@ public class ShortcutActivity extends FragmentActivity implements ServiceConnect
      * which is what happens when a user starts playing something from an
      * app-widget
      */
-    public static final String OPEN_AUDIO_PLAYER = null;
+    private static final String OPEN_AUDIO_PLAYER = null;
 
     /**
      * Service token
@@ -113,12 +112,12 @@ public class ShortcutActivity extends FragmentActivity implements ServiceConnect
      */
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        mService = IApolloService.Stub.asInterface(service);
+        musicPlaybackService = IApolloService.Stub.asInterface(service);
 
         // Check for a voice query
         if (mIntent.getAction().equals(Config.PLAY_FROM_SEARCH)) {
             getSupportLoaderManager().initLoader(0, null, mSongAlbumArtistQuery);
-        } else if (mService != null) {
+        } else if (musicPlaybackService != null) {
             AsyncHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -196,7 +195,7 @@ public class ShortcutActivity extends FragmentActivity implements ServiceConnect
      */
     @Override
     public void onServiceDisconnected(final ComponentName name) {
-        mService = null;
+        musicPlaybackService = null;
     }
 
     /**
@@ -206,7 +205,7 @@ public class ShortcutActivity extends FragmentActivity implements ServiceConnect
     protected void onDestroy() {
         super.onDestroy();
         // Unbind from the service
-        if (mService != null) {
+        if (musicPlaybackService != null) {
             MusicUtils.unbindFromService(mToken);
             mToken = null;
         }

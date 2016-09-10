@@ -44,12 +44,11 @@ import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
-import com.frostwire.android.gui.views.ClickAdapter;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import static com.andrew.apollo.utils.MusicUtils.mService;
+import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * A base {@link FragmentActivity} used to update the bottom bar and
@@ -173,7 +172,7 @@ public abstract class BaseActivity extends FragmentActivity
      */
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        mService = IApolloService.Stub.asInterface(service);
+        musicPlaybackService = IApolloService.Stub.asInterface(service);
         // Set the playback drawables
         updatePlaybackControls();
         // Current info
@@ -187,7 +186,7 @@ public abstract class BaseActivity extends FragmentActivity
      */
     @Override
     public void onServiceDisconnected(final ComponentName name) {
-        mService = null;
+        musicPlaybackService = null;
     }
 
     /**
