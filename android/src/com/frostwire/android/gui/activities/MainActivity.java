@@ -178,9 +178,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         new Thread("shutdown-halt") {
             @Override
             public void run() {
-                waitWhileServicesAreRunning(MainActivity.this,
-                        Arrays.<Class<?>>asList(MusicPlaybackService.class,
-                                EngineService.class));
+                waitWhileServicesAreRunning(MainActivity.this, 5000, MusicPlaybackService.class, EngineService.class);
                 LOG.info("MainActivity::shutdown()/shutdown-halt thread: android.os.Process.killProcess(" + android.os.Process.myPid() + ")");
                 android.os.Process.killProcess(android.os.Process.myPid());
             }
@@ -200,9 +198,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
-    private static void waitWhileServicesAreRunning(Context context, List<Class<?>> serviceClasses) {
+    private static void waitWhileServicesAreRunning(Context context, long timeout, Class<?> ... serviceClasses) {
+        final long startTime = System.currentTimeMillis();
         Set<Class<?>> serviceClassesNotRunningAnymore = new HashSet<>();
-        while (serviceClasses.size() != serviceClassesNotRunningAnymore.size()) {
+        while (serviceClasses.length != serviceClassesNotRunningAnymore.size()) {
 
             for (Class serviceClass : serviceClasses) {
                 if (isServiceRunning(context, serviceClass)) {
@@ -215,7 +214,13 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             }
 
             try {
-                if (serviceClasses.size() != serviceClassesNotRunningAnymore.size()) {
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                if (elapsedTime > timeout) {
+                    LOG.info("waitWhileServicesAreRunning(...) timed out, exiting now (" + timeout + "ms)");
+                    break;
+                }
+
+                if (serviceClasses.length != serviceClassesNotRunningAnymore.size()) {
                     LOG.info("waitWhileServicesAreRunning(...) zzz... zzz... (150ms)");
                     Thread.sleep(150);
                 } else {
