@@ -99,23 +99,13 @@ public class EngineService extends Service implements IEngineService {
     @Override
     public void onDestroy() {
         LOG.debug("EngineService onDestroy");
-
         enableReceivers(false);
-
         disablePermanentNotificationUpdates();
-
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
-
         stopServices(false);
-
-        mediaPlayer.stop();
-        mediaPlayer.shutdown();
-
         BTEngine.getInstance().stop();
         ImageLoader.getInstance(this).shutdown();
-
         PlayStore.getInstance().dispose();
-
         stopOkHttp();
     }
 

@@ -444,6 +444,8 @@ public class MusicPlaybackService extends Service {
 
     private boolean launchPlayerActivity;
 
+    private boolean exiting;
+
     /**
      * {@inheritDoc}
      */
@@ -460,7 +462,12 @@ public class MusicPlaybackService extends Service {
      */
     @Override
     public boolean onUnbind(final Intent intent) {
-        if (D) LOG.info("Service unbound");
+        if (D) LOG.info("onUnbind()");
+        if (exiting) {
+            LOG.info("onUnbind() aborted, already taken care of by releaseServiceUiAndStop() (exiting=true)");
+            return true;
+        }
+
         mServiceInUse = false;
         saveQueue(true);
 
@@ -721,9 +728,8 @@ public class MusicPlaybackService extends Service {
 
             if (SHUTDOWN_ACTION.equals(action)) {
                 cancelShutdown();
-                releaseServiceUiAndStop(intent.hasExtra("force"));
-                // in case mServiceInUse==false and it didn't call stopSelf()
-                stopSelf(mServiceStartId);
+                exiting = intent.hasExtra("force");
+                releaseServiceUiAndStop(exiting);
                 return START_NOT_STICKY;
             }
 
@@ -741,13 +747,17 @@ public class MusicPlaybackService extends Service {
         return START_STICKY;
     }
 
-    private void releaseServiceUiAndStop(boolean force) {
+    /**
+     * @param force
+     * @return true if serviced was released.
+     */
+    private boolean releaseServiceUiAndStop(boolean force) {
         if (mPlayerHandler == null
                 || (!force && isPlaying())
                 || mPausedByTransientLossOfFocus
                 || mPlayerHandler.hasMessages(TRACK_ENDED)) {
             LOG.info("releaseServiceUiAndStop(force="+force+") aborted: isPlaying()="+isPlaying());
-            return;
+            return false;
         }
 
         if (force && isPlaying()) {
@@ -760,10 +770,11 @@ public class MusicPlaybackService extends Service {
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
         updateRemoteControlClient(PLAYSTATE_STOPPED);
 
-        if (!mServiceInUse) {
+        if (!mServiceInUse || force) {
             saveQueue(true);
             stopSelf(mServiceStartId);
         }
+        return true;
     }
 
     private void handleCommandIntent(Intent intent) {
@@ -897,7 +908,17 @@ public class MusicPlaybackService extends Service {
 
     private void scheduleDelayedShutdown() {
         if (mAlarmManager != null) {
-            cancelShutdown();
+
+            if (mShutdownScheduled) {
+                cancelShutdown();
+            }
+
+            if (isPlaying()) {
+                LOG.info("scheduleDelayedShutdown() aborted, audio is playing.");
+                mShutdownScheduled = true;
+                return;
+            }
+
             if (D) LOG.info("Scheduling shutdown in " + IDLE_DELAY + " ms");
             mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + IDLE_DELAY, mShutdownIntent);
@@ -1436,6 +1457,10 @@ public class MusicPlaybackService extends Service {
             if (what.equals(PLAYSTATE_STOPPED)) {
                 playState = RemoteControlClient.PLAYSTATE_STOPPED;
             }
+        }
+
+        if (what == null) {
+            return;
         }
 
         switch (what) {
@@ -3344,27 +3369,9 @@ public class MusicPlaybackService extends Service {
     public void shutdown() {
         mPlayPos = -1;
         stopForeground(true);
-        sendForcedShutdownIntentNow();
-    }
-
-    /**
-     * Cancels any pending shutdown intents and creates a shutdown intent with an extra flag
-     * to force the shutdown when received, despite playback status.
-     */
-    private void sendForcedShutdownIntentNow() {
-        try {
-            // don't send this 60 seconds later, send it now.
-            if (mShutdownIntent != null) {
-                cancelShutdown();
-            }
-            final Intent shutdownIntent = new Intent(this, MusicPlaybackService.class);
-            shutdownIntent.setAction(SHUTDOWN_ACTION);
-            shutdownIntent.putExtra("force",true);
-            mShutdownIntent = PendingIntent.getService(this, 0, shutdownIntent, 0);
-            LOG.info("MusicPlaybackService.sendForcedShutdownIntentNow() -> sending shut down intent now");
-            mShutdownIntent.send();
-        } catch (PendingIntent.CanceledException e) {
-            e.printStackTrace();
+        if (mShutdownIntent != null) {
+            cancelShutdown();
         }
+        MusicUtils.requestMusicPlaybackServiceShutdown(this);
     }
 }

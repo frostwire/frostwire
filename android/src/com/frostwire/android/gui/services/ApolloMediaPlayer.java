@@ -61,7 +61,7 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
         try {
             if (MusicUtils.musicPlaybackService != null) {
                 MusicUtils.musicPlaybackService.shutdown();
-                LOG.info("ApolloMediaPlayer.stop() I could invoke shutdown() on the service.");
+                LOG.info("ApolloMediaPlayer.shutdown() I could invoke shutdown() on the service.");
             } else {
                 LOG.warn("ApolloMediaPlayer.shutdown() couldn't get a hold of the music playback service.");
             }

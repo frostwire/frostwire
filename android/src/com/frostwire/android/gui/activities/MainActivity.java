@@ -70,6 +70,7 @@ import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Products;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -84,7 +85,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
@@ -172,75 +175,17 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
         finishAffinity();
-        tellMusicPlaybackServiceToShutDown(MainActivity.this);
         Engine.instance().shutdown();
+        MusicUtils.requestMusicPlaybackServiceShutdown(MainActivity.this);
         // we make sure all services have finished shutting down before we kill our own process.
         new Thread("shutdown-halt") {
             @Override
             public void run() {
-                waitWhileServicesAreRunning(MainActivity.this, 5000, MusicPlaybackService.class, EngineService.class);
+                SystemUtils.waitWhileServicesAreRunning(MainActivity.this, 5000, MusicPlaybackService.class, EngineService.class);
                 LOG.info("MainActivity::shutdown()/shutdown-halt thread: android.os.Process.killProcess(" + android.os.Process.myPid() + ")");
                 android.os.Process.killProcess(android.os.Process.myPid());
             }
         }.start();
-    }
-
-    private static void tellMusicPlaybackServiceToShutDown(Context context) {
-        try {
-            final Intent shutdownIntent = new Intent(context, MusicPlaybackService.class);
-            shutdownIntent.setAction(MusicPlaybackService.SHUTDOWN_ACTION);
-            shutdownIntent.putExtra("force",true);
-            PendingIntent pendingShutdownIntent = PendingIntent.getService(context, 0, shutdownIntent, 0);
-            LOG.info("MainActivity.tellMusicPlaybackServiceToShutDown() -> sending shut down intent now");
-            pendingShutdownIntent.send();
-        } catch (PendingIntent.CanceledException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void waitWhileServicesAreRunning(Context context, long timeout, Class<?> ... serviceClasses) {
-        final long startTime = System.currentTimeMillis();
-        Set<Class<?>> serviceClassesNotRunningAnymore = new HashSet<>();
-        while (serviceClasses.length != serviceClassesNotRunningAnymore.size()) {
-
-            for (Class serviceClass : serviceClasses) {
-                if (isServiceRunning(context, serviceClass)) {
-                    LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is still running.");
-                    break;
-                } else {
-                    LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is shutdown.");
-                    serviceClassesNotRunningAnymore.add(serviceClass);
-                }
-            }
-
-            try {
-                long elapsedTime = System.currentTimeMillis() - startTime;
-                if (elapsedTime > timeout) {
-                    LOG.info("waitWhileServicesAreRunning(...) timed out, exiting now (" + timeout + "ms)");
-                    break;
-                }
-
-                if (serviceClasses.length != serviceClassesNotRunningAnymore.size()) {
-                    LOG.info("waitWhileServicesAreRunning(...) zzz... zzz... (150ms)");
-                    Thread.sleep(150);
-                } else {
-                    LOG.info("waitWhileServicesAreRunning(...) no more wait, all services shutdown!");
-                    break;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private static boolean isServiceRunning(Context context, Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

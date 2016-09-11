@@ -43,6 +43,7 @@ import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
@@ -117,6 +118,23 @@ public final class MusicUtils {
         mContextWrapper.unbindService(mBinder);
         if (mConnectionMap.isEmpty()) {
             musicPlaybackService = null;
+        }
+    }
+
+    public static void requestMusicPlaybackServiceShutdown(Context context) {
+        if (!SystemUtils.isServiceRunning(context, MusicPlaybackService.class)) {
+            LOG.info("requestMusicPlaybackServiceShutdown() aborted. MusicPlaybackService has already shutdown.");
+            return;
+        }
+        try {
+            final Intent shutdownIntent = new Intent(context, MusicPlaybackService.class);
+            shutdownIntent.setAction(MusicPlaybackService.SHUTDOWN_ACTION);
+            shutdownIntent.putExtra("force",true);
+            LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> sending shut down intent now");
+            LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> " + shutdownIntent);
+            context.startService(shutdownIntent);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
