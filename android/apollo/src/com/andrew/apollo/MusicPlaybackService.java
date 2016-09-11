@@ -607,7 +607,13 @@ public class MusicPlaybackService extends Service {
         mRemoteControlClient = new RemoteControlClient(
                 PendingIntent.getBroadcast(getApplicationContext(), 0, mediaButtonIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT));
-        mAudioManager.registerRemoteControlClient(mRemoteControlClient);
+
+        try {
+            mAudioManager.registerRemoteControlClient(mRemoteControlClient);
+        } catch (Throwable t) {
+            // seems like this doesn't work on some devices where it requires MODIFY_PHONE_STATE
+            // which is a permission only given to system apps, not third party apps.
+        }
 
         // Flags for the media transport control that this client supports.
         int flags = RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
