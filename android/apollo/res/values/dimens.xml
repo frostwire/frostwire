@@ -86,7 +86,7 @@
     <dimen name="audio_player_header_padding_left">16.0dip</dimen>
     <dimen name="audio_player_header_padding_right">16.0dip</dimen>
     <dimen name="audio_player_switch_padding">10.0dip</dimen>
-    <dimen name="audio_player_time_width">52.0dip</dimen>
+    <dimen name="audio_player_time_width">56.0dip</dimen>
     <dimen name="audio_player_seek_bar_margin_bottom">2.0dip</dimen>
     <dimen name="audio_player_controls_end_button_width">50.0dip</dimen>
     <dimen name="audio_player_controls_end_button_height">50.0dip</dimen>

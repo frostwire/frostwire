@@ -123,20 +123,6 @@
                 android:layout_alignTop="@+id/audio_player_album_art"
                 android:background="@drawable/layout_divider_1_gray" />
 
-            <!--<ImageView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/shadow_height"
-                android:layout_alignTop="@+id/audio_player_album_art"
-                android:contentDescription="@null"
-                android:src="@drawable/top_shadow" />
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/shadow_height"
-                android:layout_alignBottom="@+id/audio_player_album_art"
-                android:contentDescription="@null"
-                android:src="@drawable/bottom_shadow" />-->
-
             <FrameLayout
                 android:id="@+id/audio_player_pager_container"
                 android:layout_width="match_parent"
@@ -162,19 +148,6 @@
                     android:layout_gravity="bottom"
                     android:background="@drawable/layout_divider_1_gray" />
 
-                <!--<ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/shadow_height"
-                    android:layout_gravity="top"
-                    android:contentDescription="@null"
-                    android:src="@drawable/top_shadow" />
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/shadow_height"
-                    android:layout_gravity="bottom"
-                    android:contentDescription="@null"
-                    android:src="@drawable/bottom_shadow" />-->
             </FrameLayout>
         </RelativeLayout>
 
