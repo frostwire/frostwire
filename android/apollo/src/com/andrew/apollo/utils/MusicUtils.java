@@ -1470,7 +1470,9 @@ public final class MusicUtils {
      */
     public static void clearQueue() {
         try {
-            musicPlaybackService.removeTracks(0, Integer.MAX_VALUE);
+            if (musicPlaybackService != null) {
+                musicPlaybackService.removeTracks(0, Integer.MAX_VALUE);
+            }
         } catch (final RemoteException ignored) {
         }
     }
