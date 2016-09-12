@@ -41,11 +41,11 @@ import com.limegroup.gnutella.util.FrostWireUtils;
 /**
  * Reads an update.xml file from frostwire.com The update xml file can also come
  * with special announcements for the community.
- * 
+ * <p>
  * The correct syntax of the update.xml file should be as follows: <update
  * time="${server_time_here}" version="${update_manager_version}"
  * buyUrl="${proxy_buy_url}" />
- * 
+ * <p>
  * <message type="{update | announcement | overlay | hostiles }"
  * value="<text message goes here>" [version="${version_string}"] //version is
  * mandatory for message type in ['update','hostiles'] [url="${url}"] //url is
@@ -66,11 +66,8 @@ import com.limegroup.gnutella.util.FrostWireUtils;
  * here, with tags, it doesnt matter cause its CDATA. Could be HTML if you want
  * in theory. Just dont put a ]]> in it. ]]> <!-- there can be many messages -->
  * </message> </update>
- * 
+ *
  * @author gubatron
- * 
- * 
- * 
  */
 public final class UpdateManager implements Serializable {
 
@@ -80,12 +77,8 @@ public final class UpdateManager implements Serializable {
 
     transient private static HashSet<UpdateMessage> _seenMessages;
 
-    transient UpdateMessage _updateMessage = null;
-    transient HashSet<UpdateMessage> _announcements = null;
-
     /**
      * Starts an Update Task in <secondsAfter> seconds after.
-     * 
      */
     public static void scheduleUpdateCheckTask(final int secondsAfter, final String updateURL, final boolean force) {
 
@@ -110,11 +103,11 @@ public final class UpdateManager implements Serializable {
 
         new Thread(checkForUpdatesTask).start();
     }
-    
+
     /**
      * Starts an Update Task in <secondsAfter> seconds after at a custom update
      * URL
-     * 
+     *
      * @param secondsAfter
      */
     public static void scheduleUpdateCheckTask(int secondsAfter) {
@@ -124,15 +117,17 @@ public final class UpdateManager implements Serializable {
     /**
      * Starts an Update Task in <secondsAfter> seconds after at a custom update
      * URL
-     * 
+     *
      * @param secondsAfter
-     * @param force (force the update download)
+     * @param force        (force the update download)
      */
     public static void scheduleUpdateCheckTask(int secondsAfter, boolean force) {
         scheduleUpdateCheckTask(secondsAfter, null, force);
     }
 
-    /** The singleton instance */
+    /**
+     * The singleton instance
+     */
     private static UpdateManager INSTANCE = null;
 
     // Time on the server for when we last checked the updates.
@@ -194,18 +189,18 @@ public final class UpdateManager implements Serializable {
      * Depending on what operating system and how the message looks it can either
      * tell the user to go to FrostWire and download an update or it can start
      * downloading FrostWire via BitTorrent silently using an InstallerUpdater.
-     * 
+     * <p>
      * The user will only be notified that a FrostWire installer has already been downloaded
      * only right after startup, meaning InstallerUpdater will finish the download and not say anything
      * to not interrupt the user's activity and not tempt the user to restart.
-     * 
+     * <p>
      * Currently BitTorrent Updates are supported on Windows, Debian and Ubuntu.
-     * 
+     *
      * @param umr
      */
     private void handlePossibleUpdateMessage(UpdateMessageReader umr, boolean force) {
         UpdateMessage updateMessage = umr.getUpdateMessage();
-        
+
         if (updateMessage != null) {
             UpdateMediator.instance().setUpdateMessage(updateMessage);
         }
@@ -215,17 +210,17 @@ public final class UpdateManager implements Serializable {
 
         // attempt to show system Update Message if needed
         if (umr.hasUpdateMessage() && updateMessage.getVersion() != null && !updateMessage.getVersion().trim().equals("")
-	    && (forceUpdateMessage || UpdateManager.isFrostWireOld(updateMessage.getVersion()))) {
+                && (forceUpdateMessage || UpdateManager.isFrostWireOld(updateMessage.getVersion()))) {
 
             boolean hasUrl = updateMessage.getUrl() != null;
             boolean hasTorrent = updateMessage.getTorrent() != null;
             boolean hasInstallerUrl = updateMessage.getInstallerUrl() != null;
 
-	    if (forceUpdateMessage) {
-               System.out.println("FROSTWIRE_FORCE_UPDATE_MESSAGE env found, testing update message. (turn off with `unset FROSTWIRE_FORCE_UPDATE_MESSAGE`)");
+            if (forceUpdateMessage) {
+                System.out.println("FROSTWIRE_FORCE_UPDATE_MESSAGE env found, testing update message. (turn off with `unset FROSTWIRE_FORCE_UPDATE_MESSAGE`)");
             }
 
-	    
+
             // Logic for Windows or Mac Update
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
                 if (hasUrl && !hasTorrent && !hasInstallerUrl) {
@@ -252,7 +247,7 @@ public final class UpdateManager implements Serializable {
     /**
      * Given an update message, it checks the frostwire version on it, if we
      * have a lower version, then we show the message.
-     * 
+     *
      * @param msg
      */
     public void showUpdateMessage(final UpdateMessage msg) {
@@ -297,7 +292,7 @@ public final class UpdateManager implements Serializable {
 
     /**
      * Given announcements it will show them.
-     * 
+     *
      * @param announcements
      */
     public void attemptShowAnnouncements(HashSet<UpdateMessage> announcements) {
@@ -403,14 +398,14 @@ public final class UpdateManager implements Serializable {
     /**
      * Given a version string, it compares against the current frostwire
      * version. If frostwire is old, it will return true.
-     * 
+     * <p>
      * A valid version string looks like this: "MAJOR.RELEASE.SERVICE"
-     * 
+     * <p>
      * 4.13.1 4.13.2 ... 4.13.134
-     * 
+     * <p>
      * It will compare each number of the current version to the version
      * published by the update message.
-     * 
+     *
      * @param messageVersion
      */
     public static boolean isFrostWireOld(String messageVersion) {
@@ -470,7 +465,7 @@ public final class UpdateManager implements Serializable {
 
     /**
      * Starts a torrent download
-     * 
+     *
      * @param uriStr
      */
     public static void openTorrent(String uriStr) {
