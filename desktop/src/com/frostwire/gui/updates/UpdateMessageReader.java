@@ -265,7 +265,7 @@ final class UpdateMessageReader implements ContentHandler {
         if (msg.getVersion() == null || msg.getMessageType().equalsIgnoreCase("update"))
             return true;
 
-        return !UpdateManager.isFrostWireOld(msg.getVersion());
+        return !UpdateManager.isFrostWireOld(msg);
     }
 
     /**
