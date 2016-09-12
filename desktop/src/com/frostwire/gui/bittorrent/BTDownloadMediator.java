@@ -613,7 +613,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         GUIMediator.safeInvokeLater(new Runnable() {
             public void run() {
                 try {
-                    BTEngine.getInstance().download(torrentFile, saveDir);
+                    BTEngine.getInstance().download(torrentFile, saveDir, null);
                 } catch (Throwable e) {
                     e.printStackTrace();
                     if (!e.toString().contains("No files selected by user")) {

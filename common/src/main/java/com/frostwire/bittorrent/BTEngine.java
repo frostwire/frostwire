@@ -203,7 +203,7 @@ public final class BTEngine extends SessionManager {
         super.moveStorage(dataDir);
     }
 
-    public void loadSettings() {
+    private void loadSettings() {
         if (session == null) {
             return;
         }
@@ -226,7 +226,7 @@ public final class BTEngine extends SessionManager {
         saveSettings();
     }
 
-    public void saveSettings() {
+    private void saveSettings() {
         if (session == null) {
             return;
         }
@@ -268,10 +268,6 @@ public final class BTEngine extends SessionManager {
         }
 
         applySettings(sp);
-    }
-
-    public void download(File torrent, File saveDir) {
-        download(torrent, saveDir, null);
     }
 
     public void download(File torrent, File saveDir, boolean[] selection) {

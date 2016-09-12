@@ -322,7 +322,7 @@ public final class TransferManager {
 
             if (fetcherListener == null) {
                 if (u.getScheme().equalsIgnoreCase("file")) {
-                    BTEngine.getInstance().download(new File(u.getPath()), null);
+                    BTEngine.getInstance().download(new File(u.getPath()), null, null);
                 } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https") || u.getScheme().equalsIgnoreCase("magnet")) {
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()));
                     bittorrentDownloads.add(download);
