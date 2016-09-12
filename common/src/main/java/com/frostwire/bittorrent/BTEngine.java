@@ -750,58 +750,9 @@ public final class BTEngine extends SessionManager {
                 th.resume();
             }
         } else { // new download
-            addTorrentSupport(ti, saveDir, resumeFile, priorities, magnetUrlParams);
+            download(ti, saveDir, resumeFile, priorities, magnetUrlParams);
             //session.asyncAddTorrent(ti, saveDir, priorities, resumeFile);
         }
-    }
-
-    private void addTorrentSupport(TorrentInfo ti, File saveDir, File resumeFile, Priority[] priorities, String magnetUrlParams) {
-
-        String savePath = null;
-        if (saveDir != null) {
-            savePath = saveDir.getAbsolutePath();
-        } else if (resumeFile == null) {
-            throw new IllegalArgumentException("Both saveDir and resumeFile can't be null at the same time");
-        }
-
-        add_torrent_params p = add_torrent_params.create_instance();
-
-        if (magnetUrlParams != null && !magnetUrlParams.isEmpty()) {
-            p.setUrl(magnetUrlParams);
-        }
-
-        p.set_ti(ti.swig());
-        if (savePath != null) {
-            p.setSave_path(savePath);
-        }
-
-        if (priorities != null) {
-            byte_vector v = new byte_vector();
-            for (int i = 0; i < priorities.length; i++) {
-                v.push_back((byte) priorities[i].swig());
-            }
-            p.set_file_priorities(v);
-        }
-        p.setStorage_mode(storage_mode_t.storage_mode_sparse);
-
-        long flags = p.get_flags();
-
-        flags &= ~add_torrent_params.flags_t.flag_auto_managed.swigValue();
-
-        if (resumeFile != null) {
-            try {
-                byte[] data = FileUtils.readFileToByteArray(resumeFile);
-                p.set_resume_data(Vectors.bytes2byte_vector(data));
-
-                flags |= add_torrent_params.flags_t.flag_use_resume_save_path.swigValue();
-            } catch (Throwable e) {
-                LOGGER.warn("Unable to set resume data", e);
-            }
-        }
-
-        p.set_flags(flags);
-
-        session.swig().async_add_torrent(p);
     }
 
     // this is here until we have a properly done OS utils.

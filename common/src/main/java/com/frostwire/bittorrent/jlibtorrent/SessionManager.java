@@ -3,6 +3,7 @@ package com.frostwire.bittorrent.jlibtorrent;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.*;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.net.*;
@@ -498,7 +499,56 @@ public class SessionManager {
      * @param saveDir
      */
     public void download(TorrentInfo ti, File saveDir) {
-        download(ti, saveDir, null, null, null);
+        download(ti, saveDir, null, null, (List<TcpEndpoint>) null);
+    }
+
+    public void download(TorrentInfo ti, File saveDir, File resumeFile, Priority[] priorities, String magnetUrlParams) {
+
+        String savePath = null;
+        if (saveDir != null) {
+            savePath = saveDir.getAbsolutePath();
+        } else if (resumeFile == null) {
+            throw new IllegalArgumentException("Both saveDir and resumeFile can't be null at the same time");
+        }
+
+        add_torrent_params p = add_torrent_params.create_instance();
+
+        if (magnetUrlParams != null && !magnetUrlParams.isEmpty()) {
+            p.setUrl(magnetUrlParams);
+        }
+
+        p.set_ti(ti.swig());
+        if (savePath != null) {
+            p.setSave_path(savePath);
+        }
+
+        if (priorities != null) {
+            byte_vector v = new byte_vector();
+            for (int i = 0; i < priorities.length; i++) {
+                v.push_back((byte) priorities[i].swig());
+            }
+            p.set_file_priorities(v);
+        }
+        p.setStorage_mode(storage_mode_t.storage_mode_sparse);
+
+        long flags = p.get_flags();
+
+        flags &= ~add_torrent_params.flags_t.flag_auto_managed.swigValue();
+
+        if (resumeFile != null) {
+            try {
+                byte[] data = FileUtils.readFileToByteArray(resumeFile);
+                p.set_resume_data(Vectors.bytes2byte_vector(data));
+
+                flags |= add_torrent_params.flags_t.flag_use_resume_save_path.swigValue();
+            } catch (Throwable e) {
+                LOG.warn("Unable to set resume data", e);
+            }
+        }
+
+        p.set_flags(flags);
+
+        session.async_add_torrent(p);
     }
 
     public void remove(TorrentHandle th, Session.Options options) {
