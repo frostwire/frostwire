@@ -284,7 +284,7 @@ public final class BTEngine extends SessionManager {
 
         Priority[] priorities = null;
 
-        TorrentHandle th = convert(downloader.find(ti.infoHash()));
+        TorrentHandle th = find(ti.infoHash());
         boolean exists = th != null;
 
         if (selection != null) {
@@ -320,7 +320,7 @@ public final class BTEngine extends SessionManager {
 
         Priority[] priorities = null;
 
-        TorrentHandle th = convert(downloader.find(ti.infoHash()));
+        TorrentHandle th = find(ti.infoHash());
         boolean torrentHandleExists = th != null;
 
         if (selection != null) {
@@ -360,7 +360,7 @@ public final class BTEngine extends SessionManager {
         TorrentInfo ti = sr.getTorrentInfo();
         int fileIndex = sr.getFileIndex();
 
-        TorrentHandle th = convert(downloader.find(ti.infoHash()));
+        TorrentHandle th = find(ti.infoHash());
         boolean exists = th != null;
 
         if (th != null) {
@@ -583,7 +583,7 @@ public final class BTEngine extends SessionManager {
                     return;
                 }
             }
-            TorrentHandle th = convert(session.findTorrent(alert.handle().getInfoHash()));
+            TorrentHandle th = find(alert.handle().getInfoHash());
             if (th != null && th.isValid()) {
                 th.saveResumeData();
             }
@@ -606,7 +606,7 @@ public final class BTEngine extends SessionManager {
 
     private void fireDownloadAdded(TorrentAlert<?> alert) {
         try {
-            TorrentHandle th = convert(session.findTorrent(alert.handle().getInfoHash()));
+            TorrentHandle th = find(alert.handle().getInfoHash());
             BTDownload dl = new BTDownload(this, th);
             if (listener != null) {
                 listener.downloadAdded(this, dl);
@@ -734,7 +734,7 @@ public final class BTEngine extends SessionManager {
 
     public void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, String magnetUrlParams) {
 
-        TorrentHandle th = convert(session.findTorrent(ti.infoHash()));
+        TorrentHandle th = find(ti.infoHash());
 
         if (th != null) {
             // found a download with the same hash, just adjust the priorities if needed
@@ -930,9 +930,5 @@ public final class BTEngine extends SessionManager {
         protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
             return size() > maxSize;
         }
-    }
-
-    private TorrentHandle convert(com.frostwire.jlibtorrent.TorrentHandle th) {
-        return th != null ? new TorrentHandle(th.swig()) : null;
     }
 }

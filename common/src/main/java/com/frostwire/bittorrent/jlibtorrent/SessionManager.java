@@ -396,6 +396,15 @@ public class SessionManager {
         applySettings(sp);
     }
 
+    public TorrentHandle find(Sha1Hash sha1) {
+        if (session == null) {
+            return null;
+        }
+
+        torrent_handle th = session.find_torrent(sha1.swig());
+        return th != null && th.is_valid() ? new TorrentHandle(th) : null;
+    }
+
     /**
      * @param ti
      * @param saveDir
