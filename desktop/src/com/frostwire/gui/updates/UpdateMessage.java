@@ -15,13 +15,13 @@
 
 package com.frostwire.gui.updates;
 
+import com.limegroup.gnutella.settings.ApplicationSettings;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Date;
-
-import com.limegroup.gnutella.settings.ApplicationSettings;
 
 /** POJO to represent an UpdateMessage. */
 public final class UpdateMessage extends Object implements Serializable {
@@ -34,6 +34,7 @@ public final class UpdateMessage extends Object implements Serializable {
 
     private String _messageType; //update | announcement | overlay | hostiles | chat_server
     private String _version = null;
+    private String build = null;
     private Date _expiration = null; //only needed for messageType == "announcement"
     private String _torrent = null; //optional torrent url
     private String installerUrl; // optional installer url
@@ -159,11 +160,26 @@ public final class UpdateMessage extends Object implements Serializable {
     }
 
     public String getVersion() { 
-        if (_version != null && _version.equals(""))
+        if (_version != null && _version.equals("")) {
             _version = null;
+        }
         return _version; 
     }
+
     public void setVersion(String v) { _version = v; }
+
+    public String getBuild() {
+        if (build != null && build.equals("")) {
+            build = null;
+        }
+        return build;
+    }
+
+    public void setBuild(String b) {
+        build = b;
+    }
+
+
 
     public boolean isShownOnce() { return _showOnce.equalsIgnoreCase("true"); }
     public void setShowOnce(String s) {
@@ -217,6 +233,7 @@ public final class UpdateMessage extends Object implements Serializable {
         s.append("_url : " + getUrl() + ", \n");
         s.append("_messageType : " + getMessageType() + ", \n");
         s.append("_version : " + getVersion() + ", \n");
+        s.append("build : " + getBuild() + ", \n");
         s.append("_expiration : " + String.valueOf(getExpiration()) + ", \n");
         s.append("_torrent : " + getTorrent() + ", \n");
         s.append("installerUrl : " + getInstallerUrl() + ", \n");
