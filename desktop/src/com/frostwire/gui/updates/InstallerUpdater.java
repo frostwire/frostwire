@@ -335,21 +335,8 @@ public class InstallerUpdater implements Runnable {
             return false;
         }
 
-        String installerFilename = null;
-
-        if (_updateMessage.getTorrent() != null) {
-            int indx1 = _updateMessage.getTorrent().lastIndexOf('/') + 1;
-            int indx2 = _updateMessage.getTorrent().lastIndexOf(".torrent");
-
-            installerFilename = _updateMessage.getTorrent().substring(indx1, indx2);
-        } else if (_updateMessage.getInstallerUrl() != null) {
-            int indx1 = _updateMessage.getInstallerUrl().lastIndexOf('/') + 1;
-
-            installerFilename = _updateMessage.getInstallerUrl().substring(indx1);
-        }
-
+        String installerFilename = UpdateMediator.getInstallerFilename(_updateMessage);
         File f = new File(UpdateSettings.UPDATES_DIR, installerFilename);
-
         if (installerFilename == null || !f.exists()) {
             return false;
         }

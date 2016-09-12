@@ -7,8 +7,9 @@ frostwire (6.3.6) stable; urgency=high
     FrostWire window, and centered relative to it.
   * Fixes bug in media player where share button wasn't hidden when playback
     stopped.
+  * Support for build number based updates (not just version numbers)
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 7 Sep 2016 15:46:28 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 12 Sep 2016 17:17:00 -0600
 
 
 frostwire (6.3.5) stable; urgency=high

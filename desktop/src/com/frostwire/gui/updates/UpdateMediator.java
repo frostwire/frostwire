@@ -56,7 +56,7 @@ public final class UpdateMediator {
     }
 
     public boolean isUpdated() {
-        return latestMsg != null && latestMsg.getVersion() != null && !latestMsg.getVersion().trim().equals("") && !UpdateManager.isFrostWireOld(latestMsg.getVersion());
+        return latestMsg != null && latestMsg.getVersion() != null && !latestMsg.getVersion().trim().equals("") && !UpdateManager.isFrostWireOld(latestMsg);
     }
 
     public String getLatestVersion() {
@@ -71,47 +71,39 @@ public final class UpdateMediator {
         if (latestMsg == null) {
             return false;
         }
-
         String lastMD5 = InstallerUpdater.getLastMD5();
-
-        if (lastMD5 == null) {
-            return false;
-        }
-
-        return lastMD5.equalsIgnoreCase(latestMsg.getRemoteMD5().trim());
+        return lastMD5 != null && lastMD5.equalsIgnoreCase(latestMsg.getRemoteMD5().trim());
     }
 
-    public File getUpdateBinaryFile() {
+    private File getUpdateBinaryFile() {
         try {
             if (latestMsg == null) {
                 return null;
             }
-
-            String installerFilename = null;
-
-            if (latestMsg.getTorrent() != null) {
-                int indx1 = latestMsg.getTorrent().lastIndexOf('/') + 1;
-                int indx2 = latestMsg.getTorrent().lastIndexOf(".torrent");
-
-                installerFilename = latestMsg.getTorrent().substring(indx1, indx2);
-            } else if (latestMsg.getInstallerUrl() != null) {
-                int indx1 = latestMsg.getInstallerUrl().lastIndexOf('/') + 1;
-
-                installerFilename = latestMsg.getInstallerUrl().substring(indx1);
-            }
-
+            String installerFilename = getInstallerFilename(latestMsg);
             File f = new File(UpdateSettings.UPDATES_DIR, installerFilename);
-
             if (installerFilename == null || !f.exists()) {
                 return null;
             }
-
             return f;
         } catch (Throwable e) {
             LOG.error("Error getting update binary path", e);
         }
 
         return null;
+    }
+
+    static String getInstallerFilename(UpdateMessage message) {
+        String installerFilename = null;
+        if (message.getTorrent() != null) {
+            int index1 = message.getTorrent().lastIndexOf('/') + 1;
+            int index2 = message.getTorrent().lastIndexOf(".torrent");
+            installerFilename = message.getTorrent().substring(index1, index2);
+        } else if (message.getInstallerUrl() != null) {
+            int index1 = message.getInstallerUrl().lastIndexOf('/') + 1;
+            installerFilename = message.getInstallerUrl().substring(index1);
+        }
+        return installerFilename;
     }
 
     public void startUpdate() {

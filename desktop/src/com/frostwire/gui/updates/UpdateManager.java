@@ -15,28 +15,19 @@
 
 package com.frostwire.gui.updates;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.util.FrostWireUtils;
+import org.limewire.util.CommonUtils;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
-import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
-
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.util.FrostWireUtils;
 
 /**
  * Reads an update.xml file from frostwire.com The update xml file can also come
@@ -209,8 +200,11 @@ public final class UpdateManager implements Serializable {
         boolean forceUpdateMessage = System.getenv().get("FROSTWIRE_FORCE_UPDATE_MESSAGE") != null;
 
         // attempt to show system Update Message if needed
-        if (umr.hasUpdateMessage() && updateMessage.getVersion() != null && !updateMessage.getVersion().trim().equals("")
-                && (forceUpdateMessage || UpdateManager.isFrostWireOld(updateMessage.getVersion()))) {
+        if (umr.hasUpdateMessage()
+            &&
+            ((updateMessage.getBuild() != null && !updateMessage.getBuild().trim().equals("")) ||
+            (updateMessage.getVersion() != null && !updateMessage.getVersion().trim().equals("")))
+            && (forceUpdateMessage || UpdateManager.isFrostWireOld(updateMessage))) {
 
             boolean hasUrl = updateMessage.getUrl() != null;
             boolean hasTorrent = updateMessage.getTorrent() != null;
@@ -219,7 +213,6 @@ public final class UpdateManager implements Serializable {
             if (forceUpdateMessage) {
                 System.out.println("FROSTWIRE_FORCE_UPDATE_MESSAGE env found, testing update message. (turn off with `unset FROSTWIRE_FORCE_UPDATE_MESSAGE`)");
             }
-
 
             // Logic for Windows or Mac Update
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
@@ -395,6 +388,19 @@ public final class UpdateManager implements Serializable {
         return true;
     }
 
+    public static boolean isFrostWireOld(UpdateMessage message) {
+        if (message.getBuild() != null) {
+            try {
+                int buildNumber = Integer.parseInt(message.getBuild());
+                return buildNumber > FrostWireUtils.getBuildNumber();
+            } catch (Throwable t) {
+                System.err.println("UpdateManager::isFrostWireOld() invalid buildNumber ('"+message.getBuild()+"'), falling back to version check");
+                t.printStackTrace();
+            }
+        }
+        return isFrostWireOld(message.getVersion());
+    }
+
     /**
      * Given a version string, it compares against the current frostwire
      * version. If frostwire is old, it will return true.
@@ -408,7 +414,7 @@ public final class UpdateManager implements Serializable {
      *
      * @param messageVersion
      */
-    public static boolean isFrostWireOld(String messageVersion) {
+    private static boolean isFrostWireOld(String messageVersion) {
         // if there's nothing to compare with, then FrostWire shouldn't be old
         // for it.
         if (messageVersion == null)
