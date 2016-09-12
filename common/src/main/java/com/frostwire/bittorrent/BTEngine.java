@@ -64,7 +64,6 @@ public final class BTEngine extends SessionManager {
     private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
 
     private Session session;
-    private Downloader downloader;
     private BTEngineListener listener;
 
     private static final LruCache<String, byte[]> MAGNET_CACHE = new LruCache<String, byte[]>(50);
@@ -141,7 +140,6 @@ public final class BTEngine extends SessionManager {
 
             session = new Session(ctx.interfaces, ctx.retries, false, innerListener);
             super.session = (session) this.session.swig();
-            downloader = new Downloader(session);
             loadSettings();
             fireStarted();
         } finally {
@@ -162,8 +160,6 @@ public final class BTEngine extends SessionManager {
 
             session.removeListener(innerListener);
             saveSettings();
-
-            downloader = null;
 
             super.session = null;
             session.abort();
@@ -732,7 +728,7 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    public void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, String magnetUrlParams) {
+    private void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, String magnetUrlParams) {
 
         TorrentHandle th = find(ti.infoHash());
 
@@ -754,12 +750,12 @@ public final class BTEngine extends SessionManager {
                 th.resume();
             }
         } else { // new download
-            addTorrentSupport(ti, saveDir, priorities, resumeFile, true, magnetUrlParams);
+            addTorrentSupport(ti, saveDir, resumeFile, priorities, magnetUrlParams);
             //session.asyncAddTorrent(ti, saveDir, priorities, resumeFile);
         }
     }
 
-    private TorrentHandle addTorrentSupport(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, boolean async, String magnetUrlParams) {
+    private void addTorrentSupport(TorrentInfo ti, File saveDir, File resumeFile, Priority[] priorities, String magnetUrlParams) {
 
         String savePath = null;
         if (saveDir != null) {
@@ -770,7 +766,7 @@ public final class BTEngine extends SessionManager {
 
         add_torrent_params p = add_torrent_params.create_instance();
 
-        if (magnetUrlParams != null) {
+        if (magnetUrlParams != null && !magnetUrlParams.isEmpty()) {
             p.setUrl(magnetUrlParams);
         }
 
@@ -805,14 +801,7 @@ public final class BTEngine extends SessionManager {
 
         p.set_flags(flags);
 
-        if (async) {
-            session.swig().async_add_torrent(p);
-            return null;
-        } else {
-            error_code ec = new error_code();
-            torrent_handle th = session.swig().add_torrent(p, ec);
-            return new TorrentHandle(th);
-        }
+        session.swig().async_add_torrent(p);
     }
 
     // this is here until we have a properly done OS utils.
