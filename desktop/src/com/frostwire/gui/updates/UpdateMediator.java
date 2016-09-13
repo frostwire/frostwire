@@ -24,7 +24,6 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UpdateSettings;
 import org.apache.commons.io.FilenameUtils;
-import org.limewire.util.CommonUtils;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
@@ -81,8 +80,11 @@ public final class UpdateMediator {
                 return null;
             }
             String installerFilename = getInstallerFilename(latestMsg);
+            if (installerFilename == null) {
+                return null;
+            }
             File f = new File(UpdateSettings.UPDATES_DIR, installerFilename);
-            if (installerFilename == null || !f.exists()) {
+            if (!f.exists()) {
                 return null;
             }
             return f;
@@ -118,13 +120,12 @@ public final class UpdateMediator {
         });
     }
 
-    public static void openInstallerAndShutdown(File executableFile) {
+    static void openInstallerAndShutdown(File executableFile) {
         try {
-            if (CommonUtils.isPortable()) {
-                //UpdateMediator.instance().installPortable(executableFile);
-                return; // pending refactor
-            }
-
+//            if (CommonUtils.isPortable()) {
+//                //UpdateMediator.instance().installPortable(executableFile);
+//                return; // pending refactor
+//            }
             if (OSUtils.isWindows()) {
                 String[] commands = new String[] { "CMD.EXE", "/C", executableFile.getAbsolutePath() };
                 ProcessBuilder pbuilder = new ProcessBuilder(commands);
@@ -162,7 +163,7 @@ public final class UpdateMediator {
         UpdateManager.scheduleUpdateCheckTask(0,true);
     }
 
-    public void setUpdateMessage(UpdateMessage msg) {
+    void setUpdateMessage(UpdateMessage msg) {
         this.latestMsg = msg;
     }
 
@@ -178,12 +179,12 @@ public final class UpdateMediator {
         }
     }
 
-    void installPortable(File executableFile) {
-        PortableUpdater pu = new PortableUpdater(executableFile);
-        pu.update();
-    }
+//    void installPortable(File executableFile) {
+//        PortableUpdater pu = new PortableUpdater(executableFile);
+//        pu.update();
+//    }
 
-    static void installUbuntu(File executableFile) throws IOException {
+    private static void installUbuntu(File executableFile) throws IOException {
         boolean success = tryGnomeSoftware(executableFile) || tryGdebiGtk(executableFile) || trySoftwareCenter(executableFile);
 
         if (!success) {
@@ -209,18 +210,14 @@ public final class UpdateMediator {
     
     private static boolean tryUbuntuInstallCmd(String cmd, String ... options) {
         try {
-	    int options_length = (options == null || options.length == 0) ? 0 : options.length;
-	    
+            int options_length = (options == null || options.length == 0) ? 0 : options.length;
             String[] commands = new String[1 + options_length];
-	    commands[0] = cmd;
-	    for (int i=1; i <= options_length; i++) {
-                commands[i] = options[i-1];
-	    }
-
-
+            commands[0] = cmd;
+            if (options != null) {
+                System.arraycopy(options, 0, commands, 1, options_length);
+            }
             ProcessBuilder pbuilder = new ProcessBuilder(commands);
             pbuilder.start();
-
             return true;
         } catch (Throwable e) {
 	    e.printStackTrace();
