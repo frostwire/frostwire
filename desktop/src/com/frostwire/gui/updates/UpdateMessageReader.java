@@ -83,13 +83,12 @@ final class UpdateMessageReader implements ContentHandler {
      * which message to keep for the client.
      * 
      * @see UpdateManager::updateOverlays(HashSet<UpdateMessage>,UpdateMessageReader me)
-     * @param msg
      */
     private void addOverlay(UpdateMessage msg) {
         if (msg != null && msg.getMessageType().equals("overlay")) {
 
             if (_overlays == null)
-                _overlays = new LinkedList<UpdateMessage>();
+                _overlays = new LinkedList<>();
 
             // Replace newly found intro, or after search
             // for previously added message of same nature.
@@ -165,24 +164,16 @@ final class UpdateMessageReader implements ContentHandler {
         return _announcements;
     }
 
-    public List<UpdateMessage> getOverlays() {
-        return _overlays;
-    }
-
-    public UpdateMessage getUpdateMessage() {
+    UpdateMessage getUpdateMessage() {
         return _updateMessage;
     }
 
-    public String getUpdateURL() {
+    private String getUpdateURL() {
         return _updateURL;
     }
 
-    public boolean hasAnnouncements() {
+    boolean hasAnnouncements() {
         return _announcements != null && _announcements.size() > 0;
-    }
-
-    public boolean hasOverlays() {
-        return _overlays != null && _overlays.size() > 0;
     }
 
     boolean hasUpdateMessage() {
@@ -201,8 +192,6 @@ final class UpdateMessageReader implements ContentHandler {
      * 
      * If you want a full blown validation use isMessageForMe()
      * 
-     * @param msg
-     * @return
      */
     private boolean isMessageEligibleForMyLang(UpdateMessage msg) {
         String langinmsg = msg.getLanguage(); // current language in message
@@ -227,12 +216,9 @@ final class UpdateMessageReader implements ContentHandler {
 
     /**
      * Checks if this message should be shown for the OS on which this FrostWire
-     * is runnning on.
+     * is running on.
      * 
      * If you want a full blown validation use isMessageForMe()
-     * 
-     * @param msg
-     * @return
      */
     private boolean isMessageEligibleForMyOs(UpdateMessage msg) {
         if (msg.getOs() == null)
@@ -257,15 +243,11 @@ final class UpdateMessageReader implements ContentHandler {
      * to use the version in it to see if we have to update or not.
      * 
      * If you want a full blown validation use isMessageForMe()
-     * 
-     * @param msg
-     * @return
      */
     private boolean isMessageEligibleForMyVersion(UpdateMessage msg) {
-        if (msg.getVersion() == null || msg.getMessageType().equalsIgnoreCase("update"))
-            return true;
-
-        return !UpdateManager.isFrostWireOld(msg);
+        return msg.getVersion() == null ||
+               msg.getMessageType().equalsIgnoreCase("update") ||
+               !UpdateManager.isFrostWireOld(msg);
     }
 
     /**
@@ -277,9 +259,6 @@ final class UpdateMessageReader implements ContentHandler {
      * 
      * If the message is an announcement, it cares about the version number not
      * being outdated.
-     * 
-     * @param msg
-     * @return
      */
     private boolean isMessageForMe(UpdateMessage msg) {
         if (msg == null) {
@@ -435,7 +414,7 @@ final class UpdateMessageReader implements ContentHandler {
             } // overlays
 
             if (_bufferMessage.getMessageType().equals("uxstats")) {
-                processUXStatsMsg(_bufferMessage, atts);
+                processUXStatsMsg(atts);
             }
         }
 
@@ -445,7 +424,7 @@ final class UpdateMessageReader implements ContentHandler {
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
     }
 
-    private void processUXStatsMsg(UpdateMessage msg, Attributes atts) {
+    private void processUXStatsMsg(Attributes atts) {
         try {
             String enabled = atts.getValue("enabled");
 
