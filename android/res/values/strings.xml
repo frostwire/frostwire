@@ -514,7 +514,6 @@
     <string name="help_translate_frostwire">Help translate FrostWire</string>
     <string name="finishing">Finishing</string>
     <string name="scanning">Finishing - Scanning</string>
-    <string name="queued_for_checking">Queued for checking</string>
     <string name="checking_ellipsis">Checking&#8230;</string>
     <string name="downloading_metadata">Downloading metadata</string>
     <string name="error_moving_incomplete">Error: Moving Incomplete</string>

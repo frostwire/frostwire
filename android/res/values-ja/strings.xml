@@ -474,7 +474,6 @@
     <string name="file_descriptor_sd_mounted">このファイルはSDカードから削除されたか、別のSDカードが挿入されています。</string>
     <string name="file_descriptor_sd_unmounted">このファイルはSDカードに格納されています。デバイスに挿入してください。</string>
     <string name="help_translate_frostwire">FrostWireの翻訳を支援する</string>
-    <string name="queued_for_checking">チェックをキューに入れました</string>
     <string name="checking_ellipsis">チェック中&#8230;</string>
     <string name="downloading_metadata">メタデータのダウンロード中</string>
     <string name="error_moving_incomplete">エラー: 移動が未完了</string>

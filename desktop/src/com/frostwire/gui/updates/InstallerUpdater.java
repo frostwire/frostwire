@@ -20,6 +20,7 @@ package com.frostwire.gui.updates;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.jlibtorrent.TorrentHandle;
+import com.frostwire.bittorrent.jlibtorrent.TorrentStatus;
 import com.frostwire.gui.DigestUtils;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.Alert;
@@ -230,11 +231,11 @@ public class InstallerUpdater implements Runnable {
                     switch (type) {
                         case FILE_ERROR:
                         case PIECE_FINISHED:
-                            onStateChanged(th, th.status().getState());
+                            onStateChanged(th, th.status().state());
                             break;
                         case TORRENT_FINISHED:
                             BTEngine.getInstance().removeListener(this);
-                            onStateChanged(th, th.status().getState());
+                            onStateChanged(th, th.status().state());
                             downloadComplete(th);
                             break;
                     }
@@ -392,7 +393,7 @@ public class InstallerUpdater implements Runnable {
 
         } else if (state == TorrentStatus.State.DOWNLOADING) {
             System.out.println("stateChanged(STATE_DOWNLOADING)");
-            downloadProgress = (int) (_manager.status().getProgress() * 100);
+            downloadProgress = (int) (_manager.status().progress() * 100);
         } /*else if (state == DownloadManager.STATE_READY || state == TorrentStatus.State.STATE_QUEUED) {
             System.out.println("stateChanged(STATE_READY)");
             manager.startDownload();
@@ -512,20 +513,20 @@ public class InstallerUpdater implements Runnable {
 
         TorrentStatus stats = manager.status();
 
-        buf.append(stats.getProgress());
+        buf.append(stats.progress());
         buf.append('%');
         buf.append(" Seeds:");
-        buf.append(stats.getNumSeeds());
+        buf.append(stats.numSeeds());
         buf.append(" Peers:");
-        buf.append(stats.getNumPeers());
+        buf.append(stats.numPeers());
         buf.append(" Downloaded:");
-        buf.append(stats.getTotalDone());
+        buf.append(stats.totalDone());
         buf.append(" Uploaded:");
         buf.append(stats.totalUpload());
         buf.append(" DSpeed:");
-        buf.append(stats.getDownloadRate());
+        buf.append(stats.downloadRate());
         buf.append(" USpeed:");
-        buf.append(stats.getUploadRate());
+        buf.append(stats.uploadRate());
         //buf.append(" TrackerStatus:");
         //buf.append(manager.getTrackerStatus());
         while (buf.length() < 80) {

@@ -18,6 +18,9 @@
 
 package com.frostwire.bittorrent;
 
+import com.frostwire.bittorrent.jlibtorrent.PiecesTracker;
+import com.frostwire.bittorrent.jlibtorrent.TorrentHandle;
+import com.frostwire.bittorrent.jlibtorrent.TorrentStatus;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.entry;
@@ -30,8 +33,6 @@ import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import com.frostwire.bittorrent.jlibtorrent.TorrentHandle;
-import com.frostwire.bittorrent.jlibtorrent.PiecesTracker;
 
 import java.io.File;
 import java.util.*;
@@ -78,7 +79,7 @@ public final class BTDownload implements BittorrentDownload {
         this.engine = engine;
         this.th = th;
         this.savePath = new File(th.getSavePath());
-        this.created = new Date(th.status().getAddedTime());
+        this.created = new Date(th.status().addedTime());
         TorrentInfo ti = th.torrentFile();
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
         this.parts = ti != null ? new File(savePath, "." + ti.infoHash() + ".parts") : null;
@@ -166,11 +167,9 @@ public final class BTDownload implements BittorrentDownload {
             return TransferState.SEEDING;
         }
 
-        final TorrentStatus.State state = status.getState();
+        final TorrentStatus.State state = status.state();
 
         switch (state) {
-            case QUEUED_FOR_CHECKING:
-                return TransferState.QUEUED_FOR_CHECKING;
             case CHECKING_FILES:
                 return TransferState.CHECKING;
             case DOWNLOADING_METADATA:
@@ -225,13 +224,13 @@ public final class BTDownload implements BittorrentDownload {
             //perform sha1Hash check
         //}
 
-        float fp = th.status().getProgress();
+        float fp = th.status().progress();
 
         if (Float.compare(fp, 1f) == 0) {
             return 100;
         }
 
-        int p = (int) (th.status().getProgress() * 100);
+        int p = (int) (th.status().progress() * 100);
         return Math.min(p, 100);
     }
 
@@ -245,7 +244,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public long getTotalBytesReceived() {
-        return th.status().getAllTimeDownload();
+        return th.status().allTimeDownload();
     }
 
     public long getBytesSent() {
@@ -253,15 +252,15 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public long getTotalBytesSent() {
-        return th.status().getAllTimeUpload();
+        return th.status().allTimeUpload();
     }
 
     public long getDownloadSpeed() {
-        return (isFinished() || isPaused() || isSeeding()) ? 0 : th.status().getDownloadPayloadRate();
+        return (isFinished() || isPaused() || isSeeding()) ? 0 : th.status().downloadPayloadRate();
     }
 
     public long getUploadSpeed() {
-        return ((isFinished() && !isSeeding()) || isPaused()) ? 0 : th.status().getUploadPayloadRate();
+        return ((isFinished() && !isSeeding()) || isPaused()) ? 0 : th.status().uploadPayloadRate();
     }
 
     @Override
@@ -270,19 +269,19 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public int getConnectedPeers() {
-        return th.status().getNumPeers();
+        return th.status().numPeers();
     }
 
     public int getTotalPeers() {
-        return th.status().getListPeers();
+        return th.status().listPeers();
     }
 
     public int getConnectedSeeds() {
-        return th.status().getNumSeeds();
+        return th.status().numSeeds();
     }
 
     public int getTotalSeeds() {
-        return th.status().getListSeeds();
+        return th.status().listSeeds();
     }
 
     @Override
@@ -319,8 +318,8 @@ public final class BTDownload implements BittorrentDownload {
         }
 
         TorrentStatus status = th.status();
-        long left = ti.totalSize() - status.getTotalDone();
-        long rate = status.getDownloadPayloadRate();
+        long left = ti.totalSize() - status.totalDone();
+        long rate = status.downloadPayloadRate();
 
         if (left <= 0) {
             return 0;

@@ -477,7 +477,6 @@
     <string name="pausing">Pausando</string>
     <string name="my_music">Mi Música</string>
     <string name="error_moving_incomplete">Error: Moviendo incompleto</string>
-    <string name="queued_for_checking">En cola para chequear</string>
     <string name="yes_no_cancel_transfer_question_cloud">¿Estás seguro que quieres detener y remover esta descarga de la lista?</string>
     <string name="free_download">Descarga Gratis</string>
     <string name="couldnt_share_file">No se pudo compartir el archivo. Trayectoria extraña.</string>
