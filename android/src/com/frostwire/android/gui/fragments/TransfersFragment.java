@@ -49,8 +49,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
-import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.Session;
 import com.frostwire.transfers.*;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -66,7 +64,6 @@ import java.util.*;
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
-    private static final int UI_UPDATE_INTERVAL_IN_SECS = 2;
     private final Comparator<Transfer> transferComparator;
     private final ButtonAddTransferListener buttonAddTransferListener;
     private final ButtonMenuListener buttonMenuListener;
