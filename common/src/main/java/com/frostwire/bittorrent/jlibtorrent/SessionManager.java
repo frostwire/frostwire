@@ -603,11 +603,10 @@ public class SessionManager {
 
                 if (type.equals(AlertType.METADATA_RECEIVED)) {
                     MetadataReceivedAlert a = ((MetadataReceivedAlert) alert);
-                    // REVIEW JLIBTORRENT
-                    int size = 0;//a.metadataSize();
-                    if (size <= maxSize) {
-                        // REVIEW JLIBTORRENT
-                        data[0] = null;//a.torrentData();
+                    byte[] arr = torrentData(a);
+                    int size = arr != null ? arr.length : -1;
+                    if (0 < size && size <= maxSize) {
+                        data[0] = arr;
                     }
                 }
 
@@ -986,5 +985,28 @@ public class SessionManager {
         }
 
         return v;
+    }
+
+    public byte[] torrentData(MetadataReceivedAlert alert) {
+        try {
+            torrent_handle th = alert.swig().getHandle();
+            if (th == null || !th.is_valid()) {
+                return null;
+            }
+
+            torrent_info ti = th.get_torrent_copy();
+            if (ti == null || !ti.is_valid()) {
+                return null;
+            }
+
+            create_torrent ct = new create_torrent(ti);
+            entry e = ct.generate();
+
+            return Vectors.byte_vector2bytes(e.bencode());
+
+        } catch (Throwable e) {
+            LOG.error("Error building torrent data from metadata", e);
+            return null;
+        }
     }
 }
