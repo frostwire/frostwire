@@ -44,7 +44,7 @@ import static com.frostwire.jlibtorrent.alerts.AlertType.*;
  */
 public final class BTEngine extends SessionManager {
 
-    private static final Logger LOGGER = Logger.getLogger(BTEngine.class);
+    private static final Logger LOG = Logger.getLogger(BTEngine.class);
 
     private static final int[] INNER_LISTENER_TYPES = new int[]{TORRENT_ADDED.swig(),
             PIECE_FINISHED.swig(),
@@ -148,7 +148,7 @@ public final class BTEngine extends SessionManager {
                 revertToDefaultConfiguration();
             }
         } catch (Throwable e) {
-            LOGGER.error("Error loading session state", e);
+            LOG.error("Error loading session state", e);
         }
     }
 
@@ -166,7 +166,7 @@ public final class BTEngine extends SessionManager {
             byte[] data = saveState();
             FileUtils.writeByteArrayToFile(settingsFile(), data);
         } catch (Throwable e) {
-            LOGGER.error("Error saving session state", e);
+            LOG.error("Error saving session state", e);
         }
     }
 
@@ -318,7 +318,7 @@ public final class BTEngine extends SessionManager {
         }
 
         if (ctx.homeDir == null || !ctx.homeDir.exists()) {
-            LOGGER.warn("Wrong setup with BTEngine home dir");
+            LOG.warn("Wrong setup with BTEngine home dir");
             return;
         }
 
@@ -338,14 +338,14 @@ public final class BTEngine extends SessionManager {
 
                         File savePath = readSavePath(infoHash);
                         if (setupSaveDir(savePath) == null) {
-                            LOGGER.warn("Can't create data dir or mount point is not accessible");
+                            LOG.warn("Can't create data dir or mount point is not accessible");
                             return;
                         }
 
                         restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
                     }
                 } catch (Throwable e) {
-                    LOGGER.error("Error restoring torrent download: " + t, e);
+                    LOG.error("Error restoring torrent download: " + t, e);
                 }
             }
         }
@@ -413,7 +413,7 @@ public final class BTEngine extends SessionManager {
             fs.scan(torrentFile);
         } catch (Throwable e) {
             torrentFile = null;
-            LOGGER.warn("Error saving torrent info to file", e);
+            LOG.warn("Error saving torrent info to file", e);
         }
 
         return torrentFile;
@@ -427,7 +427,7 @@ public final class BTEngine extends SessionManager {
             byte[] arr = Vectors.byte_vector2bytes(e.bencode());
             FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHash().toString()), arr);
         } catch (Throwable e) {
-            LOGGER.warn("Error saving resume torrent", e);
+            LOG.warn("Error saving resume torrent", e);
         }
     }
 
@@ -444,7 +444,7 @@ public final class BTEngine extends SessionManager {
                 th.saveResumeData();
             }
         } catch (Throwable e) {
-            LOGGER.warn("Error triggering resume data", e);
+            LOG.warn("Error triggering resume data", e);
         }
     }
 
@@ -468,7 +468,7 @@ public final class BTEngine extends SessionManager {
                 listener.downloadAdded(this, dl);
             }
         } catch (Throwable e) {
-            LOGGER.error("Unable to create and/or notify the new download", e);
+            LOG.error("Unable to create and/or notify the new download", e);
         }
     }
 
@@ -479,7 +479,7 @@ public final class BTEngine extends SessionManager {
                 listener.downloadUpdate(this, dl);
             }
         } catch (Throwable e) {
-            LOGGER.error("Unable to notify update the a download", e);
+            LOG.error("Unable to notify update the a download", e);
         }
     }
 
@@ -487,9 +487,9 @@ public final class BTEngine extends SessionManager {
         try {
             TcpEndpoint endp = alert.getEndpoint();
             String s = "endpoint: " + endp + " type:" + alert.getSocketType();
-            LOGGER.info("Listen succeeded on " + s);
+            LOG.info("Listen succeeded on " + s);
         } catch (Throwable e) {
-            LOGGER.error("Error adding listen endpoint to internal list", e);
+            LOG.error("Error adding listen endpoint to internal list", e);
         }
     }
 
@@ -497,7 +497,7 @@ public final class BTEngine extends SessionManager {
         TcpEndpoint endp = alert.endpoint();
         String s = "endpoint: " + endp + " type:" + alert.getSocketType();
         String message = alert.getError().message();
-        LOGGER.info("Listen failed on " + s + " (error: " + message + ")");
+        LOG.info("Listen failed on " + s + " (error: " + message + ")");
     }
 
     private void migrateVuzeDownloads() {
@@ -525,19 +525,19 @@ public final class BTEngine extends SessionManager {
                         }
 
                         if (torrent.exists() && saveDir.exists()) {
-                            LOGGER.info("Restored old vuze download: " + torrent);
+                            LOG.info("Restored old vuze download: " + torrent);
                             restoreDownloadsQueue.add(new RestoreDownloadTask(torrent, saveDir, priorities, null));
                             saveResumeTorrent(torrent);
                         }
                     } catch (Throwable e) {
-                        LOGGER.error("Error restoring vuze torrent download", e);
+                        LOG.error("Error restoring vuze torrent download", e);
                     }
                 }
 
                 file.delete();
             }
         } catch (Throwable e) {
-            LOGGER.error("Error migrating old vuze downloads", e);
+            LOG.error("Error migrating old vuze downloads", e);
         }
     }
 
@@ -548,7 +548,7 @@ public final class BTEngine extends SessionManager {
             if (ctx.dataDir != null) {
                 result = ctx.dataDir;
             } else {
-                LOGGER.warn("Unable to setup save dir path, review your logic, both saveDir and ctx.dataDir are null.");
+                LOG.warn("Unable to setup save dir path, review your logic, both saveDir and ctx.dataDir are null.");
             }
         } else {
             result = saveDir;
@@ -558,12 +558,12 @@ public final class BTEngine extends SessionManager {
 
         if (result != null && !fs.isDirectory(result) && !fs.mkdirs(result)) {
             result = null;
-            LOGGER.warn("Failed to create save dir to download");
+            LOG.warn("Failed to create save dir to download");
         }
 
         if (result != null && !fs.canWrite(result)) {
             result = null;
-            LOGGER.warn("Failed to setup save dir with write access");
+            LOG.warn("Failed to setup save dir with write access");
         }
 
         return result;
@@ -655,9 +655,9 @@ public final class BTEngine extends SessionManager {
             // libtorrent perform all kind of tests
             // to avoid non usable addresses
             String address = alert.getExternalAddress().toString();
-            LOGGER.info("External IP: " + address);
+            LOG.info("External IP: " + address);
         } catch (Throwable e) {
-            LOGGER.error("Error saving reported external ip", e);
+            LOG.error("Error saving reported external ip", e);
         }
     }
 
@@ -680,7 +680,7 @@ public final class BTEngine extends SessionManager {
             try {
                 download(new TorrentInfo(torrent), saveDir, resume, priorities, (String) null);
             } catch (Throwable e) {
-                LOGGER.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
+                LOG.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
             }
         }
     }
