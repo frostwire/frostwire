@@ -35,13 +35,13 @@ public class SessionManager {
     private final ReentrantLock sync;
     private final ReentrantLock syncMagnet;
 
-    protected com.frostwire.jlibtorrent.swig.session session;
+    private session session;
 
     private final SessionStats stats;
     private long lastStatsRequestTime;
-    protected boolean firewalled;
-    protected final List<TcpEndpoint> listenEndpoints;
-    protected Address externalAddress;
+    private boolean firewalled;
+    private final List<TcpEndpoint> listenEndpoints;
+    private Address externalAddress;
 
     public SessionManager(boolean logging) {
         this.logging = logging;

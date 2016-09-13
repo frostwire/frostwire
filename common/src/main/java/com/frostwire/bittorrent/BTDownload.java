@@ -87,7 +87,7 @@ public final class BTDownload implements BittorrentDownload {
         this.paymentOptions = loadPaymentOptions(ti);
 
         this.innerListener = new InnerListener();
-        engine.session().addListener(innerListener);
+        engine.addListener(innerListener);
     }
 
     public Map<String, String> getExtra() {
@@ -403,7 +403,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     private void torrentRemoved(TorrentRemovedAlert alert) {
-        engine.session().removeListener(innerListener);
+        engine.removeListener(innerListener);
 
         if (parts != null) {
             parts.delete();

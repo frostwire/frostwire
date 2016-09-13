@@ -22,7 +22,9 @@ import com.frostwire.bittorrent.jlibtorrent.SessionManager;
 import com.frostwire.bittorrent.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
-import com.frostwire.jlibtorrent.swig.*;
+import com.frostwire.jlibtorrent.swig.entry;
+import com.frostwire.jlibtorrent.swig.settings_pack;
+import com.frostwire.jlibtorrent.swig.string_int_pair;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
@@ -33,7 +35,6 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 
@@ -47,30 +48,21 @@ public final class BTEngine extends SessionManager {
 
     private static final int[] INNER_LISTENER_TYPES = new int[]{TORRENT_ADDED.swig(),
             PIECE_FINISHED.swig(),
-            PORTMAP.swig(),
-            PORTMAP_ERROR.swig(),
             STORAGE_MOVED.swig(),
             LISTEN_SUCCEEDED.swig(),
             LISTEN_FAILED.swig(),
-            EXTERNAL_IP.swig(),
-            METADATA_RECEIVED.swig()
+            EXTERNAL_IP.swig()
     };
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
     public static BTContext ctx;
 
-    private final ReentrantLock sync;
     private final InnerListener innerListener;
     private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
 
-    private Session session;
     private BTEngineListener listener;
 
-    private static final LruCache<String, byte[]> MAGNET_CACHE = new LruCache<String, byte[]>(50);
-    private static final Object MAGNET_LOCK = new Object();
-
     private BTEngine() {
-        this.sync = new ReentrantLock();
         this.innerListener = new InnerListener();
         this.restoreDownloadsQueue = new LinkedList<>();
     }
@@ -86,10 +78,6 @@ public final class BTEngine extends SessionManager {
         return Loader.INSTANCE;
     }
 
-    public Session session() {
-        return session;
-    }
-
     public BTEngineListener getListener() {
         return listener;
     }
@@ -98,99 +86,46 @@ public final class BTEngine extends SessionManager {
         this.listener = listener;
     }
 
-    public long downloadRate() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getStats().downloadRate();
-    }
-
-    public long uploadRate() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getStats().uploadRate();
-    }
-
-    public long totalDownload() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getStats().download();
-    }
-
-    public long totalUpload() {
-        if (session == null) {
-            return 0;
-        }
-        return session.getStats().upload();
-    }
-
+    @Override
     public void start() {
-        sync.lock();
+        settings_pack sp = new settings_pack();
 
-        try {
-            if (session != null) {
-                return;
-            }
+        sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
+        sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
 
-            firewalled = true;
-            listenEndpoints.clear();
-            externalAddress = null;
-
-            session = new Session(ctx.interfaces, ctx.retries, false, innerListener);
-            super.session = (session) this.session.swig();
-            loadSettings();
-            fireStarted();
-        } finally {
-            sync.unlock();
-        }
+        super.start(new SettingsPack(sp));
     }
 
-    /**
-     * Abort and destroy the internal libtorrent session.
-     */
-    public void stop() {
-        sync.lock();
-
-        try {
-            if (session == null) {
-                return;
-            }
-
-            session.removeListener(innerListener);
-            saveSettings();
-
-            super.session = null;
-            session.abort();
-            session = null;
-
-            fireStopped();
-
-        } finally {
-            sync.unlock();
-        }
+    @Override
+    protected void onBeforeStart() {
+        addListener(innerListener);
     }
 
-    public void restart() {
-        sync.lock();
-
-        try {
-
-            stop();
-            Thread.sleep(1000); // allow some time to release native resources
-            start();
-
-        } catch (InterruptedException e) {
-            // ignore
-        } finally {
-            sync.unlock();
+    @Override
+    protected void onAfterStart() {
+        for (Pair<String, Integer> r : defaultRouters()) {
+            string_int_pair p = new string_int_pair(r.first, r.second);
+            swig().add_dht_router(p);
         }
+
+        loadSettings();
+        fireStarted();
+    }
+
+    @Override
+    protected void onBeforeStop() {
+        removeListener(innerListener);
+        saveSettings();
+    }
+
+    @Override
+    protected void onAfterStop() {
+        fireStopped();
     }
 
     @Override
     public void moveStorage(File dataDir) {
-        if (session == null) {
+        if (swig() == null) {
             return;
         }
 
@@ -200,7 +135,7 @@ public final class BTEngine extends SessionManager {
     }
 
     private void loadSettings() {
-        if (session == null) {
+        if (swig() == null) {
             return;
         }
 
@@ -223,7 +158,7 @@ public final class BTEngine extends SessionManager {
     }
 
     private void saveSettings() {
-        if (session == null) {
+        if (swig() == null) {
             return;
         }
 
@@ -236,7 +171,7 @@ public final class BTEngine extends SessionManager {
     }
 
     public void revertToDefaultConfiguration() {
-        if (session == null) {
+        if (swig() == null) {
             return;
         }
 
@@ -267,7 +202,7 @@ public final class BTEngine extends SessionManager {
     }
 
     public void download(File torrent, File saveDir, boolean[] selection) {
-        if (session == null) {
+        if (swig() == null) {
             return;
         }
 
@@ -305,7 +240,7 @@ public final class BTEngine extends SessionManager {
     }
 
     public void download(TorrentInfo ti, File saveDir, boolean[] selection, String magnetUrlParams) {
-        if (session == null) {
+        if (swig() == null) {
             return;
         }
 
@@ -344,7 +279,7 @@ public final class BTEngine extends SessionManager {
     }
 
     public void download(TorrentCrawledSearchResult sr, File saveDir) {
-        if (session == null) {
+        if (swig() == null) {
             return;
         }
 
@@ -377,83 +312,8 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    /**
-     * @param uri
-     * @param timeout in seconds
-     * @return
-     */
-    public byte[] fetchMagnet(String uri, int timeout) {
-        if (session == null) {
-            return null;
-        }
-
-        add_torrent_params p = add_torrent_params.create_instance_disabled_storage();
-        error_code ec = new error_code();
-        libtorrent.parse_magnet_uri(uri, p, ec);
-        p.setUrl(uri);
-
-        if (ec.value() != 0) {
-            throw new IllegalArgumentException(ec.message());
-        }
-
-        final sha1_hash info_hash = p.getInfo_hash();
-        String sha1 = info_hash.to_hex();
-
-        byte[] data = MAGNET_CACHE.get(sha1);
-        if (data != null) {
-            return data;
-        }
-
-        boolean add;
-        torrent_handle th;
-
-        synchronized (MAGNET_LOCK) {
-            th = session.swig().find_torrent(info_hash);
-            if (th != null && th.is_valid()) {
-                // we have a download with the same info-hash, let's wait
-                add = false;
-            } else {
-                add = true;
-            }
-
-            if (add) {
-                p.setName("fetch_magnet:" + uri);
-                p.setSave_path("fetch_magnet/" + uri);
-
-                long flags = p.get_flags();
-                flags &= ~add_torrent_params.flags_t.flag_auto_managed.swigValue();
-                p.set_flags(flags);
-
-                ec.clear();
-                th = session.swig().add_torrent(p, ec);
-                th.resume();
-            }
-        }
-
-        int n = 0;
-        do {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // ignore
-            }
-
-            data = MAGNET_CACHE.get(sha1);
-
-            n++;
-        } while (n < timeout && data == null);
-
-        synchronized (MAGNET_LOCK) {
-            if (add && th != null && th.is_valid()) {
-                session.swig().remove_torrent(th);
-            }
-        }
-
-        return data;
-    }
-
     public void restoreDownloads() {
-        if (session == null) {
+        if (swig() == null) {
             return;
         }
 
@@ -626,12 +486,6 @@ public final class BTEngine extends SessionManager {
     private void onListenSucceeded(ListenSucceededAlert alert) {
         try {
             TcpEndpoint endp = alert.getEndpoint();
-            if (alert.getSocketType() == ListenSucceededAlert.SocketType.TCP) {
-                String address = endp.address().toString();
-                int port = endp.port();
-                listenEndpoints.add(new TcpEndpoint(address, port));
-            }
-
             String s = "endpoint: " + endp + " type:" + alert.getSocketType();
             LOGGER.info("Listen succeeded on " + s);
         } catch (Throwable e) {
@@ -780,12 +634,6 @@ public final class BTEngine extends SessionManager {
                 case PIECE_FINISHED:
                     doResumeData((TorrentAlert<?>) alert, false);
                     break;
-                case PORTMAP:
-                    firewalled = false;
-                    break;
-                case PORTMAP_ERROR:
-                    firewalled = true;
-                    break;
                 case STORAGE_MOVED:
                     doResumeData((TorrentAlert<?>) alert, true);
                     break;
@@ -798,9 +646,6 @@ public final class BTEngine extends SessionManager {
                 case EXTERNAL_IP:
                     onExternalIpAlert((ExternalIpAlert) alert);
                     break;
-                case METADATA_RECEIVED:
-                    saveMagnetData((MetadataReceivedAlert) alert);
-                    break;
             }
         }
     }
@@ -810,23 +655,9 @@ public final class BTEngine extends SessionManager {
             // libtorrent perform all kind of tests
             // to avoid non usable addresses
             String address = alert.getExternalAddress().toString();
-            externalAddress = new Address(address);
-            LOGGER.info("External IP: " + externalAddress);
+            LOGGER.info("External IP: " + address);
         } catch (Throwable e) {
             LOGGER.error("Error saving reported external ip", e);
-        }
-    }
-
-    private void saveMagnetData(MetadataReceivedAlert alert) {
-        try {
-            torrent_handle th = alert.handle().swig();
-            TorrentInfo ti = new TorrentInfo(th.get_torrent_copy());
-            String sha1 = ti.infoHash().toHex();
-            byte[] data = ti.bencode();
-
-            MAGNET_CACHE.put(sha1, data);
-        } catch (Throwable e) {
-            LOGGER.error("Error in saving magnet in internal cache", e);
         }
     }
 
@@ -854,21 +685,12 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    public long dhtNodes() {
-        return session != null ? session.getStats().dhtNodes() : 0;
-    }
+    private static List<Pair<String, Integer>> defaultRouters() {
+        List<Pair<String, Integer>> list = new LinkedList<Pair<String, Integer>>();
 
-    private static final class LruCache<K, V> extends LinkedHashMap<K, V> {
+        list.add(new Pair<>("router.bittorrent.com", 6881));
+        list.add(new Pair<>("dht.transmissionbt.com", 6881));
 
-        private final int maxSize;
-
-        public LruCache(int maxSize) {
-            this.maxSize = maxSize;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-            return size() > maxSize;
-        }
+        return list;
     }
 }

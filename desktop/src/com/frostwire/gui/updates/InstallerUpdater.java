@@ -233,7 +233,7 @@ public class InstallerUpdater implements Runnable {
                             onStateChanged(th, th.status().getState());
                             break;
                         case TORRENT_FINISHED:
-                            BTEngine.getInstance().session().removeListener(this);
+                            BTEngine.getInstance().removeListener(this);
                             onStateChanged(th, th.status().getState());
                             downloadComplete(th);
                             break;
@@ -245,7 +245,7 @@ public class InstallerUpdater implements Runnable {
         };
 
         try {
-            BTEngine.getInstance().session().addListener(updateTorrentListener);
+            BTEngine.getInstance().addListener(updateTorrentListener);
             BTEngine.getInstance().download(new TorrentInfo(new File(torrentFile)),
                     new File(saveDataPath), null, null, (String) null);
         } catch (Throwable e) {

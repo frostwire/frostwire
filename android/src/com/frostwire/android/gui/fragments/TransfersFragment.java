@@ -67,7 +67,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
     private static final int UI_UPDATE_INTERVAL_IN_SECS = 2;
-    private static final int DHT_STATUS_UPDATE_INTERVAL_IN_SECS = 10;
     private final Comparator<Transfer> transferComparator;
     private final ButtonAddTransferListener buttonAddTransferListener;
     private final ButtonMenuListener buttonMenuListener;
@@ -83,7 +82,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TransferListAdapter adapter;
     private TransferStatus selectedStatus;
     private TimerSubscription subscription;
-    private int delayedDHTUpdateTimeElapsed;
     private boolean isVPNactive;
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
@@ -163,7 +161,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         int downloads = TransferManager.instance().getActiveDownloads();
         int uploads = TransferManager.instance().getActiveUploads();
 
-        delayedDHTCheck();
         updateStatusBar(sDown, sUp, downloads, uploads);
     }
 
@@ -171,33 +168,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         textDownloads.setText(downloads + " @ " + sDown);
         textUploads.setText(uploads + " @ " + sUp);
         updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
-    }
-
-    private void delayedDHTCheck() {
-        delayedDHTUpdateTimeElapsed += UI_UPDATE_INTERVAL_IN_SECS;
-        if (delayedDHTUpdateTimeElapsed >= DHT_STATUS_UPDATE_INTERVAL_IN_SECS) {
-            delayedDHTUpdateTimeElapsed = 0;
-            checkDHTPeers();
-        }
-    }
-
-    private void checkDHTPeers() {
-        try {
-            BTEngine engine = BTEngine.getInstance();
-            final Session session = engine.session();
-            if (session != null && session.isDHTRunning()) {
-                session.postDHTStats();
-                long totalDHTNodes = engine.dhtNodes();
-                if (totalDHTNodes > 0) {
-                    onCheckDHT(true, (int) totalDHTNodes);
-
-                }
-            } else {
-                onCheckDHT(false, 0);
-            }
-        } catch (Throwable e) {
-            LOG.error("Error updating DHT status in transfers", e);
-        }
     }
 
     private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
@@ -377,7 +347,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
         });
         initVPNStatusButton(v);
-        checkDHTPeers();
     }
 
     private void initVPNStatusButton(View v) {
