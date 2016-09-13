@@ -409,97 +409,9 @@ public class SessionManager {
     /**
      * @param ti
      * @param saveDir
-     * @param resumeFile
-     * @param priorities
-     */
-    public void download(TorrentInfo ti, File saveDir, File resumeFile, Priority[] priorities, List<TcpEndpoint> peers) {
-        if (session == null) {
-            return;
-        }
-
-        torrent_handle th = session.find_torrent(ti.swig().info_hash());
-
-        if (th != null && th.is_valid()) {
-            // found a download with the same hash, just adjust the priorities if needed
-            if (priorities != null) {
-                if (ti.numFiles() != priorities.length) {
-                    throw new IllegalArgumentException("priorities count should be equals to the number of files");
-                }
-                th.prioritize_files(array2int_vector(priorities));
-            } else {
-                // did they just add the entire torrent (therefore not selecting any priorities)
-                priorities = Priority.array(Priority.NORMAL, ti.numFiles());
-                th.prioritize_files(array2int_vector(priorities));
-            }
-
-            return;
-        }
-
-        if (!ti.isValid()) {
-            throw new IllegalArgumentException("torrent info not valid");
-        }
-
-        add_torrent_params p = null;
-
-        if (resumeFile != null) {
-            try {
-                // REVIEW JLIBTORRENT
-                byte[] data = null;//Files.bytes(resumeFile);
-                error_code ec = new error_code();
-                // REVIEW JLIBTORRENT
-                p = null;//add_torrent_params.read_resume_data(Vectors.bytes2byte_vector(data), ec);
-                if (ec.value() != 0) {
-                    throw new IllegalArgumentException("Unable to read the resume data: " + ec.message());
-                }
-            } catch (Throwable e) {
-                LOG.warn("Unable to set resume data", e);
-            }
-        }
-
-        if (p == null) {
-            p = add_torrent_params.create_instance();
-        }
-
-        p.set_ti(ti.swig());
-        if (saveDir != null) {
-            p.setSave_path(saveDir.getAbsolutePath());
-        }
-
-        if (priorities != null) {
-            if (ti.files().numFiles() != priorities.length) {
-                throw new IllegalArgumentException("priorities count should be equals to the number of files");
-            }
-            byte_vector v = new byte_vector();
-            for (int i = 0; i < priorities.length; i++) {
-                v.push_back((byte) priorities[i].swig());
-            }
-            p.set_file_priorities(v);
-        }
-
-        if (peers != null && !peers.isEmpty()) {
-            tcp_endpoint_vector v = new tcp_endpoint_vector();
-            for (TcpEndpoint endp : peers) {
-                v.push_back(endp.swig());
-            }
-            // REVIEW JLIBTORRENT
-            //p.setPeers(v);
-        }
-
-        long flags = p.get_flags();
-
-        flags &= ~add_torrent_params.flags_t.flag_auto_managed.swigValue();
-
-        p.set_flags(flags);
-
-        session.async_add_torrent(p);
-    }
-
-    /**
-     * @param ti
-     * @param saveDir
      */
     public void download(TorrentInfo ti, File saveDir) {
-        download(ti, saveDir, null, null, (List<TcpEndpoint>) null);
+        download(ti, saveDir, null, null, null);
     }
 
     public void download(TorrentInfo ti, File saveDir, File resumeFile, Priority[] priorities, String magnetUrlParams) {
