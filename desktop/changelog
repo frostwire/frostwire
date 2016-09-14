@@ -1,5 +1,6 @@
 frostwire (6.3.6) stable; urgency=high
   * New Search Engine: LimeTorrents
+  * New jlibtorrent 1.1.1.37 (based on libtorrent 1.1.1)
   * Fixes Monova search
   * Fixes issues opening torrent files with extension names not in lowercase.
   * Fixes upgrade bug for Ubuntu 16.04 installs w/o gdebi/software-center
@@ -9,7 +10,7 @@ frostwire (6.3.6) stable; urgency=high
     stopped.
   * Support for build number based updates (not just version numbers)
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 12 Sep 2016 17:17:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 14 Sep 2016 14:40:48 -0600
 
 
 frostwire (6.3.5) stable; urgency=high
