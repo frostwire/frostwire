@@ -1,5 +1,6 @@
-FrostWire 1.8.1 - SEP/9/2016
+FrostWire 1.8.1 - SEP/15/2016
  - New Search Engine: LimeTorrents
+ - New jlibtorrent 1.1.1.38 (with libtorrent 1.1.1)
  - Fixes shutdown and auto-restart bug.
  - Music Player will not bring back last song played paused on the next session.
  - FrostWire is cleared from the android task list on Exit on Android 21+
