@@ -240,12 +240,12 @@ public final class TransferManager {
             @Override
             public void downloadAdded(BTEngine engine, BTDownload dl) {
                 String name = dl.getName();
-                if (name != null && name.contains("fetch_magnet:")) {
+                if (name != null && name.contains("fetch_magnet")) {
                     return;
                 }
 
                 File savePath = dl.getSavePath();
-                if (savePath != null && savePath.toString().contains("fetch_magnet/")) {
+                if (savePath != null && savePath.toString().contains("fetch_magnet")) {
                     return;
                 }
 
