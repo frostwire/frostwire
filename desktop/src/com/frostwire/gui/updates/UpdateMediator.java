@@ -216,6 +216,12 @@ public final class UpdateMediator {
             if (options != null) {
                 System.arraycopy(options, 0, commands, 1, options_length);
             }
+
+	    System.out.print("UpdateMediator.tryUbuntuInstallCmd: ");
+            for (String c : commands) {
+		System.out.print(c + " ");
+	    }
+	    System.out.println();
             ProcessBuilder pbuilder = new ProcessBuilder(commands);
             pbuilder.start();
             return true;
