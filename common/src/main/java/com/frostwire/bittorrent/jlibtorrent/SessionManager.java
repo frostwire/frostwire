@@ -90,7 +90,7 @@ public class SessionManager {
             resetState();
 
             sp.setInteger(settings_pack.int_types.alert_mask.swigValue(), alertMask(logging));
-            session = new session(sp.getSwig());
+            session = new session(sp.swig());
             alertsLoop();
 
             onAfterStart();
@@ -236,7 +236,7 @@ public class SessionManager {
                 throw new IllegalArgumentException("settings pack can't be null");
             }
 
-            session.apply_settings(sp.getSwig());
+            session.apply_settings(sp.swig());
             onApplySettings(sp);
         }
     }
@@ -253,7 +253,7 @@ public class SessionManager {
             return;
         }
         SettingsPack sp = new SettingsPack();
-        sp.setDownloadRateLimit(limit);
+        sp.downloadRateLimit(limit);
         applySettings(sp);
     }
 
@@ -269,7 +269,7 @@ public class SessionManager {
             return;
         }
         SettingsPack sp = new SettingsPack();
-        sp.setUploadRateLimit(limit);
+        sp.uploadRateLimit(limit);
         applySettings(sp);
     }
 
@@ -317,7 +317,7 @@ public class SessionManager {
             return;
         }
         SettingsPack sp = new SettingsPack();
-        sp.setConnectionsLimit(limit);
+        sp.connectionsLimit(limit);
         applySettings(sp);
     }
 
@@ -333,7 +333,7 @@ public class SessionManager {
             return;
         }
         SettingsPack sp = new SettingsPack();
-        sp.setMaxPeerlistSize(limit);
+        sp.maxPeerlistSize(limit);
         applySettings(sp);
     }
 
@@ -718,9 +718,9 @@ public class SessionManager {
 
     private void onListenSucceeded(ListenSucceededAlert alert) {
         try {
-            if (alert.getSocketType() == ListenSucceededAlert.SocketType.TCP) {
-                String address = alert.getEndpoint().address().toString(); // clone
-                int port = alert.getEndpoint().port();
+            if (alert.socketType() == ListenSucceededAlert.SocketType.TCP) {
+                String address = alert.address().toString(); // clone
+                int port = alert.port();
                 listenEndpoints.add(new TcpEndpoint(address, port));
             }
         } catch (Throwable e) {
@@ -732,7 +732,7 @@ public class SessionManager {
         try {
             // libtorrent perform all kind of tests
             // to avoid non usable addresses
-            String address = alert.getExternalAddress().toString(); // clone
+            String address = alert.externalAddress().toString(); // clone
             externalAddress = new Address(address);
         } catch (Throwable e) {
             LOG.error("Error saving reported external ip", e);

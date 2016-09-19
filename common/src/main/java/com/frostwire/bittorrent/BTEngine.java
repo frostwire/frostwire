@@ -181,18 +181,18 @@ public final class BTEngine extends SessionManager {
 
         if (ctx.optimizeMemory) {
             int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
-            sp.setMaxQueuedDiskBytes(maxQueuedDiskBytes / 2);
+            sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
             int sendBufferWatermark = sp.sendBufferWatermark();
-            sp.setSendBufferWatermark(sendBufferWatermark / 2);
-            sp.setCacheSize(256);
+            sp.sendBufferWatermark(sendBufferWatermark / 2);
+            sp.cacheSize(256);
             sp.activeDownloads(4);
             sp.activeSeeds(4);
-            sp.setMaxPeerlistSize(200);
-            sp.setGuidedReadCache(true);
-            sp.setTickInterval(1000);
-            sp.setInactivityTimeout(60);
-            sp.setSeedingOutgoingConnections(false);
-            sp.setConnectionsLimit(200);
+            sp.maxPeerlistSize(200);
+            //sp.setGuidedReadCache(true);
+            sp.tickInterval(1000);
+            sp.inactivityTimeout(60);
+            sp.seedingOutgoingConnections(false);
+            sp.connectionsLimit(200);
         } else {
             sp.activeDownloads(10);
             sp.activeSeeds(10);
@@ -485,8 +485,8 @@ public final class BTEngine extends SessionManager {
 
     private void onListenSucceeded(ListenSucceededAlert alert) {
         try {
-            TcpEndpoint endp = alert.getEndpoint();
-            String s = "endpoint: " + endp + " type:" + alert.getSocketType();
+            String endp = alert.address() + ":" + alert.port();
+            String s = "endpoint: " + endp + " type:" + alert.socketType();
             LOG.info("Listen succeeded on " + s);
         } catch (Throwable e) {
             LOG.error("Error adding listen endpoint to internal list", e);
@@ -494,9 +494,9 @@ public final class BTEngine extends SessionManager {
     }
 
     private void onListenFailed(ListenFailedAlert alert) {
-        TcpEndpoint endp = alert.endpoint();
-        String s = "endpoint: " + endp + " type:" + alert.getSocketType();
-        String message = alert.getError().message();
+        String endp = alert.address() + ":" + alert.port();
+        String s = "endpoint: " + endp + " type:" + alert.socketType();
+        String message = alert.error().message();
         LOG.info("Listen failed on " + s + " (error: " + message + ")");
     }
 
@@ -654,7 +654,7 @@ public final class BTEngine extends SessionManager {
         try {
             // libtorrent perform all kind of tests
             // to avoid non usable addresses
-            String address = alert.getExternalAddress().toString();
+            String address = alert.externalAddress().toString();
             LOG.info("External IP: " + address);
         } catch (Throwable e) {
             LOG.error("Error saving reported external ip", e);

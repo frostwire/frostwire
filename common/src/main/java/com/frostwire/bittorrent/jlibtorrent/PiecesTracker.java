@@ -31,8 +31,8 @@ public final class PiecesTracker {
 
         for (int fileIndex = 0; fileIndex < numFiles; fileIndex++) {
             long size = fs.fileSize(fileIndex);
-            int firstPiece = ti.mapFile(fileIndex, 0, 1).getPiece();
-            int lastPiece = ti.mapFile(fileIndex, size - 1, 1).getPiece();
+            int firstPiece = ti.mapFile(fileIndex, 0, 1).piece();
+            int lastPiece = ti.mapFile(fileIndex, size - 1, 1).piece();
 
             int numSlices = lastPiece - firstPiece + 1;
             files[fileIndex] = new int[numSlices];
