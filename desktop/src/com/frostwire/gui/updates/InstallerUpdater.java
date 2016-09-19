@@ -212,7 +212,7 @@ public class InstallerUpdater implements Runnable {
                     }
 
                     if (alert.type().equals(TORRENT_ADDED)) {
-                        Sha1Hash sha1 = ((TorrentAlert<?>) alert).handle().getInfoHash();
+                        Sha1Hash sha1 = ((TorrentAlert<?>) alert).handle().infoHash();
                         th = BTEngine.getInstance().find(sha1);
                         _manager = th;
                         th.resume();

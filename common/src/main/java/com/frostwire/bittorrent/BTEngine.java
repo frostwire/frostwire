@@ -439,7 +439,7 @@ public final class BTEngine extends SessionManager {
                     return;
                 }
             }
-            TorrentHandle th = find(alert.handle().getInfoHash());
+            TorrentHandle th = find(alert.handle().infoHash());
             if (th != null && th.isValid()) {
                 th.saveResumeData();
             }
@@ -462,7 +462,7 @@ public final class BTEngine extends SessionManager {
 
     private void fireDownloadAdded(TorrentAlert<?> alert) {
         try {
-            TorrentHandle th = find(alert.handle().getInfoHash());
+            TorrentHandle th = find(alert.handle().infoHash());
             BTDownload dl = new BTDownload(this, th);
             if (listener != null) {
                 listener.downloadAdded(this, dl);
