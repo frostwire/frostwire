@@ -602,7 +602,8 @@ public final class BTEngine extends SessionManager {
                 th.resume();
             }
         } else { // new download
-            download(ti, saveDir, resumeFile, priorities, magnetUrlParams);
+            // TODO: restore the last parameter
+            download(ti, saveDir, resumeFile, priorities, null);
             //session.asyncAddTorrent(ti, saveDir, priorities, resumeFile);
         }
     }
@@ -676,7 +677,7 @@ public final class BTEngine extends SessionManager {
         @Override
         public void run() {
             try {
-                download(new TorrentInfo(torrent), saveDir, resume, priorities, (String) null);
+                download(new TorrentInfo(torrent), saveDir, resume, priorities, null);
             } catch (Throwable e) {
                 LOG.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
             }

@@ -3,6 +3,7 @@ package com.frostwire.bittorrent.jlibtorrent;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.*;
+import com.frostwire.util.Logger;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -415,8 +416,8 @@ public class SessionManager {
     }
 
     public void download(TorrentInfo ti, File saveDir, File resumeFile, Priority[] priorities, String magnetUrlParams) {
-
-        String savePath = null;
+        // JLIBTORRENT 1.1
+        /*String savePath = null;
         if (saveDir != null) {
             savePath = saveDir.getAbsolutePath();
         } else if (resumeFile == null) {
@@ -460,7 +461,7 @@ public class SessionManager {
 
         p.set_flags(flags);
 
-        session.async_add_torrent(p);
+        session.async_add_torrent(p);*/
     }
 
     public void remove(TorrentHandle th, SessionHandle.Options options) {
@@ -482,7 +483,8 @@ public class SessionManager {
      * @return
      */
     public byte[] fetchMagnet(String uri, int timeout, final int maxSize) {
-        if (session == null) {
+        // JLIBTORRENT 1.1
+        /*if (session == null) {
             return null;
         }
 
@@ -571,7 +573,7 @@ public class SessionManager {
             }
         }
 
-        return data[0];
+        return data[0];*/return null;
     }
 
     /**
@@ -900,7 +902,8 @@ public class SessionManager {
     }
 
     public byte[] torrentData(MetadataReceivedAlert alert) {
-        try {
+        // JLIBTORRENT 1.1
+        /*try {
             torrent_handle th = alert.swig().getHandle();
             if (th == null || !th.is_valid()) {
                 return null;
@@ -919,6 +922,6 @@ public class SessionManager {
         } catch (Throwable e) {
             LOG.error("Error building torrent data from metadata", e);
             return null;
-        }
+        }*/return null;
     }
 }

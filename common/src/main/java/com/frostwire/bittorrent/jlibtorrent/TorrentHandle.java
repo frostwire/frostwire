@@ -132,7 +132,8 @@ public final class TorrentHandle {
      * @see PeerInfo
      */
     public ArrayList<PeerInfo> peerInfo() {
-        if (!th.is_valid()) {
+        // JLIBTORRENT 1.1
+        /*if (!th.is_valid()) {
             return new ArrayList<>();
         }
 
@@ -145,7 +146,7 @@ public final class TorrentHandle {
             l.add(new PeerInfo(v.get(i)));
         }
 
-        return l;
+        return l;*/return null;
     }
 
     /**
@@ -161,10 +162,11 @@ public final class TorrentHandle {
      *
      * @return
      */
-    public TorrentInfo torrentFile() {
+    // JLIBTORRENT 1.1
+    /*public TorrentInfo torrentFile() {
         torrent_info ti = th.get_torrent_copy();
         return ti != null ? new TorrentInfo(ti) : null;
-    }
+    }*/
 
     /**
      * `status()`` will return a structure with information about the status
