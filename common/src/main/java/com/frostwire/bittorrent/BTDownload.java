@@ -361,7 +361,7 @@ public final class BTDownload implements BittorrentDownload {
 
         if (th.isValid()) {
             if (deleteData) {
-                engine.remove(th, Session.Options.DELETE_FILES);
+                engine.remove(th, SessionHandle.Options.DELETE_FILES);
             } else {
                 engine.remove(th);
             }

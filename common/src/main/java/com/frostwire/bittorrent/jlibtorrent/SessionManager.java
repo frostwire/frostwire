@@ -463,7 +463,7 @@ public class SessionManager {
         session.async_add_torrent(p);
     }
 
-    public void remove(TorrentHandle th, Session.Options options) {
+    public void remove(TorrentHandle th, SessionHandle.Options options) {
         if (session != null && th.isValid()) {
             session.remove_torrent(th.swig(), options.swig());
         }
