@@ -18,9 +18,6 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.bittorrent.jlibtorrent.PiecesTracker;
-import com.frostwire.bittorrent.jlibtorrent.TorrentHandle;
-import com.frostwire.bittorrent.jlibtorrent.TorrentStatus;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.entry;
@@ -303,7 +300,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public String getInfoHash() {
-        return th.getInfoHash().toString();
+        return th.infoHash().toString();
     }
 
     @Override
@@ -613,7 +610,7 @@ public final class BTDownload implements BittorrentDownload {
     private void serializeResumeData(SaveResumeDataAlert alert) {
         try {
             if (th.isValid()) {
-                String infoHash = th.getInfoHash().toString();
+                String infoHash = th.infoHash().toString();
                 File file = engine.resumeDataFile(infoHash);
 
                 Entry e = alert.resumeData();

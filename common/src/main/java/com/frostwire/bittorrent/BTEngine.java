@@ -18,8 +18,6 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.bittorrent.jlibtorrent.SessionManager;
-import com.frostwire.bittorrent.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.entry;

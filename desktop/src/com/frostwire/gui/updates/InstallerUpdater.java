@@ -19,8 +19,6 @@
 package com.frostwire.gui.updates;
 
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.bittorrent.jlibtorrent.TorrentHandle;
-import com.frostwire.bittorrent.jlibtorrent.TorrentStatus;
 import com.frostwire.gui.DigestUtils;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.Alert;
