@@ -130,33 +130,6 @@ public class Debug {
     	diagLoggerLogAndOut(_exception);
     }
   }
-  
-  public static String getLastCaller() {
-  	return getLastCaller(0);
-  }
-
-  public static String getLastCaller(int numToGoBackFurther) {
-    try {
-      throw new Exception();
-    }
-    catch (Exception e) {
-      // [0] = our throw
-      // [1] = the line that called getLastCaller
-      // [2] = the line that called the function that has getLastCaller
-      StackTraceElement st[] = e.getStackTrace();
-      if (st == null || st.length == 0)
-      	return "??";
-      if (st.length > 3 + numToGoBackFurther)
-        return st[3 + numToGoBackFurther].toString();
-
-      return st[st.length - 1].toString();
-    }
-  }
-
-  public static void outStackTrace() {
-    // skip the last, since they'll most likely be main
-	  diagLoggerLogAndOut(getStackTrace(1),false);
-  }
 
   private static String getStackTrace(int endNumToSkip) {
 		String sStackTrace = "";
@@ -174,14 +147,6 @@ public class Debug {
     }
     return sStackTrace;
   }
-
-	public static void
-	killAWTThreads()
-	{
-		ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-			
-		killAWTThreads( threadGroup );
-	}
 
 	private static String 
 	getCompressedStackTrace(
@@ -288,112 +253,6 @@ public class Debug {
 		return (trace_trace_tail);
 	}
 	
-	public static void
-	killAWTThreads(
-		   ThreadGroup	threadGroup )
-	{
-		 Thread[] threadList = new Thread[threadGroup.activeCount()];
-			
-		 threadGroup.enumerate(threadList);
-			
-		 for (int i = 0;	i < threadList.length;	i++){
-
-		 	Thread t = 	threadList[i];
-		 	
-		 	if ( t != null ){
-		 		
-		 		String 	name = t.getName();
-		 		
-		 		if ( name.startsWith( "AWT" )){
-		 			
-		 			out( "Interrupting thread '".concat(t.toString()).concat("'" ));
-		 			
-		 			t.interrupt();
-		 		}
-			}
-		}
-		
-		if ( threadGroup.getParent() != null ){
-	  	
-			killAWTThreads(threadGroup.getParent());
-		}	
-	}
-		
-	public static void
-	dumpThreads(
-		String	name )
-	{
-		out(name+":");
-			
-	  	ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-			
-	  	dumpThreads( threadGroup, "\t" );
-	}
-   
-   public static void
-   dumpThreads(
-   		ThreadGroup	threadGroup,
-   		String		indent )
-   {
-	  Thread[] threadList = new Thread[threadGroup.activeCount()];
-			
-	  threadGroup.enumerate(threadList);
-			
-	  for (int i = 0;	i < threadList.length;	i++){
-
-		Thread t = 	threadList[i];
-		
-		if ( t != null ){		
-		
-		   out( indent.concat("active thread = ").concat(t.toString()).concat(", daemon = ").concat(String.valueOf(t.isDaemon())));
-		}
-	  }
-	  
-	  if ( threadGroup.getParent() != null ){
-	  	
-	  	dumpThreads(threadGroup.getParent(),indent+"\t");
-	  }
-   }
-   
-   public static void
-   dumpThreadsLoop(
-   	final String	name )
-   {
-   	new AEThread("Thread Dumper")
-	   {
-		   public void 
-		   runSupport()
-		   {	
-			   while(true){
-				   Debug.dumpThreads(name);
-				   
-				   try{
-				   	Thread.sleep(5000);
-				   }catch( Throwable e ){
-				   	Debug.printStackTrace( e );
-				   }
-			   }
-		   }
-	   }.start();
-   }
-   
-	public static void
-	dumpSystemProperties()
-	{
-		out( "System Properties:");
-		
- 		Properties props = System.getProperties();
- 		
- 		Iterator it = props.keySet().iterator();
- 		
- 		while(it.hasNext()){
- 			
- 			String	name = (String)it.next();
- 			
- 			out( "\t".concat(name).concat(" = '").concat(props.get(name).toString()).concat("'" ));
- 		}
-	}
-	
 	public static String
 	getNestedExceptionMessage(
 		Throwable 		e )
@@ -441,77 +300,10 @@ public class Debug {
 		return( last_message );
 	}
 	
-	public static boolean
-	containsException(
-		Throwable					error,
-		Class<? extends Throwable>	cla )
-	{
-		if ( error == null ){
-			
-			return( false );
-				
-		}else if ( cla.isInstance( error )){
-			
-			return( true );
-		}
-		
-		return( containsException( error.getCause(), cla ));
-	}
-	
-	public static String
-	getNestedExceptionMessageAndStack(
-		Throwable 		e )
-	{
-		return( getNestedExceptionMessage(e) + ", " + getCompressedStackTrace( e, 0 ));
-	}
-	
-	public static String
-	getCompressedStackTraceSkipFrames(
-		int	frames_to_skip )
-	{
-		return( getCompressedStackTrace( new Throwable(), frames_to_skip+1, 200, false ));
-	}
-	
 	public static String
 	getCompressedStackTrace()
 	{
 		return( getCompressedStackTrace( new Throwable(), 1, 200, false ));
-	}
-
-	/**
-	 * 
-	 * @param iMaxLines Max # of stack lines.  If < 0, chops off -MaxLines entries from end
-	 * @return
-	 */
-	public static String
-	getCompressedStackTrace(int iMaxLines)
-	{
-		return( getCompressedStackTrace( new Throwable(), 1, iMaxLines, false ));
-	}
-
-	public static String
-	getExceptionMessage(
-		Throwable	e )
-	{
-		String	message = e.getMessage();
-		
-		if ( message == null || message.length() == 0 ){
-			
-			message = e.getClass().getName();
-			
-			int	pos = message.lastIndexOf(".");
-			
-			message = message.substring( pos+1 );
-			
-		}else if ( e instanceof ClassNotFoundException ){
-			
-			if ( message.toLowerCase().indexOf("found") == -1 ){
-				
-				message = "Class " + message + " not found";
-			}
-		}
-		
-		return( message );
 	}
 	
 	public static void printStackTrace(Throwable e) {
@@ -638,29 +430,5 @@ public class Debug {
 		}else{
 			diag_logger.logAndOut( e );
 		}
-	}
-
-	/**
-	 * @param key
-	 * @return
-	 */
-	public static String secretFileName(String key) {
-		if (key == null)
-			return "";
-
-		final String sep = File.separator;
-		final String regex = "([\\" + sep + "]?[^\\" + sep + "]{0,3}+)[^\\" + sep
-				+ "]*";
-		
-		String secretName = key.replaceAll(regex, "$1");
-		int iExtensionPos = key.lastIndexOf(".");
-		if (iExtensionPos >= 0)
-			secretName += key.substring(iExtensionPos); 
-		return secretName;
-	}
-
-	public static void main(String[] args) {
-		System.out.println(secretFileName("c:\\temp\\hello there.txt"));
-		System.out.println(secretFileName("hello there.txt"));
 	}
 }
