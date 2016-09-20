@@ -63,7 +63,9 @@ import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * See {@link ConfigurationManager}
@@ -373,19 +375,64 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void setupSearchEngines() {
-        PreferenceScreen category = (PreferenceScreen) findPreference(Constants.PREF_KEY_SEARCH_PREFERENCE_CATEGORY);
-        if (category != null) {
+        final PreferenceScreen searchEnginesScreen = (PreferenceScreen) findPreference(Constants.PREF_KEY_SEARCH_PREFERENCE_CATEGORY);
+
+        // Click listener for the search engines. Checks or unchecks the SelectAll checkbox
+        final Preference.OnPreferenceClickListener searchEngineClickListener = new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                TwoStatePreference cbPreference = (TwoStatePreference) preference;
+                ToggleAllSearchEnginesPreference selectAll = (ToggleAllSearchEnginesPreference) findPreference("frostwire.prefs.search.preference_category.select_all");
+
+                selectAll.setClickListenerEnabled(false);
+                if (!cbPreference.isChecked()) {
+                    selectAll.setChecked(false);
+                } else {
+                    boolean allChecked = areAllEnginesChecked();
+                    selectAll.setChecked(allChecked);
+                }
+                selectAll.setClickListenerEnabled(true);
+                return true;
+            }
+        };
+
+        // Show/Hide active search engines and setup click listeners to interact with Select All.
+        if (searchEnginesScreen != null) {
+
+            List<CheckBoxPreference> searchEnginePreferences = new ArrayList<>();
+
             for (SearchEngine engine : SearchEngine.getEngines()) {
                 CheckBoxPreference preference = (CheckBoxPreference) findPreference(engine.getPreferenceKey());
                 if (preference != null) { //it could already have been removed due to remote config value.
-                    //LOG.info(engine.getName() + " is enabled: " + engine.isActive());
                     if (!engine.isActive()) {
                         LOG.info("removing preference for engine " + engine.getName());
-                        category.removePreference(preference);
+                        searchEnginesScreen.removePreference(preference);
+                    } else {
+                        preference.setOnPreferenceClickListener(searchEngineClickListener);
+                        searchEnginePreferences.add(preference);
                     }
                 }
             }
+
+            ToggleAllSearchEnginesPreference selectAll = (ToggleAllSearchEnginesPreference) findPreference("frostwire.prefs.search.preference_category.select_all");
+            selectAll.setSearchEnginePreferences(searchEnginePreferences);
         }
+    }
+
+    private boolean areAllEnginesChecked() {
+        for (SearchEngine engine : SearchEngine.getEngines()) {
+            CheckBoxPreference preference = (CheckBoxPreference) findPreference(engine.getPreferenceKey());
+            if (preference != null) { //it could already have been removed due to remote config value.
+                if (!engine.isActive()) {
+                    continue;
+                }
+
+                if (!preference.isChecked()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private void updateIndexSummary(SimpleActionPreference preference) {
