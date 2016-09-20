@@ -49,7 +49,8 @@ public final class BTEngine extends SessionManager {
             STORAGE_MOVED.swig(),
             LISTEN_SUCCEEDED.swig(),
             LISTEN_FAILED.swig(),
-            EXTERNAL_IP.swig()
+            EXTERNAL_IP.swig(),
+            AlertType.LOG.swig()
     };
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
@@ -61,6 +62,7 @@ public final class BTEngine extends SessionManager {
     private BTEngineListener listener;
 
     private BTEngine() {
+        super(false);
         this.innerListener = new InnerListener();
         this.restoreDownloadsQueue = new LinkedList<>();
     }
@@ -644,6 +646,9 @@ public final class BTEngine extends SessionManager {
                     break;
                 case EXTERNAL_IP:
                     onExternalIpAlert((ExternalIpAlert) alert);
+                    break;
+                case LOG:
+                    System.out.println("Log: " + alert);
                     break;
             }
         }
