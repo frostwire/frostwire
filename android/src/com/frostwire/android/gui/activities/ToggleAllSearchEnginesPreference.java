@@ -1,3 +1,21 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.frostwire.android.gui.activities;
 
 import android.content.Context;
@@ -8,16 +26,21 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.SearchEngine;
 
-import java.util.List;
+import java.util.Map;
 
 /**
- * Created by gubatron on 9/20/16.
+ * Created on 9/20/16.
+ *
+ * @author gubatron
+ * @author aldenml
+ *
  */
 public class ToggleAllSearchEnginesPreference extends CheckBoxPreference {
 
     private CheckBox checkbox;
-    private List<CheckBoxPreference> searchEnginePreferences;
+    private Map<CheckBoxPreference, SearchEngine> searchEnginePreferences;
     private boolean clickListenerEnabled;
 
     public ToggleAllSearchEnginesPreference(Context context, AttributeSet attrs, int defStyle) {
@@ -69,18 +92,31 @@ public class ToggleAllSearchEnginesPreference extends CheckBoxPreference {
             return;
         }
 
-        for (CheckBoxPreference preference : searchEnginePreferences) {
+        final OnPreferenceClickListener onPreferenceClickListener = searchEnginePreferences.keySet().iterator().next().getOnPreferenceClickListener();
+        CheckBoxPreference archivePreference = null;
+
+        for (CheckBoxPreference preference : searchEnginePreferences.keySet()) {
             if (preference != null) { //it could already have been removed due to remote config value.
-                final OnPreferenceClickListener onPreferenceClickListener = preference.getOnPreferenceClickListener();
                 preference.setOnPreferenceClickListener(null);
                 preference.setChecked(checked);
                 preference.setOnPreferenceClickListener(onPreferenceClickListener);
+
+                if (searchEnginePreferences.get(preference).getName().equals("Archive.org")) {
+                    archivePreference = preference;
+                }
             }
+        }
+
+        // always leave one checked.
+        if (!checked && archivePreference != null) {
+            archivePreference.setOnPreferenceClickListener(null);
+            archivePreference.setChecked(true);
+            archivePreference.setOnPreferenceClickListener(onPreferenceClickListener);
         }
     }
 
     private boolean areAllEnginesChecked() {
-        for (CheckBoxPreference preference : searchEnginePreferences) {
+        for (CheckBoxPreference preference : searchEnginePreferences.keySet()) {
             if (preference != null) {
                 if (!preference.isChecked()) {
                     return false;
@@ -98,7 +134,7 @@ public class ToggleAllSearchEnginesPreference extends CheckBoxPreference {
         super.setChecked(checked);
     }
 
-    public void setSearchEnginePreferences(List<CheckBoxPreference> searchEnginePreferences) {
+    public void setSearchEnginePreferences(Map<CheckBoxPreference, SearchEngine> searchEnginePreferences) {
         this.searchEnginePreferences = searchEnginePreferences;
     }
 }
