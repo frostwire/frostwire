@@ -1,3 +1,6 @@
+FrostWire 1.8.2 - SEP/20/2016
+ - Settings: New 'Select All' checkbox to select/unselect active search engines.
+
 FrostWire 1.8.1 - SEP/15/2016
  - New Search Engine: LimeTorrents
  - New jlibtorrent 1.1.1.38 (with libtorrent 1.1.1)
