@@ -110,6 +110,10 @@
             android:key="frostwire.prefs.search.preference_category"
             android:title="@string/search_settings"
             android:persistent="false">
+        <com.frostwire.android.gui.activities.ToggleAllSearchEnginesPreference
+            android:title="@string/select_all"
+            android:key="frostwire.prefs.search.preference_category.select_all"
+        />
         <CheckBoxPreference
                 android:key="frostwire.prefs.search.use_archiveorg"
                 android:summary="@string/use_archiveorg"

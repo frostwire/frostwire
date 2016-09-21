@@ -230,7 +230,6 @@
                   android:label="@string/activity_VPN"
                   android:excludeFromRecents="true"
                   android:noHistory="true"/>
-
         <!-- InMobi -->
         <activity android:name="com.inmobi.rendering.InMobiAdActivity"
                   android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize"
