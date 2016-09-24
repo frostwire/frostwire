@@ -132,7 +132,7 @@
     <style name="PreferencesListView">
         <item name="android:padding">0dp</item>
     </style>
-    
+
     <style name="PreferencesCheckboxStyle">
         <item name="android:button">@drawable/checkbox_button_selector</item>
     </style>
