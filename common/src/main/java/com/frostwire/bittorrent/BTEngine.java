@@ -50,6 +50,8 @@ public final class BTEngine extends SessionManager {
             LISTEN_SUCCEEDED.swig(),
             LISTEN_FAILED.swig(),
             EXTERNAL_IP.swig(),
+            FASTRESUME_REJECTED.swig(),
+            TORRENT_LOG.swig(),
             AlertType.LOG.swig()
     };
 
@@ -647,8 +649,12 @@ public final class BTEngine extends SessionManager {
                 case EXTERNAL_IP:
                     onExternalIpAlert((ExternalIpAlert) alert);
                     break;
+                case FASTRESUME_REJECTED:
+                    onFastresumeRejected((FastresumeRejectedAlert) alert);
+                    break;
+                case TORRENT_LOG:
                 case LOG:
-                    System.out.println("Log: " + alert);
+                    printAlert(alert);
                     break;
             }
         }
@@ -663,6 +669,19 @@ public final class BTEngine extends SessionManager {
         } catch (Throwable e) {
             LOG.error("Error saving reported external ip", e);
         }
+    }
+
+    private void onFastresumeRejected(FastresumeRejectedAlert alert) {
+        try {
+            LOG.warn("Failed to load fastresume data, path: " + alert.filePath() +
+                    ", operation: " + alert.operation() + ", error: " + alert.error().message());
+        } catch (Throwable e) {
+            LOG.error("Error logging fastresume rejected alert", e);
+        }
+    }
+
+    private void printAlert(Alert alert) {
+        System.out.println("Log: " + alert);
     }
 
     private final class RestoreDownloadTask implements Runnable {
