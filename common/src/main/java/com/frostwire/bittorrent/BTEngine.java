@@ -44,9 +44,8 @@ public final class BTEngine extends SessionManager {
 
     private static final Logger LOG = Logger.getLogger(BTEngine.class);
 
-    private static final int[] INNER_LISTENER_TYPES = new int[]{TORRENT_ADDED.swig(),
-            PIECE_FINISHED.swig(),
-            STORAGE_MOVED.swig(),
+    private static final int[] INNER_LISTENER_TYPES = new int[]{
+            TORRENT_ADDED.swig(),
             LISTEN_SUCCEEDED.swig(),
             LISTEN_FAILED.swig(),
             EXTERNAL_IP.swig(),
@@ -433,23 +432,6 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    private void doResumeData(TorrentAlert<?> alert, boolean force) {
-        try {
-            if (!force) {
-                // TODO: I need to restore this later
-                if (ctx.optimizeMemory) {
-                    return;
-                }
-            }
-            TorrentHandle th = find(alert.handle().infoHash());
-            if (th != null && th.isValid()) {
-                th.saveResumeData();
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error triggering resume data", e);
-        }
-    }
-
     private void fireStarted() {
         if (listener != null) {
             listener.started(this);
@@ -572,12 +554,13 @@ public final class BTEngine extends SessionManager {
     }
 
     private void runNextRestoreDownloadTask() {
-        final RestoreDownloadTask task;
+        RestoreDownloadTask task = null;
         try {
-            task = restoreDownloadsQueue.poll();
+            if (!restoreDownloadsQueue.isEmpty()) {
+                task = restoreDownloadsQueue.poll();
+            }
         } catch (Throwable t) {
             // on Android, LinkedList's .poll() implementation throws a NoSuchElementException
-            return;
         }
         if (task != null) {
             task.run();
@@ -633,12 +616,6 @@ public final class BTEngine extends SessionManager {
                     TorrentAlert<?> torrentAlert = (TorrentAlert<?>) alert;
                     fireDownloadAdded(torrentAlert);
                     runNextRestoreDownloadTask();
-                    break;
-                case PIECE_FINISHED:
-                    doResumeData((TorrentAlert<?>) alert, false);
-                    break;
-                case STORAGE_MOVED:
-                    doResumeData((TorrentAlert<?>) alert, true);
                     break;
                 case LISTEN_SUCCEEDED:
                     onListenSucceeded((ListenSucceededAlert) alert);

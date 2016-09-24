@@ -49,7 +49,8 @@ public final class BTDownload implements BittorrentDownload {
             AlertType.TORRENT_REMOVED.swig(),
             AlertType.TORRENT_CHECKED.swig(),
             AlertType.SAVE_RESUME_DATA.swig(),
-            AlertType.PIECE_FINISHED.swig()};
+            AlertType.PIECE_FINISHED.swig(),
+            AlertType.STORAGE_MOVED.swig()};
 
     private static final String EXTRA_DATA_KEY = "extra_data";
     private static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
@@ -217,8 +218,8 @@ public final class BTDownload implements BittorrentDownload {
 
         // TODO: Add logic to check completion logic for merkle based torrents.
         //if (th.getTorrentInfo().isMerkleTorrent()) {
-            //final ArrayList<Sha1Hash> sha1Hashes = th.getTorrentInfo().merkleTree();
-            //perform sha1Hash check
+        //final ArrayList<Sha1Hash> sha1Hashes = th.getTorrentInfo().merkleTree();
+        //perform sha1Hash check
         //}
 
         float fp = th.status().progress();
@@ -334,7 +335,8 @@ public final class BTDownload implements BittorrentDownload {
 
         th.setAutoManaged(false);
         th.pause();
-        th.saveResumeData();
+
+        doResumeData(true);
     }
 
     public void resume() {
@@ -342,7 +344,8 @@ public final class BTDownload implements BittorrentDownload {
 
         th.setAutoManaged(true);
         th.resume();
-        th.saveResumeData();
+
+        doResumeData(true);
     }
 
     public void remove() {
@@ -386,7 +389,7 @@ public final class BTDownload implements BittorrentDownload {
         this.listener = listener;
     }
 
-    private void torrentFinished(TorrentFinishedAlert alert) {
+    private void torrentFinished() {
         if (listener != null) {
             try {
                 listener.finished(this);
@@ -395,10 +398,10 @@ public final class BTDownload implements BittorrentDownload {
             }
         }
 
-        th.saveResumeData();
+        doResumeData(true);
     }
 
-    private void torrentRemoved(TorrentRemovedAlert alert) {
+    private void torrentRemoved() {
         engine.removeListener(innerListener);
 
         if (parts != null) {
@@ -408,7 +411,7 @@ public final class BTDownload implements BittorrentDownload {
         fireRemoved(incompleteFilesToRemove);
     }
 
-    private void torrentChecked(TorrentCheckedAlert alert) {
+    private void torrentChecked() {
         try {
             if (th.isValid()) {
                 // trigger items calculation
@@ -418,19 +421,6 @@ public final class BTDownload implements BittorrentDownload {
         } catch (Throwable e) {
             LOG.warn("Error handling torrent checked logic", e);
         }
-    }
-
-    private void saveResumeData(SaveResumeDataAlert alert) {
-        long now = System.currentTimeMillis();
-        final TorrentStatus status = th.status();
-        boolean forceSerialization = status.isFinished() || status.isPaused();
-        if (forceSerialization || (now - lastSaveResumeTime) >= SAVE_RESUME_RESOLUTION_MILLIS) {
-            lastSaveResumeTime = now;
-        } else {
-            // skip, too fast, see SAVE_RESUME_RESOLUTION_MILLIS
-            return;
-        }
-        serializeResumeData(alert);
     }
 
     private void pieceFinished(PieceFinishedAlert alert) {
@@ -623,6 +613,23 @@ public final class BTDownload implements BittorrentDownload {
         }
     }
 
+    private void doResumeData(boolean force) {
+        long now = System.currentTimeMillis();
+        if (force || (now - lastSaveResumeTime) >= SAVE_RESUME_RESOLUTION_MILLIS) {
+            lastSaveResumeTime = now;
+        } else {
+            // skip, too fast, see SAVE_RESUME_RESOLUTION_MILLIS
+            return;
+        }
+        try {
+            if (th != null && th.isValid()) {
+                th.saveResumeData();
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error triggering resume data", e);
+        }
+    }
+
     private Map<String, String> createExtra() {
         Map<String, String> map = new HashMap<>();
 
@@ -703,19 +710,23 @@ public final class BTDownload implements BittorrentDownload {
 
             switch (type) {
                 case TORRENT_FINISHED:
-                    torrentFinished((TorrentFinishedAlert) alert);
+                    torrentFinished();
                     break;
                 case TORRENT_REMOVED:
-                    torrentRemoved((TorrentRemovedAlert) alert);
+                    torrentRemoved();
                     break;
                 case TORRENT_CHECKED:
-                    torrentChecked((TorrentCheckedAlert) alert);
+                    torrentChecked();
                     break;
                 case SAVE_RESUME_DATA:
-                    saveResumeData((SaveResumeDataAlert) alert);
+                    serializeResumeData((SaveResumeDataAlert) alert);
                     break;
                 case PIECE_FINISHED:
                     pieceFinished((PieceFinishedAlert) alert);
+                    doResumeData(false);
+                    break;
+                case STORAGE_MOVED:
+                    doResumeData(true);
                     break;
             }
         }
