@@ -25,6 +25,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.*;
@@ -37,6 +38,7 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
@@ -50,8 +52,9 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.preference.ButtonActionPreference;
+import com.frostwire.android.gui.views.preference.CheckBoxSeedingPreference;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference;
-import com.frostwire.android.gui.views.preference.SimpleActionPreference;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
@@ -80,6 +83,7 @@ public class SettingsActivity extends PreferenceActivity {
     private static String currentPreferenceKey = null;
     private boolean finishOnBack = false;
     private long removeAdsPurchaseTime = 0;
+    private TextView TitleView;
 
     @Override
     protected void onResume() {
@@ -94,8 +98,11 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         addPreferencesFromResource(R.xml.application_preferences);
+
+        getListView().setPadding(20, 0, 20, 0);
+        getListView().setDivider(new ColorDrawable(this.getResources().getColor(R.color.basic_gray_dark_solid)));
+        getListView().setDividerHeight(1);
 
         hideActionBarIcon(getActionBar());
 
@@ -316,7 +323,7 @@ public class SettingsActivity extends PreferenceActivity {
                 findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
 
         // our custom preference, only so that we can change its status, or hide it.
-        final com.frostwire.android.gui.views.preference.CheckBoxPreference preferenceSeedingWifiOnly = (com.frostwire.android.gui.views.preference.CheckBoxPreference)
+        final CheckBoxSeedingPreference preferenceSeedingWifiOnly = (CheckBoxSeedingPreference)
                 findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
 
         if (preferenceSeeding != null) {
@@ -358,7 +365,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void setupClearIndex() {
-        final SimpleActionPreference preference = (SimpleActionPreference) findPreference("frostwire.prefs.internal.clear_index");
+        final ButtonActionPreference preference = (ButtonActionPreference) findPreference("frostwire.prefs.internal.clear_index");
 
         if (preference != null) {
             updateIndexSummary(preference);
@@ -442,7 +449,7 @@ public class SettingsActivity extends PreferenceActivity {
         return true;
     }
 
-    private void updateIndexSummary(SimpleActionPreference preference) {
+    private void updateIndexSummary(ButtonActionPreference preference) {
         float size = (((float) LocalSearchEngine.instance().getCacheSize()) / 1024) / 1024;
         preference.setSummary(getString(R.string.crawl_cache_size, size));
     }

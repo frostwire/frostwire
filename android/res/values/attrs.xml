@@ -38,7 +38,7 @@
         <attr name="rich_notification_action_links_horizontal_margin" format="integer"/>
 	</declare-styleable>
 	
-    <declare-styleable name="SimpleActionPreference">
+    <declare-styleable name="ButtonActionPreference">
         <attr name="button_text" format="string" />
     </declare-styleable>
     <declare-styleable name="numberpicker">

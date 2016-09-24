@@ -30,27 +30,27 @@ import com.frostwire.android.R;
  * @author gubatron
  * @author aldenml
  */
-public class CheckBoxPreference extends android.preference.CheckBoxPreference {
+public class CheckBoxSeedingPreference extends android.preference.CheckBoxPreference {
     private TextView title;
     private TextView summary;
     private CheckBox checkbox;
 
-    public CheckBoxPreference(Context context, AttributeSet attrs) {
+    public CheckBoxSeedingPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
     protected View onCreateView(ViewGroup parent) {
-        View view = View.inflate(getContext(), R.layout.view_checkbox_preference, null);
-        title = (TextView) view.findViewById(R.id.checkbox_preference_title);
-        summary = (TextView) view.findViewById(R.id.checkbox_preference_summary);
-        checkbox = (CheckBox) view.findViewById(R.id.checkbox_preference_checkbox);
+        View view = View.inflate(getContext(), R.layout.view_preference_checkbox_seeding, null);
+        title = (TextView) view.findViewById(R.id.view_preference_checkbox_seeding_title);
+        summary = (TextView) view.findViewById(R.id.view_preference_checkbox_seeding_summary);
+        checkbox = (CheckBox) view.findViewById(R.id.view_preference_checkbox_seeding_checkbox);
 
         checkbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CheckBoxPreference.this.setChecked(checkbox.isChecked());
-                CheckBoxPreference.this.getOnPreferenceChangeListener().onPreferenceChange(CheckBoxPreference.this,
+                CheckBoxSeedingPreference.this.setChecked(checkbox.isChecked());
+                CheckBoxSeedingPreference.this.getOnPreferenceChangeListener().onPreferenceChange(CheckBoxSeedingPreference.this,
                         Boolean.valueOf(checkbox.isChecked()));
             }
         });
