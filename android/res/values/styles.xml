@@ -122,6 +122,7 @@
         <item name="android:windowBackground">@color/basic_white</item>
         <item name="android:listViewStyle">@style/PreferencesListView</item>
         <item name="android:listDivider">@drawable/layout_divider_1_gray</item>
+        <item name="android:listSelector">@drawable/listview_item_press_background_selector</item>
     </style>
 
     <style name="PreferenceListSeparator">
