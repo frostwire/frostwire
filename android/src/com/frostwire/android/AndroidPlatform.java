@@ -24,7 +24,8 @@ import android.support.v4.provider.DocumentFile;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.jlibtorrent.LibTorrent;
-import com.frostwire.jlibtorrent.swig.posix_stat;
+import com.frostwire.jlibtorrent.swig.libtorrent;
+import com.frostwire.jlibtorrent.swig.posix_stat_t;
 import com.frostwire.jlibtorrent.swig.posix_wrapper;
 import com.frostwire.util.Logger;
 import com.frostwire.platform.*;
@@ -110,7 +111,10 @@ public final class AndroidPlatform extends AbstractPlatform {
 
         if (Build.VERSION.SDK_INT >= VERSION_CODE_LOLLIPOP) {
             LollipopFileSystem lfs = new LollipopFileSystem(app);
-            LibTorrent.setPosixWrapper(new PosixCalls(lfs));
+            PosixCalls w = new PosixCalls(lfs);
+            w.swigReleaseOwnership();
+            libtorrent.set_posix_wrapper(w);
+            //LibTorrent.setPosixWrapper(new PosixCalls(lfs));
             fs = lfs;
         } else {
             fs = new DefaultFileSystem() {
@@ -150,7 +154,7 @@ public final class AndroidPlatform extends AbstractPlatform {
         }
 
         @Override
-        public int stat(String path, posix_stat buf) {
+        public int stat(String path, posix_stat_t buf) {
             LOG.info("posix - stat:" + path);
 
             int r = super.stat(path, buf);
