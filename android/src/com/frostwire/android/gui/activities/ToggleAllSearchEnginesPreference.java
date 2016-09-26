@@ -35,6 +35,7 @@ import java.util.Map;
  *
  * @author gubatron
  * @author aldenml
+ * @author marcelinkaaa
  *
  */
 public class ToggleAllSearchEnginesPreference extends CheckBoxPreference {

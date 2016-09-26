@@ -38,7 +38,6 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
@@ -83,7 +82,6 @@ public class SettingsActivity extends PreferenceActivity {
     private static String currentPreferenceKey = null;
     private boolean finishOnBack = false;
     private long removeAdsPurchaseTime = 0;
-    private TextView TitleView;
 
     @Override
     protected void onResume() {
