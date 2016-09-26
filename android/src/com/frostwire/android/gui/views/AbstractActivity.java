@@ -35,7 +35,7 @@ public abstract class AbstractActivity extends Activity {
 
     private final int layoutResId;
     private final ArrayList<String> fragmentTags;
-
+m
     private boolean paused;
 
     public AbstractActivity(int layoutResId) {

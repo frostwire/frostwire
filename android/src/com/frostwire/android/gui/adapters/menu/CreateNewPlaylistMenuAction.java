@@ -42,8 +42,8 @@ import com.frostwire.util.Logger;
  * @author aldenml
  */
 public class CreateNewPlaylistMenuAction extends MenuAction {
+    // TODO: refactor this public static field
     public static PlaylistFragment fragment;
-    private static Logger LOG = Logger.getLogger(CreateNewPlaylistMenuAction.class);
     private final long[] fileDescriptors;
 
     public CreateNewPlaylistMenuAction(Context context, long[] fileDescriptors) {
@@ -98,7 +98,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
 
             EditText playlistInput = findView(dlg, R.id.dialog_default_input_text);
 
-            if (savedInstanceState != null && savedInstanceState.getString("playlistName")!=null) {
+            if (savedInstanceState != null && savedInstanceState.getString("playlistName") != null) {
                 playlistInput.setText(savedInstanceState.getString("playlistName"));
             } else {
                 playlistInput.setText("");

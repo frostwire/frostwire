@@ -26,33 +26,31 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
-import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * The first action towards adding a song(s) to a playlist.
  * Populates a menu with an action to add the song(s) to a new Playlist
  * and then for each existing playlist it creates further actions for a next step.
- *
+ * <p>
  * Created on 12/18/14.
  *
  * @author gubatron
  * @author aldenml
  */
-public class AddToPlaylistMenuAction extends MenuAction {
-    private Logger logger = Logger.getLogger(AddToPlaylistMenuAction.class);
+public final class AddToPlaylistMenuAction extends MenuAction {
+
     private long[] fds;
 
     public AddToPlaylistMenuAction(Context context, List<FileDescriptor> fds) {
-        super(context, getIconResourceId(context), R.string.add_to_playlist);
+        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist);
         setFileIdList(fds);
     }
 
     public AddToPlaylistMenuAction(Context context, long[] fds) {
-        super(context, getIconResourceId(context), R.string.add_to_playlist);
+        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist);
         this.fds = fds;
     }
 
@@ -73,7 +71,7 @@ public class AddToPlaylistMenuAction extends MenuAction {
     }
 
     private List<MenuAction> getMenuActions() {
-        List<MenuAction> actions = new ArrayList<MenuAction>();
+        List<MenuAction> actions = new ArrayList<>();
 
         actions.add(new CreateNewPlaylistMenuAction(getContext(), fds));
 
@@ -84,9 +82,5 @@ public class AddToPlaylistMenuAction extends MenuAction {
         }
 
         return actions;
-    }
-
-    private static int getIconResourceId(Context context) {
-        return R.drawable.contextmenu_icon_playlist_add_dark;
     }
 }

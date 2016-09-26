@@ -25,20 +25,20 @@ import com.frostwire.android.gui.views.MenuAction;
 
 /**
  * Created on 12/18/14.
- *
+ * <p>
  * This action is built to show the name of a playlist, when used it will
  * add the given file descriptors to the current playlist.
  *
  * @author gubatron
  * @author aldenml
  */
-public class AddToThisPlaylistMenuAction extends MenuAction {
-    //private final Logger logger = Logger.getLogger(AddToPlaylistMenuAction.class);
+public final class AddToThisPlaylistMenuAction extends MenuAction {
+
     private final long playlistId;
     private final long[] fileDescriptors;
 
     public AddToThisPlaylistMenuAction(Context context, long playlistId, String playlistName, long[] fileDescriptors) {
-        super(context, getIconResourceId(context), playlistName);
+        super(context, R.drawable.contextmenu_icon_playlist_add_dark, playlistName);
         this.playlistId = playlistId;
         this.fileDescriptors = fileDescriptors;
     }
@@ -50,9 +50,5 @@ public class AddToThisPlaylistMenuAction extends MenuAction {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-    }
-
-    private static int getIconResourceId(Context context) {
-        return  R.drawable.contextmenu_icon_playlist_add_dark;
     }
 }
