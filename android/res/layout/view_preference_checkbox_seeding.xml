@@ -41,34 +41,45 @@
             android:layout_weight="1">
 
             <TextView
-                android:id="@android:id/title"
+                android:id="@+id/view_preference_checkbox_seeding_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="marquee"
                 android:fadingEdge="horizontal"
                 android:maxLines="2"
+                android:text="@string/dummy_title"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/app_text_primary" />
+                android:textColor="@color/disabled_text_selector" />
 
             <TextView
-                android:id="@android:id/summary"
+                android:id="@+id/view_preference_checkbox_seeding_summary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@android:id/title"
-                android:layout_below="@android:id/title"
+                android:layout_below="@+id/view_preference_checkbox_seeding_title"
                 android:maxLines="3"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:text="@string/dummy_summary"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/disabled_text_selector" />
 
         </RelativeLayout>
 
         <!-- Preference should place its actual preference widget here. -->
         <LinearLayout
-            android:id="@+android:id/widget_frame"
+            android:id="@+id/widget_frame"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
-            android:orientation="vertical" />
+            android:orientation="vertical">
 
+            <CheckBox
+                android:id="@+id/view_preference_checkbox_seeding_checkbox"
+                style="@style/PreferencesCheckboxStyle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical" />
+        </LinearLayout>
     </LinearLayout>
 
     <ImageView

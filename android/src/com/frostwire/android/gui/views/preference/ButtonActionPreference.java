@@ -34,7 +34,7 @@ import com.frostwire.android.R;
  * @author aldenml
  *
  */
-public class SimpleActionPreference extends Preference {
+public class ButtonActionPreference extends Preference {
 
     private CharSequence title;
     private CharSequence summary;
@@ -46,12 +46,12 @@ public class SimpleActionPreference extends Preference {
 
     private OnClickListener listener;
 
-    public SimpleActionPreference(Context context, AttributeSet attrs) {
+    public ButtonActionPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.SimpleActionPreference);
+        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ButtonActionPreference);
 
-        buttonText = attributes.getString(R.styleable.SimpleActionPreference_button_text);
+        buttonText = attributes.getString(R.styleable.ButtonActionPreference_button_text);
         attributes.recycle();
     }
 
@@ -71,26 +71,6 @@ public class SimpleActionPreference extends Preference {
         }
     }
 
-    public void setButtonText(CharSequence text) {
-        this.buttonText = text;
-        if (button != null) {
-            button.setText(buttonText);
-        }
-    }
-
-    public void setButtonText(int resId) {
-        this.buttonText = getContext().getString(resId);
-        if (button != null) {
-            button.setText(resId);
-        }
-    }
-
-    public void setButtonEnabled(boolean enabled) {
-        if (button != null) {
-            button.setEnabled(enabled);
-        }
-    }
-
     public void setOnActionListener(OnClickListener listener) {
         this.listener = listener;
         if (button != null) {
@@ -100,15 +80,15 @@ public class SimpleActionPreference extends Preference {
 
     @Override
     protected View onCreateView(ViewGroup parent) {
-        View v = View.inflate(getContext(), R.layout.view_preference_simple_action, null);
+        View v = View.inflate(getContext(), R.layout.view_preference_button_action, null);
 
-        textTitle = (TextView) v.findViewById(R.id.view_preference_simple_action_title_text);
+        textTitle = (TextView) v.findViewById(R.id.view_preference_button_action_title);
         textTitle.setText(title != null ? title : getTitle());
 
-        textSummary = (TextView) v.findViewById(R.id.view_preference_simple_action_summary_text);
+        textSummary = (TextView) v.findViewById(R.id.view_preference_button_action_summary);
         textSummary.setText(summary != null ? summary : getSummary());
 
-        button = (Button) v.findViewById(R.id.view_preference_simple_action_button);
+        button = (Button) v.findViewById(R.id.view_preference_button_action_button);
         button.setText(buttonText);
         if (listener != null) {
             button.setOnClickListener(listener);

@@ -22,8 +22,12 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Widget.Holo.Light.ActionMode" parent="android:Widget.Holo.ActionMode">
-        <item name="android:titleTextStyle">@android:style/TextAppearance.Holo.Widget.ActionMode.Title</item>
-        <item name="android:subtitleTextStyle">@android:style/TextAppearance.Holo.Widget.ActionMode.Subtitle</item>
+        <item name="android:titleTextStyle">
+            @android:style/TextAppearance.Holo.Widget.ActionMode.Title
+        </item>
+        <item name="android:subtitleTextStyle">
+            @android:style/TextAppearance.Holo.Widget.ActionMode.Subtitle
+        </item>
     </style>
 
     <style name="ActionBar" parent="android:Widget.Holo.Light.ActionBar">
@@ -67,25 +71,25 @@
     </style>
 
     <style name="SearchInputFileTypeButtonLand" parent="android:Widget.CompoundButton.RadioButton">
-		<item name="android:layout_weight">1</item>
-		<item name="android:button">@null</item>
-		<item name="android:background">@drawable/searchinput_button_selector</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:button">@null</item>
+        <item name="android:background">@drawable/searchinput_button_selector</item>
         <item name="android:drawableLeft">@drawable/radio_button_background_selector</item>
-		<item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
-		<item name="android:textSize">14sp</item>
-		<item name="android:gravity">center</item>
+        <item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center</item>
     </style>
 
     <style name="BrowseFileTypeButton" parent="android:Widget.CompoundButton.RadioButton">
-		<item name="android:layout_weight">1</item>
-		<item name="android:button">@null</item>
-		<item name="android:background">@drawable/radio_button_background_selector</item>
-		<item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
-		<item name="android:textSize">10sp</item>
-		<item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:button">@null</item>
+        <item name="android:background">@drawable/radio_button_background_selector</item>
+        <item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:gravity">center_horizontal</item>
         <item name="android:layout_gravity">center</item>
-	</style>
+    </style>
 
     <style name="TransparentListView" parent="@android:style/Widget.ListView">
         <item name="android:cacheColorHint">@android:color/transparent</item>
@@ -106,30 +110,40 @@
         <item name="android:overScrollFooter">@null</item>
     </style>
 
-	<!-- Preferences -->
+    <!-- Preferences -->
 
     <style name="Preferences" parent="android:Theme.Holo.Light">
         <item name="android:icon">@null</item>
         <item name="android:actionBarStyle">@style/ActionBar</item>
         <item name="android:homeAsUpIndicator">@drawable/home_as_up_padding</item>
         <item name="android:checkboxStyle">@style/PreferencesCheckboxStyle</item>
-        <item name="android:listSeparatorTextViewStyle">@style/PreferenceListHeader</item>
-		<item name="android:textColorPrimary">@color/app_text_primary</item>
-		<item name="android:textColorSecondary">@color/app_text_secondary</item>
+        <item name="android:listSeparatorTextViewStyle">@style/PreferenceListSeparator</item>
+        <item name="android:textColorPrimary">@color/app_text_primary</item>
+        <item name="android:textColorSecondary">@color/app_text_secondary</item>
+        <item name="android:windowBackground">@color/basic_white</item>
+        <item name="android:listViewStyle">@style/PreferencesListView</item>
+        <item name="android:listDivider">@drawable/layout_divider_1_gray</item>
+        <item name="android:listSelector">@drawable/listview_item_press_background_selector</item>
     </style>
 
-    <style name="PreferenceListHeader">
-		<item name="android:layout_width">match_parent</item>
-		<item name="android:layout_height">1dp</item>
+    <style name="PreferenceListSeparator">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
     </style>
 
-    <style name="PreferencesCheckboxStyle" parent="android:Widget.CompoundButton.CheckBox">
+    <style name="PreferencesListView">
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="PreferencesCheckboxStyle">
         <item name="android:button">@drawable/checkbox_button_selector</item>
     </style>
 
     <style name="ProgressBarHolo.Horizontal" parent="android:Widget.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/progress_horizontal_holo_light</item>
-        <item name="android:indeterminateDrawable">@drawable/progress_indeterminate_horizontal_holo</item>
+        <item name="android:indeterminateDrawable">
+            @drawable/progress_indeterminate_horizontal_holo
+        </item>
         <item name="android:minHeight">16dip</item>
         <item name="android:maxHeight">16dip</item>
     </style>
@@ -166,13 +180,12 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">@dimen/text_medium</item>
     </style>
+
     <style name="SlideMenuAdHeader">
         <item name="android:singleLine">true</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">@dimen/text_x_small</item>
     </style>
-
-
 
 
     <!-- SlideMenu Ad end -->
@@ -350,7 +363,8 @@
     </style>
 
     <style name="SearchProgressViewRetryButton">
-        <item name="android:background">@drawable/retry_search_button_basic_blue_round_background</item>
+        <item name="android:background">@drawable/retry_search_button_basic_blue_round_background
+        </item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">12sp</item>
         <item name="android:height">26dp</item>
@@ -442,26 +456,32 @@
         <item name="android:fontFamily">sans-serif-regular</item>
         <item name="android:layout_marginTop">-5dp</item>
     </style>
+
     <style name="VPNTitleSecond">
         <item name="android:textSize">@dimen/text_size_large</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_marginTop">-5dp</item>
     </style>
+
     <style name="VPNTitleSecond.Color">
         <item name="android:textColor">@color/basic_blue_darker_highlight</item>
     </style>
+
     <style name="VPNSubTitle">
         <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:textStyle">bold</item>
     </style>
+
     <style name="VPNText">
         <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textColor">@color/app_text_secondary</item>
     </style>
+
     <style name="VPNText.Regular">
         <item name="android:fontFamily">sans-serif-regular</item>
     </style>
+
     <style name="VPNSmallText">
         <item name="android:textSize">@dimen/text_size_small</item>
         <item name="android:fontFamily">sans-serif-light</item>
@@ -473,12 +493,15 @@
         <item name="android:textColor">@color/app_text_primary</item>
         <item name="android:textSize">@dimen/text_large</item>
     </style>
+
     <style name="BuyNoAdsCardTitle.Bold">
         <item name="android:textStyle">bold</item>
     </style>
+
     <style name="BuyNoAdsCardTitle.Purchase">
         <item name="android:textStyle">normal</item>
     </style>
+
     <style name="BuyNoAdsCardPrice">
         <item name="android:textColor">@color/app_text_primary</item>
         <item name="android:textSize">@dimen/text_large</item>
@@ -486,10 +509,12 @@
         <item name="android:paddingTop">5dp</item>
         <item name="android:paddingBottom">5dp</item>
     </style>
+
     <style name="BuyNoAdsCardDescription">
         <item name="android:textColor">@color/app_text_secondary_dark</item>
         <item name="android:textSize">@dimen/text_small</item>
     </style>
+
     <style name="BuyNoAdsCardHint">
         <item name="android:textColor">@color/basic_white</item>
         <item name="android:background">@drawable/product_card_hint_button_background</item>
@@ -501,9 +526,11 @@
         <item name="android:paddingRight">10dp</item>
         <item name="android:layout_marginBottom">4dp</item>
     </style>
+
     <style name="BuyNoAdsSelectOptionBelowTitle" parent="BuyNoAdsCardTitle.Bold">
         <item name="android:layout_marginTop">8dp</item>
     </style>
+
     <style name="BuyNoAdsBuyButton" parent="BuyNoAdsCardHint">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
@@ -517,19 +544,23 @@
         <item name="android:textColor">@color/app_text_primary</item>
         <item name="android:textSize">@dimen/text_xx_large</item>
     </style>
+
     <style name="BuyNoAdsAdText.Support">
         <item name="android:textAllCaps">true</item>
         <item name="android:textStyle">bold</item>
     </style>
+
     <style name="BuyNoAdsAdText.Project">
         <item name="android:textAllCaps">true</item>
         <item name="android:textSize">@dimen/text_x_large</item>
     </style>
+
     <style name="BuyNoAdsAdText.Remove">
         <item name="android:textColor">@color/basic_white</item>
         <item name="android:textSize">28.0sp</item>
         <item name="android:textStyle">bold</item>
     </style>
+
     <style name="BuyNoAdsAdText.AdFree">
         <item name="android:textSize">@dimen/text_x_large</item>
         <item name="android:textColor">@color/app_dark_blue</item>
@@ -546,16 +577,19 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
     <style name="WizardText">
         <item name="android:textSize">@dimen/text_size_small</item>
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textColor">@color/frostwire_gray_explanation_text</item>
     </style>
+
     <style name="WizardSubTitle">
         <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:fontFamily">sans-serif-regular</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
     <style name="WizardButton">
         <item name="android:background">@drawable/wizard_button_selector</item>
     </style>
@@ -594,17 +628,21 @@
         <item name="android:padding">15dp</item>
         <item name="android:textStyle">bold</item>
     </style>
+
     <style name="DefaultDialogTheme.MainText">
         <item name="android:textSize">@dimen/text_large</item>
     </style>
+
     <style name="DefaultDialogTheme.SmallText">
         <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textColor">@color/app_text_secondary</item>
         <item name="android:padding">3dp</item>
     </style>
+
     <style name="DefaultDialogTheme.LongText">
         <item name="android:textSize">@dimen/text_medium</item>
     </style>
+
     <style name="DefaultDialogTheme.Buttons">
         <item name="android:textSize">@dimen/text_large</item>
         <item name="android:paddingTop">15dp</item>
@@ -619,4 +657,4 @@
         <item name="android:padding">3dp</item>
         <item name="android:textStyle">bold</item>
     </style>
- </resources>
+</resources>

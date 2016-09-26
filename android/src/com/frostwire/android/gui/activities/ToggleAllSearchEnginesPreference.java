@@ -35,6 +35,7 @@ import java.util.Map;
  *
  * @author gubatron
  * @author aldenml
+ * @author marcelinkaaa
  *
  */
 public class ToggleAllSearchEnginesPreference extends CheckBoxPreference {
@@ -45,12 +46,12 @@ public class ToggleAllSearchEnginesPreference extends CheckBoxPreference {
 
     public ToggleAllSearchEnginesPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        setLayoutResource(R.layout.view_checkbox_preference);
+        setLayoutResource(R.layout.view_preference_checkbox_header);
     }
 
     public ToggleAllSearchEnginesPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setLayoutResource(R.layout.view_checkbox_preference);
+        setLayoutResource(R.layout.view_preference_checkbox_header);
     }
 
     public CheckBox getCheckbox() {
@@ -60,14 +61,14 @@ public class ToggleAllSearchEnginesPreference extends CheckBoxPreference {
     @Override
     protected View onCreateView(ViewGroup parent) {
         View view = super.onCreateView(parent);
-        final TextView titleView = (TextView) view.findViewById(R.id.checkbox_preference_title);
+        final TextView titleView = (TextView) view.findViewById(R.id.view_preference_checkbox_header_title);
         titleView.setText(getTitle());
-        view.findViewById(R.id.checkbox_preference_summary).setVisibility(View.INVISIBLE);
 
-        checkbox = (CheckBox) view.findViewById(R.id.checkbox_preference_checkbox);
+        checkbox = (CheckBox) view.findViewById(R.id.view_preference_checkbox_header_checkbox);
         checkbox.setVisibility(View.VISIBLE);
         checkbox.setClickable(true);
         checkbox.setChecked(areAllEnginesChecked());
+
 
         checkbox.setOnClickListener(new View.OnClickListener() {
             @Override
