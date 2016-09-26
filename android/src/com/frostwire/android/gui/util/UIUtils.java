@@ -30,10 +30,17 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.text.Html;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Toast;
+
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -46,9 +53,11 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -68,7 +77,7 @@ public final class UIUtils {
 
     private static final String[] BYTE_UNITS = new String[]{"b", "KB", "Mb", "Gb", "Tb"};
 
-    public static final String GENERAL_UNIT_KBPSEC = "KB/s";
+    private static final String GENERAL_UNIT_KBPSEC = "KB/s";
 
     static {
         NUMBER_FORMAT0 = NumberFormat.getNumberInstance(Locale.getDefault());
@@ -77,7 +86,7 @@ public final class UIUtils {
         NUMBER_FORMAT0.setGroupingUsed(true);
     }
 
-    public static void showToastMessage(Context context, String message, int duration, int gravity, int xOffset, int yOffset) {
+    private static void showToastMessage(Context context, String message, int duration, int gravity, int xOffset, int yOffset) {
         if (context != null && message != null) {
             Toast toast = Toast.makeText(context, message, duration);
             if (gravity != (Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM)) {
@@ -447,6 +456,23 @@ public final class UIUtils {
         }
 
         socialLinksDialog.show();
+    }
+
+    public static boolean finishOnHomeOptionItemSelected(Activity activity, MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                activity.finish();
+                return true;
+            default:
+                Class<?> superclass = activity.getClass().getSuperclass();
+                try {
+                    Method onOptionsItemSelectedMethod = superclass.getDeclaredMethod("onOptionsItemSelected", MenuItem.class);
+                    return (Boolean) onOptionsItemSelectedMethod.invoke(activity, item);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+        }
+        return false;
     }
 
     // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over enginner.

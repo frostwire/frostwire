@@ -22,6 +22,7 @@ import android.app.ActionBar;
 import android.os.Bundle;
 import android.view.MenuItem;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 
 public class AboutActivity extends AbstractActivity {
@@ -41,12 +42,6 @@ public class AboutActivity extends AbstractActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return UIUtils.finishOnHomeOptionItemSelected(this, item);
     }
 }

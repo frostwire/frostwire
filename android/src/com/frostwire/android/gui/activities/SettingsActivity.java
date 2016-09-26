@@ -307,13 +307,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return UIUtils.finishOnHomeOptionItemSelected(this, item);
     }
 
     private void setupSeedingOptions() {
