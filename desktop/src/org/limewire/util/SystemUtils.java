@@ -45,7 +45,7 @@ public class SystemUtils {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
-        } catch (UnsatisfiedLinkError noGo) {
+        } catch (Throwable noGo) {
             System.out.println("ERROR: " + noGo.getMessage());
             canLoad = false;
         }

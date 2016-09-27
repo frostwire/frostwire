@@ -16,7 +16,7 @@ public final class GURLHandler {
     static {
         try {
             System.loadLibrary("GURLLeopard");
-        } catch (UnsatisfiedLinkError err) {
+        } catch (Throwable err) {
             ErrorService.error(err);
         }
     }
