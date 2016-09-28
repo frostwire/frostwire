@@ -109,13 +109,8 @@ android {
             }
         }
 
-    //Added by muckachina for espresso - Setting the root of instrumented tests - configured by Alden 
-    androidTest {
-        java {
-            srcDir 'tests/espresso'
-        }
-    
-    }
+        //Added by muckachina for espresso - Setting the root of instrumentation test 
+        androidTest.setRoot('androidTest')
     
         plus1.res.srcDirs = ['res-plus1']
     }
@@ -160,15 +155,6 @@ android {
     }
 }
 
-//Added by muckachina for espresso
-def SUPPORT_ANNOTATIONS_VERSION = "23.3.0"
-
-configurations.all {
-    resolutionStrategy {
-        force "com.android.support:support-annotations:${SUPPORT_ANNOTATIONS_VERSION}"
-    }
-}
-
 dependencies {
     compile "com.android.support:design:24.2.1"
     compile 'com.google.android.gms:play-services-ads-lite:9.6.1'
@@ -182,19 +168,9 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     
     //Added by muckachina for espresso - Test dependencies 
-    def TEST_RUNNER_VERSION = "0.4.1"
-    def ESPRESSO_VERSION = "2.2.1"
-    //----- Instrumentation tests dependencies -----
-    androidTestCompile "com.android.support:support-annotations:${SUPPORT_ANNOTATIONS_VERSION}"
-    androidTestCompile "com.android.support.test:runner:${TEST_RUNNER_VERSION}"
-    androidTestCompile "com.android.support.test:rules:${TEST_RUNNER_VERSION}"
-    androidTestCompile "com.android.support.test.espresso:espresso-core:${ESPRESSO_VERSION}"
-    androidTestCompile("com.android.support.test.espresso:espresso-contrib:${ESPRESSO_VERSION}") {
-        exclude group: 'com.android.support', module: 'appcompat'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude module: 'recyclerview-v7'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+    exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     
 }
 
