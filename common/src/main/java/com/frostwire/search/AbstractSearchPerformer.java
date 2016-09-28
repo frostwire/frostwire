@@ -17,7 +17,7 @@
 
 package com.frostwire.search;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.util.List;
 

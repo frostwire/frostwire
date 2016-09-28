@@ -29,7 +29,7 @@ import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentItemSearchResult;
@@ -52,6 +52,7 @@ import com.limegroup.gnutella.settings.BittorrentSettings;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 import com.limegroup.gnutella.settings.TablesHandlerSettings;
 import com.limegroup.gnutella.settings.iTunesSettings;
+import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
@@ -355,7 +356,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      */
     private double getBandwidth(boolean download) {
         BTEngine engine = BTEngine.getInstance();
-        double totalBandwidth = download ? engine.getDownloadRate() : engine.getUploadRate();
+        double totalBandwidth = download ? engine.downloadRate() : engine.uploadRate();
         if (download) {
             double httpBandwidth = 0;
             for (BTDownload btDownload : this.getDownloads()) {
@@ -612,7 +613,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         GUIMediator.safeInvokeLater(new Runnable() {
             public void run() {
                 try {
-                    BTEngine.getInstance().download(torrentFile, saveDir);
+                    BTEngine.getInstance().download(torrentFile, saveDir, null);
                 } catch (Throwable e) {
                     e.printStackTrace();
                     if (!e.toString().contains("No files selected by user")) {
@@ -655,17 +656,18 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                         if (filesSelection == null) {
                             return;
                         }
+                    }
 
-                        if (onOpenRunnableForUIThread != null) {
-                            onOpenRunnableForUIThread.run();
-                        }
+                    if (onOpenRunnableForUIThread != null) {
+                        onOpenRunnableForUIThread.run();
                     }
 
                     File saveDir = null;
 
                     // Check if there's a file named like the torrent in the same folder
                     // then that means the user wants to seed
-                    String seedDataFilename = torrentFile.getName().replace(".torrent", "");
+                    String seedDataFilename = FilenameUtils.removeExtension(torrentFile.getName());
+
                     File seedDataFile = new File(torrentFile.getParentFile(), seedDataFilename);
                     if (seedDataFile.exists()) {
                         saveDir = torrentFile.getParentFile();
@@ -737,12 +739,12 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
     public long getTotalBytesDownloaded() {
         BTEngine engine = BTEngine.getInstance();
-        return engine.getTotalDownload();
+        return engine.totalDownload();
     }
 
     public long getTotalBytesUploaded() {
         BTEngine engine = BTEngine.getInstance();
-        return engine.getTotalUpload();
+        return engine.totalUpload();
     }
 
     private boolean isClearable(BTDownload initializeObject) {

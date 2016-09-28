@@ -128,9 +128,12 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     private void updateUIData(SearchResultActionsHolder actionsHolder, JTable table, int row, int column) {
         cancelEdit();
+        if (actionsHolder == null) {
+            return;
+        }
         searchResult = actionsHolder.getSearchResult();
 
-        if (searchResult==null) {
+        if (searchResult == null) {
             return;
         }
         showSolid = mouseIsOverRow(table, row);

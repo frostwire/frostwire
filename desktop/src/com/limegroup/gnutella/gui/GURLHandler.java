@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import org.limewire.service.ErrorService;
 
 /**
@@ -16,7 +16,7 @@ public final class GURLHandler {
     static {
         try {
             System.loadLibrary("GURLLeopard");
-        } catch (UnsatisfiedLinkError err) {
+        } catch (Throwable err) {
             ErrorService.error(err);
         }
     }

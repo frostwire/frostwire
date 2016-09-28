@@ -41,7 +41,7 @@ import com.frostwire.uxstats.UXStats;
  * @author gubatron
  * @author aldenml
  */
-public class CancelMenuAction extends MenuAction {
+public final class CancelMenuAction extends MenuAction {
 
     private final Transfer transfer;
     private final boolean deleteData;
@@ -67,7 +67,7 @@ public class CancelMenuAction extends MenuAction {
         CancelMenuActionDialog.newInstance(
                 transfer,
                 deleteData, deleteTorrent, this).
-                show(((Activity)getContext()).getFragmentManager());
+                show(((Activity) getContext()).getFragmentManager());
     }
 
     public static class CancelMenuActionDialog extends AbstractDialog {
@@ -77,9 +77,9 @@ public class CancelMenuAction extends MenuAction {
         private static CancelMenuAction cancelMenuAction;
 
         public static CancelMenuActionDialog newInstance(Transfer t,
-                                                  boolean delete_data,
-                                                  boolean delete_torrent,
-                                                  CancelMenuAction cancel_menu_action) {
+                                                         boolean delete_data,
+                                                         boolean delete_torrent,
+                                                         CancelMenuAction cancel_menu_action) {
             transfer = t;
             deleteData = delete_data;
             deleteTorrent = delete_torrent;

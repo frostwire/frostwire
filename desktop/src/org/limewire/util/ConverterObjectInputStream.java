@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * Converts older package and class names to the new equivalent name and is useful 

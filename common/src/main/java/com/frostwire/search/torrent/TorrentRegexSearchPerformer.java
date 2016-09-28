@@ -17,7 +17,7 @@
 
 package com.frostwire.search.torrent;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.*;
@@ -84,6 +84,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
                 Matcher matcher = htmlDetailPagePattern.matcher(html);
     
                 try {
+                    // BOOKMARK: this is a good spot to put a break point in-order to test your search performer's regex
                     if (matcher.find()) {
                         T searchResult = fromHtmlMatcher(sr, SearchMatcher.from(matcher));
                         if (searchResult != null) {

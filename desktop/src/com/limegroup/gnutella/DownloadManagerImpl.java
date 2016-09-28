@@ -18,7 +18,7 @@ package com.limegroup.gnutella;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineAdapter;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.UpdateSettings;
 
 import java.io.File;
@@ -63,7 +63,7 @@ public final class DownloadManagerImpl implements DownloadManager {
 
                     File savePath = dl.getSavePath();
 
-                    if (savePath != null && savePath.toString().contains("fetch_magnet/")) {
+                    if (savePath != null && savePath.toString().contains("fetch_magnet")) {
                         return;
                     }
 

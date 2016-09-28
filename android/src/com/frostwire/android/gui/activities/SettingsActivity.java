@@ -25,6 +25,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.*;
@@ -37,6 +38,7 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.Toast;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
@@ -49,17 +51,23 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.preference.ButtonActionPreference;
+import com.frostwire.android.gui.views.preference.CheckBoxSeedingPreference;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference;
-import com.frostwire.android.gui.views.preference.SimpleActionPreference;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
+import com.frostwire.android.offers.Products;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * See {@link ConfigurationManager}
@@ -69,10 +77,11 @@ import java.util.Collection;
  * @author sssemil
  */
 public class SettingsActivity extends PreferenceActivity {
-
     private static final Logger LOG = Logger.getLogger(SettingsActivity.class);
+    private static final boolean INTERNAL_BUILD = true;
     private static String currentPreferenceKey = null;
     private boolean finishOnBack = false;
+    private long removeAdsPurchaseTime = 0;
 
     @Override
     protected void onResume() {
@@ -87,8 +96,11 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         addPreferencesFromResource(R.xml.application_preferences);
+
+        getListView().setPadding(20, 0, 20, 0);
+        getListView().setDivider(new ColorDrawable(this.getResources().getColor(R.color.basic_gray_dark_solid)));
+        getListView().setDividerHeight(1);
 
         hideActionBarIcon(getActionBar());
 
@@ -127,7 +139,7 @@ public class SettingsActivity extends PreferenceActivity {
         setupClearIndex();
         setupSearchEngines();
         setupUXStatsOption();
-        setupStore();
+        setupStore(removeAdsPurchaseTime);
     }
 
     private void setupTorrentOptions() {
@@ -147,8 +159,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setDownloadSpeedLimit((int) newValue);
-                        return e.getDownloadSpeedLimit() == (int) newValue;
+                        e.downloadRateLimit((int) newValue);
+                        return e.downloadRateLimit() == (int) newValue;
                     }
                     return false;
                 }
@@ -163,8 +175,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setUploadSpeedLimit((int) newValue);
-                        return e.getUploadSpeedLimit() == (int) newValue;
+                        e.uploadRateLimit((int) newValue);
+                        return e.uploadRateLimit() == (int) newValue;
                     }
                     return false;
                 }
@@ -179,8 +191,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setMaxActiveDownloads((int) newValue);
-                        return e.getMaxActiveDownloads() == (int) newValue;
+                        e.maxActiveDownloads((int) newValue);
+                        return e.maxActiveDownloads() == (int) newValue;
                     }
                     return false;
                 }
@@ -195,8 +207,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setMaxActiveSeeds((int) newValue);
-                        return e.getMaxActiveSeeds() == (int) newValue;
+                        e.maxActiveSeeds((int) newValue);
+                        return e.maxActiveSeeds() == (int) newValue;
                     }
                     return false;
                 }
@@ -211,8 +223,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setMaxConnections((int) newValue);
-                        return e.getMaxConnections() == (int) newValue;
+                        e.maxConnections((int) newValue);
+                        return e.maxConnections() == (int) newValue;
                     }
                     return false;
                 }
@@ -227,8 +239,8 @@ public class SettingsActivity extends PreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if (e != null) {
-                        e.setMaxPeers((int) newValue);
-                        return e.getMaxPeers() == (int) newValue;
+                        e.maxPeers((int) newValue);
+                        return e.maxPeers() == (int) newValue;
                     }
                     return false;
                 }
@@ -239,6 +251,39 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupOtherOptions() {
         setupPermanentStatusNotificationOption();
+        setupSupportFrostWireOption();
+    }
+
+    private void setupSupportFrostWireOption() {
+        final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
+        if (!Constants.IS_BASIC_AND_DEBUG && Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            removeSupportFrostWirePreference(preference);
+        }
+        else if (!Constants.IS_BASIC_AND_DEBUG && Products.disabledAds(PlayStore.getInstance())) {
+            removeSupportFrostWirePreference(preference);
+        }
+        else if (preference != null){
+            preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    if(!((CheckBoxPreference) preference).isChecked()) {
+                        UIUtils.openURL(preference.getContext(), Constants.FROSTWIRE_GIVE_URL + "plus-unsupport-fw");
+                    }
+                    return true;
+                }
+            });
+        }
+    }
+
+    private void removeSupportFrostWirePreference(CheckBoxPreference preference) {
+        if (preference == null) {
+            return;
+        }
+        preference.setOnPreferenceClickListener(null);
+        PreferenceScreen category = (PreferenceScreen) findPreference(Constants.PREF_KEY_OTHER_PREFERENCE_CATEGORY);
+        if (category != null && preference != null) {
+            category.removePreference(preference);
+        }
     }
 
     private void setupPermanentStatusNotificationOption() {
@@ -262,13 +307,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return UIUtils.finishOnHomeOptionItemSelected(this, item);
     }
 
     private void setupSeedingOptions() {
@@ -276,7 +315,7 @@ public class SettingsActivity extends PreferenceActivity {
                 findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
 
         // our custom preference, only so that we can change its status, or hide it.
-        final com.frostwire.android.gui.views.preference.CheckBoxPreference preferenceSeedingWifiOnly = (com.frostwire.android.gui.views.preference.CheckBoxPreference)
+        final CheckBoxSeedingPreference preferenceSeedingWifiOnly = (CheckBoxSeedingPreference)
                 findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
 
         if (preferenceSeeding != null) {
@@ -318,7 +357,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void setupClearIndex() {
-        final SimpleActionPreference preference = (SimpleActionPreference) findPreference("frostwire.prefs.internal.clear_index");
+        final ButtonActionPreference preference = (ButtonActionPreference) findPreference("frostwire.prefs.internal.clear_index");
 
         if (preference != null) {
             updateIndexSummary(preference);
@@ -332,23 +371,77 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
-    private void setupSearchEngines() {
-        PreferenceScreen category = (PreferenceScreen) findPreference(Constants.PREF_KEY_SEARCH_PREFERENCE_CATEGORY);
-        if (category != null) {
-            for (SearchEngine engine : SearchEngine.getEngines()) {
-                CheckBoxPreference preference = (CheckBoxPreference) findPreference(engine.getPreferenceKey());
-                if (preference != null) { //it could already have been removed due to remote config value.
-                    //LOG.info(engine.getName() + " is enabled: " + engine.isActive());
-                    if (!engine.isActive()) {
-                        LOG.info("removing preference for engine " + engine.getName());
-                        category.removePreference(preference);
-                    }
+    private void getSearchEnginePreferences(Map<CheckBoxPreference,SearchEngine> inactiveSearchEnginePreferences, Map<CheckBoxPreference,SearchEngine> activeSearchEnginePreferences) {
+        // make sure we start empty
+        inactiveSearchEnginePreferences.clear();
+        activeSearchEnginePreferences.clear();
+
+        for (SearchEngine engine : SearchEngine.getEngines()) {
+            CheckBoxPreference preference = (CheckBoxPreference) findPreference(engine.getPreferenceKey());
+            if (preference != null) { //it could already have been removed due to remote config value.
+                if (engine.isActive()) {
+                    activeSearchEnginePreferences.put(preference, engine);
+                } else {
+                    inactiveSearchEnginePreferences.put(preference, engine);
                 }
             }
         }
     }
 
-    private void updateIndexSummary(SimpleActionPreference preference) {
+    private void setupSearchEngines() {
+        final PreferenceScreen searchEnginesScreen = (PreferenceScreen) findPreference(Constants.PREF_KEY_SEARCH_PREFERENCE_CATEGORY);
+        final Map<CheckBoxPreference, SearchEngine> inactiveSearchPreferences = new HashMap<>();
+        final Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences = new HashMap<>();
+        getSearchEnginePreferences(inactiveSearchPreferences, activeSearchEnginePreferences);
+
+            // Click listener for the search engines. Checks or unchecks the SelectAll checkbox
+        final Preference.OnPreferenceClickListener searchEngineClickListener = new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                TwoStatePreference cbPreference = (TwoStatePreference) preference;
+                ToggleAllSearchEnginesPreference selectAll = (ToggleAllSearchEnginesPreference) findPreference("frostwire.prefs.search.preference_category.select_all");
+
+                selectAll.setClickListenerEnabled(false);
+                if (!cbPreference.isChecked()) {
+                    selectAll.setChecked(false);
+                    if (areAllEnginesChecked(false, activeSearchEnginePreferences)) {
+                        cbPreference.setChecked(true); // always keep one checked
+                    }
+                } else {
+                    boolean allChecked = areAllEnginesChecked(true, activeSearchEnginePreferences);
+                    selectAll.setChecked(allChecked);
+                }
+                selectAll.setClickListenerEnabled(true);
+                return true;
+            }
+        };
+
+        // Hide inactive search engines and setup click listeners to interact with Select All.
+        if (searchEnginesScreen != null) {
+            for (CheckBoxPreference preference : inactiveSearchPreferences.keySet()) {
+                searchEnginesScreen.removePreference(preference);
+            }
+        }
+
+        for (CheckBoxPreference preference : activeSearchEnginePreferences.keySet()) {
+            preference.setOnPreferenceClickListener(searchEngineClickListener);
+        }
+
+        ToggleAllSearchEnginesPreference selectAll = (ToggleAllSearchEnginesPreference) findPreference("frostwire.prefs.search.preference_category.select_all");
+        selectAll.setSearchEnginePreferences(activeSearchEnginePreferences);
+    }
+
+    private boolean areAllEnginesChecked(boolean checked, Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences) {
+        final Collection<CheckBoxPreference> preferences = activeSearchEnginePreferences.keySet();
+        for (CheckBoxPreference preference : preferences) {
+            if (checked != preference.isChecked()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void updateIndexSummary(ButtonActionPreference preference) {
         float size = (((float) LocalSearchEngine.instance().getCacheSize()) / 1024) / 1024;
         preference.setSummary(getString(R.string.crawl_cache_size, size));
     }
@@ -445,19 +538,54 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
-    private void setupStore() {
+    private void setupStore(long purchaseTimestamp) {
         Preference p = findPreference("frostwire.prefs.offers.buy_no_ads");
-        if (p != null && !Constants.IS_STORE_ENABLE) {
+        if (p != null && !Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
             PreferenceScreen s = getPreferenceScreen();
             s.removePreference(p);
         } else if (p != null) {
             final PlayStore playStore = PlayStore.getInstance();
-            final Collection<Product> products = playStore.purchasedProducts();
-            if (products != null && products.size() > 0) {
-                Product product = products.iterator().next();
-                p.setSummary(getString(R.string.current_plan) + ":" + product.description());
+            playStore.refresh();
+            final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
+            if (purchaseTimestamp == 0 && purchasedProducts != null && purchasedProducts.size() > 0) {
+                initRemoveAdsSummaryWithPurchaseInfo(p, purchasedProducts);
+                //otherwise, a BuyActivity intent has been configured on application_preferences.xml
+            } else if (purchaseTimestamp > 0 &&
+                    (System.currentTimeMillis()-purchaseTimestamp) < 30000) {
+                p.setSummary(getString(R.string.processing_payment)+"...");
+                p.setOnPreferenceClickListener(null);
+            } else {
+                p.setSummary(R.string.remove_ads_description);
+                p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        PlayStore.getInstance().endAsync();
+                        Intent intent = new Intent(SettingsActivity.this, BuyActivity.class);
+                        startActivityForResult(intent, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
+                        return true;
+                    }
+                });
             }
         }
+    }
+
+    private void initRemoveAdsSummaryWithPurchaseInfo(Preference p, Collection<Product> purchasedProducts) {
+        final Product product = purchasedProducts.iterator().next();
+        String daysLeft = "";
+        // if it's a one time purchase, show user how many days left she has.
+        if (!product.subscription() && product.purchased()) {
+            int daysBought = Products.toDays(product.sku());
+            if (daysBought > 0) {
+                final int MILLISECONDS_IN_A_DAY = 86400000;
+                long timePassed = System.currentTimeMillis() - product.purchaseTime();
+                int daysPassed = (int) timePassed / MILLISECONDS_IN_A_DAY;
+                if (daysPassed > 0 && daysPassed < daysBought) {
+                    daysLeft = " (" + getString(R.string.days_left) + ": " + String.valueOf(daysBought - daysPassed) + ")";
+                }
+            }
+        }
+        p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
+        p.setOnPreferenceClickListener(new RemoveAdsOnPreferenceClickListener(this, purchasedProducts));
     }
 
     @Override
@@ -473,7 +601,14 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
-        } else {
+        } else if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
+                data != null &&
+                data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
+            // We (onActivityResult) are invoked before onResume()
+            removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
+            LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime="+removeAdsPurchaseTime);
+        }
+        else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -559,7 +694,6 @@ public class SettingsActivity extends PreferenceActivity {
                     dialog.dismiss();
                     if (finishOnBack) {
                         finish();
-                        return;
                     }
                 }
             });
@@ -606,6 +740,54 @@ public class SettingsActivity extends PreferenceActivity {
                 preferenceScreen.onItemClick(null, null, itemNumber, 0);
                 break;
             }
+        }
+    }
+
+    private static class RemoveAdsOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
+        private int clicksLeftToConsumeProducts = 20;
+        private final Collection<Product> purchasedProducts;
+        private WeakReference<SettingsActivity> activityRef;
+
+        RemoveAdsOnPreferenceClickListener(SettingsActivity activity, final Collection<Product> purchasedProducts) {
+            activityRef = Ref.weak(activity);
+            this.purchasedProducts = purchasedProducts;
+        }
+
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            if (purchasedProducts != null && !purchasedProducts.isEmpty()) {
+                LOG.info("Products purchased by user:");
+                for (Product p : purchasedProducts) {
+                    LOG.info(" - " + p.description() + " (" + p.sku() + ")");
+                }
+
+                if (INTERNAL_BUILD) {
+                    clicksLeftToConsumeProducts--;
+                    LOG.info("If you click again " + clicksLeftToConsumeProducts + " times, all your ONE-TIME purchases will be forced-consumed.");
+                    if (0 >= clicksLeftToConsumeProducts && clicksLeftToConsumeProducts < 11) {
+                        if (clicksLeftToConsumeProducts == 0) {
+                            for (Product p : purchasedProducts) {
+                                if (p.subscription()) {
+                                    continue;
+                                }
+                                PlayStore.getInstance().consume(p);
+                                LOG.info(" - " + p.description() + " (" + p.sku() + ") force-consumed!");
+                                UIUtils.showToastMessage(preference.getContext(),
+                                        "Product " + p.sku() + " forced-consumed.",
+                                        Toast.LENGTH_SHORT);
+                            }
+                            if (Ref.alive(activityRef)) {
+                                activityRef.get().finish();
+                            }
+                        }
+                    }
+                }
+
+                return true; // true = click was handled.
+            } else {
+                LOG.info("Couldn't find any purchases.");
+            }
+            return false;
         }
     }
 }

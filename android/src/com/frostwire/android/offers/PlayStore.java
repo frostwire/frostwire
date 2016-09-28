@@ -23,10 +23,15 @@ import android.content.Intent;
 import com.android.vending.billing.*;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.frostwire.android.offers.Products.toDays;
 
 /**
  * @author gubatron
@@ -53,6 +58,7 @@ public final class PlayStore extends StoreBase {
     private IabHelper.OnIabPurchaseFinishedListener purchaseFinishedListener;
     private IabHelper.OnConsumeFinishedListener consumeFinishedListener;
 
+    private Inventory inventory;
     private long lastRefreshTime;
 
     private String lastSkuPurchased;
@@ -75,6 +81,7 @@ public final class PlayStore extends StoreBase {
                     return;
                 }
 
+                PlayStore.this.inventory = inventory;
                 products = buildProducts(inventory);
             }
         };
@@ -91,9 +98,24 @@ public final class PlayStore extends StoreBase {
                     return;
                 }
 
+                if (purchase == null) {
+                    // could be the result of a call to endAsync
+                    return;
+                }
+
                 String sku = purchase.getSku();
                 lastSkuPurchased = sku;
                 LOG.info("Purchased sku " + sku);
+
+                if (inventory != null) {
+                    try {
+                        inventory.addPurchase(purchase);
+                        products = buildProducts(inventory);
+                        LOG.info("Inventory updated");
+                    } catch (Throwable e) {
+                        LOG.error("Error updating internal inventory after purchase", e);
+                    }
+                }
             }
         };
 
@@ -148,6 +170,7 @@ public final class PlayStore extends StoreBase {
     public void refresh() {
         long now = System.currentTimeMillis();
         if ((now - lastRefreshTime) < REFRESH_RESOLUTION_MILLIS) {
+            LOG.info("refresh() aborted, too early.");
             return;
         }
 
@@ -162,10 +185,11 @@ public final class PlayStore extends StoreBase {
             List<String> items = Products.itemSkus();
             List<String> subs = Products.subsSkus();
             helper.queryInventoryAsync(true, items, subs, inventoryListener);
+            LOG.info("Refreshing inventory...");
         } catch (IabHelper.IabAsyncInProgressException e) {
             LOG.error("Error querying inventory. Another async operation in progress.", e);
         } catch (Throwable t) {
-            LOG.error("Error querying inventory.",  t);
+            LOG.error("Error querying inventory.", t);
         }
     }
 
@@ -186,6 +210,8 @@ public final class PlayStore extends StoreBase {
             helper.launchPurchaseFlow(activity, p.sku(), codeRequest, purchaseFinishedListener);
         } catch (IabHelper.IabAsyncInProgressException e) {
             LOG.error("Error launching purchase flow. Another async operation in progress.", e);
+        } catch (Throwable e) {
+            LOG.error("Error launching purchase flow.", e);
         }
 
         if (BuildConfig.DEBUG) {
@@ -201,21 +227,41 @@ public final class PlayStore extends StoreBase {
                 return true;
             }
         }
-
         return super.enabled(code);
     }
 
-    public Collection<Product> purchasedProducts() {
-        Collection<Product> allAvailableProducts = products().values();
-        Collection<Product> purchasedProducts  = new ArrayList<>();
-        final Iterator<Product> iterator = allAvailableProducts.iterator();
-        while (iterator.hasNext()) {
-            Product product = iterator.next();
-            if (product.enable(Products.DISABLE_ADS_FEATURE)) {
-                purchasedProducts.add(product);
-            }
+    /**
+     * This method is used only for internal tests.
+     *
+     * @param product
+     */
+    public final void consume(Product product) {
+        if (product.subscription() || !product.purchased()) {
+            throw new IllegalArgumentException("Only inapp purchases can be consumed");
         }
-        return purchasedProducts;
+        try {
+            final Purchase purchase = inventory.getPurchase(product.sku());
+            helper.consumeAsync(purchase, consumeFinishedListener);
+            LOG.info("product " + product.sku() + " consumed (async).");
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            LOG.error("Error consuming purchase. Another async operation in progress.", e);
+        } catch (Throwable e) {
+            LOG.error("Error consuming purchase.", e);
+        }
+    }
+
+    public void endAsync() {
+        if (helper == null) {
+            LOG.warn("Helper has been disposed or not initialized");
+            return;
+        }
+
+        try {
+            helper.handleActivityResult(RC_NO_ADS_SUBS_REQUEST, 0, null);
+            helper.handleActivityResult(RC_NO_ADS_INAPP_REQUEST, 0, null);
+        } catch (Throwable e) {
+            LOG.error("Error ending async operation in the internal helper (review your logic)", e);
+        }
     }
 
     public void dispose() {
@@ -253,31 +299,30 @@ public final class PlayStore extends StoreBase {
         // build each product, one by one, not magic here intentionally
         Product product;
 
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_MONTH_SKU, INAPP_TYPE, inventory, 31);
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_MONTH_SKU, INAPP_TYPE, inventory, toDays(Products.INAPP_DISABLE_ADS_1_MONTH_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, 183);
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, INAPP_TYPE, inventory, toDays(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, 365);
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, INAPP_TYPE, inventory, toDays(Products.INAPP_DISABLE_ADS_1_YEAR_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, SUBS_TYPE, inventory, 31);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, SUBS_TYPE, inventory, toDays(Products.SUBS_DISABLE_ADS_1_MONTH_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, SUBS_TYPE, inventory, 183);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, SUBS_TYPE, inventory, toDays(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, SUBS_TYPE, inventory, 365);
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, SUBS_TYPE, inventory, toDays(Products.SUBS_DISABLE_ADS_1_YEAR_SKU));
         if (product != null) {
             m.put(product.sku(), product);
         }
-
         return m;
     }
 
@@ -322,6 +367,8 @@ public final class PlayStore extends StoreBase {
                     helper.consumeAsync(p, consumeFinishedListener);
                 } catch (IabHelper.IabAsyncInProgressException e) {
                     LOG.error("Error consuming purchase. Another async operation in progress.", e);
+                } catch (Throwable e) {
+                    LOG.error("Error consuming purchase", e);
                 }
                 purchased = false;
             }
@@ -334,7 +381,7 @@ public final class PlayStore extends StoreBase {
                 description, price, currency, purchased, purchaseTime, available) {
 
             @Override
-            public boolean enable(String feature) {
+            public boolean enabled(String feature) {
                 // only support disable ads feature
                 if (feature != Products.DISABLE_ADS_FEATURE) {
                     return false;

@@ -459,7 +459,6 @@
     <string name="bittorrent">BitTorrent</string>
     <string name="bittorrent_network_summary">Статус соединения</string>
     <string name="couldnt_share_file">Не смог поделиться файлом. Странно, но путь найден.</string>
-    <string name="queued_for_checking">В очереди на проверку</string>
     <string name="checking_ellipsis">Проверка…</string>
     <string name="downloading_metadata">Загрузка метаданных</string>
     <string name="error_moving_incomplete">Ошибка: Перемещение не завершено</string>

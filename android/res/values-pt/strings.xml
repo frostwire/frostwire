@@ -415,6 +415,7 @@
     <string name="context_menu_remove_from_recent">Remover da recente</string>
     <string name="use_torlock">Use TorLock</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>
+    <string name="use_limetorrents">Use Limetorrents</string>
     <string name="use_monova">Use Monova</string>
     <string name="transfer_status_demuxing">Demuxeando</string>
     <string name="cannot_be_undone">Isso não pode ser desfeita</string>
@@ -510,7 +511,6 @@
     <string name="pausing">Pausa</string>
     <string name="my_music">Minha Música</string>
     <string name="error_moving_incomplete">Erro: Transferência Incompleta</string>
-    <string name="queued_for_checking">Na fila para verificação</string>
     <string name="yes_no_cancel_transfer_question_cloud">Tem certeza que deseja parar e remover este download da lista?</string>
     <string name="free_download">Download Grátis</string>
     <string name="couldnt_share_file">Não foi possível compartilhar o arquivo. Caminho desconhecido encontrado</string>

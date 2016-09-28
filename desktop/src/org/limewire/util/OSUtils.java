@@ -13,47 +13,16 @@ public class OSUtils {
         setOperatingSystems();
     }
     
-    /** 
-     * Variable for whether or not we're on Windows.
-     */
     private static boolean _isWindows;
-    
-    /** 
-     * Variable for whether or not we're on Windows NT.
-     */
     private static boolean _isWindowsNT;
-
-    /** 
-     * Variable for whether or not we're on Windows XP.
-     */
     private static boolean _isWindowsXP;
-
-    /** 
-     * Variable for whether or not we're on Windows 95.
-     */
     private static boolean _isWindows95;
-
-    /** 
-     * Variable for whether or not we're on Windows 98.
-     */
     private static boolean _isWindows98;
-
-    /** 
-     * Variable for whether or not we're on Windows Me.
-     */
     private static boolean _isWindowsMe;
-       
-    /** 
-     * Variable for whether or not we're on Windows Vista.
-     */
     private static boolean _isWindowsVista;
-    
-    /** 
-     * Variable for whether or not we're on Windows 7.
-     */
     private static boolean _isWindows7;
-    
     private static boolean _isWindows8;
+    private static boolean _isWindows10;
 
     /** 
      * Variable for whether or not the operating system allows the 
@@ -138,6 +107,7 @@ public class OSUtils {
 		_isOS2		= os.indexOf("os/2") != -1;
 
 		if(_isWindows){
+		    _isWindows10 = os.indexOf("windows 10") != -1;
 			_isWindows8	= os.indexOf("windows 8") != -1;
 			_isWindows7	= os.indexOf("windows 7") != -1;
 			_isWindowsVista	= os.indexOf("windows vista") != -1;
@@ -263,6 +233,10 @@ public class OSUtils {
     
     public static boolean isWindows8() {
         return _isWindows8;
+    }
+
+    public static boolean isWindows10() {
+        return _isWindows10;
     }
 
     /**

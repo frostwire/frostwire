@@ -86,5 +86,5 @@ public interface Product {
      * @param feature
      * @return
      */
-    boolean enable(String feature);
+    boolean enabled(String feature);
 }

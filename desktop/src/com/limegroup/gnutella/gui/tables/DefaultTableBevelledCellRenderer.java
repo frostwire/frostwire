@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui.tables;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 
@@ -39,6 +40,8 @@ public class DefaultTableBevelledCellRenderer extends DefaultTableCellRenderer {
         if (!isSelected) {
             BeveledCellPainter.paintBorder(g, getWidth(), getHeight());
         }
+
+        setBorder(new EmptyBorder(3,3,3,3));
     }
 
     @Override

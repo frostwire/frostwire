@@ -18,13 +18,12 @@
 
 package com.frostwire.gui.updates;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UpdateSettings;
 import org.apache.commons.io.FilenameUtils;
-import org.limewire.util.CommonUtils;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
@@ -56,7 +55,7 @@ public final class UpdateMediator {
     }
 
     public boolean isUpdated() {
-        return latestMsg != null && latestMsg.getVersion() != null && !latestMsg.getVersion().trim().equals("") && !UpdateManager.isFrostWireOld(latestMsg.getVersion());
+        return latestMsg != null && latestMsg.getVersion() != null && !latestMsg.getVersion().trim().equals("") && !UpdateManager.isFrostWireOld(latestMsg);
     }
 
     public String getLatestVersion() {
@@ -71,47 +70,42 @@ public final class UpdateMediator {
         if (latestMsg == null) {
             return false;
         }
-
         String lastMD5 = InstallerUpdater.getLastMD5();
-
-        if (lastMD5 == null) {
-            return false;
-        }
-
-        return lastMD5.equalsIgnoreCase(latestMsg.getRemoteMD5().trim());
+        return lastMD5 != null && lastMD5.equalsIgnoreCase(latestMsg.getRemoteMD5().trim());
     }
 
-    public File getUpdateBinaryFile() {
+    private File getUpdateBinaryFile() {
         try {
             if (latestMsg == null) {
                 return null;
             }
-
-            String installerFilename = null;
-
-            if (latestMsg.getTorrent() != null) {
-                int indx1 = latestMsg.getTorrent().lastIndexOf('/') + 1;
-                int indx2 = latestMsg.getTorrent().lastIndexOf(".torrent");
-
-                installerFilename = latestMsg.getTorrent().substring(indx1, indx2);
-            } else if (latestMsg.getInstallerUrl() != null) {
-                int indx1 = latestMsg.getInstallerUrl().lastIndexOf('/') + 1;
-
-                installerFilename = latestMsg.getInstallerUrl().substring(indx1);
-            }
-
-            File f = new File(UpdateSettings.UPDATES_DIR, installerFilename);
-
-            if (installerFilename == null || !f.exists()) {
+            String installerFilename = getInstallerFilename(latestMsg);
+            if (installerFilename == null) {
                 return null;
             }
-
+            File f = new File(UpdateSettings.UPDATES_DIR, installerFilename);
+            if (!f.exists()) {
+                return null;
+            }
             return f;
         } catch (Throwable e) {
             LOG.error("Error getting update binary path", e);
         }
 
         return null;
+    }
+
+    static String getInstallerFilename(UpdateMessage message) {
+        String installerFilename = null;
+        if (message.getTorrent() != null) {
+            int index1 = message.getTorrent().lastIndexOf('/') + 1;
+            int index2 = message.getTorrent().lastIndexOf(".torrent");
+            installerFilename = message.getTorrent().substring(index1, index2);
+        } else if (message.getInstallerUrl() != null) {
+            int index1 = message.getInstallerUrl().lastIndexOf('/') + 1;
+            installerFilename = message.getInstallerUrl().substring(index1);
+        }
+        return installerFilename;
     }
 
     public void startUpdate() {
@@ -126,13 +120,12 @@ public final class UpdateMediator {
         });
     }
 
-    public static void openInstallerAndShutdown(File executableFile) {
+    static void openInstallerAndShutdown(File executableFile) {
         try {
-            if (CommonUtils.isPortable()) {
-                //UpdateMediator.instance().installPortable(executableFile);
-                return; // pending refactor
-            }
-
+//            if (CommonUtils.isPortable()) {
+//                //UpdateMediator.instance().installPortable(executableFile);
+//                return; // pending refactor
+//            }
             if (OSUtils.isWindows()) {
                 String[] commands = new String[] { "CMD.EXE", "/C", executableFile.getAbsolutePath() };
                 ProcessBuilder pbuilder = new ProcessBuilder(commands);
@@ -170,7 +163,7 @@ public final class UpdateMediator {
         UpdateManager.scheduleUpdateCheckTask(0,true);
     }
 
-    public void setUpdateMessage(UpdateMessage msg) {
+    void setUpdateMessage(UpdateMessage msg) {
         this.latestMsg = msg;
     }
 
@@ -186,36 +179,54 @@ public final class UpdateMediator {
         }
     }
 
-    void installPortable(File executableFile) {
-        PortableUpdater pu = new PortableUpdater(executableFile);
-        pu.update();
-    }
+//    void installPortable(File executableFile) {
+//        PortableUpdater pu = new PortableUpdater(executableFile);
+//        pu.update();
+//    }
 
-    static void installUbuntu(File executableFile) throws IOException {
-        boolean success = trySoftwareCenter(executableFile) || tryGdebiGtk(executableFile);
+    private static void installUbuntu(File executableFile) throws IOException {
+        boolean success = tryGnomeSoftware(executableFile) || tryGdebiGtk(executableFile) || trySoftwareCenter(executableFile);
 
         if (!success) {
             throw new IOException("Unable to install update");
         }
     }
 
-    private static boolean trySoftwareCenter(File executableFile) {
-        return tryUbuntuInstallCmd("/usr/bin/software-center", executableFile);
+    private static boolean tryGnomeSoftware(File executableFile) {
+        return tryUbuntuInstallCmd("/usr/bin/gnome-software", "--local-filename="+executableFile.getAbsolutePath(), "--verbose");
     }
-
+    
     private static boolean tryGdebiGtk(File executableFile) {
         return tryUbuntuInstallCmd("gdebi-gtk", executableFile);
     }
 
+    private static boolean trySoftwareCenter(File executableFile) {
+        return tryUbuntuInstallCmd("/usr/bin/software-center", executableFile);
+    }
+    
     private static boolean tryUbuntuInstallCmd(String cmd, File executableFile) {
+        return tryUbuntuInstallCmd(cmd, executableFile.getAbsolutePath());
+    }
+    
+    private static boolean tryUbuntuInstallCmd(String cmd, String ... options) {
         try {
-            String[] commands = new String[] { cmd, executableFile.getAbsolutePath() };
+            int options_length = (options == null || options.length == 0) ? 0 : options.length;
+            String[] commands = new String[1 + options_length];
+            commands[0] = cmd;
+            if (options != null) {
+                System.arraycopy(options, 0, commands, 1, options_length);
+            }
 
+	    System.out.print("UpdateMediator.tryUbuntuInstallCmd: ");
+            for (String c : commands) {
+		System.out.print(c + " ");
+	    }
+	    System.out.println();
             ProcessBuilder pbuilder = new ProcessBuilder(commands);
             pbuilder.start();
-
             return true;
         } catch (Throwable e) {
+	        e.printStackTrace();
             return false;
         }
     }

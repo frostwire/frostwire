@@ -50,10 +50,6 @@ public class NewTransferDialog extends AbstractDialog {
     private static final String SEARCH_RESULT_DATA_KEY = "search_result_data";
     private static final String HIDE_CHECK_SHOW_KEY = "hide_check_show";
 
-    private Button buttonNo;
-    private Button buttonYes;
-    private CheckBox checkShow;
-
     public NewTransferDialog() {
         super(R.layout.dialog_default_checkbox);
     }
@@ -98,15 +94,15 @@ public class NewTransferDialog extends AbstractDialog {
         DialogListener yes = new DialogListener(this, true);
         DialogListener no = new DialogListener(this, false);
 
-        buttonYes = findView(dlg, R.id.dialog_default_checkbox_button_yes);
+        Button buttonYes = findView(dlg, R.id.dialog_default_checkbox_button_yes);
         buttonYes.setText(android.R.string.yes);
         buttonYes.setOnClickListener(yes);
 
-        buttonNo = findView(dlg, R.id.dialog_default_checkbox_button_no);
+        Button buttonNo = findView(dlg, R.id.dialog_default_checkbox_button_no);
         buttonNo.setText(android.R.string.no);
         buttonNo.setOnClickListener(no);
 
-        checkShow = findView(dlg, R.id.dialog_default_checkbox_show);
+        CheckBox checkShow = findView(dlg, R.id.dialog_default_checkbox_show);
         checkShow.setChecked(ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG));
         checkShow.setOnCheckedChangeListener(yes);
 

@@ -511,14 +511,19 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         
         if (rightfulUseConfirmed) {
             //reset
-            ndButton.setSelected(false);
-            saButton.setSelected(true);
+            apacheButton.setSelected(true);
             publicDomainButton.setSelected(true);
             cc0Button.setSelected(false);
             updatePickedLicenseLabel();
         } else {
             ndButton.setSelected(false);
             saButton.setSelected(false);
+            publicDomainButton.setSelected(false);
+            cc0Button.setSelected(false);
+
+            for (LicenseToggleButton licenseToggleButton : openSourceLicenseButtons) {
+                licenseToggleButton.setSelected(false);
+            }
         }
     }
 

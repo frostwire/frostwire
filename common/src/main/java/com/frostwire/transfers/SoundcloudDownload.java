@@ -18,7 +18,7 @@
 
 package com.frostwire.transfers;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.mp3.ID3Wrapper;
 import com.frostwire.mp3.ID3v1Tag;
 import com.frostwire.mp3.ID3v23Tag;

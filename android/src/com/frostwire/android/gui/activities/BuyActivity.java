@@ -21,72 +21,138 @@ package com.frostwire.android.gui.activities;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.*;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
-import com.frostwire.android.gui.views.ProductPaymentOptionsViewListener;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
-import com.frostwire.logging.Logger;
+
+import java.util.Random;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class BuyActivity extends AbstractActivity implements ProductPaymentOptionsViewListener {
-
-    private final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
-    private final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
-
-    private Logger LOGGER = Logger.getLogger(BuyActivity.class);
+public class BuyActivity extends AbstractActivity {
+    public static final String INTERSTITIAL_MODE = "interstitialMode";
+    static final int PURCHASE_SUCCESSFUL_RESULT_CODE = 989898;
+    static final String EXTRA_KEY_PURCHASE_TIMESTAMP = "purchase_timestamp";
+    private static final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
+    private static final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
+    private static final String OFFER_ACCEPTED = "offer_accepted";
     private ProductCardView card30days;
     private ProductCardView card1year;
     private ProductCardView card6months;
     private ProductCardView selectedProductCard;
     private ProductPaymentOptionsView paymentOptionsView;
-    private Animation slideUpAnimation;
-    private Animation slideDownAnimation;
+    private boolean offerAccepted;
 
     public BuyActivity() {
         super(R.layout.activity_buy);
     }
 
-    @Override
-    public void onBuyAutomaticRenewal() {
-        purchaseProduct(R.id.SUBS_PRODUCT_KEY);
-    }
-
-    @Override
-    public void onBuyOneTime() {
-        purchaseProduct(R.id.INAPP_PRODUCT_KEY);
-    }
-
     private void purchaseProduct(int tagId) {
         Product p = (Product) selectedProductCard.getTag(tagId);
         if (p != null) {
-            try {
-                PlayStore.getInstance().purchase(BuyActivity.this, p);
-            } catch (Throwable t) {
-                LOGGER.error("Couldn't make product purchase.", t);
-            }
+            PlayStore.getInstance().purchase(BuyActivity.this, p);
         }
     }
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        final boolean interstitialMode = getIntent().hasExtra(INTERSTITIAL_MODE);
+        if (interstitialMode) {
+            hideOSTitleBar();
+        } else {
+            final ActionBar bar = getActionBar();
+            if (bar != null) {
+                bar.setDisplayHomeAsUpEnabled(true);
+                bar.setIcon(android.R.color.transparent);
+                bar.setTitle(getActionBarTitle());
+            }
+        }
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     protected void initComponents(Bundle savedInstanceState) {
-        initActionBar();
+        final boolean interstitialMode = getIntent().hasExtra(INTERSTITIAL_MODE);
+        offerAccepted = savedInstanceState != null &&
+                savedInstanceState.containsKey(OFFER_ACCEPTED) &&
+                savedInstanceState.getBoolean(OFFER_ACCEPTED, false);
+        if (interstitialMode) {
+            initInterstitialModeActionBar(getActionBarTitle());
+        }
+        initOfferLayer(interstitialMode);
         initProductCards(getLastSelectedCardViewId(savedInstanceState));
-        initAnimations();
         initPaymentOptionsView(getLastPaymentOptionsViewVisibility(savedInstanceState));
+    }
+
+    private String getActionBarTitle() {
+        final String titlePrefix = getString(R.string.remove_ads);
+        return titlePrefix + ". " + getRandomPitch(false) + ".";
+    }
+
+    private String getRandomPitch(final boolean avoidSupportPitches) {
+        // put "support" pitches at the beginning and modify offset2
+        final int[] pitches = {
+                R.string.support_frostwire,
+                R.string.support_free_software,
+                R.string.save_bandwidth,
+                R.string.cheaper_than_drinks,
+                R.string.cheaper_than_lattes,
+                R.string.cheaper_than_parking,
+                R.string.cheaper_than_beer,
+                R.string.cheaper_than_cigarettes,
+                R.string.cheaper_than_gas,
+                R.string.keep_the_project_alive
+        };
+        final int offset1 = 0;
+        final int offset2 = 2;
+
+        int offset = !avoidSupportPitches ? offset1 : offset2;
+        int suffixId = pitches[offset + new Random().nextInt(pitches.length - offset)];
+
+        return getString(suffixId);
+    }
+
+    private void initOfferLayer(boolean interstitialMode) {
+        if (!interstitialMode) {
+            View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
+            offerLayout.setVisibility(View.GONE);
+            return;
+        }
+
+        // user rotates screen after having already accepted the offer
+        if (offerAccepted) {
+            View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
+            offerLayout.setVisibility(View.GONE);
+            return;
+        }
+
+        final InterstitialOfferDismissButtonClickListener dismissOfferClickListener = new InterstitialOfferDismissButtonClickListener();
+        ImageButton dismissButton = findView(R.id.activity_buy_interstitial_dismiss_button);
+        dismissButton.setOnClickListener(dismissOfferClickListener);
+
+        final OfferClickListener offerClickListener = new OfferClickListener();
+        View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
+        offerLayout.setOnClickListener(offerClickListener);
+
+        final TextView randomPitch = findView(R.id.activity_buy_interstitial_random_pitch);
+        randomPitch.setText(getRandomPitch(true));
     }
 
     @Override
@@ -95,17 +161,46 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         scrollToSelectedCard();
     }
 
-    private void initActionBar() {
-        ActionBar bar = getActionBar();
-        if (bar != null) {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-            getActionBar().setIcon(android.R.color.transparent);
+    @Override
+    public void onBackPressed() {
+        Intent intent = getIntent();
+        if (intent.hasExtra(INTERSTITIAL_MODE)) {
+            onInterstitialActionBarDismiss();
+        } else {
+            finish();
         }
     }
 
-    private void initAnimations() {
-        slideUpAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_up);
-        slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+    private void hideOSTitleBar() {
+        Window w = getWindow();
+        w.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        w.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        w.requestFeature(Window.FEATURE_NO_TITLE);
+    }
+
+    private void onInterstitialActionBarDismiss() {
+        final Intent intent = getIntent();
+        if (intent != null && intent.hasExtra(INTERSTITIAL_MODE)) {
+            boolean dismissActivityAfterward = intent.getBooleanExtra("dismissActivityAfterward", false);
+            boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
+
+            Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(
+                    null,
+                    this,
+                    dismissActivityAfterward,
+                    shutdownActivityAfterwards,
+                    false,
+                    getApplication());
+        }
+    }
+
+    private void initInterstitialModeActionBar(String title) {
+        View v = findView(R.id.activity_buy_actionbar_interstitial);
+        v.setVisibility(View.VISIBLE);
+        TextView titleTextView = findView(R.id.activity_buy_actionbar_interstitial_buy_activity_title);
+        titleTextView.setText(title);
+        ImageButton closeButton = findView(R.id.activity_buy_actionbar_interstitial_buy_activity_dismiss_button);
+        closeButton.setOnClickListener(new InterstitialActionBarDismissButtonClickListener());
     }
 
     private void initProductCards(int lastSelectedCardViewId) {
@@ -118,7 +213,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
         initProductCard(card6months, store, Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, Products.INAPP_DISABLE_ADS_6_MONTHS_SKU);
 
-        View.OnClickListener cardClickListener = createCardClickListener();
+        View.OnClickListener cardClickListener = new ProductCardViewOnClickListener();
         card30days.setOnClickListener(cardClickListener);
         card1year.setOnClickListener(cardClickListener);
         card6months.setOnClickListener(cardClickListener);
@@ -127,7 +222,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void initLastCardSelection(int lastSelectedCardViewId) {
-        switch (lastSelectedCardViewId)  {
+        switch (lastSelectedCardViewId) {
             case R.id.activity_buy_product_card_30_days:
                 selectedProductCard = card30days;
                 break;
@@ -144,8 +239,18 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
 
     private void initPaymentOptionsView(int paymentOptionsVisibility) {
         paymentOptionsView = findView(R.id.activity_buy_product_payment_options_view);
-        paymentOptionsView.setBuyButtonsListener(this);
         paymentOptionsView.setVisibility(paymentOptionsVisibility);
+        paymentOptionsView.setOnBuyListener(new ProductPaymentOptionsView.OnBuyListener() {
+            @Override
+            public void onAutomaticRenewal() {
+                purchaseProduct(R.id.subs_product_tag_id);
+            }
+
+            @Override
+            public void onOneTime() {
+                purchaseProduct(R.id.inapp_product_tag_id);
+            }
+        });
 
         if (paymentOptionsVisibility == View.VISIBLE) {
             showPaymentOptionsBelowSelectedCard();
@@ -153,10 +258,27 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String inappSKU) {
-        if (card != null && store != null && subsSKU != null && inappSKU != null) {
-            card.setTag(R.id.SUBS_PRODUCT_KEY, store.product(subsSKU));
-            card.setTag(R.id.INAPP_PRODUCT_KEY, store.product(inappSKU));
-            card.updateData(store.product(subsSKU));
+        if (card == null) {
+            throw new IllegalArgumentException("card argument can't be null");
+        }
+        if (store == null) {
+            throw new IllegalArgumentException("store argument can't be null");
+        }
+        if (subsSKU == null) {
+            throw new IllegalArgumentException("subsSKU argument can't be null");
+        }
+        if (inappSKU == null) {
+            throw new IllegalArgumentException("inappSKU argument can't be null");
+        }
+
+        Product prodSubs = store.product(subsSKU);
+        Product prodInApp = store.product(inappSKU);
+
+        card.setTag(R.id.subs_product_tag_id, prodSubs);
+        card.setTag(R.id.inapp_product_tag_id, prodInApp);
+
+        if (prodSubs != null) {
+            card.updateData(prodSubs);
         }
     }
 
@@ -164,6 +286,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(LAST_SELECTED_CARD_ID_KEY, selectedProductCard.getId());
         outState.putInt(PAYMENT_OPTIONS_VISIBILITY_KEY, paymentOptionsView.getVisibility());
+        outState.putBoolean(OFFER_ACCEPTED, offerAccepted);
         super.onSaveInstanceState(outState);
     }
 
@@ -187,18 +310,6 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         return paymentOptionsVisibility;
     }
 
-    private void on30DaysCardTouched() {
-        selectedProductCard = card30days;
-    }
-
-    private void on1YearCardTouched() {
-        selectedProductCard = card1year;
-    }
-
-    private void on6MonthsCardTouched() {
-        selectedProductCard = card6months;
-    }
-
     private void highlightSelectedCard() {
         if (selectedProductCard == null) {
             return;
@@ -209,7 +320,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void scrollToSelectedCard() {
-        ScrollView scrollView =  (ScrollView) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        ScrollView scrollView = findView(R.id.activity_buy_scrollview);
         LinearLayout linearLayout = (LinearLayout) scrollView.getChildAt(0);
         int index = linearLayout.indexOfChild(selectedProductCard);
         int cardHeight = selectedProductCard.getHeight() + selectedProductCard.getPaddingTop();
@@ -217,8 +328,7 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
     }
 
     private void showPaymentOptionsBelowSelectedCard() {
-        final ViewGroup contentView = (ViewGroup) findViewById(android.R.id.content);
-        final ViewGroup scrollView = (ViewGroup) contentView.getChildAt(0);
+        final ViewGroup scrollView = findView(R.id.activity_buy_scrollview);
         final ViewGroup layout = (ViewGroup) scrollView.getChildAt(0);
         if (layout != null) {
             int selectedCardIndex = layout.indexOfChild(selectedProductCard);
@@ -231,44 +341,30 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                     return;
                 }
 
-                paymentOptionsView.clearAnimation();
-                paymentOptionsView.startAnimation(slideUpAnimation);
-
-                // APOLOGIES FOR THE UGLY HACK BELOW.
-                // I tried in numerous ways to use AnimationListeners
-                // but they did not work, it seems these APIs are broken.
-                // I even tried overriding the onAnimationEnd() method on
-                // the view. AnimationListeners will never be invoked
-                // not on the Animation object, not on the view, not on the
-                // Layout (ViewGroup), this is one of the suggested workaround
-                // if you need to do something right after an animation is done.
-                // TL;DR; Android's AnimationListeners are broken. -gubatron.
-                paymentOptionsView.postDelayed(
-                        new Runnable() {
+                paymentOptionsView.animate().setDuration(200)
+                        .scaleY(0).setInterpolator(new DecelerateInterpolator())
+                        .withEndAction(new Runnable() {
                             @Override
                             public void run() {
-                                slideDownPaymentOptionsView(layout);
+                                scaleDownPaymentOptionsView(layout);
                             }
-                        },
-                        slideUpAnimation.getDuration() + 100);
+                        })
+                        .start();
             } else {
                 // first time shown
-                slideDownPaymentOptionsView(layout);
+                scaleDownPaymentOptionsView(layout);
             }
         }
     }
 
-    private void slideDownPaymentOptionsView(final ViewGroup layout) {
-        paymentOptionsView.clearAnimation();
+    private void scaleDownPaymentOptionsView(final ViewGroup layout) {
         layout.removeView(paymentOptionsView);
         int selectedCardIndex = layout.indexOfChild(selectedProductCard);
         paymentOptionsView.setVisibility(View.VISIBLE);
         layout.addView(paymentOptionsView, selectedCardIndex + 1);
-        paymentOptionsView.startAnimation(slideDownAnimation);
-    }
-
-    private View.OnClickListener createCardClickListener() {
-        return new ProductCardViewOnClickListener();
+        paymentOptionsView.animate().setDuration(200)
+                .scaleY(1).setInterpolator(new DecelerateInterpolator())
+                .start();
     }
 
     private class ProductCardViewOnClickListener implements View.OnClickListener {
@@ -278,17 +374,16 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
                 int id = v.getId();
                 switch (id) {
                     case R.id.activity_buy_product_card_30_days:
-                        BuyActivity.this.on30DaysCardTouched();
+                        selectedProductCard = card30days;
                         break;
                     case R.id.activity_buy_product_card_1_year:
-                        BuyActivity.this.on1YearCardTouched();
+                        selectedProductCard = card1year;
                         break;
                     case R.id.activity_buy_product_card_6_months:
-                        BuyActivity.this.on6MonthsCardTouched();
+                        selectedProductCard = card6months;
                         break;
                     default:
-                        BuyActivity.this.on1YearCardTouched();
-                        break;
+                        throw new IllegalArgumentException("Card view not handled, review layout");
                 }
                 highlightSelectedCard();
                 showPaymentOptionsBelowSelectedCard();
@@ -302,26 +397,64 @@ public class BuyActivity extends AbstractActivity implements ProductPaymentOptio
         PlayStore store = PlayStore.getInstance();
         if (store.handleActivityResult(requestCode, resultCode, data)) {
             store.refresh();
+
+            // RESPONSE_CODE = 0 -> Payment Successful
             // user clicked outside of the PlayStore purchase dialog
-            if (data != null &&
-                data.hasExtra("RESPONSE_CODE") &&
-                data.getIntExtra("RESPONSE_CODE",0) == 5) {
-                paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.AutomaticRenewal);
-                paymentOptionsView.hideProgressBarOnButton(ProductPaymentOptionsView.PurchaseButton.OneTimePurchase);
+            if (data != null && data.hasExtra("RESPONSE_CODE") && data.getIntExtra("RESPONSE_CODE", 0) != 0) {
+                paymentOptionsView.stopProgressBar();
                 return;
             }
+
+            // make sure ads won't show on this session any more if we got a positive response.
+            Offers.stopAdNetworks(this);
+            // in case user gets plus
+            ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
+
+            // now we prepare a result for SettingsActivity since it won't know right away
+            // given the purchase process is asynchronous
+            Intent result = new Intent();
+            result.putExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, System.currentTimeMillis());
+            setResult(BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE, result);
             finish();
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        return UIUtils.finishOnHomeOptionItemSelected(this, item);
+    }
+
+    private class InterstitialActionBarDismissButtonClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            onInterstitialActionBarDismiss();
+            finish();
+        }
+    }
+
+    private class InterstitialOfferDismissButtonClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            offerAccepted = false;
+            onInterstitialActionBarDismiss();
+            finish();
+        }
+    }
+
+    private class OfferClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            final View offerLayout = findView(R.id.activity_buy_interstitial_linear_layout);
+            offerAccepted = true;
+            offerLayout.animate().setDuration(500)
+                    .translationY(offerLayout.getBottom()).setInterpolator(new AccelerateDecelerateInterpolator())
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            offerLayout.setVisibility(View.GONE);
+                        }
+                    })
+                    .start();
         }
     }
 }

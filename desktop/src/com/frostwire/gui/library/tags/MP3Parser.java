@@ -27,7 +27,7 @@ import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
 import org.jaudiotagger.tag.id3.ID3v24Frames;
 import org.jaudiotagger.tag.images.Artwork;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * 

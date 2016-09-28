@@ -19,6 +19,7 @@ public class MacOSXUtils {
             System.loadLibrary("MacOSXUtilsLeopard");
             initialized = true;
         } catch (Throwable err) {
+            err.printStackTrace();
         }
     }
 

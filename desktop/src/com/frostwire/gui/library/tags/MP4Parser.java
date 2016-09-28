@@ -32,7 +32,7 @@ import javax.imageio.ImageIO;
 import com.frostwire.mp4.*;
 import org.apache.commons.io.IOUtils;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * @author aldenml

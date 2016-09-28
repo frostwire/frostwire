@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.bittorrent;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.bittorrent.PaymentOptions.PaymentMethod;
 import com.frostwire.util.JsonUtils;

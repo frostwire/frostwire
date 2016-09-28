@@ -394,7 +394,6 @@
     <string name="error_moving_incomplete">Greška: premještaj neuspješan</string>
     <string name="torrent_url_added">URL torrenta dodaj u prijenose.</string>
     <string name="please_enter_valid_url">Molimo unesite pravilan URL</string>
-    <string name="queued_for_checking">U redu za provjeru</string>
     <string name="file_is_already_downloading">Datoteka se već preuzima</string>
     <string name="nickname_sharing_count_files">%1$s - dijelim %2$d datoteka</string>
     <string name="are_you_sure_wifi_sharing_off">Gašenje Wi-Fi dijeljenja će učiniti sve lokano dijeljene datoteke nedostupnima ostalim korisnicima na okolnoj Wi-Fi mreži.</string>

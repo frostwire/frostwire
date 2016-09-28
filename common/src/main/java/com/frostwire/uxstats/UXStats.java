@@ -17,14 +17,14 @@
 
 package com.frostwire.uxstats;
 
+import com.frostwire.util.Logger;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.JsonUtils;
+import com.frostwire.util.http.HttpClient;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-
-import com.frostwire.logging.Logger;
-import com.frostwire.util.http.HttpClient;
-import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.JsonUtils;
 
 /**
  * @author gubatron
@@ -164,8 +164,6 @@ public final class UXStats {
             new Thread(r, "UXStats-sendData").start();
         }
     }
-    
-    
 
     private UXData newData() {
         return new UXData(conf.getGuid(), conf.getOS(), conf.getFwversion(), conf.getFwbuild());

@@ -26,17 +26,15 @@ import android.view.View.OnTouchListener;
 import android.view.animation.AnimationUtils;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-
-import com.frostwire.android.R;
 import com.andrew.apollo.ui.activities.ProfileActivity;
 import com.andrew.apollo.utils.ApolloUtils;
+import com.frostwire.android.R;
 
 /**
  * A custom {@link HorizontalScrollView} that displays up to two "tabs" in the
  * {@link ProfileActivity}. If the second tab is visible, a fraction of it will
  * overflow slightly onto the screen.
  */
-@SuppressLint("NewApi")
 public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchListener {
 
     /**
@@ -494,13 +492,6 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
     public void fetchAlbumPhoto(final Activity context, final String albumName,
             final String artistName) {
         mFirstTab.fetchAlbumPhoto(context, albumName, artistName);
-    }
-
-    /**
-     * @return The main {@link ImageView} for the first tab
-     */
-    public ImageView getHeaderPhoto() {
-        return mFirstTab.getPhoto();
     }
 
     /** When clicked, selects the corresponding tab. */

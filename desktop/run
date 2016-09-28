@@ -16,6 +16,7 @@ OPTS="${OPTS} -Dcom.sun.management.jmxremote.port=9595"
 OPTS="${OPTS} -Dcom.sun.management.jmxremote.ssl=false"
 OPTS="${OPTS} -Dcom.sun.management.jmxremote.authenticate=false"
 OPTS="${OPTS} -Djava.rmi.server.hostname=127.0.0.1"
+OPTS="${OPTS} -agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n"
 
 export CLASSPATH
 echo Classpath:

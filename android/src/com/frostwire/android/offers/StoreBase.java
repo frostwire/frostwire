@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * CODE STYLE NOMENCLATURE: @aldenml names abstract classes which aren't meant to be extended
  * by anybody "*Base" classes, API users should use the concrete implementations.
- *
+ * <p>
  * If an abstract class is meant to be extended, then it's named *Abstract.
  *
  * @author gubatron
@@ -54,7 +54,13 @@ abstract class StoreBase implements Store {
         Iterator<Product> it = products.values().iterator();
 
         while (!r && it.hasNext()) {
-            r = it.next().enable(code);
+            Product p = it.next();
+            // protection for faulty implementations of products
+            if (p.subscription()) {
+                r = p.purchased() && p.enabled(code);
+            } else {
+                r = !p.available() && p.purchased() && p.enabled(code);
+            }
         }
 
         return r;

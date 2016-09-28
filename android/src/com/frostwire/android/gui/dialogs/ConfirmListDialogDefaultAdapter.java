@@ -32,7 +32,7 @@ import com.frostwire.android.gui.dialogs.AbstractConfirmListDialog.SelectionMode
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.ImageLoader;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.util.HashMap;
 import java.util.List;

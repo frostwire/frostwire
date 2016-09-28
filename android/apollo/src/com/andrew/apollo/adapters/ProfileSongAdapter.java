@@ -27,13 +27,11 @@ import com.frostwire.android.R;
  * artist, album, playlist, or genre for {@link ArtistSongFragment},
  * {@link AlbumSongFragment},{@link PlaylistSongFragment},
  * {@link GenreSongFragment},{@link FavoriteFragment},{@link LastAddedFragment}.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (gubatron@gmail.com)
  */
 public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
-
-    //public static final Logger LOGGER = Logger.getLogger(ProfileSongAdapter.class);
 
     /**
      * Default display setting: title/album
@@ -79,10 +77,10 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
 
     /**
      * Constructor of <code>ProfileSongAdapter</code>
-     * 
-     * @param context The {@link Context} to use
+     *
+     * @param context  The {@link Context} to use
      * @param layoutId The resource Id of the view to inflate.
-     * @param setting defines the content of the second line
+     * @param setting  defines the content of the second line
      */
     public ProfileSongAdapter(final Context context, final int layoutId, final int setting) {
         super(context, layoutId, 0);
@@ -98,8 +96,8 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
 
     /**
      * Constructor of <code>ProfileSongAdapter</code>
-     * 
-     * @param context The {@link Context} to use
+     *
+     * @param context  The {@link Context} to use
      * @param layoutId The resource Id of the view to inflate.
      */
     public ProfileSongAdapter(final Context context, final int layoutId) {
@@ -193,7 +191,7 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
     public void insert(Song object, int index) {
         synchronized (mDataListLock) {
             super.insert(object, index);
-            mDataList.add(index,object);
+            mDataList.add(index, object);
         }
     }
 
@@ -208,6 +206,6 @@ public class ProfileSongAdapter extends ApolloFragmentAdapter<Song> {
 
     @Override
     public long getItemId(final int position) {
-        return position-1;
+        return position - 1;
     }
 }

@@ -462,7 +462,6 @@
     <string name="cant_open_file_does_not_exist">Nie mogę otworzyć %1$s, plik nie istnieje.</string>
     <string name="saving_to_sd_card">Zapisuje na kartę SD.</string>
     <string name="help_translate_frostwire">Pomóż tłumaczyć FrostWire</string>
-    <string name="queued_for_checking">Zakolejkowane do sprawdzenia</string>
     <string name="checking_ellipsis">Sprawdzanie...</string>
     <string name="downloading_metadata">Pobieranie metadanych</string>
     <string name="error_moving_incomplete">Błąd: Przenoszenie niekompletne</string>

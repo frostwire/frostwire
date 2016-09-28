@@ -21,13 +21,12 @@ import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
-import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the playlists on a user's
  * device for {@link PlaylistFragment}.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements ApolloFragmentAdapter.Cacheable {
@@ -39,8 +38,8 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
 
     /**
      * Constructor of <code>PlaylistAdapter</code>
-     * 
-     * @param context The {@link Context} to use.
+     *
+     * @param context  The {@link Context} to use.
      * @param layoutId The resource Id of the view to inflate.
      */
     public PlaylistAdapter(final Context context, final int layoutId) {
@@ -71,7 +70,7 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
                     getContext().getResources().getDimension(R.dimen.text_size_large));
             convertView.setTag(holder);
         } else {
-            holder = (MusicViewHolder)convertView.getTag();
+            holder = (MusicViewHolder) convertView.getTag();
         }
 
         // Retrieve the data holder

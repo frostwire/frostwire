@@ -85,7 +85,7 @@ public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
     private void updateDefaultSaveFolders(File newSaveFolder) {
         SharingSettings.TORRENT_DATA_DIR_SETTING.setValue(newSaveFolder);
 
-        BTEngine.getInstance().updateSavePath(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue());
+        BTEngine.getInstance().moveStorage(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue());
     }
 
     @Override

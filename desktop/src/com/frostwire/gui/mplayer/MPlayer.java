@@ -381,11 +381,11 @@ public class MPlayer extends BaseMediaPlayer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else if (line.startsWith("VDecoder init failed")) {
+		/*} else if (line.startsWith("VDecoder init failed")) {
 
 			MediaPlaybackState.Failed.setDetails(MessageText
 					.getString("azemp.failed.nocodec"));
-			reportNewState(MediaPlaybackState.Failed);
+			reportNewState(MediaPlaybackState.Failed);*/
 		} else if (line
 				.startsWith("<vo_direct3d>Reading display capabilities failed")) {
 

@@ -27,7 +27,7 @@ import java.util.Set;
 
 import javax.swing.JComponent;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.dnd.DropInfo;
 import com.limegroup.gnutella.gui.dnd.FileTransferable;

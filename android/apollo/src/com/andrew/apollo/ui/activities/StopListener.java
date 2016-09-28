@@ -23,9 +23,9 @@ import android.content.Intent;
 import android.os.RemoteException;
 import android.view.View;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 
@@ -33,11 +33,11 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  * @author aldenml
  */
-public class StopListener implements View.OnLongClickListener {
+class StopListener implements View.OnLongClickListener {
     private WeakReference<Activity> activityRef;
     private final boolean finishOnStop;
 
-    public StopListener(Activity activity, boolean finishOnStop) {
+    StopListener(Activity activity, boolean finishOnStop) {
         this.activityRef = Ref.weak(activity);
         this.finishOnStop = finishOnStop;
     }
@@ -58,7 +58,7 @@ public class StopListener implements View.OnLongClickListener {
             @Override
             public void run() {
                 try {
-                    MusicUtils.mService.stop();
+                    MusicUtils.musicPlaybackService.stop();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }

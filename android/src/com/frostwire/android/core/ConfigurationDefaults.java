@@ -2,29 +2,24 @@
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.core;
 
-import android.content.Context;
 import android.os.Environment;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author gubatron
@@ -35,24 +30,23 @@ final class ConfigurationDefaults {
     private final Map<String, Object> defaultValues;
     private final Map<String, Object> resetValues;
 
-    public ConfigurationDefaults(Context context) {
-        defaultValues = new HashMap<String, Object>();
-        resetValues = new HashMap<String, Object>();
-        load(context);
+    ConfigurationDefaults() {
+        defaultValues = new HashMap<>();
+        resetValues = new HashMap<>();
+        load();
     }
 
-    public Map<String, Object> getDefaultValues() {
+    Map<String, Object> getDefaultValues() {
         return Collections.unmodifiableMap(defaultValues);
     }
 
-    public Map<String, Object> getResetValues() {
+    Map<String, Object> getResetValues() {
         return Collections.unmodifiableMap(resetValues);
     }
 
-    private void load(Context context) {
+    private void load() {
         defaultValues.put(Constants.PREF_KEY_CORE_UUID, uuidToByteArray(UUID.randomUUID()));
         defaultValues.put(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION, "");//won't know until I see it.
-        defaultValues.put(Constants.PREF_KEY_CORE_EXPERIMENTAL, false);
 
         defaultValues.put(Constants.PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD, true);
         defaultValues.put(Constants.PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER, Constants.FILE_TYPE_AUDIO);
@@ -63,13 +57,21 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION, true);
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_TRANSFERS_ON_DOWNLOAD_START, true);
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG, true);
-        defaultValues.put(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, Constants.IS_FREE_DISTRIBUTION);
-        defaultValues.put(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE_THRESHOLD, true);
+        defaultValues.put(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, true);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_INMOBI, false);
+        defaultValues.put(Constants.PREF_KEY_GUI_USE_MOBFOX, false);
+        defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
+        defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 5);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, 15);
-
+        defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
+                new String[]{
+                        Constants.AD_NETWORK_SHORTCODE_APPLOVIN,
+                        Constants.AD_NETWORK_SHORTCODE_INMOBI,
+                        Constants.AD_NETWORK_SHORTCODE_REMOVEADS
+                });
+        defaultValues.put(Constants.PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN, 20);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN, 10);
         defaultValues.put(Constants.PREF_KEY_SEARCH_INTERVAL_MS_FOR_TORRENT_DEEP_SCAN, 2000);
@@ -88,6 +90,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_BITSNOOP, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORLOCK, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_LIMETORRENTS, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_EZTV, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_APPIA, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TPB, true);
@@ -95,7 +98,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YIFY, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTSFM, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_BTJUNKIE, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_KAT, true);
 
         defaultValues.put(Constants.PREF_KEY_NETWORK_ENABLE_DHT, true);
         defaultValues.put(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA, true);
@@ -104,12 +106,12 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, false);
         defaultValues.put(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY, true);
 
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, Long.valueOf(0));
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, Long.valueOf(0));
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, Long.valueOf(4));
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, Long.valueOf(4));
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, Long.valueOf(200));
-        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_PEERS, Long.valueOf(200));
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, 0L);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, 0L);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, 4L);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, 4L);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, 200L);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_PEERS, 200L);
 
         defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath()); // /mnt/sdcard
 

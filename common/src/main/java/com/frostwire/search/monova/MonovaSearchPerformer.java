@@ -33,17 +33,17 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
 
     private static final int MAX_RESULTS = 10;
     private static final String REGEX = "(?is)<a href=\"//%s/torrent/(?<itemid>[0-9]*?)/(?<filename>.*?).html";
-    private static final String HTML_REGEX = "(?is).*?" +
+    private static final String HTML_REGEX = "(?is)" +
             // filename
-            "<div class=\"col-md-11.*?<h4>\\n(?<filename>.*?) </h4>.*?"+
+            "<div class=\"col-md-12.*?<h1>\\n(?<filename>.*?) </h1>.*?" +
             // creationtime
-            "<td>Added:</td>\\n<td>(?<creationtime>.*?)</td>.*?"+
+            "<td>Added:</td>.*?<td>(?<creationtime>.*?)</td>.*?" +
             // seeds
             "<td>(?<seeds>\\d+) seeders.*?" +
             // infohash
-            "<td>Hash:</td>\\n<td>(?<infohash>[A-Fa-f0-9]{40})</td>.*?" +
+            "<td>Hash:</td>.*?<td>(?<infohash>[A-Fa-f0-9]{40})</td>.*?" +
             // size
-            "<td>Total size:</td>\\n<td>(?<size>.*?)</td>.*?";
+            "<td>Total size:</td>.*?<td>(?<size>.*?)</td>.*?";
 
     public MonovaSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, String.format(REGEX, domainName), HTML_REGEX);

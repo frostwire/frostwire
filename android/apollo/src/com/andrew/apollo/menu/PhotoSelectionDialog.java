@@ -136,12 +136,6 @@ public class PhotoSelectionDialog extends DialogFragment {
     private void setArtistChoices() {
         // Select a photo from the gallery
         mChoices.add(NEW_PHOTO, getString(R.string.new_photo));
-        if (ApolloUtils.isOnline(getActivity())) {
-            // Option to fetch the old artist image
-            mChoices.add(OLD_PHOTO, getString(R.string.context_menu_fetch_artist_image));
-            // Search Google for the artist name
-            mChoices.add(GOOGLE_SEARCH, getString(R.string.google_search));
-        }
     }
 
     /**
@@ -152,12 +146,6 @@ public class PhotoSelectionDialog extends DialogFragment {
         mChoices.add(NEW_PHOTO, getString(R.string.new_photo));
         // Option to fetch the old album image
         mChoices.add(OLD_PHOTO, getString(R.string.old_photo));
-        if (ApolloUtils.isOnline(getActivity())) {
-            // Search Google for the album name
-            mChoices.add(GOOGLE_SEARCH, getString(R.string.google_search));
-            // Option to fetch the album image
-            mChoices.add(FETCH_IMAGE, getString(R.string.context_menu_fetch_album_art));
-        }
     }
 
     /**

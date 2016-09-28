@@ -19,7 +19,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 
 /**
@@ -45,7 +45,7 @@ public class SystemUtils {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
-        } catch (UnsatisfiedLinkError noGo) {
+        } catch (Throwable noGo) {
             System.out.println("ERROR: " + noGo.getMessage());
             canLoad = false;
         }
@@ -441,7 +441,7 @@ public class SystemUtils {
 
     /*
      * The following methods are implemented in C++ code in SystemUtilities.dll.
-     * In addition, setFileWritable(String) and idleTime() may be implemeted in FrostWire's native library for another platform, like Mac or Linux.
+     * In addition, setFileWritable(String) and idleTime() may be implemented in FrostWire's native library for another platform, like Mac or Linux.
      * The idea is that the Windows, Mac, and Linux libraries have methods with the same names.
      * Call a method, and it will run platform-specific code to complete the task in the appropriate platform-specific way.
      */

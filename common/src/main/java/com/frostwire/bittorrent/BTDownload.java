@@ -23,11 +23,11 @@ import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
 import com.frostwire.jlibtorrent.swig.string_vector;
-import com.frostwire.logging.Logger;
 import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
+import com.frostwire.util.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -38,7 +38,7 @@ import java.util.*;
  * @author gubatron
  * @author aldenml
  */
-public final class BTDownload extends TorrentAlertAdapter implements BittorrentDownload {
+public final class BTDownload implements BittorrentDownload {
 
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
 
@@ -49,7 +49,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             AlertType.TORRENT_REMOVED.swig(),
             AlertType.TORRENT_CHECKED.swig(),
             AlertType.SAVE_RESUME_DATA.swig(),
-            AlertType.PIECE_FINISHED.swig()};
+            AlertType.PIECE_FINISHED.swig(),
+            AlertType.STORAGE_MOVED.swig()};
 
     private static final String EXTRA_DATA_KEY = "extra_data";
     private static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
@@ -70,19 +71,22 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private long lastSaveResumeTime;
     private final PaymentOptions paymentOptions;
 
+    private final InnerListener innerListener;
+
     public BTDownload(BTEngine engine, TorrentHandle th) {
-        super(th);
         this.engine = engine;
         this.th = th;
         this.savePath = new File(th.getSavePath());
-        this.created = new Date(th.getStatus().getAddedTime());
-        TorrentInfo ti = th.getTorrentInfo();
+        this.created = new Date(th.status().addedTime());
+        TorrentInfo ti = th.torrentFile();
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
         this.parts = ti != null ? new File(savePath, "." + ti.infoHash() + ".parts") : null;
 
         this.extra = createExtra();
         this.paymentOptions = loadPaymentOptions(ti);
-        engine.getSession().addListener(this);
+
+        this.innerListener = new InnerListener();
+        engine.addListener(innerListener);
     }
 
     public Map<String, String> getExtra() {
@@ -99,7 +103,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public String getDisplayName() {
-        Priority[] priorities = th.getFilePriorities();
+        Priority[] priorities = th.filePriorities();
 
         int count = 0;
         int index = 0;
@@ -110,11 +114,11 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             }
         }
 
-        return count != 1 ? th.getName() : FilenameUtils.getName(th.getTorrentInfo().files().filePath(index));
+        return count != 1 ? th.getName() : FilenameUtils.getName(th.torrentFile().files().filePath(index));
     }
 
     public long getSize() {
-        TorrentInfo ti = th.getTorrentInfo();
+        TorrentInfo ti = th.torrentFile();
         return ti != null ? ti.totalSize() : 0;
     }
 
@@ -123,19 +127,19 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public boolean isPaused() {
-        return th.getStatus().isPaused() || engine.isPaused() || !engine.isStarted();
+        return th.status().isPaused() || engine.isPaused() || !engine.isRunning();
     }
 
     public boolean isSeeding() {
-        return th.getStatus().isSeeding();
+        return th.status().isSeeding();
     }
 
     public boolean isFinished() {
-        return th.getStatus().isFinished();
+        return th.status().isFinished();
     }
 
     public TransferState getState() {
-        if (!engine.isStarted()) {
+        if (!engine.isRunning()) {
             return TransferState.STOPPED;
         }
 
@@ -147,7 +151,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             return TransferState.ERROR;
         }
 
-        final TorrentStatus status = th.getStatus();
+        final TorrentStatus status = th.status();
 
         if (status.isPaused() && status.isFinished()) {
             return TransferState.FINISHED;
@@ -161,11 +165,9 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             return TransferState.SEEDING;
         }
 
-        final TorrentStatus.State state = status.getState();
+        final TorrentStatus.State state = status.state();
 
         switch (state) {
-            case QUEUED_FOR_CHECKING:
-                return TransferState.QUEUED_FOR_CHECKING;
             case CHECKING_FILES:
                 return TransferState.CHECKING;
             case DOWNLOADING_METADATA:
@@ -210,23 +212,23 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             return 0;
         }
 
-        if (th.getTorrentInfo() == null) {
+        if (th.torrentFile() == null) {
             return 0;
         }
 
         // TODO: Add logic to check completion logic for merkle based torrents.
-        if (th.getTorrentInfo().isMerkleTorrent()) {
-            //final ArrayList<Sha1Hash> sha1Hashes = th.getTorrentInfo().merkleTree();
-            //perform sha1Hash check
-        }
+        //if (th.getTorrentInfo().isMerkleTorrent()) {
+        //final ArrayList<Sha1Hash> sha1Hashes = th.getTorrentInfo().merkleTree();
+        //perform sha1Hash check
+        //}
 
-        float fp = th.getStatus().getProgress();
+        float fp = th.status().progress();
 
         if (Float.compare(fp, 1f) == 0) {
             return 100;
         }
 
-        int p = (int) (th.getStatus().getProgress() * 100);
+        int p = (int) (th.status().progress() * 100);
         return Math.min(p, 100);
     }
 
@@ -236,27 +238,27 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public long getBytesReceived() {
-        return th.getStatus().totalDownload();
+        return th.status().totalDownload();
     }
 
     public long getTotalBytesReceived() {
-        return th.getStatus().getAllTimeDownload();
+        return th.status().allTimeDownload();
     }
 
     public long getBytesSent() {
-        return th.getStatus().totalUpload();
+        return th.status().totalUpload();
     }
 
     public long getTotalBytesSent() {
-        return th.getStatus().getAllTimeUpload();
+        return th.status().allTimeUpload();
     }
 
     public long getDownloadSpeed() {
-        return (isFinished() || isPaused() || isSeeding()) ? 0 : th.getStatus().getDownloadPayloadRate();
+        return (isFinished() || isPaused() || isSeeding()) ? 0 : th.status().downloadPayloadRate();
     }
 
     public long getUploadSpeed() {
-        return ((isFinished() && !isSeeding()) || isPaused()) ? 0 : th.getStatus().getUploadPayloadRate();
+        return ((isFinished() && !isSeeding()) || isPaused()) ? 0 : th.status().uploadPayloadRate();
     }
 
     @Override
@@ -265,19 +267,19 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public int getConnectedPeers() {
-        return th.getStatus().getNumPeers();
+        return th.status().numPeers();
     }
 
     public int getTotalPeers() {
-        return th.getStatus().getListPeers();
+        return th.status().listPeers();
     }
 
     public int getConnectedSeeds() {
-        return th.getStatus().getNumSeeds();
+        return th.status().numSeeds();
     }
 
     public int getTotalSeeds() {
-        return th.getStatus().getListSeeds();
+        return th.status().listSeeds();
     }
 
     @Override
@@ -287,7 +289,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 return null;
             }
 
-            TorrentInfo ti = th.getTorrentInfo();
+            TorrentInfo ti = th.torrentFile();
             if (ti != null && ti.swig() != null) {
                 return new File(savePath.getAbsolutePath(), ti.numFiles() > 1 ? th.getName() : ti.files().filePath(0));
             }
@@ -299,7 +301,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public String getInfoHash() {
-        return th.getInfoHash().toString();
+        return th.infoHash().toString();
     }
 
     @Override
@@ -308,14 +310,14 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public long getETA() {
-        TorrentInfo ti = th.getTorrentInfo();
+        TorrentInfo ti = th.torrentFile();
         if (ti == null) {
             return 0;
         }
 
-        TorrentStatus status = th.getStatus();
-        long left = ti.totalSize() - status.getTotalDone();
-        long rate = status.getDownloadPayloadRate();
+        TorrentStatus status = th.status();
+        long left = ti.totalSize() - status.totalDone();
+        long rate = status.downloadPayloadRate();
 
         if (left <= 0) {
             return 0;
@@ -333,7 +335,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         th.setAutoManaged(false);
         th.pause();
-        th.saveResumeData();
+
+        doResumeData(true);
     }
 
     public void resume() {
@@ -341,7 +344,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         th.setAutoManaged(true);
         th.resume();
-        th.saveResumeData();
+
+        doResumeData(true);
     }
 
     public void remove() {
@@ -356,15 +360,13 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     public void remove(boolean deleteTorrent, boolean deleteData) {
         String infoHash = this.getInfoHash();
 
-        Session s = engine.getSession();
-
         incompleteFilesToRemove = getIncompleteFiles();
 
         if (th.isValid()) {
             if (deleteData) {
-                s.removeTorrent(th, Session.Options.DELETE_FILES);
+                engine.remove(th, SessionHandle.Options.DELETE_FILES);
             } else {
-                s.removeTorrent(th);
+                engine.remove(th);
             }
         }
 
@@ -387,13 +389,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.listener = listener;
     }
 
-    @Override
-    public int[] types() {
-        return ALERT_TYPES;
-    }
-
-    @Override
-    public void torrentFinished(TorrentFinishedAlert alert) {
+    private void torrentFinished() {
         if (listener != null) {
             try {
                 listener.finished(this);
@@ -402,12 +398,11 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             }
         }
 
-        th.saveResumeData();
+        doResumeData(true);
     }
 
-    @Override
-    public void torrentRemoved(TorrentRemovedAlert alert) {
-        engine.getSession().removeListener(this);
+    private void torrentRemoved() {
+        engine.removeListener(innerListener);
 
         if (parts != null) {
             parts.delete();
@@ -416,8 +411,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         fireRemoved(incompleteFilesToRemove);
     }
 
-    @Override
-    public void torrentChecked(TorrentCheckedAlert alert) {
+    private void torrentChecked() {
         try {
             if (th.isValid()) {
                 // trigger items calculation
@@ -429,22 +423,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         }
     }
 
-    @Override
-    public void saveResumeData(SaveResumeDataAlert alert) {
-        long now = System.currentTimeMillis();
-        final TorrentStatus status = th.getStatus();
-        boolean forceSerialization = status.isFinished() || status.isPaused();
-        if (forceSerialization || (now - lastSaveResumeTime) >= SAVE_RESUME_RESOLUTION_MILLIS) {
-            lastSaveResumeTime = now;
-        } else {
-            // skip, too fast, see SAVE_RESUME_RESOLUTION_MILLIS
-            return;
-        }
-        serializeResumeData(alert);
-    }
-
-    @Override
-    public void pieceFinished(PieceFinishedAlert alert) {
+    private void pieceFinished(PieceFinishedAlert alert) {
         try {
             if (piecesTracker != null) {
                 piecesTracker.setComplete(alert.pieceIndex(), true);
@@ -455,7 +434,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public boolean isPartial() {
-        Priority[] priorities = th.getFilePriorities();
+        Priority[] priorities = th.filePriorities();
 
         for (Priority p : priorities) {
             if (Priority.IGNORE.equals(p)) {
@@ -522,7 +501,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         ArrayList<TransferItem> items = new ArrayList<>();
 
         if (th.isValid()) {
-            TorrentInfo ti = th.getTorrentInfo();
+            TorrentInfo ti = th.torrentFile();
             if (ti != null && ti.isValid()) {
                 FileStorage fs = ti.files();
                 int numFiles = ti.numFiles();
@@ -562,7 +541,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
             long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
 
-            TorrentInfo ti = th.getTorrentInfo();
+            TorrentInfo ti = th.torrentFile();
             if (ti == null) {
                 // still downloading the info (from magnet)
                 return s;
@@ -598,7 +577,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public boolean isSequentialDownload() {
-        return th.getStatus().isSequentialDownload();
+        return th.status().isSequentialDownload();
     }
 
     public void setSequentialDownload(boolean sequential) {
@@ -621,7 +600,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private void serializeResumeData(SaveResumeDataAlert alert) {
         try {
             if (th.isValid()) {
-                String infoHash = th.getInfoHash().toString();
+                String infoHash = th.infoHash().toString();
                 File file = engine.resumeDataFile(infoHash);
 
                 Entry e = alert.resumeData();
@@ -631,6 +610,23 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             }
         } catch (Throwable e) {
             LOG.warn("Error saving resume data", e);
+        }
+    }
+
+    private void doResumeData(boolean force) {
+        long now = System.currentTimeMillis();
+        if (force || (now - lastSaveResumeTime) >= SAVE_RESUME_RESOLUTION_MILLIS) {
+            lastSaveResumeTime = now;
+        } else {
+            // skip, too fast, see SAVE_RESUME_RESOLUTION_MILLIS
+            return;
+        }
+        try {
+            if (th != null && th.isValid()) {
+                th.saveResumeData();
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error triggering resume data", e);
         }
     }
 
@@ -689,6 +685,49 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 listener.removed(this, incompleteFiles);
             } catch (Throwable e) {
                 LOG.error("Error calling listener", e);
+            }
+        }
+    }
+
+    private final class InnerListener implements AlertListener {
+
+        @Override
+        public int[] types() {
+            return ALERT_TYPES;
+        }
+
+        @Override
+        public void alert(Alert<?> alert) {
+            if (!(alert instanceof TorrentAlert<?>)) {
+                return;
+            }
+
+            if (!((TorrentAlert<?>) alert).handle().swig().op_eq(th.swig())) {
+                return;
+            }
+
+            AlertType type = alert.type();
+
+            switch (type) {
+                case TORRENT_FINISHED:
+                    torrentFinished();
+                    break;
+                case TORRENT_REMOVED:
+                    torrentRemoved();
+                    break;
+                case TORRENT_CHECKED:
+                    torrentChecked();
+                    break;
+                case SAVE_RESUME_DATA:
+                    serializeResumeData((SaveResumeDataAlert) alert);
+                    break;
+                case PIECE_FINISHED:
+                    pieceFinished((PieceFinishedAlert) alert);
+                    doResumeData(false);
+                    break;
+                case STORAGE_MOVED:
+                    doResumeData(true);
+                    break;
             }
         }
     }

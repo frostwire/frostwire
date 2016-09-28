@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.offers;
@@ -21,15 +20,29 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.content.Context;
 
-import java.lang.ref.WeakReference;
-
-public interface AdNetwork {
+interface AdNetwork {
     void initialize(final Activity activity);
+
+    /** Stops the network, any calls to started() should return false after this has been invoked */
     void stop(Context context);
+
+    /** Enables or disables the ad network */
+    void enable(boolean enabled);
+
+    /** Returns whether the ad network is enabled or not */
     boolean enabled();
+
+    /** Returns true if the network is enabled and initialized */
     boolean started();
-    boolean showInterstitial(final WeakReference<Activity> activityRef,
+
+    boolean showInterstitial(Activity activity,
                              final boolean shutdownActivityAfterwards,
                              final boolean dismissActivityAfterward);
+
     void loadNewInterstitial(Activity activity);
+
+    String getShortCode();
+    String getInUsePreferenceKey();
+
+    boolean isDebugOn();
 }

@@ -88,7 +88,7 @@ public final class FileTypeRadioButtonSelectorFactory {
 
     private void updateSearchRadioButtonBackground(RadioButton button, LayerDrawable layerDrawable, BitmapDrawable iconDrawable) {
         // things are a bit different for the radio buttons on the search screen.
-        button.setBackgroundDrawable(layerDrawable);
+        button.setBackground(layerDrawable);
 
         if (button.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             // android:drawableTop

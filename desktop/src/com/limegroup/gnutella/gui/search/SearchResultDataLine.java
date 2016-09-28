@@ -15,20 +15,18 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.Icon;
-
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.IconManager;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
+import org.apache.commons.io.FilenameUtils;
+
+import javax.swing.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /** 
  * A single line of a search result.
@@ -142,19 +140,9 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
             return GUIMediator.getThemeImage("downloading");
         }
 
-        String ext = getExtension();
 
-        //let's try to extract the extension from inside the torrent name
-        if (ext.equals("torrent")) {
-            String filename = getFilename().replace(".torrent", "");
 
-            Matcher fileExtensionMatcher = Pattern.compile(".*\\.(\\S*)$").matcher(filename);
-
-            if (fileExtensionMatcher.matches()) {
-                ext = fileExtensionMatcher.group(1);
-            }
-
-        }
+        String ext = FilenameUtils.getExtension(getFilename());
 
         return IconManager.instance().getIconForExtension(ext);
     }

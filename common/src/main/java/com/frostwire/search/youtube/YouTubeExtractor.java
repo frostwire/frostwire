@@ -15,7 +15,7 @@
 
 package com.frostwire.search.youtube;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.HttpClientFactory;

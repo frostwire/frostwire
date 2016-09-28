@@ -33,7 +33,7 @@ import java.util.zip.ZipFile;
 import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 
 /**

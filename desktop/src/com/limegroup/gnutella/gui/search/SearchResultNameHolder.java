@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,17 +27,15 @@ import com.limegroup.gnutella.gui.tables.NameHolder;
  * @author aldenml
  * 
  */
-public final class SearchResultNameHolder extends NameHolder {
-
+final class SearchResultNameHolder extends NameHolder {
     private final UISearchResult sr;
     private final String displayName;
 
-    public SearchResultNameHolder(final UISearchResult sr) {
+    SearchResultNameHolder(final UISearchResult sr) {
         super(buildHTMLString(sr));
         this.sr = sr;
         this.displayName = sr.getDisplayName();
     }
-    
 
     public int compareTo(SearchResultNameHolder o) {
         return AbstractTableMediator.compare(sr.getDisplayName(), o.sr.getDisplayName());

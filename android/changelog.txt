@@ -1,7 +1,40 @@
-FrostWire 1.7.7 - JUL/13/2016
+FrostWire 1.8.2 - SEP/20/2016
+ - Settings: New 'Select All' checkbox to select/unselect active search engines.
+
+FrostWire 1.8.1 - SEP/15/2016
+ - New Search Engine: LimeTorrents
+ - New jlibtorrent 1.1.1.38 (with libtorrent 1.1.1)
+ - Fixes shutdown and auto-restart bug.
+ - Music Player will not bring back last song played paused on the next session.
+ - FrostWire is cleared from the android task list on Exit on Android 21+
+ - Fixes Monova search
+ - android support v4.23.4.0.
+
+FrostWire 1.8.0 - AUG/19/2016
+ - New jlibtorrent 1.1.0.37
+ - Speed and stability improvements.
+ - Fixes download issues with BitSnoop search results.
+ - Improved swipe gesture detection.
+ - Replaced Terms of Use dialog for checkbox on final wizard screen.
+ - Bug fix: ringtones can be set as ringtones.
+
+FrostWire 1.7.9 - JUL/30/2016
+ - Faster app shutdown.
+ - Use audio as ringtone fixed for Android 6 devices.
+ - Optimizations, cleanup, crash fixes.
+ - Fixes bug where app wouldn't shutdown.
+
+FrostWire 1.7.8 - JUL/23/2016
+ - Removes KAT search.
+ - Refactoring, cleanup, optimizations.
+ - Remove Ads (Basic only)
+ - Crash fixes
+
+FrostWire 1.7.7 - JUL/19/2016
  - Fixes YT search issues
- - Remove Ads
  - More descriptive error when cloud transfers are timed out
+ - Upgraded google play services (9.2.1), gson (2.7)
+ - Fonts and styles updates.
 
 FrostWire 1.7.6 - JUN/29/2016
  - Fixes YT search issues

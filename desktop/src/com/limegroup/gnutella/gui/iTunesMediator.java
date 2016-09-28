@@ -39,7 +39,7 @@ import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
 import com.frostwire.gui.bittorrent.TorrentUtil;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.iTunesImportSettings;
 import com.limegroup.gnutella.settings.iTunesSettings;

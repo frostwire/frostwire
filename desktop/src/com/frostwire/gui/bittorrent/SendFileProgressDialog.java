@@ -18,7 +18,7 @@
 package com.frostwire.gui.bittorrent;
 
 import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;

@@ -30,7 +30,8 @@ import com.frostwire.android.gui.views.MenuAction;
  * @author aldenml
  * @author votaguz
  */
-public class CopyToClipboardMenuAction extends MenuAction {
+public final class CopyToClipboardMenuAction extends MenuAction {
+
     private final int messageId;
     private final Object data;
 

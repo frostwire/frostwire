@@ -23,7 +23,7 @@ import com.frostwire.gui.library.LibraryUtils;
 import com.frostwire.gui.library.tags.TagsData;
 import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.theme.ThemeMediator;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
@@ -542,7 +542,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     }
 
     private void updateShareButtonVisibility(MediaSource currentMedia) {
-        boolean isLocalOrPlaylistFiles = (currentMedia.getFile() != null || (currentMedia.getPlaylistItem() != null && currentMedia.getPlaylistItem().getFilePath() != null && new File(currentMedia.getPlaylistItem().getFilePath()).exists()));
+        boolean isLocalOrPlaylistFiles = (currentMedia != null && (currentMedia.getFile() != null || (currentMedia.getPlaylistItem() != null && currentMedia.getPlaylistItem().getFilePath() != null && new File(currentMedia.getPlaylistItem().getFilePath()).exists())));
         boolean showShareButton = currentMedia != null && (isLocalOrPlaylistFiles);
         shareButton.setVisible(showShareButton);
     }
@@ -600,6 +600,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         if (state == MediaPlaybackState.Stopped || state == MediaPlaybackState.Closed) {
             trackTitle.setText("");
             updateMediaSourceButton(null);
+            updateShareButtonVisibility(null);
         } else {
             updateTitle(mediaPlayer.getCurrentMedia());
         }
@@ -1092,8 +1093,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                 GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
                 UXStats.instance().log(UXAction.SHARING_TORRENT_CREATED_WITH_SEND_TO_FRIEND_FROM_PLAYER);
             }
-            
-            
         }
     }
 

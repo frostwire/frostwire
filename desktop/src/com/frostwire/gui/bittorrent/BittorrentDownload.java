@@ -23,7 +23,7 @@ import com.frostwire.bittorrent.*;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -506,7 +506,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                     if (dl instanceof BittorrentDownload &&
                             TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[]{dl}) &&
                             showShareTorrentDialog) {
-                        new ShareTorrentDialog(((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
+                        new ShareTorrentDialog(GUIMediator.getAppFrame(), ((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
                     } else if (dl instanceof SoundcloudDownload || dl instanceof YouTubeDownload || dl instanceof HttpDownload) {
                         if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
                             new Thread(new Runnable() {

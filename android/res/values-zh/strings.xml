@@ -437,7 +437,6 @@
     <string name="please_enter_valid_url">請輸入有效的鏈接</string>
     <string name="stop">停止</string>
     <string name="watch_tv">看電視</string>
-    <string name="queued_for_checking">輪候檢查</string>
     <string name="available">可用</string>
     <string name="are_you_sure_wifi_sharing_off">關閉 Wi-Fi 共享將使得鄰近 Wi-Fi 網絡的其他用戶無法存取您所有的本地共享檔案。</string>
     <string name="use_yify">使用 Yify</string>

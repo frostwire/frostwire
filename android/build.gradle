@@ -16,10 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-def JLIBTORRENT_VERSION='1.1.0.35'
-
-import groovy.swing.SwingBuilder
-
 apply plugin: 'com.android.application'
 apply from: '../common/dependencies.gradle'
 
@@ -28,13 +24,14 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.android.tools.build:gradle:2.2.0'
     }
 }
 
 repositories {
     mavenCentral()
     jcenter()
+    maven { url "https://jitpack.io" }
 }
 
 def manifestVersionCode() {
@@ -61,8 +58,6 @@ def changeApkOutput(variant) {
         flavor = 'basic'
     } else if (variant.productFlavors[0].name.equals("plus1")) {
         flavor = 'plus'
-    } else if (variant.productFlavors[0].name.equals("store")) {
-        flavor = 'store'
     }
     def suffix = project.ext.versionName + '-b' + project.ext.versionCode + '-' + flavor
     def name = "$project.buildDir/frostwire-android-" + variant.buildType.name + '-' + suffix
@@ -82,7 +77,7 @@ project.ext.versionName = manifestVersionName()
 android {
 
     compileSdkVersion 16
-    buildToolsVersion '24.0.0'
+    buildToolsVersion '24.0.2'
 
     defaultConfig {
         versionName project.ext.versionName
@@ -99,7 +94,7 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            res.srcDirs = ['res', 'apollo/res', ]
+            res.srcDirs = ['res', 'apollo/res']
             aidl.srcDirs = ['src', 'apollo/src']
             assets.srcDirs = ['assets']
             java {
@@ -107,6 +102,8 @@ android {
 
                 srcDir 'apollo/src'
                 srcDir 'src'
+
+                exclude "**/MobFox*.java"
             }
         }
 
@@ -154,12 +151,6 @@ android {
             applicationId 'com.frostwire.android'
             versionCode 9050000 + project.ext.versionCode
         }
-        store {
-            // this is basic plus store enable
-            // for a while the versionCode is the basic + 1
-            applicationId 'com.frostwire.android'
-            versionCode 9010000 + project.ext.versionCode + 3
-        }
     }
 
     applicationVariants.all { variant ->
@@ -177,14 +168,16 @@ configurations.all {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:23.2.1'
-    compile 'com.google.android.gms:play-services-ads:9.0.2'
+    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.google.android.gms:play-services-ads-lite:9.4.0'
     compile 'com.inmobi.monetization:inmobi-ads:5.3.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    //compile 'com.github.mobfox:MobFox-Android-SDK-Core:2.1.4'
 
-    compile 'com.frostwire:jlibtorrent:' + JLIBTORRENT_VERSION
-    compile 'com.frostwire:jlibtorrent-android-arm:' + JLIBTORRENT_VERSION
-    compile 'com.frostwire:jlibtorrent-android-x86:' + JLIBTORRENT_VERSION
+    compile "com.frostwire:jlibtorrent-android-arm:1.2.0.0-alpha7"
+    compile "com.frostwire:jlibtorrent-android-x86:1.2.0.0-alpha7"
+    //compile "com.frostwire:jlibtorrent-android-arm:1.1.1.40"
+    //compile "com.frostwire:jlibtorrent-android-x86:1.1.1.40"
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     
@@ -205,6 +198,50 @@ dependencies {
     
 }
 
+class DeployRelease extends DefaultTask {
+
+    String flavor = 'unknown'
+
+    def version = project.ext.versionName
+    def build = project.ext.versionCode
+
+    def runCmd(cmd) {
+        println(cmd)
+
+        def p = Runtime.getRuntime().exec(cmd)
+        def stdOut = new BufferedReader(new InputStreamReader(p.getInputStream()))
+
+        def s
+        while ((s = stdOut.readLine()) != null) {
+            println(s)
+        }
+    }
+
+    @TaskAction
+    def run() {
+
+        println "Building and installing..."
+        println "VERSION: $version"
+        println "BUILD: $build"
+        println "FLAVOR: $flavor"
+
+        def suffix = version + '-b' + build + '-' + flavor
+        def filename = "$project.buildDir/frostwire-android-release-" + suffix + '.apk'
+
+        runCmd("adb uninstall com.frostwire.android")
+        runCmd("./gradlew clean assembleRelease")
+        runCmd("adb install $filename")
+    }
+}
+
+task deployBasic(type: DeployRelease) {
+    flavor = 'basic'
+}
+
+task deployPlus(type: DeployRelease) {
+    flavor = 'plus'
+}
+
 gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.hasTask(':assembleRelease')) {
 
@@ -212,7 +249,7 @@ gradle.taskGraph.whenReady { taskGraph ->
         def myKeyPassword = ""
 
         if (System.console() == null) {
-            new SwingBuilder().edt {
+            new groovy.swing.SwingBuilder().edt {
                 dialog(modal: true,
                         title: 'Enter keystore data',
                         alwaysOnTop: true,

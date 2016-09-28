@@ -42,9 +42,8 @@
  */
 package com.frostwire.gui.bittorrent;
 
-import com.frostwire.bittorrent.MagnetUriBuilder;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.AnnounceEntry;
-import com.frostwire.jlibtorrent.Session;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.*;
@@ -59,7 +58,6 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
-import javax.swing.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -129,7 +127,7 @@ public final class TorrentUtil {
         return "magnet:?xt=urn:btih:" + hash;
     }
 
-    static String getMagnetURLParameters(TorrentInfo torrent, Session session) {
+    static String getMagnetURLParameters(TorrentInfo torrent) {
         StringBuilder sb = new StringBuilder();
 
         //dn (display name)
@@ -145,9 +143,7 @@ public final class TorrentUtil {
         }
 
         //x.pe (bootstrapping peer(s) ip:port)
-        if (session != null) {
-            return new MagnetUriBuilder(sb.toString()).getMagnet();
-        }
+        sb.append(BTEngine.getInstance().magnetPeers());
 
         return sb.toString();
     }
@@ -220,13 +216,13 @@ public final class TorrentUtil {
             create_torrent torrentCreator = new create_torrent(fs);
 
             if (!dhtTrackedOnly) {
-                torrentCreator.add_tracker("udp://tracker.openbittorrent.com:80");
-                torrentCreator.add_tracker("udp://tracker.publicbt.com:80");
-                torrentCreator.add_tracker("udp://open.demonii.com:1337");
-                torrentCreator.add_tracker("udp://tracker.coppersurfer.tk:6969");
-                torrentCreator.add_tracker("udp://tracker.leechers-paradise.org:6969");
-                torrentCreator.add_tracker("udp://exodus.desync.com:6969");
-                torrentCreator.add_tracker("udp://tracker.pomf.se");
+                torrentCreator.add_tracker(TorrentUtil.convert("udp://tracker.openbittorrent.com:80"));
+                torrentCreator.add_tracker(TorrentUtil.convert("udp://tracker.publicbt.com:80"));
+                torrentCreator.add_tracker(TorrentUtil.convert("udp://open.demonii.com:1337"));
+                torrentCreator.add_tracker(TorrentUtil.convert("udp://tracker.coppersurfer.tk:6969"));
+                torrentCreator.add_tracker(TorrentUtil.convert("udp://tracker.leechers-paradise.org:6969"));
+                torrentCreator.add_tracker(TorrentUtil.convert("udp://exodus.desync.com:6969"));
+                torrentCreator.add_tracker(TorrentUtil.convert("udp://tracker.pomf.se"));
             }
 
             torrentCreator.set_priv(false);
@@ -256,7 +252,7 @@ public final class TorrentUtil {
                     }
                     GUIMediator.instance().openTorrentForSeed(torrentFile, file.getParentFile());
                     if (showShareTorrentDialog) {
-                        new ShareTorrentDialog(torrent).setVisible(true);
+                        new ShareTorrentDialog(GUIMediator.getAppFrame(), torrent).setVisible(true);
                     }
                 }
             });
@@ -283,5 +279,10 @@ public final class TorrentUtil {
                state == TransferState.DOWNLOADING_TORRENT ||
                state == TransferState.SEEDING ||
                state == TransferState.UPLOADING;
+    }
+
+    // TODO: remove this when using the java wrapper API
+    public static string_view convert(String url) {
+        return new string_view(url);
     }
 }

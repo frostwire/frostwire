@@ -33,12 +33,35 @@
         style="@style/WizardSubTitle" />
 
     <CheckBox
-        android:id="@+id/view_intent_wizard_page_check_accept"
+        android:id="@+id/view_intent_wizard_page_check_accept_copyright"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:text="@string/accept_intent"
         android:textColor="@android:color/white"
         style="@style/WizardText" />
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <CheckBox
+                android:id="@+id/view_intent_wizard_page_check_accept_tou"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="@string/i_have_read_and_agree_to_the"
+                android:textColor="@android:color/white"
+                style="@style/WizardText" />
+        <TextView android:id="@+id/view_intent_wizard_page_text_tos"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/terms_of_use"
+                  android:clickable="true"
+                  style="@style/WizardText"
+                  android:layout_marginLeft="5dp"
+                  />
+    </LinearLayout>
+
 
 </LinearLayout>

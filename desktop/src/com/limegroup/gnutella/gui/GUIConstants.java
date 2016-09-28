@@ -35,8 +35,14 @@ public final class GUIConstants {
     public static final int OUTER_MARGIN = 6;
 
     /**
-     * Standard number of pixels that should separate many 
+     * Standard number of pixels that should separate many
      * different types of gui components.
      */
     public static final int SEPARATOR = 6;
+
+    // TODO: move this constants to a better place
+    public static final String TWITTER_FROSTWIRE_URL = "https://twitter.com/frostwire";
+    public static final String FACEBOOK_FROSTWIRE_URL = "https://www.facebook.com/FrostwireOfficial";
+    public static final String REDDIT_FROSTWIRE_URL = "https://www.reddit.com/r/frostwire";
+    public static final String GPLUS_FROSTWIRE_URL = "https://plus.google.com/+frostwire/posts";
 }

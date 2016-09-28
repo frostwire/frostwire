@@ -25,7 +25,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.provider.DocumentFile;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.platform.Platforms;
 
 import java.lang.reflect.Method;

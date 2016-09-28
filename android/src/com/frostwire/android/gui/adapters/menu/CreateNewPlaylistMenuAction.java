@@ -31,7 +31,7 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * Created by gubatron on 12/18/14.
@@ -42,8 +42,8 @@ import com.frostwire.logging.Logger;
  * @author aldenml
  */
 public class CreateNewPlaylistMenuAction extends MenuAction {
+    // TODO: refactor this public static field
     public static PlaylistFragment fragment;
-    private static Logger LOG = Logger.getLogger(CreateNewPlaylistMenuAction.class);
     private final long[] fileDescriptors;
 
     public CreateNewPlaylistMenuAction(Context context, long[] fileDescriptors) {
@@ -98,7 +98,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
 
             EditText playlistInput = findView(dlg, R.id.dialog_default_input_text);
 
-            if (savedInstanceState != null && savedInstanceState.getString("playlistName")!=null) {
+            if (savedInstanceState != null && savedInstanceState.getString("playlistName") != null) {
                 playlistInput.setText(savedInstanceState.getString("playlistName"));
             } else {
                 playlistInput.setText("");

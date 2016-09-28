@@ -21,15 +21,16 @@ import com.andrew.apollo.model.Artist;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
+import com.frostwire.util.Ref;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the artists on a user's
  * device for {@link ArtistFragment}.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
+
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
@@ -47,7 +48,7 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
 
     /**
      * Constructor of <code>ArtistAdapter</code>
-     * 
+     *
      * @param context The {@link Context} to use.
      * @param layoutId The resource Id of the view to inflate.
      */
@@ -81,9 +82,9 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
             }
             if (Ref.alive(holder.mBackground)) {
                 if (mLayoutId == R.layout.list_item_detailed_no_background) {
-                   holder.mBackground.get().setBackground(null);
-                   holder.mBackground.get().setBackgroundColor(convertView.getResources().getColor(R.color.app_light_background));
-                }  else {
+                    holder.mBackground.get().setBackground(null);
+                    holder.mBackground.get().setBackgroundColor(convertView.getResources().getColor(R.color.app_light_background));
+                } else {
                     // Set the background image
                     mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mBackground.get());
                 }
@@ -141,7 +142,7 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
     /**
      * Starts playing an artist if the user touches the artist image in the
      * list.
-     * 
+     *
      * @param artist The {@link ImageView} holding the aritst image
      * @param position The position of the artist to play.
      */

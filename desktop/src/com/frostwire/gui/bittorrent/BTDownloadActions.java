@@ -320,7 +320,7 @@ final class BTDownloadActions {
                     BittorrentDownload btDownload = (BittorrentDownload) d;
                     String magnetUri = btDownload.makeMagnetUri();
                     str += magnetUri;
-                    str += "&" + TorrentUtil.getMagnetURLParameters(btDownload.getTorrentInfo(), BTEngine.getInstance().getSession());
+                    str += BTEngine.getInstance().magnetPeers();
 
                     if (i < downloaders.length - 1) {
                         str += System.lineSeparator();
@@ -387,7 +387,7 @@ final class BTDownloadActions {
             if (btDownload instanceof BittorrentDownload) {
                 TorrentInfo t = ((BittorrentDownload) btDownload).getTorrentInfo();
                 if (t != null) { // avoid NPE due to an invalid torrent handle
-                    new ShareTorrentDialog(t).setVisible(true);
+                    new ShareTorrentDialog(GUIMediator.getAppFrame(), t).setVisible(true);
                 }
             }
         }

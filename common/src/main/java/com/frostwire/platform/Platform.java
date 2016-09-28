@@ -47,13 +47,6 @@ public interface Platform {
     int androidVersion();
 
     /**
-     * Returns true if we are supporting experimental features.
-     *
-     * @return
-     */
-    boolean experimental();
-
-    /**
      * Returns the current network type.
      * <p/>
      * This is the type of the network that the packages will

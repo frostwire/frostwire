@@ -577,7 +577,7 @@ public class CreateTorrentDialog extends JDialog {
             if (trackers != null && !trackers.isEmpty()) {
                 reportCurrentTask(I18n.tr("Adding trackers..."));
                 for (String trackerUrl : trackers) {
-                    torrent.add_tracker(trackerUrl);
+                    torrent.add_tracker(TorrentUtil.convert(trackerUrl));
                 }
             }
 
@@ -645,7 +645,7 @@ public class CreateTorrentDialog extends JDialog {
 	           
                if (result) {
                        for (String mirror : mirrors) {
-                           torrent.add_url_seed(mirror);
+                           torrent.add_url_seed(TorrentUtil.convert(mirror));
                        }
         	           result = true;
                }

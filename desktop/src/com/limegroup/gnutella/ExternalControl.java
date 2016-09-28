@@ -40,7 +40,7 @@ import org.gudy.azureus2.core3.util.Debug;
 import org.limewire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.HttpClientFactory;
 
 public class ExternalControl {

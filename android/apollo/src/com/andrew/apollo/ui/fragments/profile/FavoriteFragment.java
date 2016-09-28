@@ -14,7 +14,9 @@ package com.andrew.apollo.ui.fragments.profile;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import android.view.*;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.View;
 import android.widget.AdapterView;
 import com.andrew.apollo.adapters.ProfileSongAdapter;
 import com.andrew.apollo.loaders.FavoritesLoader;
@@ -25,8 +27,6 @@ import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
-import com.frostwire.logging.Logger;
-
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ import java.util.List;
  * @author Alden Torres (@aldenml)
  */
 public class FavoriteFragment extends ApolloFragment<ProfileSongAdapter, Song> {
-    Logger LOGGER = Logger.getLogger(FavoriteFragment.class);
+
     /**
      * Empty constructor as per the {@link Fragment} documentation
      */

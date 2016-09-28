@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package com.frostwire.android.gui;
 import android.os.Build;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.logging.Logger;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.bitsnoop.BitSnoopSearchPerformer;
@@ -30,7 +29,7 @@ import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
-import com.frostwire.search.kat.KATSearchPerformer;
+import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.mininova.MininovaSearchPerformer;
 import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
@@ -39,6 +38,7 @@ import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.youtube.YouTubeSearchPerformer;
+import com.frostwire.util.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -173,6 +173,13 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine LIMETORRENTS = new SearchEngine("LimeTorrents", Constants.PREF_KEY_SEARCH_USE_LIMETORRENTS) {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new LimeTorrentsSearchPerformer("www.limetorrents.cc", token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     public static final SearchEngine EZTV = new SearchEngine("Eztv", Constants.PREF_KEY_SEARCH_USE_EZTV) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -232,19 +239,5 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine KAT = new SearchEngine("KAT", Constants.PREF_KEY_SEARCH_USE_KAT) {
-
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            KATSearchPerformer performer = null;
-            if (NetworkManager.instance().isDataWIFIUp()) {
-                performer = new KATSearchPerformer("kat.cr", token, keywords, DEFAULT_TIMEOUT);
-            } else {
-                LOG.info("No KATSearchPerformer, WiFi not up");
-            }
-            return performer;
-        }
-    };
-
-    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, KAT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, BTJUNKIE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, BITSNOOP, EZTV);
+    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, BTJUNKIE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, LIMETORRENTS, BITSNOOP, EZTV);
 }

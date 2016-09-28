@@ -21,7 +21,7 @@ import android.content.Context;
 import com.frostwire.android.util.DiskCache;
 import com.frostwire.android.util.DiskCache.Entry;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.CrawlCache;
 import com.frostwire.util.Ref;
 import org.apache.commons.io.IOUtils;

@@ -17,7 +17,7 @@
 
 package com.frostwire.search;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.platform.AppSettings;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.bitsnoop.BitSnoopSearchPerformer;
@@ -26,13 +26,13 @@ import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.filter.SearchTable;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
-import com.frostwire.search.kat.KATSearchPerformer;
 import com.frostwire.search.mininova.MininovaSearchPerformer;
 import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
-import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
+import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
+import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.youtube.YouTubeSearchPerformer;
 import com.frostwire.util.Ref;
@@ -415,10 +415,17 @@ public final class SearchManager {
         }
     };
 
-    public static final SearchEngine TORRENTDOWNLOADS = new SearchEngine("TorrentDownloads.me", AppSettings.SEARCH_TORRENTDOWNLOADS_ENABLED) {
+    public static final SearchEngine TORRENTDOWNLOADS = new SearchEngine("TorrentDownloads", AppSettings.SEARCH_TORRENTDOWNLOADS_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new TorrentDownloadsSearchPerformer("www.torrentdownloads.me", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine LIMETORRENTS = new SearchEngine("LimeTorrents", AppSettings.SEARCH_LIMETORRENTS_ENABLED) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new LimeTorrentsSearchPerformer("www.limetorrents.cc", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
@@ -457,12 +464,5 @@ public final class SearchManager {
         }
     };
 
-    public static final SearchEngine KAT = new SearchEngine("KAT", AppSettings.SEARCH_KAT_ENABLED, false) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new KATSearchPerformer("kat.cr", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, KAT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, BTJUNKIE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, BITSNOOP, EZTV);
+    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, BTJUNKIE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, BITSNOOP, EZTV, LIMETORRENTS);
 }

@@ -29,7 +29,7 @@ import java.util.Map;
 public interface Store {
 
     /**
-     * List all available to purchase products in the store.
+     * List all products in the store.
      *
      * @return
      */
@@ -58,6 +58,4 @@ public interface Store {
      * @param p
      */
     void purchase(Activity activity, Product p);
-
-    Collection<Product> purchasedProducts();
 }

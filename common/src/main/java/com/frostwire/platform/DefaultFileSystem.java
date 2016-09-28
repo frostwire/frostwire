@@ -18,7 +18,7 @@
 
 package com.frostwire.platform;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;

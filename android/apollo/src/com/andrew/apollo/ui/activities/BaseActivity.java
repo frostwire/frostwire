@@ -41,13 +41,14 @@ import com.andrew.apollo.widgets.ShuffleButton;
 import com.andrew.apollo.widgets.theme.BottomActionBar;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.ClickAdapter;
+import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import static com.andrew.apollo.utils.MusicUtils.mService;
+import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * A base {@link FragmentActivity} used to update the bottom bar and
@@ -57,8 +58,8 @@ import static com.andrew.apollo.utils.MusicUtils.mService;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public abstract class BaseActivity extends FragmentActivity implements ServiceConnection {
-
+public abstract class BaseActivity extends FragmentActivity
+        implements ServiceConnection {
     /**
      * Play state and meta change listener
      */
@@ -134,10 +135,22 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
         initBottomActionBar();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE) {
+            WriteSettingsPermissionActivityHelper helper = new WriteSettingsPermissionActivityHelper(this);
+            if (helper.onActivityResult(this,requestCode)) {
+                return;
+            }
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     private void prepareActionBar() {
         final ActionBar actionBar = getActionBar();
         if (actionBar != null) {
-            mResources.themeActionBar(actionBar, getString(R.string.app_name), getWindow());
+            mResources.themeActionBar(actionBar, getString(R.string.app_name));
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
@@ -145,11 +158,13 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-
         TextView actionBarTitleTextView = (TextView) findViewById(R.id.action_bar_title);
-        if (actionBarTitleTextView != null) {
-            actionBarTitleTextView.setOnClickListener(new ActionBarTextViewClickListener(this));
-        }
+        actionBarTitleTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getBackHome();
+            }
+        });
     }
 
     /**
@@ -157,7 +172,7 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
      */
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        mService = IApolloService.Stub.asInterface(service);
+        musicPlaybackService = IApolloService.Stub.asInterface(service);
         // Set the playback drawables
         updatePlaybackControls();
         // Current info
@@ -171,7 +186,7 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
      */
     @Override
     public void onServiceDisconnected(final ComponentName name) {
-        mService = null;
+        musicPlaybackService = null;
     }
 
     /**
@@ -217,7 +232,7 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                getBackHome(this);
+                getBackHome();
                 return true;
             case R.id.menu_new_playlist:
                 onOptionsItemNewPlaylistSelected();
@@ -488,11 +503,11 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
         }
     }
 
-    private static void getBackHome(Activity activity) {
-        if (activity.isTaskRoot()) {
-            UIUtils.goToFrostWireMainActivity(activity);
+    private void getBackHome() {
+        if (isTaskRoot()) {
+            UIUtils.goToFrostWireMainActivity(this);
         } else {
-            activity.finish();
+            finish();
         }
     }
 
@@ -503,7 +518,7 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
 
     private class StopAndHideBottomActionBarListener extends StopListener {
 
-        public StopAndHideBottomActionBarListener(Activity activity, boolean finishOnStop) {
+        StopAndHideBottomActionBarListener(Activity activity, boolean finishOnStop) {
             super(activity, finishOnStop);
         }
 
@@ -512,18 +527,6 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceCo
             super.onLongClick(v);
             setBottomActionBarVisible(false);
             return true;
-        }
-    }
-
-    private final static class ActionBarTextViewClickListener extends ClickAdapter<BaseActivity> {
-
-        public ActionBarTextViewClickListener(BaseActivity owner) {
-            super(owner);
-        }
-
-        @Override
-        public void onClick(BaseActivity owner, View v) {
-            getBackHome(owner);
         }
     }
 }

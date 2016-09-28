@@ -160,9 +160,6 @@
     <string name="app_widget_recent">Apollo: recently listened</string>
     <string name="app_widget_text_separator" translatable="false">-</string>
 
-    <!-- What keywords to use when shopping for Apollo themes -->
-    <string name="apollo_themes_shop_key" translatable="false">Apollo Themes</string>
-
     <!-- Empty list / error messages -->
     <string name="no_effects_for_you">The equalizer could not be opened.</string>
     <string name="empty_music">To copy music from your computer to your device, use a USB cable.</string>

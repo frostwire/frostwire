@@ -16,7 +16,7 @@ import org.limewire.setting.SettingsGroupManager;
 import org.limewire.util.OSUtils;
 import org.limewire.util.SystemUtils;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 
 public class LifecycleManagerImpl implements LifecycleManager {

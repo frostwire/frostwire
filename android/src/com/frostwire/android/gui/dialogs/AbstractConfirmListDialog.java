@@ -31,7 +31,7 @@ import android.widget.*;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractListAdapter;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.util.*;

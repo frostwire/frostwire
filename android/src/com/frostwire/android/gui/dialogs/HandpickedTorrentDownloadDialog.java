@@ -32,7 +32,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Ref;
 import org.apache.commons.io.FilenameUtils;
@@ -306,11 +306,13 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
             Engine.instance().getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                    BTEngine.getInstance().download(theDialog.getTorrentInfo(),
-                            null,
-                            selection,
-                            theDialog.getMagnetUri());
-                    UIUtils.showTransfersOnDownloadStart(context);
+                    try {
+                        BTEngine.getInstance().download(theDialog.getTorrentInfo(),
+                                null,
+                                selection,
+                                theDialog.getMagnetUri());
+                        UIUtils.showTransfersOnDownloadStart(context);
+                    } catch (Throwable ignored) {}
                 }
             });
 

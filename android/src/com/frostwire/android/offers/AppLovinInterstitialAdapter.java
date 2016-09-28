@@ -20,35 +20,33 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Intent;
+import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.adview.AppLovinInterstitialAd;
 import com.applovin.adview.AppLovinInterstitialAdDialog;
 import com.applovin.sdk.AppLovinAd;
 import com.applovin.sdk.AppLovinAdDisplayListener;
 import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinSdk;
-import com.frostwire.android.core.ConfigurationManager;
-import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 
 class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDisplayListener, AppLovinAdLoadListener {
     private static final Logger LOG = Logger.getLogger(AppLovinInterstitialAdapter.class);
-    private WeakReference<Activity> activityRef;
+    private WeakReference<? extends Activity> activityRef;
     private final Application app;
     private AppLovinAdNetwork appLovinAdNetwork;
     private AppLovinAd ad;
 
-    private boolean dismissAfter = false;
+    private boolean finishAfterDismiss = false;
     private boolean shutdownAfter = false;
     private boolean isVideoAd = false;
+    private boolean wasPlayingMusic = false;
 
-    AppLovinInterstitialAdapter(Activity parentActivity, AppLovinAdNetwork appLovinAdNetwork) {
+    AppLovinInterstitialAdapter(AppLovinAdNetwork appLovinAdNetwork, Activity parentActivity) {
         this.activityRef = Ref.weak(parentActivity);
         this.appLovinAdNetwork = appLovinAdNetwork;
-
         this.app = parentActivity.getApplication();
     }
 
@@ -74,12 +72,11 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
         return isVideoAd;
     }
 
-    public boolean show(WeakReference<Activity> activityWeakReference) {
+    public boolean show(Activity activity) {
         boolean result = false;
-        if (ad != null && Ref.alive(activityWeakReference)) {
+        if (ad != null && activity != null) {
             try {
-                this.activityRef = activityWeakReference;
-                final AppLovinInterstitialAdDialog adDialog = AppLovinInterstitialAd.create(AppLovinSdk.getInstance(activityRef.get()), activityRef.get());
+                final AppLovinInterstitialAdDialog adDialog = AppLovinInterstitialAd.create(AppLovinSdk.getInstance(activity), activity);
 
                 if (adDialog.isShowing()) {
                     // this could happen because a previous ad failed to be properly dismissed
@@ -90,7 +87,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
                     adDialog.dismiss();
                     return false;
                 }
-
+                wasPlayingMusic = MusicUtils.isPlaying();
                 adDialog.setAdDisplayListener(this);
                 adDialog.showAndRender(ad);
                 result = true;
@@ -106,38 +103,21 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
     }
 
     public void dismissActivityAfterwards(boolean dismiss) {
-        dismissAfter = dismiss;
+        finishAfterDismiss = dismiss;
     }
 
     @Override
     public void adDisplayed(AppLovinAd appLovinAd) {
+        if (isVideoAd() && wasPlayingMusic && !shutdownAfter) {
+            LOG.info("adDisplayed(): wasPlaying and not shutting down, resuming player playback");
+            MusicUtils.play();
+        }
     }
 
     @Override
     public void adHidden(AppLovinAd appLovinAd) {
-        dismissAndOrShutdownIfNecessary();
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(appLovinAdNetwork, activityRef.get(), finishAfterDismiss, shutdownAfter, true, app);
         reloadInterstitial(appLovinAd);
-    }
-
-    private void dismissAndOrShutdownIfNecessary() {
-        if (Ref.alive(activityRef)) {
-            Activity callerActivity = activityRef.get();
-            if (dismissAfter) {
-                callerActivity.finish();
-            }
-            if (shutdownAfter) {
-                if (callerActivity instanceof MainActivity) {
-                    ((MainActivity) callerActivity).shutdown();
-                }
-            }
-        } else {
-            if (shutdownAfter) {
-                Intent i = new Intent(app, MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.putExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), true);
-                app.startActivity(i);
-            }
-        }
     }
 
     private void reloadInterstitial(AppLovinAd appLovinAd) {
@@ -148,10 +128,12 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
                 Offers.THREAD_POOL.execute(new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            appLovinAdNetwork.loadNewInterstitial(activityRef.get());
-                        } catch (Throwable e) {
-                            LOG.error(e.getMessage(), e);
+                        if (appLovinAdNetwork.enabled() && appLovinAdNetwork.started()) {
+                            try {
+                                appLovinAdNetwork.loadNewInterstitial(activityRef.get());
+                            } catch (Throwable e) {
+                                LOG.error(e.getMessage(), e);
+                            }
                         }
                     }
                 });

@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package com.frostwire.gui.tabs;
 
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
@@ -25,17 +24,17 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UISettings;
 
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
  * Created on 6/15/16.
+ *
  * @author gubatron
  * @author aldenml
  */
-public class SearchTransfersTab extends AbstractTab {
+public final class SearchTransfersTab extends AbstractTab {
+
     private final JSplitPane searchDownloadSplitPane;
 
     public SearchTransfersTab(SearchTab searchTab, TransfersTab transfersTab) {
@@ -61,15 +60,6 @@ public class SearchTransfersTab extends AbstractTab {
                     splitPane.setDividerLocation(splitPane.getSize().height - BTDownloadMediator.MIN_HEIGHT);
                 }
                 UISettings.UI_TRANSFERS_DIVIDER_LOCATION.setValue(splitPane.getDividerLocation());
-            }
-        });
-
-        searchDownloadSplitPane.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println("UISettings.UI_TRANSFERS_DIVIDER_LOCATION = " + UISettings.UI_TRANSFERS_DIVIDER_LOCATION.getValue());
-                System.out.println("searchDownloadSplitPane.getSize() = " + searchDownloadSplitPane.getSize());
-                System.out.println("searchDownloadSplitPane.getDividerLocation() = " + searchDownloadSplitPane.getDividerLocation());
             }
         });
     }

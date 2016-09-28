@@ -949,7 +949,7 @@ public class IabHelper {
                     itemType, continueToken);
 
             int response = getResponseCodeFromBundle(ownedItems);
-            logDebug("Owned items response: " + String.valueOf(response));
+            logDebug("Owned items response code: " + String.valueOf(response));
             if (response != BILLING_RESPONSE_RESULT_OK) {
                 logDebug("getPurchases() failed: " + getResponseDesc(response));
                 return response;
@@ -1042,6 +1042,11 @@ public class IabHelper {
             querySkus.putStringArrayList(GET_SKU_DETAILS_ITEM_LIST, skuPartList);
             Bundle skuDetails = mService.getSkuDetails(3, mContext.getPackageName(),
                     itemType, querySkus);
+
+            if (skuDetails == null) {
+                logError("getSkuDetails() returned a null bundle.");
+                return IABHELPER_BAD_RESPONSE;
+            }
 
             if (!skuDetails.containsKey(RESPONSE_GET_SKU_DETAILS_LIST)) {
                 int response = getResponseCodeFromBundle(skuDetails);

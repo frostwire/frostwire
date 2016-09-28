@@ -154,7 +154,6 @@ final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     public static Map<TransferState, String> TRANSFER_STATE_STRING_MAP = new HashMap<>();
 
     static {
-        TRANSFER_STATE_STRING_MAP.put(TransferState.QUEUED_FOR_CHECKING, I18n.tr("Queued for checking"));
         TRANSFER_STATE_STRING_MAP.put(TransferState.CHECKING, I18n.tr("Checking..."));
         TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_METADATA, I18n.tr("Downloading metadata"));
         TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_TORRENT, I18n.tr("Downloading torrent"));

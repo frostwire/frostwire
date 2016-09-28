@@ -18,7 +18,7 @@
 
 package com.frostwire.search.youtube;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlRegexSearchPerformer;
 import com.frostwire.search.SearchMatcher;
@@ -41,7 +41,7 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
 
     private static final Logger LOG = Logger.getLogger(YouTubeSearchPerformer.class);
 
-    private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title[ ]*\"><a href=\"(?<link>/watch.*?)\".*? title=\"(?<title>.*?)\".*? Duration: (?<duration>.*?)\\.</span>.*?(by |byline\">)<a href=\"/(user|channel)/(?<user>.*?)\"";
+    private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title.*?\"><a href=\"(?<link>/watch.*?)\".*? title=\"(?<title>.*?)\".*? Duration: (?<duration>.*?)\\.</span>.*?(by |byline\">)<a href=\"/(user|channel)/(?<user>.*?)\"";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     private static final int MAX_RESULTS = 20;
@@ -191,4 +191,33 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
             LOG.warn("Error parsing secondary content", e);
         }
     }
+
+    /**
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        byte[] readAllBytes = new byte[0];
+        try {
+            readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/youtube.html"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String fileStr = new String(readAllBytes,"utf-8");
+
+        Pattern pattern = Pattern.compile(REGEX);
+        //Pattern pattern = Pattern.compile(HTML_REGEX);
+
+        Matcher matcher = pattern.matcher(fileStr);
+
+        int found = 0;
+        while (matcher.find()) {
+            found++;
+            System.out.println("\nfound " + found);
+            System.out.println("link: [" + matcher.group("link") + "]");
+            System.out.println("===");
+
+            SearchMatcher sm = new SearchMatcher(matcher);
+            //
+            // EztvSearchResult sr = new EztvSearchResult("http://someurl.com", sm);
+        }
+        System.out.println("-done-");
+    }*/
 }

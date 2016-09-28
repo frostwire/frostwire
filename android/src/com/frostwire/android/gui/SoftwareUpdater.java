@@ -41,7 +41,8 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
-import com.frostwire.logging.Logger;
+import com.frostwire.android.offers.Offers;
+import com.frostwire.util.Logger;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
@@ -117,10 +118,8 @@ public final class SoftwareUpdater {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
-                    final String basicOrPlus = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic" : "plus";
-                    final String userAgent = "FrostWire/android-" + basicOrPlus + "/" + Constants.FROSTWIRE_VERSION_STRING;
                     byte[] jsonBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).
-                            getBytes(Constants.SERVER_UPDATE_URL, 5000, userAgent, null);
+                            getBytes(Constants.SERVER_UPDATE_URL, 5000, Constants.USER_AGENT, null);
 
                     if (jsonBytes != null) {
                         update = JsonUtils.toObject(new String(jsonBytes), Update.class);
@@ -171,7 +170,7 @@ public final class SoftwareUpdater {
                 }
 
                 // Even if we're offline, we need to disable these for the Google Play Distro.
-                if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+                if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
                     SearchEngine ytSE = SearchEngine.forName("YouTube");
                     ytSE.setActive(false);
 
@@ -296,7 +295,7 @@ public final class SoftwareUpdater {
     }
 
     private boolean isFrostWireOld(int myBuild, String latestBuild) {
-        if (Constants.IS_BASIC_DEBUG) {
+        if (Constants.IS_BASIC_AND_DEBUG) {
             myBuild += 40000;
         }
         LOG.info("isFrostWireOld(myBuild=" + myBuild + ", latestBuild=" + latestBuild + ")");
@@ -363,8 +362,6 @@ public final class SoftwareUpdater {
             return;
         }
 
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE_THRESHOLD, new Random().nextInt(100) < update.config.supportThreshold);
-
         if (update.config.activeSearchEngines != null && update.config.activeSearchEngines.keySet() != null) {
             for (String name : update.config.activeSearchEngines.keySet()) {
                 SearchEngine engine = SearchEngine.forName(name);
@@ -377,10 +374,14 @@ public final class SoftwareUpdater {
             }
         }
 
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_APPLOVIN, update.config.appLovin);
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_USE_INMOBI, update.config.inmobi);
-        ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
-        ConfigurationManager.instance().setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
+        ConfigurationManager CM = ConfigurationManager.instance();
+        CM.setStringArray(Constants.PREF_KEY_GUI_OFFERS_WATERFALL, update.config.waterfall);
+        CM.setInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, update.config.removeAdsB2bThreshold);
+        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
+        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
+
+        // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
+        Offers.initAdNetworks((Activity) activityContext);
 
         if (update.config.uxEnabled && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_UXSTATS_ENABLED)) {
             String url = "http://ux.frostwire.com/aux";
@@ -447,10 +448,9 @@ public final class SoftwareUpdater {
 
     @SuppressWarnings("CanBeFinal")
     private static class Config {
-        int supportThreshold = 100;
         Map<String, Boolean> activeSearchEngines;
-        boolean appLovin = false;
-        boolean inmobi = false;
+        String[] waterfall;
+        int removeAdsB2bThreshold = 50;
         int interstitialOffersTransferStarts = 5;
         int interstitialTransferOffersTimeoutInMinutes = 15;
 

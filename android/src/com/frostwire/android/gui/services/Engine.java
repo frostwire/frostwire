@@ -22,14 +22,13 @@ import android.app.Application;
 import android.content.*;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.util.BloomFilter;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.io.*;
 import java.util.BitSet;
@@ -82,7 +81,7 @@ public final class Engine implements IEngineService {
      * new 20 bytes of the new hash.
      */
     private void loadNotifiedDownloads() {
-        notifiedDownloads = new BloomFilter<String>(Constants.NOTIFIED_BLOOM_FILTER_BITSET_SIZE,
+        notifiedDownloads = new BloomFilter<>(Constants.NOTIFIED_BLOOM_FILTER_BITSET_SIZE,
                 Constants.NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS);
 
         if (!notifiedDat.exists()) {
@@ -98,7 +97,7 @@ public final class Engine implements IEngineService {
                 int numberOfElements = ois.readInt();
                 BitSet bs = (BitSet) ois.readObject();
                 ois.close();
-                notifiedDownloads = new BloomFilter<String>(
+                notifiedDownloads = new BloomFilter<>(
                         Constants.NOTIFIED_BLOOM_FILTER_BITSET_SIZE,
                         Constants.NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS,
                         numberOfElements,
@@ -134,19 +133,19 @@ public final class Engine implements IEngineService {
     }
 
     public boolean isStarting() {
-        return service != null ? service.isStarting() : false;
+        return service != null && service.isStarting();
     }
 
     public boolean isStopped() {
-        return service != null ? service.isStopped() : false;
+        return service != null && service.isStopped();
     }
 
     public boolean isStopping() {
-        return service != null ? service.isStopping() : false;
+        return service != null && service.isStopping();
     }
 
     public boolean isDisconnected() {
-        return service != null ? service.isDisconnected() : false;
+        return service != null && service.isDisconnected();
     }
 
     public void startServices() {
@@ -229,6 +228,7 @@ public final class Engine implements IEngineService {
                 try {
                     getApplication().unbindService(connection);
                 } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -236,9 +236,9 @@ public final class Engine implements IEngineService {
                 try {
                     getApplication().unregisterReceiver(receiver);
                 } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
                 }
             }
-
             service.shutdown();
         }
     }

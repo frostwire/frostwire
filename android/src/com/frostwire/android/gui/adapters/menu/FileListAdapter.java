@@ -2,18 +2,17 @@
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.adapters.menu;
@@ -22,8 +21,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
@@ -32,20 +29,20 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.bittorrent.MagnetUriBuilder;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import org.apache.commons.io.FilenameUtils;
@@ -68,13 +65,12 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private final byte fileType;
     private final ImageLoader thumbnailLoader;
     private final DownloadButtonClickListener downloadButtonClickListener;
-    private final FileListFilter fileListFilter;
 
     protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType) {
         super(context, getViewItemId(fileType), convertFiles(files));
         setShowMenuOnClick(true);
 
-        fileListFilter = new FileListFilter();
+        FileListFilter fileListFilter = new FileListFilter();
         setAdapterFilter(fileListFilter);
 
         this.fileType = fileType;
@@ -99,9 +95,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     @Override
     protected MenuAdapter getMenuAdapter(View view) {
-        Handler h = new Handler(Looper.getMainLooper());
-        h.sendEmptyMessage(5011105);
-
         Context context = getContext();
 
         List<MenuAction> items = new ArrayList<>();
@@ -127,15 +120,12 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         boolean showSingleOptions = showSingleOptions(checked, fd);
 
-        if (TransferManager.canSeedFromMyFilesTempHACK()) {
-            if (showSingleOptions) {
-                items.add(new SeedAction(context, fd));
-            } else {
-                items.add(new SeedAction(context, checked));
-            }
-        }
-
         if (showSingleOptions) {
+            if (!AndroidPlatform.saf(new File(fd.filePath)) &&
+                    fd.fileType != Constants.FILE_TYPE_RINGTONES) {
+                items.add(new SeedAction(context, fd));
+            }
+
             if (canOpenFile) {
                 items.add(new OpenMenuAction(context, fd.filePath, fd.mime));
             }
@@ -148,7 +138,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 items.add(new SetAsWallpaperMenuAction(context, fd));
             }
 
-            if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS && numChecked <= 1) {
+            if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS && numChecked <= 1 &&
+                    fd.fileType != Constants.FILE_TYPE_RINGTONES) {
                 items.add(new RenameFileMenuAction(context, this, fd));
             }
 
@@ -157,14 +148,14 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                         R.drawable.contextmenu_icon_magnet,
                         R.string.transfers_context_menu_copy_magnet,
                         R.string.transfers_context_menu_copy_magnet_copied,
-                        new MagnetUriBuilder(fd.filePath).getMagnet()
+                        readInfoFromTorrent(fd.filePath, true)
                 ));
 
                 items.add(new CopyToClipboardMenuAction(context,
                         R.drawable.contextmenu_icon_copy,
                         R.string.transfers_context_menu_copy_infohash,
                         R.string.transfers_context_menu_copy_infohash_copied,
-                        new InfoHashBuilder(fd.filePath)
+                        readInfoFromTorrent(fd.filePath, false)
                 ));
             }
         }
@@ -178,7 +169,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             items.add(new AddToPlaylistMenuAction(context, list));
         }
 
-        if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS) {
+        if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS &&
+                fd.fileType != Constants.FILE_TYPE_RINGTONES) {
             items.add(new SendFileMenuAction(context, fd));
             items.add(new DeleteFileMenuAction(context, this, list));
         }
@@ -488,27 +480,26 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return false;
     }
 
-
-
-    private static final class InfoHashBuilder {
-
-        private final String torrentFilePath;
-
-        InfoHashBuilder(String torrentFilePath) {
-            this.torrentFilePath = torrentFilePath;
+    private static String readInfoFromTorrent(String torrent, boolean magnet) {
+        if (torrent == null) {
+            return "";
         }
 
-        @Override
-        public String toString() {
-            if (this.torrentFilePath != null) {
-                try {
-                    return new TorrentInfo(new File(this.torrentFilePath)).infoHash().toString();
-                } catch (Throwable e) {
-                    LOG.warn("Error trying to get infohash", e);
-                }
+        String result = "";
+
+        try {
+            TorrentInfo ti = new TorrentInfo(new File(torrent));
+
+            if (magnet) {
+                result = ti.makeMagnetUri() + BTEngine.getInstance().magnetPeers();
+            } else {
+                result = ti.infoHash().toString();
             }
-            return super.toString();
+        } catch (Throwable e) {
+            LOG.warn("Error trying read torrent: " + torrent, e);
         }
+
+        return result;
     }
 
     private static class FileListFilter implements ListAdapterFilter<FileDescriptorItem> {

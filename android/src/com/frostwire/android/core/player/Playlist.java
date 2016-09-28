@@ -26,17 +26,17 @@ import java.util.List;
  *
  */
 public interface Playlist {
-    public String getTitle();
+    String getTitle();
     
-    public void setTitle(String s);
+    void setTitle(String s);
 
-    public PlaylistItem getPreviousItem();
+    PlaylistItem getPreviousItem();
 
-    public PlaylistItem getNextItem();
+    PlaylistItem getNextItem();
     
-    public void removeItem(PlaylistItem item);
+    void removeItem(PlaylistItem item);
     
-    public List<PlaylistItem> getItems();
+    List<PlaylistItem> getItems();
     
-    public PlaylistItem getCurrentItem();
+    PlaylistItem getCurrentItem();
 }

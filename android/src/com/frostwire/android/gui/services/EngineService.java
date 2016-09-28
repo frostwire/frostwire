@@ -28,7 +28,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 import com.andrew.apollo.MediaButtonIntentReceiver;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -42,7 +41,7 @@ import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
 import com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver;
 import com.squareup.okhttp.ConnectionPool;
@@ -58,7 +57,6 @@ public class EngineService extends Service implements IEngineService {
 
     public final static int FROSTWIRE_STATUS_NOTIFICATION = 0x4ac4642a; // just a random number
     private static final Logger LOG = Logger.getLogger(EngineService.class);
-    private static final String TAG = "FW.EngineService";
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
 
     private final IBinder binder;
@@ -71,7 +69,7 @@ public class EngineService extends Service implements IEngineService {
     public EngineService() {
         binder = new EngineServiceBinder();
 
-        mediaPlayer = new ApolloMediaPlayer(this);
+        mediaPlayer = new ApolloMediaPlayer();
 
         state = STATE_DISCONNECTED;
     }
@@ -101,36 +99,14 @@ public class EngineService extends Service implements IEngineService {
     @Override
     public void onDestroy() {
         LOG.debug("EngineService onDestroy");
-
         enableReceivers(false);
-
         disablePermanentNotificationUpdates();
-
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
-
         stopServices(false);
-
-        mediaPlayer.stop();
-        mediaPlayer.shutdown();
-
         BTEngine.getInstance().stop();
         ImageLoader.getInstance(this).shutdown();
-
         PlayStore.getInstance().dispose();
-
         stopOkHttp();
-
-        new Thread("shutdown-halt") {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    // ignore
-                }
-                android.os.Process.killProcess(android.os.Process.myPid());
-            }
-        }.start();
     }
 
     // what a bad design to properly shutdown the framework threads!
@@ -153,7 +129,6 @@ public class EngineService extends Service implements IEngineService {
 
     private void enableReceivers(boolean enable) {
         PackageManager pm = getPackageManager();
-
         enableReceiver(pm, ImIdShareBroadCastReceiver.class, enable);
         enableReceiver(pm, EngineBroadcastReceiver.class, enable);
         enableReceiver(pm, MediaButtonIntentReceiver.class, enable);
@@ -233,7 +208,7 @@ public class EngineService extends Service implements IEngineService {
 
         state = STATE_STARTED;
 
-        Log.v(TAG, "Engine started");
+        LOG.info("Engine started");
     }
 
     public synchronized void stopServices(boolean disconnected) {
@@ -246,7 +221,7 @@ public class EngineService extends Service implements IEngineService {
         BTEngine.getInstance().pause();
 
         state = disconnected ? STATE_DISCONNECTED : STATE_STOPPED;
-        Log.v(TAG, "Engine stopped, state: " + state);
+        LOG.info("Engine stopped, state: " + state);
     }
 
     public ExecutorService getThreadPool() {
@@ -274,12 +249,13 @@ public class EngineService extends Service implements IEngineService {
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             manager.notify(Constants.NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED, notification);
         } catch (Throwable e) {
-            Log.e(TAG, "Error creating notification for download finished", e);
+            LOG.error("Error creating notification for download finished", e);
         }
     }
 
     @Override
     public void shutdown() {
+        LOG.info("shutdown()");
         stopForeground(true);
         stopSelf();
     }

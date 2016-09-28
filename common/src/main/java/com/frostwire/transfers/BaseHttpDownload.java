@@ -18,7 +18,7 @@
 
 package com.frostwire.transfers;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;

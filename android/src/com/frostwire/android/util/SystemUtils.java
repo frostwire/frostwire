@@ -25,11 +25,13 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.os.EnvironmentCompat;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.pm.ApplicationInfo.FLAG_LARGE_HEAP;
@@ -177,7 +179,7 @@ public final class SystemUtils {
         }
     }
 
-    public static boolean hasSdkOrNewer(int versionCode) {
+    private static boolean hasSdkOrNewer(int versionCode) {
         return Build.VERSION.SDK_INT >= versionCode;
     }
 
@@ -190,5 +192,56 @@ public final class SystemUtils {
      */
     public static boolean hasKitKatOrNewer() {
         return hasSdkOrNewer(VERSION_CODE_KITKAT);
+    }
+
+    /**
+     *
+     * @param context
+     * @param timeout timeout in ms. set to -1 to wait forever.
+     * @param serviceClasses
+     */
+    public static void waitWhileServicesAreRunning(Context context, long timeout, Class<?> ... serviceClasses) {
+        final long startTime = System.currentTimeMillis();
+        Set<Class<?>> serviceClassesNotRunningAnymore = new HashSet<>();
+        while (serviceClasses.length != serviceClassesNotRunningAnymore.size()) {
+
+            for (Class serviceClass : serviceClasses) {
+                if (isServiceRunning(context, serviceClass)) {
+                    LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is still running.");
+                    break;
+                } else {
+                    LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is shutdown.");
+                    serviceClassesNotRunningAnymore.add(serviceClass);
+                }
+            }
+
+            try {
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                if (timeout != -1 && elapsedTime > timeout) {
+                    LOG.info("waitWhileServicesAreRunning(...) timed out, exiting now (" + timeout + "ms)");
+                    break;
+                }
+
+                if (serviceClasses.length != serviceClassesNotRunningAnymore.size()) {
+                    LOG.info("waitWhileServicesAreRunning(...) zzz... zzz... (150ms)");
+                    Thread.sleep(150);
+                } else {
+                    LOG.info("waitWhileServicesAreRunning(...) no more wait, all services shutdown!");
+                    break;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

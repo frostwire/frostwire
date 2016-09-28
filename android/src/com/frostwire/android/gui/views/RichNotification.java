@@ -22,10 +22,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.text.Html;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -55,8 +53,7 @@ public class RichNotification extends LinearLayout {
         return r;
     }
 
-	public static final List<Integer> wasDismissed = new ArrayList<Integer>();
-	private boolean titleUnderlined;
+	public static final List<Integer> wasDismissed = new ArrayList<>();
 	private String title;
 	private String description;
 	private Drawable icon;
@@ -130,7 +127,7 @@ public class RichNotification extends LinearLayout {
 		
 		ImageView imageViewIcon = (ImageView) findViewById(R.id.view_rich_notification_icon);
 		if (imageViewIcon != null && icon != null) {
-			imageViewIcon.setBackgroundDrawable(icon);
+			imageViewIcon.setBackground(icon);
 		}
 		
 		OnClickListener onClickNotificationListener = new OnClickListener() {
@@ -140,7 +137,7 @@ public class RichNotification extends LinearLayout {
 			}
 		};
 
-		TextView textViewTitle = updateTextViewText(R.id.view_rich_notification_title, (titleUnderlined) ? Html.fromHtml(title) : title, onClickNotificationListener);
+		TextView textViewTitle = updateTextViewText(R.id.view_rich_notification_title, title, onClickNotificationListener);
 		TextView textViewDescription = updateTextViewText(R.id.view_rich_notification_description, description, onClickNotificationListener);
 		
 		textViewTitle.setTypeface(ROBOTO_LIGHT, Typeface.BOLD);

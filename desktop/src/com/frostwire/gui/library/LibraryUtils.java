@@ -28,7 +28,7 @@ import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.theme.DialogFinishedListener;
 import com.frostwire.gui.theme.FrostwireInputDialog;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;

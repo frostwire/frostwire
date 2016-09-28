@@ -19,17 +19,17 @@
 package com.frostwire.gui.updates;
 
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.*;
-import com.frostwire.jlibtorrent.alerts.BlockFinishedAlert;
-import com.frostwire.jlibtorrent.alerts.FileErrorAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
-import com.frostwire.logging.Logger;
 import com.frostwire.gui.DigestUtils;
+import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.Alert;
+import com.frostwire.jlibtorrent.alerts.AlertType;
+import com.frostwire.jlibtorrent.alerts.TorrentAlert;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpRangeException;
-import com.frostwire.util.HttpClientFactory;
-import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.DialogOption;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UpdateSettings;
 import org.limewire.util.CommonUtils;
@@ -39,9 +39,10 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 
 /**
  * @author gubatron
@@ -61,13 +62,13 @@ public class InstallerUpdater implements Runnable {
 
     private final boolean forceUpdate;
 
-    public InstallerUpdater(UpdateMessage updateMessage, boolean force) {
+    InstallerUpdater(UpdateMessage updateMessage, boolean force) {
         _updateMessage = updateMessage;
         forceUpdate = force;
         isDownloadingUpdate = false;
     }
 
-    public static int getUpdateDownloadProgress() {
+    static int getUpdateDownloadProgress() {
         return downloadProgress;
     }
 
@@ -75,7 +76,7 @@ public class InstallerUpdater implements Runnable {
         new Thread(this, "InstallerUpdater").start();
     }
 
-    public static boolean isDownloadingUpdate() {
+    static boolean isDownloadingUpdate() {
         return isDownloadingUpdate;
     }
 
@@ -103,12 +104,11 @@ public class InstallerUpdater implements Runnable {
         File torrentFileLocation = downloadDotTorrent();
 
         try {
-
             // workaround to java issue
             // http://bugs.sun.com/bugdatabase/view_bug.do;:YfiG?bug_id=4483097
             boolean exists = torrentFileLocation.exists() || torrentFileLocation.getAbsoluteFile().exists();
             if (torrentFileLocation != null && exists) {
-                _manager = startTorrentDownload(torrentFileLocation.getAbsolutePath(), UpdateSettings.UPDATES_DIR.getAbsolutePath());
+                startTorrentDownload(torrentFileLocation.getAbsolutePath(), UpdateSettings.UPDATES_DIR.getAbsolutePath());
             } else {
                 isDownloadingUpdate = false;
             }
@@ -143,7 +143,7 @@ public class InstallerUpdater implements Runnable {
                 @Override
                 public void onData(HttpClient client, byte[] buffer, int offset, int length) {
                     downloaded += length;
-                    downloadProgress = (int) ((float) downloaded/contentLength*100.0);
+                    downloadProgress = (int) ((float) downloaded / contentLength * 100.0);
                 }
 
                 @Override
@@ -158,7 +158,6 @@ public class InstallerUpdater implements Runnable {
 
                 @Override
                 public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
-                    final Set<String> strings = headerFields.keySet();
                     if (headerFields.containsKey("Content-Length")) {
                         contentLength = Long.valueOf(headerFields.get("Content-Length").get(0));
                     }
@@ -188,34 +187,66 @@ public class InstallerUpdater implements Runnable {
         }
     }
 
-    private final TorrentHandle startTorrentDownload(String torrentFile, String saveDataPath) throws Exception {
-        final Session session = BTEngine.getInstance().getSession();
+    private void startTorrentDownload(String torrentFile, String saveDataPath) throws Exception {
 
-        TorrentHandle th = session.addTorrent(new File(torrentFile), new File(saveDataPath));
+        AlertListener updateTorrentListener = new AlertListener() {
 
-        session.addListener(new TorrentAlertAdapter(th) {
+            TorrentHandle th = null;
 
             @Override
-            public void fileError(FileErrorAlert alert) {
-                onStateChanged(th, th.getStatus().getState());
+            public int[] types() {
+                return new int[]{TORRENT_ADDED.swig(),
+                        FILE_ERROR.swig(),
+                        PIECE_FINISHED.swig(),
+                        TORRENT_FINISHED.swig()
+                };
             }
 
             @Override
-            public void blockFinished(BlockFinishedAlert alert) {
-                onStateChanged(th, th.getStatus().getState());
+            public void alert(Alert<?> alert) {
+                try {
+                    if (!(alert instanceof TorrentAlert<?>)) {
+                        return;
+                    }
+
+                    if (alert.type().equals(TORRENT_ADDED)) {
+                        Sha1Hash sha1 = ((TorrentAlert<?>) alert).handle().infoHash();
+                        th = BTEngine.getInstance().find(sha1);
+                        _manager = th;
+                        th.resume();
+                        return;
+                    }
+
+                    if (!((TorrentAlert<?>) alert).handle().swig().op_eq(th.swig())) {
+                        return;
+                    }
+
+                    AlertType type = alert.type();
+
+                    switch (type) {
+                        case FILE_ERROR:
+                        case PIECE_FINISHED:
+                            onStateChanged(th, th.status().state());
+                            break;
+                        case TORRENT_FINISHED:
+                            BTEngine.getInstance().removeListener(this);
+                            onStateChanged(th, th.status().state());
+                            downloadComplete();
+                            break;
+                    }
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
             }
+        };
 
-            @Override
-            public void torrentFinished(TorrentFinishedAlert alert) {
-                session.removeListener(this);
-                onStateChanged(th, th.getStatus().getState());
-                downloadComplete(th);
-            }
-        });
-
-        th.resume();
-
-        return th;
+        try {
+            BTEngine.getInstance().addListener(updateTorrentListener);
+            BTEngine.getInstance().download(new TorrentInfo(new File(torrentFile)),
+                    new File(saveDataPath), null, null, null);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     private void showUpdateMessage() {
@@ -256,7 +287,7 @@ public class InstallerUpdater implements Runnable {
         return torrentFileLocation;
     }
 
-    private final InstallerMetaData getLastInstallerMetaData() {
+    private InstallerMetaData getLastInstallerMetaData() {
         InstallerMetaData result = null;
         try {
             File installerDatFile = new File(getInstallerDatPath());
@@ -300,21 +331,8 @@ public class InstallerUpdater implements Runnable {
             return false;
         }
 
-        String installerFilename = null;
-
-        if (_updateMessage.getTorrent() != null) {
-            int indx1 = _updateMessage.getTorrent().lastIndexOf('/') + 1;
-            int indx2 = _updateMessage.getTorrent().lastIndexOf(".torrent");
-
-            installerFilename = _updateMessage.getTorrent().substring(indx1, indx2);
-        } else if (_updateMessage.getInstallerUrl() != null) {
-            int indx1 = _updateMessage.getInstallerUrl().lastIndexOf('/') + 1;
-
-            installerFilename = _updateMessage.getInstallerUrl().substring(indx1);
-        }
-
+        String installerFilename = UpdateMediator.getInstallerFilename(_updateMessage);
         File f = new File(UpdateSettings.UPDATES_DIR, installerFilename);
-
         if (installerFilename == null || !f.exists()) {
             return false;
         }
@@ -343,7 +361,7 @@ public class InstallerUpdater implements Runnable {
             return;
         }
 
-        System.out.println("InstallerUpdater.stateChanged() - " + state + " completed: " + manager.getStatus().isFinished());
+        System.out.println("InstallerUpdater.stateChanged() - " + state + " completed: " + manager.status().isFinished());
         if (state == TorrentStatus.State.SEEDING) {
             isDownloadingUpdate = false;
             System.out.println("InstallerUpdater.stateChanged() - SEEDING!");
@@ -351,7 +369,7 @@ public class InstallerUpdater implements Runnable {
         }
 
         //if (state == DownloadManager.STATE_ERROR) {
-        ErrorCode error = manager.getStatus().errorCode();
+        ErrorCode error = manager.status().errorCode();
         if (error != null && error.value() != 0) {
             isDownloadingUpdate = false;
             System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -362,7 +380,7 @@ public class InstallerUpdater implements Runnable {
             //try to restart the download. delete torrent and data
             //manager.stopIt(DownloadManager.STATE_READY, false, true);
             try {
-                BTEngine.getInstance().getSession().removeTorrent(manager, Session.Options.DELETE_FILES);
+                BTEngine.getInstance().remove(manager, SessionHandle.Options.DELETE_FILES);
                 //processMessage(_updateMessage);
             } catch (Throwable e) {
                 LOG.error("Error removing download manager on error", e);
@@ -370,14 +388,14 @@ public class InstallerUpdater implements Runnable {
 
         } else if (state == TorrentStatus.State.DOWNLOADING) {
             System.out.println("stateChanged(STATE_DOWNLOADING)");
-            downloadProgress = (int)(_manager.getStatus().getProgress()*100);
+            downloadProgress = (int) (_manager.status().progress() * 100);
         } /*else if (state == DownloadManager.STATE_READY || state == TorrentStatus.State.STATE_QUEUED) {
             System.out.println("stateChanged(STATE_READY)");
             manager.startDownload();
         }*/
     }
 
-    private void downloadComplete(TorrentHandle manager) {
+    private void downloadComplete() {
         System.out.println("InstallerUpdater.downloadComplete()!!!!");
         printDownloadManagerStatus(_manager);
 
@@ -397,14 +415,8 @@ public class InstallerUpdater implements Runnable {
 
             @Override
             public boolean accept(File dir, String name) {
-
                 Matcher m = p.matcher(name);
-
-                if (m.matches()) {
-                    return !m.group(1).equals(_updateMessage.getVersion());
-                }
-
-                return false;
+                return m.matches() && !m.group(1).equals(_updateMessage.getVersion());
             }
         })) {
 
@@ -412,7 +424,7 @@ public class InstallerUpdater implements Runnable {
         }
     }
 
-    private final String getInstallerDatPath() {
+    private String getInstallerDatPath() {
         return CommonUtils.getUserSettingsDir().getAbsolutePath() + File.separator + "installer.dat";
     }
 
@@ -433,7 +445,7 @@ public class InstallerUpdater implements Runnable {
 
             FileOutputStream fos = new FileOutputStream(installerPath);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject((InstallerMetaData) md);
+            oos.writeObject(md);
 
             fos.close();
 
@@ -443,84 +455,43 @@ public class InstallerUpdater implements Runnable {
     }
 
     private boolean torrentDataDownloadedToDisk() {
-        if (_manager == null) {
-            return false;
-        }
-
-        if (!_manager.isValid()) {
-            return false;
-        }
-
-        return _manager.getStatus().isFinished() || _manager.getStatus().isSeeding();
-
-        /*
-        String saveLocation = UpdateSettings.UPDATES_DIR.getAbsolutePath();
-        File f = new File(saveLocation);
-
-        DiskManager dm = _manager.getDiskManager();
-        //boolean filesExist = dm.filesExist();		
-        int percentDone = dm.getPercentDone();
-        long totalLength = dm.getTotalLength();
-        int rechecking = dm.getCompleteRecheckStatus();
-
-        return f.exists() && f.length() == totalLength && percentDone == 1000 && rechecking == -1;
-        */
+        return _manager != null && _manager.isValid() && (_manager.status().isFinished() || _manager.status().isSeeding());
     }
 
-    /*
-    public static void printDiskManagerPieces(DiskManager dm) {
-        if (dm == null) {
-            return;
-        }
-        DiskManagerPiece[] pieces = dm.getPieces();
-        for (DiskManagerPiece piece : pieces) {
-            System.out.print(piece.isDone() ? "1" : "0");
-        }
-
-        System.out.println();
-    }*/
-
-    public static void printDownloadManagerStatus(TorrentHandle manager) {
+    private static void printDownloadManagerStatus(TorrentHandle manager) {
         if (manager == null) {
             return;
         }
-
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(" Completed:");
-
-        TorrentStatus stats = manager.getStatus();
-
-        buf.append(stats.getProgress());
+        TorrentStatus stats = manager.status();
+        buf.append(stats.progress());
         buf.append('%');
         buf.append(" Seeds:");
-        buf.append(stats.getNumSeeds());
+        buf.append(stats.numSeeds());
         buf.append(" Peers:");
-        buf.append(stats.getNumPeers());
+        buf.append(stats.numPeers());
         buf.append(" Downloaded:");
-        buf.append(stats.getTotalDone());
+        buf.append(stats.totalDone());
         buf.append(" Uploaded:");
         buf.append(stats.totalUpload());
         buf.append(" DSpeed:");
-        buf.append(stats.getDownloadRate());
+        buf.append(stats.downloadRate());
         buf.append(" USpeed:");
-        buf.append(stats.getUploadRate());
-        //buf.append(" TrackerStatus:");
-        //buf.append(manager.getTrackerStatus());
+        buf.append(stats.uploadRate());
         while (buf.length() < 80) {
             buf.append(' ');
         }
-
         buf.append(" TO:");
         buf.append(manager.getSavePath());
-
         System.out.println(buf.toString());
     }
 
-    public static final String getLastMD5() {
+    static String getLastMD5() {
         return lastMD5;
     }
 
-    public final static void downloadTorrentFile(String torrentURL, File saveLocation) throws IOException, URISyntaxException {
+    private static void downloadTorrentFile(String torrentURL, File saveLocation) throws IOException, URISyntaxException {
         byte[] contents = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).getBytes(torrentURL);
 
         // save the torrent locally if you have to
@@ -542,7 +513,7 @@ public class InstallerUpdater implements Runnable {
         }
     } //downloadTorrentFile
 
-    public static class InstallerMetaData implements Serializable {
+    private static class InstallerMetaData implements Serializable {
 
         private static final long serialVersionUID = -2309399378691373445L;
 

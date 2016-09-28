@@ -19,7 +19,7 @@ import com.frostwire.gui.filters.SearchFilter;
 import com.frostwire.gui.filters.SearchFilterFactory;
 import com.frostwire.gui.filters.SearchFilterFactoryImpl;
 import com.frostwire.gui.tabs.TransfersTab;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.*;
 import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
@@ -42,7 +42,7 @@ import java.util.*;
 /**
  * This class acts as a mediator between the various search components --
  * the hub that all traffic passes through.  This allows the decoupling of
- * the various search packages and simplfies the responsibilities of the
+ * the various search packages and simplifies the responsibilities of the
  * underlying classes.
  */
 public final class SearchMediator {

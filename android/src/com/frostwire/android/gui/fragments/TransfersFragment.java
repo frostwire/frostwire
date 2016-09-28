@@ -2,18 +2,17 @@
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.fragments;
@@ -46,16 +45,12 @@ import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.util.SwipeDetector;
-import com.frostwire.android.gui.util.SwipeListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
-import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.Session;
-import com.frostwire.logging.Logger;
 import com.frostwire.transfers.*;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
@@ -66,11 +61,9 @@ import java.util.*;
  * @author gubatron
  * @author aldenml
  */
-public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener, SwipeListener {
+public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
-    private static final int UI_UPDATE_INTERVAL_IN_SECS = 2;
-    private static final int DHT_STATUS_UPDATE_INTERVAL_IN_SECS = 10;
     private final Comparator<Transfer> transferComparator;
     private final ButtonAddTransferListener buttonAddTransferListener;
     private final ButtonMenuListener buttonMenuListener;
@@ -86,11 +79,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TransferListAdapter adapter;
     private TransferStatus selectedStatus;
     private TimerSubscription subscription;
-    private int delayedDHTUpdateTimeElapsed;
     private boolean isVPNactive;
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
-    private final SwipeDetector viewSwipeDetector;
 
     private boolean showTorrentSettingsOnClick;
 
@@ -101,7 +92,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         this.buttonMenuListener = new ButtonMenuListener(this);
         selectedStatus = TransferStatus.ALL;
         vpnRichToastHandler = new Handler();
-        viewSwipeDetector = new SwipeDetector(this, 100);
     }
 
     @Override
@@ -168,7 +158,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         int downloads = TransferManager.instance().getActiveDownloads();
         int uploads = TransferManager.instance().getActiveUploads();
 
-        delayedDHTCheck();
         updateStatusBar(sDown, sUp, downloads, uploads);
     }
 
@@ -176,34 +165,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         textDownloads.setText(downloads + " @ " + sDown);
         textUploads.setText(uploads + " @ " + sUp);
         updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
-    }
-
-    private void delayedDHTCheck() {
-        delayedDHTUpdateTimeElapsed += UI_UPDATE_INTERVAL_IN_SECS;
-        if (delayedDHTUpdateTimeElapsed >= DHT_STATUS_UPDATE_INTERVAL_IN_SECS) {
-            delayedDHTUpdateTimeElapsed = 0;
-            checkDHTPeers();
-        }
-    }
-
-
-    private void checkDHTPeers() {
-        try {
-            BTEngine engine = BTEngine.getInstance();
-            final Session session = engine.getSession();
-            if (session != null && session.isDHTRunning()) {
-                session.postDHTStats();
-                final int totalDHTNodes = engine.getTotalDHTNodes();
-                if (totalDHTNodes > 0) {
-                    onCheckDHT(true, totalDHTNodes);
-
-                }
-            } else {
-                onCheckDHT(false, 0);
-            }
-        } catch (Throwable e) {
-            LOG.error("Error updating DHT status in transfers", e);
-        }
     }
 
     private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
@@ -218,18 +179,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (wasActiveBefore) {
             showVPNRichToast();
         }
-    }
-
-    @Override
-    public void onSwipeLeft() {
-        // if they swipe left, we move to the right (drag gesture)
-        selectStatusTabToThe(true);
-    }
-
-    @Override
-    public void onSwipeRight() {
-        // if they swipe right, we move to the left (drag gesture)
-        selectStatusTabToThe(false);
     }
 
     private void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
@@ -357,7 +306,18 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         buttonSelectCompleted.setOnClickListener(new ButtonTabListener(this, TransferStatus.COMPLETED));
 
         list = findView(v, R.id.fragment_transfers_list);
-        list.setOnTouchListener(viewSwipeDetector);
+        SwipeLayout swipe = findView(v, R.id.fragment_transfers_swipe);
+        swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
+            @Override
+            public void onSwipeLeft() {
+                selectStatusTabToThe(true);
+            }
+
+            @Override
+            public void onSwipeRight() {
+                selectStatusTabToThe(false);
+            }
+        });
 
         textDHTPeers = findView(v, R.id.fragment_transfers_dht_peers);
         textDHTPeers.setVisibility(View.INVISIBLE);
@@ -375,7 +335,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         textDownloads = findView(v, R.id.fragment_transfers_text_downloads);
         textUploads = findView(v, R.id.fragment_transfers_text_uploads);
 
-        vpnRichToast = findView(v, R.id.toast_vpn_notification_transfers_text);
+        vpnRichToast = findView(v, R.id.fragment_transfers_vpn_notification);
         vpnRichToast.setVisibility(View.GONE);
         vpnRichToast.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -384,7 +344,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
         });
         initVPNStatusButton(v);
-        checkDHTPeers();
     }
 
     private void initVPNStatusButton(View v) {
@@ -427,16 +386,16 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         //if you do have an SD Card mounted and you're using internal memory, we'll let you know
         //that you now can use the SD Card. We'll keep this for a few releases.
         File sdCardDir = getBiggestSDCardDir(getActivity());
-		if (sdCardDir != null && com.frostwire.android.util.SystemUtils.isSecondaryExternalStorageMounted(sdCardDir) &&
-			!TransferManager.isUsingSDCardPrivateStorage() &&
-			!internalMemoryNotification.wasDismissed()) {
-			String bytesAvailableInHuman = UIUtils.getBytesInHuman(com.frostwire.android.util.SystemUtils.getAvailableStorageSize(sdCardDir));
-			String internalMemoryNotificationDescription = getString(R.string.saving_to_internal_memory_description, bytesAvailableInHuman);
-			internalMemoryNotification.setDescription(internalMemoryNotificationDescription);
-			internalMemoryNotification.setVisibility(View.VISIBLE);
-			internalMemoryNotification.setOnClickListener(new SDCardNotificationListener(this));
-		}
-	}
+        if (sdCardDir != null && com.frostwire.android.util.SystemUtils.isSecondaryExternalStorageMounted(sdCardDir) &&
+                !TransferManager.isUsingSDCardPrivateStorage() &&
+                !internalMemoryNotification.wasDismissed()) {
+            String bytesAvailableInHuman = UIUtils.getBytesInHuman(com.frostwire.android.util.SystemUtils.getAvailableStorageSize(sdCardDir));
+            String internalMemoryNotificationDescription = getString(R.string.saving_to_internal_memory_description, bytesAvailableInHuman);
+            internalMemoryNotification.setDescription(internalMemoryNotificationDescription);
+            internalMemoryNotification.setVisibility(View.VISIBLE);
+            internalMemoryNotification.setOnClickListener(new SDCardNotificationListener(this));
+        }
+    }
 
     private void setupAdapter() {
         List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);

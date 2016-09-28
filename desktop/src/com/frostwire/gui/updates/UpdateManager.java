@@ -15,37 +15,28 @@
 
 package com.frostwire.gui.updates;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.util.FrostWireUtils;
+import org.limewire.util.CommonUtils;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
-import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
-
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.util.FrostWireUtils;
-
 /**
  * Reads an update.xml file from frostwire.com The update xml file can also come
  * with special announcements for the community.
- * 
+ * <p>
  * The correct syntax of the update.xml file should be as follows: <update
  * time="${server_time_here}" version="${update_manager_version}"
  * buyUrl="${proxy_buy_url}" />
- * 
+ * <p>
  * <message type="{update | announcement | overlay | hostiles }"
  * value="<text message goes here>" [version="${version_string}"] //version is
  * mandatory for message type in ['update','hostiles'] [url="${url}"] //url is
@@ -63,14 +54,11 @@ import com.limegroup.gnutella.util.FrostWireUtils;
  * [md5=""] //optional, used for the MD5 of the overlay image so we can cache
  * them or refresh them. Also to check the MD5 of the hostiles.version.txt.zip
  * when the torrent has been downloaded /> <![CDATA[ Put all the text you want
- * here, with tags, it doesnt matter cause its CDATA. Could be HTML if you want
+ * here, with tags, it doesn't matter cause its CDATA. Could be HTML if you want
  * in theory. Just dont put a ]]> in it. ]]> <!-- there can be many messages -->
  * </message> </update>
- * 
+ *
  * @author gubatron
- * 
- * 
- * 
  */
 public final class UpdateManager implements Serializable {
 
@@ -80,14 +68,10 @@ public final class UpdateManager implements Serializable {
 
     transient private static HashSet<UpdateMessage> _seenMessages;
 
-    transient UpdateMessage _updateMessage = null;
-    transient HashSet<UpdateMessage> _announcements = null;
-
     /**
      * Starts an Update Task in <secondsAfter> seconds after.
-     * 
      */
-    public static void scheduleUpdateCheckTask(final int secondsAfter, final String updateURL, final boolean force) {
+    private static void scheduleUpdateCheckTask(final int secondsAfter, final String updateURL, final boolean force) {
 
         Runnable checkForUpdatesTask = new Runnable() {
 
@@ -98,8 +82,7 @@ public final class UpdateManager implements Serializable {
 
                 try {
                     Thread.sleep(secondsAfter * 1000);
-                } catch (InterruptedException e) {
-
+                } catch (InterruptedException ignored) {
                 }
 
                 //System.out.println("UpdateManager.scheduleUpdateCheckTask() Runnable: here we go!");
@@ -110,12 +93,10 @@ public final class UpdateManager implements Serializable {
 
         new Thread(checkForUpdatesTask).start();
     }
-    
+
     /**
      * Starts an Update Task in <secondsAfter> seconds after at a custom update
      * URL
-     * 
-     * @param secondsAfter
      */
     public static void scheduleUpdateCheckTask(int secondsAfter) {
         scheduleUpdateCheckTask(secondsAfter, false);
@@ -124,15 +105,14 @@ public final class UpdateManager implements Serializable {
     /**
      * Starts an Update Task in <secondsAfter> seconds after at a custom update
      * URL
-     * 
-     * @param secondsAfter
-     * @param force (force the update download)
      */
-    public static void scheduleUpdateCheckTask(int secondsAfter, boolean force) {
+    static void scheduleUpdateCheckTask(int secondsAfter, boolean force) {
         scheduleUpdateCheckTask(secondsAfter, null, force);
     }
 
-    /** The singleton instance */
+    /**
+     * The singleton instance
+     */
     private static UpdateManager INSTANCE = null;
 
     // Time on the server for when we last checked the updates.
@@ -141,7 +121,7 @@ public final class UpdateManager implements Serializable {
     private UpdateManager() {
     }
 
-    public void setServerTime(String serverTime) {
+    void setServerTime(String serverTime) {
         // if we can't get the server's time, we will show all the
         // announcements.
         // rather have the message getting to our community than not getting to
@@ -160,14 +140,14 @@ public final class UpdateManager implements Serializable {
             _serverTime = Calendar.getInstance().getTime();
     } // setServerTime
 
-    public Date getServerTime() {
+    Date getServerTime() {
         return _serverTime;
     }
 
     /**
      * Checks for updates, and shows message dialogs if needed.
      */
-    public void checkForUpdates(String updateURL, boolean force) {
+    private void checkForUpdates(String updateURL, boolean force) {
         // We start the XML Reader/Parser. It will connect to
         // frostwire.com/update.xml
         // and parse the given XML.
@@ -194,29 +174,39 @@ public final class UpdateManager implements Serializable {
      * Depending on what operating system and how the message looks it can either
      * tell the user to go to FrostWire and download an update or it can start
      * downloading FrostWire via BitTorrent silently using an InstallerUpdater.
-     * 
+     * <p>
      * The user will only be notified that a FrostWire installer has already been downloaded
      * only right after startup, meaning InstallerUpdater will finish the download and not say anything
      * to not interrupt the user's activity and not tempt the user to restart.
-     * 
+     * <p>
      * Currently BitTorrent Updates are supported on Windows, Debian and Ubuntu.
-     * 
-     * @param umr
      */
     private void handlePossibleUpdateMessage(UpdateMessageReader umr, boolean force) {
         UpdateMessage updateMessage = umr.getUpdateMessage();
-        
+
         if (updateMessage != null) {
             UpdateMediator.instance().setUpdateMessage(updateMessage);
+        } else {
+            return;
         }
-        
+
+        // we might be testing and want to force the update message
+        boolean forceUpdateMessage = System.getenv().get("FROSTWIRE_FORCE_UPDATE_MESSAGE") != null;
+
         // attempt to show system Update Message if needed
-        if (umr.hasUpdateMessage() && updateMessage.getVersion() != null && !updateMessage.getVersion().trim().equals("")
-                && UpdateManager.isFrostWireOld(updateMessage.getVersion())) {
+        if (umr.hasUpdateMessage()
+            &&
+            ((updateMessage.getBuild() != null && !updateMessage.getBuild().trim().equals("")) ||
+            (updateMessage.getVersion() != null && !updateMessage.getVersion().trim().equals("")))
+            && (forceUpdateMessage || UpdateManager.isFrostWireOld(updateMessage))) {
 
             boolean hasUrl = updateMessage.getUrl() != null;
             boolean hasTorrent = updateMessage.getTorrent() != null;
             boolean hasInstallerUrl = updateMessage.getInstallerUrl() != null;
+
+            if (forceUpdateMessage) {
+                System.out.println("FROSTWIRE_FORCE_UPDATE_MESSAGE env found, testing update message. (turn off with `unset FROSTWIRE_FORCE_UPDATE_MESSAGE`)");
+            }
 
             // Logic for Windows or Mac Update
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
@@ -244,10 +234,8 @@ public final class UpdateManager implements Serializable {
     /**
      * Given an update message, it checks the frostwire version on it, if we
      * have a lower version, then we show the message.
-     * 
-     * @param msg
      */
-    public void showUpdateMessage(final UpdateMessage msg) {
+    private void showUpdateMessage(final UpdateMessage msg) {
         final String title = (msg.getMessageType().equals("update")) ? I18n.tr("New FrostWire Update Available") : I18n.tr("FrostWire Team Announcement");
 
         int optionType = JOptionPane.CANCEL_OPTION;
@@ -255,7 +243,7 @@ public final class UpdateManager implements Serializable {
         // check if there's an URL to link to
         if (msg.getUrl() != null && !msg.getUrl().trim().equals("")) {
             System.out.println("\t" + msg.getUrl());
-            optionType = optionType | JOptionPane.OK_OPTION;
+            optionType |= JOptionPane.OK_OPTION;
         }
 
         String[] options = new String[3];
@@ -289,36 +277,23 @@ public final class UpdateManager implements Serializable {
 
     /**
      * Given announcements it will show them.
-     * 
-     * @param announcements
      */
-    public void attemptShowAnnouncements(HashSet<UpdateMessage> announcements) {
-        // System.out.println("ABOUT TO SHOW SOME ANNOUNCEMENTS");
-        java.util.Iterator<UpdateMessage> it = announcements.iterator();
-
-        while (it.hasNext()) {
-            UpdateMessage msg = it.next();
-            // System.out.println("UpdateManager.attemptShowAnnouncements(), what about... "
-            // + msg);
-
+    private void attemptShowAnnouncements(HashSet<UpdateMessage> announcements) {
+        for (UpdateMessage msg : announcements) {
             if (msg.isShownOnce() && haveShownMessageBefore(msg)) {
-                // System.out.println("UpdateManager.attemptShowAnnouncements() - Skipping message:\n"
-                // + msg+ "\n");
                 continue;
             }
-
-            // check for url to link to with this message
             if (msg.getUrl() != null && !msg.getUrl().trim().equals("")) {
                 showUpdateMessage(msg);
-            } // if
-        } // while
-    } // attemptShowAnnouncements
+            }
+        }
+    }
 
     @SuppressWarnings("unchecked")
     private void loadSeenMessages() {
         // de-serializes seen messages if available
         File f = new File(CommonUtils.getUserSettingsDir(), "seenMessages.dat");
-        _seenMessages = new HashSet<UpdateMessage>();
+        _seenMessages = new HashSet<>();
 
         if (!f.exists()) {
             try {
@@ -358,7 +333,7 @@ public final class UpdateManager implements Serializable {
 
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f));
-            oos.writeObject((HashSet<UpdateMessage>) _seenMessages);
+            oos.writeObject(_seenMessages);
             oos.close();
         } catch (Exception e) {
             System.out.println("UpdateManager.saveSeenMessages() - Cannot serialize.");
@@ -368,10 +343,10 @@ public final class UpdateManager implements Serializable {
 
     /**
      * Checks on a Message map, if we've seen this message before. The message
-     * map is serialized on disk everytime we write to it. Its initialized from
+     * map is serialized on disk every time we write to it. Its initialized from
      * disk when we start the Update Manager.
      */
-    public boolean haveShownMessageBefore(UpdateMessage msg) {
+    private boolean haveShownMessageBefore(UpdateMessage msg) {
         if (!msg.isShownOnce())
             return false; // we'll ignore messages that can be seen more than
         // once
@@ -381,7 +356,7 @@ public final class UpdateManager implements Serializable {
         if (_seenMessages == null || _seenMessages.size() == 0 || !_seenMessages.contains(msg)) {
 
             if (_seenMessages == null)
-                _seenMessages = new HashSet<UpdateMessage>();
+                _seenMessages = new HashSet<>();
 
             _seenMessages.add(msg);
 
@@ -392,20 +367,31 @@ public final class UpdateManager implements Serializable {
         return true;
     }
 
+    static boolean isFrostWireOld(UpdateMessage message) {
+        if (message.getBuild() != null) {
+            try {
+                int buildNumber = Integer.parseInt(message.getBuild());
+                return buildNumber > FrostWireUtils.getBuildNumber();
+            } catch (Throwable t) {
+                System.err.println("UpdateManager::isFrostWireOld() invalid buildNumber ('"+message.getBuild()+"'), falling back to version check");
+                t.printStackTrace();
+            }
+        }
+        return isFrostWireOld(message.getVersion());
+    }
+
     /**
      * Given a version string, it compares against the current frostwire
      * version. If frostwire is old, it will return true.
-     * 
+     * <p>
      * A valid version string looks like this: "MAJOR.RELEASE.SERVICE"
-     * 
+     * <p>
      * 4.13.1 4.13.2 ... 4.13.134
-     * 
+     * <p>
      * It will compare each number of the current version to the version
      * published by the update message.
-     * 
-     * @param messageVersion
      */
-    public static boolean isFrostWireOld(String messageVersion) {
+    private static boolean isFrostWireOld(String messageVersion) {
         // if there's nothing to compare with, then FrostWire shouldn't be old
         // for it.
         if (messageVersion == null)
@@ -462,10 +448,8 @@ public final class UpdateManager implements Serializable {
 
     /**
      * Starts a torrent download
-     * 
-     * @param uriStr
      */
-    public static void openTorrent(String uriStr) {
+    private static void openTorrent(String uriStr) {
         try {
             URI uri = new URI(uriStr);
 

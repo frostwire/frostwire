@@ -1,62 +1,76 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.inmobi.ads.InMobiInterstitial;
 import com.inmobi.sdk.InMobiSdk;
 
-import java.lang.ref.WeakReference;
+class InMobiAdNetwork implements AdNetwork {
 
-public class InMobiAdNetwork implements AdNetwork {
     private static final Logger LOG = Logger.getLogger(InMobiAdNetwork.class);
-    private InMobiListener inmobiListener;
+    private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
+
+    private InMobiInterstitialListener inmobiListener;
     private InMobiInterstitial inmobiInterstitial;
     private boolean started = false;
-    private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150l;
-    private final boolean DEBUG_MODE;
+    private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150L;
 
-    public InMobiAdNetwork(boolean debugMode) {
-        DEBUG_MODE = debugMode;
+    InMobiAdNetwork() {
     }
 
     public void initialize(final Activity activity) {
         if (!enabled()) {
-            LOG.info("InMobi initialize(): aborted. not enabled.");
+            if (!started()) {
+                LOG.info("InMobi initialize(): aborted. not enabled.");
+            } else {
+                // initialize can be called multiple times, we may have to stop
+                // this network if we started it using a default value.
+                stop(activity);
+            }
             return;
         }
 
         if (!started) {
             try {
-                // this initialize call is very expensive, this is why we should be invoked in a thread.
-                LOG.info("InMobi.initialize()...");
-                InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
-                if (DEBUG_MODE) {
-                    InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
-                }
-                LOG.info("InMobi.initialized.");
-                started = true;
-                LOG.info("Load InmobiInterstitial.");
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            LOG.info("InMobi.initialize()...");
+                            InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
+                            if (DEBUG_MODE) {
+                                InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
+                            }
+                            LOG.info("InMobi.initialized.");
+                            started = true;
+                            LOG.info("Load InmobiInterstitial.");
+                        } catch (Throwable e) {
+                            // TODO: IMPORTANT review this problem, by aldenml
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                // this one makes sure it runs on the UI thread, enqueued after
                 loadNewInterstitial(activity);
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -67,25 +81,22 @@ public class InMobiAdNetwork implements AdNetwork {
 
     @Override
     public void stop(Context context) {
+        started = false;
+        LOG.info("stopped");
     }
 
+    @Override
+    public void enable(boolean enabled) {
+        Offers.AdNetworkHelper.enable(this, enabled);
+    }
+
+    @Override
     public boolean enabled() {
-        if (DEBUG_MODE) {
-            return true;
-        }
-
-        ConfigurationManager config;
-        boolean isInMobiEnabled = false;
-        try {
-            config = ConfigurationManager.instance();
-            isInMobiEnabled = (config.getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE) && config.getBoolean(Constants.PREF_KEY_GUI_USE_INMOBI));
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        return isInMobiEnabled;
+        return Offers.AdNetworkHelper.enabled(this);
     }
 
-    public boolean showInterstitial(final WeakReference<Activity> activityWeakReference,
+    @Override
+    public boolean showInterstitial(Activity activity,
                                     boolean shutdownActivityAfterwards,
                                     boolean dismissActivityAfterward) {
         if (!started || !enabled() || inmobiInterstitial == null || inmobiListener == null) {
@@ -115,7 +126,7 @@ public class InMobiAdNetwork implements AdNetwork {
 
     @Override
     public void loadNewInterstitial(final Activity activity) {
-        if (!started) {
+        if (!started || !enabled()) {
             return; //not ready
         }
 
@@ -123,7 +134,7 @@ public class InMobiAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 try {
-                    inmobiListener = new InMobiListener(activity);
+                    inmobiListener = new InMobiInterstitialListener(InMobiAdNetwork.this, activity);
                     inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
                     inmobiInterstitial.load();
                 } catch (Throwable t) {
@@ -133,5 +144,20 @@ public class InMobiAdNetwork implements AdNetwork {
                 }
             }
         });
+    }
+
+    @Override
+    public String getShortCode() {
+        return Constants.AD_NETWORK_SHORTCODE_INMOBI;
+    }
+
+    @Override
+    public String getInUsePreferenceKey() {
+        return Constants.PREF_KEY_GUI_USE_INMOBI;
+    }
+
+    @Override
+    public boolean isDebugOn() {
+        return DEBUG_MODE;
     }
 }

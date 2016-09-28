@@ -20,11 +20,11 @@
 
 package com.frostwire.util.filetypes;
 
+import org.limewire.util.OSUtils;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.URL;
-
-import org.limewire.util.OSUtils;
 
 
 /**
@@ -41,6 +41,7 @@ public class WinRegistryWrapper {
 				}
 			}
 		} catch (Throwable t) {
+            t.printStackTrace();
 		}
 	}
  

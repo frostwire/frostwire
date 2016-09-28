@@ -90,6 +90,7 @@
     <string name="search_no_keywords">Please enter search keywords</string>
     <string name="search_select_filetype">Please select a file type</string>
     <string name="select_all">Select All</string>
+    <string name="select_deselect_all">Select/Deselect All</string>
     <string name="searching_for">Searching for</string>
     <string name="search_for_type_files">Search for %s files</string>
     <string name="update_title">Update time!</string>
@@ -444,7 +445,7 @@
     <string name="delete_this_track">Delete this track</string>
     <string name="are_you_sure_delete_current_track">Are you sure you want to delete the current track?</string>
     <string name="wifi_sharing_disabled">Wi-fi sharing is off.\n\nWi-fi sharing can be used to share files locally between FrostWire powered devices connected to the same Wi-Fi network.\n\n&lt;a href=\"http://bit.ly/1tVReSt\"&gt;Learn more.&lt;/a&gt;</string>
-    <string name="turn_on_wifi_sharing">Turn on Wi-fi Sharing</string>    
+    <string name="turn_on_wifi_sharing">Turn on Wi-fi Sharing</string>
     <string name="are_you_sure_wifi_sharing_off">Turning off Wi-Fi sharing will make all your locally shared files unavailable to other users on the nearby Wi-Fi network.</string>
     <string name="anonymous_usage_statistics">Anonymous Usage Statistics</string>
     <string name="anonymous_usage_statistics_summary">Send anonymous usage statistics. No information that can personally identify you will be stored on disk or sent through the network.</string>
@@ -452,6 +453,7 @@
     <string name="use_bitsnoop">Use BitSnoop</string>
     <string name="use_torlock">Use TorLock</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>
+    <string name="use_limetorrents">Use Limetorrents</string>
     <string name="use_eztv">Use Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="player_paused_press_and_hold_to_stop">Player paused. (Tip: Press and hold to stop)</string>
@@ -513,7 +515,6 @@
     <string name="help_translate_frostwire">Help translate FrostWire</string>
     <string name="finishing">Finishing</string>
     <string name="scanning">Finishing - Scanning</string>
-    <string name="queued_for_checking">Queued for checking</string>
     <string name="checking_ellipsis">Checking&#8230;</string>
     <string name="downloading_metadata">Downloading metadata</string>
     <string name="error_moving_incomplete">Error: Moving Incomplete</string>
@@ -621,5 +622,19 @@
     <string name="one_time_purchase">One Time Purchase</string>
     <string name="no_trial_period_included">No trial period included</string>
     <string name="error_connection_timed_out">Error: connection timed out/dropped. Try again.</string>
-    <string name="current_plan">Current plan:</string>
+    <string name="current_plan">Current plan</string>
+    <string name="days_left">days left</string>
+    <string name="save_bandwidth">Save Bandwidth</string>
+    <string name="cheaper_than_lattes">Cheaper than Lattes</string>
+    <string name="cheaper_than_drinks">Cheaper than Drinks</string>
+    <string name="cheaper_than_parking">Cheaper than Parking</string>
+    <string name="cheaper_than_cigarettes">Cheaper than Cigarettes</string>
+    <string name="cheaper_than_beer">Cheaper than Beer</string>
+    <string name="cheaper_than_coffee">Cheaper than Coffee</string>
+    <string name="cheaper_than_gas">Cheaper than Gas</string>
+    <string name="no_interruptions">No Interruptions</string>
+    <string name="keep_the_project_alive">Keep the Project Alive</string>
+    <string name="processing_payment">Processing payment, refresh in a few seconds</string>
+    <string name="i_have_read_and_agree_to_the">I have read and agree to the</string>
+    <string name="terms_of_use">Terms of Use</string>
 </resources>

@@ -20,7 +20,7 @@ package com.frostwire.search;
 
 import java.io.IOException;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import org.apache.commons.io.FileUtils;
 
 import com.frostwire.content.ContentValues;

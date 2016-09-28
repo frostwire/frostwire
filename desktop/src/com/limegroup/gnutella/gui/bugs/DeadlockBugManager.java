@@ -3,7 +3,7 @@ package com.limegroup.gnutella.gui.bugs;
 import org.limewire.util.Version;
 import org.limewire.util.VersionFormatException;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.HttpClientFactory;
 import com.limegroup.gnutella.gui.LimeWireModule;
 import com.limegroup.gnutella.settings.BugSettings;

@@ -17,12 +17,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import android.view.ContextMenu;
+import android.view.*;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.ProfileSongAdapter;
@@ -42,7 +38,7 @@ import java.util.List;
 
 /**
  * This class is used to display all of the songs from a particular playlist.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
@@ -70,7 +66,7 @@ public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Son
      */
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v,
-            final ContextMenuInfo menuInfo) {
+                                    final ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         // Remove the song from playlist
@@ -81,7 +77,7 @@ public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Son
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        super.onCreateView(inflater,container, savedInstanceState);
+        super.onCreateView(inflater, container, savedInstanceState);
         DragSortListView dsListView = (DragSortListView) mListView;
         dsListView.setDropListener(this);
         // Set the swipe to remove listener
@@ -105,7 +101,7 @@ public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Son
      */
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
-            final long id) {
+                            final long id) {
         MusicUtils.playAllFromUserItemClick(mAdapter, position);
     }
 

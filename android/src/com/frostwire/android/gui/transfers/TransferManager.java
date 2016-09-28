@@ -31,7 +31,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineAdapter;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchResult;
@@ -77,19 +77,6 @@ public final class TransferManager {
         this.bittorrentDownloads = new CopyOnWriteArrayList<>();
         this.downloadsToReview = 0;
         loadTorrents();
-    }
-
-    /**
-     * TEMPORARY HACK.
-     * @return true if the save path is not the SD Card.
-     */
-    public static boolean canSeedFromMyFilesTempHACK() {
-        // TODO: Remove this hack when we can create .torrents from My Files
-        // by going through the ridiculous hoops Android has imposed to access
-        // the SD card. For now, let's make the feature available only to files
-        // on internal storage.
-
-        return !TransferManager.isUsingSDCardPrivateStorage();
     }
 
     /**
@@ -212,7 +199,7 @@ public final class TransferManager {
     }
 
     public long getDownloadsBandwidth() {
-        long torrentDownloadsBandwidth = BTEngine.getInstance().getDownloadRate();
+        long torrentDownloadsBandwidth = BTEngine.getInstance().downloadRate();
         long peerDownloadsBandwidth = 0;
         for (Transfer d : httpDownloads) {
             peerDownloadsBandwidth += d.getDownloadSpeed();
@@ -221,7 +208,7 @@ public final class TransferManager {
     }
 
     public double getUploadsBandwidth() {
-        return BTEngine.getInstance().getUploadRate();
+        return BTEngine.getInstance().uploadRate();
     }
 
     public int getDownloadsToReview() {
@@ -253,12 +240,12 @@ public final class TransferManager {
             @Override
             public void downloadAdded(BTEngine engine, BTDownload dl) {
                 String name = dl.getName();
-                if (name != null && name.contains("fetch_magnet:")) {
+                if (name != null && name.contains("fetch_magnet")) {
                     return;
                 }
 
                 File savePath = dl.getSavePath();
-                if (savePath != null && savePath.toString().contains("fetch_magnet/")) {
+                if (savePath != null && savePath.toString().contains("fetch_magnet")) {
                     return;
                 }
 
@@ -335,7 +322,7 @@ public final class TransferManager {
 
             if (fetcherListener == null) {
                 if (u.getScheme().equalsIgnoreCase("file")) {
-                    BTEngine.getInstance().download(new File(u.getPath()), null);
+                    BTEngine.getInstance().download(new File(u.getPath()), null, null);
                 } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https") || u.getScheme().equalsIgnoreCase("magnet")) {
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()));
                     bittorrentDownloads.add(download);
@@ -519,17 +506,17 @@ public final class TransferManager {
                 BTEngine e = BTEngine.getInstance();
 
                 if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED)) {
-                    e.setDownloadSpeedLimit((int) ConfigurationManager.instance().getLong(key));
+                    e.downloadRateLimit((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED)) {
-                    e.setUploadSpeedLimit((int) ConfigurationManager.instance().getLong(key));
+                    e.uploadRateLimit((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS)) {
-                    e.setMaxActiveDownloads((int) ConfigurationManager.instance().getLong(key));
+                    e.maxActiveDownloads((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOADS)) {
-                    e.setMaxActiveSeeds((int) ConfigurationManager.instance().getLong(key));
+                    e.maxActiveSeeds((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS)) {
-                    e.setMaxConnections((int) ConfigurationManager.instance().getLong(key));
+                    e.maxConnections((int) ConfigurationManager.instance().getLong(key));
                 } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_PEERS)) {
-                    e.setMaxPeers((int) ConfigurationManager.instance().getLong(key));
+                    e.maxPeers((int) ConfigurationManager.instance().getLong(key));
                 }
             }
         };

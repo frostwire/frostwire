@@ -15,63 +15,49 @@
 
 package com.frostwire.gui.updates;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import com.frostwire.logging.Logger;
-import org.limewire.util.OSUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
-
+import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXStats;
 import com.frostwire.uxstats.UXStatsConf;
 import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
+import org.limewire.util.OSUtils;
+import org.xml.sax.*;
+import org.xml.sax.helpers.XMLReaderFactory;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * SAX Parser and more. Its responsible for creating UpdateMessages The
  * UpdateManager will ask this object if it has announcements or an update
  * message available.
  */
-public final class UpdateMessageReader implements ContentHandler {
+final class UpdateMessageReader implements ContentHandler {
 
     private static final Logger LOG = Logger.getLogger(UpdateMessageReader.class);
     private static final String DEFAULT_UPDATE_URL = "http://update.frostwire.com";
 
-    public HashSet<UpdateMessage> _announcements = null;
+    private HashSet<UpdateMessage> _announcements = null;
 
-    public UpdateMessage _bufferMessage = null;
+    private UpdateMessage _bufferMessage = null;
 
-    public boolean _introloaded = false;
+    private LinkedList<UpdateMessage> _overlays = null;
 
-    public boolean _otherloaded = false;
+    private UpdateMessage _updateMessage = null;
 
-    public LinkedList<UpdateMessage> _overlays = null;
-
-    public UpdateMessage _updateMessage = null;
-
-    // public void UpdateMessageReader() {}
-    public String _updateURL = DEFAULT_UPDATE_URL;
+    private String _updateURL = DEFAULT_UPDATE_URL;
 
     /**
      * Only ads Announcements that have not expired
-     * 
-     * @param msg
      */
-    public void addAnnouncement(UpdateMessage msg) {
+    private void addAnnouncement(UpdateMessage msg) {
         if (_announcements == null) {
-            _announcements = new HashSet<UpdateMessage>();
+            _announcements = new HashSet<>();
         }
 
         if (msg.getMessageType().equals("announcement") && !msg.hasExpired()) {
@@ -96,24 +82,18 @@ public final class UpdateMessageReader implements ContentHandler {
      * 
      * which message to keep for the client.
      * 
-     * @see 
-     *      UpdateManager.updateOverlays(HashSet<UpdateMessage>,UpdateMessageReader
-     *      aka:me)
-     * @param msg
+     * @see UpdateManager::updateOverlays(HashSet<UpdateMessage>,UpdateMessageReader me)
      */
-    public void addOverlay(UpdateMessage msg) {
+    private void addOverlay(UpdateMessage msg) {
         if (msg != null && msg.getMessageType().equals("overlay")) {
 
             if (_overlays == null)
-                _overlays = new LinkedList<UpdateMessage>();
+                _overlays = new LinkedList<>();
 
-            // Replace newly found intro, or aftersearch
+            // Replace newly found intro, or after search
             // for previously added message of same nature.
             if (!_overlays.isEmpty()) {
-                Iterator<UpdateMessage> it = _overlays.iterator();
-                while (it.hasNext()) {
-                    UpdateMessage m = it.next();
-
+                for (UpdateMessage m : _overlays) {
                     // Find another intro or after search, and replace it
                     if (m.isIntro() == msg.isIntro()) {
                         _overlays.remove(m);
@@ -180,40 +160,27 @@ public final class UpdateMessageReader implements ContentHandler {
     public void endPrefixMapping(String arg0) throws SAXException {
     }
 
-    public HashSet<UpdateMessage> getAnnouncements() {
+    HashSet<UpdateMessage> getAnnouncements() {
         return _announcements;
     }
 
-    public List<UpdateMessage> getOverlays() {
-        return _overlays;
-    }
-
-    public UpdateMessage getUpdateMessage() {
+    UpdateMessage getUpdateMessage() {
         return _updateMessage;
     }
 
-    public String getUpdateURL() {
+    private String getUpdateURL() {
         return _updateURL;
     }
 
-    public boolean hasAnnouncements() {
+    boolean hasAnnouncements() {
         return _announcements != null && _announcements.size() > 0;
     }
 
-    public boolean hasOverlays() {
-        return _overlays != null && _overlays.size() > 0;
-    }
-
-    public boolean hasUpdateMessage() {
+    boolean hasUpdateMessage() {
         return _updateMessage != null;
     }
 
     public void ignorableWhitespace(char[] arg0, int arg1, int arg2) throws SAXException {
-    }
-
-    public boolean isIntroLoaded() {
-        return _introloaded; // checks if intro is loaded for the current
-                             // language
     }
 
     /**
@@ -225,8 +192,6 @@ public final class UpdateMessageReader implements ContentHandler {
      * 
      * If you want a full blown validation use isMessageForMe()
      * 
-     * @param msg
-     * @return
      */
     private boolean isMessageEligibleForMyLang(UpdateMessage msg) {
         String langinmsg = msg.getLanguage(); // current language in message
@@ -251,12 +216,9 @@ public final class UpdateMessageReader implements ContentHandler {
 
     /**
      * Checks if this message should be shown for the OS on which this FrostWire
-     * is runnning on.
+     * is running on.
      * 
      * If you want a full blown validation use isMessageForMe()
-     * 
-     * @param msg
-     * @return
      */
     private boolean isMessageEligibleForMyOs(UpdateMessage msg) {
         if (msg.getOs() == null)
@@ -281,15 +243,11 @@ public final class UpdateMessageReader implements ContentHandler {
      * to use the version in it to see if we have to update or not.
      * 
      * If you want a full blown validation use isMessageForMe()
-     * 
-     * @param msg
-     * @return
      */
     private boolean isMessageEligibleForMyVersion(UpdateMessage msg) {
-        if (msg.getVersion() == null || msg.getMessageType().equalsIgnoreCase("update"))
-            return true;
-
-        return !UpdateManager.isFrostWireOld(msg.getVersion());
+        return msg.getVersion() == null ||
+               msg.getMessageType().equalsIgnoreCase("update") ||
+               !UpdateManager.isFrostWireOld(msg);
     }
 
     /**
@@ -301,9 +259,6 @@ public final class UpdateMessageReader implements ContentHandler {
      * 
      * If the message is an announcement, it cares about the version number not
      * being outdated.
-     * 
-     * @param msg
-     * @return
      */
     private boolean isMessageForMe(UpdateMessage msg) {
         if (msg == null) {
@@ -322,17 +277,12 @@ public final class UpdateMessageReader implements ContentHandler {
         return isMessageEligibleForMyOs(msg) && isMessageEligibleForMyLang(msg) && isMessageEligibleForMyVersion(msg);
     } // isMessageForMe
 
-    public boolean isOtherLoaded() {
-        return _otherloaded; // check if overlay is loaded for the current
-                             // language
-    }
-
     public void processingInstruction(String arg0, String arg1) throws SAXException {
     }
 
-    public void readUpdateFile() {
-        HttpURLConnection connection = null;
-        InputSource src = null;
+    void readUpdateFile() {
+        HttpURLConnection connection;
+        InputSource src;
 
         try {
             String userAgent = "FrostWire/" + OSUtils.getOS() + "-" + OSUtils.getArchitecture() + "/" + FrostWireUtils.getFrostWireVersion();
@@ -358,7 +308,7 @@ public final class UpdateMessageReader implements ContentHandler {
             connection.getInputStream().close();
             connection.disconnect();
         } catch (java.net.SocketTimeoutException e3) {
-            System.out.println("UpdateMessageReadre.readUpdateFile() Socket Timeout Exeception " + e3.toString());
+            System.out.println("UpdateMessageReader.readUpdateFile() Socket Timeout Exception " + e3.toString());
         } catch (IOException e) {
             System.out.println("UpdateMessageReader.readUpdateFile() IO exception " + e.toString());
         } catch (SAXException e2) {
@@ -370,19 +320,17 @@ public final class UpdateMessageReader implements ContentHandler {
     }
 
     /**
-     * Sets only the first update message it finds. Make sure to put only have a
-     * single update message everytime on the server, If you plan to leave old
+     * Sets only the first update message it finds. Make sure to put only a
+     * single update message every time on the server, If you plan to leave old
      * messages there, keep the newest one at the beginning of the file.
-     * 
-     * @param msg
      */
-    public void setUpdateMessage(UpdateMessage msg) {
+    private void setUpdateMessage(UpdateMessage msg) {
         if (_updateMessage == null && msg != null && msg.getMessageType().equals("update")) {
             _updateMessage = msg;
         }
     }
 
-    public void setUpdateURL(String updateURL) {
+    void setUpdateURL(String updateURL) {
         if (updateURL == null)
             _updateURL = DEFAULT_UPDATE_URL;
         else
@@ -417,6 +365,7 @@ public final class UpdateMessageReader implements ContentHandler {
             String os = atts.getValue("os");
             String showOnce = atts.getValue("showOnce");
             String version = atts.getValue("version");
+            String build = atts.getValue("build");
             String src = atts.getValue("src");
 
             _bufferMessage = new UpdateMessage(type, message);
@@ -426,6 +375,7 @@ public final class UpdateMessageReader implements ContentHandler {
             _bufferMessage.setOs(os);
             _bufferMessage.setShowOnce(showOnce);
             _bufferMessage.setVersion(version);
+            _bufferMessage.setBuild(build);
 
             if (atts.getValue("md5") != null) {
                 _bufferMessage.setRemoteMD5(atts.getValue("md5"));
@@ -464,7 +414,7 @@ public final class UpdateMessageReader implements ContentHandler {
             } // overlays
 
             if (_bufferMessage.getMessageType().equals("uxstats")) {
-                processUXStatsMsg(_bufferMessage, atts);
+                processUXStatsMsg(atts);
             }
         }
 
@@ -474,7 +424,7 @@ public final class UpdateMessageReader implements ContentHandler {
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
     }
 
-    private void processUXStatsMsg(UpdateMessage msg, Attributes atts) {
+    private void processUXStatsMsg(Attributes atts) {
         try {
             String enabled = atts.getValue("enabled");
 

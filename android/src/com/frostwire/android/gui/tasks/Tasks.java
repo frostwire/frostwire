@@ -20,7 +20,7 @@ package com.frostwire.android.gui.tasks;
 
 import android.os.AsyncTask;
 import android.os.Build;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * Utility class to have AsyncTasks executed in the proper executor.

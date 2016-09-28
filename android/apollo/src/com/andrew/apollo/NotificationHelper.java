@@ -96,7 +96,7 @@ public class NotificationHelper {
         Notification aNotification = new NotificationCompat.Builder(mService)
                 .setSmallIcon(getNotificationIcon())
                 .setContentIntent(pendingintent)
-                .setPriority(0)//(Notification.PRIORITY_DEFAULT)
+                .setPriority(Notification.PRIORITY_DEFAULT)
                 .setContent(mNotificationTemplate)
                 .build();
         // Control playback from the notification

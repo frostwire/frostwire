@@ -19,9 +19,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.theme.SkinCheckBoxMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
-import com.frostwire.jlibtorrent.Session;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
-import com.limegroup.gnutella.gui.util.Constants;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.StatusBarSettings;
@@ -90,7 +88,6 @@ public final class StatusLine {
     private StatusComponent STATUS_COMPONENT;
     private JPanel _centerPanel;
     private Component _centerComponent;
-    private long _lastOnTotalNodesUpdate;
 
     ///////////////////////////////////////////////////////////////////////////
     //  Construction
@@ -177,18 +174,18 @@ public final class StatusLine {
 
     private void createTwitterButton() {
         _twitterButton = new IconButton("TWITTER");
-        initSocialButton(_twitterButton, I18n.tr("Follow us @frostwire"), Constants.TWITTER_FROSTWIRE_URL);
+        initSocialButton(_twitterButton, I18n.tr("Follow us @frostwire"), GUIConstants.TWITTER_FROSTWIRE_URL);
     }
 
     private void createFacebookButton() {
         _facebookButton = new IconButton("FACEBOOK");
-        initSocialButton(_facebookButton, I18n.tr("Like FrostWire on Facebook and stay in touch with the community. Get Help and Help Others."), Constants.FACEBOOK_FROSTWIRE_URL);
+        initSocialButton(_facebookButton, I18n.tr("Like FrostWire on Facebook and stay in touch with the community. Get Help and Help Others."), GUIConstants.FACEBOOK_FROSTWIRE_URL);
     }
 
     private void createGooglePlusButton() {
         _googlePlusButton = new IconButton("GOOGLEPLUS");
         _googlePlusButton.setPreferredSize(new Dimension(19, 16));
-        initSocialButton(_googlePlusButton, I18n.tr("Circle FrostWire on G+"), Constants.GPLUS_FROSTWIRE_URL);
+        initSocialButton(_googlePlusButton, I18n.tr("Circle FrostWire on G+"), GUIConstants.GPLUS_FROSTWIRE_URL);
     }
 
     private void initSocialButton(IconButton socialButton, String toolTipText, final String url) {
@@ -574,40 +571,14 @@ public final class StatusLine {
             break;
         }
 
-        updateTotalDHTNodesInTooltip(tip);
+        long dhtNodes = BTEngine.getInstance().dhtNodes();
+        if (dhtNodes > 0) {
+            String updatedToolTip = tip + ". (DHT: " + dhtNodes + " " + I18n.tr("nodes") + ")";
+            _connectionQualityMeter.setToolTipText(updatedToolTip);
+        } else {
+            _connectionQualityMeter.setToolTipText(tip);
+        }
         _connectionQualityMeter.setText(status);
-    }
-
-    /**
-     *  Adds a DhtStatsAlert listener to the session, has the session post the DHTStatsAlert
-     *  when it receives it, it removes the listener, calculates the node count from all
-     *  the routing buckets, then calls onTotalNodes(int) which safely updates
-     *  the tooltip of the connection quality meter on the UI thread.
-     */
-    private void updateTotalDHTNodesInTooltip(String tip) {
-        if (System.currentTimeMillis() - _lastOnTotalNodesUpdate < 5000) {
-            return;
-        }
-
-        try {
-            BTEngine engine = BTEngine.getInstance();
-            final Session session = engine.getSession();
-            if (session != null && session.isDHTRunning()) {
-                session.postDHTStats();
-                int totalDHTNodes = engine.getTotalDHTNodes();
-                if (totalDHTNodes != -1) {
-                    final String updatedToolTip = tip + ". (DHT: " + totalDHTNodes + " " + I18n.tr("nodes") + ")";
-                    GUIMediator.safeInvokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            _lastOnTotalNodesUpdate = System.currentTimeMillis();
-                            _connectionQualityMeter.setToolTipText(updatedToolTip);
-                        }
-                    });
-                }
-            }
-        } catch (Throwable ignored) {
-        }
     }
 
     /**
@@ -648,7 +619,8 @@ public final class StatusLine {
             processMouseEvent(me);
         }
 
-        public void processMouseEvent(MouseEvent me) {
+        void processMouseEvent(MouseEvent me) {
+            final Component clickedComponent = me.getComponent();
             if (me.isPopupTrigger()) {
                 JPopupMenu jpm = new SkinPopupMenu();
 
@@ -682,7 +654,14 @@ public final class StatusLine {
                 jpm.add(jcbmi);
 
                 jpm.pack();
-                jpm.show(me.getComponent(), me.getX(), me.getY());
+                jpm.show(clickedComponent, me.getX(), me.getY());
+            } else {
+                // if they click on the speed indicators show them the active transfers.
+                if (clickedComponent == _bandwidthUsageUp || clickedComponent == _bandwidthUsageDown) {
+                    final GUIMediator.Tabs transfersTab = GUIMediator.Tabs.TRANSFERS.isEnabled() ?
+                            GUIMediator.Tabs.TRANSFERS : GUIMediator.Tabs.SEARCH_TRANSFERS;
+                    GUIMediator.instance().setWindow(transfersTab);
+                }
             }
         }
     };
@@ -691,11 +670,6 @@ public final class StatusLine {
      * Action for the 'Show Connection Quality' menu item.
      */
     private class ShowConnectionQualityAction extends AbstractAction {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = 7922422377962473634L;
 
         public ShowConnectionQualityAction() {
             putValue(Action.NAME, I18n.tr("Show Connection Quality"));
@@ -727,11 +701,6 @@ public final class StatusLine {
      */
     private class ShowLanguageStatusAction extends AbstractAction {
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 726208491122581283L;
-
         public ShowLanguageStatusAction() {
             putValue(Action.NAME, I18n.tr("Show Language Status"));
         }
@@ -751,11 +720,6 @@ public final class StatusLine {
      */
     private class ShowFirewallStatusAction extends AbstractAction {
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -8489901794229005217L;
-
         public ShowFirewallStatusAction() {
             putValue(Action.NAME, I18n.tr("Show Firewall Status"));
         }
@@ -771,11 +735,6 @@ public final class StatusLine {
      */
     private class ShowBandwidthConsumptionAction extends AbstractAction {
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 1455679943975682049L;
-
         public ShowBandwidthConsumptionAction() {
             putValue(Action.NAME, I18n.tr("Show Bandwidth Consumption"));
         }
@@ -788,11 +747,6 @@ public final class StatusLine {
 
     private class ShowDonationButtonsAction extends AbstractAction {
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 1455679943975682049L;
-
         public ShowDonationButtonsAction() {
             putValue(Action.NAME, I18n.tr("Show Donation Buttons"));
         }
@@ -804,11 +758,6 @@ public final class StatusLine {
     }
 
     private class LazyTooltip extends JLabel {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -5759748801999410032L;
 
         LazyTooltip(ImageIcon icon) {
             super(icon);

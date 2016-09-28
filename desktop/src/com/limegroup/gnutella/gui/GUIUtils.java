@@ -18,7 +18,7 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.gui.theme.ThemeMediator;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.CommonUtils;
@@ -526,7 +526,7 @@ public final class GUIUtils {
      */
     private static boolean launchFile(final File file, boolean playOneTime, boolean isPlaying ) {
         String extension = FilenameUtils.getExtension(file.getName());
-        if(extension != null && extension.equals("torrent")) {
+        if(extension != null && extension.toLowerCase().contains("torrent")) {
             GUIMediator.instance().openTorrentFile(file, true);
             return false;
         }

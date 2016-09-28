@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 /**
  * @author gubatron

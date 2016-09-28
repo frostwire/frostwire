@@ -27,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -36,19 +37,18 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.adapters.menu.*;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.transfers.*;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.bittorrent.BTDownloadItem;
-import com.frostwire.bittorrent.MagnetUriBuilder;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.logging.Logger;
 import com.frostwire.search.WebSearchPerformer;
 import com.frostwire.transfers.*;
-import com.frostwire.transfers.YouTubeDownload;
+import com.frostwire.util.Logger;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -86,7 +86,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     private void initTransferStateStringMap() {
         Context c = context.get();
         TRANSFER_STATE_STRING_MAP.put(TransferState.FINISHING, c.getString(R.string.finishing));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.QUEUED_FOR_CHECKING, c.getString(R.string.queued_for_checking));
         TRANSFER_STATE_STRING_MAP.put(TransferState.CHECKING, c.getString(R.string.checking_ellipsis));
         TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_METADATA, c.getString(R.string.downloading_metadata));
         TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_TORRENT, c.getString(R.string.torrent_fetcher_download_status_downloading_torrent));
@@ -281,8 +280,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
-            if (TransferManager.canSeedFromMyFilesTempHACK() && files != null && files.size() == 1) {
-                items.add(new SeedAction(context.get(), files.get(0),download));
+            if (files != null && files.size() == 1 && !AndroidPlatform.saf(new File(files.get(0).filePath))) {
+                items.add(new SeedAction(context.get(), files.get(0), download));
             }
             items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
         }
@@ -339,7 +338,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 R.drawable.contextmenu_icon_magnet,
                 R.string.transfers_context_menu_copy_magnet,
                 R.string.transfers_context_menu_copy_magnet_copied,
-                new MagnetUriBuilder(download).getMagnet()
+                download.magnetUri() + BTEngine.getInstance().magnetPeers()
         ));
 
         items.add(new CopyToClipboardMenuAction(context.get(),

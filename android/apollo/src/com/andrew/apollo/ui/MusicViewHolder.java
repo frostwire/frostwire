@@ -11,22 +11,19 @@
 
 package com.andrew.apollo.ui;
 
-import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.andrew.apollo.appwidgets.RecentWidgetService;
-import com.andrew.apollo.utils.Ref;
 import com.frostwire.android.R;
+import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 
 /**
  * Used to efficiently cache and recyle the {@link View}s used in the artist,
  * album, song, playlist, and genre adapters.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class MusicViewHolder {
@@ -50,7 +47,7 @@ public class MusicViewHolder {
 
     /**
      * This is the first line displayed in the list or grid
-     * 
+     *
      * @see {@code #getView()} of a specific adapter for more detailed info
      */
     public WeakReference<TextView> mLineOne;
@@ -64,14 +61,14 @@ public class MusicViewHolder {
 
     /**
      * This is the second line displayed in the list or grid
-     * 
+     *
      * @see {@code #getView()} of a specific adapter for more detailed info
      */
     public WeakReference<TextView> mLineTwo;
 
     /**
      * This is the third line displayed in the list or grid
-     * 
+     *
      * @see {@code #getView()} of a specific adapter for more detailed info
      */
     public WeakReference<TextView> mLineThree;
@@ -84,25 +81,25 @@ public class MusicViewHolder {
         mConvertView = new WeakReference<>(view);
 
         // Initialize mOverlay
-        mOverlay = new WeakReference<>((RelativeLayout)view.findViewById(R.id.image_background));
+        mOverlay = new WeakReference<>((RelativeLayout) view.findViewById(R.id.image_background));
 
         // Initialize mBackground
-        mBackground = new WeakReference<>((ImageView)view.findViewById(R.id.list_item_background));
+        mBackground = new WeakReference<>((ImageView) view.findViewById(R.id.list_item_background));
 
         // Initialize mImage
-        mImage = new WeakReference<>((ImageView)view.findViewById(R.id.image));
+        mImage = new WeakReference<>((ImageView) view.findViewById(R.id.image));
 
         // Initialize mLineOne
-        mLineOne = new WeakReference<>((TextView)view.findViewById(R.id.line_one));
+        mLineOne = new WeakReference<>((TextView) view.findViewById(R.id.line_one));
 
         // Initialize mLineOneRight
-        mLineOneRight = new WeakReference<>((TextView)view.findViewById(R.id.line_one_right));
+        mLineOneRight = new WeakReference<>((TextView) view.findViewById(R.id.line_one_right));
 
         // Initialize mLineTwo
-        mLineTwo = new WeakReference<>((TextView)view.findViewById(R.id.line_two));
+        mLineTwo = new WeakReference<>((TextView) view.findViewById(R.id.line_two));
 
         // Initialize mLineThree
-        mLineThree = new WeakReference<>((TextView)view.findViewById(R.id.line_three));
+        mLineThree = new WeakReference<>((TextView) view.findViewById(R.id.line_three));
     }
 
     public void reset() {
@@ -146,7 +143,7 @@ public class MusicViewHolder {
 
         /**
          * This is the first line displayed in the list or grid
-         * 
+         *
          * @see {@code #getView()} of a specific adapter for more detailed info
          */
         public String mLineOne;
@@ -160,22 +157,17 @@ public class MusicViewHolder {
 
         /**
          * This is the second line displayed in the list or grid
-         * 
+         *
          * @see {@code #getView()} of a specific adapter for more detailed info
          */
         public String mLineTwo;
 
         /**
          * This is the third line displayed in the list or grid
-         * 
+         *
          * @see {@code #getView()} of a specific adapter for more detailed info
          */
         public String mLineThree;
-
-        /**
-         * This is the album art bitmap used in {@link RecentWidgetService}.
-         */
-        public Bitmap mImage;
 
         /**
          * Constructor of <code>DataHolder</code>

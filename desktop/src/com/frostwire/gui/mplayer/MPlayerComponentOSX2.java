@@ -18,13 +18,6 @@
 
 package com.frostwire.gui.mplayer;
 
-import java.awt.Canvas;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.io.File;
-
-import javax.swing.SwingUtilities;
-
 import com.frostwire.gui.player.MPlayerUIEventHandler;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaPlayerListener;
@@ -32,6 +25,10 @@ import com.frostwire.gui.player.MediaSource;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.limegroup.gnutella.gui.MPlayerMediator;
 import com.limegroup.gnutella.util.FrostWireUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
 
 /**
  * @author aldenml
@@ -42,7 +39,11 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     private static final long serialVersionUID = -4871743835162851226L;
 
     static {
-        System.loadLibrary("JMPlayer");
+        try {
+            System.loadLibrary("JMPlayer");
+        } catch (Throwable err) {
+            err.printStackTrace();
+        }
     }
 
     private long view;

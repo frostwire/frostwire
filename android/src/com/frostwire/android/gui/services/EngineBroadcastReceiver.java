@@ -34,7 +34,7 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.platform.Platforms;
 
 import java.io.File;

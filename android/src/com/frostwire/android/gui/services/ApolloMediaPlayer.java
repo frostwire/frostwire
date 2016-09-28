@@ -1,11 +1,5 @@
 package com.frostwire.android.gui.services;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import android.app.Service;
-
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
@@ -13,15 +7,17 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.core.player.Playlist;
 import com.frostwire.android.core.player.PlaylistItem;
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.util.Logger;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ApolloMediaPlayer implements CoreMediaPlayer {
+    private static Logger LOG = Logger.getLogger(ApolloMediaPlayer.class);
+    private Map<Long, FileDescriptor> idMap = new HashMap<>();
 
-    private final Service service;
-
-    private Map<Long, FileDescriptor> idMap = new HashMap<Long, FileDescriptor>();
-
-    public ApolloMediaPlayer(Service service) {
-        this.service = service;
+    public ApolloMediaPlayer() {
     }
 
     @Override
@@ -49,8 +45,11 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
     @Override
     public void stop() {
         try {
-            if (MusicUtils.mService != null) {
-                MusicUtils.mService.stop();
+            if (MusicUtils.musicPlaybackService != null) {
+                MusicUtils.musicPlaybackService.stop();
+                LOG.info("ApolloMediaPlayer.stop() I could invoke stop() on the service.");
+            } else {
+                LOG.warn("ApolloMediaPlayer.stop() couldn't get a hold of the music playback service.");
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -60,8 +59,11 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
     @Override
     public void shutdown() {
         try {
-            if (MusicUtils.mService != null) {
-                MusicUtils.mService.shutdown();
+            if (MusicUtils.musicPlaybackService != null) {
+                MusicUtils.musicPlaybackService.shutdown();
+                LOG.info("ApolloMediaPlayer.shutdown() I could invoke shutdown() on the service.");
+            } else {
+                LOG.warn("ApolloMediaPlayer.shutdown() couldn't get a hold of the music playback service.");
             }
         } catch (Throwable e) {
             e.printStackTrace();

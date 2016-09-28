@@ -24,6 +24,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import com.frostwire.util.Hex;
+import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
@@ -37,7 +38,6 @@ import java.util.Map.Entry;
  * @author aldenml
  */
 public class ConfigurationManager {
-
     private final SharedPreferences preferences;
     private final Editor editor;
 
@@ -63,10 +63,11 @@ public class ConfigurationManager {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = preferences.edit();
 
-        defaults = new ConfigurationDefaults(context);
-
+        defaults = new ConfigurationDefaults();
         initPreferences();
     }
+
+
 
     public String getString(String key) {
         return preferences.getString(key, null);
@@ -108,7 +109,7 @@ public class ConfigurationManager {
         return new File(preferences.getString(key, ""));
     }
 
-    public void setFile(String key, File value) {
+    private void setFile(String key, File value) {
         editor.putString(key, value.getAbsolutePath());
         editor.commit();
     }
@@ -127,7 +128,7 @@ public class ConfigurationManager {
         }
     }
 
-    public void setByteArray(String key, byte[] value) {
+    private void setByteArray(String key, byte[] value) {
         setString(key, new String(Hex.encode(value)));
     }
 
@@ -135,7 +136,7 @@ public class ConfigurationManager {
         resetToDefaults(defaults.getDefaultValues());
     }
 
-    public void resetToDefault(String key) {
+    private void resetToDefault(String key) {
         if (defaults != null) {
             Map<String, Object> defaultValues = defaults.getDefaultValues();
             if (defaultValues != null && defaultValues.containsKey(key)) {
@@ -160,6 +161,21 @@ public class ConfigurationManager {
     public boolean vibrateOnFinishedDownload() {
         return getBoolean(Constants.PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD);
     }
+
+    public String[] getStringArray(String key) {
+        String jsonStringArray = preferences.getString(key, null);
+        if (jsonStringArray == null) {
+            return null;
+        }
+        return JsonUtils.toObject(jsonStringArray, String[].class);
+    }
+
+
+    public void setStringArray(String key, String[] values) {
+        editor.putString(key, JsonUtils.toJson(values));
+        editor.commit();
+    }
+
 
     public int maxConcurrentUploads() {
         return getInt(Constants.PREF_KEY_NETWORK_MAX_CONCURRENT_UPLOADS);
@@ -211,6 +227,8 @@ public class ConfigurationManager {
             initByteArrayPreference(key, (byte[]) value, force);
         } else if (value instanceof File) {
             initFilePreference(key, (File) value, force);
+        } else if (value instanceof String[]) {
+            initStringArrayPreference(key, (String[]) value, force);
         }
     }
 
@@ -250,6 +268,12 @@ public class ConfigurationManager {
         }
     }
 
+    private void initStringArrayPreference(String prefKeyName, String[] defaultValue, boolean force) {
+        if (!preferences.contains(prefKeyName) || force) {
+            setStringArray(prefKeyName, defaultValue);
+        }
+    }
+
     private void resetToDefaults(Map<String, Object> map) {
         for (Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() instanceof String) {
@@ -264,6 +288,8 @@ public class ConfigurationManager {
                 setByteArray(entry.getKey(), (byte[]) entry.getValue());
             } else if (entry.getValue() instanceof File) {
                 setFile(entry.getKey(), (File) entry.getValue());
+            } else if (entry.getValue() instanceof String[]) {
+                setStringArray(entry.getKey(), (String[]) entry.getValue());
             }
         }
     }

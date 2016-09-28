@@ -1,4 +1,4 @@
-/*
+  /*
  * Copyright (C) 2012-2015 Andrew Neal, Angel Leon, Alden Torres Licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the
  * License. You may obtain a copy of the License at
@@ -12,11 +12,9 @@
 package com.andrew.apollo;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.appwidget.AppWidgetManager;
 import android.content.*;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -34,20 +32,14 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import com.andrew.apollo.appwidgets.AppWidgetLarge;
-import com.andrew.apollo.appwidgets.AppWidgetLargeAlternate;
-import com.andrew.apollo.appwidgets.AppWidgetSmall;
-import com.andrew.apollo.appwidgets.RecentWidgetProvider;
 import com.andrew.apollo.cache.ImageCache;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
-import com.andrew.apollo.utils.ApolloUtils;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.Ref;
+import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -59,10 +51,9 @@ import java.util.TreeSet;
  * A background {@link Service} used to keep music playing between activities
  * and when the user moves Apollo into the background.
  */
-@SuppressLint("NewApi")
 public class MusicPlaybackService extends Service {
-    private static final String TAG = "MusicPlaybackService";
-    private static final boolean D = false;
+    private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
+    private static final boolean D = true;
 
     /**
      * Indicates that the music has paused or resumed
@@ -72,13 +63,13 @@ public class MusicPlaybackService extends Service {
     /**
      * Indicates has been stopped
      */
-    public static final String PLAYSTATE_STOPPED = "com.andrew.apollo.playstatestopped";
+    private static final String PLAYSTATE_STOPPED = "com.andrew.apollo.playstatestopped";
 
     /**
      * Indicates that music playback position within
      * a title was changed
      */
-    public static final String POSITION_CHANGED = "com.android.apollo.positionchanged";
+    private static final String POSITION_CHANGED = "com.android.apollo.positionchanged";
 
     /**
      * Indicates the meta data has changed in some way, like a track change
@@ -88,7 +79,7 @@ public class MusicPlaybackService extends Service {
     /**
      * Indicates the queue has been updated
      */
-    public static final String QUEUE_CHANGED = "com.andrew.apollo.queuechanged";
+    private static final String QUEUE_CHANGED = "com.andrew.apollo.queuechanged";
 
     /**
      * Indicates the repeat mode changed
@@ -104,29 +95,29 @@ public class MusicPlaybackService extends Service {
      * For backwards compatibility reasons, also provide sticky
      * broadcasts under the music package
      */
-    public static final String APOLLO_PACKAGE_NAME = "com.andrew.apollo";
-    public static final String MUSIC_PACKAGE_NAME = "com.android.music";
+    private static final String APOLLO_PACKAGE_NAME = "com.andrew.apollo";
+    private static final String MUSIC_PACKAGE_NAME = "com.android.music";
 
     /**
      * Called to indicate a general service command. Used in
      * {@link MediaButtonIntentReceiver}
      */
-    public static final String SERVICECMD = "com.andrew.apollo.musicservicecommand";
+    static final String SERVICECMD = "com.andrew.apollo.musicservicecommand";
 
     /**
      * Called to go toggle between pausing and playing the music
      */
-    public static final String TOGGLEPAUSE_ACTION = "com.andrew.apollo.togglepause";
+    static final String TOGGLEPAUSE_ACTION = "com.andrew.apollo.togglepause";
 
     /**
      * Called to go to pause the playback
      */
-    public static final String PAUSE_ACTION = "com.andrew.apollo.pause";
+    private static final String PAUSE_ACTION = "com.andrew.apollo.pause";
 
     /**
      * Called to go to stop the playback
      */
-    public static final String STOP_ACTION = "com.andrew.apollo.stop";
+    static final String STOP_ACTION = "com.andrew.apollo.stop";
 
     /**
      * Called to go to the previous track
@@ -136,17 +127,17 @@ public class MusicPlaybackService extends Service {
     /**
      * Called to go to the next track
      */
-    public static final String NEXT_ACTION = "com.andrew.apollo.next";
+    static final String NEXT_ACTION = "com.andrew.apollo.next";
 
     /**
      * Called to change the repeat mode
      */
-    public static final String REPEAT_ACTION = "com.andrew.apollo.repeat";
+    private static final String REPEAT_ACTION = "com.andrew.apollo.repeat";
 
     /**
      * Called to change the shuffle mode
      */
-    public static final String SHUFFLE_ACTION = "com.andrew.apollo.shuffle";
+    private static final String SHUFFLE_ACTION = "com.andrew.apollo.shuffle";
 
     /**
      * Called to update the service about the foreground state of Apollo's activities
@@ -155,7 +146,7 @@ public class MusicPlaybackService extends Service {
 
     public static final String NOW_IN_FOREGROUND = "nowinforeground";
 
-    public static final String FROM_MEDIA_BUTTON = "frommediabutton";
+    static final String FROM_MEDIA_BUTTON = "frommediabutton";
 
     /**
      * Used to easily notify a list that it should refresh. i.e. A playlist
@@ -166,28 +157,28 @@ public class MusicPlaybackService extends Service {
     /**
      * Used by the alarm intent to shutdown the service after being idle
      */
-    private static final String SHUTDOWN = "com.andrew.apollo.shutdown";
+    public static final String SHUTDOWN_ACTION = "com.andrew.apollo.shutdown";
 
-    public static final String CMDNAME = "command";
+    static final String CMDNAME = "command";
 
-    public static final String CMDTOGGLEPAUSE = "togglepause";
+    static final String CMDTOGGLEPAUSE = "togglepause";
 
-    public static final String CMDSTOP = "stop";
+    static final String CMDSTOP = "stop";
 
-    public static final String CMDPAUSE = "pause";
+    static final String CMDPAUSE = "pause";
 
-    public static final String CMDPLAY = "play";
+    static final String CMDPLAY = "play";
 
-    public static final String CMDPREVIOUS = "previous";
+    static final String CMDPREVIOUS = "previous";
 
-    public static final String CMDNEXT = "next";
+    static final String CMDNEXT = "next";
 
     private static final int IDCOLIDX = 0;
 
     /**
      * Moves a list to the front of the queue
      */
-    public static final int NOW = 1;
+    private static final int NOW = 1;
 
     /**
      * Moves a list to the next position in the queue
@@ -252,17 +243,17 @@ public class MusicPlaybackService extends Service {
     /**
      * Indicates some sort of focus change, maybe a phone call
      */
-    private static final int FOCUSCHANGE = 5;
+    private static final int FOCUS_CHANGE = 5;
 
     /**
      * Indicates to fade the volume down
      */
-    private static final int FADEDOWN = 6;
+    private static final int FADE_DOWN = 6;
 
     /**
      * Indicates to fade the volume back up
      */
-    private static final int FADEUP = 7;
+    private static final int FADE_UP = 7;
 
     /**
      * Idle time before stopping the foreground notification (1 minute)
@@ -284,7 +275,7 @@ public class MusicPlaybackService extends Service {
     /**
      * The columns used to retrieve any info from the current track
      */
-    private static final String[] PROJECTION = new String[] {
+    private static final String[] PROJECTION = new String[]{
             "audio._id AS _id", MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.MIME_TYPE, MediaStore.Audio.Media.ALBUM_ID,
@@ -294,7 +285,7 @@ public class MusicPlaybackService extends Service {
     /**
      * The columns used to retrieve any info from the current album
      */
-    private static final String[] ALBUM_PROJECTION = new String[] {
+    private static final String[] ALBUM_PROJECTION = new String[]{
             MediaStore.Audio.Albums.ALBUM, MediaStore.Audio.Albums.ARTIST,
             MediaStore.Audio.Albums.LAST_YEAR
     };
@@ -302,7 +293,7 @@ public class MusicPlaybackService extends Service {
     /**
      * Keeps a mapping of the track history
      */
-    private static final LinkedList<Integer> mHistory = Lists.newLinkedList();
+    private static final LinkedList<Integer> mHistory =  new LinkedList<>();
 
     /**
      * Used to shuffle the tracks
@@ -315,7 +306,7 @@ public class MusicPlaybackService extends Service {
      * turn allows us to save the playlist more often without worrying too
      * much about performance
      */
-    private static final char HEX_DIGITS[] = new char[] {
+    private static final char HEX_DIGITS[] = new char[]{
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     };
 
@@ -323,27 +314,6 @@ public class MusicPlaybackService extends Service {
      * Service stub
      */
     private final IBinder mBinder = new ServiceStub(this);
-
-    /**
-     * 4x1 widget
-     */
-    private final AppWidgetSmall mAppWidgetSmall = AppWidgetSmall.getInstance();
-
-    /**
-     * 4x2 widget
-     */
-    private final AppWidgetLarge mAppWidgetLarge = AppWidgetLarge.getInstance();
-
-    /**
-     * 4x2 alternate widget
-     */
-    private final AppWidgetLargeAlternate mAppWidgetLargeAlternate = AppWidgetLargeAlternate
-            .getInstance();
-
-    /**
-     * Recently listened widget
-     */
-    private final RecentWidgetProvider mRecentWidgetProvider = RecentWidgetProvider.getInstance();
 
     /**
      * The media player
@@ -474,12 +444,14 @@ public class MusicPlaybackService extends Service {
 
     private boolean launchPlayerActivity;
 
+    private boolean exiting;
+
     /**
      * {@inheritDoc}
      */
     @Override
     public IBinder onBind(final Intent intent) {
-        if (D) Log.d(TAG, "Service bound, intent = " + intent);
+        if (D) LOG.info("Service bound, intent = " + intent);
         cancelShutdown();
         mServiceInUse = true;
         return mBinder;
@@ -490,7 +462,12 @@ public class MusicPlaybackService extends Service {
      */
     @Override
     public boolean onUnbind(final Intent intent) {
-        if (D) Log.d(TAG, "Service unbound");
+        if (D) LOG.info("onUnbind()");
+        if (exiting) {
+            LOG.info("onUnbind() aborted, already taken care of by releaseServiceUiAndStop() (exiting=true)");
+            return true;
+        }
+
         mServiceInUse = false;
         saveQueue(true);
 
@@ -526,11 +503,11 @@ public class MusicPlaybackService extends Service {
      */
     @Override
     public void onCreate() {
-        if (D) Log.d(TAG, "Creating service");
+        if (D) LOG.info("Creating service");
         super.onCreate();
 
         if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
-            PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             initService();
         }
     }
@@ -606,7 +583,7 @@ public class MusicPlaybackService extends Service {
 
         // Initialize the delayed shutdown intent
         final Intent shutdownIntent = new Intent(this, MusicPlaybackService.class);
-        shutdownIntent.setAction(SHUTDOWN);
+        shutdownIntent.setAction(SHUTDOWN_ACTION);
 
         mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         mShutdownIntent = PendingIntent.getService(this, 0, shutdownIntent, 0);
@@ -630,7 +607,13 @@ public class MusicPlaybackService extends Service {
         mRemoteControlClient = new RemoteControlClient(
                 PendingIntent.getBroadcast(getApplicationContext(), 0, mediaButtonIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT));
-        mAudioManager.registerRemoteControlClient(mRemoteControlClient);
+
+        try {
+            mAudioManager.registerRemoteControlClient(mRemoteControlClient);
+        } catch (Throwable t) {
+            // seems like this doesn't work on some devices where it requires MODIFY_PHONE_STATE
+            // which is a permission only given to system apps, not third party apps.
+        }
 
         // Flags for the media transport control that this client supports.
         int flags = RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
@@ -640,27 +623,26 @@ public class MusicPlaybackService extends Service {
                 | RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
                 | RemoteControlClient.FLAG_KEY_MEDIA_STOP;
 
-        if (ApolloUtils.hasJellyBeanMR2()) {
-            // aldenml: Commented due to the nature of the needed refactor
-            /*
-            flags |= RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE;
+        // aldenml: Commented due to the nature of the needed refactor
+        // enable when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
+        /*
+        flags |= RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE;
 
-            mRemoteControlClient.setOnGetPlaybackPositionListener(
-                    new RemoteControlClient.OnGetPlaybackPositionListener() {
-                @Override
-                public long onGetPlaybackPosition() {
-                    return position();
-                }
-            });
-            mRemoteControlClient.setPlaybackPositionUpdateListener(
-                    new RemoteControlClient.OnPlaybackPositionUpdateListener() {
-                @Override
-                public void onPlaybackPositionUpdate(long newPositionMs) {
-                    seek(newPositionMs);
-                }
-            });
-            */
-        }
+        mRemoteControlClient.setOnGetPlaybackPositionListener(
+                new RemoteControlClient.OnGetPlaybackPositionListener() {
+            @Override
+            public long onGetPlaybackPosition() {
+                return position();
+            }
+        });
+        mRemoteControlClient.setPlaybackPositionUpdateListener(
+                new RemoteControlClient.OnPlaybackPositionUpdateListener() {
+            @Override
+            public void onPlaybackPositionUpdate(long newPositionMs) {
+                seek(newPositionMs);
+            }
+        });
+        */
 
         mRemoteControlClient.setTransportControlFlags(flags);
     }
@@ -670,7 +652,7 @@ public class MusicPlaybackService extends Service {
      */
     @Override
     public void onDestroy() {
-        if (D) Log.d(TAG, "Destroying service");
+        if (D) LOG.info("Destroying service");
         super.onDestroy();
 
         // Tell any sound effect processors (e.g. equalizers) that we're leaving
@@ -680,7 +662,8 @@ public class MusicPlaybackService extends Service {
             audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, getAudioSessionId());
             audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
             sendBroadcast(audioEffectsIntent);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
 
         // remove any pending alarms
         if (mAlarmManager != null) {
@@ -738,7 +721,7 @@ public class MusicPlaybackService extends Service {
      */
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        if (D) Log.d(TAG, "Got new intent " + intent + ", startId = " + startId);
+        if (D) LOG.info("Got new intent " + intent + ", startId = " + startId);
         mServiceStartId = startId;
 
         if (intent != null) {
@@ -749,9 +732,10 @@ public class MusicPlaybackService extends Service {
                 updateNotification();
             }
 
-            if (SHUTDOWN.equals(action)) {
-                mShutdownScheduled = false;
-                releaseServiceUiAndStop();
+            if (SHUTDOWN_ACTION.equals(action)) {
+                cancelShutdown();
+                exiting = intent.hasExtra("force");
+                releaseServiceUiAndStop(exiting);
                 return START_NOT_STICKY;
             }
 
@@ -769,30 +753,41 @@ public class MusicPlaybackService extends Service {
         return START_STICKY;
     }
 
-    private void releaseServiceUiAndStop() {
-        if (mPlayerHandler == null ||
-                isPlaying()
+    /**
+     * @param force
+     * @return true if serviced was released.
+     */
+    private boolean releaseServiceUiAndStop(boolean force) {
+        if (mPlayerHandler == null
+                || (!force && isPlaying())
                 || mPausedByTransientLossOfFocus
                 || mPlayerHandler.hasMessages(TRACK_ENDED)) {
-            return;
+            LOG.info("releaseServiceUiAndStop(force="+force+") aborted: isPlaying()="+isPlaying());
+            return false;
         }
 
-        if (D) Log.d(TAG, "Nothing is playing anymore, releasing notification");
+        if (force && isPlaying()) {
+            LOG.info("releaseServiceUiAndStop(force=true) : isPlaying()="+isPlaying());
+            stopPlayer();
+        }
+
+        if (D) LOG.info("Nothing is playing anymore, releasing notification");
         mNotificationHelper.killNotification();
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
         updateRemoteControlClient(PLAYSTATE_STOPPED);
 
-        if (!mServiceInUse) {
+        if (!mServiceInUse || force) {
             saveQueue(true);
             stopSelf(mServiceStartId);
         }
+        return true;
     }
 
     private void handleCommandIntent(Intent intent) {
         final String action = intent.getAction();
         final String command = SERVICECMD.equals(action) ? intent.getStringExtra(CMDNAME) : null;
 
-        if (D) Log.d(TAG, "handleCommandIntent: action = " + action + ", command = " + command);
+        if (D) LOG.info("handleCommandIntent: action = " + action + ", command = " + command);
 
         if (CMDNEXT.equals(command) || NEXT_ACTION.equals(action)) {
             gotoNext(true);
@@ -819,7 +814,7 @@ public class MusicPlaybackService extends Service {
             pause();
             mPausedByTransientLossOfFocus = false;
             seek(0);
-            releaseServiceUiAndStop();
+            releaseServiceUiAndStop(false);
         } else if (REPEAT_ACTION.equals(action)) {
             cycleRepeat();
         } else if (SHUFFLE_ACTION.equals(action)) {
@@ -858,7 +853,6 @@ public class MusicPlaybackService extends Service {
             if (cursor != null && cursor.moveToFirst()) {
                 mCardId = cursor.getInt(0);
                 cursor.close();
-                cursor = null;
             }
         } catch (SecurityException e) {
             e.printStackTrace();
@@ -874,7 +868,7 @@ public class MusicPlaybackService extends Service {
      *
      * @param storagePath The path to mount point for the removed media
      */
-    public void closeExternalStorageFiles(final String storagePath) {
+    private void closeExternalStorageFiles(final String storagePath) {
         stop(true);
         notifyChange(QUEUE_CHANGED);
         notifyChange(META_CHANGED);
@@ -886,7 +880,7 @@ public class MusicPlaybackService extends Service {
      * going to be ejected, so applications can clean up any files they have
      * open.
      */
-    public void registerExternalStorageListener() {
+    private void registerExternalStorageListener() {
         if (mUnmountReceiver == null) {
             mUnmountReceiver = new BroadcastReceiver() {
 
@@ -919,8 +913,19 @@ public class MusicPlaybackService extends Service {
     }
 
     private void scheduleDelayedShutdown() {
-        if (D) Log.v(TAG, "Scheduling shutdown in " + IDLE_DELAY + " ms");
         if (mAlarmManager != null) {
+
+            if (mShutdownScheduled) {
+                cancelShutdown();
+            }
+
+            if (isPlaying()) {
+                LOG.info("scheduleDelayedShutdown() aborted, audio is playing.");
+                mShutdownScheduled = true;
+                return;
+            }
+
+            if (D) LOG.info("Scheduling shutdown in " + IDLE_DELAY + " ms");
             mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + IDLE_DELAY, mShutdownIntent);
             mShutdownScheduled = true;
@@ -930,8 +935,8 @@ public class MusicPlaybackService extends Service {
     }
 
     private void cancelShutdown() {
-        if (D) Log.d(TAG, "Cancelling delayed shutdown, scheduled = " + mShutdownScheduled);
-        if (mShutdownScheduled) {
+        if (mAlarmManager != null && mShutdownIntent != null) {
+            if (D) LOG.info("Cancelling delayed shutdown. Was it previously scheduled? : " + mShutdownScheduled);
             mAlarmManager.cancel(mShutdownIntent);
             mShutdownScheduled = false;
         }
@@ -940,21 +945,26 @@ public class MusicPlaybackService extends Service {
     /**
      * Stops playback
      *
-     * @param goToIdle True to go to the idle state, false otherwise
+     * @param scheduleShutdown True to go to the idle state, false otherwise
      */
-    private void stop(final boolean goToIdle) {
-        if (D) Log.d(TAG, "Stopping playback, goToIdle = " + goToIdle);
-        if (mPlayer != null && mPlayer.isInitialized()) {
-            mPlayer.stop();
-        }
+    private void stop(final boolean scheduleShutdown) {
+        if (D) LOG.info("Stopping playback, scheduleShutdown = " + scheduleShutdown);
+        stopPlayer();
         mFileToPlay = null;
         closeCursor();
-        if (goToIdle) {
+        if (scheduleShutdown) {
             scheduleDelayedShutdown();
             mIsSupposedToBePlaying = false;
             updateRemoteControlClient(PLAYSTATE_STOPPED);
         } else {
             stopForeground(false);
+        }
+    }
+
+    private void stopPlayer() {
+        if (mPlayer != null && mPlayer.isInitialized()) {
+            LOG.info("stopPlayer()");
+            mPlayer.stop();
         }
     }
 
@@ -1129,9 +1139,9 @@ public class MusicPlaybackService extends Service {
      *                 otherwise.
      */
     private void openCurrentAndMaybeNext(final boolean openNext) {
-        Log.d(TAG, "openCurrentAndMaybeNext() waiting for synchronized(this)");
+        LOG.info("openCurrentAndMaybeNext() waiting for synchronized(this)");
         synchronized (this) {
-            Log.d(TAG, "openCurrentAndMaybeNext() DONE waiting for synchronized(this)\n");
+            LOG.info("openCurrentAndMaybeNext() DONE waiting for synchronized(this)\n");
             closeCursor();
 
             if (mPlayListLen == 0 || mPlayList == null) {
@@ -1154,21 +1164,14 @@ public class MusicPlaybackService extends Service {
                 closeCursor();
                 if (mOpenFailedCounter++ < 10 && mPlayListLen > 1) {
                     final int pos = getNextPosition(false);
-                    if (pos < 0) {
-                        scheduleDelayedShutdown();
-                        if (mIsSupposedToBePlaying) {
-                            mIsSupposedToBePlaying = false;
-                            notifyChange(PLAYSTATE_CHANGED);
-                        }
-                        return;
-                    }
+                    if (scheduleShutdownAndNotifyPlayStateChange(pos)) return;
                     mPlayPos = pos;
                     stop(false);
                     mPlayPos = pos;
                     updateCursor(mPlayList[mPlayPos]);
                 } else {
                     mOpenFailedCounter = 0;
-                    Log.w(TAG, "Failed to open file for playback");
+                    LOG.warn("Failed to open file for playback");
                     scheduleDelayedShutdown();
                     if (mIsSupposedToBePlaying) {
                         mIsSupposedToBePlaying = false;
@@ -1264,7 +1267,7 @@ public class MusicPlaybackService extends Service {
      */
     private void setNextTrack() {
         mNextPlayPos = getNextPosition(false);
-        if (D) Log.d(TAG, "setNextTrack: next play position = " + mNextPlayPos);
+        if (D) LOG.info("setNextTrack: next play position = " + mNextPlayPos);
 
         if (mPlayer != null) {
             if (mNextPlayPos >= 0 && mPlayList != null) {
@@ -1274,7 +1277,7 @@ public class MusicPlaybackService extends Service {
                 mPlayer.setNextDataSource(null);
             }
         } else {
-            Log.w(TAG, "setNextTrack() -> no mPlayer instance available.");
+            LOG.warn("setNextTrack() -> no mPlayer instance available.");
         }
     }
 
@@ -1299,7 +1302,8 @@ public class MusicPlaybackService extends Service {
             }
             mAutoShuffleList = list;
             return true;
-        } catch (final RuntimeException ignored) {} finally {
+        } catch (final RuntimeException ignored) {
+        } finally {
             if (cursor != null) {
                 cursor.close();
             }
@@ -1384,9 +1388,9 @@ public class MusicPlaybackService extends Service {
      * Notify the change-receivers that something has changed.
      */
     private void notifyChange(final String what) {
-        if (D) Log.d(TAG, "notifyChange: what = " + what);
+        if (D) LOG.info("notifyChange: what = " + what);
 
-        // Update the lockscreen controls
+        // Update the lock screen controls
         updateRemoteControlClient(what);
 
         if (what.equals(POSITION_CHANGED)) {
@@ -1437,23 +1441,17 @@ public class MusicPlaybackService extends Service {
         if (what.equals(PLAYSTATE_CHANGED)) {
             mNotificationHelper.updatePlayState(isPlaying());
         }
-
-        // Update the app-widgets
-        mAppWidgetSmall.notifyChange(this, what);
-        mAppWidgetLarge.notifyChange(this, what);
-        mAppWidgetLargeAlternate.notifyChange(this, what);
-        mRecentWidgetProvider.notifyChange(this, what);
     }
 
     /**
-     * Updates the lockscreen controls.
+     * Updates the lock screen controls.
      *
      * @param what The broadcast
      */
     private void updateRemoteControlClient(final String what) {
 
         if (mRemoteControlClient == null) {
-            Log.d(TAG, "mRemoteControlClient is null, review your logic");
+            LOG.info("mRemoteControlClient is null, review your logic");
             return;
         }
 
@@ -1467,38 +1465,43 @@ public class MusicPlaybackService extends Service {
             }
         }
 
-        if (ApolloUtils.hasJellyBeanMR2()
-                && (what.equals(PLAYSTATE_CHANGED) || what.equals(POSITION_CHANGED))) {
-            //mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
-            mRemoteControlClient.setPlaybackState(playState);
-        } else if (what.equals(PLAYSTATE_CHANGED) || what.equals(PLAYSTATE_STOPPED)) {
-            mRemoteControlClient.setPlaybackState(playState);
-        } else if (what.equals(META_CHANGED) || what.equals(QUEUE_CHANGED)) {
-            Bitmap albumArt = getAlbumArt();
-            if (albumArt != null) {
-                // RemoteControlClient wants to recycle the bitmaps thrown at it, so we need
-                // to make sure not to hand out our cache copy
-                Bitmap.Config config = albumArt.getConfig();
-                if (config == null) {
-                    config = Bitmap.Config.ARGB_8888;
-                }
-                albumArt = albumArt.copy(config, false);
-            }
-            mRemoteControlClient
-                    .editMetadata(true)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, getArtistName())
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST,
-                            getAlbumArtistName())
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, getAlbumName())
-                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, getTrackName())
-                    .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration())
-                    .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArt)
-                    .apply();
+        if (what == null) {
+            return;
+        }
 
-            if (ApolloUtils.hasJellyBeanMR2()) {
-                //mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
+        switch (what) {
+            case PLAYSTATE_CHANGED:
+            case POSITION_CHANGED:
+            case PLAYSTATE_STOPPED:
                 mRemoteControlClient.setPlaybackState(playState);
-            }
+                break;
+            case META_CHANGED:
+            case QUEUE_CHANGED:
+                Bitmap albumArt = getAlbumArt();
+                if (albumArt != null) {
+                    // RemoteControlClient wants to recycle the bitmaps thrown at it, so we need
+                    // to make sure not to hand out our cache copy
+                    Bitmap.Config config = albumArt.getConfig();
+                    if (config == null) {
+                        config = Bitmap.Config.ARGB_8888;
+                    }
+                    albumArt = albumArt.copy(config, false);
+                }
+                mRemoteControlClient
+                        .editMetadata(true)
+                        .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, getArtistName())
+                        .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST,
+                                getAlbumArtistName())
+                        .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, getAlbumName())
+                        .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, getTrackName())
+                        .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration())
+                        .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArt)
+                        .apply();
+
+                // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
+                // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
+                mRemoteControlClient.setPlaybackState(playState);
+                break;
         }
     }
 
@@ -1518,9 +1521,7 @@ public class MusicPlaybackService extends Service {
             int len = mPlayListLen;
             for (int i = 0; i < len; i++) {
                 long n = mPlayList[i];
-                if (n < 0) {
-                    continue;
-                } else if (n == 0) {
+                if (n == 0) {
                     q.append("0;");
                 } else {
                     while (n != 0) {
@@ -1632,7 +1633,7 @@ public class MusicPlaybackService extends Service {
             seek(seekpos >= 0 && seekpos < duration() ? seekpos : 0);
 
             if (D) {
-                Log.d(TAG, "restored queue, currently at position "
+                LOG.info("restored queue, currently at position "
                         + position() + "/" + duration()
                         + " (requested " + seekpos + ")");
             }
@@ -1651,7 +1652,6 @@ public class MusicPlaybackService extends Service {
                 q = mPreferences.getString("history", "");
                 qlen = q != null ? q.length() : 0;
                 if (qlen > 1) {
-                    plen = 0;
                     n = 0;
                     shift = 0;
                     mHistory.clear();
@@ -1694,7 +1694,7 @@ public class MusicPlaybackService extends Service {
      * @param path The path of the file to open
      */
     public boolean openFile(final String path) {
-        if (D) Log.d(TAG, "openFile: path = " + path);
+        if (D) LOG.info("openFile: path = " + path);
         synchronized (this) {
             if (path == null) {
                 return false;
@@ -1730,7 +1730,7 @@ public class MusicPlaybackService extends Service {
                         mPlayList[0] = mCursor.getLong(IDCOLIDX);
                         mPlayPos = 0;
                     }
-                } catch (final UnsupportedOperationException ex) {
+                } catch (final UnsupportedOperationException ignored) {
                 }
             }
             mFileToPlay = path;
@@ -1751,7 +1751,7 @@ public class MusicPlaybackService extends Service {
      *
      * @return The current media player audio session ID
      */
-    public int getAudioSessionId() {
+    private int getAudioSessionId() {
         if (mPlayer == null) {
             return -1;
         }
@@ -1766,7 +1766,7 @@ public class MusicPlaybackService extends Service {
      *
      * @return 1 if Intent.ACTION_MEDIA_MOUNTED is called, 0 otherwise
      */
-    public int getMediaMountedCount() {
+    private int getMediaMountedCount() {
         return mMediaMountedCount;
     }
 
@@ -1775,7 +1775,7 @@ public class MusicPlaybackService extends Service {
      *
      * @return The current shuffle mode (all, party, none)
      */
-    public int getShuffleMode() {
+    private int getShuffleMode() {
         return mShuffleMode;
     }
 
@@ -1784,7 +1784,7 @@ public class MusicPlaybackService extends Service {
      *
      * @return The current repeat mode (all, one, none)
      */
-    public int getRepeatMode() {
+    private int getRepeatMode() {
         return mRepeatMode;
     }
 
@@ -1794,7 +1794,7 @@ public class MusicPlaybackService extends Service {
      * @param id The id to be removed
      * @return how many instances of the track were removed
      */
-    public int removeTrack(final long id) {
+    private int removeTrack(final long id) {
         int numremoved = 0;
         synchronized (this) {
             for (int i = 0; i < mPlayListLen; i++) {
@@ -1819,7 +1819,7 @@ public class MusicPlaybackService extends Service {
      * @param last  The last file to be removed
      * @return the number of tracks deleted
      */
-    public int removeTracks(final int first, final int last) {
+    private int removeTracks(final int first, final int last) {
         final int numremoved = removeTracksInternal(first, last);
         if (numremoved > 0) {
             notifyChange(QUEUE_CHANGED);
@@ -1832,7 +1832,7 @@ public class MusicPlaybackService extends Service {
      *
      * @return the current position in the queue
      */
-    public int getQueuePosition() {
+    private int getQueuePosition() {
         synchronized (this) {
             return mPlayPos;
         }
@@ -1876,7 +1876,7 @@ public class MusicPlaybackService extends Service {
      *
      * @return The current song name
      */
-    public String getTrackName() {
+    private String getTrackName() {
         synchronized (this) {
             if (mCursor == null || mCursor.isClosed()) {
                 return null;
@@ -1914,7 +1914,7 @@ public class MusicPlaybackService extends Service {
      *
      * @return The current song artist name
      */
-    public String getAlbumArtistName() {
+    private String getAlbumArtistName() {
         synchronized (this) {
             if (mAlbumCursor == null || mAlbumCursor.isClosed()) {
                 return null;
@@ -1942,7 +1942,7 @@ public class MusicPlaybackService extends Service {
      *
      * @return The current song artist ID
      */
-    public long getArtistId() {
+    private long getArtistId() {
         synchronized (this) {
             if (mCursor == null || mCursor.isClosed()) {
                 return -1;
@@ -1956,7 +1956,7 @@ public class MusicPlaybackService extends Service {
      *
      * @return The current track ID
      */
-    public long getAudioId() {
+    private long getAudioId() {
         synchronized (this) {
             if (mPlayPos >= 0 && mPlayer != null && mPlayer.isInitialized()) {
                 return mPlayList[mPlayPos];
@@ -1986,7 +1986,7 @@ public class MusicPlaybackService extends Service {
     }
 
     /**
-     * Returns the current position in time of the currenttrack
+     * Returns the current position in time of the current track
      *
      * @return The current playback position in milliseconds
      */
@@ -2016,11 +2016,8 @@ public class MusicPlaybackService extends Service {
      */
     public long[] getQueue() {
         synchronized (this) {
-            final int len = mPlayListLen;
-            final long[] list = new long[len];
-            for (int i = 0; i < len; i++) {
-                list[i] = mPlayList[i];
-            }
+            final long[] list = new long[mPlayListLen];
+            System.arraycopy(mPlayList, 0, list, 0, mPlayListLen);
             return list;
         }
     }
@@ -2096,7 +2093,7 @@ public class MusicPlaybackService extends Service {
     }
 
     /**
-     * Stops playback.
+     * Stops playback and schedules the service to shutdown later unless it's playing audio.
      */
     public void stop() {
         stop(true);
@@ -2113,7 +2110,7 @@ public class MusicPlaybackService extends Service {
         int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
-        if (D) Log.d(TAG, "Starting playback: audio focus request status = " + status);
+        if (D) LOG.info("Starting playback: audio focus request status = " + status);
 
         if (status != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             return;
@@ -2139,8 +2136,8 @@ public class MusicPlaybackService extends Service {
             mPlayer.start();
 
             if (mPlayerHandler != null) {
-                mPlayerHandler.removeMessages(FADEDOWN);
-                mPlayerHandler.sendEmptyMessage(FADEUP);
+                mPlayerHandler.removeMessages(FADE_DOWN);
+                mPlayerHandler.sendEmptyMessage(FADE_UP);
             }
 
             if (!mIsSupposedToBePlaying) {
@@ -2159,10 +2156,10 @@ public class MusicPlaybackService extends Service {
      * Temporarily pauses playback.
      */
     public void pause() {
-        if (D) Log.d(TAG, "Pausing playback");
+        if (D) LOG.info("Pausing playback");
         synchronized (this) {
             if (mPlayerHandler != null) {
-                mPlayerHandler.removeMessages(FADEUP);
+                mPlayerHandler.removeMessages(FADE_UP);
             }
             if (mIsSupposedToBePlaying && mPlayer != null) {
                 mPlayer.pause();
@@ -2181,22 +2178,15 @@ public class MusicPlaybackService extends Service {
      * Changes from the current track to the next track
      */
     public void gotoNext(final boolean force) {
-        if (D) Log.d(TAG, "Going to next track");
+        if (D) LOG.info("Going to next track");
         synchronized (this) {
             if (mPlayListLen <= 0) {
-                if (D) Log.d(TAG, "No play queue");
+                if (D) LOG.info("No play queue");
                 scheduleDelayedShutdown();
                 return;
             }
             final int pos = getNextPosition(force);
-            if (pos < 0) {
-                scheduleDelayedShutdown();
-                if (mIsSupposedToBePlaying) {
-                    mIsSupposedToBePlaying = false;
-                    notifyChange(PLAYSTATE_CHANGED);
-                }
-                return;
-            }
+            if (scheduleShutdownAndNotifyPlayStateChange(pos)) return;
             mPlayPos = pos;
             stop(false);
             mPlayPos = pos;
@@ -2206,11 +2196,23 @@ public class MusicPlaybackService extends Service {
         }
     }
 
+    private boolean scheduleShutdownAndNotifyPlayStateChange(int pos) {
+        if (pos < 0) {
+            scheduleDelayedShutdown();
+            if (mIsSupposedToBePlaying) {
+                mIsSupposedToBePlaying = false;
+                notifyChange(PLAYSTATE_CHANGED);
+            }
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Changes from the current track to the previous played track
      */
     public void prev() {
-        if (D) Log.d(TAG, "Going to previous track");
+        if (D) LOG.info("Going to previous track");
         synchronized (this) {
             if (mShuffleMode == SHUFFLE_NORMAL) {
                 // Go to previously-played track and remove it from the history
@@ -2451,22 +2453,7 @@ public class MusicPlaybackService extends Service {
         public void onReceive(final Context context, final Intent intent) {
             final String command = intent.getStringExtra(CMDNAME);
 
-            if (AppWidgetSmall.CMDAPPWIDGETUPDATE.equals(command)) {
-                final int[] small = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mAppWidgetSmall.performUpdate(MusicPlaybackService.this, small);
-            } else if (AppWidgetLarge.CMDAPPWIDGETUPDATE.equals(command)) {
-                final int[] large = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mAppWidgetLarge.performUpdate(MusicPlaybackService.this, large);
-            } else if (AppWidgetLargeAlternate.CMDAPPWIDGETUPDATE.equals(command)) {
-                final int[] largeAlt = intent
-                        .getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mAppWidgetLargeAlternate.performUpdate(MusicPlaybackService.this, largeAlt);
-            } else if (RecentWidgetProvider.CMDAPPWIDGETUPDATE.equals(command)) {
-                final int[] recent = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mRecentWidgetProvider.performUpdate(MusicPlaybackService.this, recent);
-            } else {
-                handleCommandIntent(intent);
-            }
+            handleCommandIntent(intent);
         }
     };
 
@@ -2477,10 +2464,17 @@ public class MusicPlaybackService extends Service {
         @Override
         public void onAudioFocusChange(final int focusChange) {
             if (mPlayerHandler != null) {
-                mPlayerHandler.obtainMessage(FOCUSCHANGE, focusChange, 0).sendToTarget();
+                mPlayerHandler.obtainMessage(FOCUS_CHANGE, focusChange, 0).sendToTarget();
             }
         }
     };
+
+    public static void stopService(Context context) {
+        LOG.info("stopService() <static>");
+        Intent i = new Intent();
+        i.setClass(context, MusicPlaybackService.class);
+        context.stopService(i);
+    }
 
     private static final class MusicPlayerHandler extends Handler {
         private final WeakReference<MusicPlaybackService> mService;
@@ -2508,19 +2502,19 @@ public class MusicPlaybackService extends Service {
             }
 
             switch (msg.what) {
-                case FADEDOWN:
+                case FADE_DOWN:
                     mCurrentVolume -= .05f;
                     if (mCurrentVolume > .2f) {
-                        sendEmptyMessageDelayed(FADEDOWN, 10);
+                        sendEmptyMessageDelayed(FADE_DOWN, 10);
                     } else {
                         mCurrentVolume = .2f;
                     }
                     service.mPlayer.setVolume(mCurrentVolume);
                     break;
-                case FADEUP:
+                case FADE_UP:
                     mCurrentVolume += .01f;
                     if (mCurrentVolume < 1.0f) {
-                        sendEmptyMessageDelayed(FADEUP, 10);
+                        sendEmptyMessageDelayed(FADE_UP, 10);
                     } else {
                         mCurrentVolume = 1.0f;
                     }
@@ -2560,8 +2554,8 @@ public class MusicPlaybackService extends Service {
                 case RELEASE_WAKELOCK:
                     service.mWakeLock.release();
                     break;
-                case FOCUSCHANGE:
-                    if (D) Log.d(TAG, "Received audio focus change event " + msg.arg1);
+                case FOCUS_CHANGE:
+                    if (D) LOG.info("Received audio focus change event " + msg.arg1);
                     switch (msg.arg1) {
                         case AudioManager.AUDIOFOCUS_LOSS:
                         case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -2572,8 +2566,8 @@ public class MusicPlaybackService extends Service {
                             service.pause();
                             break;
                         case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                            removeMessages(FADEUP);
-                            sendEmptyMessage(FADEDOWN);
+                            removeMessages(FADE_UP);
+                            sendEmptyMessage(FADE_DOWN);
                             break;
                         case AudioManager.AUDIOFOCUS_GAIN:
                             if (!service.isPlaying()
@@ -2583,8 +2577,8 @@ public class MusicPlaybackService extends Service {
                                 service.mPlayer.setVolume(mCurrentVolume);
                                 service.play();
                             } else {
-                                removeMessages(FADEDOWN);
-                                sendEmptyMessage(FADEUP);
+                                removeMessages(FADE_DOWN);
+                                sendEmptyMessage(FADE_UP);
                             }
                             break;
                         default:
@@ -2727,12 +2721,12 @@ public class MusicPlaybackService extends Service {
             try {
                 mCurrentMediaPlayer.setNextMediaPlayer(null);
             } catch (IllegalArgumentException e) {
-                Log.i(TAG, "Next media player is current one, continuing");
+                LOG.info("Next media player is current one, continuing");
             } catch (IllegalStateException e) {
-                Log.e(TAG, "Media player not initialized!");
+                LOG.error("Media player not initialized!");
                 return;
             } catch (Throwable e) {
-                Log.e(TAG, "Media player fatal error", e);
+                LOG.error("Media player fatal error", e);
                 return;
             }
 
@@ -2748,7 +2742,7 @@ public class MusicPlaybackService extends Service {
                 try {
                     mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
                 } catch (Throwable e) {
-                    Log.e(TAG, "Media player fatal error", e);
+                    LOG.error("Media player fatal error", e);
                     return;
                 }
             } else {
@@ -2763,7 +2757,7 @@ public class MusicPlaybackService extends Service {
             try {
                 mNextMediaPlayer.setAudioSessionId(getAudioSessionId());
             } catch (Throwable e) {
-                Log.e(TAG, "Media player Illegal State exception", e);
+                LOG.error("Media player Illegal State exception", e);
             }
         }
 
@@ -2775,7 +2769,7 @@ public class MusicPlaybackService extends Service {
             try {
                 mCurrentMediaPlayer.release();
             } catch (Throwable e) {
-                Log.w(TAG, "releaseCurrentMediaPlayer() couldn't release mCurrentMediaPlayer", e);
+                LOG.warn("releaseCurrentMediaPlayer() couldn't release mCurrentMediaPlayer", e);
             } finally {
                 mCurrentMediaPlayer = null;
             }
@@ -2789,7 +2783,7 @@ public class MusicPlaybackService extends Service {
             try {
                 mNextMediaPlayer.release();
             } catch (Throwable e) {
-                Log.w(TAG, "releaseNextMediaPlayer() couldn't release mNextMediaPlayer", e);
+                LOG.warn("releaseNextMediaPlayer() couldn't release mNextMediaPlayer", e);
             } finally {
                 mNextMediaPlayer = null;
             }
@@ -2977,7 +2971,8 @@ public class MusicPlaybackService extends Service {
                     mHandler.sendEmptyMessage(TRACK_ENDED);
                     mHandler.sendEmptyMessage(RELEASE_WAKELOCK);
                 }
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
         }
     }
 
@@ -3380,6 +3375,9 @@ public class MusicPlaybackService extends Service {
     public void shutdown() {
         mPlayPos = -1;
         stopForeground(true);
-        stopSelf(mServiceStartId);
+        if (mShutdownIntent != null) {
+            cancelShutdown();
+        }
+        MusicUtils.requestMusicPlaybackServiceShutdown(this);
     }
 }

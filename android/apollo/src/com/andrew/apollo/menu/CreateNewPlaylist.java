@@ -23,7 +23,7 @@ import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.util.List;
 

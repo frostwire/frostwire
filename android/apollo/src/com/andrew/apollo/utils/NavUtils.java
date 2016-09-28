@@ -103,16 +103,6 @@ public final class NavUtils {
     }
 
     /**
-     * Opens to {@link SettingsActivity}.
-     * 
-     * @param activity The {@link Activity} to use.
-     */
-    public static void openSettings(final Activity activity) {
-        final Intent intent = new Intent(activity, SettingsActivity.class);
-        activity.startActivity(intent);
-    }
-
-    /**
      * Opens to {@link AudioPlayerActivity}.
      * 
      * @param activity The {@link Activity} to use.

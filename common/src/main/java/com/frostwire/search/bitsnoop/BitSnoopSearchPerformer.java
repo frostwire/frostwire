@@ -1,24 +1,23 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.search.bitsnoop;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.search.*;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
@@ -35,7 +34,13 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
     private static Logger LOG = Logger.getLogger(BitSnoopSearchPerformer.class);
     private static final int MAX_RESULTS = 10;
     private static final String REGEX = "(?is)<span class=\"icon cat.*?</span> <a href=\"(.*?)\">.*?<div class=\"torInfo\"";
-    private static final String HTML_REGEX = "(?is).*?Help</a>, <a href=\"magnet:\\?xt=urn:btih:([0-9a-fA-F]{40})&dn=(.*?)\" onclick=\".*?Magnet</a>.*?<a href=\"(.*?)\" title=\".*?\" class=\"dlbtn.*?title=\"Torrent Size\"><strong>(.*?)</strong>.*?title=\"Availability\"></span>(.*?)</span></td>.*?<li>Added to index &#8212; (.*?) \\(.{0,50}?\\)</li>.*?";
+    private static final String HTML_REGEX = "(?is)"+
+            ".*?No client needed.*?<a href=\"(?<magneturl>.*?)\" title=\"Magnet Link\" class=\"dlbtn dl_mag2\".*?" +
+            "Help</a>, <a href=\"magnet:\\?xt=urn:btih:(?<infohash>[0-9a-fA-F]{40})&dn=(?<filename>.*?)\" onclick=\".*?Magnet</a>.*?" +
+            "<a href=\"(?<torrenturl>.*?)\" title=\".*?\".*?" +
+            "title=\"Torrent Size\"><strong>(?<size>.*?)</strong>.*?" +
+            "title=\"Availability\"></span>(?<seeds>.*?)</span></td>.*?" +
+            "<li>Added to index &#8212; (?<creationtime>.*?) \\(.{0,50}?\\)</li>.*?";
     private static final String SCRAPE_REGEX = "(?is)<td .*?<span class=\"filetype .*?</span> (?<filepath>.*?)</td><td align=\"right\"><span class=\"icon.*?\"></span>(?<filesize>.*?) (?<unit>[GBMK]+)</td>";
     private boolean isScrapingFile = false;
     private static final Pattern FILE_SCRAPE_PATTERN = Pattern.compile(SCRAPE_REGEX);
@@ -153,7 +158,7 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
             return Collections.emptyList();
         }
 
-        List<SearchResult> searchResults = new LinkedList<SearchResult>();
+        List<SearchResult> searchResults = new LinkedList<>();
         byte[] detailPageData = null;
         // sr is a temp result.
         if (!sr.isComplete()) {

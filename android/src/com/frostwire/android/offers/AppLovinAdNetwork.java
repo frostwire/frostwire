@@ -1,46 +1,50 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
-import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
-import java.lang.ref.WeakReference;
+class AppLovinAdNetwork implements AdNetwork {
 
-public class AppLovinAdNetwork implements AdNetwork {
-    private final boolean DEBUG_MODE;
     private static final Logger LOG = Logger.getLogger(AppLovinAdNetwork.class);
+    private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
+
     private AppLovinInterstitialAdapter interstitialAdapter = null;
     private boolean started = false;
 
-    public AppLovinAdNetwork(boolean debugMode) {
-        DEBUG_MODE = debugMode;
+    AppLovinAdNetwork() {
     }
 
+    @Override
     public void initialize(final Activity activity) {
         if (!enabled()) {
+            if (!started()) {
+                LOG.info("AppLovin initialize(): aborted. not enabled.");
+            } else {
+                // initialize can be called multiple times, we may have to stop
+                // this network if we started it using a default value.
+                stop(activity);
+            }
             return;
         }
 
@@ -51,6 +55,7 @@ public class AppLovinAdNetwork implements AdNetwork {
                     if (!started) {
                         final Context applicationContext = activity.getApplicationContext();
                         AppLovinSdk.initializeSdk(applicationContext);
+                        AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
                         if (DEBUG_MODE) {
                             AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(true);
                         }
@@ -66,51 +71,64 @@ public class AppLovinAdNetwork implements AdNetwork {
 
     @Override
     public void stop(Context context) {
-
+        started = false;
+        LOG.info("stopped");
     }
 
+    @Override
     public void loadNewInterstitial(Activity activity) {
-        interstitialAdapter = new AppLovinInterstitialAdapter(activity, this);
+        interstitialAdapter = new AppLovinInterstitialAdapter(this, activity);
         AppLovinSdk.getInstance(activity).getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, interstitialAdapter);
     }
 
+    @Override
+    public String getShortCode() {
+        return Constants.AD_NETWORK_SHORTCODE_APPLOVIN;
+    }
+
+    @Override
+    public String getInUsePreferenceKey() {
+        return Constants.PREF_KEY_GUI_USE_APPLOVIN;
+    }
+
+    @Override
+    public boolean isDebugOn() {
+        return DEBUG_MODE;
+    }
+
+    @Override
     public boolean started() {
         return started;
     }
 
-    public boolean enabled() {
-        if (DEBUG_MODE) {
-            return true;
-        }
-
-        ConfigurationManager config;
-        boolean enabled = false;
-        try {
-            config = ConfigurationManager.instance();
-            enabled = (config.getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE) && config.getBoolean(Constants.PREF_KEY_GUI_USE_APPLOVIN));
-        } catch (Throwable e) {
-            LOG.error(e.getMessage(), e);
-        }
-        return enabled;
+    @Override
+    public void enable(boolean enabled) {
+        Offers.AdNetworkHelper.enable(this, enabled);
     }
 
-    public boolean showInterstitial(final WeakReference<Activity> activityWeakReference,
+    @Override
+    public boolean enabled() {
+        return Offers.AdNetworkHelper.enabled(this);
+    }
+
+    @Override
+    public boolean showInterstitial(Activity activity,
                                     final boolean shutdownAfterwards,
                                     final boolean dismissAfterward) {
+        boolean result = false;
         if (enabled() && started) {
+            // make sure video ads are always muted, it's very annoying (regardless of playback status)
+            AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
             interstitialAdapter.shutdownAppAfter(shutdownAfterwards);
             interstitialAdapter.dismissActivityAfterwards(dismissAfterward);
             try {
-                if (interstitialAdapter.isVideoAd() && MusicUtils.isPlaying()) {
-                    return false;
-                }
-                return interstitialAdapter.isAdReadyToDisplay() && interstitialAdapter.show(activityWeakReference);
+                result = interstitialAdapter.isAdReadyToDisplay() && interstitialAdapter.show(activity);
             } catch (Throwable e) {
                 e.printStackTrace();
-                return false;
+                result = false;
             }
-        } else {
-            return false;
         }
+
+        return result;
     }
 }

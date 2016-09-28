@@ -20,7 +20,7 @@ package com.frostwire.content;
 //import android.os.Parcelable;
 //import android.util.Log;
 
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;

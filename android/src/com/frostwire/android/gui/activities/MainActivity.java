@@ -21,6 +21,8 @@ package com.frostwire.android.gui.activities;
 import android.app.*;
 import android.content.*;
 import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -33,10 +35,10 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import com.andrew.apollo.IApolloService;
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.AndroidPlatform;
@@ -48,34 +50,46 @@ import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.MainMenuAdapter;
-import com.frostwire.android.offers.Offers;
-import com.frostwire.android.gui.dialogs.*;
+import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
+import com.frostwire.android.gui.dialogs.NewTransferDialog;
+import com.frostwire.android.gui.dialogs.SDPermissionDialog;
+import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.fragments.BrowsePeerFragment;
 import com.frostwire.android.gui.fragments.MainFragment;
 import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.preference.StoragePreference;
-import com.frostwire.logging.Logger;
+import com.frostwire.android.offers.Offers;
+import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.offers.Products;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import static com.andrew.apollo.utils.MusicUtils.mService;
+import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * @author gubatron
@@ -105,6 +119,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private Fragment currentFragment;
     private final Stack<Integer> fragmentsStack;
     private PlayerMenuItemView playerItem;
+    private AdMenuItemView menuRemoveAdsItem;
     private TimerSubscription playerSubscription;
     private BroadcastReceiver mainBroadcastReceiver;
     private boolean externalStoragePermissionsRequested = false;
@@ -114,10 +129,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         this.controller = new MainController(this);
         this.fragmentsStack = new Stack<>();
         this.permissionsCheckers = initPermissionsCheckers();
-    }
-
-    public void switchFragment(int itemId) {
-        controller.switchFragment(itemId);
     }
 
     @Override
@@ -164,10 +175,48 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
         Engine.instance().shutdown();
+        MusicUtils.requestMusicPlaybackServiceShutdown(MainActivity.this);
+        // we make sure all services have finished shutting down before we kill our own process.
+        new Thread("shutdown-halt") {
+            @Override
+            public void run() {
+                SystemUtils.waitWhileServicesAreRunning(MainActivity.this, 5000, MusicPlaybackService.class, EngineService.class);
+                LOG.info("MainActivity::shutdown()/shutdown-halt thread: android.os.Process.killProcess(" + android.os.Process.myPid() + ")");
+                android.os.Process.killProcess(android.os.Process.myPid());
+            }
+        }.start();
+    }
+
+    @Override
+    public void finish() {
+        if (Build.VERSION.SDK_INT >= 21) {
+            finishAndRemoveTaskViaReflection();
+        } else {
+            super.finish();
+        }
+    }
+
+    private void finishAndRemoveTaskViaReflection() {
+        final Class<? extends MainActivity> clazz = getClass();
+        try {
+            final Method finishAndRemoveTaskMethod = clazz.getMethod("finishAndRemoveTask");
+            if (finishAndRemoveTaskMethod != null) {
+                finishAndRemoveTaskMethod.invoke(this);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            super.finish();
+        }
     }
 
     private boolean isShutdown() {
-        Intent intent = getIntent();
+        return isShutdown(null);
+    }
+
+    private boolean isShutdown(Intent intent) {
+        if (intent == null) {
+            intent = getIntent();
+        }
         boolean result = intent != null && intent.getBooleanExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), false);
         if (result) {
             shutdown();
@@ -184,6 +233,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         leftDrawer = findView(R.id.activity_main_left_drawer);
         listMenu = findView(R.id.left_drawer);
         initPlayerItemListener();
+        initAdMenuItemListener();
         setupFragments();
         setupMenuItems();
         setupInitialFragment(savedInstanceState);
@@ -197,8 +247,21 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void initPlayerItemListener() {
         playerItem = findView(R.id.slidemenu_player_menuitem);
         playerItem.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 controller.launchPlayerActivity();
+            }
+        });
+    }
+
+    private void initAdMenuItemListener() {
+        menuRemoveAdsItem = findView(R.id.slidermenu_ad_menuitem);
+        RelativeLayout menuAd = findView(R.id.view_ad_menu_item_ad);
+        menuAd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, BuyActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -209,6 +272,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             @Override
             public void onDrawerStateChanged(int newState) {
                 refreshPlayerItem();
+                refreshMenuRemoveAdsItem();
             }
 
             @Override
@@ -233,21 +297,18 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             return;
         }
 
+        if (isShutdown(intent)) {
+            return;
+        }
+
         String action = intent.getAction();
 
         if (action != null) {
             if (action.equals(Constants.ACTION_SHOW_TRANSFERS)) {
                 intent.setAction(null);
                 controller.showTransfers(TransferStatus.ALL);
-            } else if (action.equals(Constants.ACTION_OPEN_TORRENT_URL)) {
+            } else if (action.equals(Intent.ACTION_VIEW)) {
                 openTorrentUrl(intent);
-            }
-            // When another application wants to "Share" a file and has chosen FrostWire to do so.
-            // We make the file "Shared" so it's visible for other FrostWire devices on the local network.
-            else if (action.equals(Intent.ACTION_SEND) ||
-                    action.equals(Intent.ACTION_SEND_MULTIPLE)) {
-                controller.handleSendAction(intent);
-                intent.setAction(null);
             } else if (action.equals(Constants.ACTION_START_TRANSFER_FROM_PREVIEW)) {
                 if (Ref.alive(NewTransferDialog.srRef)) {
                     SearchFragment.startDownload(this, NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
@@ -275,25 +336,43 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 LOG.warn("Error handling download complete notification", e);
             }
         }
+
+        if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
+            finish();
+        }
     }
 
     private void openTorrentUrl(Intent intent) {
-        //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
+        try {
+            //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
 
-        //Show me the transfer tab
-        Intent i = new Intent(this, MainActivity.class);
-        i.setAction(Constants.ACTION_SHOW_TRANSFERS);
-        i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivity(i);
+            //Show me the transfer tab
+            Intent i = new Intent(this, MainActivity.class);
+            i.setAction(Constants.ACTION_SHOW_TRANSFERS);
+            i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(i);
 
-        //go!
-        final String uri = intent.getDataString();
-        intent.setAction(null);
-        if (uri != null) {
-            TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this));
-        } else {
-            LOG.warn("MainActivity.onNewIntent(): Couldn't start torrent download from Intent's URI, intent.getDataString() -> null");
-            LOG.warn("(maybe URI is coming in another property of the intent object - #fragmentation)");
+            //go!
+            final String uri = intent.getDataString();
+            intent.setAction(null);
+            if (uri != null) {
+                if (uri.startsWith("file") ||
+                        uri.startsWith("http") ||
+                        uri.startsWith("https") ||
+                        uri.startsWith("magnet")) {
+                    TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this));
+                } else if (uri.startsWith("content")) {
+                    String newUri = saveViewContent(this, Uri.parse(uri), "content-intent.torrent");
+                    if (newUri != null) {
+                        TransferManager.instance().downloadTorrent(newUri, new HandpickedTorrentDownloadDialogOnFetch(this));
+                    }
+                }
+            } else {
+                LOG.warn("MainActivity.onNewIntent(): Couldn't start torrent download from Intent's URI, intent.getDataString() -> null");
+                LOG.warn("(maybe URI is coming in another property of the intent object - #fragmentation)");
+            }
+        } catch (Throwable e) {
+            LOG.error("Error opening torrent from intent", e);
         }
     }
 
@@ -304,19 +383,16 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         initDrawerListener();
         setupDrawer();
         initPlayerItemListener();
+        initAdMenuItemListener();
 
         refreshPlayerItem();
+        refreshMenuRemoveAdsItem();
 
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
-            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
-                mainResume();
-                Offers.initAdNetworks(this);
-            } else {
-                controller.startWizardActivity();
-            }
-        } else {
-            TermsUseDialog dlg = new TermsUseDialog();
-            dlg.show(getFragmentManager());
+        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
+            mainResume();
+            Offers.initAdNetworks(this);
+        } else if (!isShutdown()){
+            controller.startWizardActivity();
         }
 
         checkLastSeenVersion();
@@ -351,28 +427,16 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         // EXTERNAL STORAGE ACCESS CHECKER.
         final DangerousPermissionsChecker externalStorageChecker =
                 new DangerousPermissionsChecker(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        externalStorageChecker.setPermissionsGrantedCallback(new DangerousPermissionsChecker.OnPermissionsGrantedCallback() {
-            @Override
-            public void onPermissionsGranted() {
-                // TODO: is the restart necessary?
-                /*
-                UIUtils.showInformationDialog(MainActivity.this,
-                        R.string.restarting_summary,
-                        R.string.restarting,
-                        false,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                externalStorageChecker.restartFrostWire(2000);
-                            }
-                        });
-                        */
-            }
-        });
+        //externalStorageChecker.setPermissionsGrantedCallback(() -> {});
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
 
-        // add more permissions checkers if needed...
+        // WRITE SETTINGS (Setting the default ringtone requires this)
+        final DangerousPermissionsChecker writeSettingsChecker =
+                new DangerousPermissionsChecker(this, DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
+        checkers.put(DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE, writeSettingsChecker);
+        // the permissionGrantedCallBack will be set by whoever uses this during runtime.
 
+        // add more permissions checkers if needed...
         return checkers;
     }
 
@@ -506,7 +570,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
-        } else {
+        } else if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -559,8 +623,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             onLastDialogButtonPositive();
         } else if (tag.equals(SHUTDOWN_DIALOG_ID) && which == Dialog.BUTTON_POSITIVE) {
             onShutdownDialogButtonPositive();
-        } else if (tag.equals(TermsUseDialog.TAG)) {
-            controller.startWizardActivity();
         } else if (tag.equals(SDPermissionDialog.TAG)) {
             handleSDPermissionDialogClick(which);
         }
@@ -626,11 +688,26 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
+    private void refreshMenuRemoveAdsItem() {
+        // only visible for basic or debug build
+        int visibility = View.GONE;
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
+            // if they haven't paid for ads
+            if (!Products.disabledAds(PlayStore.getInstance()) &&
+                (playerItem == null || playerItem.getVisibility() == View.GONE)) {
+                visibility = View.VISIBLE;
+            }
+        }
+        menuRemoveAdsItem.setVisibility(visibility);
+    }
+
     private void setupMenuItems() {
         listMenu.setAdapter(new MainMenuAdapter(this));
         listMenu.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-        listMenu.setOnItemClickListener(new OnItemClickListener() {
+        listMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //onItemClick(AdapterView<?> parent, View view, int position, long id)
                 syncSlideMenu();
                 controller.closeSlideMenu();
                 try {
@@ -657,7 +734,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
         library = (BrowsePeerFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_browse_peer);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
-
         hideFragments(getFragmentManager().beginTransaction()).commit();
     }
 
@@ -762,8 +838,18 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
+        if (drawerToggle != null) {
+            try {
+                drawerToggle.onOptionsItemSelected(item);
+            } catch (Throwable t) {
+                // usually java.lang.IllegalArgumentException: No drawer view found with gravity LEFT
+                return false;
+            }
             return true;
+        }
+
+        if (item == null) {
+            return false;
         }
 
         switch (item.getItemId()) {
@@ -800,22 +886,23 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        mService = IApolloService.Stub.asInterface(service);
+        musicPlaybackService = IApolloService.Stub.asInterface(service);
     }
 
     /**
      * {@inheritDoc}
      */
     public void onServiceDisconnected(final ComponentName name) {
-        mService = null;
+        musicPlaybackService = null;
     }
 
-    @Override
+    //@Override commented override since we are in API 16, but it will in API 23
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         DangerousPermissionsChecker checker = permissionsCheckers.get(requestCode);
         if (checker != null) {
             checker.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+        Offers.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private static final class MenuDrawerToggle extends ActionBarDrawerToggle {
@@ -850,6 +937,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             if (Ref.alive(activityRef)) {
                 MainActivity activity = activityRef.get();
                 activity.refreshPlayerItem();
+                activity.refreshMenuRemoveAdsItem();
                 activity.syncSlideMenu();
             }
         }
@@ -859,5 +947,34 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         SearchFragment searchFragment = (SearchFragment) getFragmentByMenuId(R.id.menu_main_search);
         searchFragment.performYTSearch(ytUrl);
         switchContent(searchFragment);
+    }
+
+    // TODO: refactor and move this method for a common place when needed
+    private static String saveViewContent(Context context, Uri uri, String name) {
+        InputStream inStream = null;
+        OutputStream outStream = null;
+        if (!Platforms.temp().exists()) {
+            Platforms.temp().mkdirs();
+        }
+        File target = new File(Platforms.temp(), name);
+        try {
+            inStream = context.getContentResolver().openInputStream(uri);
+            outStream = new FileOutputStream(target);
+
+            byte[] buffer = new byte[16384]; // MAGIC_NUMBER
+            int bytesRead;
+            while ((bytesRead = inStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+
+        } catch (Throwable e) {
+            LOG.error("Error when copying file from " + uri + " to temp/" + name, e);
+            return null;
+        } finally {
+            IOUtils.closeQuietly(inStream);
+            IOUtils.closeQuietly(outStream);
+        }
+
+        return "file://" + target.getAbsolutePath();
     }
 }

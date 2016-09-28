@@ -20,7 +20,7 @@ package com.frostwire.android.gui.views;
 
 import android.app.Fragment;
 import android.view.View;
-import com.frostwire.logging.Logger;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
