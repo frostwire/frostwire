@@ -114,6 +114,18 @@
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:text="@string/love_frostwire" />
+
+            <Button
+                android:id="@+id/fragment_about_send_feedback"
+                style="@style/BlueButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="15dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:text="@string/send_feedback" />
         </LinearLayout>
 
         <TextView
