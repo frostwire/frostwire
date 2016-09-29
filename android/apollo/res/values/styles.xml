@@ -54,25 +54,25 @@
         <item name="android:padding">@dimen/notification_action_padding</item>
         <item name="android:background">?android:selectableItemBackground</item>
     </style>
-
+jjj
     <style name="NotificationAction.Previous" parent="@style/NotificationAction">
-        <item name="android:src">@drawable/btn_notification_playback_previous</item>
+        <item name="android:src">@drawable/btn_playback_previous</item>
         <item name="android:visibility">gone</item>
         <item name="android:contentDescription">@string/accessibility_prev</item>
     </style>
 
     <style name="NotificationAction.Play" parent="@style/NotificationAction">
-        <item name="android:src">@drawable/btn_notification_playback_play</item>
+        <item name="android:src">@drawable/btn_playback_play</item>
         <item name="android:contentDescription">@string/accessibility_play</item>
     </style>
 
     <style name="NotificationAction.Next" parent="@style/NotificationAction">
-        <item name="android:src">@drawable/btn_notification_playback_next</item>
+        <item name="android:src">@drawable/btn_playback_next</item>
         <item name="android:contentDescription">@string/accessibility_next</item>
     </style>
 
     <style name="NotificationAction.Collapse" parent="@style/NotificationAction">
-        <item name="android:src">@drawable/btn_notification_collapse</item>
+        <item name="android:src">@drawable/btn_collapse</item>
     </style>
 
     <!-- Bottom Action Bar TextViews -->
