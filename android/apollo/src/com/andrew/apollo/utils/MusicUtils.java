@@ -1092,7 +1092,7 @@ public final class MusicUtils {
      * @param list    The list to enqueue.
      */
     public static void addToQueue(final Context context, final long[] list) {
-        if (context == null musicPlaybackService == null || list == null){
+        if (context == null || musicPlaybackService == null || list == null){
             return;
         }
         try {
