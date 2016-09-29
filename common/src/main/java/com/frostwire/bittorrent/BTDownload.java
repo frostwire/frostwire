@@ -222,6 +222,10 @@ public final class BTDownload implements BittorrentDownload {
         //perform sha1Hash check
         //}
 
+        if (th.status() == null) {
+            return 0;
+        }
+
         float fp = th.status().progress();
 
         if (Float.compare(fp, 1f) == 0) {
