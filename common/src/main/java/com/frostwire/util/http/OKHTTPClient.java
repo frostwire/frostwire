@@ -76,7 +76,7 @@ public class OKHTTPClient extends AbstractHttpClient {
             responseBody = getSyncResponse(okHttpClient, builder).body();
             result = responseBody.bytes();
         } catch (Throwable e) {
-            LOG.error("Error getting bytes from http body response: " + e.getMessage(), e);
+            LOG.error("Error getting bytes from http body response: " + e.getMessage());
         } finally {
            if (responseBody != null) {
                closeQuietly(responseBody);

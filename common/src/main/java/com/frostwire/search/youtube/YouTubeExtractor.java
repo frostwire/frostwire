@@ -440,8 +440,8 @@ public final class YouTubeExtractor {
                 sig = new YouTubeSig(jscode);
                 YT_SIG_MAP.put(html5playerUrl, sig);
             } catch (Throwable t) {
-                LOG.error("Could not getYouTubeSig", t);
-                LOG.error("jscode:\n" + jscode);
+                LOG.error("Could not getYouTubeSig");
+                //LOG.error("jscode:\n" + jscode);
             }
         } else {
             //cache hit, it worked with this url.            

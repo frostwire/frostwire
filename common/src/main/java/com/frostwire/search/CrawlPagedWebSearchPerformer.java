@@ -88,7 +88,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                         long failedWhen = array2long(failed);
                         if ((System.currentTimeMillis() - failedWhen) < FAILED_CRAWL_URL_CACHE_LIFETIME) {
                             //if the failed request is still fresh we stop
-                            LOG.info("CrawlPagedWebSearchPerformer::crawl() - hit failed cache url");
+                            //LOG.info("CrawlPagedWebSearchPerformer::crawl() - hit failed cache url");
                             onResults(Collections.EMPTY_LIST);
                             return;
                         } else {
@@ -110,7 +110,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                     }
 
                     if (data == null) { // not a big deal about synchronization here
-                        LOG.debug("Downloading data for: " + url);
+                        //LOG.debug("Downloading data for: " + url);
 
                         if (url.startsWith("magnet")) {
                             data = fetchMagnet(url);
@@ -132,7 +132,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                                 cachePut(infohash, data);
                             }
                         } else {
-                            LOG.warn("Failed to download data: " + url);
+                            //LOG.warn("Failed to download data: " + url);
                             cachePut("failed:" + url, long2array(System.currentTimeMillis()));
                         }
                     }
@@ -145,7 +145,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                             }
                         }
                     } catch (Throwable e) {
-                        LOG.warn("Error creating crawled results from downloaded data: " + e.getMessage(), e);
+                        LOG.warn("Error creating crawled results from downloaded data: " + e.getMessage());
                         cacheRemove(url); // invalidating cache data
                     }
                 } else {

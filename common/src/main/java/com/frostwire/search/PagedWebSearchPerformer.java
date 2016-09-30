@@ -59,7 +59,7 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
             if (url == null) {
                 url = "n.a";
             }
-            LOG.error("Error searching page [" + url + "]: " + e.getMessage(), e);
+            LOG.error("Error searching page [" + url + "]: " + e.getMessage());
         }
         return result;
     }
