@@ -232,9 +232,11 @@
                   android:noHistory="true"/>
         <!-- InMobi -->
         <activity android:name="com.inmobi.rendering.InMobiAdActivity"
-                  android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize"
+                  android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
                   android:theme="@android:style/Theme.Translucent.NoTitleBar"
-                  android:hardwareAccelerated="true"/>
+                  android:hardwareAccelerated="true"
+                  tools:ignore="UnusedAttribute"/>
+        <!-- when we get to Android N (API level 24) add -> android:resizeableActivity="false" -->
 
         <receiver
                 android:name="com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver"
