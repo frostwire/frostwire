@@ -612,4 +612,8 @@
 <string name="keep_the_project_alive">Mantén el proyecto vivo</string>
 <string name="remove_ads">Remover publicidad</string>
 <string name="haptic_feedback">Retroalimenación Háptica</string>
+<string name="i_have_read_and_agree_to_the">He leído y estoy de acuerdo con</string>
+<string name="processing_payment">Procesando pago, vuelve a cargar en unos segundos</string>
+<string name="select_deselect_all">Seleccionar/Deseleccionar todo</string>
+<string name="terms_of_use">Términos de Uso</string>
 </resources>
