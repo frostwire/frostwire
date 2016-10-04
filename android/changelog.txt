@@ -4,7 +4,6 @@ FrostWire 1.8.2 - OCT/03/2016
  - New Send Feedback button from About screen.
  - jlibtorrent 1.2.0.0
  - applovin 6.3.2 update.
- - android sdk update, from sdk 16 to sdk 17.
 
 FrostWire 1.8.1 - SEP/15/2016
  - New Search Engine: LimeTorrents
