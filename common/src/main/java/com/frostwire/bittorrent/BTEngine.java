@@ -500,7 +500,7 @@ public final class BTEngine extends SessionManager {
                         Map<String, Entry> map = d.dictionary();
                         File saveDir = new File(map.get("save_dir").string());
                         File torrent = new File(map.get("torrent").string());
-                        ArrayList<Entry> filePriorities = map.get("file_priorities").list();
+                        List<Entry> filePriorities = map.get("file_priorities").list();
 
                         Priority[] priorities = Priority.array(Priority.IGNORE, filePriorities.size());
                         for (int i = 0; i < filePriorities.size(); i++) {

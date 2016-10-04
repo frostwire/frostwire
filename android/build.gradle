@@ -155,8 +155,8 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     //compile 'com.github.mobfox:MobFox-Android-SDK-Core:2.1.4'
 
-    compile "com.frostwire:jlibtorrent-android-arm:1.2.0.0-beta1"
-    compile "com.frostwire:jlibtorrent-android-x86:1.2.0.0-beta1"
+    compile "com.frostwire:jlibtorrent-android-arm:1.2.0.0-beta2"
+    compile "com.frostwire:jlibtorrent-android-x86:1.2.0.0-beta2"
     //compile "com.frostwire:jlibtorrent-android-arm:1.1.1.40"
     //compile "com.frostwire:jlibtorrent-android-x86:1.1.1.40"
 
