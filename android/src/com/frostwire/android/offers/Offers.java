@@ -137,8 +137,12 @@ public final class Offers {
             if (dismissAfterwards) {
                 activity.finish();
             }
-            if (shutdownAfterwards && activity instanceof MainActivity) {
-                ((MainActivity) activity).shutdown();
+            if (shutdownAfterwards) {
+                if (activity instanceof MainActivity) {
+                    ((MainActivity) activity).shutdown();
+                } else {
+                    UIUtils.sendShutdownIntent(activity);
+                }
             }
         } // otherwise it's up to the interstitial and its listener to dismiss or shutdown if necessary.
     }
