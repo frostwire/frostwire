@@ -224,6 +224,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         return result;
     }
 
+    private boolean isGoHome(Intent intent) {
+        if (intent == null) {
+            intent = getIntent();
+        }
+
+        return intent != null && intent.getBooleanExtra("gohome-" + ConfigurationManager.instance().getUUIDString(), false);
+    }
+
     @Override
     protected void initComponents(Bundle savedInstanceState) {
         if (isShutdown()) {
@@ -298,6 +306,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         if (isShutdown(intent)) {
+            return;
+        }
+
+        if (isGoHome(intent)) {
+            finish();
             return;
         }
 

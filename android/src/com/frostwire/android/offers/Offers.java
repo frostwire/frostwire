@@ -290,7 +290,12 @@ public final class Offers {
                 }
 
                 if (finishAfterDismiss) {
-                    activity.finish();
+                    if (activity instanceof MainActivity) {
+                        activity.finish();
+                    } else {
+                        activity.finish();
+                        UIUtils.sendGoHomeIntent(activity);
+                    }
                 }
 
                 if (!finishAfterDismiss && !shutdownAfter && tryBack2BackRemoveAdsOffer) {
