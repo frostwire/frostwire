@@ -560,7 +560,7 @@
     <string name="one_time_purchase">Compra de uma só vez</string>
     <string name="activity_VPN">Conexão</string>
     <string name="one_year">1 ano</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Uma conexão desprotegida significa que tudo que você faz online (incluindo <b>buscas, mensagens e downloads</b>) pode ser monitorado por qualquer pessoa na rede e até mesmo pelo seu provedor de serviços de Internet.<br><br>Recomendamos o uso de ExpressVPN para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>.]]></string>
     <string name="i_have_read_and_agree_to_the">Eu li e concordo com o</string>
     <string name="scanning">Acabamento - Scanning</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">De acordo com suas configurações eu não posso começar a semeadura, a menos que você estiver em Wi-Fi. O arquivo estará pronto para semear automaticamente quando você voltar para uma internet habilitado rede Wi-Fi.</string>
@@ -591,7 +591,7 @@
     <string name="learn_more">Saber mais</string>
     <string name="save_bandwidth">Economizar largura de banda</string>
     <string name="vpn_client_feature_4">Suporte ao cliente 24/7</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you do not need a VPN to use FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Apesar de recomendado para seus downloads, <b>você não precisa de uma VPN para usar FrostWire. </b>]]></string>
     <string name="vpn_client_feature_1">Criptografia de nível militar</string>
     <string name="vpn_client_feature_3">Navegação privada e logless</string>
     <string name="try_frostwire_plus_for_more_results">Tente FrostWire Plus para mais resultados</string>
@@ -641,7 +641,7 @@
     <string name="cheaper_than_cigarettes">Mais barato do que cigarros</string>
     <string name="days_left">dias restantes</string>
     <string name="six_months">6 meses</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso <b>ExpressVPN</b> para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">O caminho selecionado não é um diretório</string>
     <string name="protect_my_privacy">Proteger a minha privacidade</string>
     <string name="your_privacy_is_a_fundamental_right_html">A sua privacidade é um direito humano fundamental.</string>
