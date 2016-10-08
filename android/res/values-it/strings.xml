@@ -358,4 +358,5 @@
     <string name="support_frostwire_summary">Mostra gli annunci per sostenere lo sviluppo di questa applicazione.</string>
     <string name="storage_preference_title">Seleziona posizione di archiviazione</string>
     <string name="storage_preference_summary">La posizione di memorizzazione di default dove i file verranno salvati.</string>
+    <string name="haptic_feedback">Feedback Tattile</string>
 </resources>

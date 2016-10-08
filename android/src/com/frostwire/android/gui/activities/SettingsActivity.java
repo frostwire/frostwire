@@ -251,7 +251,23 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupOtherOptions() {
         setupPermanentStatusNotificationOption();
+        setupHapticFeedback();
         setupSupportFrostWireOption();
+    }
+
+    private void setupHapticFeedback() {
+        final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
+        if (preference != null) {
+            preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    CheckBoxPreference cbPreference = (CheckBoxPreference) preference;
+                    ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, cbPreference.isChecked());
+                    Engine.instance().getVibrator().onPreferenceChanged();
+                    return true;
+                }
+            });
+        }
     }
 
     private void setupSupportFrostWireOption() {

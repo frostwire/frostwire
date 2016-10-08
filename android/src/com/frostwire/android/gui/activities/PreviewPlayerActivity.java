@@ -199,6 +199,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     private void onDownloadButtonClick() {
         if (Ref.alive(srRef)) {
+            Engine.instance().getVibrator().hapticFeedback();
             final FileSearchResult fileSearchResult = srRef.get();
             if (fileSearchResult instanceof YouTubePackageSearchResult) {
                 releaseMediaPlayer();

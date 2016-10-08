@@ -611,4 +611,5 @@
 <string name="six_months">6 meses</string>
 <string name="keep_the_project_alive">Mantén el proyecto vivo</string>
 <string name="remove_ads">Remover publicidad</string>
+<string name="haptic_feedback">Retroalimenación Háptica</string>
 </resources>

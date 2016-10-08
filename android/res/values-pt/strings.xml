@@ -531,4 +531,5 @@
     <string name="torrent_max_peers_summary">Max Pares</string>
     <string name="use_btjunkie">Utilize BTJunkie</string>
     <string name="help">Socorro</string>
+    <string name="haptic_feedback">Feedback Táctil</string>
 </resources>

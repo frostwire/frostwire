@@ -23,6 +23,7 @@ import android.content.Context;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
@@ -273,6 +274,7 @@ public final class Offers {
                                                            final boolean tryBack2BackRemoveAdsOffer,
                                                            final Application fallbackContext) {
             LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + shutdownAfter + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
+            Engine.instance().getVibrator().hapticFeedback();
             if (activity != null) {
                 if (shutdownAfter) {
                     if (adNetwork != null) {

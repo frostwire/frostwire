@@ -42,6 +42,7 @@ import com.frostwire.android.gui.adapters.SearchResultListAdapter.FilteredSearch
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
@@ -363,6 +364,8 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void startTransfer(final SearchResult sr, final String toastMessage) {
+        Engine.instance().getVibrator().hapticFeedback();
+
         if (!(sr instanceof AbstractTorrentSearchResult || sr instanceof TorrentPromotionSearchResult) &&
                 ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
             if (sr instanceof FileSearchResult && !(sr instanceof YouTubeSearchResult)) {

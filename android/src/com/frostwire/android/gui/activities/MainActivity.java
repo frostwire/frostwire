@@ -1,3 +1,4 @@
+
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
@@ -722,6 +723,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //onItemClick(AdapterView<?> parent, View view, int position, long id)
                 syncSlideMenu();
+                Engine.instance().getVibrator().hapticFeedback();
                 controller.closeSlideMenu();
                 try {
                     if (id == R.id.menu_main_settings) {
