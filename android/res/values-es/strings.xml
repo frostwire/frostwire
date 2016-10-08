@@ -614,4 +614,5 @@
     <string name="processing_payment">Procesando pago, vuelve a cargar en unos segundos</string>
     <string name="select_deselect_all">Seleccionar/Deseleccionar todo</string>
     <string name="terms_of_use">Términos de Uso</string>
+    <string name="haptic_feedback">Retroalimentación Táctil</string>
 </resources>
