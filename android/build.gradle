@@ -63,11 +63,7 @@ def changeApkOutput(variant) {
     def name = "$project.buildDir/frostwire-android-" + variant.buildType.name + '-' + suffix
 
     variant.outputs.each { output ->
-        if (output.zipAlign) {
-            output.outputFile = file(name + '.apk')
-        }
-
-        //output.packageApplication.outputFile = file(name + '-unaligned.apk')
+        output.outputFile = file(name + '.apk')
     }
 }
 
