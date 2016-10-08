@@ -317,7 +317,7 @@ public final class Engine implements IEngineService {
         public void hapticFeedback() {
             if (!enabled) return;
             try {
-                vibrator.vibrate(40);
+                vibrator.vibrate(50);
             } catch (Throwable ignored) {
             }
         }

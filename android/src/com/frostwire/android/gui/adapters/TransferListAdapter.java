@@ -681,6 +681,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         }
 
         public void onClick(Context ctx, View v) {
+            Engine.instance().getVibrator().hapticFeedback();
             Object tag = v.getTag();
             if (tag instanceof TransferItem) {
                 TransferItem item = (TransferItem) tag;
