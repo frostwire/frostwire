@@ -51,6 +51,7 @@ import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.uxstats.UXAction;
@@ -430,6 +431,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
      */
     @Override
     public void onBackPressed() {
+        Engine.instance().getVibrator().hapticFeedback();
         super.onBackPressed();
         finish();
     }
@@ -487,20 +489,25 @@ public class AudioPlayerActivity extends FragmentActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mIsPaused = false;
-        mTimeHandler.removeMessages(REFRESH_TIME);
-        // Unbind from the service
-        if (musicPlaybackService != null) {
-            MusicUtils.unbindFromService(mToken);
-            mToken = null;
-        }
+        Engine.instance().getThreadPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                mIsPaused = false;
+                mTimeHandler.removeMessages(REFRESH_TIME);
+                // Unbind from the service
+                if (musicPlaybackService != null) {
+                    MusicUtils.unbindFromService(mToken);
+                    mToken = null;
+                }
 
-        // Unregister the receiver
-        try {
-            unregisterReceiver(mPlaybackStatus);
-        } catch (final Throwable e) {
-            //$FALL-THROUGH$
-        }
+                // Unregister the receiver
+                try {
+                    unregisterReceiver(mPlaybackStatus);
+                } catch (final Throwable e) {
+                    //$FALL-THROUGH$
+                }
+            }
+        });
     }
 
     /**

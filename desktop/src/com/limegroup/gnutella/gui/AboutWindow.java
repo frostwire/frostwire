@@ -76,6 +76,9 @@ final class AboutWindow {
 		JLabel java = new JLabel("Java " + VersionUtils.getJavaVersion());
 		java.setHorizontalAlignment(SwingConstants.CENTER);
 
+		JLabel osInfo = new JLabel(OSUtils.getFullOS());
+		osInfo.setHorizontalAlignment(SwingConstants.CENTER);
+
 		// set up frostwire.com label
 		JLabel url = new URLLabel("http://www.frostwire.com");
 		url.setHorizontalAlignment(SwingConstants.CENTER);
@@ -117,20 +120,23 @@ final class AboutWindow {
 		pane.add(client, gbc);
 
 		gbc.gridy = 3;
-		pane.add(java, gbc);
+		pane.add(osInfo, gbc);
 
 		gbc.gridy = 4;
-		pane.add(url, gbc);
+		pane.add(java, gbc);
 
 		gbc.gridy = 5;
+		pane.add(url, gbc);
+
+		gbc.gridy = 6;
 		pane.add(Box.createVerticalStrut(GUIConstants.SEPARATOR), gbc);
 
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		pane.add(SCROLLING_PANE, gbc);
 
-		gbc.gridy = 7;
+		gbc.gridy = 8;
 		gbc.weighty = 0;
 		gbc.fill = GridBagConstraints.NONE;
 		pane.add(Box.createVerticalStrut(GUIConstants.SEPARATOR), gbc);
@@ -144,13 +150,13 @@ final class AboutWindow {
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridwidth = 1;
-		gbc.gridy = 8;
+		gbc.gridy = 9;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.WEST;
 		pane.add(legalLinksPanel, gbc);
 
 		gbc = new GridBagConstraints();
-		gbc.gridy = 8;
+		gbc.gridy = 10;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.anchor = GridBagConstraints.EAST;
 		pane.add(button, gbc);

@@ -31,7 +31,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.util.UIUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -75,6 +77,9 @@ public class AboutFragment extends Fragment implements MainFragment {
                 onLoveFrostWire();
             }
         });
+        
+        final Button sendFeedbackButton = (Button) view.findViewById(R.id.fragment_about_send_feedback);
+        sendFeedbackButton.setOnClickListener(new OnFeedbackClickAdapter(this, null, ConfigurationManager.instance()));
 
         final ImageButton fbButton = (ImageButton) view.findViewById(R.id.fragment_about_facebook_button);
         final ImageButton twitterButton = (ImageButton) view.findViewById(R.id.fragment_about_twitter_button);
@@ -104,6 +109,9 @@ public class AboutFragment extends Fragment implements MainFragment {
         });
 
         return view;
+    }
+
+    private void onSendFeedback() {
     }
 
     private void onLoveFrostWire() {

@@ -381,4 +381,5 @@
     <string name="transfers_select_all">alle</string>
     <string name="cant_open_file_does_not_exist">Kann %1$s nicht öffnen, wird die Datei nicht existiert.</string>
     <string name="help">Hilfe</string>
+    <string name="haptic_feedback">Haptisches Feedback</string>
 </resources>

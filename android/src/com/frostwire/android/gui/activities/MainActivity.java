@@ -1,3 +1,4 @@
+
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
@@ -224,6 +225,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         return result;
     }
 
+    private boolean isGoHome(Intent intent) {
+        if (intent == null) {
+            intent = getIntent();
+        }
+
+        return intent != null && intent.getBooleanExtra("gohome-" + ConfigurationManager.instance().getUUIDString(), false);
+    }
+
     @Override
     protected void initComponents(Bundle savedInstanceState) {
         if (isShutdown()) {
@@ -298,6 +307,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         if (isShutdown(intent)) {
+            return;
+        }
+
+        if (isGoHome(intent)) {
+            finish();
             return;
         }
 
@@ -709,6 +723,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //onItemClick(AdapterView<?> parent, View view, int position, long id)
                 syncSlideMenu();
+                Engine.instance().getVibrator().hapticFeedback();
                 controller.closeSlideMenu();
                 try {
                     if (id == R.id.menu_main_settings) {

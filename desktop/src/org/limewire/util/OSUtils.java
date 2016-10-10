@@ -36,16 +36,22 @@ public class OSUtils {
     private static boolean _isMacOSX;
 
     /**
-     * Variable for whether or not we're on Mac OS X 10.5 (Leopard)
+     * OSX versions
+     * 10.5 - Leopard
+     * 10.6 - Snow Leopard
+     * 10.7 - Lion
+     * 10.8 - Mountain Lion
+     * --- no more cats, now it's mountains
+     * 10.9 - Mavericks
+     * 10.10 - Yosemite
+     * 10.11 - El Capitan
+     * -- No longer called OSX, now called macOS
+     * 10.12 - Sierra
      */
     private static boolean _isMacOSX105;
-    
-    /**
-     * Variable for wether or not we're on Mac OS X 10.6 (Snow Leopard)
-     * 
-     */
     private static boolean _isMacOSX106;
-    
+    private static boolean _isMacOSX107;
+
     /** 
      * Variable for whether or not we're on Linux.
      */
@@ -70,8 +76,6 @@ public class OSUtils {
      * Variable for whether or not we're on OS/2.
      */
     private static boolean _isOS2;
-
-	private static boolean _isMacOSX107;
 
 
 	/**
@@ -130,15 +134,9 @@ public class OSUtils {
 		if(os.startsWith("mac os")) {
 			if(os.endsWith("x")) {
 				_isMacOSX = true;
-
-				if (System.getProperty("os.version").startsWith("10.5"))
-						_isMacOSX105 = true;
-
-				if (System.getProperty("os.version").startsWith("10.6"))
-						_isMacOSX106 = true;
-
-				if (System.getProperty("os.version").startsWith("10.7"))
-					_isMacOSX107 = true;
+                _isMacOSX105 = System.getProperty("os.version").startsWith("10.5");
+                _isMacOSX106 = System.getProperty("os.version").startsWith("10.6");
+                _isMacOSX107 = System.getProperty("os.version").startsWith("10.7");
 			}
 		}
 	}

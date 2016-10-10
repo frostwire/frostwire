@@ -23,7 +23,10 @@ import android.content.*;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.telephony.TelephonyManager;
+
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
@@ -47,6 +50,7 @@ public final class Engine implements IEngineService {
     private final File notifiedDat;
 
     private static Engine instance;
+    private FWVibrator vibrator;
 
     public synchronized static void create(Application context) {
         if (instance != null) {
@@ -64,8 +68,10 @@ public final class Engine implements IEngineService {
 
     private Engine(Application context) {
         notifiedDat = new File(context.getExternalFilesDir(null), "notified.dat");
+        vibrator = new FWVibrator(context);
         loadNotifiedDownloads();
         startEngineService(context);
+
     }
 
     /**
@@ -294,5 +300,35 @@ public final class Engine implements IEngineService {
             r = service.getApplication();
         }
         return r;
+    }
+
+    public FWVibrator getVibrator() {
+        return vibrator;
+    }
+
+    public static class FWVibrator {
+        private final Vibrator vibrator;
+        private boolean enabled;
+        public FWVibrator(Application context) {
+            vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            enabled = isActive();
+        }
+
+        public void hapticFeedback() {
+            if (!enabled) return;
+            try {
+                vibrator.vibrate(50);
+            } catch (Throwable ignored) {
+            }
+        }
+
+        public void onPreferenceChanged() {
+            enabled = isActive();
+        }
+
+        public boolean isActive() {
+            return vibrator != null &&
+                    ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
+        }
     }
 }

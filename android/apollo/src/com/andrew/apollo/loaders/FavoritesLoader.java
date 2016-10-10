@@ -48,6 +48,10 @@ public class FavoritesLoader extends SongLoader {
      * @return The {@link Cursor} used to run the favorites query.
      */
     public static Cursor makeFavoritesCursor(final Context context) {
+        if (context == null) {
+            return null;
+        }
+        
         return FavoritesStore
                 .getInstance(context)
                 .getReadableDatabase()

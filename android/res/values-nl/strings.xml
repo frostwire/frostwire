@@ -358,4 +358,5 @@
     <string name="support_frostwire_summary">Toon advertenties aan de ontwikkeling van deze app te ondersteunen.</string>
     <string name="storage_preference_title">Selecteer opslag Woonplaats</string>
     <string name="storage_preference_summary">De standaard opslag locatie waar de bestanden worden opgeslagen.</string>
+    <string name="haptic_feedback">Haptische Feedback</string>
 </resources>

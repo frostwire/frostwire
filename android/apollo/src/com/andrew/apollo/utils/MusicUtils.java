@@ -88,6 +88,9 @@ public final class MusicUtils {
      */
     public static ServiceToken bindToService(final Context context,
                                              final ServiceConnection callback) {
+        if (context == null) {
+            return null;
+        }
         Activity realActivity = ((Activity) context).getParent();
         if (realActivity == null) {
             realActivity = (Activity) context;
@@ -122,6 +125,10 @@ public final class MusicUtils {
     }
 
     public static void requestMusicPlaybackServiceShutdown(Context context) {
+        if (context == null) {
+            LOG.warn("requestMusicPlaybackServiceShutdown() aborted. context is null.");
+            return;
+        }
         if (!SystemUtils.isServiceRunning(context, MusicPlaybackService.class)) {
             LOG.info("requestMusicPlaybackServiceShutdown() aborted. MusicPlaybackService has already shutdown.");
             return;
@@ -949,7 +956,7 @@ public final class MusicUtils {
      */
     public static long createPlaylist(final Context context, final String name) {
         long result = -1;
-        if (name != null && name.length() > 0) {
+        if (context != null && name != null && name.length() > 0) {
             final ContentResolver resolver = context.getContentResolver();
             final String[] projection = new String[]{
                     PlaylistsColumns.NAME
@@ -980,8 +987,10 @@ public final class MusicUtils {
      * @param playlistId The playlist ID.
      */
     public static void clearPlaylist(final Context context, final int playlistId) {
-        final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
-        context.getContentResolver().delete(uri, null, null);
+        if (context != null) {
+            final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
+            context.getContentResolver().delete(uri, null, null);
+        }
     }
 
     /**
@@ -990,6 +999,11 @@ public final class MusicUtils {
      * @param playlistid The id of the playlist being added to.
      */
     public static void addToPlaylist(final Context context, final long[] ids, final long playlistid) {
+        if (context == null) {
+            LOG.warn("context was null, not adding anything to playlist.");
+            return;
+        }
+
         if (ids == null) {
             LOG.warn("song ids given null, not adding anything to playlist.");
             return;
@@ -1040,6 +1054,10 @@ public final class MusicUtils {
      */
     public static void removeFromPlaylist(final Context context, final long id,
                                           final long playlistId, boolean showNotification) {
+        if (context == null) {
+            return;
+        }
+
         final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
         final ContentResolver resolver = context.getContentResolver();
         resolver.delete(uri, Playlists.Members.AUDIO_ID + " = ? ", new String[]{
@@ -1074,7 +1092,7 @@ public final class MusicUtils {
      * @param list    The list to enqueue.
      */
     public static void addToQueue(final Context context, final long[] list) {
-        if (musicPlaybackService == null || list == null) {
+        if (context == null || musicPlaybackService == null || list == null){
             return;
         }
         try {
@@ -1091,6 +1109,10 @@ public final class MusicUtils {
      * @param fileType
      */
     public static void setRingtone(final Context context, final long id, byte fileType) {
+        if (context == null) {
+            LOG.warn("context was null, not setting ringtone.");
+            return;
+        }
         final ContentResolver resolver = context.getContentResolver();
 
         Uri contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -1141,7 +1163,7 @@ public final class MusicUtils {
      * @return The song count for an album.
      */
     public static String getSongCountForAlbum(final Context context, final long id) {
-        if (id == -1) {
+        if (context == null || id == -1) {
             return null;
         }
         try {
@@ -1176,7 +1198,7 @@ public final class MusicUtils {
      * @return The release date for an album.
      */
     public static String getReleaseDateForAlbum(final Context context, final long id) {
-        if (id == -1) {
+        if (context == null || id == -1) {
             return null;
         }
         try {
@@ -1249,6 +1271,10 @@ public final class MusicUtils {
      * @return The track list for a playlist
      */
     public static long[] getSongListForPlaylist(final Context context, final long playlistId) {
+        if (context == null) {
+            return sEmptyList;
+        }
+
         final String[] projection = new String[]{
                 MediaStore.Audio.Playlists.Members.AUDIO_ID
         };
@@ -1365,7 +1391,11 @@ public final class MusicUtils {
      */
     public static void makePlaylistMenu(final Context context, final int groupId,
                                         final SubMenu subMenu, final boolean showFavorites) {
-//        subMenu.clear();
+        if (context == null) {
+            LOG.warn("context was null, not making playlist menu");
+            return;
+        }
+
         subMenu.clearHeader();
         if (showFavorites) {
             subMenu.add(groupId, FragmentMenuItems.ADD_TO_FAVORITES, Menu.NONE,

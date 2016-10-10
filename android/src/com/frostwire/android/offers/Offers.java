@@ -23,6 +23,7 @@ import android.content.Context;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
@@ -137,8 +138,12 @@ public final class Offers {
             if (dismissAfterwards) {
                 activity.finish();
             }
-            if (shutdownAfterwards && activity instanceof MainActivity) {
-                ((MainActivity) activity).shutdown();
+            if (shutdownAfterwards) {
+                if (activity instanceof MainActivity) {
+                    ((MainActivity) activity).shutdown();
+                } else {
+                    UIUtils.sendShutdownIntent(activity);
+                }
             }
         } // otherwise it's up to the interstitial and its listener to dismiss or shutdown if necessary.
     }
@@ -269,6 +274,7 @@ public final class Offers {
                                                            final boolean tryBack2BackRemoveAdsOffer,
                                                            final Application fallbackContext) {
             LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + shutdownAfter + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
+            Engine.instance().getVibrator().hapticFeedback();
             if (activity != null) {
                 if (shutdownAfter) {
                     if (adNetwork != null) {
@@ -286,7 +292,12 @@ public final class Offers {
                 }
 
                 if (finishAfterDismiss) {
-                    activity.finish();
+                    if (activity instanceof MainActivity) {
+                        activity.finish();
+                    } else {
+                        activity.finish();
+                        UIUtils.sendGoHomeIntent(activity);
+                    }
                 }
 
                 if (!finishAfterDismiss && !shutdownAfter && tryBack2BackRemoveAdsOffer) {

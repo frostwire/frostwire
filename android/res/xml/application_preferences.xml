@@ -222,6 +222,10 @@
             android:layout="@layout/view_preference_simple_action"
             android:title="@string/vibrate_on_finished_download" />
         <CheckBoxPreference
+            android:key="frostwire.prefs.gui.haptic_feedback_on"
+            android:layout="@layout/view_preference_simple_action"
+            android:title="@string/haptic_feedback" />
+        <CheckBoxPreference
             android:key="frostwire.prefs.uxstats.enabled"
             android:layout="@layout/view_preference_simple_action"
             android:summary="@string/anonymous_usage_statistics_summary"

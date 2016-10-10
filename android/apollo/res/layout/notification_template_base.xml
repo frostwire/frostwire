@@ -21,7 +21,7 @@
     android:layout_height="match_parent"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:background="@android:color/black"
+    android:background="@android:color/white"
     tools:ignore="ContentDescription" >
 
     <ImageView
@@ -43,6 +43,7 @@
         <TextView
             android:id="@+id/notification_base_line_one"
             style="@style/NotificationText"
+            android:textColor="@color/black"
             android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent.Title" />
 
         <TextView

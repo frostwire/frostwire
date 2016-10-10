@@ -94,7 +94,9 @@ public final class BTEngine extends SessionManager {
         sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
         sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
 
-        super.start(new SettingsPack(sp));
+        //super.start(new SettingsPack(sp));
+        SessionParams params = new SessionParams(new SettingsPack(sp));
+        super.start(params);
     }
 
     @Override
@@ -498,7 +500,7 @@ public final class BTEngine extends SessionManager {
                         Map<String, Entry> map = d.dictionary();
                         File saveDir = new File(map.get("save_dir").string());
                         File torrent = new File(map.get("torrent").string());
-                        ArrayList<Entry> filePriorities = map.get("file_priorities").list();
+                        List<Entry> filePriorities = map.get("file_priorities").list();
 
                         Priority[] priorities = Priority.array(Priority.IGNORE, filePriorities.size());
                         for (int i = 0; i < filePriorities.size(); i++) {
