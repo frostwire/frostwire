@@ -9,7 +9,7 @@ import android.view.KeyEvent;
 
 import com.frostwire.android.R;
 import com.frostwire.android.test.utils.PreferencesManipulator;
-import com.frostwire.android.test.utils.WaitUntiVisibleIdlingResource;
+import com.frostwire.android.test.utils.WaitUntilVisibleIdlingResource;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,7 +57,7 @@ public class SearchTest {
                 .perform(pressKey(KeyEvent.KEYCODE_ENTER)); //press enter
 
 
-        WaitUntiVisibleIdlingResource resource = new WaitUntiVisibleIdlingResource(
+        WaitUntilVisibleIdlingResource resource = new WaitUntilVisibleIdlingResource(
                 activityRule.getActivity().findViewById(R.id.fragment_search_list),
                 activityRule.getActivity().findViewById(R.id.view_search_progress_text_no_results_feedback)
         );
