@@ -8,6 +8,13 @@ import com.frostwire.android.core.Constants;
 
 import java.util.Map;
 
+/**
+ * When running tests, we need to put the app in a known state so the tests
+ * can run constantly. PreferencesManipulator lets us configure SharedPreference
+ * values to represent various conditions such as if a user has started the app
+ * once and has accepted terms, has never run the GUI, etc.
+ */
+
 public class PreferencesManipulator {
     SharedPreferences mPreferences;
 
@@ -15,7 +22,7 @@ public class PreferencesManipulator {
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public void clearGuiPrefs() {
+    public void userHasNeverStartedApp() {
         clearPrefsWithPrefix("frostwire.prefs.gui.");
     }
 

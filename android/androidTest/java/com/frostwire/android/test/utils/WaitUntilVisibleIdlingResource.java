@@ -3,13 +3,15 @@ package com.frostwire.android.test.utils;
 import android.support.test.espresso.IdlingResource;
 import android.view.View;
 
-
-public class WaitUntiVisibleIdlingResource implements IdlingResource {
+/**
+ * Created by ralf on 5/1/16.
+ */
+public class WaitUntilVisibleIdlingResource implements IdlingResource {
     ResourceCallback mResourceCallback;
 
     View[] mViewsToCheck;
 
-    public WaitUntiVisibleIdlingResource(View... viewsToCheck) {
+    public WaitUntilVisibleIdlingResource(View... viewsToCheck) {
         mViewsToCheck = viewsToCheck;
     }
 

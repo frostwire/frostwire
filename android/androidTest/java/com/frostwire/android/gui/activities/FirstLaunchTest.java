@@ -30,7 +30,7 @@ public class FirstLaunchTest {
             super.beforeActivityLaunched();
             PreferencesManipulator prefsManipulator =
                     new PreferencesManipulator(InstrumentationRegistry.getTargetContext());
-            prefsManipulator.clearGuiPrefs();
+           prefsManipulator.userHasNeverStartedApp();
         }
     };
 
