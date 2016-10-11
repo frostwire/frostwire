@@ -11,41 +11,55 @@
 
 package com.andrew.apollo;
 
-import android.Manifest;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.*;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.media.AudioManager;
-import android.media.AudioManager.OnAudioFocusChangeListener;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
-import android.media.RemoteControlClient;
-import android.media.audiofx.AudioEffect;
-import android.net.Uri;
-import android.os.*;
-import android.os.PowerManager.WakeLock;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Audio.AlbumColumns;
-import android.provider.MediaStore.Audio.AudioColumns;
-import android.support.v4.content.ContextCompat;
-import com.andrew.apollo.cache.ImageCache;
-import com.andrew.apollo.cache.ImageFetcher;
-import com.andrew.apollo.provider.FavoritesStore;
-import com.andrew.apollo.provider.RecentStore;
-import com.andrew.apollo.ui.activities.AudioPlayerActivity;
-import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
+  import android.Manifest;
+  import android.app.AlarmManager;
+  import android.app.PendingIntent;
+  import android.app.Service;
+  import android.content.BroadcastReceiver;
+  import android.content.ComponentName;
+  import android.content.ContentResolver;
+  import android.content.Context;
+  import android.content.Intent;
+  import android.content.IntentFilter;
+  import android.content.SharedPreferences;
+  import android.content.pm.PackageManager;
+  import android.database.Cursor;
+  import android.graphics.Bitmap;
+  import android.media.AudioManager;
+  import android.media.AudioManager.OnAudioFocusChangeListener;
+  import android.media.MediaMetadataRetriever;
+  import android.media.MediaPlayer;
+  import android.media.RemoteControlClient;
+  import android.media.audiofx.AudioEffect;
+  import android.net.Uri;
+  import android.os.Handler;
+  import android.os.HandlerThread;
+  import android.os.IBinder;
+  import android.os.Looper;
+  import android.os.Message;
+  import android.os.PowerManager;
+  import android.os.PowerManager.WakeLock;
+  import android.os.RemoteException;
+  import android.os.SystemClock;
+  import android.provider.MediaStore;
+  import android.provider.MediaStore.Audio.AlbumColumns;
+  import android.provider.MediaStore.Audio.AudioColumns;
+  import android.support.v4.content.ContextCompat;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.LinkedList;
-import java.util.Random;
-import java.util.TreeSet;
+  import com.andrew.apollo.cache.ImageCache;
+  import com.andrew.apollo.cache.ImageFetcher;
+  import com.andrew.apollo.provider.FavoritesStore;
+  import com.andrew.apollo.provider.RecentStore;
+  import com.andrew.apollo.ui.activities.AudioPlayerActivity;
+  import com.andrew.apollo.utils.MusicUtils;
+  import com.frostwire.util.Logger;
+  import com.frostwire.util.Ref;
+
+  import java.io.IOException;
+  import java.lang.ref.WeakReference;
+  import java.util.LinkedList;
+  import java.util.Random;
+  import java.util.TreeSet;
 
 /**
  * A background {@link Service} used to keep music playing between activities
@@ -754,7 +768,6 @@ public class MusicPlaybackService extends Service {
     }
 
     /**
-     * @param force
      * @return true if serviced was released.
      */
     private boolean releaseServiceUiAndStop(boolean force) {
@@ -2016,6 +2029,9 @@ public class MusicPlaybackService extends Service {
      */
     public long[] getQueue() {
         synchronized (this) {
+            if (mPlayList == null) {
+                return new long[0];
+            }
             final long[] list = new long[mPlayListLen];
             System.arraycopy(mPlayList, 0, list, 0, mPlayListLen);
             return list;

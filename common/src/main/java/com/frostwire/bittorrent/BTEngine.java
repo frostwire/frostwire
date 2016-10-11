@@ -20,9 +20,7 @@ package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
-import com.frostwire.jlibtorrent.swig.entry;
-import com.frostwire.jlibtorrent.swig.settings_pack;
-import com.frostwire.jlibtorrent.swig.string_int_pair;
+import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
@@ -32,7 +30,10 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 
@@ -94,8 +95,7 @@ public final class BTEngine extends SessionManager {
         sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
         sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
 
-        //super.start(new SettingsPack(sp));
-        SessionParams params = new SessionParams(new SettingsPack(sp));
+        SessionParams params = loadSettings();
         super.start(params);
     }
 
@@ -110,8 +110,6 @@ public final class BTEngine extends SessionManager {
             string_int_pair p = new string_int_pair(r.first, r.second);
             swig().add_dht_router(p);
         }
-
-        loadSettings();
         fireStarted();
     }
 
@@ -137,21 +135,33 @@ public final class BTEngine extends SessionManager {
         super.moveStorage(dataDir);
     }
 
-    private void loadSettings() {
-        if (swig() == null) {
-            return;
-        }
-
+    private SessionParams loadSettings() {
         try {
             File f = settingsFile();
             if (f.exists()) {
                 byte[] data = FileUtils.readFileToByteArray(f);
-                loadState(data);
+                byte_vector buffer = Vectors.bytes2byte_vector(data);
+                bdecode_node n = new bdecode_node();
+                error_code ec = new error_code();
+                int ret = bdecode_node.bdecode(buffer, n, ec);
+
+                if (ret == 0) {
+                    session_params params = libtorrent.read_session_params(n);
+                    buffer.clear(); // prevents GC
+                    return new SessionParams(params);
+                } else {
+                    throw new IllegalArgumentException("Can't decode data: " + ec.message());
+                }
             } else {
-                revertToDefaultConfiguration();
+                SettingsPack sp = defaultSettings();
+                SessionParams params = new SessionParams(sp);
+                return params;
             }
         } catch (Throwable e) {
             LOG.error("Error loading session state", e);
+            SettingsPack sp = defaultSettings();
+            SessionParams params = new SessionParams(sp);
+            return params;
         }
     }
 
@@ -178,28 +188,7 @@ public final class BTEngine extends SessionManager {
             return;
         }
 
-        SettingsPack sp = settings();
-
-        sp.broadcastLSD(true);
-
-        if (ctx.optimizeMemory) {
-            int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
-            sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
-            int sendBufferWatermark = sp.sendBufferWatermark();
-            sp.sendBufferWatermark(sendBufferWatermark / 2);
-            sp.cacheSize(256);
-            sp.activeDownloads(4);
-            sp.activeSeeds(4);
-            sp.maxPeerlistSize(200);
-            //sp.setGuidedReadCache(true);
-            sp.tickInterval(1000);
-            sp.inactivityTimeout(60);
-            sp.seedingOutgoingConnections(false);
-            sp.connectionsLimit(200);
-        } else {
-            sp.activeDownloads(10);
-            sp.activeSeeds(10);
-        }
+        SettingsPack sp = defaultSettings();
 
         applySettings(sp);
     }
@@ -694,5 +683,32 @@ public final class BTEngine extends SessionManager {
         list.add(new Pair<>("dht.transmissionbt.com", 6881));
 
         return list;
+    }
+
+    private static SettingsPack defaultSettings() {
+        SettingsPack sp = new SettingsPack();
+
+        sp.broadcastLSD(true);
+
+        if (ctx.optimizeMemory) {
+            int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
+            sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
+            int sendBufferWatermark = sp.sendBufferWatermark();
+            sp.sendBufferWatermark(sendBufferWatermark / 2);
+            sp.cacheSize(256);
+            sp.activeDownloads(4);
+            sp.activeSeeds(4);
+            sp.maxPeerlistSize(200);
+            //sp.setGuidedReadCache(true);
+            sp.tickInterval(1000);
+            sp.inactivityTimeout(60);
+            sp.seedingOutgoingConnections(false);
+            sp.connectionsLimit(200);
+        } else {
+            sp.activeDownloads(10);
+            sp.activeSeeds(10);
+        }
+
+        return sp;
     }
 }
