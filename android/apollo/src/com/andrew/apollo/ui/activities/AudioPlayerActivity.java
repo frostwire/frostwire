@@ -73,6 +73,7 @@ import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.SwipeLayout;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
@@ -210,6 +211,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
             }
         });
 
+        initRemoveAds();
+
         // Set the layout
         setContentView(R.layout.activity_player_base);
 
@@ -224,6 +227,14 @@ public class AudioPlayerActivity extends FragmentActivity implements
         findViewById(R.id.audio_player_album_art).setOnTouchListener(gestureListener);
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
+    }
+
+
+
+    private void initRemoveAds() {
+        if (Offers.removeAdsOffersEnabled()) {
+
+        }
     }
 
     /**

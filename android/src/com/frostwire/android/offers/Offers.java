@@ -20,6 +20,8 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
@@ -166,6 +168,19 @@ public final class Offers {
             TM.resetStartedTransfers();
             Offers.lastInterstitialShownTimestamp = System.currentTimeMillis();
         }
+    }
+
+    /**
+     * @return true only for flavor basic or for plus_debug and we haven't paid for ad removals.
+     */
+    public static boolean removeAdsOffersEnabled() {
+        // Coded so explicitly for clarity.
+        boolean isBasic = Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
+        boolean isPlus = BuildConfig.FLAVOR.equals("plus");
+        boolean isDebug = BuildConfig.DEBUG;
+        boolean isPlusButDebugging = isPlus && isDebug;
+        boolean paidForAdsRemoval = Products.disabledAds(PlayStore.getInstance());
+        return (isBasic || isPlusButDebugging) && !paidForAdsRemoval;
     }
 
     private static void tryBackToBackInterstitial(Activity activity) {

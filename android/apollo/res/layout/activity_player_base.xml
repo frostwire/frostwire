@@ -110,12 +110,28 @@
                 android:scaleType="fitXY"
                 android:padding="16dp"/>
 
-            <View
-                android:id="@+id/audio_player_footer_two"
+            <FrameLayout
+                android:id="@+id/audio_player_remove_ads_text_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_below="@+id/audio_player_album_art" />
+                android:layout_below="@+id/audio_player_album_art"
+                android:layout_alignParentBottom="true">
+                <View
+                    android:id="@+id/audio_player_footer_two"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                     />
+                <TextView
+                    android:id="@+id/audio_player_remove_ads_text_link"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/remove_ads"
+                    style="@style/NoSearchResultsLink"
+                    android:textSize="@dimen/text_size_x_large"
+                    android:gravity="center"
+                    />
+            </FrameLayout>
+
 
             <View
                 android:layout_width="match_parent"
