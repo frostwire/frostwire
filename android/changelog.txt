@@ -1,4 +1,4 @@
-FrostWire 1.8.2 - OCT/08/2016
+FrostWire 1.8.2 - OCT/11/2016
  - New haptic feedback on most important actions
  - Settings: New 'Select All' checkbox to select/unselect active search engines
  - Music player notification background is now white
@@ -6,7 +6,7 @@ FrostWire 1.8.2 - OCT/08/2016
  - jlibtorrent 1.2.0.0
  - applovin 6.3.2 update
  - inmobi 6.0.0 update
- - Translation updates for Spanish, Portuguese
+ - Translation updates for Spanish, Portuguese, French
  - Crash fixes
 
 FrostWire 1.8.1 - SEP/15/2016
