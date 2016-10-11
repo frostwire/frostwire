@@ -36,13 +36,6 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentLeft="true"
                 android:scaleType="fitXY" />
-
-            <!--<ImageView
-                android:layout_width="@dimen/shadow_height"
-                android:layout_height="match_parent"
-                android:layout_alignRight="@+id/audio_player_album_art"
-                android:contentDescription="@null"
-                android:src="@drawable/right_shadow" />-->
         </RelativeLayout>
 
         <FrameLayout
@@ -63,13 +56,6 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="right"
                 android:background="@drawable/layout_divider_1_gray" />
-
-            <!--<ImageView
-                android:layout_width="@dimen/shadow_height"
-                android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:contentDescription="@null"
-                android:src="@drawable/right_shadow" />-->
         </FrameLayout>
 
         <View

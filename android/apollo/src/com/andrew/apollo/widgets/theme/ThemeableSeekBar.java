@@ -36,7 +36,9 @@ public class ThemeableSeekBar extends SeekBar {
         // Initialze the theme resources
         final ThemeUtils resources = new ThemeUtils(context);
         // Theme the seek bar
-        setProgressDrawable(resources.getDrawable(PROGESS));
+        if (!isInEditMode()) {
+            setProgressDrawable(resources.getDrawable(PROGESS));
+        }
     }
 
 }
