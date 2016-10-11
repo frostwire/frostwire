@@ -77,6 +77,9 @@ android {
 
     defaultConfig {
         versionName project.ext.versionName
+        
+        //Added by muckachina for espresso
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -100,6 +103,9 @@ android {
             }
         }
 
+        //Added by muckachina for espresso - Setting the root of instrumentation test 
+        androidTest.setRoot('androidTest')
+    
         plus1.res.srcDirs = ['res-plus1']
     }
 
@@ -157,6 +163,12 @@ dependencies {
     //compile "com.frostwire:jlibtorrent-android-x86:1.1.1.40"
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    
+    //Added by muckachina for espresso - Test dependencies 
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+    exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    
 }
 
 class DeployRelease extends DefaultTask {
