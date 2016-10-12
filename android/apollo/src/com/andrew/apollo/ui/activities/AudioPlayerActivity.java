@@ -69,6 +69,7 @@ import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
@@ -211,13 +212,13 @@ public class AudioPlayerActivity extends FragmentActivity implements
             }
         });
 
-        initRemoveAds();
-
         // Set the layout
         setContentView(R.layout.activity_player_base);
 
         // Cache all the items
         initPlaybackControls();
+
+        initRemoveAds();
 
         mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
 
@@ -232,8 +233,25 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
 
     private void initRemoveAds() {
-        if (Offers.removeAdsOffersEnabled()) {
+        TextView removeAdsTextView = (TextView) findViewById(R.id.audio_player_remove_ads_text_link);
+        View footerView = findViewById(R.id.audio_player_footer_two);
 
+        if (!Offers.removeAdsOffersEnabled()) {
+            removeAdsTextView.setVisibility(View.GONE);
+            footerView.setVisibility(View.VISIBLE);
+            removeAdsTextView.setOnClickListener(null);
+        } else {
+            removeAdsTextView.setVisibility(View.VISIBLE);
+            footerView.setVisibility(View.GONE);
+            removeAdsTextView.setClickable(true);
+            removeAdsTextView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(AudioPlayerActivity.this, BuyActivity.class);
+                    startActivity(i); //start
+                    //startActivityForResult();
+                }
+            });
         }
     }
 
@@ -471,6 +489,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         updateNowPlayingInfo();
         // Refresh the queue
         ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+        initRemoveAds();
     }
 
     /**

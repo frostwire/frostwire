@@ -171,7 +171,8 @@ public final class Offers {
     }
 
     /**
-     * @return true only for flavor basic or for plus_debug and we haven't paid for ad removals.
+     * @return true only for flavor basic or for plus_debug and we haven't paid for ad removals, or
+     * it's plus supporting frostwire with ads
      */
     public static boolean removeAdsOffersEnabled() {
         // Coded so explicitly for clarity.
@@ -179,8 +180,9 @@ public final class Offers {
         boolean isPlus = BuildConfig.FLAVOR.equals("plus");
         boolean isDebug = BuildConfig.DEBUG;
         boolean isPlusButDebugging = isPlus && isDebug;
+        boolean isPlusSupportingFW = isPlus && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
         boolean paidForAdsRemoval = Products.disabledAds(PlayStore.getInstance());
-        return (isBasic || isPlusButDebugging) && !paidForAdsRemoval;
+        return isPlusSupportingFW || ((isBasic || isPlusButDebugging) && !paidForAdsRemoval);
     }
 
     private static void tryBackToBackInterstitial(Activity activity) {
