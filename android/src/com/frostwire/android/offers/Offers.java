@@ -177,12 +177,10 @@ public final class Offers {
     public static boolean removeAdsOffersEnabled() {
         // Coded so explicitly for clarity.
         boolean isBasic = Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
-        boolean isPlus = BuildConfig.FLAVOR.equals("plus");
-        boolean isDebug = BuildConfig.DEBUG;
-        boolean isPlusButDebugging = isPlus && isDebug;
-        boolean isPlusSupportingFW = isPlus && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
+        boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
+        boolean isSupportingFW = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
         boolean paidForAdsRemoval = Products.disabledAds(PlayStore.getInstance());
-        return isPlusSupportingFW || ((isBasic || isPlusButDebugging) && !paidForAdsRemoval);
+        return ((isBasic || (isDevelopment && isSupportingFW)) && !paidForAdsRemoval);
     }
 
     private static void tryBackToBackInterstitial(Activity activity) {
