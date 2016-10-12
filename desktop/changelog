@@ -1,3 +1,11 @@
+frostwire (6.3.7) stable; urgency=high
+  * New jlibtorrent 1.2.0.0
+  * Fixes media player for macOS Sierra (10.12)
+  * Crash fixes
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 12 Sep 2016 04:27:55 -0600
+
+
 frostwire (6.3.6) stable; urgency=high
   * New Search Engine: LimeTorrents
   * New jlibtorrent 1.1.1.38 (based on libtorrent 1.1.1)
