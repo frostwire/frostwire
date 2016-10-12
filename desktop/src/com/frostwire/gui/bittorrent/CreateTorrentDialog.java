@@ -597,7 +597,7 @@ public class CreateTorrentDialog extends JDialog {
                     final File torrent_file = new File(dotTorrentSavePath);
                     reportCurrentTask(I18n.tr("Saving torrent to disk..."));
 
-                    Entry entryFromUpdatedMap = Entry.fromMap(entryMap);
+                    Entry entryFromUpdatedMap = entryFromMap(entryMap);
                     final byte[] bencoded_torrent_bytes = entryFromUpdatedMap.bencode();
                     FileOutputStream fos = new FileOutputStream(torrent_file);
                     BufferedOutputStream bos = new BufferedOutputStream(fos);
@@ -620,6 +620,35 @@ public class CreateTorrentDialog extends JDialog {
         }
 
         return result;
+    }
+
+    // TODO: Add this fix to Entry.fromMap() on jlibtorrent and delete this.
+    static Entry entryFromMap(Map<?, ?> map) {
+        entry e = new entry(entry.data_type.dictionary_t);
+
+        string_entry_map d = e.dict();
+        for (Object o : map.keySet()) {
+            String k = (String) o;
+            Object v = map.get(k);
+
+            if (v instanceof String) {
+                d.set(k, new entry((String) v));
+            } else if (v instanceof Integer) {
+                d.set(k, new entry((Integer) v));
+            } else if (v instanceof Entry) {
+                d.set(k, ((Entry) v).swig());
+            } else if (v instanceof entry) {
+                d.set(k, (entry) v);
+            } else if (v instanceof List) {
+                d.set(k, Entry.fromList((List<?>) v).swig());
+            } else if (v instanceof Map) {
+                d.set(k, entryFromMap((Map<?, ?>) v).swig());
+            } else {
+                d.set(k, new entry(v.toString()));
+            }
+        }
+
+        return new Entry(e);
     }
 
     private boolean addAvailableWebSeeds(create_torrent torrent, boolean isMultiFile) {
