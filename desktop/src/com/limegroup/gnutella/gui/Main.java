@@ -16,6 +16,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.theme.ThemeMediator;
+import com.frostwire.jlibtorrent.swig.libtorrent_jni;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.util.OSUtils;
 
@@ -58,6 +59,9 @@ public class Main {
             System.setProperty("jlibtorrent.jni.path", jlibtorrentPath);
         }
         //System.out.println("1: Main.main("+args+")");
+
+        // make sure jlibtorrent is statically loaded on time to avoid jni symbols not found issues.
+        libtorrent_jni.version();
 
         Frame splash = null;
         try {
