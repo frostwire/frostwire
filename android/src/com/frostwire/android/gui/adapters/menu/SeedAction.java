@@ -272,6 +272,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.
+    @SuppressWarnings("WeakerAccess")
     public static class ShowNoWifiInformationDialog extends AbstractDialog {
 
         public static ShowNoWifiInformationDialog newInstance() {
