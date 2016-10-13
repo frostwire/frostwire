@@ -15,11 +15,20 @@ import android.animation.ObjectAnimator;
 import android.app.ActionBar;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
-import android.os.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Albums;
 import android.provider.MediaStore.Audio.Artists;
@@ -27,12 +36,22 @@ import android.provider.MediaStore.Audio.Playlists;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.view.*;
+import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AnimationUtils;
-import android.widget.*;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
+import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
+
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.adapters.PagerAdapter;
@@ -87,12 +106,6 @@ public class AudioPlayerActivity extends FragmentActivity implements
     // Shuffle button
     private ShuffleButton mShuffleButton;
 
-    // Previous button
-    private RepeatingImageButton mPreviousButton;
-
-    // Next button
-    private RepeatingImageButton mNextButton;
-
     // Track name
     private TextView mTrackName;
 
@@ -122,9 +135,6 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     // Handler used to update the current time
     private TimeHandler mTimeHandler;
-
-    // View pager
-    private ViewPager mViewPager;
 
     // Pager adapter
     private PagerAdapter mPagerAdapter;
@@ -186,9 +196,11 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         // Theme the action bar
         final ActionBar actionBar = getActionBar();
-        mResources.themeActionBar(actionBar, getString(R.string.frostwire_player));
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setIcon(R.color.transparent);
+        if (actionBar != null) {
+            mResources.themeActionBar(actionBar, getString(R.string.frostwire_player));
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setIcon(R.color.transparent);
+        }
 
         TextView actionBarTitleTextView = (TextView) findViewById(R.id.action_bar_title);
         actionBarTitleTextView.setOnClickListener(new OnClickListener() {
@@ -489,25 +501,16 @@ public class AudioPlayerActivity extends FragmentActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Engine.instance().getThreadPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                mIsPaused = false;
-                mTimeHandler.removeMessages(REFRESH_TIME);
-                // Unbind from the service
-                if (musicPlaybackService != null) {
-                    MusicUtils.unbindFromService(mToken);
-                    mToken = null;
-                }
-
-                // Unregister the receiver
-                try {
-                    unregisterReceiver(mPlaybackStatus);
-                } catch (final Throwable e) {
-                    //$FALL-THROUGH$
-                }
-            }
-        });
+        mIsPaused = false;
+        mTimeHandler.removeMessages(REFRESH_TIME);
+        if (musicPlaybackService != null) {
+            MusicUtils.unbindFromService(mToken);
+            mToken = null;
+        }
+        try {
+            unregisterReceiver(mPlaybackStatus);
+        } catch (final Throwable ignore) {
+        }
     }
 
     /**
@@ -536,7 +539,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         mPagerAdapter.add(QueueFragment.class, null);
 
         // Initialize the ViewPager
-        mViewPager = (ViewPager) findViewById(R.id.audio_player_pager);
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.audio_player_pager);
         // Attach the adapter
         mViewPager.setAdapter(mPagerAdapter);
         // Offscreen pager loading limit
@@ -548,9 +551,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
         // Repeat button
         mRepeatButton = (RepeatButton) findViewById(R.id.action_button_repeat);
         // Previous button
-        mPreviousButton = (RepeatingImageButton) findViewById(R.id.action_button_previous);
+        RepeatingImageButton mPreviousButton = (RepeatingImageButton) findViewById(R.id.action_button_previous);
         // Next button
-        mNextButton = (RepeatingImageButton) findViewById(R.id.action_button_next);
+        RepeatingImageButton mNextButton = (RepeatingImageButton) findViewById(R.id.action_button_next);
         // Track name
         mTrackName = (TextView) findViewById(R.id.audio_player_track_name);
         // Artist name
@@ -614,16 +617,14 @@ public class AudioPlayerActivity extends FragmentActivity implements
         return str;
     }
 
-    private long parseIdFromIntent(Intent intent, String longKey,
-                                   String stringKey, long defaultId) {
+    private long parseIdFromIntent(Intent intent, String longKey, String stringKey) {
         long id = intent.getLongExtra(longKey, -1);
         if (id < 0) {
             String idString = intent.getStringExtra(stringKey);
             if (idString != null) {
                 try {
                     id = Long.parseLong(idString);
-                } catch (NumberFormatException e) {
-                    // ignore
+                } catch (NumberFormatException ignored) {
                 }
             }
         }
@@ -649,20 +650,20 @@ public class AudioPlayerActivity extends FragmentActivity implements
             MusicUtils.playFile(uri);
             handled = true;
         } else if (Playlists.CONTENT_TYPE.equals(mimeType)) {
-            long id = parseIdFromIntent(intent, "playlistId", "playlist", -1);
+            long id = parseIdFromIntent(intent, "playlistId", "playlist");
             if (id >= 0) {
                 MusicUtils.playPlaylist(this, id);
                 handled = true;
             }
         } else if (Albums.CONTENT_TYPE.equals(mimeType)) {
-            long id = parseIdFromIntent(intent, "albumId", "album", -1);
+            long id = parseIdFromIntent(intent, "albumId", "album");
             if (id >= 0) {
                 int position = intent.getIntExtra("position", 0);
                 MusicUtils.playAlbum(this, id, position);
                 handled = true;
             }
         } else if (Artists.CONTENT_TYPE.equals(mimeType)) {
-            long id = parseIdFromIntent(intent, "artistId", "artist", -1);
+            long id = parseIdFromIntent(intent, "artistId", "artist");
             if (id >= 0) {
                 int position = intent.getIntExtra("position", 0);
                 MusicUtils.playArtist(this, id, position);
@@ -996,7 +997,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         /**
          * Constructor of <code>TimeHandler</code>
          */
-        public TimeHandler(final AudioPlayerActivity player) {
+        TimeHandler(final AudioPlayerActivity player) {
             mAudioPlayer = new WeakReference<>(player);
         }
 
@@ -1033,21 +1034,25 @@ public class AudioPlayerActivity extends FragmentActivity implements
         @Override
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
-            if (action.equals(MusicPlaybackService.META_CHANGED)) {
-                // Current info
-                mReference.get().updateNowPlayingInfo();
-                // Update the favorites icon
-                mReference.get().invalidateOptionsMenu();
-                mReference.get().updateQueueFragmentCurrentSong();
-            } else if (action.equals(MusicPlaybackService.PLAYSTATE_CHANGED)) {
-                // Set the play and pause image
-                mReference.get().mPlayPauseButton.updateState();
-            } else if (action.equals(MusicPlaybackService.REPEATMODE_CHANGED)
-                    || action.equals(MusicPlaybackService.SHUFFLEMODE_CHANGED)) {
-                // Set the repeat image
-                mReference.get().mRepeatButton.updateRepeatState();
-                // Set the shuffle image
-                mReference.get().mShuffleButton.updateShuffleState();
+            switch (action) {
+                case MusicPlaybackService.META_CHANGED:
+                    // Current info
+                    mReference.get().updateNowPlayingInfo();
+                    // Update the favorites icon
+                    mReference.get().invalidateOptionsMenu();
+                    mReference.get().updateQueueFragmentCurrentSong();
+                    break;
+                case MusicPlaybackService.PLAYSTATE_CHANGED:
+                    // Set the play and pause image
+                    mReference.get().mPlayPauseButton.updateState();
+                    break;
+                case MusicPlaybackService.REPEATMODE_CHANGED:
+                case MusicPlaybackService.SHUFFLEMODE_CHANGED:
+                    // Set the repeat image
+                    mReference.get().mRepeatButton.updateRepeatState();
+                    // Set the shuffle image
+                    mReference.get().mShuffleButton.updateShuffleState();
+                    break;
             }
         }
     }
