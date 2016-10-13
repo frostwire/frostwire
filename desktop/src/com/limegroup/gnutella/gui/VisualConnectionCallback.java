@@ -108,7 +108,7 @@ public final class VisualConnectionCallback implements ActivityCallback {
     @Override
     public void addDownload(BTDownload dl) {
         Runnable doWorkRunnable = new AddDownload(dl);
-        GUIMediator.safeInvokeAndWait(doWorkRunnable);
+        GUIMediator.safeInvokeLater(doWorkRunnable);
     }
 
     @Override
