@@ -227,13 +227,26 @@ public final class BTDownload implements BittorrentDownload {
         }
 
         float fp = th.status().progress();
+        TorrentStatus.State state = th.status().state();
 
-        if (Float.compare(fp, 1f) == 0) {
+        if (Float.compare(fp, 1f) == 0 && state != TorrentStatus.State.CHECKING_FILES) {
             return 100;
         }
 
         int p = (int) (th.status().progress() * 100);
-        return Math.min(p, 100);
+        if (p > 0) {
+            return Math.min(p, 100);
+        }
+        final long  received = getTotalBytesReceived();
+        if (getSize() == received) {
+            return 100;
+        }
+        if (received > 0) {
+            p = (int) ((getSize() * 100) / received);
+            return Math.min(p, 100);
+        }
+
+        return 0;
     }
 
     @Override
