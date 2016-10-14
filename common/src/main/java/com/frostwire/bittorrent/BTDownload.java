@@ -237,12 +237,13 @@ public final class BTDownload implements BittorrentDownload {
         if (p > 0) {
             return Math.min(p, 100);
         }
-        final long  received = getTotalBytesReceived();
-        if (getSize() == received) {
+        final long received = getTotalBytesReceived();
+        final long size = getSize();
+        if (size == received) {
             return 100;
         }
-        if (received > 0) {
-            p = (int) ((getSize() * 100) / received);
+        if (size > 0) {
+            p = (int) ((received * 100) / size);
             return Math.min(p, 100);
         }
 
