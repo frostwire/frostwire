@@ -180,7 +180,7 @@ public final class Offers {
         boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
         boolean isSupportingFW = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
         boolean paidForAdsRemoval = Products.disabledAds(PlayStore.getInstance());
-        return ((isBasic || (isDevelopment && isSupportingFW)) && !paidForAdsRemoval);
+        return (isBasic || isDevelopment) && isSupportingFW && !paidForAdsRemoval;
     }
 
     private static void tryBackToBackInterstitial(Activity activity) {
