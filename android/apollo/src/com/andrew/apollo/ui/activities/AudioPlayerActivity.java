@@ -75,6 +75,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
@@ -92,6 +93,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
         OnSeekBarChangeListener,
         DeleteDialog.DeleteDialogCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private static Logger LOG = Logger.getLogger(AudioPlayerActivity.class);
 
     // Message to refresh the time
     private static final int REFRESH_TIME = 1;
@@ -167,6 +170,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
     private WriteSettingsPermissionActivityHelper writeSettingsHelper;
     private GestureDetector gestureDetector;
 
+    // for removeAds display
+    private long removeAdsPurchaseTime = 0;
+
     /**
      * {@inheritDoc}
      */
@@ -236,7 +242,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         TextView removeAdsTextView = (TextView) findViewById(R.id.audio_player_remove_ads_text_link);
         View footerView = findViewById(R.id.audio_player_footer_two);
 
-        if (!Offers.removeAdsOffersEnabled()) {
+        if (!Offers.removeAdsOffersEnabled() || (removeAdsPurchaseTime > 0)    ) {
             removeAdsTextView.setVisibility(View.GONE);
             footerView.setVisibility(View.VISIBLE);
             removeAdsTextView.setOnClickListener(null);
@@ -248,8 +254,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 @Override
                 public void onClick(View view) {
                     Intent i = new Intent(AudioPlayerActivity.this, BuyActivity.class);
-                    startActivity(i); //start
-                    //startActivityForResult();
+                    startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
                 }
             });
         }
@@ -461,8 +466,13 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
+        if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
+                data != null &&
+                data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
+            // We (onActivityResult) are invoked before onResume()
+            removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
+            LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime="+removeAdsPurchaseTime);
+        } else if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
