@@ -785,6 +785,7 @@ public class SettingsActivity extends PreferenceActivity {
                                     continue;
                                 }
                                 PlayStore.getInstance().consume(p);
+                                ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, true);
                                 LOG.info(" - " + p.description() + " (" + p.sku() + ") force-consumed!");
                                 UIUtils.showToastMessage(preference.getContext(),
                                         "Product " + p.sku() + " forced-consumed.",
