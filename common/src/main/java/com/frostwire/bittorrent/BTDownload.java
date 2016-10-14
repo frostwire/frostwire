@@ -234,7 +234,7 @@ public final class BTDownload implements BittorrentDownload {
         }
 
         int p = (int) (th.status().progress() * 100);
-        if (p > 0) {
+        if (p > 0 && state != TorrentStatus.State.CHECKING_FILES) {
             return Math.min(p, 100);
         }
         final long received = getTotalBytesReceived();
