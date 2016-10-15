@@ -1,24 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-/*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
--->
+        <!--
+        /*
+         * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+         * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+         *
+         * This program is free software: you can redistribute it and/or modify
+         * it under the terms of the GNU General Public License as published by
+         * the Free Software Foundation, either version 3 of the License, or
+         * (at your option) any later version.
+         *
+         * This program is distributed in the hope that it will be useful,
+         * but WITHOUT ANY WARRANTY; without even the implied warranty of
+         * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+         * GNU General Public License for more details.
+         *
+         * You should have received a copy of the GNU General Public License
+         * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+         */
+        -->
 <resources>
+    <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * Chociaż bardzo zalecamy, <b> nie musisz mieć VPN aby korzystać z FrostWire. </b></p>]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nie zabezpieczone połączenie oznacza że wszystko co robisz na internecie (łącznie z <b>wyszukiwaniami, przesyłaniem wiadomości lub ściąganiem plików</b>) może być monitorowane przez każdego na twojej sieci oraz twojego usługodawce internetowego.<br><br>Aby efektywnie zabezpieczyć połączenie i <b>uchronić prywatnośc na internetcie</b>, polecamy ExpressVPN</b>.]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Łączysz się z internetem używając VPN. Jeżeli jeszcze nie używasz <b>ExpressVPN</b>, to gorąco polecamy ten serwis do zabezpieczania twojego połączenia internetowego i <b>ochrony prywatności</b>.]]></string>
+
+    <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ustawienia</string>
     <string name="activity_browse_peer_name">Wybierz Hosta</string>
@@ -285,7 +290,7 @@
     <string name="downloading_promotion">Pobieranie %s</string>
     <string name="activity_about_droidwire_description">FrostWire dla Android</string>
     <string name="download_type_not_supported">Pobieranie typy nie są obsługiwane</string>
-    <string name="im_on_it">Pracuję nad tym...</string>
+    <string name="im_on_it">Pracuję nad tym…</string>
     <string name="hint_transfers">Użyj "menu" dla większego wyboru akcji</string>
     <string name="torrent_settings">Ustawienia Torrentów</string>
     <string name="torrent_max_download_speed_summary">Maksymalna Szybkość Pobierania</string>
@@ -358,7 +363,7 @@
     <string name="support_frostwire_summary">Pokazuj reklamy aby wspierać rozwój tej aplikacji.</string>
     <string name="storage_preference_title">Wybierz Miejsce Zapisywania</string>
     <string name="storage_preference_summary">Miejsce domyślnie gdzie twoje pliki będą zapisywane.</string>
-    <string name="loading">Ładuję...</string>
+    <string name="loading">Ładuję…</string>
     <string name="wifi_sharing">Udostępnianie przez Wi-Fi</string>
     <string name="activity_mediaplayer_name">Odtwarzacz Multimedialny</string>
     <string name="stop">Zatrzymaj</string>
@@ -462,7 +467,8 @@
     <string name="cant_open_file_does_not_exist">Nie mogę otworzyć %1$s, plik nie istnieje.</string>
     <string name="saving_to_sd_card">Zapisuje na kartę SD.</string>
     <string name="help_translate_frostwire">Pomóż tłumaczyć FrostWire</string>
-    <string name="checking_ellipsis">Sprawdzanie...</string>
+    <string name="queued_for_checking">Zakolejkowane do sprawdzenia</string>
+    <string name="checking_ellipsis">Sprawdzanie…</string>
     <string name="downloading_metadata">Pobieranie metadanych</string>
     <string name="error_moving_incomplete">Błąd: Przenoszenie niekompletne</string>
     <string name="error_wrong_md5_hash">Błąd: Zły hash MD5</string>
@@ -517,12 +523,98 @@
     <string name="media_preview">%s podgląd</string>
     <string name="rating_reminder_description">Jeżeli lubisz FrostWire, prosimy o ocenę aplikacji.</string>
     <string name="transfers_context_menu_copy_magnet">Skopiuj Magnet</string>
-    <string name="thank_you">Wielkie Dzięki!</string> 
+    <string name="thank_you">Wielkie Dzięki!</string>
     <string name="rate_our_app">Oceń Aplikację</string>
-
     <string name="your_privacy_is_a_fundamental_right_html">Twoja prywatność jest podstawowym prawem człowieka.</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * Chociaż bardzo zalecamy, <b> nie musisz mieć VPN aby korzystać z FrostWire. </b></p>]]></string>
     <string name="unprotected_connections_visibility_bullet">Niezabezpieczone połączenie sprawia, że wszystko co robisz w Internecie, jak wyszukiwania, przeglądanie stron internetowych, wysłane wiadomości, e-maile i pobrane pliki, jest widoczne dla dostawcy Internetu jak i wszystkich w Twojej sieci. Rozważ VPN.</string>
     <string name="protected_connections_visibility_bullet">Cieszymy się że ochraniasz swoją prywatność używając VPN. Twoje połączenie jest bezpieczne.</string>
-    <string name="learn_more">Learn more</string>
+    <string name="learn_more">Dowiedz się więcej</string>
+    <string name="vpn_not_found">Brak VPNu. Polecamy zaszyfrowanie polączenia.</string>
+    <string name="error_connection_timed_out">Błąd: przekroczono limit czasu połączenia. Spróbuj jeszcze raz. </string>
+    <string name="request_again">Ponów żądanie</string>
+    <string name="unprotected_connection">niezabezpieczone</string>
+    <string name="buy_uppercase">KUP</string>
+    <string name="bittorrent">BitTorrent</string>
+    <string name="selected">wybrane</string>
+    <string name="bittorrent_off">BitTorrent wyłączony</string>
+    <string name="storage_picker_treeuri_error">Nieoczekiwany błąd wyboru ścieżki przechowywania</string>
+    <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Plik nie mógł być seedowany. BitTorrent pozostanie odłączony.</string>
+    <string name="protected_connection">VPN-zabezpieczony</string>
+    <string name="cheaper_than_parking">Tańszy niż Parkowanie</string>
+    <string name="dummy_price">$ 99.99</string>
+    <string name="the_file_could_not_be_seeded_enable_seeding">Plik nie mógł być seedowany. Włącz seedowanie w ustawieniach.</string>
+    <string name="vpn_money_back">30-dniowa gwarancja zwrotu pieniędzy</string>
+    <string name="vpn_what_you_get_with">Co dostajesz z </string>
+    <string name="one_time_purchase">Zakup jednorazowy</string>
+    <string name="activity_VPN">Połączenie</string>
+    <string name="one_year">1 rok</string>
+    <string name="i_have_read_and_agree_to_the">Przeczytałem i zgadzam się z</string>
+    <string name="scanning">Kończę - Skanuję</string>
+    <string name="according_to_settings_i_cant_seed_unless_wifi">Z twoich ustanień wynika że nie mogę rozpocząć seedowania kiedy Wi-Fi nie jest dostępna. Plik będzie gotowy do seedowania automatycznie kiedy powrócisz d io sieci Wi-Fi z aktywnym połączeniem z internetem</string>
+    <string name="vpn_found">VPN znaleziony. Połączenie zaszyfrowane.</string>
+    <string name="are_you_sure_delete_playlist">Czy na pewno chcesz usunąć playlistę %s</string>
+    <string name="storage_picker_treeuri_null">Nie ma wybranej ścieżki zachowywania plików</string>
+    <string name="best_value">Najlepsza Cena</string>
+    <string name="vpn_client_feature_2">Nieograniczona prędkość pobierania</string>
+    <string name="delete_files">Usuń pliki</string>
+    <string name="vpn_price">od $%1$.2f na miesiąc</string>
+    <string name="thirty_days">30 dni</string>
+    <string name="remove_ads_description">Sciągaj pliki i odtwarzaj muzykę bez reklam, wsparaj FrostWire</string>
+    <string name="dummy_title_bold">[Bold Title]</string>
+    <string name="storage_picker_treeuri_cant_write">FrostWire nie może zachować pliku na wybranej ścieżce zachowywania</string>
+    <string name="processing_payment">Przyjmuję płatność, odśwież za kilka sekund</string>
+    <string name="connection_header_title">Status połączenia:</string>
+    <string name="http_download_status_temp_dir_error">Folder tymczasowy nie istnieje lub nie może być stworzony</string>
+    <string name="notify_frostwire_is_running_summary">Pokaż stałe powiadomienie Androida ze statusem transferów </string>
+    <string name="storage_path">Ścieżka Zachowyania</string>
+    <string name="finishing">Kończę</string>
+    <string name="check_internet_connection">Sprawdź połączenie z internetem</string>
+    <string name="cheaper_than_coffee">Tańszy niż Kawa</string>
+    <string name="vpn_on_toast_notification">Jesteś połączony z VPN.</string>
+    <string name="haptic_feedback">Wibracja</string>
+    <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent jest wyłączony. Czy mam go włączyć dla ciebie?</string>
+    <string name="save_bandwidth">Oszczędzaj Bandwidth</string>
+    <string name="vpn_client_feature_4">24/7 obsługa klienta</string>
+    <string name="vpn_client_feature_1">Zaawansowane szyfrowanie</string>
+    <string name="vpn_client_feature_3">Całkowity brak zapisywania Twoich działań w przeglądarce</string>
+    <string name="no_trial_period_included">Nie obejmuje okres próbny</string>
+    <string name="bittorrent_off_data_saver_on">"BitTorrent wyłączony (Oszczędzacz Danych Włączony)"</string>
+    <string name="ad_free">Bez Reklam</string>
+    <string name="current_plan">Obecny Plan</string>
+    <string name="sd_permission_no_accessible_path">Wybrana ścieżka na karcie SD nie jest już dostępna. Naciśnij OK, aby wybrać ponownie. </string>
+    <string name="select_deselect_all">Zaznacz/Odznacz Wszystko</string>
+    <string name="get_vpn_client">Pobierz ExpressVPN</string>
+    <string name="frostwire_is_running">FrostWire jest uruchomiony</string>
+    <string name="select_option_below">Wybierz opcję poniżej:</string>
+    <string name="use_limetorrents">Używaj Limetorrents</string>
+    <string name="error_no_internet_connection">Błąd: Sprawdź połączenie z internetem</string>
+    <string name="invalid_filename">Nieprawidłowa nazwa pliku</string>
+    <string name="vpn_client">ExpressVPN</string>
+    <string name="wifi_network_unavailable">Sieć Wi-Fi Jest Niedostępna</string>
+    <string name="select_all">Zaznacz Wszystko</string>
+    <string name="cheaper_than_drinks">Tańszy niż Drinki</string>
+    <string name="pick_the_files_you_want_to_download_from_this_torrent">Wybierz pliki, które chcesz pobrać z tego torrentu</string>
+    <string name="automatic_renewal">Automatyczne Odnowienie</string>
+    <string name="seeding_is_currently_disabled">Seedowanie jest wyłączone w twoich ustawieniach. Czy mam je włączyć aby można było dzielić się tym plikiem?</string>
+    <string name="cheaper_than_lattes">Tańszy niż kawa latte</string>
+    <string name="vpn_off_toast_notification">Twoje połączenie może nie być prywatne.</string>
+    <string name="notify_frostwire_is_running">Powiadom jeżeli FrostWire jest uruchomiony</string>
+    <string name="dht_contacts">Kontakty DHT</string>
+    <string name="terms_of_use">Warunki Korzystania z Serwisu</string>
+    <string name="no_interruptions">Bez Przerw</string>
+    <string name="fetching_torrent_ellipsis">Pobieranie torrentu…</string>
+    <string name="visit_vpn_client">Odwiedź ExpressVPN</string>
+    <string name="enable_experimental">Funkcje Eksperymentalne</string>
+    <string name="cheaper_than_beer">Tańszy niż Sześciopak</string>
+    <string name="includes_3_day_free_trial">Zawiera 3-dniową gwarancję zwrotu pieniędzy. Polecamy.</string>
+    <string name="get_express_VPN">Pobierz ExpressVPN</string>
+    <string name="enable_seeding">Włącz seedowanie</string>
+    <string name="cheaper_than_gas">Tańszy niż Benzyna</string>
+    <string name="cheaper_than_cigarettes">Tańszy niż Szlugi</string>
+    <string name="days_left">dni pozostało</string>
+    <string name="six_months">6 miesięcy</string>
+    <string name="storage_picker_treeuri_not_directory">Wybrana ścieżka nie jest folderem</string>
+    <string name="protect_my_privacy">Ochraniaj moją prywatność</string>
+    <string name="keep_the_project_alive">Umożliwij rozwój tego projektu</string>
+    <string name="remove_ads">Usuń Reklamy</string>
 </resources>
