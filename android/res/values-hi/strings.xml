@@ -379,7 +379,7 @@
     <string name="ten_dollars">$10</string>
     <string name="saving_to_internal_memory">आंतरिक स्मृति के लिए सेविंग</string>
     <string name="dialog_desktop_upload_request_text_text">%1$s आप भेजना चाहता है %2$s योग %3$s</string>
-    <string name="choose_email_app">एक ईमेल अनुप्रयोग चुनें...</string>
+    <string name="choose_email_app">एक ईमेल अनुप्रयोग चुनें…</string>
     <string name="my_filetype">मेरे %s</string>
     <string name="accept">स्वीकार करना</string>
     <string name="paused">रोके गए</string>
@@ -539,7 +539,7 @@
     <string name="select_all">सभी का चयन करे</string>
     <string name="clear_search_cache_summary">साफ खोज कैश प्रविष्टियों</string>
     <string name="cheaper_than_drinks">पेय की तुलना में सस्ता</string>
-    <string name="restarting">शुरु होने के ...</string>
+    <string name="restarting">शुरु होने के…</string>
     <string name="file_descriptor_sd_mounted">इस फ़ाइल में एसडी कार्ड से हटा दिया गया था, या एसडी कार्ड तुम डाला है एक अलग से एक है।</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">फ़ाइलों उठाओ, आप इस धार से डाउनलोड करना चाहते</string>
     <string name="torrent_transfer_aborted_on_mobile_data">टोरेंट स्थानान्तरण शुरू कर देंगे नहीं है जब तक आप एक वाई-फाई नेटवर्क से कनेक्ट। (3 जी / 4 जी डेटा के उपयोग के बारे में अपने नेटवर्क सेटिंग्स की जाँच करें)</string>
@@ -563,7 +563,7 @@
     <string name="bittorrent_network_summary">संपर्क स्थिति</string>
     <string name="terms_of_use">उपयोग की शर्तें</string>
     <string name="no_interruptions">कोई रुकावट</string>
-    <string name="fetching_torrent_ellipsis">ला रहा है धार ...</string>
+    <string name="fetching_torrent_ellipsis">ला रहा है धार…</string>
     <string name="error_not_enough_peers">फिर, पर्याप्त नहीं साथियों प्रयास</string>
     <string name="support_frostwire_summary">विज्ञापन दिखाएं इस एप्लिकेशन के विकास का समर्थन करने के लिए।</string>
     <string name="visit_vpn_client">बेवसाइट देखना ExpressVPN</string>
