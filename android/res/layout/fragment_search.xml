@@ -48,7 +48,21 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
     />
+
     <include layout="@layout/view_remove_ads_notification" />
+    <include layout="@layout/view_less_results_notification" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="FROSTWIRE FEATURES:"
+        android:background="@color/black"
+        android:textColor="@color/basic_white"
+        android:textStyle="bold"
+        android:paddingBottom="12dp"
+        android:paddingTop="12dp"
+        android:paddingLeft="15dp"/>
+
     <LinearLayout
             android:id="@+id/fragment_search_adview_layout"
             android:layout_width="match_parent"
