@@ -7,7 +7,7 @@ FrostWire 1.8.2 - OCT/15/2016
  - jlibtorrent 1.2.0.0
  - applovin 6.3.2 update
  - inmobi 6.0.0 update
- - Translation updates for Spanish, Portuguese, French, German, Polish, Chinese
+ - Translation updates for Spanish, Portuguese, French, German, Polish, Chinese, Hindi
  - Crash fixes
 
 FrostWire 1.8.1 - SEP/15/2016
