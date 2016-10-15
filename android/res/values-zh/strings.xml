@@ -499,7 +499,7 @@
     <string name="your_installation_is_complete">您的安装完成。</string>
     <string name="error_connection_timed_out">错误：连接超时/丢弃。 再试一次。</string>
     <string name="request_again">再次请求</string>
-    <string name="restarting_summary">FrostWire将不会重新启动以使授权权限生效...</string>
+    <string name="restarting_summary">FrostWire将不会重新启动以使授权权限生效…</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire是一个文件浏览器和下载程序，因此它需要能够访问您的磁盘.\n\n没有您的权限FrostWire不能工作.\n\n想再试一次吗？</string>
     <string name="unprotected_connection">无保护</string>
     <string name="transfers_context_menu_copy_magnet_copied">磁铁已复制到剪贴簿</string>
@@ -509,7 +509,7 @@
     <string name="storage_picker_treeuri_error">选择存储路径时出现意外错误</string>
     <string name="wifi_seeding_has_been_turned_off">没有可用的Wifi，播种已关闭</string>
     <string name="send_feedback">发送反馈</string>
-    <string name="choose_email_app">选择电子邮件应用...</string>
+    <string name="choose_email_app">选择电子邮件应用…</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">无法为该文件设置种子。 BitTorrent将保持断开连接。</string>
     <string name="protected_connection">VPN保护</string>
     <string name="cheaper_than_parking">比停车场便宜</string>
@@ -528,7 +528,6 @@
     <string name="scanning">完成 - 扫描</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">根据您的设置，我不能开始播种，除非你在Wi-Fi。 当您返回启用互联网的Wi-Fi网络时，该文件将可以自动播种.</string>
     <string name="ringtone_not_set">无法设置铃声</string>
-    <string name="torrent_transfer_enqueued_on_mobile_data">当您连接到Wi-Fi网络时，torrent传输将自动开始下载（检查您的有关3G/4G数据使用的网络设置）</string>
     <string name="vpn_found">找到VPN。 连接加密.</string>
     <string name="are_you_sure_delete_playlist">您确定要删除播放列表 %s</string>
     <string name="storage_picker_treeuri_null">未选择存储路径</string>
@@ -539,9 +538,7 @@
     <string name="vpn_price">从 $%1$.2f 每月</string>
     <string name="thirty_days">30天</string>
     <string name="remove_ads_description">享受无广告的体验，支持FrostWire</string>
-    <string name="wifi_sharing_disabled">Wifi共享已关闭.\n\nWi-Fi共享可用于在连接到同一Wi-Fi网络的FrostWire供电设备之间本地共享文件.\n\n&lt;a href=\"http://bit.ly/1tVReSt\"&gt;了解更多.&lt;/a&gt;</string>
     <string name="dummy_title_bold">[粗体标题]</string>
-    <string name="anonymous_usage_statistics_summary">发送匿名使用统计信息。 没有可以识别您的信息将存储在磁盘上或通过网络发送.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire无法在所选的存储路径上写入</string>
     <string name="processing_payment">处理付款，在几秒钟内刷新</string>
     <string name="connection_header_title">连接状态：</string>
@@ -555,8 +552,7 @@
     <string name="vpn_on_toast_notification">您已连接到VPN。</string>
     <string name="haptic_feedback">触觉反馈</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent已断开连接。 你想让我为你开始吗？</string>
-    <string name="shutting_down">正在关闭...</string>
-    <string name="torrent_transfer_consuming_mobile_data">警告：此洪流传输正在使用您的3G/4G数据。 （如果您希望仅在WiFi上使用BitTorrent，请检查您的网络设置）</string>
+    <string name="shutting_down">正在关闭…</string>
     <string name="learn_more">了解更多</string>
     <string name="save_bandwidth">保存带宽</string>
     <string name="vpn_client_feature_4">24/7客户支持</string>
@@ -585,7 +581,7 @@
     <string name="wifi_network_unavailable">Wifi网络不可用</string>
     <string name="select_all">全选</string>
     <string name="cheaper_than_drinks">比饮料便宜</string>
-    <string name="restarting">正在重新启动...</string>
+    <string name="restarting">正在重新启动…</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">选择您想从这个种子下载的文件</string>
     <string name="torrent_transfer_aborted_on_mobile_data">在您连接到Wi-Fi网络之前，Torrent传输将无法启动（请检查有关3G/4G数据使用情况的网络设置）</string>
     <string name="automatic_renewal">自动续订</string>
@@ -613,7 +609,6 @@
     <string name="thank_you">谢谢！</string>
     <string name="get_express_VPN">获取ExpressVPN</string>
     <string name="enable_seeding">启用种子</string>
-    <string name="storage_setting_confirm_dialog_text">我理解，所有由FrostWire下载到SD卡的文件将被从该设备卸载FrostWire应用程序的时候被删除，我不会保持FrostWire LLC责任任何文件丢失.</string>
     <string name="cheaper_than_gas">比气体便宜</string>
     <string name="rate_our_app">为我们的应用程序</string>
     <string name="cheaper_than_cigarettes">比香烟便宜</string>
