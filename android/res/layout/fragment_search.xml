@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
     />
-
+    <include layout="@layout/view_remove_ads_notification" />
     <LinearLayout
             android:id="@+id/fragment_search_adview_layout"
             android:layout_width="match_parent"
