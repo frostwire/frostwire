@@ -20,9 +20,9 @@
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="130dp"
+    android:layout_height="140dp"
     android:background="@drawable/view_remove_ads_background_blue"
-    android:gravity="center_vertical"
+    android:gravity="center_vertical|center_horizontal"
     android:orientation="horizontal">
 
 
@@ -35,7 +35,7 @@
         android:text="@string/support_frostwire"
         android:textAllCaps="true"
         android:textColor="@color/app_text_primary"
-        android:textSize="16sp"
+        android:textSize="@dimen/text_medium"
         android:textStyle="bold" />
 
     <TextView
@@ -46,7 +46,7 @@
         android:layout_centerHorizontal="true"
         android:text="@string/remove_ads"
         android:textColor="@color/basic_white"
-        android:textSize="24sp"
+        android:textSize="@dimen/text_xx_large"
         android:textStyle="bold" />
 
 
@@ -58,6 +58,22 @@
         android:layout_marginRight="25dp"
         android:layout_toLeftOf="@+id/view_remove_ads_notification_title"
         android:src="@drawable/ad_remove_speaker_white" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@+id/view_remove_ads_notification_subtitle"
+        android:background="@drawable/activity_buy_interstitial_ad_free_button_background"
+        android:padding="12dp"
+        android:text="@string/remove_ads"
+        android:textAllCaps="true"
+        android:textColor="@color/app_dark_blue"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/view_remove_ads_notification_close"
