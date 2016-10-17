@@ -1,11 +1,11 @@
-frostwire (6.3.7) stable; urgency=high
+frostwire (6.4.0) stable; urgency=high
   * New jlibtorrent 1.2.0.0
   * Fixes media player for macOS Sierra (10.12)
   * Improved transfer progress calculation
   * Fixes issue showing active transfers on launch
   * Crash fixes
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 13 Sep 2016 17:40:28 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 17 Sep 2016 12:27:00 -0600
 
 
 frostwire (6.3.6) stable; urgency=high
