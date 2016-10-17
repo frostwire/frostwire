@@ -550,7 +550,7 @@
     <string name="one_year">1 rok</string>
     <string name="i_have_read_and_agree_to_the">Przeczytałem i zgadzam się z</string>
     <string name="scanning">Kończę - Skanuję</string>
-    <string name="according_to_settings_i_cant_seed_unless_wifi">Z twoich ustanień wynika że nie mogę rozpocząć seedowania kiedy Wi-Fi nie jest dostępna. Plik będzie gotowy do seedowania automatycznie kiedy powrócisz d io sieci Wi-Fi z aktywnym połączeniem z internetem</string>
+    <string name="according_to_settings_i_cant_seed_unless_wifi">Z twoich ustanień wynika że nie mogę rozpocząć seedowania kiedy Wi-Fi nie jest dostępna. Plik będzie gotowy do seedowania automatycznie kiedy powrócisz do sieci Wi-Fi z aktywnym połączeniem z internetem.</string>
     <string name="vpn_found">VPN znaleziony. Połączenie zaszyfrowane.</string>
     <string name="are_you_sure_delete_playlist">Czy na pewno chcesz usunąć playlistę %s</string>
     <string name="storage_picker_treeuri_null">Nie ma wybranej ścieżki zachowywania plików</string>
