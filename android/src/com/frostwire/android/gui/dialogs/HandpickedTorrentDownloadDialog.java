@@ -24,30 +24,41 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
-import com.frostwire.android.offers.Offers;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
+import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.util.Logger;
+import com.frostwire.jlibtorrent.swig.add_torrent_params;
+import com.frostwire.jlibtorrent.swig.error_code;
+import com.frostwire.jlibtorrent.swig.libtorrent;
+import com.frostwire.jlibtorrent.swig.tcp_endpoint_vector;
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created on 4/19/16.
  *
  * @author gubatron
  * @author aldenml
- *
  */
-@SuppressWarnings("WeakerAccess") // We need the class to be public so that the dialog can be rotated (via Reflection)
+@SuppressWarnings("WeakerAccess")
+// We need the class to be public so that the dialog can be rotated (via Reflection)
 public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<HandpickedTorrentDownloadDialog.TorrentFileEntry> {
     private static Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialog.class);
     private TorrentInfo torrentInfo;
@@ -75,7 +86,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         // we are able to use such Bundle to create our adapter.
         final TorrentFileEntryList torrentInfoList = getTorrentInfoList(tinfo.files());
         boolean[] allChecked = new boolean[torrentInfoList.list.size()];
-        for (int i=0; i < allChecked.length; i++) {
+        for (int i = 0; i < allChecked.length; i++) {
             allChecked[i] = true;
         }
 
@@ -99,7 +110,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         TorrentFileEntryList entryList = new TorrentFileEntryList();
         if (fileStorage != null && fileStorage.numFiles() > 0) {
             int n = fileStorage.numFiles();
-            for (int i=0; i < n; i++) {
+            for (int i = 0; i < n; i++) {
                 entryList.add(new TorrentFileEntry(i,
                         fileStorage.fileName(i),
                         fileStorage.filePath(i),
@@ -136,7 +147,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (outState!=null && torrentInfo != null) {
+        if (outState != null && torrentInfo != null) {
             outState.putByteArray(BUNDLE_KEY_TORRENT_INFO_DATA, torrentInfo.bencode());
             outState.putString(BUNDLE_KEY_MAGNET_URI, magnetUri);
         }
@@ -149,7 +160,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         Bundle arguments = getArguments();
         if (this.torrentInfo == null &&
                 arguments != null &&
-            (torrentInfoData=arguments.getByteArray(BUNDLE_KEY_TORRENT_INFO_DATA))!=null) {
+                (torrentInfoData = arguments.getByteArray(BUNDLE_KEY_TORRENT_INFO_DATA)) != null) {
             torrentInfo = TorrentInfo.bdecode(torrentInfoData);
             magnetUri = arguments.getString(BUNDLE_KEY_MAGNET_URI, null);
         }
@@ -166,6 +177,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
 
     private static class TorrentFileEntryList {
         final List<TorrentFileEntry> list = new ArrayList<>();
+
         public void add(TorrentFileEntry entry) {
             list.add(entry);
         }
@@ -288,10 +300,10 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
 
         private void startTorrentPartialDownload(final Context context, List<TorrentFileEntry> results) {
             if (context == null ||
-                !Ref.alive(dlgRef) ||
-                results == null ||
-                dlgRef.get().getList() == null ||
-                results.size() > dlgRef.get().getList().size()) {
+                    !Ref.alive(dlgRef) ||
+                    results == null ||
+                    dlgRef.get().getList() == null ||
+                    results.size() > dlgRef.get().getList().size()) {
                 LOG.warn("can't startTorrentPartialDownload()");
                 return;
             }
@@ -307,15 +319,38 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
                 @Override
                 public void run() {
                     try {
+                        String magnet = theDialog.getMagnetUri();
+                        List<TcpEndpoint> peers = parsePeers(magnet);
+
                         BTEngine.getInstance().download(theDialog.getTorrentInfo(),
                                 null,
                                 selection,
-                                theDialog.getMagnetUri());
+                                peers);
                         UIUtils.showTransfersOnDownloadStart(context);
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) {
+                    }
                 }
             });
+        }
 
+        private static List<TcpEndpoint> parsePeers(String magnet) {
+            if (magnet == null || magnet.isEmpty() || magnet.startsWith("http")) {
+                return Collections.emptyList();
+            }
+
+            add_torrent_params params = add_torrent_params.create_instance();
+            // TODO: replace this with the public API
+            error_code ec = new error_code();
+            libtorrent.parse_magnet_uri(magnet, params, ec);
+            tcp_endpoint_vector v = params.getPeers();
+            int size = (int) v.size();
+            ArrayList<TcpEndpoint> l = new ArrayList<>();
+
+            for (int i = 0; i < size; i++) {
+                l.add(new TcpEndpoint(v.get(i)));
+            }
+
+            return l;
         }
     }
 

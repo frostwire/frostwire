@@ -23,16 +23,24 @@ import com.frostwire.bittorrent.CopyrightLicenseBroker;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.jlibtorrent.FileStorage;
+import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.util.Logger;
+import com.frostwire.jlibtorrent.swig.add_torrent_params;
+import com.frostwire.jlibtorrent.swig.error_code;
+import com.frostwire.jlibtorrent.swig.libtorrent;
+import com.frostwire.jlibtorrent.swig.tcp_endpoint_vector;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.UserAgentGenerator;
 import com.limegroup.gnutella.gui.GUIMediator;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -229,12 +237,12 @@ public class TorrentFetcherDownload implements BTDownload {
         });
     }
 
-    private void downloadTorrent(final byte[] data, final String magnetUri) {
+    private void downloadTorrent(final byte[] data, final List<TcpEndpoint> peers) {
         if (relativePath != null) {
             try {
                 TorrentInfo ti = TorrentInfo.bdecode(data);
                 boolean[] selection = calculateSelection(ti, relativePath);
-                BTEngine.getInstance().download(ti, null, selection, magnetUri);
+                BTEngine.getInstance().download(ti, null, selection, peers);
             } catch (Throwable e) {
                 LOG.error("Error downloading torrent", e);
             }
@@ -254,7 +262,7 @@ public class TorrentFetcherDownload implements BTDownload {
                             }
                         }
                         TorrentInfo ti = TorrentInfo.bdecode(data);
-                        BTEngine.getInstance().download(ti, null, selection, magnetUri);
+                        BTEngine.getInstance().download(ti, null, selection, peers);
                         GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
                     } catch (Throwable e) {
                         LOG.error("Error downloading torrent", e);
@@ -317,7 +325,7 @@ public class TorrentFetcherDownload implements BTDownload {
 
                 if (data != null) {
                     try {
-                        downloadTorrent(data, uri);
+                        downloadTorrent(data, parsePeers(uri));
                     } finally {
                         cancel();
                     }
@@ -329,5 +337,25 @@ public class TorrentFetcherDownload implements BTDownload {
                 LOG.error("Error downloading torrent from uri", e);
             }
         }
+    }
+
+    private static List<TcpEndpoint> parsePeers(String magnet) {
+        if (magnet == null || magnet.isEmpty() || magnet.startsWith("http")) {
+            return Collections.emptyList();
+        }
+
+        add_torrent_params params = add_torrent_params.create_instance();
+        // TODO: replace this with the public API
+        error_code ec = new error_code();
+        libtorrent.parse_magnet_uri(magnet, params, ec);
+        tcp_endpoint_vector v = params.getPeers();
+        int size = (int) v.size();
+        ArrayList<TcpEndpoint> l = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            l.add(new TcpEndpoint(v.get(i)));
+        }
+
+        return l;
     }
 }

@@ -109,7 +109,7 @@ public final class AndroidPlatform extends AbstractPlatform {
     private static FileSystem buildFileSystem(Application app) {
         FileSystem fs;
 
-        if (Build.VERSION.SDK_INT >= VERSION_CODE_LOLLIPOP) {
+        if (false) {//(Build.VERSION.SDK_INT >= VERSION_CODE_LOLLIPOP) {
             LollipopFileSystem lfs = new LollipopFileSystem(app);
             PosixCalls w = new PosixCalls(lfs);
             w.swigReleaseOwnership();

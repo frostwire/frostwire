@@ -18,13 +18,37 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.*;
-import com.frostwire.jlibtorrent.alerts.*;
-import com.frostwire.jlibtorrent.swig.*;
+import com.frostwire.jlibtorrent.AlertListener;
+import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.jlibtorrent.Pair;
+import com.frostwire.jlibtorrent.Priority;
+import com.frostwire.jlibtorrent.SessionManager;
+import com.frostwire.jlibtorrent.SessionParams;
+import com.frostwire.jlibtorrent.SettingsPack;
+import com.frostwire.jlibtorrent.TcpEndpoint;
+import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.Vectors;
+import com.frostwire.jlibtorrent.alerts.Alert;
+import com.frostwire.jlibtorrent.alerts.AlertType;
+import com.frostwire.jlibtorrent.alerts.ExternalIpAlert;
+import com.frostwire.jlibtorrent.alerts.FastresumeRejectedAlert;
+import com.frostwire.jlibtorrent.alerts.ListenFailedAlert;
+import com.frostwire.jlibtorrent.alerts.ListenSucceededAlert;
+import com.frostwire.jlibtorrent.alerts.TorrentAlert;
+import com.frostwire.jlibtorrent.swig.bdecode_node;
+import com.frostwire.jlibtorrent.swig.byte_vector;
+import com.frostwire.jlibtorrent.swig.entry;
+import com.frostwire.jlibtorrent.swig.error_code;
+import com.frostwire.jlibtorrent.swig.libtorrent;
+import com.frostwire.jlibtorrent.swig.session_params;
+import com.frostwire.jlibtorrent.swig.settings_pack;
+import com.frostwire.jlibtorrent.swig.string_int_pair;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -35,7 +59,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import static com.frostwire.jlibtorrent.alerts.AlertType.*;
+import static com.frostwire.jlibtorrent.alerts.AlertType.EXTERNAL_IP;
+import static com.frostwire.jlibtorrent.alerts.AlertType.FASTRESUME_REJECTED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_FAILED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_SUCCEEDED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_ADDED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_LOG;
 
 /**
  * @author gubatron
@@ -231,7 +260,7 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    public void download(TorrentInfo ti, File saveDir, boolean[] selection, String magnetUrlParams) {
+    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers) {
         if (swig() == null) {
             return;
         }
@@ -262,7 +291,7 @@ public final class BTEngine extends SessionManager {
             }
         }
 
-        download(ti, saveDir, priorities, null, magnetUrlParams);
+        download(ti, saveDir, priorities, null, peers);
 
         if (!torrentHandleExists) {
             File torrent = saveTorrent(ti);
@@ -558,7 +587,7 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    private void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, String magnetUrlParams) {
+    private void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, List<TcpEndpoint> peers) {
 
         TorrentHandle th = find(ti.infoHash());
 
@@ -580,9 +609,7 @@ public final class BTEngine extends SessionManager {
                 th.resume();
             }
         } else { // new download
-            // TODO: restore the last parameter
-            download(ti, saveDir, resumeFile, priorities, null);
-            //session.asyncAddTorrent(ti, saveDir, priorities, resumeFile);
+            download(ti, saveDir, resumeFile, priorities, peers);
         }
     }
 
