@@ -32,7 +32,7 @@ public final class Constants {
     }
 
     public static final boolean IS_BASIC_AND_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
-    public static final boolean IS_PLUS_OR_DEBUG = BuildConfig.FLAVOR.equals("plus") || BuildConfig.BUILD_TYPE.equals("debug");
+    public static final boolean IS_PLUS_OR_DEBUG = BuildConfig.FLAVOR.contains("plus") || BuildConfig.BUILD_TYPE.equals("debug");
     public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic");
 
     private static final String BUILD_PREFIX = !IS_GOOGLE_PLAY_DISTRIBUTION ? "1000" : "";
