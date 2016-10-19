@@ -67,12 +67,22 @@ def changeApkOutput(variant) {
     }
 }
 
+def removeExplodedFile(group, name, version, exclude) {
+    exclude.each {
+        String path = "${group}/${name}/${version}/${it}"
+        File file = file("${buildDir}/intermediates/exploded-aar/${path}")
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+}
+
 project.ext.versionCode = manifestVersionCode()
 project.ext.versionName = manifestVersionName()
 
 android {
 
-    compileSdkVersion 16
+    compileSdkVersion 17
     buildToolsVersion '24.0.2'
 
     defaultConfig {
@@ -87,7 +97,7 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            res.srcDirs = ['res', 'apollo/res']
+            res.srcDirs = ['res', 'apollo/res', "material"]
             aidl.srcDirs = ['src', 'apollo/src']
             assets.srcDirs = ['assets']
             java {
@@ -144,7 +154,8 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:24.2.1'
+    //compile 'com.android.support:support-v4:24.2.1'
+    compile "com.android.support:design:24.2.1"
     compile 'com.google.android.gms:play-services-ads-lite:9.6.1'
     compile 'com.google.android.gms:play-services-base:9.6.1'
     compile 'com.inmobi.monetization:inmobi-ads:6.0.0'
@@ -156,6 +167,48 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+tasks.create("excludeMaterialResources") << {
+    removeExplodedFile("com.android.support", "appcompat-v7", "24.2.1",
+            ["res/values-ldltr-v21/values-ldltr-v21.xml",
+             "res/values-v17/values-v17.xml",
+             "res/values-v21/values-v21.xml",
+             "res/values-v22/values-v22.xml",
+             "res/values-v23/values-v23.xml",
+             "res/drawable-v21/abc_action_bar_item_background_material.xml",
+             "res/drawable-v21/abc_btn_colored_material.xml",
+             "res/drawable-v23/abc_control_background_material.xml",
+             "res/color-v23/abc_color_highlight_material.xml"])
+
+    // TODO: review these in detail
+    removeExplodedFile("com.android.support", "appcompat-v7", "24.2.1",
+            ["res/drawable/abc_ic_ab_back_material.xml",
+             "res/drawable/abc_ic_arrow_drop_right_black_24dp.xml",
+             "res/drawable/abc_ic_clear_material.xml",
+             "res/drawable/abc_ic_go_search_api_material.xml",
+             "res/drawable/abc_ic_menu_overflow_material.xml",
+             "res/drawable/abc_ic_search_api_material.xml",
+             "res/drawable/abc_ic_voice_search_api_material.xml",
+             "res/drawable/abc_ratingbar_indicator_material.xml",
+             "res/drawable/abc_ratingbar_material.xml",
+             "res/drawable/abc_ratingbar_small_material.xml",
+             "res/drawable/abc_vector_test.xml"])
+
+    removeExplodedFile("com.android.support", "design", "24.2.1",
+            ["res/values-v21/values-v21.xml",
+             "res/anim-v21/design_bottom_sheet_slide_in.xml",
+             "res/anim-v21/design_bottom_sheet_slide_out.xml"])
+
+    // TODO: review these in detail
+    removeExplodedFile("com.android.support", "design", "24.2.1",
+            ["res/drawable/design_ic_visibility.xml"])
+}
+
+tasks.whenTaskAdded({
+    if (it.name.matches(/^process.*Resources$/)) {
+        it.dependsOn excludeMaterialResources
+    }
+})
 
 class DeployRelease extends DefaultTask {
 
