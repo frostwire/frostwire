@@ -63,6 +63,7 @@ import static com.frostwire.jlibtorrent.alerts.AlertType.EXTERNAL_IP;
 import static com.frostwire.jlibtorrent.alerts.AlertType.FASTRESUME_REJECTED;
 import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_FAILED;
 import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_SUCCEEDED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.PEER_LOG;
 import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_ADDED;
 import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_LOG;
 
@@ -81,6 +82,7 @@ public final class BTEngine extends SessionManager {
             EXTERNAL_IP.swig(),
             FASTRESUME_REJECTED.swig(),
             TORRENT_LOG.swig(),
+            PEER_LOG.swig(),
             AlertType.LOG.swig()
     };
 
@@ -648,6 +650,7 @@ public final class BTEngine extends SessionManager {
                     onFastresumeRejected((FastresumeRejectedAlert) alert);
                     break;
                 case TORRENT_LOG:
+                case PEER_LOG:
                 case LOG:
                     printAlert(alert);
                     break;
