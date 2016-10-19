@@ -260,10 +260,6 @@
         <meta-data android:name="applovin.sdk.verbose_logging" android:value="false"/>
         <!-- end of AppLovin -->
 
-        <!-- MobFox -->
-        <!--<activity android:name="com.mobfox.sdk.interstitialads.InterstitialActivity"></activity>-->
-        <!-- end of MobFox -->
-
         <!-- services -->
 
         <service android:name="com.frostwire.android.gui.services.EngineService"

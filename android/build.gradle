@@ -31,7 +31,6 @@ buildscript {
 repositories {
     mavenCentral()
     jcenter()
-    maven { url "https://jitpack.io" }
 }
 
 def manifestVersionCode() {
@@ -102,11 +101,8 @@ android {
             assets.srcDirs = ['assets']
             java {
                 srcDir '../common/src/main/java'
-
                 srcDir 'apollo/src'
                 srcDir 'src'
-
-                exclude "**/MobFox*.java"
             }
         }
 
@@ -154,13 +150,11 @@ android {
 }
 
 dependencies {
-    //compile 'com.android.support:support-v4:24.2.1'
     compile "com.android.support:design:24.2.1"
     compile 'com.google.android.gms:play-services-ads-lite:9.6.1'
     compile 'com.google.android.gms:play-services-base:9.6.1'
     compile 'com.inmobi.monetization:inmobi-ads:6.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    //compile 'com.github.mobfox:MobFox-Android-SDK-Core:2.1.4'
 
     compile "com.frostwire:jlibtorrent-android-arm:1.2.0.0-beta5"
     compile "com.frostwire:jlibtorrent-android-x86:1.2.0.0-beta5"
@@ -180,7 +174,6 @@ tasks.create("excludeMaterialResources") << {
              "res/drawable-v23/abc_control_background_material.xml",
              "res/color-v23/abc_color_highlight_material.xml"])
 
-    // TODO: review these in detail
     removeExplodedFile("com.android.support", "appcompat-v7", "24.2.1",
             ["res/drawable/abc_ic_ab_back_material.xml",
              "res/drawable/abc_ic_arrow_drop_right_black_24dp.xml",
@@ -199,7 +192,6 @@ tasks.create("excludeMaterialResources") << {
              "res/anim-v21/design_bottom_sheet_slide_in.xml",
              "res/anim-v21/design_bottom_sheet_slide_out.xml"])
 
-    // TODO: review these in detail
     removeExplodedFile("com.android.support", "design", "24.2.1",
             ["res/drawable/design_ic_visibility.xml"])
 }
