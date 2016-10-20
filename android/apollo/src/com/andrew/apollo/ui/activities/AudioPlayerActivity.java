@@ -549,6 +549,12 @@ public class AudioPlayerActivity extends FragmentActivity implements
         mIsPaused = false;
 
         try {
+            mAlbumArtAd.destroy();
+        } catch (Throwable ignored) {
+            LOG.error(ignored.getMessage(), ignored);
+        }
+
+        try {
             mTimeHandler.removeMessages(REFRESH_TIME);
         } catch (Throwable ignored) {
             LOG.error(ignored.getMessage(), ignored);
@@ -560,7 +566,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
         }
         try {
             unregisterReceiver(mPlaybackStatus);
-        } catch (final Throwable ignore) {
+        } catch (final Throwable ignored) {
+            LOG.error(ignored.getMessage(), ignored);
         }
     }
 
