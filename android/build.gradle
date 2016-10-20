@@ -170,7 +170,6 @@ dependencies {
 tasks.create("excludeMaterialResources") << {
     removeExplodedFile("com.android.support", "appcompat-v7", "24.2.1",
             ["res/values-ldltr-v21/values-ldltr-v21.xml",
-             "res/values-v17/values-v17.xml",
              "res/values-v21/values-v21.xml",
              "res/values-v22/values-v22.xml",
              "res/values-v23/values-v23.xml",
