@@ -78,6 +78,8 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+import com.mopub.mobileads.MoPubErrorCode;
+import com.mopub.mobileads.MoPubView;
 
 import java.lang.ref.WeakReference;
 
@@ -116,6 +118,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     // Artist name
     private TextView mArtistName;
+
+    // Ad on top of Album art
+    private MoPubView mAlbumArtAd;
 
     // Album art
     private ImageView mAlbumArt;
@@ -542,7 +547,13 @@ public class AudioPlayerActivity extends FragmentActivity implements
     protected void onDestroy() {
         super.onDestroy();
         mIsPaused = false;
-        mTimeHandler.removeMessages(REFRESH_TIME);
+
+        try {
+            mTimeHandler.removeMessages(REFRESH_TIME);
+        } catch (Throwable ignored) {
+            LOG.error(ignored.getMessage(), ignored);
+        }
+
         if (musicPlaybackService != null) {
             MusicUtils.unbindFromService(mToken);
             mToken = null;
@@ -613,12 +624,58 @@ public class AudioPlayerActivity extends FragmentActivity implements
         // Progress
         mProgress = (SeekBar) findViewById(android.R.id.progress);
 
+        initAlbumArtBanner();
+
         // Set the repeat listener for the previous button
         mPreviousButton.setRepeatListener(mRewindListener);
         // Set the repeat listener for the next button
         mNextButton.setRepeatListener(mFastForwardListener);
         // Update the progress
         mProgress.setOnSeekBarChangeListener(this);
+    }
+
+    private void initAlbumArtBanner() {
+        // Album art Ad
+        mAlbumArtAd = (MoPubView) findViewById(R.id.audio_player_mopubview);
+        mAlbumArtAd.setAdUnitId("c737d8a55b2e41189aa1532ae0520ad1");
+        mAlbumArtAd.loadAd();
+
+        StringBuilder keywords = new StringBuilder("music,audio,ringtone");
+        String artistName = MusicUtils.getArtistName();
+        String albumName = MusicUtils.getAlbumName();
+        if (artistName != null) {
+            keywords.append(",").append(artistName);
+        }
+        if (albumName != null) {
+            keywords.append(",").append(albumName);
+        }
+        mAlbumArtAd.setKeywords(keywords.toString());
+        mAlbumArtAd.setBannerAdListener(new MoPubView.BannerAdListener() {
+            @Override
+            public void onBannerLoaded(MoPubView banner) {
+                LOG.info("onBannerLoaded()");
+            }
+
+            @Override
+            public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
+                LOG.info("onBannerFailed");
+            }
+
+            @Override
+            public void onBannerClicked(MoPubView banner) {
+                LOG.info("onBannerClicked");
+            }
+
+            @Override
+            public void onBannerExpanded(MoPubView banner) {
+                LOG.info("onBannerExpanded");
+            }
+
+            @Override
+            public void onBannerCollapsed(MoPubView banner) {
+                LOG.info("onBannerCollapsed");
+            }
+        });
     }
 
     /**

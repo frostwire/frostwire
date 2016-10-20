@@ -133,11 +133,23 @@
             </FrameLayout>
 
 
-            <View
+            <!-- TODO FRAME LAYOUT HERE TO LAYER ALBUM ART AND MOPUB ON TOP -->
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_alignTop="@+id/audio_player_album_art"
-                android:background="@drawable/layout_divider_1_gray" />
+                android:layout_height="wrap_content">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignTop="@+id/audio_player_album_art"
+                    android:background="@drawable/layout_divider_1_gray" />
+
+                <com.mopub.mobileads.MoPubView
+                    android:id="@+id/audio_player_mopubview"
+                    android:layout_width="fill_parent"
+                    android:layout_height="250dp"
+                    />
+            </FrameLayout>
+
 
             <FrameLayout
                 android:id="@+id/audio_player_pager_container"

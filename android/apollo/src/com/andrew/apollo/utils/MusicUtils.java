@@ -114,14 +114,16 @@ public final class MusicUtils {
             return;
         }
         final ContextWrapper mContextWrapper = token.mWrappedContext;
-        final ServiceBinder mBinder = mConnectionMap.remove(mContextWrapper);
-        if (mBinder == null) {
-            return;
-        }
-        mContextWrapper.unbindService(mBinder);
-        if (mConnectionMap.isEmpty()) {
-            musicPlaybackService = null;
-        }
+        try {
+            final ServiceBinder mBinder = mConnectionMap.remove(mContextWrapper);
+            if (mBinder == null) {
+                return;
+            }
+            mContextWrapper.unbindService(mBinder);
+            if (mConnectionMap.isEmpty()) {
+                musicPlaybackService = null;
+            }
+        } catch (Throwable ignored) { LOG.error(ignored.getMessage(), ignored); }
     }
 
     public static void requestMusicPlaybackServiceShutdown(Context context) {
