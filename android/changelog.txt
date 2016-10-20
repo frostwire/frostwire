@@ -1,3 +1,7 @@
+FrostWire 1.8.3 - OCT/20/2016
+ - Fixes crash that occurred on some transfers larger than 6Gb
+ - Fixes bug that would cause torrent connections to be choked unnecessarily
+
 FrostWire 1.8.2 - OCT/18/2016
  - New haptic feedback on most important actions
  - Settings: New 'Select All' checkbox to select/unselect active search engines
@@ -8,8 +12,6 @@ FrostWire 1.8.2 - OCT/18/2016
  - applovin 6.3.2 update
  - inmobi 6.0.0 update
  - Translation updates for Spanish, Portuguese, French, German, Polish, Chinese, Hindi and Dutch
- - Fixes crash that occurred on some transfers larger than 6Gb
- - Fixes bug that would cause connections to be choked unnecessarily
  - Crash fixes
 
 FrostWire 1.8.1 - SEP/15/2016
