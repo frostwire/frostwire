@@ -1,3 +1,6 @@
+import groovy.swing.SwingBuilder
+import groovy.xml.Namespace
+
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
@@ -36,7 +39,7 @@ repositories {
 def manifestVersionCode() {
     def manifestFile = file(project.projectDir.absolutePath + '/AndroidManifest.xml')
 
-    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
     def xml = new XmlParser().parse(manifestFile)
 
     return Integer.parseInt(xml.attributes()[ns.versionCode].toString())
@@ -45,7 +48,7 @@ def manifestVersionCode() {
 def manifestVersionName() {
     def manifestFile = file(project.projectDir.absolutePath + '/AndroidManifest.xml')
 
-    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
     def xml = new XmlParser().parse(manifestFile)
 
     return xml.attributes()[ns.versionName].toString()
@@ -216,7 +219,7 @@ class DeployRelease extends DefaultTask {
     def version = project.ext.versionName
     def build = project.ext.versionCode
 
-    def runCmd(cmd) {
+    static def runCmd(cmd) {
         println(cmd)
 
         def p = Runtime.getRuntime().exec(cmd)
@@ -260,7 +263,7 @@ gradle.taskGraph.whenReady { taskGraph ->
         def myKeyPassword = ""
 
         if (System.console() == null) {
-            new groovy.swing.SwingBuilder().edt {
+            new SwingBuilder().edt {
                 dialog(modal: true,
                         title: 'Enter keystore data',
                         alwaysOnTop: true,
