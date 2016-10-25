@@ -5,6 +5,8 @@
 -keepnames class ** { *; }
 -keepnames enum ** { *; }
 
+-keepclassmembers class com.frostwire.jlibtorrent.swig.libtorrent_jni { *; }
+
 -dontwarn com.google.android.**
 -dontwarn com.inmobi.**
 -dontwarn com.moat.**
