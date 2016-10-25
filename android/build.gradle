@@ -161,8 +161,8 @@ dependencies {
     compile 'com.inmobi.monetization:inmobi-ads:6.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    compile "com.frostwire:jlibtorrent-android-arm:1.2.0.0-beta6"
-    compile "com.frostwire:jlibtorrent-android-x86:1.2.0.0-beta6"
+    compile "com.frostwire:jlibtorrent-android-arm:1.2.0.0"
+    compile "com.frostwire:jlibtorrent-android-x86:1.2.0.0"
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
