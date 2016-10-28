@@ -99,7 +99,6 @@ android {
             res.srcDirs = ['res', 'apollo/res', "material"]
             aidl.srcDirs = ['src', 'apollo/src']
             assets.srcDirs = ['assets']
-            jniLibs.srcDirs = ["libs"]
             java {
                 srcDir '../common/src/main/java'
                 srcDir 'apollo/src'
@@ -157,8 +156,8 @@ dependencies {
     compile 'com.inmobi.monetization:inmobi-ads:6.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    //compile "com.frostwire:jlibtorrent-android-arm:1.2.0.0"
-    compile "com.frostwire:jlibtorrent-android-x86:1.2.0.0"
+    compile "com.frostwire:jlibtorrent-android-arm:1.2.0.1"
+    compile "com.frostwire:jlibtorrent-android-x86:1.2.0.1"
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
