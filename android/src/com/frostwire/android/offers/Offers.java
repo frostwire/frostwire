@@ -170,6 +170,12 @@ public final class Offers {
         }
     }
 
+    public static boolean adsDisabled() {
+        boolean userDisabledAdSupport = Constants.IS_PLUS_OR_DEBUG && !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
+        boolean userPaidForAdRemoval = Products.disabledAds(PlayStore.getInstance());
+        return userDisabledAdSupport || userPaidForAdRemoval;
+    }
+
     /**
      * @return true only for flavor basic or for plus_debug and we haven't paid for ad removals, or
      * it's plus supporting frostwire with ads
