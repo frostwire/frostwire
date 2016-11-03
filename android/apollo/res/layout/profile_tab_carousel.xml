@@ -44,12 +44,6 @@
                 android:id="@+id/profile_tab_carousel_tab_two"
                 layout="@layout/profile_tab" />
         </LinearLayout>
-
-        <View
-            android:id="@+id/profile_tab_carousel_shadow"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/profile_photo_shadow_height"
-            android:background="?android:attr/windowContentOverlay" />
     </LinearLayout>
 
 </view>
