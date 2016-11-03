@@ -1,65 +1,65 @@
-  /*
- * Copyright (C) 2012-2015 Andrew Neal, Angel Leon, Alden Torres Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
- */
+/*
+* Copyright (C) 2012-2015 Andrew Neal, Angel Leon, Alden Torres Licensed under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with the
+* License. You may obtain a copy of the License at
+* http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
+* or agreed to in writing, software distributed under the License is
+* distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied. See the License for the specific language
+* governing permissions and limitations under the License.
+*/
 
 package com.andrew.apollo;
 
-  import android.Manifest;
-  import android.app.AlarmManager;
-  import android.app.PendingIntent;
-  import android.app.Service;
-  import android.content.BroadcastReceiver;
-  import android.content.ComponentName;
-  import android.content.ContentResolver;
-  import android.content.Context;
-  import android.content.Intent;
-  import android.content.IntentFilter;
-  import android.content.SharedPreferences;
-  import android.content.pm.PackageManager;
-  import android.database.Cursor;
-  import android.graphics.Bitmap;
-  import android.media.AudioManager;
-  import android.media.AudioManager.OnAudioFocusChangeListener;
-  import android.media.MediaMetadataRetriever;
-  import android.media.MediaPlayer;
-  import android.media.RemoteControlClient;
-  import android.media.audiofx.AudioEffect;
-  import android.net.Uri;
-  import android.os.Handler;
-  import android.os.HandlerThread;
-  import android.os.IBinder;
-  import android.os.Looper;
-  import android.os.Message;
-  import android.os.PowerManager;
-  import android.os.PowerManager.WakeLock;
-  import android.os.RemoteException;
-  import android.os.SystemClock;
-  import android.provider.MediaStore;
-  import android.provider.MediaStore.Audio.AlbumColumns;
-  import android.provider.MediaStore.Audio.AudioColumns;
-  import android.support.v4.content.ContextCompat;
+import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.AudioManager;
+import android.media.AudioManager.OnAudioFocusChangeListener;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
+import android.media.RemoteControlClient;
+import android.media.audiofx.AudioEffect;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.os.RemoteException;
+import android.os.SystemClock;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Audio.AlbumColumns;
+import android.provider.MediaStore.Audio.AudioColumns;
+import android.support.v4.content.ContextCompat;
 
-  import com.andrew.apollo.cache.ImageCache;
-  import com.andrew.apollo.cache.ImageFetcher;
-  import com.andrew.apollo.provider.FavoritesStore;
-  import com.andrew.apollo.provider.RecentStore;
-  import com.andrew.apollo.ui.activities.AudioPlayerActivity;
-  import com.andrew.apollo.utils.MusicUtils;
-  import com.frostwire.util.Logger;
-  import com.frostwire.util.Ref;
+import com.andrew.apollo.cache.ImageCache;
+import com.andrew.apollo.cache.ImageFetcher;
+import com.andrew.apollo.provider.FavoritesStore;
+import com.andrew.apollo.provider.RecentStore;
+import com.andrew.apollo.ui.activities.AudioPlayerActivity;
+import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
-  import java.io.IOException;
-  import java.lang.ref.WeakReference;
-  import java.util.LinkedList;
-  import java.util.Random;
-  import java.util.TreeSet;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.LinkedList;
+import java.util.Random;
+import java.util.TreeSet;
 
 /**
  * A background {@link Service} used to keep music playing between activities
@@ -172,6 +172,11 @@ public class MusicPlaybackService extends Service {
      * Used by the alarm intent to shutdown the service after being idle
      */
     public static final String SHUTDOWN_ACTION = "com.andrew.apollo.shutdown";
+
+    /**
+     * Simple player stopped playing the sound (completed or was stopped)
+     */
+    public static final String SIMPLE_PLAYSTATE_STOPPED = "com.andrew.apollo.simple.stopped";
 
     static final String CMDNAME = "command";
 
@@ -305,9 +310,17 @@ public class MusicPlaybackService extends Service {
     };
 
     /**
+     * The columns used to retrieve any info from the current track
+     */
+    private static final String[] SIMPLE_PROJECTION = new String[]{
+            "_id", MediaStore.Audio.Media.DATA
+    };
+
+
+    /**
      * Keeps a mapping of the track history
      */
-    private static final LinkedList<Integer> mHistory =  new LinkedList<>();
+    private static final LinkedList<Integer> mHistory = new LinkedList<>();
 
     /**
      * Used to shuffle the tracks
@@ -333,6 +346,18 @@ public class MusicPlaybackService extends Service {
      * The media player
      */
     private MultiPlayer mPlayer;
+
+    /**
+     * Simple Media Player used for out of order sounds playback
+     * Trumped by mPlayer play actions
+     */
+    private MediaPlayer mSimplePlayer;
+
+    /**
+     * Path to file currently played by SimplePlayer
+     */
+    private String mSimplePlayerPlayingFile;
+
 
     /**
      * The path of the current file to play
@@ -695,6 +720,12 @@ public class MusicPlaybackService extends Service {
             mPlayer = null;
         }
 
+        // Release simple player
+        if (mSimplePlayer != null) {
+            mSimplePlayer.release();
+            mSimplePlayer = null;
+        }
+
         // Remove the audio focus listener and lock screen controls
         if (mAudioManager != null) {
             mAudioManager.abandonAudioFocus(mAudioFocusListener);
@@ -775,12 +806,12 @@ public class MusicPlaybackService extends Service {
                 || (!force && isPlaying())
                 || mPausedByTransientLossOfFocus
                 || mPlayerHandler.hasMessages(TRACK_ENDED)) {
-            LOG.info("releaseServiceUiAndStop(force="+force+") aborted: isPlaying()="+isPlaying());
+            LOG.info("releaseServiceUiAndStop(force=" + force + ") aborted: isPlaying()=" + isPlaying());
             return false;
         }
 
         if (force && isPlaying()) {
-            LOG.info("releaseServiceUiAndStop(force=true) : isPlaying()="+isPlaying());
+            LOG.info("releaseServiceUiAndStop(force=true) : isPlaying()=" + isPlaying());
             stopPlayer();
         }
 
@@ -949,7 +980,8 @@ public class MusicPlaybackService extends Service {
 
     private void cancelShutdown() {
         if (mAlarmManager != null && mShutdownIntent != null) {
-            if (D) LOG.info("Cancelling delayed shutdown. Was it previously scheduled? : " + mShutdownScheduled);
+            if (D)
+                LOG.info("Cancelling delayed shutdown. Was it previously scheduled? : " + mShutdownScheduled);
             mAlarmManager.cancel(mShutdownIntent);
             mShutdownScheduled = false;
         }
@@ -978,6 +1010,36 @@ public class MusicPlaybackService extends Service {
         if (mPlayer != null && mPlayer.isInitialized()) {
             LOG.info("stopPlayer()");
             mPlayer.stop();
+        }
+    }
+
+    public void playSimple(String path) {
+        String justStoppedFile = mSimplePlayerPlayingFile;
+        if (mSimplePlayer != null) {
+            stopSimplePlayer();
+        }
+        if (!path.equals(justStoppedFile)) {
+            mSimplePlayer = MediaPlayer.create(this, Uri.parse(path));
+            final String pathCopy = path;
+            mSimplePlayerPlayingFile = path;
+            mSimplePlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mSimplePlayerPlayingFile = null;
+                    notifySimpleStopped(pathCopy);
+                }
+            });
+            mSimplePlayer.start();
+        }
+    }
+
+    private void stopSimplePlayer() {
+        if (mSimplePlayer != null) {
+            mSimplePlayer.reset();
+            mSimplePlayer.release();
+            notifySimpleStopped(mSimplePlayerPlayingFile);
+            mSimplePlayer = null;
+            mSimplePlayerPlayingFile = null;
         }
     }
 
@@ -1454,6 +1516,17 @@ public class MusicPlaybackService extends Service {
         if (what.equals(PLAYSTATE_CHANGED)) {
             mNotificationHelper.updatePlayState(isPlaying());
         }
+    }
+
+    /**
+     * Notify the change-receivers that simple player has stopped
+     */
+    private void notifySimpleStopped(final String path) {
+        if (D) LOG.info("notifySimplePlayerStopped");
+
+        final Intent intent = new Intent(SIMPLE_PLAYSTATE_STOPPED);
+        intent.putExtra("path", path);
+        sendStickyBroadcast(intent);
     }
 
     /**
@@ -1979,6 +2052,43 @@ public class MusicPlaybackService extends Service {
     }
 
     /**
+     * Returns the current audio for simple player ID
+     *
+     * @return The current simple player track ID
+     */
+    private long getCurrentSimplePlayerAudioId() {
+        synchronized (this) {
+            long id = -1;
+            if (mSimplePlayerPlayingFile != null) {
+                id = getIdFromPath(mSimplePlayerPlayingFile, MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
+                if (id == -1) {
+                    id = getIdFromPath(mSimplePlayerPlayingFile, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                }
+            }
+            return id;
+        }
+    }
+
+    /**
+     * Returns the current id of file at given path in Selected uri or -1 if not found
+     *
+     * @return File id
+     */
+    private long getIdFromPath(String path, Uri uri) {
+        String selectionClause = MediaStore.Audio.Media.DATA + " = ?";
+        String[] selectionArgs = {path};
+        Cursor cursor = getContentResolver().query(uri, SIMPLE_PROJECTION, selectionClause, selectionArgs, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToNext();
+            long id = cursor.getLong(IDCOLIDX);
+            cursor.close();
+            return id;
+        }
+        return -1;
+    }
+
+
+    /**
      * Seeks the current track to a specific time
      *
      * @param position The time to seek to
@@ -2122,6 +2232,8 @@ public class MusicPlaybackService extends Service {
         if (mAudioManager == null) {
             return;
         }
+
+        stopSimplePlayer();
 
         int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -3051,6 +3163,21 @@ public class MusicPlaybackService extends Service {
             }
         }
 
+        @Override
+        public void playSimple(String path) throws RemoteException {
+            if (Ref.alive(mService)) {
+                mService.get().playSimple(path);
+            }
+        }
+
+        @Override
+        public void stopSimplePlayer() throws RemoteException {
+            if (Ref.alive(mService)) {
+                mService.get().stopSimplePlayer();
+            }
+        }
+
+
         /**
          * {@inheritDoc}
          */
@@ -3215,6 +3342,11 @@ public class MusicPlaybackService extends Service {
                 return mService.get().getAudioId();
             }
             return -1;
+        }
+
+        @Override
+        public long getCurrentSimplePlayerAudioId() throws RemoteException {
+            return mService.get().getCurrentSimplePlayerAudioId();
         }
 
         /**

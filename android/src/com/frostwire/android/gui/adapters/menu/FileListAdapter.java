@@ -29,6 +29,8 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
@@ -45,6 +47,7 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -78,11 +81,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         this.downloadButtonClickListener = new DownloadButtonClickListener();
 
         checkSDStatus();
-        if(fileType == Constants.FILE_TYPE_RINGTONES) {
-            setCheckboxesVisibility(false);
-        } else {
-            setCheckboxesVisibility(true);
-        }
+        setCheckboxesVisibility(fileType != Constants.FILE_TYPE_RINGTONES);
     }
 
     public byte getFileType() {
@@ -135,7 +134,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 items.add(new OpenMenuAction(context, fd.filePath, fd.mime));
             }
 
-            if (( fd.fileType == Constants.FILE_TYPE_AUDIO && numChecked <= 1) || fd.fileType == Constants.FILE_TYPE_RINGTONES) {
+            if ((fd.fileType == Constants.FILE_TYPE_AUDIO && numChecked <= 1) || fd.fileType == Constants.FILE_TYPE_RINGTONES) {
                 items.add(new SetAsRingtoneMenuAction(context, fd));
             }
 
@@ -210,13 +209,27 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             notifyDataSetChanged();
         } else {
             if (fd.filePath != null && fd.mime != null) {
-                UIUtils.openFile(ctx, fd.filePath, fd.mime);
+                //special treatment of ringtones
+                if (fd.fileType == Constants.FILE_TYPE_RINGTONES) {
+                    playRingtone(fd);
+                } else {
+                    UIUtils.openFile(ctx, fd.filePath, fd.mime);
+                }
             } else {
                 // it will automatically remove the 'Open' entry.
                 new MenuBuilder(getMenuAdapter(view)).show();
                 UIUtils.showShortMessage(ctx, R.string.cant_open_file);
             }
         }
+    }
+
+    private void playRingtone(FileDescriptor fileDescriptor) {
+        //pause real music if any
+        if (MusicUtils.isPlaying()) {
+            MusicUtils.playOrPause();
+        }
+        MusicUtils.playSimple(fileDescriptor.filePath);
+        notifyDataSetChanged();
     }
 
     private void ensureCorrectMimeType(FileDescriptor fd) {
@@ -238,8 +251,14 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             Uri uri = Uri.withAppendedPath(ImageLoader.APPLICATION_THUMBNAILS_URI, fd.album);
             thumbnailLoader.load(uri, fileThumbnail, 96, 96);
         } else {
-            if (in(fileType, Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_RINGTONES)) {
+            if (in(fileType, Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS)) {
                 if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD())) {
+                    fileThumbnail.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.STOP);
+                } else {
+                    fileThumbnail.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.PLAY);
+                }
+            } else if (fileType == Constants.FILE_TYPE_RINGTONES) {
+                if (fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD())) {
                     fileThumbnail.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.STOP);
                 } else {
                     fileThumbnail.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.PLAY);
@@ -303,7 +322,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         BrowseThumbnailImageButton downloadButton = findView(view, R.id.view_browse_peer_list_item_download);
 
-        if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD())) {
+        if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD()) || fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD())) {
             downloadButton.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.STOP);
         } else {
             downloadButton.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.PLAY);
