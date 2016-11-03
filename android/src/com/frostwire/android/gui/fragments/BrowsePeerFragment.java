@@ -286,6 +286,16 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         initRadioButton(v, R.id.fragment_browse_peer_radio_torrents, Constants.FILE_TYPE_TORRENTS);
     }
 
+    private void updateCheckAllStatusInSearchBar(){
+        if (adapter != null && filesBar != null) {
+            if(adapter.getFileType() == Constants.FILE_TYPE_RINGTONES){
+                filesBar.hideCheckAll();
+            } else {
+                filesBar.showCheckAll();
+            }
+        }
+    }
+
     private RadioButton initRadioButton(View v, int viewId, final byte fileType) {
         RadioButton button = findView(v, viewId);
         Resources r = button.getResources();
@@ -391,6 +401,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
         }
 
+        updateCheckAllStatusInSearchBar();
         restoreListViewScrollPosition();
     }
 
@@ -430,7 +441,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     }
                 }
             };
-            adapter.setCheckboxesVisibility(true);
             restorePreviouslyChecked();
             restorePreviousFilter();
             list.setAdapter(adapter);
