@@ -134,6 +134,18 @@ public class BrowsePeerSearchBarView extends RelativeLayout {
         inputSearch.setText(text);
     }
 
+    public void hideCheckAll() {
+        if(checkAll != null) {
+            checkAll.setVisibility(View.GONE);
+        }
+    }
+
+    public void showCheckAll() {
+        if(checkAll != null) {
+            checkAll.setVisibility(View.VISIBLE);
+        }
+    }
+
     public interface OnActionListener {
 
         void onCheckAll(View v, boolean isChecked);

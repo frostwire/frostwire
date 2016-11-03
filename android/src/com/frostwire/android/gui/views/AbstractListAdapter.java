@@ -524,7 +524,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         public void onClick(View v) {
             if (showMenuOnClick) {
                 MenuAdapter adapter = getMenuAdapter(v);
-                if (adapter != null) {
+                if (adapter != null && adapter.getCount()>0) {
                     trackDialog(new MenuBuilder(adapter).show());
                     return;
                 }
@@ -536,7 +536,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private final class ViewOnLongClickListener implements OnLongClickListener {
         public boolean onLongClick(View v) {
             MenuAdapter adapter = getMenuAdapter(v);
-            if (adapter != null) {
+            if (adapter != null && adapter.getCount()>0) {
                 trackDialog(new MenuBuilder(adapter).show());
                 return true;
             }

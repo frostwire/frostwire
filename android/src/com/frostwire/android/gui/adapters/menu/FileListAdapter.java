@@ -78,6 +78,11 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         this.downloadButtonClickListener = new DownloadButtonClickListener();
 
         checkSDStatus();
+        if(fileType == Constants.FILE_TYPE_RINGTONES) {
+            setCheckboxesVisibility(false);
+        } else {
+            setCheckboxesVisibility(true);
+        }
     }
 
     public byte getFileType() {
@@ -130,7 +135,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 items.add(new OpenMenuAction(context, fd.filePath, fd.mime));
             }
 
-            if ((fd.fileType == Constants.FILE_TYPE_RINGTONES || fd.fileType == Constants.FILE_TYPE_AUDIO) && numChecked <= 1) {
+            if (( fd.fileType == Constants.FILE_TYPE_AUDIO && numChecked <= 1) || fd.fileType == Constants.FILE_TYPE_RINGTONES) {
                 items.add(new SetAsRingtoneMenuAction(context, fd));
             }
 
@@ -360,6 +365,11 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     }
 
     private boolean showSingleOptions(List<FileDescriptor> checked, FileDescriptor fd) {
+        //if ringtone - ignore other checked items
+        if (fd.fileType == Constants.FILE_TYPE_RINGTONES) {
+            return true;
+        }
+
         if (checked.size() > 1) {
             return false;
         }
