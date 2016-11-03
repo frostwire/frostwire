@@ -129,11 +129,11 @@
                     style="@style/NoSearchResultsLink"
                     android:textSize="@dimen/text_size_x_large"
                     android:gravity="center"
+                    android:layout_gravity="center"
                     />
             </FrameLayout>
 
 
-            <!-- TODO FRAME LAYOUT HERE TO LAYER ALBUM ART AND MOPUB ON TOP -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -143,11 +143,23 @@
                     android:layout_alignTop="@+id/audio_player_album_art"
                     android:background="@drawable/layout_divider_1_gray" />
 
-                <com.mopub.mobileads.MoPubView
-                    android:id="@+id/audio_player_mopubview"
-                    android:layout_width="fill_parent"
-                    android:layout_height="250dp"
-                    />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <ImageButton
+                        android:id="@+id/audio_player_dismiss_mopubview_button"
+                        android:src="@drawable/full_screen_close"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|right"
+                        android:background="@null"/>
+                    <com.mopub.mobileads.MoPubView
+                        android:id="@+id/audio_player_mopubview"
+                        android:layout_width="fill_parent"
+                        android:layout_height="250dp"
+                        />
+                </LinearLayout>
             </FrameLayout>
 
 
