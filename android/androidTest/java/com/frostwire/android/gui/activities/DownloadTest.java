@@ -1,28 +1,40 @@
  package com.frostwire.android.gui.activities;
 
+ import android.preference.CheckBoxPreference;
  import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
+ import android.support.test.espresso.DataInteraction;
+ import android.support.test.espresso.Espresso;
+ import android.support.test.espresso.NoMatchingViewException;
+ import android.support.test.espresso.ViewAssertion;
  import android.support.test.espresso.ViewInteraction;
  import android.support.test.espresso.matcher.BoundedMatcher;
-import android.support.test.rule.ActivityTestRule;
+ import android.support.test.espresso.matcher.PreferenceMatchers;
+ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.ListView;
+ import android.widget.CheckBox;
+ import android.widget.LinearLayout;
+ import android.widget.ListView;
+ import android.widget.RelativeLayout;
+ import android.widget.TextView;
 
-import com.frostwire.android.R;
+ import com.frostwire.android.R;
 import com.frostwire.android.test.utils.PreferencesManipulator;
 import com.frostwire.android.test.utils.WaitUntilListViewNotEmptyIdlingResource;
 import com.frostwire.android.test.utils.WaitUntilVisibleIdlingResource;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.transfers.Transfer;
 
-import org.hamcrest.Description;
+ import org.hamcrest.CoreMatchers;
+ import org.hamcrest.CustomMatcher;
+ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
+ import org.hamcrest.Matchers;
+ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,12 +45,16 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.pressKey;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
+ import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
+ import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
  import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
  import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
  import static android.support.test.espresso.matcher.ViewMatchers.withId;
  import static android.support.test.espresso.matcher.ViewMatchers.withParent;
+ import static android.support.test.espresso.matcher.ViewMatchers.withResourceName;
+ import static android.support.test.espresso.matcher.ViewMatchers.withTagKey;
+ import static android.support.test.espresso.matcher.ViewMatchers.withText;
  import static org.hamcrest.CoreMatchers.is;
  import static org.hamcrest.core.AllOf.allOf;
 
@@ -46,6 +62,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class DownloadTest {
+
+    boolean mSelectAllIsChecked;
 
     @Rule
     public ActivityTestRule activityRule = new ActivityTestRule<MainActivity>(MainActivity.class) {
@@ -59,8 +77,6 @@ public class DownloadTest {
     };
 
     @Test
-
-
     public void searchAudio_download() {
 
         //muckachina test part one (filtering Archive source)
@@ -73,7 +89,7 @@ public class DownloadTest {
                         isDisplayed()));
         linearLayout.perform(click());
 
-        ViewInteraction checkableRelativeLayout = onView(
+        final ViewInteraction checkableRelativeLayout = onView(
                 allOf(childAtPosition(
                         allOf(withId(R.id.left_drawer),
                                 withParent(withId(R.id.activity_main_left_drawer))),
@@ -89,9 +105,20 @@ public class DownloadTest {
                         isDisplayed()));
         linearLayout2.perform(click());
 
-        ViewInteraction checkBox5 = onView(
-                allOf(withId(R.id.view_preference_checkbox_header_checkbox), isDisplayed()));
-        checkBox5.perform(click()); //Here only Archive is selected
+
+        ViewInteraction selectAllInteraction = onView(allOf(withId(R.id.view_preference_checkbox_header_checkbox), isDisplayed()));
+
+        // Let's make sure Archive.org is the only one checked, by deselecting all, archive.org
+        // should remain checked.
+        selectAllInteraction.check(new ViewAssertion() {
+            @Override
+            public void check(View view, NoMatchingViewException noViewFoundException) {
+                CheckBox checkbox = (CheckBox) view;
+                mSelectAllIsChecked = checkbox.isChecked();
+            }
+        });
+        ensureArchiveOrgIsTheOnlyOne(selectAllInteraction);
+
 
         ViewInteraction linearLayout3 = onView(
                 allOf(withContentDescription("Search Settings, Navigate up"),
@@ -162,11 +189,6 @@ public class DownloadTest {
 
         //Layout of list item in list view inside of fragment_transfers: R.layout.view_transfer_item_list_item
         //Make sure we're downloading the file we chose from the search
-        ExactFileSearchResultMatcher downloadingChosenResultMatcher = new ExactFileSearchResultMatcher(matchFirstFileSearchResult.mSearchResult);
-        onData(downloadingChosenResultMatcher)
-                .inAdapterView(withId(R.id.fragment_transfers_list))
-                .check(matches(isDisplayed()));
-
         //Switch to the completed list
         onView(withId(R.id.fragment_transfers_button_select_completed))
                 .check(matches(isDisplayed()))
@@ -178,13 +200,31 @@ public class DownloadTest {
         );
         Espresso.registerIdlingResources(idlingResource);
 
+
+        ExactFileSearchResultMatcher downloadingChosenResultMatcher = new ExactFileSearchResultMatcher(matchFirstFileSearchResult.mSearchResult);
+        onData(downloadingChosenResultMatcher)
+                .inAdapterView(withId(R.id.fragment_transfers_list))
+                .check(matches(isDisplayed()));
+
         onData(downloadingChosenResultMatcher)
                 .inAdapterView(withId(R.id.fragment_transfers_list))
                 .check(matches(isDisplayed()));
 
         Espresso.unregisterIdlingResources(idlingResource);
-    //}
+    }
 
+    private void ensureArchiveOrgIsTheOnlyOne(ViewInteraction selectAllInteraction) {
+        // (we do this outside the ViewAssertion code as otherwise we freeze the UI thread (doPerform) and the check never
+        // ends.
+        // if it's not checked... let's make sure we check it, and uncheck it.
+        if (!mSelectAllIsChecked) {
+            selectAllInteraction.perform(click());
+            selectAllInteraction.perform(click());
+        }
+        // if it's checked, let's make sure we uncheck it.
+        else {
+            selectAllInteraction.perform(click());
+        }
     }
 
     //muckachina test second part
@@ -236,7 +276,7 @@ public class DownloadTest {
     }
 
     private class ExactFileSearchResultMatcher extends BoundedMatcher<Object, Transfer> {
-        public FileSearchResult mSearchResultToMatch;
+        public final FileSearchResult mSearchResultToMatch;
 
         public ExactFileSearchResultMatcher(FileSearchResult searchResult) {
             super(Transfer.class);
