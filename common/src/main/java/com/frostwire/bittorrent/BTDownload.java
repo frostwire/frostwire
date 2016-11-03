@@ -76,7 +76,7 @@ public final class BTDownload implements BittorrentDownload {
     public BTDownload(BTEngine engine, TorrentHandle th) {
         this.engine = engine;
         this.th = th;
-        this.savePath = new File(th.getSavePath());
+        this.savePath = new File(th.savePath());
         this.created = new Date(th.status().addedTime());
         TorrentInfo ti = th.torrentFile();
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
@@ -98,7 +98,7 @@ public final class BTDownload implements BittorrentDownload {
         if (th == null) {
             return null;
         }
-        return th.getName();
+        return th.name();
     }
 
     @Override
@@ -114,7 +114,7 @@ public final class BTDownload implements BittorrentDownload {
             }
         }
 
-        return count != 1 ? th.getName() : FilenameUtils.getName(th.torrentFile().files().filePath(index));
+        return count != 1 ? th.name() : FilenameUtils.getName(th.torrentFile().files().filePath(index));
     }
 
     public long getSize() {
@@ -309,7 +309,7 @@ public final class BTDownload implements BittorrentDownload {
 
             TorrentInfo ti = th.torrentFile();
             if (ti != null && ti.swig() != null) {
-                return new File(savePath.getAbsolutePath(), ti.numFiles() > 1 ? th.getName() : ti.files().filePath(0));
+                return new File(savePath.getAbsolutePath(), ti.numFiles() > 1 ? th.name() : ti.files().filePath(0));
             }
         } catch (Throwable e) {
             LOG.warn("Could not retrieve download content save path", e);
@@ -557,7 +557,7 @@ public final class BTDownload implements BittorrentDownload {
                 return s;
             }
 
-            long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
+            long[] progress = th.fileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
 
             TorrentInfo ti = th.torrentFile();
             if (ti == null) {

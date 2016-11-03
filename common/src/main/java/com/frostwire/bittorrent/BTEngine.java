@@ -125,6 +125,7 @@ public final class BTEngine extends SessionManager {
 
         sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
         sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
+        sp.set_str(settings_pack.string_types.dht_bootstrap_nodes.swigValue(), dhtBootstrapNodes());
 
         SessionParams params = loadSettings();
         super.start(params);
@@ -137,10 +138,6 @@ public final class BTEngine extends SessionManager {
 
     @Override
     protected void onAfterStart() {
-        for (Pair<String, Integer> r : defaultRouters()) {
-            string_int_pair p = new string_int_pair(r.first, r.second);
-            swig().add_dht_router(p);
-        }
         fireStarted();
     }
 
@@ -706,13 +703,16 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    private static List<Pair<String, Integer>> defaultRouters() {
-        List<Pair<String, Integer>> list = new LinkedList<Pair<String, Integer>>();
+    private static String dhtBootstrapNodes() {
+        StringBuilder sb = new StringBuilder();
 
-        list.add(new Pair<>("router.bittorrent.com", 6881));
-        list.add(new Pair<>("dht.transmissionbt.com", 6881));
+        sb.append("dht.libtorrent.org:25401").append(",");
+        sb.append("router.bittorrent.com:6881").append(",");
+        sb.append("dht.transmissionbt.com:6881").append(",");
+        // for DHT IPv6
+        sb.append("outer.silotis.us:6881");
 
-        return list;
+        return sb.toString();
     }
 
     private static SettingsPack defaultSettings() {

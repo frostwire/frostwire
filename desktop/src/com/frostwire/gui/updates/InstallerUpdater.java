@@ -483,7 +483,7 @@ public class InstallerUpdater implements Runnable {
             buf.append(' ');
         }
         buf.append(" TO:");
-        buf.append(manager.getSavePath());
+        buf.append(manager.savePath());
         System.out.println(buf.toString());
     }
 

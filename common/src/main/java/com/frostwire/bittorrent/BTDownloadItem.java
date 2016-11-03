@@ -44,7 +44,7 @@ public class BTDownloadItem implements TransferItem {
         this.th = th;
         this.index = index;
 
-        this.file = new File(th.getSavePath(), filePath);
+        this.file = new File(th.savePath(), filePath);
         this.name = file.getName();
         this.size = fileSize;
 
@@ -82,7 +82,7 @@ public class BTDownloadItem implements TransferItem {
             return 0;
         }
 
-        long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
+        long[] progress = th.fileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
         return progress[index];
     }
 
