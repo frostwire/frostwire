@@ -38,6 +38,7 @@ public class BrowseThumbnailImageButton extends ImageButton {
 
     public void setOverlayState(MediaPlaybackOverlay.MediaPlaybackState state) {
         overlay.setOverlayState(state);
+        this.invalidate();
     }
 
     @Override

@@ -33,7 +33,6 @@ import com.frostwire.android.R;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class BrowsePeerSearchBarView extends RelativeLayout {
 
@@ -85,7 +84,7 @@ public class BrowsePeerSearchBarView extends RelativeLayout {
         inputSearch.setOnActionListener(inputSearchListener);
         listener.onClear();
     }
-    
+
     public String getText() {
         return inputSearch.getText();
     }
@@ -134,15 +133,9 @@ public class BrowsePeerSearchBarView extends RelativeLayout {
         inputSearch.setText(text);
     }
 
-    public void hideCheckAll() {
-        if(checkAll != null) {
-            checkAll.setVisibility(View.GONE);
-        }
-    }
-
-    public void showCheckAll() {
-        if(checkAll != null) {
-            checkAll.setVisibility(View.VISIBLE);
+    public void setCheckAllVisible(boolean visible) {
+        if (checkAll != null) {
+            checkAll.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
     }
 

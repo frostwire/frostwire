@@ -9,6 +9,8 @@ interface IApolloService
     void stop();
     void pause();
     void play();
+    void playSimple(String path);
+    void stopSimplePlayer();
     void prev();
     void next();
     void enqueue(in long [] list, int action);
@@ -26,6 +28,7 @@ interface IApolloService
     long position();
     long seek(long pos);
     long getAudioId();
+    long getCurrentSimplePlayerAudioId();
     long getArtistId();
     long getAlbumId();
     String getArtistName();
