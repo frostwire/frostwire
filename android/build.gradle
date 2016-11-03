@@ -82,7 +82,7 @@ project.ext.versionName = manifestVersionName()
 android {
 
     compileSdkVersion 17
-    buildToolsVersion "25"
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         versionName project.ext.versionName
@@ -154,9 +154,9 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:design:24.2.1"
-    compile 'com.google.android.gms:play-services-ads-lite:9.6.1'
-    compile 'com.google.android.gms:play-services-base:9.6.1'
+    compile "com.android.support:design:25.0.0"
+    compile "com.google.android.gms:play-services-ads-lite:9.8.0"
+    compile "com.google.android.gms:play-services-base:9.8.0"
     compile 'com.inmobi.monetization:inmobi-ads:6.0.2'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
@@ -169,17 +169,19 @@ dependencies {
 }
 
 tasks.create("excludeMaterialResources") << {
-    removeExplodedFile("com.android.support", "appcompat-v7", "24.2.1",
+    removeExplodedFile("com.android.support", "appcompat-v7", "25.0.0",
             ["res/values-ldltr-v21/values-ldltr-v21.xml",
              "res/values-v21/values-v21.xml",
              "res/values-v22/values-v22.xml",
              "res/values-v23/values-v23.xml",
+             "res/values-v25/values-v25.xml",
              "res/drawable-v21/abc_action_bar_item_background_material.xml",
              "res/drawable-v21/abc_btn_colored_material.xml",
+             "res/drawable-v21/notification_action_background.xml",
              "res/drawable-v23/abc_control_background_material.xml",
              "res/color-v23/abc_color_highlight_material.xml"])
 
-    removeExplodedFile("com.android.support", "appcompat-v7", "24.2.1",
+    removeExplodedFile("com.android.support", "appcompat-v7", "25.0.0",
             ["res/drawable/abc_ic_ab_back_material.xml",
              "res/drawable/abc_ic_arrow_drop_right_black_24dp.xml",
              "res/drawable/abc_ic_clear_material.xml",
@@ -192,12 +194,12 @@ tasks.create("excludeMaterialResources") << {
              "res/drawable/abc_ratingbar_small_material.xml",
              "res/drawable/abc_vector_test.xml"])
 
-    removeExplodedFile("com.android.support", "design", "24.2.1",
+    removeExplodedFile("com.android.support", "design", "25.0.0",
             ["res/values-v21/values-v21.xml",
              "res/anim-v21/design_bottom_sheet_slide_in.xml",
              "res/anim-v21/design_bottom_sheet_slide_out.xml"])
 
-    removeExplodedFile("com.android.support", "design", "24.2.1",
+    removeExplodedFile("com.android.support", "design", "25.0.0",
             ["res/drawable/design_ic_visibility.xml"])
 }
 
