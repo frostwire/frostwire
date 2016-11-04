@@ -69,6 +69,7 @@ import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
@@ -84,6 +85,7 @@ import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 
 import java.lang.ref.WeakReference;
+import java.util.Random;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
@@ -661,6 +663,13 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     private void initAlbumArtBanner() {
         if (Offers.adsDisabled()) {
+            return;
+        }
+
+        final int mopubAlbumArtBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD);
+        final int r = new Random().nextInt(100)+1;
+        LOG.info("mopubAlbumArtBannerThreshold: " + mopubAlbumArtBannerThreshold + " - dice roll: " + r + " - skip initAlbumArt? " + (r > mopubAlbumArtBannerThreshold));
+        if (r > mopubAlbumArtBannerThreshold) {
             return;
         }
 
