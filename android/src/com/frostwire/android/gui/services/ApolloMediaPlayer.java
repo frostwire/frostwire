@@ -94,4 +94,15 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
 
         return null;
     }
+
+    @Override
+    public FileDescriptor getSimplePlayerCurrentFD() {
+        try {
+            long audioId = MusicUtils.getCurrentSimplePlayerAudioId();
+            FileDescriptor fd = Librarian.instance().getFileDescriptor(Constants.FILE_TYPE_RINGTONES, (int) audioId);
+            return fd;
+        } catch (Throwable e) {
+        }
+        return null;
+    }
 }

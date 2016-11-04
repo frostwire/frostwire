@@ -29,6 +29,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+
 import com.frostwire.android.R;
 import com.frostwire.util.Logger;
 
@@ -81,7 +82,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         this.checkboxOnCheckedChangeListener = new CheckboxOnCheckedChangeListener();
         this.radioButtonCheckedChangeListener = new RadioButtonOnCheckedChangeListener();
         this.dialogs = new ArrayList<>();
-        this.list = (list==null || list.equals(Collections.emptyList())) ? new ArrayList<T>() : list;
+        this.list = (list == null || list.equals(Collections.emptyList())) ? new ArrayList<T>() : list;
         this.checked = checked;
         this.visualList = list;
     }
@@ -126,14 +127,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * @return List of items chosen with checkboxes.
      */
     public Set<T> getChecked() {
-       return checked;
+        return checked;
     }
 
     /**
      * @return The last item selected on a radio button.
      */
     public T getSelectedItem() {
-       return getItem(lastSelectedRadioButtonIndex);
+        return getItem(lastSelectedRadioButtonIndex);
     }
 
     public void setChecked(Set<T> newChecked) {
@@ -395,7 +396,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     private void onRadioButtonItemChecked(CompoundButton buttonView, boolean isChecked) {
-        if (buttonView instanceof RadioButton && isChecked){
+        if (buttonView instanceof RadioButton && isChecked) {
             final RadioButton radioButton = (RadioButton) buttonView;
             T item = (T) radioButton.getTag();
             int position = (item == null) ? 0 : getList().indexOf(item);
@@ -503,9 +504,11 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
     }
 
-    /** Meant to be overridden. Here you must return a String that shows the sum of all the checked elements
-     *  and some significant unit. For files, this would be the amount of total bytes if we summed all the selected
-     *  files. If you had a list of items to purchase, this could be total amount of money and a currency symbol.
+    /**
+     * Meant to be overridden. Here you must return a String that shows the sum of all the checked elements
+     * and some significant unit. For files, this would be the amount of total bytes if we summed all the selected
+     * files. If you had a list of items to purchase, this could be total amount of money and a currency symbol.
+     *
      * @return
      */
     public String getCheckedSum() {
@@ -524,7 +527,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         public void onClick(View v) {
             if (showMenuOnClick) {
                 MenuAdapter adapter = getMenuAdapter(v);
-                if (adapter != null) {
+                if (adapter != null && adapter.getCount() > 0) {
                     trackDialog(new MenuBuilder(adapter).show());
                     return;
                 }
@@ -536,7 +539,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private final class ViewOnLongClickListener implements OnLongClickListener {
         public boolean onLongClick(View v) {
             MenuAdapter adapter = getMenuAdapter(v);
-            if (adapter != null) {
+            if (adapter != null && adapter.getCount() > 0) {
                 trackDialog(new MenuBuilder(adapter).show());
                 return true;
             }
@@ -636,7 +639,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
     }
 
-    public int getLastSelectedRadioButtonIndex(){
+    public int getLastSelectedRadioButtonIndex() {
         return lastSelectedRadioButtonIndex;
     }
 }

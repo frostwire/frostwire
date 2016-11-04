@@ -32,7 +32,9 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+
 import com.andrew.apollo.MusicPlaybackService;
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -200,6 +202,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         filter.addAction(Constants.ACTION_FILE_ADDED_OR_REMOVED);
         filter.addAction(MusicPlaybackService.META_CHANGED);
         filter.addAction(MusicPlaybackService.PLAYSTATE_CHANGED);
+        filter.addAction(MusicPlaybackService.SIMPLE_PLAYSTATE_STOPPED);
         getActivity().registerReceiver(broadcastReceiver, filter);
     }
 
@@ -208,6 +211,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         super.onPause();
         savePreviouslyCheckedFileDescriptors();
         savePreviousFilter();
+        MusicUtils.stopSimplePlayer();
         getActivity().unregisterReceiver(broadcastReceiver);
     }
 
@@ -284,6 +288,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         initRadioButton(v, R.id.fragment_browse_peer_radio_pictures, Constants.FILE_TYPE_PICTURES);
         initRadioButton(v, R.id.fragment_browse_peer_radio_documents, Constants.FILE_TYPE_DOCUMENTS);
         initRadioButton(v, R.id.fragment_browse_peer_radio_torrents, Constants.FILE_TYPE_TORRENTS);
+    }
+
+    private void updateCheckAllStatusInSearchBar() {
+        if (adapter != null && filesBar != null) {
+            filesBar.setCheckAllVisible(adapter.getFileType() != Constants.FILE_TYPE_RINGTONES);
+        }
     }
 
     private RadioButton initRadioButton(View v, int viewId, final byte fileType) {
@@ -391,6 +401,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
         }
 
+        MusicUtils.stopSimplePlayer();
+        updateCheckAllStatusInSearchBar();
         restoreListViewScrollPosition();
     }
 
@@ -430,7 +442,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     }
                 }
             };
-            adapter.setCheckboxesVisibility(true);
             restorePreviouslyChecked();
             restorePreviousFilter();
             list.setAdapter(adapter);
@@ -509,7 +520,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     action.equals(Constants.ACTION_MEDIA_PLAYER_STOPPED) ||
                     action.equals(Constants.ACTION_MEDIA_PLAYER_PAUSED) ||
                     action.equals(MusicPlaybackService.PLAYSTATE_CHANGED) ||
-                    action.equals(MusicPlaybackService.META_CHANGED)
+                    action.equals(MusicPlaybackService.META_CHANGED) ||
+                    action.equals(MusicPlaybackService.SIMPLE_PLAYSTATE_STOPPED)
                     ) {
                 if (adapter != null) {
                     adapter.notifyDataSetChanged();

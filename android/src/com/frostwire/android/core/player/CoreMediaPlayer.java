@@ -41,4 +41,11 @@ public interface CoreMediaPlayer {
      * @return
      */
     FileDescriptor getCurrentFD();
+
+    /**
+     * The current file the simple media player is playing.
+     *
+     * @return
+     */
+    FileDescriptor getSimplePlayerCurrentFD();
 }

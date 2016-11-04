@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.SubMenu;
 import android.widget.ArrayAdapter;
+
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.loaders.FavoritesLoader;
@@ -47,6 +48,7 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
@@ -138,7 +140,7 @@ public final class MusicUtils {
         try {
             final Intent shutdownIntent = new Intent(context, MusicPlaybackService.class);
             shutdownIntent.setAction(MusicPlaybackService.SHUTDOWN_ACTION);
-            shutdownIntent.putExtra("force",true);
+            shutdownIntent.putExtra("force", true);
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> sending shut down intent now");
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> " + shutdownIntent);
             context.startService(shutdownIntent);
@@ -460,6 +462,19 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getAudioId();
+            } catch (final RemoteException ignored) {
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * @return The current song Id played by Simple Player.
+     */
+    public static long getCurrentSimplePlayerAudioId() {
+        if (musicPlaybackService != null) {
+            try {
+                return musicPlaybackService.getCurrentSimplePlayerAudioId();
             } catch (final RemoteException ignored) {
             }
         }
@@ -1094,7 +1109,7 @@ public final class MusicUtils {
      * @param list    The list to enqueue.
      */
     public static void addToQueue(final Context context, final long[] list) {
-        if (context == null || musicPlaybackService == null || list == null){
+        if (context == null || musicPlaybackService == null || list == null) {
             return;
         }
         try {
@@ -1667,5 +1682,23 @@ public final class MusicUtils {
         long[] result = ArrayUtils.toPrimitive(songList.toArray(list));
         songList.clear();
         return result;
+    }
+
+    public static void playSimple(String path) {
+        try {
+            if (musicPlaybackService != null) {
+                musicPlaybackService.playSimple(path);
+            }
+        } catch (RemoteException ignored) {
+        }
+    }
+
+    public static void stopSimplePlayer() {
+        try {
+            if (musicPlaybackService != null) {
+                musicPlaybackService.stopSimplePlayer();
+            }
+        } catch (RemoteException ignored) {
+        }
     }
 }
