@@ -614,4 +614,5 @@
     <string name="storage_picker_treeuri_not_directory">Выбранный путь не является каталогом</string>
     <string name="keep_the_project_alive">Держите проект жив</string>
     <string name="remove_ads">Убрать рекламу</string>
+    <string name="advertisement">Реклама</string>
 </resources>

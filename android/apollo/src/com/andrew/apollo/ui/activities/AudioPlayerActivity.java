@@ -126,6 +126,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
     // Ad on top of Album art
     private MoPubView mAlbumArtAd;
 
+    // 'advertisement' label
+    private TextView mAdvertisementText;
+
     // Button to dismiss album art
     private ImageButton mDismissAlbumArtAdButton;
 
@@ -238,11 +241,10 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         // Album Art Ad Controls
         mAlbumArtAd = (MoPubView) findViewById(R.id.audio_player_mopubview);
-        mAlbumArtAd.setVisibility(View.GONE);
         mDismissAlbumArtAdButton = (ImageButton) findViewById(R.id.audio_player_dismiss_mopubview_button);
-        mDismissAlbumArtAdButton.setVisibility(View.GONE);
-        initRemoveAds();
+        mAdvertisementText = (TextView) findViewById(R.id.audio_player_advertisement_text);
         initAlbumArtBanner();
+        initRemoveAds();
 
         mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
 
@@ -737,6 +739,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
             int albumArtVisibility = visible ? View.GONE : View.VISIBLE;
             mAlbumArtAd.setVisibility(adVisibility);
             mDismissAlbumArtAdButton.setVisibility(adVisibility);
+            mAdvertisementText.setVisibility(adVisibility);
             mAlbumArt.setVisibility(albumArtVisibility);
         }
     }

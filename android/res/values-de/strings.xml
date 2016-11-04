@@ -610,5 +610,5 @@
     <string name="keep_the_project_alive">Halten Sie das Projekt lebendig</string>
     <string name="remove_ads">Anzeigen entfernen</string>
     <string name="use_tpb_summary">TPB ist Magnet basiert, funktioniert nur auf der Wifi</string>
-
+    <string name="advertisement">werbung</string>
 </resources>
