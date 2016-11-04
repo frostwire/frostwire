@@ -19,7 +19,10 @@
 package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
+
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 
@@ -31,21 +34,35 @@ import com.frostwire.android.gui.views.MenuAction;
 public class OpenMenuAction extends MenuAction {
     private final String path;
     private final String mime;
+    private final byte fileType;
 
     public OpenMenuAction(Context context, String title, String path, String mime) {
         super(context, R.drawable.contextmenu_icon_play, R.string.open_menu_action, title);
         this.path = path;
         this.mime = mime;
+        this.fileType = -1;
     }
 
     public OpenMenuAction(Context context, String path, String mime) {
         super(context, R.drawable.contextmenu_icon_play, R.string.open);
         this.path = path;
         this.mime = mime;
+        this.fileType = -1;
+    }
+
+    public OpenMenuAction(Context context, String filePath, String mime, byte fileType) {
+        super(context, R.drawable.contextmenu_icon_play, R.string.open);
+        this.path = filePath;
+        this.mime = mime;
+        this.fileType = fileType;
     }
 
     @Override
     protected void onClick(Context context) {
-        UIUtils.openFile(context, path, mime);
+        if (fileType != Constants.FILE_TYPE_RINGTONES) {
+            UIUtils.openFile(context, path, mime);
+        } else {
+            MusicUtils.playSimple(path);
+        }
     }
 }
