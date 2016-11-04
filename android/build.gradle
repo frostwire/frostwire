@@ -1,6 +1,3 @@
-import groovy.swing.SwingBuilder
-import groovy.xml.Namespace
-
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
@@ -18,6 +15,9 @@ import groovy.xml.Namespace
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import groovy.swing.SwingBuilder
+import groovy.xml.Namespace
 
 apply plugin: 'com.android.application'
 apply from: '../common/dependencies.gradle'
@@ -69,22 +69,12 @@ def changeApkOutput(variant) {
     }
 }
 
-def removeExplodedFile(group, name, version, exclude) {
-    exclude.each {
-        String path = "${group}/${name}/${version}/${it}"
-        File file = file("${buildDir}/intermediates/exploded-aar/${path}")
-        if (file.exists()) {
-            file.delete();
-        }
-    }
-}
-
 project.ext.versionCode = manifestVersionCode()
 project.ext.versionName = manifestVersionName()
 
 android {
 
-    compileSdkVersion 17
+    compileSdkVersion 23
     buildToolsVersion "25.0.0"
 
     defaultConfig {
@@ -101,7 +91,7 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            res.srcDirs = ['res', 'apollo/res', "material"]
+            res.srcDirs = ['res', 'apollo/res']
             aidl.srcDirs = ['src', 'apollo/src']
             assets.srcDirs = ['assets']
             java {
@@ -169,52 +159,10 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    //Added by muckachina for espresso - Test dependencies 
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
 }
-
-tasks.create("excludeMaterialResources") << {
-    removeExplodedFile("com.android.support", "appcompat-v7", "25.0.0",
-            ["res/values-ldltr-v21/values-ldltr-v21.xml",
-             "res/values-v21/values-v21.xml",
-             "res/values-v22/values-v22.xml",
-             "res/values-v23/values-v23.xml",
-             "res/values-v25/values-v25.xml",
-             "res/drawable-v21/abc_action_bar_item_background_material.xml",
-             "res/drawable-v21/abc_btn_colored_material.xml",
-             "res/drawable-v21/notification_action_background.xml",
-             "res/drawable-v23/abc_control_background_material.xml",
-             "res/color-v23/abc_color_highlight_material.xml"])
-
-    removeExplodedFile("com.android.support", "appcompat-v7", "25.0.0",
-            ["res/drawable/abc_ic_ab_back_material.xml",
-             "res/drawable/abc_ic_arrow_drop_right_black_24dp.xml",
-             "res/drawable/abc_ic_clear_material.xml",
-             "res/drawable/abc_ic_go_search_api_material.xml",
-             "res/drawable/abc_ic_menu_overflow_material.xml",
-             "res/drawable/abc_ic_search_api_material.xml",
-             "res/drawable/abc_ic_voice_search_api_material.xml",
-             "res/drawable/abc_ratingbar_indicator_material.xml",
-             "res/drawable/abc_ratingbar_material.xml",
-             "res/drawable/abc_ratingbar_small_material.xml",
-             "res/drawable/abc_vector_test.xml"])
-
-    removeExplodedFile("com.android.support", "design", "25.0.0",
-            ["res/values-v21/values-v21.xml",
-             "res/anim-v21/design_bottom_sheet_slide_in.xml",
-             "res/anim-v21/design_bottom_sheet_slide_out.xml"])
-
-    removeExplodedFile("com.android.support", "design", "25.0.0",
-            ["res/drawable/design_ic_visibility.xml"])
-}
-
-tasks.whenTaskAdded({
-    if (it.name.matches(/^process.*Resources$/)) {
-        it.dependsOn excludeMaterialResources
-    }
-})
 
 class DeployRelease extends DefaultTask {
 
