@@ -194,7 +194,7 @@ public final class Offers {
             return;
         }
         final int b2bThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD);
-        final int r = new Random().nextInt(101);
+        final int r = new Random().nextInt(100) + 1;
         LOG.info("threshold: " + b2bThreshold + " - dice roll: " + r + " (" + (r < b2bThreshold) + ")");
         if (r < b2bThreshold) {
             REMOVE_ADS.showInterstitial(activity, false, false);
