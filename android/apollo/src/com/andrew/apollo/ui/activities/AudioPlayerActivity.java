@@ -275,11 +275,12 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 footerView.setVisibility(View.GONE);
             }
 
-            removeAdsTextView.setVisibility(View.VISIBLE);
+            removeAdsTextView.setVisibility(View.GONE);
             removeAdsTextView.setClickable(true);
             removeAdsTextView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    setAlbumArtAdVisibility(false);
                     Intent i = new Intent(AudioPlayerActivity.this, BuyActivity.class);
                     startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
                 }
@@ -741,6 +742,11 @@ public class AudioPlayerActivity extends FragmentActivity implements
             mDismissAlbumArtAdButton.setVisibility(adVisibility);
             mAdvertisementText.setVisibility(adVisibility);
             mAlbumArt.setVisibility(albumArtVisibility);
+
+            TextView removeAdsTextView = (TextView) findViewById(R.id.audio_player_remove_ads_text_link);
+            if (removeAdsTextView != null) {
+                removeAdsTextView.setVisibility(adVisibility);
+            }
         }
     }
 
