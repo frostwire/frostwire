@@ -79,13 +79,6 @@
                 android:layout_height="match_parent" />
         </LinearLayout>
 
-        <View
-            android:id="@+id/audio_player_footer"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_toRightOf="@+id/audio_player_large_album_frame" />
-
         <LinearLayout
             android:id="@+id/audio_player_header"
             android:layout_width="match_parent"
@@ -213,6 +206,29 @@
                 <include layout="@layout/audio_player_controls" />
             </LinearLayout>
         </LinearLayout>
+
+        <View
+            android:id="@+id/audio_player_footer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="36dp"
+            android:layout_marginEnd="36dp" />
+
+        <TextView
+            style="@style/NoSearchResultsLink"
+            android:id="@+id/audio_player_remove_ads_text_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/remove_ads"
+            android:textSize="@dimen/text_size_x_large"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/audio_player_total_time"
+            android:layout_toRightOf="@+id/audio_player_current_time"
+            android:layout_toEndOf="@+id/audio_player_current_time" />
     </RelativeLayout>
 
 </com.andrew.apollo.widgets.theme.ThemeableFrameLayout>

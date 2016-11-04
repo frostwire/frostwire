@@ -236,16 +236,11 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         // Album Art Ad Controls
         mAlbumArtAd = (MoPubView) findViewById(R.id.audio_player_mopubview);
-        if (mAlbumArtAd != null) {
-            mAlbumArtAd.setVisibility(View.GONE);
-        }
+        mAlbumArtAd.setVisibility(View.GONE);
         mDismissAlbumArtAdButton = (ImageButton) findViewById(R.id.audio_player_dismiss_mopubview_button);
-        if (mDismissAlbumArtAdButton != null) {
-            mDismissAlbumArtAdButton.setVisibility(View.GONE);
-        }
+        mDismissAlbumArtAdButton.setVisibility(View.GONE);
         initRemoveAds();
         initAlbumArtBanner();
-
 
         mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
 
@@ -261,21 +256,22 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     private void initRemoveAds() {
         TextView removeAdsTextView = (TextView) findViewById(R.id.audio_player_remove_ads_text_link);
-
-        if (removeAdsTextView == null) {
-            // temporary logic, because it has not yet been implemented for the landscape layout
-            return;
-        }
-
         View footerView = findViewById(R.id.audio_player_footer_two);
 
         if (!Offers.removeAdsOffersEnabled() || (removeAdsPurchaseTime > 0)    ) {
+            if (footerView != null) {
+                // available on vertical layout only
+                footerView.setVisibility(View.VISIBLE);
+            }
             removeAdsTextView.setVisibility(View.GONE);
-            footerView.setVisibility(View.VISIBLE);
             removeAdsTextView.setOnClickListener(null);
         } else {
+            if (footerView != null) {
+                // available on vertical layout only
+                footerView.setVisibility(View.GONE);
+            }
+
             removeAdsTextView.setVisibility(View.VISIBLE);
-            footerView.setVisibility(View.GONE);
             removeAdsTextView.setClickable(true);
             removeAdsTextView.setOnClickListener(new OnClickListener() {
                 @Override
