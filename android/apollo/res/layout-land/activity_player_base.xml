@@ -22,13 +22,13 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:id="@+id/audio_player_large_album_frame"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true" >
+            android:layout_alignParentLeft="true">
 
             <com.andrew.apollo.widgets.SquareImageView
                 android:id="@+id/audio_player_album_art"
@@ -57,6 +57,27 @@
                 android:layout_gravity="right"
                 android:background="@drawable/layout_divider_1_gray" />
         </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/audio_player_header">
+
+            <ImageButton
+                android:id="@+id/audio_player_dismiss_mopubview_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|right"
+                android:background="@null"
+                android:src="@drawable/full_screen_close" />
+
+            <com.mopub.mobileads.MoPubView
+                android:id="@+id/audio_player_mopubview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
         <View
             android:id="@+id/audio_player_footer"
