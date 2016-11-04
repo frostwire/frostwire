@@ -48,8 +48,8 @@ import java.util.Random;
  */
 public class BuyActivity extends AbstractActivity {
     public static final String INTERSTITIAL_MODE = "interstitialMode";
-    static final int PURCHASE_SUCCESSFUL_RESULT_CODE = 989898;
-    static final String EXTRA_KEY_PURCHASE_TIMESTAMP = "purchase_timestamp";
+    public static final int PURCHASE_SUCCESSFUL_RESULT_CODE = 0xaadd;
+    public static final String EXTRA_KEY_PURCHASE_TIMESTAMP = "purchase_timestamp";
     private static final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
     private static final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
     private static final String OFFER_ACCEPTED = "offer_accepted";
@@ -402,6 +402,11 @@ public class BuyActivity extends AbstractActivity {
             // user clicked outside of the PlayStore purchase dialog
             if (data != null && data.hasExtra("RESPONSE_CODE") && data.getIntExtra("RESPONSE_CODE", 0) != 0) {
                 paymentOptionsView.stopProgressBar();
+                // UNCOMMENT BELOW IF YOU WANT TO SIMULATE A SUCCESSFUL PURCHASE TEMPORARILY
+                //Intent deleteMe = new Intent();
+                //deleteMe.putExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, System.currentTimeMillis());
+                //setResult(BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE, deleteMe);
+                //finish();
                 return;
             }
 

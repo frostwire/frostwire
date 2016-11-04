@@ -272,10 +272,8 @@ public class SettingsActivity extends PreferenceActivity {
 
     private void setupSupportFrostWireOption() {
         final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
-        if (!Constants.IS_BASIC_AND_DEBUG && Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            removeSupportFrostWirePreference(preference);
-        }
-        else if (!Constants.IS_BASIC_AND_DEBUG && Products.disabledAds(PlayStore.getInstance())) {
+        if (!Constants.IS_BASIC_AND_DEBUG &&
+            (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Products.disabledAds(PlayStore.getInstance()))) {
             removeSupportFrostWirePreference(preference);
         }
         else if (preference != null){
@@ -787,6 +785,7 @@ public class SettingsActivity extends PreferenceActivity {
                                     continue;
                                 }
                                 PlayStore.getInstance().consume(p);
+                                ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, true);
                                 LOG.info(" - " + p.description() + " (" + p.sku() + ") force-consumed!");
                                 UIUtils.showToastMessage(preference.getContext(),
                                         "Product " + p.sku() + " forced-consumed.",

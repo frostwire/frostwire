@@ -610,4 +610,5 @@
     <string name="keep_the_project_alive">Houd het project in leven</string>
     <string name="remove_ads">Verwijder advertenties</string>
     <string name="use_tpb_summary">TPB is de magneet gebaseerd, werkt alleen op de website Wifi</string>
+    <string name="advertisement">advertentie</string>
 </resources>

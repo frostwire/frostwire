@@ -462,4 +462,5 @@
     <string name="file_descriptor_sd_mounted">Αυτό το αρχείο διαγράφηκε από την κάρτα SD ή έχεις βάλει μία άλλη κάρτα SD.</string>
     <string name="file_descriptor_sd_unmounted">Αυτό το αρχείο ανήκει σε μία κάρτα SD, παρακαλώ βάλ\' τη στη συσκευή σου.</string>
     <string name="help_translate_frostwire">Βοήθα με τη μετάφραση του FrostWire</string>
+    <string name="advertisement">διαφήμιση</string>
 </resources>

@@ -22,13 +22,13 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:id="@+id/audio_player_large_album_frame"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true" >
+            android:layout_alignParentLeft="true">
 
             <com.andrew.apollo.widgets.SquareImageView
                 android:id="@+id/audio_player_album_art"
@@ -36,13 +36,6 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentLeft="true"
                 android:scaleType="fitXY" />
-
-            <!--<ImageView
-                android:layout_width="@dimen/shadow_height"
-                android:layout_height="match_parent"
-                android:layout_alignRight="@+id/audio_player_album_art"
-                android:contentDescription="@null"
-                android:src="@drawable/right_shadow" />-->
         </RelativeLayout>
 
         <FrameLayout
@@ -63,21 +56,47 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="right"
                 android:background="@drawable/layout_divider_1_gray" />
-
-            <!--<ImageView
-                android:layout_width="@dimen/shadow_height"
-                android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:contentDescription="@null"
-                android:src="@drawable/right_shadow" />-->
         </FrameLayout>
 
-        <View
-            android:id="@+id/audio_player_footer"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_toRightOf="@+id/audio_player_large_album_frame" />
+            android:orientation="vertical"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/audio_player_header">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/audio_player_advertisement_text"
+                    android:layout_weight="1.0"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/advertisement"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:textColor="#ccc"
+                    android:visibility="gone"/>
+
+                <ImageButton
+                    android:id="@+id/audio_player_dismiss_mopubview_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|right"
+                    android:background="@null"
+                    android:src="@drawable/full_screen_close"
+                    android:visibility="gone"/>
+            </LinearLayout>
+
+            <com.mopub.mobileads.MoPubView
+                android:id="@+id/audio_player_mopubview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/audio_player_header"
@@ -206,6 +225,29 @@
                 <include layout="@layout/audio_player_controls" />
             </LinearLayout>
         </LinearLayout>
+
+        <View
+            android:id="@+id/audio_player_footer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="36dp"
+            android:layout_marginEnd="36dp" />
+
+        <TextView
+            style="@style/NoSearchResultsLink"
+            android:id="@+id/audio_player_remove_ads_text_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/remove_ads"
+            android:textSize="@dimen/text_size_x_large"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/audio_player_total_time"
+            android:layout_toRightOf="@+id/audio_player_current_time"
+            android:layout_toEndOf="@+id/audio_player_current_time" />
     </RelativeLayout>
 
 </com.andrew.apollo.widgets.theme.ThemeableFrameLayout>

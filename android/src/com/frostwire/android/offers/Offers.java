@@ -20,6 +20,8 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
@@ -168,12 +170,31 @@ public final class Offers {
         }
     }
 
+    public static boolean adsDisabled() {
+        boolean userDisabledAdSupport = Constants.IS_PLUS_OR_DEBUG && !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
+        boolean userPaidForAdRemoval = Products.disabledAds(PlayStore.getInstance());
+        return userDisabledAdSupport || userPaidForAdRemoval;
+    }
+
+    /**
+     * @return true only for flavor basic or for plus_debug and we haven't paid for ad removals, or
+     * it's plus supporting frostwire with ads
+     */
+    public static boolean removeAdsOffersEnabled() {
+        // Coded so explicitly for clarity.
+        boolean isBasic = Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
+        boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
+        boolean isSupportingFW = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
+        boolean paidForAdsRemoval = Products.disabledAds(PlayStore.getInstance());
+        return (isBasic || isDevelopment) && isSupportingFW && !paidForAdsRemoval;
+    }
+
     private static void tryBackToBackInterstitial(Activity activity) {
         if (REMOVE_ADS == null || !REMOVE_ADS.enabled() || !REMOVE_ADS.started()) {
             return;
         }
         final int b2bThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD);
-        final int r = new Random().nextInt(101);
+        final int r = new Random().nextInt(100) + 1;
         LOG.info("threshold: " + b2bThreshold + " - dice roll: " + r + " (" + (r < b2bThreshold) + ")");
         if (r < b2bThreshold) {
             REMOVE_ADS.showInterstitial(activity, false, false);

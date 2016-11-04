@@ -44,6 +44,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
@@ -68,15 +69,23 @@ import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.SwipeLayout;
+import com.frostwire.android.offers.Offers;
+import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+import com.mopub.mobileads.MoPubErrorCode;
+import com.mopub.mobileads.MoPubView;
 
 import java.lang.ref.WeakReference;
+import java.util.Random;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
@@ -90,6 +99,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
         OnSeekBarChangeListener,
         DeleteDialog.DeleteDialogCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private static Logger LOG = Logger.getLogger(AudioPlayerActivity.class);
 
     // Message to refresh the time
     private static final int REFRESH_TIME = 1;
@@ -111,6 +122,15 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     // Artist name
     private TextView mArtistName;
+
+    // Ad on top of Album art
+    private MoPubView mAlbumArtAd;
+
+    // 'advertisement' label
+    private TextView mAdvertisementText;
+
+    // Button to dismiss album art
+    private ImageButton mDismissAlbumArtAdButton;
 
     // Album art
     private ImageView mAlbumArt;
@@ -165,6 +185,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
     private WriteSettingsPermissionActivityHelper writeSettingsHelper;
     private GestureDetector gestureDetector;
 
+    // for removeAds display
+    private long removeAdsPurchaseTime = 0;
+
     /**
      * {@inheritDoc}
      */
@@ -216,6 +239,13 @@ public class AudioPlayerActivity extends FragmentActivity implements
         // Cache all the items
         initPlaybackControls();
 
+        // Album Art Ad Controls
+        mAlbumArtAd = (MoPubView) findViewById(R.id.audio_player_mopubview);
+        mDismissAlbumArtAdButton = (ImageButton) findViewById(R.id.audio_player_dismiss_mopubview_button);
+        mAdvertisementText = (TextView) findViewById(R.id.audio_player_advertisement_text);
+        initAlbumArtBanner();
+        initRemoveAds();
+
         mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
 
         PlayerGestureListener gestureListener = new PlayerGestureListener();
@@ -224,6 +254,37 @@ public class AudioPlayerActivity extends FragmentActivity implements
         findViewById(R.id.audio_player_album_art).setOnTouchListener(gestureListener);
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
+    }
+
+
+
+    private void initRemoveAds() {
+        TextView removeAdsTextView = (TextView) findViewById(R.id.audio_player_remove_ads_text_link);
+        View footerView = findViewById(R.id.audio_player_footer_two);
+
+        if (!Offers.removeAdsOffersEnabled() || (removeAdsPurchaseTime > 0)    ) {
+            if (footerView != null) {
+                // available on vertical layout only
+                footerView.setVisibility(View.VISIBLE);
+            }
+            removeAdsTextView.setVisibility(View.GONE);
+            removeAdsTextView.setOnClickListener(null);
+        } else {
+            if (footerView != null) {
+                // available on vertical layout only
+                footerView.setVisibility(View.GONE);
+            }
+
+            removeAdsTextView.setVisibility(View.VISIBLE);
+            removeAdsTextView.setClickable(true);
+            removeAdsTextView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(AudioPlayerActivity.this, BuyActivity.class);
+                    startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
+                }
+            });
+        }
     }
 
     /**
@@ -432,8 +493,13 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
+        if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
+                data != null &&
+                data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
+            // We (onActivityResult) are invoked before onResume()
+            removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
+            LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime="+removeAdsPurchaseTime);
+        } else if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -460,6 +526,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         updateNowPlayingInfo();
         // Refresh the queue
         ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+        initRemoveAds();
     }
 
     /**
@@ -502,14 +569,29 @@ public class AudioPlayerActivity extends FragmentActivity implements
     protected void onDestroy() {
         super.onDestroy();
         mIsPaused = false;
-        mTimeHandler.removeMessages(REFRESH_TIME);
+
+        try {
+            if (mAlbumArtAd != null) {
+                mAlbumArtAd.destroy();
+            }
+        } catch (Throwable ignored) {
+            LOG.error(ignored.getMessage(), ignored);
+        }
+
+        try {
+            mTimeHandler.removeMessages(REFRESH_TIME);
+        } catch (Throwable ignored) {
+            LOG.error(ignored.getMessage(), ignored);
+        }
+
         if (musicPlaybackService != null) {
             MusicUtils.unbindFromService(mToken);
             mToken = null;
         }
         try {
             unregisterReceiver(mPlaybackStatus);
-        } catch (final Throwable ignore) {
+        } catch (final Throwable ignored) {
+            LOG.error(ignored.getMessage(), ignored);
         }
     }
 
@@ -580,6 +662,88 @@ public class AudioPlayerActivity extends FragmentActivity implements
         // Update the progress
         mProgress.setOnSeekBarChangeListener(this);
     }
+
+    private void initAlbumArtBanner() {
+        if (Offers.adsDisabled()) {
+            return;
+        }
+
+        final int mopubAlbumArtBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD);
+        final int r = new Random().nextInt(100)+1;
+        LOG.info("mopubAlbumArtBannerThreshold: " + mopubAlbumArtBannerThreshold + " - dice roll: " + r + " - skip initAlbumArt? " + (r > mopubAlbumArtBannerThreshold));
+        if (r > mopubAlbumArtBannerThreshold) {
+            return;
+        }
+
+        StringBuilder keywords = new StringBuilder("music,audio,ringtone");
+        String artistName = MusicUtils.getArtistName();
+        String albumName = MusicUtils.getAlbumName();
+        if (artistName != null) {
+            keywords.append(",").append(artistName);
+        }
+        if (albumName != null) {
+            keywords.append(",").append(albumName);
+        }
+
+        if (mAlbumArtAd != null && mDismissAlbumArtAdButton != null) {
+            mDismissAlbumArtAdButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    setAlbumArtAdVisibility(false);
+                }
+            });
+
+            setAlbumArtAdVisibility(false);
+
+            //mAlbumArtAd.setTesting(true);
+            mAlbumArtAd.setAutorefreshEnabled(true);
+            mAlbumArtAd.setAdUnitId("c737d8a55b2e41189aa1532ae0520ad1");
+            mAlbumArtAd.setKeywords(keywords.toString());
+            mAlbumArtAd.setBannerAdListener(new MoPubView.BannerAdListener() {
+                @Override
+                public void onBannerLoaded(MoPubView banner) {
+                    LOG.info("onBannerLoaded()");
+                    setAlbumArtAdVisibility(true);
+                }
+
+                @Override
+                public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
+                    LOG.info("onBannerFailed");
+                    setAlbumArtAdVisibility(false);
+                }
+
+                @Override
+                public void onBannerClicked(MoPubView banner) {
+                    LOG.info("onBannerClicked: " + banner);
+                }
+
+                @Override
+                public void onBannerExpanded(MoPubView banner) {
+                    LOG.info("onBannerExpanded");
+                    setAlbumArtAdVisibility(true);
+                }
+
+                @Override
+                public void onBannerCollapsed(MoPubView banner) {
+                    LOG.info("onBannerCollapsed");
+                    setAlbumArtAdVisibility(false);
+                }
+            });
+            mAlbumArtAd.loadAd();
+        }
+    }
+
+    private void setAlbumArtAdVisibility(boolean visible) {
+        if (mAlbumArtAd != null && mDismissAlbumArtAdButton != null) {
+            int adVisibility = visible ? View.VISIBLE : View.GONE;
+            int albumArtVisibility = visible ? View.GONE : View.VISIBLE;
+            mAlbumArtAd.setVisibility(adVisibility);
+            mDismissAlbumArtAdButton.setVisibility(adVisibility);
+            mAdvertisementText.setVisibility(adVisibility);
+            mAlbumArt.setVisibility(albumArtVisibility);
+        }
+    }
+
 
     /**
      * Sets the track name, album name, and album art.
@@ -1033,25 +1197,31 @@ public class AudioPlayerActivity extends FragmentActivity implements
          */
         @Override
         public void onReceive(final Context context, final Intent intent) {
+            if (!Ref.alive(mReference)) {
+                return;
+            }
+            AudioPlayerActivity activity = mReference.get();
             final String action = intent.getAction();
+
             switch (action) {
                 case MusicPlaybackService.META_CHANGED:
                     // Current info
-                    mReference.get().updateNowPlayingInfo();
+                    activity.updateNowPlayingInfo();
                     // Update the favorites icon
-                    mReference.get().invalidateOptionsMenu();
-                    mReference.get().updateQueueFragmentCurrentSong();
+                    activity.invalidateOptionsMenu();
+                    activity.updateQueueFragmentCurrentSong();
+                    activity.initAlbumArtBanner();
                     break;
                 case MusicPlaybackService.PLAYSTATE_CHANGED:
                     // Set the play and pause image
-                    mReference.get().mPlayPauseButton.updateState();
+                    activity.mPlayPauseButton.updateState();
                     break;
                 case MusicPlaybackService.REPEATMODE_CHANGED:
                 case MusicPlaybackService.SHUFFLEMODE_CHANGED:
                     // Set the repeat image
-                    mReference.get().mRepeatButton.updateRepeatState();
+                    activity.mRepeatButton.updateRepeatState();
                     // Set the shuffle image
-                    mReference.get().mShuffleButton.updateShuffleState();
+                    activity.mShuffleButton.updateShuffleState();
                     break;
             }
         }

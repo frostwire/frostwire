@@ -1,3 +1,6 @@
+import groovy.swing.SwingBuilder
+import groovy.xml.Namespace
+
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
@@ -36,7 +39,7 @@ repositories {
 def manifestVersionCode() {
     def manifestFile = file(project.projectDir.absolutePath + '/AndroidManifest.xml')
 
-    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
     def xml = new XmlParser().parse(manifestFile)
 
     return Integer.parseInt(xml.attributes()[ns.versionCode].toString())
@@ -45,7 +48,7 @@ def manifestVersionCode() {
 def manifestVersionName() {
     def manifestFile = file(project.projectDir.absolutePath + '/AndroidManifest.xml')
 
-    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
     def xml = new XmlParser().parse(manifestFile)
 
     return xml.attributes()[ns.versionName].toString()
@@ -158,6 +161,7 @@ dependencies {
     compile "com.google.android.gms:play-services-ads-lite:9.8.0"
     compile "com.google.android.gms:play-services-base:9.8.0"
     compile "com.inmobi.monetization:inmobi-ads:6.0.3"
+    compile('com.mopub:mopub-sdk:4.10.0@aar') { transitive = true }
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     compile "com.frostwire:jlibtorrent-android-arm:1.2.0.2"
@@ -165,7 +169,10 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    androidTestCompile "com.android.support.test.espresso:espresso-core:2.2.2"
+    //Added by muckachina for espresso - Test dependencies 
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
 }
 
 tasks.create("excludeMaterialResources") << {
@@ -216,7 +223,7 @@ class DeployRelease extends DefaultTask {
     def version = project.ext.versionName
     def build = project.ext.versionCode
 
-    def runCmd(cmd) {
+    static def runCmd(cmd) {
         println(cmd)
 
         def p = Runtime.getRuntime().exec(cmd)
@@ -260,7 +267,7 @@ gradle.taskGraph.whenReady { taskGraph ->
         def myKeyPassword = ""
 
         if (System.console() == null) {
-            new groovy.swing.SwingBuilder().edt {
+            new SwingBuilder().edt {
                 dialog(modal: true,
                         title: 'Enter keystore data',
                         alwaysOnTop: true,

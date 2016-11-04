@@ -20,11 +20,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 
-import com.frostwire.android.R;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.ThemeUtils;
 import com.andrew.apollo.widgets.theme.HoloSelector;
+import com.frostwire.android.R;
 
 /**
  * A {@link ImageButton} that will repeatedly call a 'listener' method as long
@@ -66,7 +66,7 @@ public class RepeatingImageButton extends ImageButton implements OnClickListener
     @SuppressWarnings("deprecation")
     public RepeatingImageButton(final Context context, final AttributeSet attrs) {
         super(context, attrs);
-        // Initialze the theme resources
+        // Initialize the theme resources
         mResources = new ThemeUtils(context);
         // Theme the selector
         setBackgroundDrawable(new HoloSelector(context));
@@ -97,7 +97,6 @@ public class RepeatingImageButton extends ImageButton implements OnClickListener
      * interval in milliseconds with which it will be called.
      * 
      * @param l The listener that will be called
-     * @param interval The interval in milliseconds for calls
      */
     public void setRepeatListener(final RepeatListener l) {
         mListener = l;
@@ -194,6 +193,9 @@ public class RepeatingImageButton extends ImageButton implements OnClickListener
      * Sets the correct drawable for playback.
      */
     public void updateState() {
+        if (isInEditMode()) {
+            return;
+        }
         switch (getId()) {
             case R.id.action_button_next:
                 if (nextDrawable == 0) {

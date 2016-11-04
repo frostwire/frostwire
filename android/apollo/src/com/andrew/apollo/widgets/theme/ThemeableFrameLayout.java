@@ -18,7 +18,7 @@ import android.widget.FrameLayout;
 import com.andrew.apollo.utils.ThemeUtils;
 
 /**
- * This is a custom {@link FrameLayout} that is used as the main conent when
+ * This is a custom {@link FrameLayout} that is used as the main content when
  * transacting fragments that is made themeable by allowing developers to change
  * the background.
  *
@@ -37,9 +37,11 @@ public class ThemeableFrameLayout extends FrameLayout {
      */
     public ThemeableFrameLayout(final Context context, final AttributeSet attrs) {
         super(context, attrs);
-        // Initialze the theme resources
+        // Initialize the theme resources
         final ThemeUtils resources = new ThemeUtils(context);
         // Theme the layout
-        setBackground(resources.getDrawable(BACKGROUND));
+        if (!isInEditMode()) {
+            setBackground(resources.getDrawable(BACKGROUND));
+        }
     }
 }
