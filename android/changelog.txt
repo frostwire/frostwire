@@ -1,6 +1,7 @@
 FrostWire 1.8.3 - NOV/04/2016
  - Fixes crash that occurred on some transfers larger than 6Gb
  - Fixes bug that would cause torrent connections to be choked unnecessarily
+ - Fixes issues with ringtone playback and management
  - New jlibtorrent 1.2.0.2
  - update to android ndk-r13b
  - fixes bug that would fetch magnet if torrent was in the session
