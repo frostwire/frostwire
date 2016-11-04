@@ -126,11 +126,29 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal|right"
+                            android:layout_marginRight="10dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@null"
+                            android:src="@drawable/ad_cancel"
+                            android:layout_alignRight="@+id/audio_player_advertisement_text"
+                            android:visibility="invisible" />
                         <TextView
                             android:id="@+id/audio_player_advertisement_text"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_weight="1.0"
@@ -143,48 +161,33 @@
                             android:id="@+id/audio_player_dismiss_mopubview_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal|right"
+                            android:layout_gravity="center_vertical|right"
                             android:layout_marginRight="10dp"
-                            android:layout_marginTop="10dp"
                             android:background="@null"
                             android:src="@drawable/ad_cancel"
                             android:layout_alignRight="@+id/audio_player_advertisement_text"
                             android:visibility="gone" />
-
-
-
+                    </LinearLayout>
                     <com.mopub.mobileads.MoPubView
                         android:id="@+id/audio_player_mopubview"
                         android:layout_width="match_parent"
                         android:layout_height="250dp"
                         android:visibility="gone" />
-
-
-                    <FrameLayout
-                        android:id="@+id/audio_player_remove_ads_text_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_below="@+id/audio_player_mopubview">
-
-                        <View
-                            android:id="@+id/audio_player_footer_two"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
                         <TextView
                             android:id="@+id/audio_player_remove_ads_text_link"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:gravity="center"
-                            android:paddingTop="10dp"
+                            android:paddingTop="20dp"
                             android:text="@string/remove_ads"
                             android:textColor="@color/basic_blue_darker_highlight"
                             android:textSize="@dimen/text_medium"
                             android:textStyle="bold"
                             android:visibility="gone" />
-                    </FrameLayout>
+
+                    </LinearLayout>
+
                 </RelativeLayout>
             </FrameLayout>
 

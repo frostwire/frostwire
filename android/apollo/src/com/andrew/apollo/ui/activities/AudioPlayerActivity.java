@@ -260,21 +260,11 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
     private void initRemoveAds() {
         TextView removeAdsTextView = (TextView) findViewById(R.id.audio_player_remove_ads_text_link);
-        View footerView = findViewById(R.id.audio_player_footer_two);
 
         if (!Offers.removeAdsOffersEnabled() || (removeAdsPurchaseTime > 0)    ) {
-            if (footerView != null) {
-                // available on vertical layout only
-                footerView.setVisibility(View.VISIBLE);
-            }
             removeAdsTextView.setVisibility(View.GONE);
             removeAdsTextView.setOnClickListener(null);
         } else {
-            if (footerView != null) {
-                // available on vertical layout only
-                footerView.setVisibility(View.GONE);
-            }
-
             removeAdsTextView.setVisibility(View.GONE);
             removeAdsTextView.setClickable(true);
             removeAdsTextView.setOnClickListener(new OnClickListener() {
