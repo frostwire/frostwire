@@ -26,15 +26,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
+import com.frostwire.util.Logger;
+import com.frostwire.util.StringUtils;
 
 import java.util.List;
 
@@ -46,29 +49,73 @@ import java.util.List;
  * @author aldenml
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
+    private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
     private final List<Slide> slides;
+    private final SearchFragment searchFragment;
     private final ImageLoader imageLoader;
     private int specialOfferLayout;
     private int specialOfferId;
     private int featuresTitleId;
     private static final double PROMO_HEIGHT_TO_WIDTH_RATIO = 0.52998;
 
-    public PromotionsAdapter(Context ctx, List<Slide> slides) {
+    public PromotionsAdapter(Context ctx, List<Slide> slides, SearchFragment searchFragment) {
         super(ctx, R.layout.view_promotions_item);
         this.slides = slides;
         this.imageLoader = ImageLoader.getInstance(ctx);
+        this.searchFragment = searchFragment;
     }
 
     @Override
     public void setupView(View convertView, ViewGroup parent, Slide viewItem) {
         ImageView imageView = findView(convertView, R.id.view_promotions_item_image);
+        TextView downloadTextView = findView(convertView, R.id.view_promotions_item_download_textview);
+        ImageView previewImageView = findView(convertView, R.id.view_promotions_item_preview_imageview);
+        ImageView readmoreImageView =  findView(convertView, R.id.view_promotions_item_readmore_imageview);
 
         GridView gridView = (GridView) parent;
         int promoWidth = gridView.getColumnWidth();
         int promoHeight = (int) (promoWidth * PROMO_HEIGHT_TO_WIDTH_RATIO);
-
         if (promoWidth > 0 && promoHeight > 0 && imageView != null) {
             imageLoader.load(Uri.parse(viewItem.imageSrc), imageView, promoWidth, promoHeight);
+        }
+
+        final Slide theSlide = viewItem;
+        View.OnClickListener downloadPromoClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchFragment.startPromotionDownload(theSlide);
+            }
+        };
+
+        View.OnClickListener previewClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LOG.info("Preview the video at " + theSlide.videoURL);
+            }
+        };
+
+        View.OnClickListener readmoreClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LOG.info("Open FrostClick at " + theSlide.clickURL);
+            }
+        };
+
+        imageView.setOnClickListener(downloadPromoClickListener);
+        downloadTextView.setOnClickListener(downloadPromoClickListener);
+
+        if (StringUtils.isNullOrEmpty(theSlide.videoURL)) {
+            previewImageView.setVisibility(View.GONE);
+        } else {
+            previewImageView.setOnClickListener(previewClickListener);
+            previewImageView.setVisibility(View.VISIBLE);
+        }
+
+        if (StringUtils.isNullOrEmpty(theSlide.clickURL)) {
+            readmoreImageView.setVisibility(View.GONE);
+        } else {
+            readmoreImageView.setOnClickListener(readmoreClickListener);
+            readmoreImageView.setVisibility(View.VISIBLE);
         }
     }
 

@@ -180,12 +180,9 @@ public final class SearchFragment extends AbstractFragment implements
         deepSearchProgress.setVisibility(View.GONE);
 
         promotions = findView(view, R.id.fragment_search_promos);
-        promotions.setOnPromotionClickListener(new OnPromotionClickListener() {
-            @Override
-            public void onPromotionClick(PromotionsView v, Slide slide) {
-                startPromotionDownload(slide);
-            }
-        });
+        // Click Listeners of the inner promos need this reference because there's too much logic
+        // on starting a download already here. See PromotionsView.setupView()
+        promotions.setSearchFragment(this);
 
         searchProgress = findView(view, R.id.fragment_search_search_progress);
         searchProgress.setCurrentQueryReporter(this);
@@ -445,7 +442,7 @@ public final class SearchFragment extends AbstractFragment implements
         return new OnFeedbackClickAdapter(SearchFragment.this, ratingReminder, CM);
     }
 
-    private void startPromotionDownload(Slide slide) {
+    public void startPromotionDownload(Slide slide) {
         SearchResult sr;
 
         switch (slide.method) {
@@ -565,7 +562,8 @@ public final class SearchFragment extends AbstractFragment implements
                 String json = http.get(url);
                 SlideList slides = JsonUtils.toObject(json, SlideList.class);
 
-                // TODO: Remove this once we can remove that slide from the server.
+                // HACK: Get rid of the old see more search results slide.
+                // TODO: Remove this once we can remove that slide from the server (after several android updates).
                 if (slides != null && slides.slides != null) {
                     Iterator<Slide> it = slides.slides.iterator();
                     while (it.hasNext()) {

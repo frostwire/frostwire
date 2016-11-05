@@ -29,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.PromotionsAdapter;
+import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Products;
 import com.frostwire.frostclick.Slide;
@@ -41,20 +42,12 @@ import java.util.List;
  * @author aldenml
  */
 public class PromotionsView extends LinearLayout {
-    //private Logger LOG = Logger.getLogger(PromotionsView.class);
-
     private GridView gridview;
-
     private List<Slide> slides;
-
-    private OnPromotionClickListener onPromotionClickListener;
+    private SearchFragment searchFragment;
 
     public PromotionsView(Context context, AttributeSet attrs) {
         super(context, attrs);
-    }
-
-    public void setOnPromotionClickListener(OnPromotionClickListener listener) {
-        this.onPromotionClickListener = listener;
     }
 
     public List<Slide> getSlides() {
@@ -75,7 +68,7 @@ public class PromotionsView extends LinearLayout {
                 // remove all ad slides flagged as advertisement
                 removeAds(slides);
             }
-            gridview.setAdapter(new PromotionsAdapter(gridview.getContext(), slides));
+            gridview.setAdapter(new PromotionsAdapter(gridview.getContext(), slides, searchFragment));
         }
     }
 
@@ -104,11 +97,8 @@ public class PromotionsView extends LinearLayout {
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 if (position == 0) {
-                    ((PromotionsAdapter)gridview.getAdapter()).onSpecialOfferClick();
-                } else if (position > 1) {
-                    Slide slide = (Slide) gridview.getAdapter().getItem(position-2);
-                    if (onPromotionClickListener != null && slide != null) {
-                        onPromotionClickListener.onPromotionClick(PromotionsView.this, slide);
+                    if (gridview.getAdapter() != null) {
+                        ((PromotionsAdapter) gridview.getAdapter()).onSpecialOfferClick();
                     }
                 }
                 // TODO: A click on "All free downloads" button that takes us to frostWire.com/features
@@ -142,11 +132,10 @@ public class PromotionsView extends LinearLayout {
             Drawable d = view.getDrawable();
             d.setCallback(null);
             view.setImageDrawable(null);
-            //UIUtils.picassoRecycle(d);
         }
     }
 
-    public interface OnPromotionClickListener {
-        void onPromotionClick(PromotionsView v, Slide slide);
+    public void setSearchFragment(SearchFragment searchFragment) {
+        this.searchFragment = searchFragment;
     }
 }
