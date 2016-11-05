@@ -77,6 +77,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
@@ -271,6 +272,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
                 @Override
                 public void onClick(View view) {
                     setAlbumArtAdVisibility(false);
+                    PlayStore.getInstance().endAsync();
                     Intent i = new Intent(AudioPlayerActivity.this, BuyActivity.class);
                     startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
                 }

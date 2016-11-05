@@ -39,6 +39,7 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
+import com.frostwire.util.Logger;
 
 import java.util.Random;
 
@@ -47,6 +48,7 @@ import java.util.Random;
  * @author aldenml
  */
 public class BuyActivity extends AbstractActivity {
+    private static final Logger LOG = Logger.getLogger(BuyActivity.class);
     public static final String INTERSTITIAL_MODE = "interstitialMode";
     public static final int PURCHASE_SUCCESSFUL_RESULT_CODE = 0xaadd;
     public static final String EXTRA_KEY_PURCHASE_TIMESTAMP = "purchase_timestamp";
@@ -402,6 +404,8 @@ public class BuyActivity extends AbstractActivity {
             // user clicked outside of the PlayStore purchase dialog
             if (data != null && data.hasExtra("RESPONSE_CODE") && data.getIntExtra("RESPONSE_CODE", 0) != 0) {
                 paymentOptionsView.stopProgressBar();
+
+                LOG.info("onActivityResult -> purchase cancelled");
                 // UNCOMMENT BELOW IF YOU WANT TO SIMULATE A SUCCESSFUL PURCHASE TEMPORARILY
                 //Intent deleteMe = new Intent();
                 //deleteMe.putExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, System.currentTimeMillis());
@@ -417,6 +421,7 @@ public class BuyActivity extends AbstractActivity {
 
             // now we prepare a result for SettingsActivity since it won't know right away
             // given the purchase process is asynchronous
+            LOG.info("onActivityResult -> purchase finished");
             Intent result = new Intent();
             result.putExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, System.currentTimeMillis());
             setResult(BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE, result);
