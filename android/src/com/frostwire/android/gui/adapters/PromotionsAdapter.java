@@ -20,10 +20,12 @@ package com.frostwire.android.gui.adapters;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ImageView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.util.ImageLoader;
@@ -39,9 +41,9 @@ import java.util.List;
  * @author aldenml
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
-
     private final List<Slide> slides;
     private final ImageLoader imageLoader;
+    private int specialOfferId;
     private static final double PROMO_HEIGHT_TO_WIDTH_RATIO = 0.52998;
 
     public PromotionsAdapter(Context ctx, List<Slide> slides) {
@@ -58,7 +60,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         int promoWidth = gridView.getColumnWidth();
         int promoHeight = (int) (promoWidth * PROMO_HEIGHT_TO_WIDTH_RATIO);
 
-        if (promoWidth > 0 && promoHeight > 0) {
+        if (promoWidth > 0 && promoHeight > 0 && imageView != null) {
             imageLoader.load(Uri.parse(viewItem.imageSrc), imageView, promoWidth, promoHeight);
         }
     }
@@ -78,16 +80,18 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         return position;
     }
 
+    @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (position == 0) {
-            if (convertView == null) {
-                //view_remove_ads_notification
-                int layout = Math.random() % 2 == 0 ? R.layout.view_remove_ads_notification : R.layout.view_less_results_notification;
-                convertView = View.inflate(getContext(), layout, null);
-            }
+            //int layout = Math.random() % 2 == 0 ? R.layout.view_remove_ads_notification : R.layout.view_less_results_notification;
+            convertView = View.inflate(getContext(), R.layout.view_remove_ads_notification, null);
+            specialOfferId = convertView.getId();
             return convertView;
         } else {
+            if (convertView != null && convertView.getId() == specialOfferId) {
+                convertView = null;
+            }
             return super.getView(position-1, convertView, parent);
         }
     }

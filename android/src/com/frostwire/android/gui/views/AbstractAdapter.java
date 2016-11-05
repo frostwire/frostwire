@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,20 +39,17 @@ public abstract class AbstractAdapter<T> extends ArrayAdapter<T> {
 
     public AbstractAdapter(Context context, int layoutResId) {
         super(context, 0);
-
         this.layoutResId = layoutResId;
     }
 
+    @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         T item = getItem(position);
-
         if (convertView == null) {
             convertView = View.inflate(getContext(), layoutResId, null);
         }
-
         setupView(convertView, parent, item);
-        
         return convertView;
     }
 
