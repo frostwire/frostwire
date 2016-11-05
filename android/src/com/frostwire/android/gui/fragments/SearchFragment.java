@@ -70,6 +70,7 @@ import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
 import java.lang.ref.WeakReference;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -563,6 +564,18 @@ public final class SearchFragment extends AbstractFragment implements
                 String url = String.format("%s?from=android&fw=%s&sdk=%s", Constants.SERVER_PROMOTIONS_URL, Constants.FROSTWIRE_VERSION_STRING, Build.VERSION.SDK_INT);
                 String json = http.get(url);
                 SlideList slides = JsonUtils.toObject(json, SlideList.class);
+
+                // TODO: Remove this once we can remove that slide from the server.
+                if (slides != null && slides.slides != null) {
+                    Iterator<Slide> it = slides.slides.iterator();
+                    while (it.hasNext()) {
+                        Slide slide = it.next();
+                        if (slide.imageSrc.equals("http://static.frostwire.com/images/overlays/fw-results-overlay-2.jpg")) {
+                            it.remove();
+                        }
+                    }
+                }
+
                 // yes, these requests are done only once per session.
                 //LOG.info("SearchFragment.LoadSlidesTask performed http request to " + url);
                 return slides.slides;

@@ -103,10 +103,15 @@ public class PromotionsView extends LinearLayout {
 
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                Slide slide = (Slide) gridview.getAdapter().getItem(position);
-                if (onPromotionClickListener != null && slide != null) {
-                    onPromotionClickListener.onPromotionClick(PromotionsView.this, slide);
+                if (position == 0) {
+                    ((PromotionsAdapter)gridview.getAdapter()).onSpecialOfferClick();
+                } else if (position > 1) {
+                    Slide slide = (Slide) gridview.getAdapter().getItem(position-2);
+                    if (onPromotionClickListener != null && slide != null) {
+                        onPromotionClickListener.onPromotionClick(PromotionsView.this, slide);
+                    }
                 }
+                // TODO: A click on "All free downloads" button that takes us to frostWire.com/features
             }
         });
     }

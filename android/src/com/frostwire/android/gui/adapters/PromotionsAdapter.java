@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -26,8 +27,12 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.activities.BuyActivity;
+import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.views.AbstractAdapter;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
 
@@ -43,7 +48,9 @@ import java.util.List;
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
     private final List<Slide> slides;
     private final ImageLoader imageLoader;
+    private int specialOfferLayout;
     private int specialOfferId;
+    private int featuresTitleId;
     private static final double PROMO_HEIGHT_TO_WIDTH_RATIO = 0.52998;
 
     public PromotionsAdapter(Context ctx, List<Slide> slides) {
@@ -84,15 +91,33 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (position == 0) {
-            //int layout = Math.random() % 2 == 0 ? R.layout.view_remove_ads_notification : R.layout.view_less_results_notification;
-            convertView = View.inflate(getContext(), R.layout.view_remove_ads_notification, null);
+            specialOfferLayout = Math.random() % 2 == 0 ? R.layout.view_remove_ads_notification : R.layout.view_less_results_notification;
+            convertView = View.inflate(getContext(), specialOfferLayout, null);
             specialOfferId = convertView.getId();
-            return convertView;
-        } else {
-            if (convertView != null && convertView.getId() == specialOfferId) {
-                convertView = null;
+        } else if (position == 1) {
+            convertView = View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
+            featuresTitleId = convertView.getId();
+        }
+        else {
+            convertView = super.getView(position-2, null, parent);
+        }
+        return convertView;
+    }
+
+    public void onSpecialOfferClick() {
+        if (specialOfferLayout == R.layout.view_remove_ads_notification) {
+            // take to buy remove ads screen
+            PlayStore.getInstance().endAsync();
+            MainActivity mainActivity = (MainActivity) getContext();
+            Intent i = new Intent(getContext(), BuyActivity.class);
+            mainActivity.startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
+        } else if (specialOfferLayout == R.layout.view_less_results_notification) {
+            Intent i = new Intent("android.intent.action.VIEW", Uri.parse("http://support.frostwire.com/hc/en-us/articles/204095909-How-to-fix-FrostWire-for-Android-not-showing-YouTube-search-results-"));
+            try {
+                getContext().startActivity(i);
+            } catch (Throwable t) {
+                // some devices incredibly may have no apps to handle this intent.
             }
-            return super.getView(position-1, convertView, parent);
         }
     }
 }
