@@ -737,7 +737,8 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
             TextView removeAdsTextView = (TextView) findViewById(R.id.audio_player_remove_ads_text_link);
             if (removeAdsTextView != null) {
-                removeAdsTextView.setVisibility(adVisibility);
+                removeAdsTextView.setVisibility(Offers.removeAdsOffersEnabled() && visible ?
+                        View.VISIBLE : View.GONE);
             }
         }
     }
