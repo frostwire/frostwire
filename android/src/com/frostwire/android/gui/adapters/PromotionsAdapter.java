@@ -77,4 +77,18 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     public long getItemId(int position) {
         return position;
     }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (position == 0) {
+            if (convertView == null) {
+                //view_remove_ads_notification
+                int layout = Math.random() % 2 == 0 ? R.layout.view_remove_ads_notification : R.layout.view_less_results_notification;
+                convertView = View.inflate(getContext(), layout, null);
+            }
+            return convertView;
+        } else {
+            return super.getView(position-1, convertView, parent);
+        }
+    }
 }

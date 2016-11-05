@@ -64,7 +64,7 @@
             android:orientation="vertical">
         
         <!--<include layout="@layout/view_less_results_notification" />-->
-        <!--<include layout="@layout/view_remove_ads_notification" />-->
+
 
         <TextView
             android:layout_width="match_parent"

@@ -43,7 +43,7 @@ public abstract class AbstractAdapter<T> extends ArrayAdapter<T> {
     }
 
     @Override
-    public final View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         T item = getItem(position);
 
         if (convertView == null) {
