@@ -107,6 +107,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private static final String LAST_BACK_DIALOG_ID = "last_back_dialog";
     private static final String SHUTDOWN_DIALOG_ID = "shutdown_dialog";
     private static boolean firstTime = true;
+    public static int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
     private final Map<Integer, DangerousPermissionsChecker> permissionsCheckers;
     private MainController controller;
     private DrawerLayout drawerLayout;
@@ -584,7 +585,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
-        } else if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
+        } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
+            Offers.showInterstitial(this, false, false);
+        }
+
+        if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }

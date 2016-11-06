@@ -136,8 +136,9 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             videoURL = videoURL.substring(videoURL.indexOf("detailsUrl=")+"detailsUrl=".length());
         }
 
-        Offers.showInterstitial((MainActivity) getContext(), false, false);
-        UIUtils.openURL(getContext(), videoURL);
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(videoURL));
+        ((MainActivity) getContext()).startActivityForResult(i, MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE);
     }
 
     private void startPromotionDownlaod(Slide theSlide) {
