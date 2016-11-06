@@ -27,9 +27,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
 import com.frostwire.android.R;
+import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.PromotionsAdapter;
-import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Products;
 import com.frostwire.frostclick.Slide;
@@ -44,7 +45,7 @@ import java.util.List;
 public class PromotionsView extends LinearLayout {
     private GridView gridview;
     private List<Slide> slides;
-    private SearchFragment searchFragment;
+    private PromotionDownloader promotionDownloader;
 
     public PromotionsView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -68,7 +69,7 @@ public class PromotionsView extends LinearLayout {
                 // remove all ad slides flagged as advertisement
                 removeAds(slides);
             }
-            gridview.setAdapter(new PromotionsAdapter(gridview.getContext(), slides, searchFragment));
+            gridview.setAdapter(new PromotionsAdapter(gridview.getContext(), slides, promotionDownloader));
         }
     }
 
@@ -135,7 +136,7 @@ public class PromotionsView extends LinearLayout {
         }
     }
 
-    public void setSearchFragment(SearchFragment searchFragment) {
-        this.searchFragment = searchFragment;
+    public void setPromotionDownloader(PromotionDownloader promotionDownloader) {
+        this.promotionDownloader = promotionDownloader;
     }
 }

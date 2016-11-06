@@ -31,18 +31,23 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
+import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter.FilteredSearchResults;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
@@ -50,20 +55,30 @@ import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
-import com.frostwire.android.gui.views.*;
-import com.frostwire.android.gui.views.PromotionsView.OnPromotionClickListener;
+import com.frostwire.android.gui.views.AbstractFragment;
+import com.frostwire.android.gui.views.ClickAdapter;
+import com.frostwire.android.gui.views.PromotionsView;
+import com.frostwire.android.gui.views.RichNotification;
+import com.frostwire.android.gui.views.RichNotificationActionLink;
+import com.frostwire.android.gui.views.SearchInputView;
+import com.frostwire.android.gui.views.SearchProgressView;
+import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
-import com.frostwire.util.Logger;
-import com.frostwire.search.*;
+import com.frostwire.search.FileSearchResult;
+import com.frostwire.search.HttpSearchResult;
+import com.frostwire.search.SearchError;
+import com.frostwire.search.SearchListener;
+import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeSearchResult;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.uxstats.UXAction;
@@ -82,7 +97,7 @@ import java.util.regex.Pattern;
 public final class SearchFragment extends AbstractFragment implements
         MainFragment,
         OnDialogClickListener,
-        SearchProgressView.CurrentQueryReporter {
+        SearchProgressView.CurrentQueryReporter, PromotionDownloader {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
     private SearchResultListAdapter adapter;
     private List<Slide> slides;
@@ -182,7 +197,7 @@ public final class SearchFragment extends AbstractFragment implements
         promotions = findView(view, R.id.fragment_search_promos);
         // Click Listeners of the inner promos need this reference because there's too much logic
         // on starting a download already here. See PromotionsView.setupView()
-        promotions.setSearchFragment(this);
+        promotions.setPromotionDownloader(this);
 
         searchProgress = findView(view, R.id.fragment_search_search_progress);
         searchProgress.setCurrentQueryReporter(this);

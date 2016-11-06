@@ -1,5 +1,5 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,14 +31,20 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.fragments.SearchFragment;
+import com.frostwire.android.gui.activities.PreviewPlayerActivity;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
+import com.frostwire.search.FileSearchResult;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -47,22 +53,23 @@ import java.util.List;
  *
  * @author gubatron
  * @author aldenml
+ * @author marcelinkaaa
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
     private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
     private final List<Slide> slides;
-    private final SearchFragment searchFragment;
+    private final PromotionDownloader promotionDownloader;
     private final ImageLoader imageLoader;
     private int specialOfferLayout;
     private int specialOfferId;
     private int featuresTitleId;
     private static final double PROMO_HEIGHT_TO_WIDTH_RATIO = 0.52998;
 
-    public PromotionsAdapter(Context ctx, List<Slide> slides, SearchFragment searchFragment) {
+    public PromotionsAdapter(Context ctx, List<Slide> slides, PromotionDownloader promotionDownloader) {
         super(ctx, R.layout.view_promotions_item);
         this.slides = slides;
         this.imageLoader = ImageLoader.getInstance(ctx);
-        this.searchFragment = searchFragment;
+        this.promotionDownloader = promotionDownloader;
     }
 
     @Override
@@ -83,21 +90,21 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         View.OnClickListener downloadPromoClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchFragment.startPromotionDownload(theSlide);
+                startPromotionDownlaod(theSlide);
             }
         };
 
         View.OnClickListener previewClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LOG.info("Preview the video at " + theSlide.videoURL);
+                startVideoPreview(theSlide.videoURL);
             }
         };
 
         View.OnClickListener readmoreClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LOG.info("Open FrostClick at " + theSlide.clickURL);
+                openClickURL(theSlide.clickURL);
             }
         };
 
@@ -117,6 +124,25 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             readmoreImageView.setOnClickListener(readmoreClickListener);
             readmoreImageView.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void openClickURL(String clickURL) {
+        UIUtils.openURL(getContext(), clickURL);
+    }
+
+    private void startVideoPreview(String videoURL) {
+
+        if (videoURL.startsWith("http://www.frostwire-preview.com/")) {
+            videoURL = videoURL.substring(videoURL.indexOf("detailsUrl=")+"detailsUrl=".length());
+        }
+
+        Offers.showInterstitial((MainActivity) getContext(), false, false);
+        UIUtils.openURL(getContext(), videoURL);
+    }
+
+    private void startPromotionDownlaod(Slide theSlide) {
+        promotionDownloader.startPromotionDownload(theSlide);
+        Offers.showInterstitialOfferIfNecessary((MainActivity) getContext());
     }
 
     @Override
