@@ -23,8 +23,10 @@
     android:background="@drawable/view_remove_ads_background_blue"
     android:gravity="center_vertical|center_horizontal"
     android:id="@+id/view_remove_ads_notification"
-    android:layout_height="170dp"
+    android:layout_height="150dp"
     android:layout_width="match_parent"
+    android:paddingTop="25dp"
+    android:paddingBottom="25dp"
     android:orientation="horizontal">
 
     <TextView
