@@ -29,22 +29,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.activities.PreviewPlayerActivity;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
-import com.frostwire.search.FileSearchResult;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -57,12 +53,11 @@ import java.util.List;
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
     private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
+    private static final int NO_SPECIAL_OFFER = 97999605;
     private final List<Slide> slides;
     private final PromotionDownloader promotionDownloader;
     private final ImageLoader imageLoader;
     private int specialOfferLayout;
-    private int specialOfferId;
-    private int featuresTitleId;
     private static final double PROMO_HEIGHT_TO_WIDTH_RATIO = 0.52998;
 
     public PromotionsAdapter(Context ctx, List<Slide> slides, PromotionDownloader promotionDownloader) {
@@ -131,7 +126,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     }
 
     private void startVideoPreview(String videoURL) {
-
+        // frostwire-preview is not a mobile friendly experience, let's take them straight to youtube
         if (videoURL.startsWith("http://www.frostwire-preview.com/")) {
             videoURL = videoURL.substring(videoURL.indexOf("detailsUrl=")+"detailsUrl=".length());
         }
@@ -164,18 +159,45 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (position == 0) {
-            specialOfferLayout = Math.random() % 2 == 0 ? R.layout.view_remove_ads_notification : R.layout.view_less_results_notification;
-            convertView = View.inflate(getContext(), specialOfferLayout, null);
-            specialOfferId = convertView.getId();
-        } else if (position == 1) {
-            convertView = View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
-            featuresTitleId = convertView.getId();
-        }
-        else {
-            convertView = super.getView(position-2, null, parent);
+        // Plus needs no special offer as we can't sell remove ads yet
+        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            // we subtract 1 because of the "FROSTWIRE FEATURES" item view.
+            if (position == 0) {
+                convertView = View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
+            } else {
+                convertView = super.getView(position - 1, null, parent);
+            }
+        } else {
+            int specialOfferLayout = pickSpecialOfferLayout();
+            if (position == 0) {
+                convertView = View.inflate(getContext(), specialOfferLayout, null);
+            } else if (position == 1) {
+                convertView = View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
+            } else {
+                convertView = super.getView(position - 2, null, parent);
+            }
         }
         return convertView;
+    }
+
+    /**
+     * Decide what the special offer layout we should use.
+     */
+    private int pickSpecialOfferLayout() {
+        // TODO: Throttle me.
+
+        // Optimistic: If we're plus, we can't offer ad removal yet.
+        specialOfferLayout = NO_SPECIAL_OFFER;
+
+        // If we're basic and we have not paid to remove ads, we pick the specialOfferLayout randomly.
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && Offers.removeAdsOffersEnabled()) {
+            specialOfferLayout = Math.random() % 2 == 0 ? R.layout.view_remove_ads_notification : R.layout.view_less_results_notification;
+        }
+        // If we're basic and we paid... you should still know about plus :)
+        else if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && Offers.adsDisabled()) {
+            specialOfferLayout = R.layout.view_less_results_notification;
+        }
+        return specialOfferLayout;
     }
 
     public void onSpecialOfferClick() {
