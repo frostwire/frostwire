@@ -23,13 +23,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/basic_gray_lighter"
-    android:paddingTop="40dp"
-    android:paddingBottom="40dp"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="horizontal">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="40dp"
         android:text="@string/all_free_downloads"
         android:background="@drawable/blue_dark_button_background_selector"
         android:textSize="@dimen/text_medium"
@@ -37,6 +37,7 @@
         android:paddingTop="14dp"
         android:paddingBottom="14dp"
         android:paddingRight="20dp"
-        android:paddingLeft="20dp"/>
-
+        android:paddingLeft="20dp"
+        />
 </LinearLayout>
+
