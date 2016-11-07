@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -97,12 +98,19 @@ public class PromotionsView extends LinearLayout {
 
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                PromotionsAdapter promoAdapter = (PromotionsAdapter) gridview.getAdapter();
                 if (position == 0) {
                     if (gridview.getAdapter() != null) {
-                        ((PromotionsAdapter) gridview.getAdapter()).onSpecialOfferClick();
+                        promoAdapter.onSpecialOfferClick();
                     }
                 }
-                // TODO: A click on "All free downloads" button that takes us to frostWire.com/features
+
+                boolean inLandscapeMode = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+                if (position ==  promoAdapter.lastPosition(inLandscapeMode)) {
+                    if (gridview.getAdapter() != null) {
+                        promoAdapter.onAllFeaturedDownloadsClick();
+                    }
+                }
             }
         });
     }

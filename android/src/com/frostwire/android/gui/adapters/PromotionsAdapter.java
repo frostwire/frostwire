@@ -128,7 +128,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     private void startVideoPreview(String videoURL) {
         // frostwire-preview is not a mobile friendly experience, let's take them straight to youtube
-        if (videoURL.startsWith("http://www.frostwire-preview.com/")) {
+        if (videoURL.startsWith(Constants.FROSTWIRE_PREVIEW_DOT_COM_URL)) {
             videoURL = videoURL.substring(videoURL.indexOf("detailsUrl=")+"detailsUrl=".length());
         }
 
@@ -194,7 +194,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         return convertView;
     }
 
-    private int lastPosition(boolean inLandscapeMode) {
+    public int lastPosition(boolean inLandscapeMode) {
         if (slides == null) {
             return 0;
         }
@@ -227,6 +227,10 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         return specialOfferLayout;
     }
 
+    public void onAllFeaturedDownloadsClick() {
+        UIUtils.openURL(getContext(), Constants.ALL_FEATURED_DOWNLOADS_URL);
+    }
+
     public void onSpecialOfferClick() {
         if (specialOfferLayout == R.layout.view_remove_ads_notification) {
             // take to buy remove ads screen
@@ -235,7 +239,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             Intent i = new Intent(getContext(), BuyActivity.class);
             mainActivity.startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
         } else if (specialOfferLayout == R.layout.view_less_results_notification) {
-            Intent i = new Intent("android.intent.action.VIEW", Uri.parse("http://support.frostwire.com/hc/en-us/articles/204095909-How-to-fix-FrostWire-for-Android-not-showing-YouTube-search-results-"));
+            Intent i = new Intent("android.intent.action.VIEW", Uri.parse(Constants.HOW_TO_GET_MORE_SEARCH_RESULTS_URL));
             try {
                 getContext().startActivity(i);
             } catch (Throwable t) {

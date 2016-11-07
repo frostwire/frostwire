@@ -163,6 +163,9 @@ public final class Constants {
     public static final String SERVER_PROMOTIONS_URL = "http://update.frostwire.com/o.php?" + FROM_URL_PARAMETERS;
     public static final String SUPPORT_URL = "http://support.frostwire.com/hc/en-us/categories/200014385-FrostWire-for-Android";
     public static final String TERMS_OF_USE_URL = "http://www.frostwire.com/terms";
+    public static final String ALL_FEATURED_DOWNLOADS_URL = "http://www.frostwire.com/featured-downloads";
+    public static final String HOW_TO_GET_MORE_SEARCH_RESULTS_URL = "http://support.frostwire.com/hc/en-us/articles/204095909-How-to-fix-FrostWire-for-Android-not-showing-YouTube-search-results-";
+    public static final String FROSTWIRE_PREVIEW_DOT_COM_URL = "http://www.frostwire-preview.com/";
 
     public static final String USER_AGENT = "FrostWire/android-" + (Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic" : "plus" ) + "/" + Constants.FROSTWIRE_VERSION_STRING + "/" + Constants.FROSTWIRE_BUILD;
 

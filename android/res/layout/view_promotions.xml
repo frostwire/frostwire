@@ -23,8 +23,6 @@
     android:layout_height="match_parent"
     android:padding="0sp" >
 
-    <!--<include layout="@layout/view_remove_ads_notification" />-->
-
     <GridView
         android:id="@+id/view_promotions_gridview"
         android:layout_width="match_parent"
