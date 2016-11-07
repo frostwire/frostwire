@@ -22,20 +22,20 @@
     android:id="@+id/view_frostwire_features_all_downloads"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/basic_gray_lighter"
+    android:background="@color/basic_gray_dark"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="horizontal">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
-        android:layout_marginBottom="45dp"
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="70dp"
         android:text="@string/all_free_downloads"
         android:background="@drawable/blue_dark_button_background_selector"
         android:textSize="@dimen/text_medium"
         android:textColor="@color/basic_white"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        android:paddingRight="24dp"
-        android:paddingLeft="24dp" />
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:paddingRight="30dp"
+        android:paddingLeft="30dp" />
 </LinearLayout>
