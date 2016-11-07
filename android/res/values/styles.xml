@@ -396,7 +396,7 @@
     </style>
 
     <style name="BlueButton">
-        <item name="android:background">@drawable/blue_button_background_selector</item>
+        <item name="android:background">@drawable/blue_light_button_background_selector</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:paddingTop">0dp</item>
         <item name="android:paddingBottom">0dp</item>

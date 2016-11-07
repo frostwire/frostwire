@@ -173,6 +173,8 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             // we subtract 1 because of the "FROSTWIRE FEATURES" item view.
             if (!inLandscapeMode && position == 0) {
                 convertView = View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
+            } else if (position == 6) {
+                convertView = View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
             } else {
                 convertView = super.getView(inLandscapeMode ? position : position - 1, null, parent);
             }
@@ -180,6 +182,8 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             int specialOfferLayout = pickSpecialOfferLayout();
             if (position == 0) {
                 convertView = View.inflate(getContext(), specialOfferLayout, null);
+            } else if (position == 6) {
+            convertView = View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
             } else if (position == 1) {
                 convertView = View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
             } else {

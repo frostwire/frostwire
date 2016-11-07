@@ -640,4 +640,5 @@
     <string name="haptic_feedback">Haptic Feedback</string>
     <string name="advertisement">advertisement</string>
     <string name="frostwire_features">FROSTWIRE FEATURES</string>
+    <string name="all_free_downloads">All free downloads</string>
 </resources>

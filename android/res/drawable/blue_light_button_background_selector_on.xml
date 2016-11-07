@@ -18,10 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item android:drawable="@drawable/blue_button_background_selector_on" android:state_pressed="true"/>
-    <item android:drawable="@drawable/blue_button_background_selector_on" android:state_focused="true"/>
-    <item android:drawable="@drawable/blue_button_background_selector_off"/>
+    <item>
+        <shape>
+            <solid android:color="@color/basic_blue_darker_highlight" />
+            <corners android:radius="4dp" />
+        </shape>
+    </item>
 
-</selector>
+</layer-list>
