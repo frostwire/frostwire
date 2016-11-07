@@ -127,14 +127,23 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isPaused() {
+        if (!th.isValid()) {
+            return false;
+        }
         return th.status().isPaused() || engine.isPaused() || !engine.isRunning();
     }
 
     public boolean isSeeding() {
+        if (!th.isValid()) {
+            return false;
+        }
         return th.status().isSeeding();
     }
 
     public boolean isFinished() {
+        if (!th.isValid()) {
+            return false;
+        }
         return th.status().isFinished();
     }
 
