@@ -20,6 +20,7 @@ package com.frostwire.android.gui.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -143,6 +144,13 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @Override
     public int getCount() {
+        final boolean landscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
+        // if we are in landscape mode and the number of slides
+        // is an uneven number we remove the last one
+        if (landscapeMode && slides.size() % 2 != 0) {
+            slides.remove(slides.size()-1);
+        }
+
         return slides.size();
     }
 
@@ -159,13 +167,14 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Plus needs no special offer as we can't sell remove ads yet
-        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+        // Plus (or when on landscape orientation) needs no special offer as we can't sell remove ads yet
+        boolean inLandscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
+        if (inLandscapeMode || !Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
             // we subtract 1 because of the "FROSTWIRE FEATURES" item view.
-            if (position == 0) {
+            if (!inLandscapeMode && position == 0) {
                 convertView = View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
             } else {
-                convertView = super.getView(position - 1, null, parent);
+                convertView = super.getView(inLandscapeMode ? position : position - 1, null, parent);
             }
         } else {
             int specialOfferLayout = pickSpecialOfferLayout();

@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -577,8 +578,8 @@ public final class SearchFragment extends AbstractFragment implements
                 String json = http.get(url);
                 SlideList slides = JsonUtils.toObject(json, SlideList.class);
 
-                // HACK: Get rid of the old see more search results slide.
-                // TODO: Remove this once we can remove that slide from the server (after several android updates).
+                // HACK: Gets rid of the old "see more search results" slide.
+                // TODO: Remove this when unnecessary after several updates
                 if (slides != null && slides.slides != null) {
                     Iterator<Slide> it = slides.slides.iterator();
                     while (it.hasNext()) {
