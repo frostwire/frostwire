@@ -98,18 +98,19 @@ public class PromotionsView extends LinearLayout {
 
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                if (gridview == null || gridview.getAdapter() == null) {
+                    return;
+                }
                 PromotionsAdapter promoAdapter = (PromotionsAdapter) gridview.getAdapter();
                 if (position == 0) {
-                    if (gridview.getAdapter() != null) {
-                        promoAdapter.onSpecialOfferClick();
-                    }
+                    promoAdapter.onSpecialOfferClick();
+                    return;
                 }
 
                 boolean inLandscapeMode = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
                 if (position ==  promoAdapter.lastPosition(inLandscapeMode)) {
-                    if (gridview.getAdapter() != null) {
-                        promoAdapter.onAllFeaturedDownloadsClick();
-                    }
+                    promoAdapter.onAllFeaturedDownloadsClick();
+                    return;
                 }
             }
         });
