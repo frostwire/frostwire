@@ -1,4 +1,5 @@
-FrostWire 1.8.3 - NOV/04/2016
+FrostWire 1.8.3 - NOV/07/2016
+ - Improved feature download display on welcome screen
  - Fixes crash that occurred on some transfers larger than 6Gb
  - Fixes bug that would cause torrent connections to be choked unnecessarily
  - Fixes issues with ringtone playback and management
