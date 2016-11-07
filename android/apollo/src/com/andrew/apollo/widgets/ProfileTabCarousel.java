@@ -78,11 +78,6 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
     private final int mTabDisplayLabelHeight;
 
     /**
-     * Height in pixels of the shadow under the tab carousel
-     */
-    private final int mTabShadowHeight;
-
-    /**
      * First tab click listener
      */
     private final TabClickListener mTabOneTouchInterceptListener = new TabClickListener(
@@ -133,15 +128,13 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
 
     /**
      * @param context The {@link Context} to use
-     * @param attrs The attributes of the XML tag that is inflating the view.
+     * @param attrs   The attributes of the XML tag that is inflating the view.
      */
     public ProfileTabCarousel(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         setOnTouchListener(this);
         final Resources mResources = context.getResources();
-        mTabDisplayLabelHeight = mResources
-                .getDimensionPixelSize(R.dimen.profile_photo_shadow_height);
-        mTabShadowHeight = mResources.getDimensionPixelSize(R.dimen.profile_carousel_label_height);
+        mTabDisplayLabelHeight = mResources.getDimensionPixelSize(R.dimen.profile_carousel_label_height);
         tabWidthScreenWidthFraction = mResources.getFraction(
                 R.fraction.tab_width_screen_percentage, 1, 1);
         tabHeightScreenWidthFraction = mResources.getFraction(
@@ -176,12 +169,12 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
         }
 
         final int tabHeight = Math.round(screenWidth * tabHeightScreenWidthFraction)
-                + mTabShadowHeight;
+                + mTabDisplayLabelHeight;
         if (getChildCount() > 0) {
             final View child = getChildAt(0);
 
             // Add 1 dip of separation between the tabs
-            final int separatorPixels = (int)(TypedValue.applyDimension(
+            final int separatorPixels = (int) (TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()) + 0.5f);
 
             if (mEnableSwipe) {
@@ -194,7 +187,7 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
                         MeasureSpec.makeMeasureSpec(tabHeight, MeasureSpec.EXACTLY));
             }
         }
-        mAllowedVerticalScrollLength = tabHeight - mTabDisplayLabelHeight - mTabShadowHeight;
+        mAllowedVerticalScrollLength = tabHeight - mTabDisplayLabelHeight;
         setMeasuredDimension(resolveSize(screenWidth, widthMeasureSpec),
                 resolveSize(tabHeight, heightMeasureSpec));
     }

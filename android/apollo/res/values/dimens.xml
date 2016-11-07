@@ -74,8 +74,6 @@
     <dimen name="notification_expanded_content_padding_top">8.0dip</dimen>
     <dimen name="notification_expanded_collapse_padding">8.0dip</dimen>
 
-    <!-- Height of the shadow asset under the photo -->
-    <dimen name="profile_photo_shadow_height">10.0dip</dimen>
     <!-- Height of the text label in the carousel -->
     <dimen name="profile_carousel_label_height">45.0dip</dimen>
     <dimen name="profile_indicator_height">5.0dip</dimen>
