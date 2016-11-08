@@ -39,7 +39,7 @@ final class EztvSearchResult extends AbstractTorrentSearchResult {
     private final String displayName;
     private final String detailsUrl;
     private final String torrentUrl;
-    private String infoHash;
+    private final String infoHash;
     private final long size;
     private final long creationTime;
     private final int seeds;
@@ -58,16 +58,7 @@ final class EztvSearchResult extends AbstractTorrentSearchResult {
         this.torrentUrl = buildTorrentUrl(matcher);
 
         this.filename = parseFileName(FilenameUtils.getName(torrentUrl));
-        this.infoHash = null;
-
-        try {
-            if (matcher.group("infohash") != null) {
-                this.infoHash = matcher.group("infohash");
-            } else if (torrentUrl.startsWith("magnet:?xt=urn:btih:")) {
-                this.infoHash = torrentUrl.substring(20, 52);
-            }
-        } catch (Throwable ignored) {
-        }
+        this.infoHash = parseInfoHash(matcher, torrentUrl);
 
         this.seeds = -1;
         this.creationTime = parseCreationTime(matcher.group("creationtime"));
@@ -128,6 +119,18 @@ final class EztvSearchResult extends AbstractTorrentSearchResult {
         } catch (UnsupportedEncodingException ignored) {
         }
         return decodedFileName;
+    }
+
+    private static String parseInfoHash(SearchMatcher matcher, String torrentUrl) {
+        try {
+            if (matcher.group("infohash") != null) {
+                return matcher.group("infohash");
+            } else if (torrentUrl.startsWith("magnet:?xt=urn:btih:")) {
+                return torrentUrl.substring(20, 52);
+            }
+        } catch (Throwable ignored) {
+        }
+        return null;
     }
 
     private long parseCreationTime(String dateString) {

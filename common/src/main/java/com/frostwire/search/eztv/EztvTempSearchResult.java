@@ -25,18 +25,12 @@ import com.frostwire.search.CrawlableSearchResult;
  * @author gubatron
  * @author aldenml
  */
-public final class EztvTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
+final class EztvTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
-    private final String itemId;
     private final String detailsUrl;
 
     public EztvTempSearchResult(String domainName, String itemId) {
-        this.itemId = itemId;
         this.detailsUrl = "https://" + domainName + itemId;
-    }
-
-    public String getItemId() {
-        return itemId;
     }
 
     @Override
