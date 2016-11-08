@@ -123,7 +123,7 @@ class AppLovinAdNetwork implements AdNetwork {
             interstitialAdapter.shutdownAppAfter(shutdownAfterwards);
             interstitialAdapter.dismissActivityAfterwards(dismissAfterward);
             try {
-                result = interstitialAdapter.isAdReadyToDisplay() && interstitialAdapter.show(activity);
+                result = interstitialAdapter.isAdReadyToDisplay() && interstitialAdapter.show(activity, placement);
             } catch (Throwable e) {
                 e.printStackTrace();
                 result = false;

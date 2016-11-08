@@ -104,12 +104,6 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     }
 
     @Override
-    public boolean show(Activity activity) {
-        //unused.
-        return false;
-    }
-
-    @Override
     public void shutdownAppAfter(boolean shutdown) {
         shutDownAfter = shutdown;
     }

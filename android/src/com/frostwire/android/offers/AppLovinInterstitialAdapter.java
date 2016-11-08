@@ -74,11 +74,6 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
 
     @Override
     public boolean show(Activity activity, String placement) {
-        return show(activity);
-    }
-
-    @Override
-    public boolean show(Activity activity) {
         boolean result = false;
         if (ad != null && activity != null) {
             try {
@@ -95,7 +90,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
                 }
                 wasPlayingMusic = MusicUtils.isPlaying();
                 adDialog.setAdDisplayListener(this);
-                adDialog.showAndRender(ad);
+                adDialog.showAndRender(ad, placement);
                 result = true;
             } catch (Throwable t) {
                 result = false;

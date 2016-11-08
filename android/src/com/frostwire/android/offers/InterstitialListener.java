@@ -23,7 +23,6 @@ interface InterstitialListener {
     boolean isAdReadyToDisplay();
     boolean isVideoAd();
     boolean show(Activity activity, String placement);
-    boolean show(Activity activity);
     void shutdownAppAfter(boolean shutdown);
     void dismissActivityAfterwards(boolean dismiss);
 }
