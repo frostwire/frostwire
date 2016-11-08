@@ -1,3 +1,7 @@
+FrostWire 1.8.4 - NOV/08/2016
+ - Improved Featured Downloads on welcome screen
+ - Translation updates: Italian
+
 FrostWire 1.8.3 - NOV/07/2016
  - Improved feature download display on welcome screen
  - Fixes crash that occurred on some transfers larger than 6Gb
