@@ -98,6 +98,12 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     }
 
     @Override
+    public boolean show(Activity activity, String placement) {
+        //unused
+        return false;
+    }
+
+    @Override
     public boolean show(Activity activity) {
         //unused.
         return false;

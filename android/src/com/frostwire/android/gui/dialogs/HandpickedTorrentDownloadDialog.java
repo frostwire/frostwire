@@ -292,7 +292,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
                     dlg.dismiss();
 
                     if (ctxRef.get() instanceof Activity) {
-                        Offers.showInterstitialOfferIfNecessary((Activity) ctxRef.get());
+                        Offers.showInterstitialOfferIfNecessary((Activity) ctxRef.get(), Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, false, false);
                     }
                 }
             }

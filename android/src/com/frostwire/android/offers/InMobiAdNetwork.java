@@ -97,6 +97,7 @@ class InMobiAdNetwork implements AdNetwork {
 
     @Override
     public boolean showInterstitial(Activity activity,
+                                    String placement,
                                     boolean shutdownActivityAfterwards,
                                     boolean dismissActivityAfterward) {
         if (!started || !enabled() || inmobiInterstitial == null || inmobiListener == null) {

@@ -42,6 +42,10 @@ public final class Offers {
     private static final Logger LOG = Logger.getLogger(Offers.class);
     static final boolean DEBUG_MODE = false;
 
+    public static final String PLACEMENT_INTERSTITIAL_EXIT = "interstitial_exit";
+    public static final String PLACEMENT_INTERSTITIAL_HOME = "interstitial_home";
+    public static final String PLACEMENT_INTERSTITIAL_TRANSFERS = "interstitial_transfers";
+
     private Offers() {
     }
 
@@ -113,6 +117,7 @@ public final class Offers {
     }
 
     public static void showInterstitial(final Activity activity,
+                                        String placement,
                                         final boolean shutdownAfterwards,
                                         final boolean dismissAfterwards) {
 
@@ -126,7 +131,7 @@ public final class Offers {
             for (AdNetwork adNetwork : getActiveAdNetworks()) {
                 if (!interstitialShown && adNetwork != null && adNetwork.started()) {
                     LOG.info("showInterstitial: AdNetwork " + adNetwork.getClass().getSimpleName() + " started? " + adNetwork.started());
-                    interstitialShown = adNetwork.showInterstitial(activity, shutdownAfterwards, dismissAfterwards);
+                    interstitialShown = adNetwork.showInterstitial(activity, placement, shutdownAfterwards, dismissAfterwards);
                     if (interstitialShown) {
                         LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial shown");
                         return;
@@ -150,7 +155,9 @@ public final class Offers {
         } // otherwise it's up to the interstitial and its listener to dismiss or shutdown if necessary.
     }
 
-    public static void showInterstitialOfferIfNecessary(Activity ctx) {
+    public static void showInterstitialOfferIfNecessary(Activity ctx, String placement,
+                                                        final boolean shutdownAfterwards,
+                                                        final boolean dismissAfterwards) {
         TransferManager TM = TransferManager.instance();
         int startedTransfers = TM.incrementStartedTransfers();
         ConfigurationManager CM = ConfigurationManager.instance();
@@ -164,7 +171,7 @@ public final class Offers {
         boolean shouldDisplayFirstOne = (Offers.lastInterstitialShownTimestamp == -1 && startedEnoughTransfers);
 
         if (shouldDisplayFirstOne || (itsBeenLongEnough && startedEnoughTransfers)) {
-            Offers.showInterstitial(ctx, false, false);
+            Offers.showInterstitial(ctx, placement, shutdownAfterwards, dismissAfterwards);
             TM.resetStartedTransfers();
             Offers.lastInterstitialShownTimestamp = System.currentTimeMillis();
         }
@@ -197,7 +204,7 @@ public final class Offers {
         final int r = new Random().nextInt(100) + 1;
         LOG.info("threshold: " + b2bThreshold + " - dice roll: " + r + " (" + (r < b2bThreshold) + ")");
         if (r < b2bThreshold) {
-            REMOVE_ADS.showInterstitial(activity, false, false);
+            REMOVE_ADS.showInterstitial(activity, null, false, false);
         }
     }
 

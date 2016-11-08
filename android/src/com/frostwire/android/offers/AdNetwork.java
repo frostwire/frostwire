@@ -36,6 +36,7 @@ interface AdNetwork {
     boolean started();
 
     boolean showInterstitial(Activity activity,
+                             String placement,
                              final boolean shutdownActivityAfterwards,
                              final boolean dismissActivityAfterward);
 

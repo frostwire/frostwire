@@ -89,7 +89,7 @@ public class StartDownloadTask extends ContextTask<Transfer> {
     protected void onPostExecute(Context ctx, Transfer transfer) {
         if (transfer != null) {
             if (ctx instanceof Activity) {
-                Offers.showInterstitialOfferIfNecessary((Activity) ctx);
+                Offers.showInterstitialOfferIfNecessary((Activity) ctx, Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, false, false);
             }
 
             if (!(transfer instanceof InvalidTransfer)) {

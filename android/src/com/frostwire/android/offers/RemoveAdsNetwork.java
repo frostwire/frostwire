@@ -85,6 +85,7 @@ class RemoveAdsNetwork implements AdNetwork {
 
     @Override
     public boolean showInterstitial(Activity activity,
+                                    String placement,
                                     boolean shutdownActivityAfterwards,
                                     boolean dismissActivityAfterward) {
         if (started() && enabled() && activity != null) {

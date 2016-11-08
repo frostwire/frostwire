@@ -72,6 +72,12 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
         return isVideoAd;
     }
 
+    @Override
+    public boolean show(Activity activity, String placement) {
+        return show(activity);
+    }
+
+    @Override
     public boolean show(Activity activity) {
         boolean result = false;
         if (ad != null && activity != null) {

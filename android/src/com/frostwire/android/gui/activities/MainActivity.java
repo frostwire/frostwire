@@ -586,7 +586,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
         } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
-            Offers.showInterstitial(this, false, false);
+            Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, false, false);
         }
 
         if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
@@ -648,11 +648,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void onLastDialogButtonPositive() {
-        Offers.showInterstitial(this, false, true);
+        Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_HOME, false, true);
     }
 
     private void onShutdownDialogButtonPositive() {
-        Offers.showInterstitial(this, true, false);
+        Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, true, false);
     }
 
     private void syncSlideMenu() {

@@ -113,6 +113,7 @@ class AppLovinAdNetwork implements AdNetwork {
 
     @Override
     public boolean showInterstitial(Activity activity,
+                                    String placement,
                                     final boolean shutdownAfterwards,
                                     final boolean dismissAfterward) {
         boolean result = false;
