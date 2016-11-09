@@ -270,6 +270,9 @@ public final class Offers {
     }
 
     public static class AdNetworkHelper {
+
+        private static Map<AdNetwork, Boolean> STARTED_NETWORKS = new HashMap<>();
+
         public static boolean enabled(AdNetwork network) {
             if (network.isDebugOn()) {
                 return true;
@@ -338,6 +341,25 @@ public final class Offers {
                     UIUtils.sendShutdownIntent(fallbackContext);
                 }
             }
+        }
+
+        public static boolean started(AdNetwork adNetwork) {
+            if (STARTED_NETWORKS.containsKey(adNetwork)) {
+                return false;
+            }
+            return STARTED_NETWORKS.get(adNetwork);
+        }
+
+        public static void start(AdNetwork adNetwork) {
+            if (adNetwork.enabled()) {
+                STARTED_NETWORKS.put(adNetwork, true);
+            } else {
+                LOG.warn("AdNetworkHelper.start() failed, network (" + adNetwork.getShortCode() + ") is not enabled");
+            }
+        }
+
+        public static void stop(AdNetwork adNetwork) {
+            STARTED_NETWORKS.put(adNetwork, false);
         }
     }
 }

@@ -26,14 +26,18 @@ interface AdNetwork {
     /** Stops the network, any calls to started() should return false after this has been invoked */
     void stop(Context context);
 
-    /** Enables or disables the ad network */
+    /** Starts the network, any calls to startted() should return true after this has been invoked */
+    void start();
+
+    /** Returns true if the network is initialized. The app can't start unless it's enabled */
+    boolean started();
+
+    /** Enables or disables the ad network in the app's inner settings */
     void enable(boolean enabled);
 
-    /** Returns whether the ad network is enabled or not */
+    /** Returns whether the ad network is enabled or not in the settings */
     boolean enabled();
 
-    /** Returns true if the network is enabled and initialized */
-    boolean started();
 
     boolean showInterstitial(Activity activity,
                              String placement,
@@ -46,4 +50,6 @@ interface AdNetwork {
     String getInUsePreferenceKey();
 
     boolean isDebugOn();
+
+    int hashCode();
 }

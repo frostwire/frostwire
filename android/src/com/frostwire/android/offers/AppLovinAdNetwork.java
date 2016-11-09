@@ -24,7 +24,7 @@ import com.applovin.sdk.AppLovinSdk;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 
-class AppLovinAdNetwork implements AdNetwork {
+class AppLovinAdNetwork extends AbstractAdNetwork {
 
     private static final Logger LOG = Logger.getLogger(AppLovinAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
@@ -39,7 +39,7 @@ class AppLovinAdNetwork implements AdNetwork {
     public void initialize(final Activity activity) {
         if (!enabled()) {
             if (!started()) {
-                LOG.info("AppLovin initialize(): aborted. not enabled.");
+                LOG.info(getClass().getSimpleName() + " initialize(): aborted. not enabled.");
             } else {
                 // initialize can be called multiple times, we may have to stop
                 // this network if we started it using a default value.
@@ -52,7 +52,7 @@ class AppLovinAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 try {
-                    if (!started) {
+                    if (!started()) {
                         final Context applicationContext = activity.getApplicationContext();
                         AppLovinSdk.initializeSdk(applicationContext);
                         AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
@@ -67,12 +67,6 @@ class AppLovinAdNetwork implements AdNetwork {
                 }
             }
         });
-    }
-
-    @Override
-    public void stop(Context context) {
-        started = false;
-        LOG.info("stopped");
     }
 
     @Override
@@ -96,20 +90,6 @@ class AppLovinAdNetwork implements AdNetwork {
         return DEBUG_MODE;
     }
 
-    @Override
-    public boolean started() {
-        return started;
-    }
-
-    @Override
-    public void enable(boolean enabled) {
-        Offers.AdNetworkHelper.enable(this, enabled);
-    }
-
-    @Override
-    public boolean enabled() {
-        return Offers.AdNetworkHelper.enabled(this);
-    }
 
     @Override
     public boolean showInterstitial(Activity activity,
