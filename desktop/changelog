@@ -1,3 +1,11 @@
+frostwire (6.4.1) stable; urgency=high
+  * New jlibtorrent 1.2.0.2
+  * Fixes YT search
+  * Crash fixes and performance upgrades
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 9 Nov 2016 10:11:34 -0600
+
+
 frostwire (6.4.0) stable; urgency=high
   * New jlibtorrent 1.2.0.0
   * Fixes media player for macOS Sierra (10.12)
