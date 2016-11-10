@@ -1,4 +1,4 @@
-FrostWire 1.8.4 - NOV/08/2016
+FrostWire 1.8.4 - NOV/09/2016
  - Fixed YT search
  - Improved Featured Downloads on welcome screen
  - Translation updates: Italian
