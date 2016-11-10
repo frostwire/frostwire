@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package com.frostwire.util.http;
 
 import com.frostwire.util.Logger;
@@ -38,12 +37,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-/** An OkHttpClient based HTTP Client.
-  *
-  * @author gubatron
-  * @author aldenml
-*/
+/**
+ * An OkHttpClient based HTTP Client.
+ *
+ * @author gubatron
+ * @author aldenml
+ */
 public class OKHTTPClient extends AbstractHttpClient {
+
     private static final Logger LOG = Logger.getLogger(OKHTTPClient.class);
     private final ThreadPool pool;
 
@@ -78,9 +79,9 @@ public class OKHTTPClient extends AbstractHttpClient {
         } catch (Throwable e) {
             LOG.error("Error getting bytes from http body response: " + e.getMessage());
         } finally {
-           if (responseBody != null) {
-               closeQuietly(responseBody);
-           }
+            if (responseBody != null) {
+                closeQuietly(responseBody);
+            }
         }
         return result;
     }
@@ -282,9 +283,12 @@ public class OKHTTPClient extends AbstractHttpClient {
         return searchClient;
     }
 
-    /** This interceptor compresses the HTTP request body. Many web servers can't handle this! */
+    /**
+     * This interceptor compresses the HTTP request body. Many web servers can't handle this!
+     */
     class GzipRequestInterceptor implements Interceptor {
-        @Override public Response intercept(Chain chain) throws IOException {
+        @Override
+        public Response intercept(Chain chain) throws IOException {
             Request originalRequest = chain.request();
             if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
                 return chain.proceed(originalRequest);
@@ -297,7 +301,9 @@ public class OKHTTPClient extends AbstractHttpClient {
             return chain.proceed(compressedRequest);
         }
 
-        /** https://github.com/square/okhttp/issues/350 */
+        /**
+         * https://github.com/square/okhttp/issues/350
+         */
         private RequestBody forceContentLength(final RequestBody requestBody) throws IOException {
             final Buffer buffer = new Buffer();
             requestBody.writeTo(buffer);
