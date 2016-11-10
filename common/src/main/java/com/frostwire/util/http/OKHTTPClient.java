@@ -180,19 +180,23 @@ public class OKHTTPClient extends AbstractHttpClient {
         String result = null;
         final OkHttpClient okHttpClient = newOkHttpClient();
         final Response response = this.getSyncResponse(okHttpClient, builder);
-        int httpResponseCode = response.code();
+        try {
+            int httpResponseCode = response.code();
 
-        if ((httpResponseCode != HttpURLConnection.HTTP_OK) && (httpResponseCode != HttpURLConnection.HTTP_PARTIAL)) {
-            throw new ResponseCodeNotSupportedException(httpResponseCode);
+            if ((httpResponseCode != HttpURLConnection.HTTP_OK) && (httpResponseCode != HttpURLConnection.HTTP_PARTIAL)) {
+                throw new ResponseCodeNotSupportedException(httpResponseCode);
+            }
+
+            if (canceled) {
+                onCancel();
+            } else {
+                result = response.body().string();
+                onComplete();
+            }
+        } finally {
+            closeQuietly(response.body());
         }
 
-        if (canceled) {
-            onCancel();
-        } else {
-            result = response.body().string();
-            onComplete();
-        }
-        closeQuietly(response.body());
         return result;
     }
 
