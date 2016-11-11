@@ -120,8 +120,13 @@ public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult 
                 return result - 31L * 24L * 60L * 60L * 1000L; // a month in milliseconds
             }
 
+            if (dateString.contains("Yesterday")) {
+                return result - 1L * 24L * 60L * 60L * 1000L; // one day in milliseconds
+            }
+
+            // this format seems to be not used anymore
             SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            result = myFormat.parse(dateString).getTime();
+            result = myFormat.parse(dateString.trim()).getTime();
         } catch (Throwable t) {
         }
         return result;
