@@ -37,14 +37,7 @@ class AppLovinAdNetwork extends AbstractAdNetwork {
 
     @Override
     public void initialize(final Activity activity) {
-        if (!enabled()) {
-            if (!started()) {
-                LOG.info(getClass().getSimpleName() + " initialize(): aborted. not enabled.");
-            } else {
-                // initialize can be called multiple times, we may have to stop
-                // this network if we started it using a default value.
-                stop(activity);
-            }
+        if (abortInitializeIfNotEnabled(activity)) {
             return;
         }
 
@@ -55,10 +48,9 @@ class AppLovinAdNetwork extends AbstractAdNetwork {
                     if (!started()) {
                         final Context applicationContext = activity.getApplicationContext();
                         AppLovinSdk.initializeSdk(applicationContext);
-                        AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
-                        if (DEBUG_MODE) {
-                            AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(true);
-                        }
+                        AppLovinSdk.getInstance(activity).getSettings().setMuted(!DEBUG_MODE);
+                        AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(DEBUG_MODE);
+                        LOG.info("AppLovin initialized.");
                         loadNewInterstitial(activity);
                         markStarted();
                     }

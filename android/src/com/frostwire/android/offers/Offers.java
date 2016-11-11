@@ -347,19 +347,21 @@ public final class Offers {
             if (STARTED_NETWORKS.containsKey(adNetwork)) {
                 return false;
             }
-            return STARTED_NETWORKS.get(adNetwork);
+
+            Boolean result = STARTED_NETWORKS.get(adNetwork);
+            return result != null && result.booleanValue();
         }
 
         public static void markStarted(AdNetwork adNetwork) {
             if (adNetwork.enabled()) {
-                STARTED_NETWORKS.put(adNetwork, true);
+                STARTED_NETWORKS.put(adNetwork, Boolean.TRUE);
             } else {
                 LOG.warn("AdNetworkHelper.start() failed, network (" + adNetwork.getShortCode() + ") is not enabled");
             }
         }
 
         public static void stop(AdNetwork adNetwork) {
-            STARTED_NETWORKS.put(adNetwork, false);
+            STARTED_NETWORKS.put(adNetwork, Boolean.FALSE);
         }
     }
 }

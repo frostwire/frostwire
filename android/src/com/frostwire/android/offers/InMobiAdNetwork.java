@@ -18,7 +18,7 @@
 package com.frostwire.android.offers;
 
 import android.app.Activity;
-import android.content.Context;
+
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 import com.inmobi.ads.InMobiInterstitial;
@@ -37,14 +37,7 @@ class InMobiAdNetwork extends AbstractAdNetwork {
     }
 
     public void initialize(final Activity activity) {
-        if (!enabled()) {
-            if (!started()) {
-                LOG.info("InMobi initialize(): aborted. not enabled.");
-            } else {
-                // initialize can be called multiple times, we may have to stop
-                // this network if we started it using a default value.
-                stop(activity);
-            }
+        if (abortInitializeIfNotEnabled(activity)) {
             return;
         }
 
