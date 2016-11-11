@@ -19,6 +19,7 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
+
 import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
 import com.frostwire.android.core.Constants;
@@ -30,7 +31,6 @@ class AppLovinAdNetwork extends AbstractAdNetwork {
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
 
     private AppLovinInterstitialAdapter interstitialAdapter = null;
-    private boolean started = false;
 
     AppLovinAdNetwork() {
     }
@@ -60,7 +60,7 @@ class AppLovinAdNetwork extends AbstractAdNetwork {
                             AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(true);
                         }
                         loadNewInterstitial(activity);
-                        started = true;
+                        markStarted();
                     }
                 } catch (Throwable e) {
                     LOG.error(e.getMessage(), e);
@@ -97,7 +97,7 @@ class AppLovinAdNetwork extends AbstractAdNetwork {
                                     final boolean shutdownAfterwards,
                                     final boolean dismissAfterward) {
         boolean result = false;
-        if (enabled() && started) {
+        if (enabled() && started()) {
             // make sure video ads are always muted, it's very annoying (regardless of playback status)
             AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
             interstitialAdapter.shutdownAppAfter(shutdownAfterwards);
