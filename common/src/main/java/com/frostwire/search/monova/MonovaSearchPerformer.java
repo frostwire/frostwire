@@ -29,7 +29,7 @@ import java.io.IOException;
  * @author gubatron
  * @author aldenml
  */
-public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSearchResult> {
+public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSearchResult> {
 
     private static final int MAX_RESULTS = 10;
     private static final String REGEX = "(?is)<a href=\"//%s/torrent/(?<itemid>[0-9]*?)/(?<filename>.*?).html";
@@ -66,7 +66,7 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
 
     @Override
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
-        String fileName = matcher.group("filename").replace("&amp;", "&").replace("\n","");
+        String fileName = matcher.group("filename").replace("&amp;", "&").replace("\n", "");
         return new MonovaTempSearchResult(getDomainName(), matcher.group("itemid"), fileName);
     }
 
@@ -82,7 +82,7 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
         return candidate;
     }
 
-     /**
+    /**
      public static void main(String[] args) throws Throwable {
 
      for (int i=1; i <= 2; i++) {
@@ -106,5 +106,5 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
      System.out.println("");
      }
      }
-      */
+     */
 }

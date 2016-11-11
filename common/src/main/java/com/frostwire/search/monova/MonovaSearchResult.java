@@ -28,20 +28,19 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public class MonovaSearchResult extends AbstractTorrentSearchResult {
-    private String filename;
-    private String displayName;
-    private String detailsUrl;
-    private String torrentUrl;
-    private String infoHash;
-    private long size;
-    private long creationTime;
-    private int seeds;
+public final class MonovaSearchResult extends AbstractTorrentSearchResult {
+
+    private final String filename;
+    private final String displayName;
+    private final String detailsUrl;
+    private final String torrentUrl;
+    private final String infoHash;
+    private final long size;
+    private final long creationTime;
+    private final int seeds;
 
     public MonovaSearchResult(String detailsUrl, SearchMatcher matcher) {
         /*
@@ -65,7 +64,7 @@ public class MonovaSearchResult extends AbstractTorrentSearchResult {
     }
 
     private String parseDisplayName(String fileName) {
-        return fileName.replaceAll("_"," ");
+        return fileName.replaceAll("_", " ");
     }
 
     private String parseFileName(String name) {

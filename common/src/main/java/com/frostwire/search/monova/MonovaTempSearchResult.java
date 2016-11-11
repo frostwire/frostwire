@@ -25,18 +25,12 @@ import com.frostwire.search.CrawlableSearchResult;
  * @author gubatron
  * @author aldenml
  */
-public class MonovaTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
+final class MonovaTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
-    private final String itemId;
     private final String detailsUrl;
 
     public MonovaTempSearchResult(String domainName, String itemId, String filename) {
-        this.itemId = itemId;
         this.detailsUrl = "http://" + domainName + "/torrent/" + itemId + "/" + filename + ".html";
-    }
-
-    public String getItemId() {
-        return itemId;
     }
 
     @Override
