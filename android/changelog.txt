@@ -1,6 +1,7 @@
 FrostWire 1.8.5 - NOV/11/2016
  - http updates
  - Translation updates: Indonesian, Arabic
+ - jlibtorrent upgrades to openssl-1.1.0c
 
 FrostWire 1.8.4 - NOV/09/2016
  - Fixed YT search
