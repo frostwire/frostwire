@@ -47,6 +47,10 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
         return preliminarySearchResultsPattern;
     }
 
+    public Pattern getDetailsPattern() {
+        return htmlDetailPagePattern;
+    }
+
     @Override
     protected String getCrawlUrl(CrawlableSearchResult sr) {
         String crawlUrl;

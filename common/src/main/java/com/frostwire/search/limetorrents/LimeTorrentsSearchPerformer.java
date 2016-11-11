@@ -69,37 +69,4 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
     protected LimeTorrentsSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         return new LimeTorrentsSearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
     }
-/*
- public static void main(String[] args) throws Exception {
- //REGEX TEST CODE
-
-
-        String resultsHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/testa.html"));
-       final Pattern resultsPattern = Pattern.compile(REGEX);
-
-         final SearchMatcher matcher = SearchMatcher.from(resultsPattern.matcher(resultsHTML));
-          while (matcher.find()) {
-          System.out.println(matcher.group(1));
-             System.out.println("TorrentID: " + matcher.group("itemid"));
-          }
-
-/*
- String resultHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/single.html"));
- final Pattern detailPattern = Pattern.compile(HTML_REGEX);
- final SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(resultHTML));
-
- if (detailMatcher.find()) {
-
-  System.out.println("File name: " + detailMatcher.group("filename"));
-  System.out.println("TorrentID: " + detailMatcher.group("torrentid"));
-  System.out.println("Size: " + detailMatcher.group("filesize"));
-  System.out.println("Unit: " + detailMatcher.group("unit"));
-  System.out.println("Date: " + detailMatcher.group("time"));
-  System.out.println("Seeds: " + detailMatcher.group("seeds"));
- } else {
- System.out.println("No detail matched.");
- }
-
- }
-*/
 }
