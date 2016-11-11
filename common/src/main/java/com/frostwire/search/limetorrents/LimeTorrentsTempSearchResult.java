@@ -20,6 +20,7 @@ package com.frostwire.search.limetorrents;
 
 import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
+import com.frostwire.util.UrlUtils;
 
 /**
  * Created by alejandroarturom on 26-08-16.
@@ -29,6 +30,8 @@ final class LimeTorrentsTempSearchResult extends AbstractSearchResult implements
     private final String detailsUrl;
 
     LimeTorrentsTempSearchResult(String domainName, String itemId) {
+        // sometimes the itemId needs to be url encoded
+        itemId = UrlUtils.encode(itemId);
         this.detailsUrl = "https://" + domainName + "/torrent/" + itemId + ".html";
     }
 
