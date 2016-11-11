@@ -30,11 +30,11 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"http://itorrents.org/torrent/(.*?).torrent?(.*?)\" rel=\"nofollow\" class=\"csprite_dl14\"></a><a href=\"(?<itemid>.*?).html?(.*?)\">.*?</a></div>.*?";
     private static final String HTML_REGEX =
-            "(?is)<h1>(?<filename>.*?)</h1>.*?" + // +
+            "(?is)(<h1>|<img.*/> )(?<filename>.*?)</h1>.*?" +
                     "<span class=\"greenish\">Seeders : (?<seeds>\\d*?)</span>.*?" +
                     "<tr><td align=\"right\"><b>Hash</b> :</td><td>(?<torrentid>.*?)</td></tr>.*?" +
-                    "<tr><td align=\"right\"><b>Added</b> :</td><td>(?<time>.*?)  in.*?" +
-                    "<tr><td align=\"right\"><b>Size</b> :</td><td>(?<filesize>.*?) (?<unit>[A-Z]+)</td></tr>.*?"; // +
+                    "<tr><td align=\"right\"><b>Added</b> :</td><td>(?<time>.*?) in.*?" +
+                    "<tr><td align=\"right\"><b>Size</b> :</td><td>(?<filesize>.*?) (?<unit>[A-Z]+)</td></tr>.*?";
 
     public LimeTorrentsSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
