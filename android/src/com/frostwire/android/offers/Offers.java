@@ -350,7 +350,7 @@ public final class Offers {
             return STARTED_NETWORKS.get(adNetwork);
         }
 
-        public static void start(AdNetwork adNetwork) {
+        public static void markStarted(AdNetwork adNetwork) {
             if (adNetwork.enabled()) {
                 STARTED_NETWORKS.put(adNetwork, true);
             } else {

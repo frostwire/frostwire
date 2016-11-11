@@ -30,7 +30,7 @@ import com.frostwire.util.Logger;
  * @author gubatron
  */
 
-public class MoPubAdNetwork implements AdNetwork {
+public class MoPubAdNetwork extends AbstractAdNetwork {
     private static final Logger LOG = Logger.getLogger(MoPubAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
 
@@ -40,33 +40,12 @@ public class MoPubAdNetwork implements AdNetwork {
     }
 
     @Override
-    public void stop(Context context) {
-
-    }
-
-    @Override
-    public void enable(boolean enabled) {
-        Offers.AdNetworkHelper.enable(this, enabled);
-    }
-
-    @Override
-    public boolean enabled() {
-        return Offers.AdNetworkHelper.enabled(this);
-    }
-
-    @Override
-    public boolean started() {
-        return false;
-    }
-
-    @Override
     public boolean showInterstitial(Activity activity, String placement, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward) {
         return false;
     }
 
     @Override
     public void loadNewInterstitial(Activity activity) {
-
     }
 
     @Override

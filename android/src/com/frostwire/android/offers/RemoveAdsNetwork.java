@@ -30,36 +30,27 @@ import com.frostwire.util.Logger;
  * @author aldenml
  * @author gubatron
  */
-class RemoveAdsNetwork implements AdNetwork {
+class RemoveAdsNetwork extends AbstractAdNetwork {
 
     private static final Logger LOG = Logger.getLogger(RemoveAdsNetwork.class);
-
-    private boolean started;
 
     RemoveAdsNetwork() {
     }
 
     @Override
     public void initialize(Activity activity) {
-        if (!(started = enabled())) {
+        if (enabled()) {
+            markStarted();
+        }
+        if (!started()) {
             LOG.info("RemoveAds initialize(): aborted. not enabled.");
             if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
                 LOG.info("RemoveAds initialize(): not available for plus.");
             }
-            started = false;
+            stop(activity);
         }
     }
 
-    @Override
-    public void stop(Context context) {
-        started = false;
-        LOG.info("stopped");
-    }
-
-    @Override
-    public void enable(boolean enabled) {
-        Offers.AdNetworkHelper.enable(this, enabled);
-    }
 
     @Override
     public boolean enabled() {
@@ -75,12 +66,6 @@ class RemoveAdsNetwork implements AdNetwork {
             e.printStackTrace();
         }
         return enabled;
-    }
-
-    @Override
-    public boolean started() {
-        LOG.info("started() -> " + started);
-        return started;
     }
 
     @Override

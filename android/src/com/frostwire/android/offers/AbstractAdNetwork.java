@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.frostwire.android.offers;
 
 import android.app.Activity;
@@ -6,7 +23,9 @@ import android.content.Context;
 import com.frostwire.util.Logger;
 
 /**
- * Created by gubatron on 11/9/16.
+ * Created on 11/9/16.
+ * @author aldenml
+ * @author gubatron
  */
 public abstract class AbstractAdNetwork implements AdNetwork {
 
@@ -18,7 +37,7 @@ public abstract class AbstractAdNetwork implements AdNetwork {
     public abstract void loadNewInterstitial(Activity activity);
     public abstract String getShortCode();
     public abstract String getInUsePreferenceKey();
-    public abstract boolean isDebugOn()
+    public abstract boolean isDebugOn();
 
     @Override
     public void stop(Context context) {
@@ -26,14 +45,9 @@ public abstract class AbstractAdNetwork implements AdNetwork {
         LOG.info("stop() - " + getShortCode() + " stopped");
     }
 
-    public void start() {
-        Offers.AdNetworkHelper.start(this);
-        LOG.info("start() - " + getShortCode() + " started");
-    }
-
     @Override
     public void enable(boolean enabled) {
-        Offers.AdNetworkHelper.enable(this, true);
+        Offers.AdNetworkHelper.enable(this, enabled);
     }
 
     @Override
@@ -44,6 +58,12 @@ public abstract class AbstractAdNetwork implements AdNetwork {
     @Override
     public boolean started() {
         return Offers.AdNetworkHelper.started(this);
+    }
+
+    @Override
+    public void markStarted() {
+        Offers.AdNetworkHelper.markStarted(this);
+        LOG.info("start() - " + getShortCode() + " started");
     }
 
     @Override

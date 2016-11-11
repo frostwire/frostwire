@@ -26,8 +26,8 @@ interface AdNetwork {
     /** Stops the network, any calls to started() should return false after this has been invoked */
     void stop(Context context);
 
-    /** Starts the network, any calls to startted() should return true after this has been invoked */
-    void start();
+    /** Marks the network as started. */
+    void markStarted();
 
     /** Returns true if the network is initialized. The app can't start unless it's enabled */
     boolean started();

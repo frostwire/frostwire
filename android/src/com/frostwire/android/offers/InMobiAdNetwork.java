@@ -24,14 +24,13 @@ import com.frostwire.util.Logger;
 import com.inmobi.ads.InMobiInterstitial;
 import com.inmobi.sdk.InMobiSdk;
 
-class InMobiAdNetwork implements AdNetwork {
+class InMobiAdNetwork extends AbstractAdNetwork {
 
     private static final Logger LOG = Logger.getLogger(InMobiAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
 
     private InMobiInterstitialListener inmobiListener;
     private InMobiInterstitial inmobiInterstitial;
-    private boolean started = false;
     private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150L;
 
     InMobiAdNetwork() {
@@ -49,7 +48,7 @@ class InMobiAdNetwork implements AdNetwork {
             return;
         }
 
-        if (!started) {
+        if (!started()) {
             try {
                 activity.runOnUiThread(new Runnable() {
                     @Override
@@ -61,7 +60,7 @@ class InMobiAdNetwork implements AdNetwork {
                                 InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
                             }
                             LOG.info("InMobi.initialized.");
-                            started = true;
+                            markStarted();
                             LOG.info("Load InmobiInterstitial.");
                         } catch (Throwable e) {
                             // TODO: IMPORTANT review this problem, by aldenml
@@ -74,33 +73,18 @@ class InMobiAdNetwork implements AdNetwork {
                 loadNewInterstitial(activity);
             } catch (Throwable t) {
                 t.printStackTrace();
-                started = false;
+                stop(activity);
             }
         }
     }
 
-    @Override
-    public void stop(Context context) {
-        started = false;
-        LOG.info("stopped");
-    }
-
-    @Override
-    public void enable(boolean enabled) {
-        Offers.AdNetworkHelper.enable(this, enabled);
-    }
-
-    @Override
-    public boolean enabled() {
-        return Offers.AdNetworkHelper.enabled(this);
-    }
 
     @Override
     public boolean showInterstitial(Activity activity,
                                     String placement,
                                     boolean shutdownActivityAfterwards,
                                     boolean dismissActivityAfterward) {
-        if (!started || !enabled() || inmobiInterstitial == null || inmobiListener == null) {
+        if (!started() || !enabled() || inmobiInterstitial == null || inmobiListener == null) {
             return false;
         }
 
@@ -121,13 +105,8 @@ class InMobiAdNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean started() {
-        return started;
-    }
-
-    @Override
     public void loadNewInterstitial(final Activity activity) {
-        if (!started || !enabled()) {
+        if (!started() || !enabled()) {
             return; //not ready
         }
 
