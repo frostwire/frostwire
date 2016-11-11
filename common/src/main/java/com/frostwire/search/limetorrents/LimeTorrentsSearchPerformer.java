@@ -30,7 +30,7 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"http://itorrents.org/torrent/(.*?).torrent?(.*?)\" rel=\"nofollow\" class=\"csprite_dl14\"></a><a href=\"(?<itemid>.*?).html?(.*?)\">.*?</a></div>.*?";
     private static final String HTML_REGEX =
-                    "(?is)<h1>(?<filename>.*?)</h1>.*?" + // +
+            "(?is)<h1>(?<filename>.*?)</h1>.*?" + // +
                     "<span class=\"greenish\">Seeders : (?<seeds>\\d*?)</span>.*?" +
                     "<tr><td align=\"right\"><b>Hash</b> :</td><td>(?<torrentid>.*?)</td></tr>.*?" +
                     "<tr><td align=\"right\"><b>Added</b> :</td><td>(?<time>.*?)  in.*?" +
@@ -53,17 +53,17 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
         return new LimeTorrentsTempSearchResult(getDomainName(), transformedId);
     }
 
-        @Override
-        protected int htmlPrefixOffset(String html) {
-            int offset = html.indexOf("FREE</a>");
-            return offset > 0 ? offset : 0;
-        }
+    @Override
+    protected int htmlPrefixOffset(String html) {
+        int offset = html.indexOf("FREE</a>");
+        return offset > 0 ? offset : 0;
+    }
 
-        @Override
-        protected int htmlSuffixOffset(String html) {
-            int offset = html.indexOf("<div><h3>Latest Searches</h3>");
-            return offset > 0 ? offset : 0;
-        }
+    @Override
+    protected int htmlSuffixOffset(String html) {
+        int offset = html.indexOf("<div><h3>Latest Searches</h3>");
+        return offset > 0 ? offset : 0;
+    }
 
     @Override
     protected LimeTorrentsSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
