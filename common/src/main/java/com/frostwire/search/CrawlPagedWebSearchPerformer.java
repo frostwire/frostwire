@@ -44,6 +44,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
     private int numCrawls;
 
     protected static final Map<String, Integer> UNIT_TO_BYTES;
+
     static {
         UNIT_TO_BYTES = new HashMap<>();
         UNIT_TO_BYTES.put("bytes", 1);
@@ -145,7 +146,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                             }
                         }
                     } catch (Throwable e) {
-                        LOG.warn("Error creating crawled results from downloaded data: " + e.getMessage());
+                        LOG.warn("Error creating crawled results from downloaded data: " + "url=" + url + ", e=" + e.getMessage());
                         cacheRemove(url); // invalidating cache data
                     }
                 } else {

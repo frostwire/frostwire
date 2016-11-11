@@ -19,10 +19,10 @@ package com.frostwire.search;
 
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.util.Logger;
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
-import com.frostwire.regex.Pattern;
+import com.frostwire.util.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -77,17 +77,17 @@ public final class PerformersHelper {
      * This method is only public allow reuse inside the package search, consider it a private API
      */
     public static List<? extends SearchResult> crawlTorrent(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data, boolean detectAlbums) {
-        List<TorrentCrawledSearchResult> list = new LinkedList<TorrentCrawledSearchResult>();
+        List<TorrentCrawledSearchResult> list = new LinkedList<>();
 
         if (data == null) {
             return list;
         }
 
-        TorrentInfo ti = null;
+        TorrentInfo ti;
         try {
             ti = TorrentInfo.bdecode(data);
         } catch (Throwable t) {
-            LOG.error("Can't bdecode:\n" + new String(data) + "\n\n");
+            //LOG.error("Can't bdecode:\n" + new String(data) + "\n\n");
             throw t;
         }
 
@@ -104,7 +104,7 @@ public final class PerformersHelper {
         }
 
         if (detectAlbums) {
-            List<SearchResult> temp = new LinkedList<SearchResult>();
+            List<SearchResult> temp = new LinkedList<>();
             temp.addAll(list);
             temp.addAll(new AlbumCluster().detect(sr, list));
             return temp;
