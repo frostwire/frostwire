@@ -25,6 +25,7 @@ import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 /**
  * @author alejandroarturom
  */
+// TODO: this performer does not need to download a torrent to get the details
 public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<LimeTorrentsSearchResult> {
 
     private static final int MAX_RESULTS = 20;
