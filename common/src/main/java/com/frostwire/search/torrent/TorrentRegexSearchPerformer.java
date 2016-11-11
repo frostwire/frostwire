@@ -17,25 +17,24 @@
 
 package com.frostwire.search.torrent;
 
-import com.frostwire.util.Logger;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.*;
+import com.frostwire.util.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResult> extends CrawlRegexSearchPerformer<CrawlableSearchResult> {
 
+    private final static Logger LOG = Logger.getLogger(TorrentRegexSearchPerformer.class);
+
     private final Pattern preliminarySearchResultsPattern;
     private final Pattern htmlDetailPagePattern;
-    private final static Logger LOG = Logger.getLogger(TorrentRegexSearchPerformer.class);
 
     public TorrentRegexSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls, int regexMaxResults, String preliminarySearchResultsRegex, String htmlDetailPagePatternRegex) {
         super(domainName, token, keywords, timeout, pages, numCrawls, regexMaxResults);
@@ -82,7 +81,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
 
             if (html != null) {
                 Matcher matcher = htmlDetailPagePattern.matcher(html);
-    
+
                 try {
                     // BOOKMARK: this is a good spot to put a break point in-order to test your search performer's regex
                     if (matcher.find()) {
@@ -91,10 +90,10 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
                             list.add(searchResult);
                         }
                     } else {
-                        LOG.error("Update Necessary: Search broken for " + sr.getClass().getPackage().getName() + "\n(please notify dev-team on twitter @frostwire or write to contact@frostwire.com if you keep seeing this message.)\n" + sr.getDetailsUrl()+"\n\n");
+                        LOG.error("Update Necessary: Search broken for " + sr.getClass().getPackage().getName() + "\n(please notify dev-team on twitter @frostwire or write to contact@frostwire.com if you keep seeing this message.)\n" + sr.getDetailsUrl() + "\n\n");
                     }
                 } catch (Throwable e) {
-                    throw new Exception("URL:" + sr.getDetailsUrl() + " ("+ e.getMessage()+")", e);
+                    throw new Exception("URL:" + sr.getDetailsUrl() + " (" + e.getMessage() + ")", e);
                 }
             } else {
                 LOG.error("Update Necessary: HTML could not be reduced for optimal search. Search broken for " + sr.getClass().getPackage().getName() + " (please notify dev-team on twitter @frostwire or write to contact@frostwire.com if you keep seeing this message.)");
@@ -113,7 +112,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
     protected int htmlPrefixOffset(String html) {
         return 0;
     }
-    
+
     /**
      * Sometimes the HTML_REGEX has to work on too big of an HTML file.
      * In order to minimize the chance for long backtracking times we can
