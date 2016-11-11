@@ -41,7 +41,7 @@ public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult 
     private final int seeds;
 
 
-    LimeTorrentsSearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
+    LimeTorrentsSearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
         this.infoHash = matcher.group("torrentid");
         this.filename = parseFileName(matcher.group("filename"));

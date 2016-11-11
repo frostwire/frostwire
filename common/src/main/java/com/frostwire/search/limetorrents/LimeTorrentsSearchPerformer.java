@@ -67,6 +67,6 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
 
     @Override
     protected LimeTorrentsSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
-        return new LimeTorrentsSearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
+        return new LimeTorrentsSearchResult(sr.getDetailsUrl(), matcher);
     }
 }
