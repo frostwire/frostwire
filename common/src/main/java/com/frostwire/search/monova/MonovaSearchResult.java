@@ -57,10 +57,7 @@ public final class MonovaSearchResult extends AbstractTorrentSearchResult {
         this.creationTime = parseCreationTime(matcher.group("creationtime"));
         this.size = parseSize(matcher.group("size"));
         this.seeds = parseSeeds(matcher.group("seeds"));
-
-        // Monova can't handle direct download of torrents without some sort of cookie
-        //the torcache url wont resolve into direct .torrent
-        this.torrentUrl = "magnet:?xt=urn:btih:" + infoHash;
+        this.torrentUrl = matcher.group("torrenturl");
     }
 
     private String parseDisplayName(String fileName) {

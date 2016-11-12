@@ -19,7 +19,6 @@
 package com.frostwire.search.monova;
 
 import com.frostwire.search.CrawlableSearchResult;
-import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 
@@ -43,7 +42,9 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
             // infohash
             "<td>Hash:</td>.*?<td>(?<infohash>[A-Fa-f0-9]{40})</td>.*?" +
             // size
-            "<td>Total size:</td>.*?<td>(?<size>.*?)</td>.*?";
+            "<td>Total size:</td>.*?<td>(?<size>.*?)</td>.*?" +
+            // download torrent url
+            "<a id=\"download-file\" href=\"(?<torrenturl>.*?)\" class=\"btn";
 
     public MonovaSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, String.format(REGEX, domainName), HTML_REGEX);
@@ -72,13 +73,8 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
 
     @Override
     protected MonovaSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
-        MonovaSearchResult candidate = new MonovaSearchResult(sr.getDetailsUrl(), matcher);
-        int daysOld = PerformersHelper.daysOld(candidate);
-        if (candidate.getSeeds() < 25 || daysOld > 200) {
-            //since we can only do monova using magnets, we better have seeds or else we'll
-            //suck in UX.
-            candidate = null;
-        }
-        return candidate;
+        MonovaSearchResult r = new MonovaSearchResult(sr.getDetailsUrl(), matcher);
+        // filter out magnets
+        return !r.getTorrentUrl().contains("magnet") ? r : null;
     }
 }
