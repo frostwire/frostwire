@@ -18,7 +18,7 @@
 package com.frostwire.search;
 
 import com.frostwire.regex.Pattern;
-import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
+import com.frostwire.search.monova.MonovaSearchPerformer;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -27,11 +27,28 @@ import java.io.IOException;
  * @author gubatron
  * @author aldenml
  */
-public class LimeTorrentsTest {
+public class MonovaTest {
+
+    @Test
+    public void testRegex() throws IOException {
+        MonovaSearchPerformer p = (MonovaSearchPerformer) SearchManager.MONOVA.newPerformer(0, "<keyword>");
+
+        String url = p.getUrl(0, p.getEncodedKeywords());
+        System.out.println(url);
+        String page = p.fetchSearchPage(url);
+        System.out.println(page);
+
+        Pattern pattern = p.getPattern();
+        SearchMatcher matcher = SearchMatcher.from(pattern.matcher(page));
+
+        while (matcher.find()) {
+            System.out.println("itemid: [" + matcher.group("itemid") + "]");
+        }
+    }
 
     @Test
     public void testDetailsRegex() throws IOException {
-        LimeTorrentsSearchPerformer p = (LimeTorrentsSearchPerformer) SearchManager.LIMETORRENTS.newPerformer(0, "<keyword>");
+        MonovaSearchPerformer p = (MonovaSearchPerformer) SearchManager.MONOVA.newPerformer(0, "<keyword>");
 
         String url = "<url>";
         String page = p.fetch(url);
@@ -41,12 +58,11 @@ public class LimeTorrentsTest {
         SearchMatcher matcher = SearchMatcher.from(pattern.matcher(page));
 
         if (matcher.find()) {
-            System.out.println("File name: " + matcher.group("filename"));
-            System.out.println("TorrentID: " + matcher.group("torrentid"));
-            System.out.println("Size: " + matcher.group("filesize"));
-            System.out.println("Unit: " + matcher.group("unit"));
-            System.out.println("Date: " + matcher.group("time"));
-            System.out.println("Seeds: " + matcher.group("seeds"));
+            System.out.println("group filename: [" + matcher.group("filename") + "]");
+            System.out.println("group creationtime: [" + matcher.group("creationtime") + "]");
+            System.out.println("group seeds: [" + matcher.group("seeds") + "]");
+            System.out.println("group infohash: [" + matcher.group("infohash") + "]");
+            System.out.println("group size: [" + matcher.group("size") + "]");
         } else {
             System.out.println("No detail matched.");
         }

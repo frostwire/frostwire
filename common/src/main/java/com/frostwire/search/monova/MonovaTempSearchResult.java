@@ -30,7 +30,7 @@ final class MonovaTempSearchResult extends AbstractSearchResult implements Crawl
     private final String detailsUrl;
 
     public MonovaTempSearchResult(String domainName, String itemId, String filename) {
-        this.detailsUrl = "http://" + domainName + "/torrent/" + itemId + "/" + filename + ".html";
+        this.detailsUrl = "https://" + domainName + "/torrent/" + itemId + "/" + filename;
     }
 
     @Override

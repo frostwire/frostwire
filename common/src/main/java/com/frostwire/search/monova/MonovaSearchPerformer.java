@@ -32,7 +32,7 @@ import java.io.IOException;
 public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSearchResult> {
 
     private static final int MAX_RESULTS = 10;
-    private static final String REGEX = "(?is)<a href=\"//%s/torrent/(?<itemid>[0-9]*?)/(?<filename>.*?).html";
+    private static final String REGEX = "(?is)<a href=\"//%s/torrent/(?<itemid>[0-9]*?)/(?<filename>.*?)\">";
     private static final String HTML_REGEX = "(?is)" +
             // filename
             "<div class=\"col-md-12.*?<h1>\\n(?<filename>.*?) </h1>.*?" +
@@ -50,12 +50,12 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
     }
 
     @Override
-    protected String getUrl(int page, String encodedKeywords) {
+    public String getUrl(int page, String encodedKeywords) {
         return "http://" + getDomainName() + "/search?verified=1&sort=1&page=1&term=" + encodedKeywords;
     }
 
     @Override
-    protected String fetchSearchPage(String url) throws IOException {
+    public String fetchSearchPage(String url) throws IOException {
         return fetch(url, "MONOVA=1; MONOVA-ADULT=0; MONOVA-NON-ADULT=1;", null);
     }
 
@@ -81,30 +81,4 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
         }
         return candidate;
     }
-
-    /**
-     public static void main(String[] args) throws Throwable {
-
-     for (int i=1; i <= 2; i++) {
-     byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/monova_input" + i + ".html"));
-     String fileStr = new String(readAllBytes, "utf-8");
-     System.out.println(HTML_REGEX);
-     Pattern pattern = Pattern.compile(HTML_REGEX);
-     Matcher matcher = pattern.matcher(fileStr);
-
-     boolean matcherFind = matcher.find();
-     System.out.println("find? : " + matcherFind);
-
-     if (matcherFind) {
-     System.out.println("group filename: [" + matcher.group("filename") + "]");
-     System.out.println("group creationtime: [" + matcher.group("creationtime") + "]");
-     System.out.println("group seeds: [" + matcher.group("seeds") + "]");
-     System.out.println("group infohash: [" + matcher.group("infohash") + "]");
-     System.out.println("group size: [" + matcher.group("size") + "]");
-     System.out.println("\n========================");
-     }
-     System.out.println("");
-     }
-     }
-     */
 }
