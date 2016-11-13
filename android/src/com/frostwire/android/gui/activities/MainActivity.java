@@ -445,11 +445,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         //externalStorageChecker.setPermissionsGrantedCallback(() -> {});
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
 
-        // WRITE SETTINGS (Setting the default ringtone requires this)
-        final DangerousPermissionsChecker writeSettingsChecker =
-                new DangerousPermissionsChecker(this, DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
-        checkers.put(DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE, writeSettingsChecker);
-        // the permissionGrantedCallBack will be set by whoever uses this during runtime.
+        // COARSE
+        final DangerousPermissionsChecker accessCoarseLocationChecker =
+                new DangerousPermissionsChecker(this, DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE);
+        checkers.put(DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE, accessCoarseLocationChecker);
 
         // add more permissions checkers if needed...
         return checkers;
@@ -495,6 +494,17 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         checkExternalStoragePermissionsOrBindMusicService();
+        checkAccessCoarseLocationPermissions();
+    }
+
+    private void checkAccessCoarseLocationPermissions() {
+        DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE);
+        if (checker != null && !checker.hasAskedBefore()) {
+            checker.requestPermissions();
+            ConfigurationManager.instance().setBoolean(Constants.ASKED_FOR_ACCESS_COARSE_LOCATION_PERMISSIONS, true);
+        } else {
+            LOG.info("Asked for ACCESS_COARSE_LOCATION before, skipping.");
+        }
     }
 
     private void checkExternalStoragePermissionsOrBindMusicService() {

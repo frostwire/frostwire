@@ -29,6 +29,8 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.util.Logger;
@@ -43,13 +45,21 @@ import java.lang.reflect.Method;
  */
 public final class DangerousPermissionsChecker implements ActivityCompat.OnRequestPermissionsResultCallback {
 
+    public boolean hasAskedBefore() {
+        if (requestCode == ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE) {
+            return ConfigurationManager.instance().getBoolean(Constants.ASKED_FOR_ACCESS_COARSE_LOCATION_PERMISSIONS);
+        }
+        return false;
+    }
+
     public interface OnPermissionsGrantedCallback {
         void onPermissionsGranted();
     }
 
-    private static final Logger LOGGER = Logger.getLogger(DangerousPermissionsChecker.class);
+    private static final Logger LOG = Logger.getLogger(DangerousPermissionsChecker.class);
     public static final int EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE = 0x000A;
     public static final int WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE = 0x000B;
+    public static final int ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE = 0x000C;
 
     // HACK: just couldn't find another way, and this saved a lot of overcomplicated logic in the onActivityResult handling activities.
     static long AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
@@ -80,7 +90,6 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             return;
         }
         Activity activity = activityRef.get();
-
         String[] permissions = null;
         switch (requestCode) {
             case EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE:
@@ -100,6 +109,9 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
                         Manifest.permission.WRITE_SETTINGS
                 };
                 break;
+            case ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE:
+                permissions = new String[] { Manifest.permission.ACCESS_COARSE_LOCATION };
+                break;
         }
 
         if (permissions != null) {
@@ -117,6 +129,8 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             case WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE:
                 permissionWasGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 break;
+            case ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE:
+                permissionWasGranted = onAccessCoarseLocationPermissionsResult(permissions, grantResults);
             default:
                 break;
         }
@@ -150,14 +164,14 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         boolean hasWriteSettings = DangerousPermissionsChecker.hasPermissionToWriteSettings(handlerActivity);
 
         if (!hasWriteSettings) {
-            LOGGER.warn("handleOnWriteSettingsActivityResult! had no permission to write settings");
+            LOG.warn("handleOnWriteSettingsActivityResult! had no permission to write settings");
             AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
             FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
             return false;
         }
 
         if (AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK == -1) {
-            LOGGER.warn("handleOnWriteSettingsActivityResult! AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK not set");
+            LOG.warn("handleOnWriteSettingsActivityResult! AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK not set");
             return false;
         }
 
@@ -182,7 +196,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             final Method canWriteMethod = SystemClass.getMethod("canWrite", Context.class);
             return (boolean) canWriteMethod.invoke(null, context);
         } catch (Throwable t) {
-            LOGGER.error(t.getMessage(), t);
+            LOG.error(t.getMessage(), t);
         }
         return false;
     }
@@ -248,6 +262,16 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             }
         }
         return true;
+    }
+
+    private boolean onAccessCoarseLocationPermissionsResult(String[] permissions, int[] grantResults) {
+        for (int i = 0; i < permissions.length; i++) {
+            if (permissions[i].equals(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                LOG.info("ACCESS_COARSE_LOCATION permission granted? " + (grantResults[i] == PackageManager.PERMISSION_GRANTED));
+                return grantResults[i] == PackageManager.PERMISSION_GRANTED;
+            }
+        }
+        return false;
     }
 
     private void shutdownFrostWire() {
