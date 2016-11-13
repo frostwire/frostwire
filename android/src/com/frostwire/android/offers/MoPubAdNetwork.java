@@ -74,7 +74,14 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
 
     @Override
     public boolean showInterstitial(Activity activity, String placement, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward) {
-        return false;
+        if (interstitials == null || interstitials.isEmpty()) {
+            return false;
+        }
+        MoPubInterstitial interstitial = interstitials.get(placement);
+        MoPubInterstitialListener listener = (MoPubInterstitialListener) interstitial.getInterstitialAdListener();
+        listener.shutdownAppAfter(shutdownActivityAfterwards);
+        listener.dismissActivityAfterwards(dismissActivityAfterward);
+        return interstitial.show();
     }
 
     @Override
