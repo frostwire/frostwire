@@ -273,6 +273,11 @@ public final class Offers {
 
         private static Map<AdNetwork, Boolean> STARTED_NETWORKS = new HashMap<>();
 
+        /**
+         * Is the network enabled in the configuration?
+         * @param network
+         * @return
+         */
         public static boolean enabled(AdNetwork network) {
             if (network.isDebugOn()) {
                 return true;
@@ -289,6 +294,11 @@ public final class Offers {
             return enabled;
         }
 
+        /**
+         * Mark the network enabled or disabled in the configuration
+         * @param network
+         * @param enabled
+         */
         public static void enable(AdNetwork network, boolean enabled) {
             ConfigurationManager config = ConfigurationManager.instance();
             try {
@@ -344,12 +354,10 @@ public final class Offers {
         }
 
         public static boolean started(AdNetwork adNetwork) {
-            if (STARTED_NETWORKS.containsKey(adNetwork)) {
+            if (!STARTED_NETWORKS.containsKey(adNetwork)) {
                 return false;
             }
-
-            Boolean result = STARTED_NETWORKS.get(adNetwork);
-            return result != null && result.booleanValue();
+            return STARTED_NETWORKS.get(adNetwork);
         }
 
         public static void markStarted(AdNetwork adNetwork) {

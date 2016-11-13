@@ -32,10 +32,10 @@ interface AdNetwork {
     /** Returns true if the network is initialized. The app can't start unless it's enabled */
     boolean started();
 
-    /** Enables or disables the ad network in the app's inner settings */
+    /** Enables or disables the ad network in the app's inner configuration */
     void enable(boolean enabled);
 
-    /** Returns whether the ad network is enabled or not in the settings */
+    /** Returns whether the ad network is enabled or not in the configuration */
     boolean enabled();
 
 
@@ -52,4 +52,5 @@ interface AdNetwork {
     boolean isDebugOn();
 
     int hashCode();
+    boolean equals(Object obj);
 }
