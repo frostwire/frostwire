@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
-import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
@@ -30,10 +29,13 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
-//import com.mobfox.sdk.bannerads.Banner;
-//import com.mobfox.sdk.interstitialads.InterstitialAd;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -52,9 +54,9 @@ public final class Offers {
     static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<Runnable>(), true);
     private static long lastInterstitialShownTimestamp = -1;
 
+    private final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
-    //private final static MobFoxAdNetwork MOBFOX = new MobFoxAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
 
     private static Map<String,AdNetwork> AD_NETWORKS;
@@ -97,10 +99,10 @@ public final class Offers {
     private static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {
             AD_NETWORKS = new HashMap<>();
+            AD_NETWORKS.put(MOPUB.getShortCode(), MOPUB);
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
             AD_NETWORKS.put(IN_MOBI.getShortCode(), IN_MOBI);
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
-            //AD_NETWORKS.put(MOBFOX.getShortCode(), MOBFOX);
         }
         return AD_NETWORKS;
     }
@@ -270,7 +272,6 @@ public final class Offers {
     }
 
     public static class AdNetworkHelper {
-
         private static Map<AdNetwork, Boolean> STARTED_NETWORKS = new HashMap<>();
 
         /**

@@ -21,7 +21,14 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
+import com.mopub.mobileads.MoPubInterstitial;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.RunnableFuture;
 
 /**
  * Created on Nov/8/16 (2016 US election day)
@@ -33,10 +40,36 @@ import com.frostwire.util.Logger;
 public class MoPubAdNetwork extends AbstractAdNetwork {
     private static final Logger LOG = Logger.getLogger(MoPubAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
+    private Map<String,String> placements;
+    private boolean isTablet;
+
+
+    private Map<String, MoPubInterstitialListener> interstitialListeners;
+    private Map<String, MoPubInterstitial> interstitials;
 
     @Override
     public void initialize(Activity activity) {
+        if (abortInitializeIfNotEnabled(activity)) {
+            return;
+        }
+        initPlacementMappings(activity);
+        markStarted();
+        loadNewInterstitial(activity);
+    }
 
+    private void initPlacementMappings(Activity activity) {
+        isTablet = UIUtils.isTablet(activity);
+        placements = new HashMap<>();
+
+        if (!isTablet) {
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_EXIT, "399a20d69bdc449a8e0ca171f82179c8");
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_HOME, "e3b83b39766544bebe91d567cbc3f8e0");
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, "f8d5aad13317448287aab91308faa1cd");
+        } else {
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_EXIT, "cebdbc56b37c4d31ba79e861d1cb0de4");
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_HOME, "06d585ac80e54e7f9abb485bc2153ee9");
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, "381bc8b0a9b243ac86e32088e918e653");
+        }
     }
 
     @Override
@@ -45,7 +78,37 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
     }
 
     @Override
-    public void loadNewInterstitial(Activity activity) {
+    public void loadNewInterstitial(final Activity activity) {
+        if (!started() || !enabled()) {
+            return; //not ready
+        }
+        if (placements.isEmpty()) {
+            LOG.warn("check your logic, can't call loadNewInterstitial() before initialize()");
+            return;
+        }
+        interstitials = new HashMap<>();
+        Set<String> placementKeys = placements.keySet();
+        for (String placement : placementKeys) {
+            loadMoPubInterstitial(activity, placement);
+        }
+    }
+
+    public void loadMoPubInterstitial(final Activity activity, final String placement) {
+        if (activity == null) {
+            LOG.info("Aborted loading interstitial ("+placement+"), no Activity");
+            return;
+        }
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                LOG.info("Loading " + placement + " interstitial");
+                MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, placements.get(placement));
+                MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(MoPubAdNetwork.this, placement);
+                moPubInterstitial.setInterstitialAdListener(moPubListener);
+                interstitials.put(placement, moPubInterstitial);
+                moPubInterstitial.load();
+            }
+        });
     }
 
     @Override
@@ -61,5 +124,20 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
     @Override
     public boolean isDebugOn() {
         return DEBUG_MODE;
+    }
+
+    @Override
+    public void stop(Context context) {
+        super.stop(context);
+        if (placements.isEmpty() || interstitials.isEmpty()) {
+            return;
+        }
+        Set<String> placementKeys = placements.keySet();
+        for (String key : placementKeys) {
+            MoPubInterstitial interstitial = interstitials.get(key);
+            if (interstitial != null) {
+                interstitial.destroy();
+            }
+        }
     }
 }
