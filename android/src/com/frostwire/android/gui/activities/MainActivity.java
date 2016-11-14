@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -107,7 +108,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private static final String LAST_BACK_DIALOG_ID = "last_back_dialog";
     private static final String SHUTDOWN_DIALOG_ID = "shutdown_dialog";
     private static boolean firstTime = true;
-    public static int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
+    public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
     private final Map<Integer, DangerousPermissionsChecker> permissionsCheckers;
     private MainController controller;
     private DrawerLayout drawerLayout;
@@ -230,7 +231,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (intent == null) {
             intent = getIntent();
         }
-
         return intent != null && intent.getBooleanExtra("gohome-" + ConfigurationManager.instance().getUUIDString(), false);
     }
 
@@ -306,18 +306,15 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (intent == null) {
             return;
         }
-
         if (isShutdown(intent)) {
             return;
         }
-
         if (isGoHome(intent)) {
             finish();
             return;
         }
 
         String action = intent.getAction();
-
         if (action != null) {
             if (action.equals(Constants.ACTION_SHOW_TRANSFERS)) {
                 intent.setAction(null);
@@ -334,7 +331,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 showShutdownDialog();
             }
         }
-
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
             controller.showTransfers(TransferStatus.COMPLETED);
             TransferManager.instance().clearDownloadsToReview();
@@ -351,7 +347,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 LOG.warn("Error handling download complete notification", e);
             }
         }
-
         if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
             finish();
         }
@@ -360,7 +355,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void openTorrentUrl(Intent intent) {
         try {
             //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
-
             //Show me the transfer tab
             Intent i = new Intent(this, MainActivity.class);
             i.setAction(Constants.ACTION_SHOW_TRANSFERS);
@@ -394,29 +388,23 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     @Override
     protected void onResume() {
         super.onResume();
-
         initDrawerListener();
         setupDrawer();
         initPlayerItemListener();
         initAdMenuItemListener();
-
         refreshPlayerItem();
         refreshMenuRemoveAdsItem();
-
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
             Offers.initAdNetworks(this);
         } else if (!isShutdown()){
             controller.startWizardActivity();
         }
-
         checkLastSeenVersion();
         registerMainBroadcastReceiver();
         syncSlideMenu();
-
         //uncomment to test social links dialog
         //UIUtils.showSocialLinksDialog(this, true, null, "");
-
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
             checkExternalStoragePermissionsOrBindMusicService();
         }
@@ -425,7 +413,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     @Override
     protected void onPause() {
         super.onPause();
-
         if (mainBroadcastReceiver != null) {
             try {
                 unregisterReceiver(mainBroadcastReceiver);
@@ -445,11 +432,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         //externalStorageChecker.setPermissionsGrantedCallback(() -> {});
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
 
-        // WRITE SETTINGS (Setting the default ringtone requires this)
-        final DangerousPermissionsChecker writeSettingsChecker =
-                new DangerousPermissionsChecker(this, DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
-        checkers.put(DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE, writeSettingsChecker);
-        // the permissionGrantedCallBack will be set by whoever uses this during runtime.
+        // COARSE
+        final DangerousPermissionsChecker accessCoarseLocationChecker =
+                new DangerousPermissionsChecker(this, DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE);
+        checkers.put(DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE, accessCoarseLocationChecker);
 
         // add more permissions checkers if needed...
         return checkers;
@@ -495,6 +481,17 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         checkExternalStoragePermissionsOrBindMusicService();
+        checkAccessCoarseLocationPermissions();
+    }
+
+    private void checkAccessCoarseLocationPermissions() {
+        DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE);
+        if (checker != null && !checker.hasAskedBefore()) {
+            checker.requestPermissions();
+            ConfigurationManager.instance().setBoolean(Constants.ASKED_FOR_ACCESS_COARSE_LOCATION_PERMISSIONS, true);
+        } else {
+            LOG.info("Asked for ACCESS_COARSE_LOCATION before, skipping.");
+        }
     }
 
     private void checkExternalStoragePermissionsOrBindMusicService() {
@@ -530,6 +527,9 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             MusicUtils.unbindFromService(mToken);
             mToken = null;
         }
+
+        // necessary unregisters broadcast its internal receivers, avoids leaks.
+        Offers.destroyMopubInterstitials(this);
     }
 
     private void saveLastFragment(Bundle outState) {
@@ -588,7 +588,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
             Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, false, false);
         }
-
         if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -787,8 +786,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void restoreFragmentsStack(Bundle savedInstanceState) {
         try {
             int[] stack = savedInstanceState.getIntArray(FRAGMENTS_STACK_KEY);
-            for (int id : stack) {
-                fragmentsStack.push(id);
+            if (stack != null) {
+                for (int id : stack) {
+                    fragmentsStack.push(id);
+                }
             }
         } catch (Throwable ignored) {
         }
@@ -796,11 +797,15 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void updateHeader(Fragment fragment) {
         try {
-            RelativeLayout placeholder = (RelativeLayout) getActionBar().getCustomView();
+            ActionBar actionBar = getActionBar();
+            if (actionBar == null) {
+                LOG.warn("updateHeader(): Check your logic, no actionBar available");
+                return;
+            }
+            RelativeLayout placeholder = (RelativeLayout) actionBar.getCustomView();
             if (placeholder != null && placeholder.getChildCount() > 0) {
                 placeholder.removeAllViews();
             }
-
             if (fragment instanceof MainFragment) {
                 View header = ((MainFragment) fragment).getHeader(this);
                 if (placeholder != null && header != null) {
@@ -917,7 +922,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     //@Override commented override since we are in API 16, but it will in API 23
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         DangerousPermissionsChecker checker = permissionsCheckers.get(requestCode);
         if (checker != null) {
             checker.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -983,10 +988,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
             byte[] buffer = new byte[16384]; // MAGIC_NUMBER
             int bytesRead;
-            while ((bytesRead = inStream.read(buffer)) != -1) {
-                outStream.write(buffer, 0, bytesRead);
+            if (inStream != null && outStream != null) {
+                while ((bytesRead = inStream.read(buffer)) != -1) {
+                    outStream.write(buffer, 0, bytesRead);
+                }
             }
-
         } catch (Throwable e) {
             LOG.error("Error when copying file from " + uri + " to temp/" + name, e);
             return null;

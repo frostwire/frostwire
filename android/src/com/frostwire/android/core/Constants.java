@@ -97,6 +97,7 @@ public final class Constants {
     public static final String PREF_KEY_GUI_USE_APPLOVIN = "frostwire.prefs.gui.use_applovin";
     public static final String PREF_KEY_GUI_USE_INMOBI = "frostwire.prefs.gui.use_inmobi";
     public static final String PREF_KEY_GUI_USE_REMOVEADS = "frostwire.prefs.gui.use_removeads";
+    public static final String PREF_KEY_GUI_USE_MOPUB = "frostwire.prefs.gui.use_mopub";
     public static final String PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD = "frostwire.prefs.gui.removeads_back_to_back_threshold";
     public static final String PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_album_art_banner_threshold";
     public static final String PREF_KEY_GUI_SUPPORT_FROSTWIRE = "frostwire.prefs.gui.support_fw2";
@@ -140,6 +141,8 @@ public final class Constants {
 
     public static final String BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION = "com.frostwire.android.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION.";
 
+    public static final String ASKED_FOR_ACCESS_COARSE_LOCATION_PERMISSIONS = "frostwire.prefs.gui.asked_for_access_coarse_location_permissions";
+
     public static final int NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED = 1001;
 
     // generic file types
@@ -172,7 +175,6 @@ public final class Constants {
     public static final long LIBRARIAN_FILE_COUNT_CACHE_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
     public static final String INMOBI_INTERSTITIAL_PROPERTY_ID = "c1e6be702d614523b725af8b86f99e8f";
-    public static final String MOBFOX_INVENTORY_HASH = "cc73727fabc4235d769120f8a1d0635d";
 
     public static final int NOTIFIED_BLOOM_FILTER_BITSET_SIZE = 320000; //40 kilobytes
     public static final int NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS = 10000;
@@ -194,5 +196,5 @@ public final class Constants {
     public static final String AD_NETWORK_SHORTCODE_APPLOVIN = "AL";
     public static final String AD_NETWORK_SHORTCODE_INMOBI = "IM";
     public static final String AD_NETWORK_SHORTCODE_REMOVEADS = "RA";
-    public static final String AD_NETWORK_SHORTCODE_MOBFOX = "MF";
+    public static final String AD_NETWORK_SHORTCODE_MOPUB = "MP";
 }

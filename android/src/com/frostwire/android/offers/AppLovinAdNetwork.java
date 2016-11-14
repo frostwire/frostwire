@@ -19,32 +19,25 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
+
 import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 
-class AppLovinAdNetwork implements AdNetwork {
+class AppLovinAdNetwork extends AbstractAdNetwork {
 
     private static final Logger LOG = Logger.getLogger(AppLovinAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
 
     private AppLovinInterstitialAdapter interstitialAdapter = null;
-    private boolean started = false;
 
     AppLovinAdNetwork() {
     }
 
     @Override
     public void initialize(final Activity activity) {
-        if (!enabled()) {
-            if (!started()) {
-                LOG.info("AppLovin initialize(): aborted. not enabled.");
-            } else {
-                // initialize can be called multiple times, we may have to stop
-                // this network if we started it using a default value.
-                stop(activity);
-            }
+        if (abortInitialize(activity)) {
             return;
         }
 
@@ -52,27 +45,20 @@ class AppLovinAdNetwork implements AdNetwork {
             @Override
             public void run() {
                 try {
-                    if (!started) {
+                    if (!started()) {
                         final Context applicationContext = activity.getApplicationContext();
                         AppLovinSdk.initializeSdk(applicationContext);
-                        AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
-                        if (DEBUG_MODE) {
-                            AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(true);
-                        }
+                        AppLovinSdk.getInstance(activity).getSettings().setMuted(!DEBUG_MODE);
+                        AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(DEBUG_MODE);
+                        LOG.info("AppLovin initialized.");
                         loadNewInterstitial(activity);
-                        started = true;
+                        start();
                     }
                 } catch (Throwable e) {
                     LOG.error(e.getMessage(), e);
                 }
             }
         });
-    }
-
-    @Override
-    public void stop(Context context) {
-        started = false;
-        LOG.info("stopped");
     }
 
     @Override
@@ -96,20 +82,6 @@ class AppLovinAdNetwork implements AdNetwork {
         return DEBUG_MODE;
     }
 
-    @Override
-    public boolean started() {
-        return started;
-    }
-
-    @Override
-    public void enable(boolean enabled) {
-        Offers.AdNetworkHelper.enable(this, enabled);
-    }
-
-    @Override
-    public boolean enabled() {
-        return Offers.AdNetworkHelper.enabled(this);
-    }
 
     @Override
     public boolean showInterstitial(Activity activity,
@@ -117,7 +89,7 @@ class AppLovinAdNetwork implements AdNetwork {
                                     final boolean shutdownAfterwards,
                                     final boolean dismissAfterward) {
         boolean result = false;
-        if (enabled() && started) {
+        if (enabled() && started()) {
             // make sure video ads are always muted, it's very annoying (regardless of playback status)
             AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
             interstitialAdapter.shutdownAppAfter(shutdownAfterwards);

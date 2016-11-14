@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -480,6 +481,15 @@ public final class UIUtils {
                 }
         }
         return false;
+    }
+
+    public static boolean isTablet(Activity activity) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        float yInches= metrics.heightPixels/metrics.ydpi;
+        float xInches= metrics.widthPixels/metrics.xdpi;
+        double diagonalInches = Math.sqrt(xInches*xInches + yInches*yInches);
+        return diagonalInches>=6.5;
     }
 
     // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over enginner.

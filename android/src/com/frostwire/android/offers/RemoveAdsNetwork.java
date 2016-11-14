@@ -30,57 +30,46 @@ import com.frostwire.util.Logger;
  * @author aldenml
  * @author gubatron
  */
-class RemoveAdsNetwork implements AdNetwork {
+class RemoveAdsNetwork extends AbstractAdNetwork {
 
     private static final Logger LOG = Logger.getLogger(RemoveAdsNetwork.class);
-
-    private boolean started;
 
     RemoveAdsNetwork() {
     }
 
     @Override
     public void initialize(Activity activity) {
-        if (!(started = enabled())) {
+        if (abortInitialize(activity)) {
+            return;
+        }
+
+        if (enabled()) {
+            start();
+        }
+        if (!started()) {
             LOG.info("RemoveAds initialize(): aborted. not enabled.");
             if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
                 LOG.info("RemoveAds initialize(): not available for plus.");
             }
-            started = false;
+            stop(activity);
         }
     }
 
-    @Override
-    public void stop(Context context) {
-        started = false;
-        LOG.info("stopped");
-    }
-
-    @Override
-    public void enable(boolean enabled) {
-        Offers.AdNetworkHelper.enable(this, enabled);
-    }
 
     @Override
     public boolean enabled() {
         boolean enabled = false;
         try {
             //noinspection SimplifiableIfStatement (done like this on purpose for readability)
-            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Products.disabledAds(PlayStore.getInstance())) {
+            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
                 enabled = false;
             } else {
-                enabled = Offers.AdNetworkHelper.enabled(this);
+                enabled = super.enabled();
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
         return enabled;
-    }
-
-    @Override
-    public boolean started() {
-        LOG.info("started() -> " + started);
-        return started;
     }
 
     @Override

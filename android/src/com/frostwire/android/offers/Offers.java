@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
-import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
@@ -30,10 +29,13 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
-//import com.mobfox.sdk.bannerads.Banner;
-//import com.mobfox.sdk.interstitialads.InterstitialAd;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -52,9 +54,9 @@ public final class Offers {
     static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<Runnable>(), true);
     private static long lastInterstitialShownTimestamp = -1;
 
+    private final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
-    //private final static MobFoxAdNetwork MOBFOX = new MobFoxAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
 
     private static Map<String,AdNetwork> AD_NETWORKS;
@@ -79,30 +81,21 @@ public final class Offers {
         if (AD_NETWORKS == null) {
             return;
         }
-        /*final MobFoxAdNetwork adNetwork = (MobFoxAdNetwork) AD_NETWORKS.get(Constants.AD_NETWORK_SHORTCODE_MOBFOX);
-        if (adNetwork != null && adNetwork.enabled() && adNetwork.started()) {
-            final InterstitialAd interstitialAd = adNetwork.getInterstitialAd();
-            if (interstitialAd != null) {
-
-                // if permissions were not granted...
-                if (grantResults.length > 0 && grantResults[0] != 0) {
-                    Banner.setGetLocation(false);
-                    adNetwork.dontAskForLocationPermissions();
-                }
-                interstitialAd.onRequestPermissionsResult(requestCode, permissions, grantResults);
-            }
-        }*/
     }
 
     private static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {
             AD_NETWORKS = new HashMap<>();
+            AD_NETWORKS.put(MOPUB.getShortCode(), MOPUB);
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
             AD_NETWORKS.put(IN_MOBI.getShortCode(), IN_MOBI);
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
-            //AD_NETWORKS.put(MOBFOX.getShortCode(), MOBFOX);
         }
         return AD_NETWORKS;
+    }
+
+    public static void destroyMopubInterstitials(Context context) {
+        MOPUB.stop(context);
     }
 
     public static void stopAdNetworks(Context context) {
@@ -141,6 +134,8 @@ public final class Offers {
                 }
             }
         }
+
+
         if (!interstitialShown) {
             if (dismissAfterwards) {
                 activity.finish();
@@ -270,6 +265,9 @@ public final class Offers {
     }
 
     public static class AdNetworkHelper {
+        /**
+         * Is the network enabled in the configuration?
+         */
         public static boolean enabled(AdNetwork network) {
             if (network.isDebugOn()) {
                 return true;
@@ -278,14 +276,18 @@ public final class Offers {
             ConfigurationManager config;
             boolean enabled = false;
             try {
+                boolean adsDisabled = Products.disabledAds(PlayStore.getInstance());
                 config = ConfigurationManager.instance();
-                enabled = config.getBoolean(network.getInUsePreferenceKey());
+                enabled = config.getBoolean(network.getInUsePreferenceKey()) && !adsDisabled;
             } catch (Throwable e) {
                 LOG.error(e.getMessage(), e);
             }
             return enabled;
         }
 
+        /**
+         * Mark the network enabled or disabled in the configuration
+         */
         public static void enable(AdNetwork network, boolean enabled) {
             ConfigurationManager config = ConfigurationManager.instance();
             try {
@@ -320,6 +322,10 @@ public final class Offers {
                 }
 
                 if (finishAfterDismiss) {
+                    if (adNetwork != null) {
+                        adNetwork.stop(activity);
+                    }
+
                     if (activity instanceof MainActivity) {
                         activity.finish();
                     } else {

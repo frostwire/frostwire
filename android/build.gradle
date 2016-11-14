@@ -152,6 +152,7 @@ dependencies {
     compile "com.google.android.gms:play-services-base:9.8.0"
     compile "com.inmobi.monetization:inmobi-ads:6.0.3"
     compile('com.mopub:mopub-sdk-banner:4.10.0@aar') { transitive = true }
+    compile('com.mopub:mopub-sdk-interstitial:4.9.0@aar') { transitive = true }
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     compile "com.frostwire:jlibtorrent-android-arm:1.2.0.4"
