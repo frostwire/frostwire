@@ -156,7 +156,6 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
         addNodesPerMediaType(root);
 
-        root.add(new DirectoryHolderNode(new StarredDirectoryHolder()));
         root.add(new DirectoryHolderNode(new TorrentDirectoryHolder()));
         root.add(new DirectoryHolderNode(new SavedFilesDirectoryHolder(SharingSettings.TORRENT_DATA_DIR_SETTING, I18n.tr("Default Save Folder"))));
 
