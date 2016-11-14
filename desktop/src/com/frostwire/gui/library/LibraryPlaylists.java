@@ -103,7 +103,6 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private LibraryPlaylistsListCell starredPlaylistCell;
 
     private ActionListener _selectedPlaylistAction;
-    private ActionListener selectedStarredPlaylistAction;
 
     private LibraryPlaylistsMouseObserver _listMouseObserver;
     private ListSelectionListener _listSelectionListener;
@@ -198,10 +197,10 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
 
         _selectedPlaylistAction = new SelectedPlaylistActionListener();
 
-        selectedStarredPlaylistAction = new SelectedStarredPlaylistActionListener();
         Playlist starredPlaylist = LibraryMediator.getLibrary().getStarredPlaylist();
 
-        starredPlaylistCell = new LibraryPlaylistsListCell(I18n.tr("Starred"), I18n.tr("Show all starred items"), GUIMediator.getThemeImage("star_on"), starredPlaylist, selectedStarredPlaylistAction);
+        starredPlaylistCell = new LibraryPlaylistsListCell(I18n.tr("Starred"), I18n.tr("Show all starred items"),
+                GUIMediator.getThemeImage("star_on"), starredPlaylist, _selectedPlaylistAction);
 
         _model.addElement(_newPlaylistCell);
         _model.addElement(starredPlaylistCell);
@@ -324,7 +323,11 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         Playlist playlist = cell.getPlaylist();
 
         if (playlist != null) {
-            playlist.refresh();
+            if (playlist.getId() == LibraryDatabase.STARRED_PLAYLIST_ID){
+                playlist = LibraryMediator.getLibrary().getStarredPlaylist();
+            } else {
+                playlist.refresh();
+            }
             LibraryMediator.instance().updateTableItems(playlist);
             String status = LibraryUtils.getPlaylistDurationInDDHHMMSS(playlist) + ", " + playlist.getItems().size() + " " + I18n.tr("tracks");
             LibraryMediator.instance().getLibrarySearch().setStatus(status);
@@ -655,16 +658,6 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private class SelectedPlaylistActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             refreshSelection();
-        }
-    }
-
-    private class SelectedStarredPlaylistActionListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Playlist playlist = LibraryMediator.getLibrary().getStarredPlaylist();
-            LibraryMediator.instance().updateTableItems(playlist);
-            String status = LibraryUtils.getPlaylistDurationInDDHHMMSS(playlist) + ", " + playlist.getItems().size() + " " + I18n.tr("tracks");
-            LibraryMediator.instance().getLibrarySearch().setStatus(status);
         }
     }
 
