@@ -252,7 +252,6 @@ public class SettingsActivity extends PreferenceActivity {
     private void setupOtherOptions() {
         setupPermanentStatusNotificationOption();
         setupHapticFeedback();
-        setupSupportFrostWireOption();
     }
 
     private void setupHapticFeedback() {
@@ -264,25 +263,6 @@ public class SettingsActivity extends PreferenceActivity {
                     CheckBoxPreference cbPreference = (CheckBoxPreference) preference;
                     ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, cbPreference.isChecked());
                     Engine.instance().getVibrator().onPreferenceChanged();
-                    return true;
-                }
-            });
-        }
-    }
-
-    private void setupSupportFrostWireOption() {
-        final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
-        if (!Constants.IS_BASIC_AND_DEBUG &&
-            (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Products.disabledAds(PlayStore.getInstance()))) {
-            removeSupportFrostWirePreference(preference);
-        }
-        else if (preference != null){
-            preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    if(!((CheckBoxPreference) preference).isChecked()) {
-                        UIUtils.openURL(preference.getContext(), Constants.FROSTWIRE_GIVE_URL + "plus-unsupport-fw");
-                    }
                     return true;
                 }
             });
@@ -785,7 +765,6 @@ public class SettingsActivity extends PreferenceActivity {
                                     continue;
                                 }
                                 PlayStore.getInstance().consume(p);
-                                ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, true);
                                 LOG.info(" - " + p.description() + " (" + p.sku() + ") force-consumed!");
                                 UIUtils.showToastMessage(preference.getContext(),
                                         "Product " + p.sku() + " forced-consumed.",

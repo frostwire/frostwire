@@ -62,18 +62,11 @@ public final class Offers {
     private static Map<String,AdNetwork> AD_NETWORKS;
 
     public static void initAdNetworks(Activity activity) {
-        boolean supportFrostWire = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
-        if (!supportFrostWire) {
-            LOG.info("initAdNetworks(). Aborting, PREF_KEY_GUI_SUPPORT_FROSTWIRE = false");
-            return;
-        }
-
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
             if (adNetwork != null) { // because of a typo on config file this can happen
                 adNetwork.initialize(activity);
             }
         }
-
         stopAdNetworksIfPurchasedRemoveAds(activity);
     }
 
@@ -116,10 +109,8 @@ public final class Offers {
 
         boolean interstitialShown = false;
 
-        if (Products.disabledAds(PlayStore.getInstance())) {
+        if (Offers.adsDisabled()) {
             LOG.info("Skipping interstitial ads display, PlayStore reports no ads");
-        } else if (Constants.IS_PLUS_OR_DEBUG && !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE)) {
-            LOG.info("Skipping interstitial ads display, Plus instance not supporting FrostWire development");
         } else {
             for (AdNetwork adNetwork : getActiveAdNetworks()) {
                 if (!interstitialShown && adNetwork != null && adNetwork.started()) {
@@ -173,9 +164,7 @@ public final class Offers {
     }
 
     public static boolean adsDisabled() {
-        boolean userDisabledAdSupport = Constants.IS_PLUS_OR_DEBUG && !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
-        boolean userPaidForAdRemoval = Products.disabledAds(PlayStore.getInstance());
-        return userDisabledAdSupport || userPaidForAdRemoval;
+        return Products.disabledAds(PlayStore.getInstance());
     }
 
     /**
@@ -186,9 +175,8 @@ public final class Offers {
         // Coded so explicitly for clarity.
         boolean isBasic = Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
         boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
-        boolean isSupportingFW = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE);
-        boolean paidForAdsRemoval = Products.disabledAds(PlayStore.getInstance());
-        return (isBasic || isDevelopment) && isSupportingFW && !paidForAdsRemoval;
+        boolean paidForAdsRemoval = Offers.adsDisabled();
+        return (isBasic || isDevelopment) && !paidForAdsRemoval;
     }
 
     private static void tryBackToBackInterstitial(Activity activity) {
@@ -276,7 +264,7 @@ public final class Offers {
             ConfigurationManager config;
             boolean enabled = false;
             try {
-                boolean adsDisabled = Products.disabledAds(PlayStore.getInstance());
+                boolean adsDisabled = Offers.adsDisabled();
                 config = ConfigurationManager.instance();
                 enabled = config.getBoolean(network.getInUsePreferenceKey()) && !adsDisabled;
             } catch (Throwable e) {

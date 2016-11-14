@@ -711,7 +711,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         int visibility = View.GONE;
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
             // if they haven't paid for ads
-            if (!Products.disabledAds(PlayStore.getInstance()) &&
+            if (!Offers.adsDisabled() &&
                 (playerItem == null || playerItem.getVisibility() == View.GONE)) {
                 visibility = View.VISIBLE;
             }

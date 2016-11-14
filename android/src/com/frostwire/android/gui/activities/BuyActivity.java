@@ -416,8 +416,6 @@ public class BuyActivity extends AbstractActivity {
 
             // make sure ads won't show on this session any more if we got a positive response.
             Offers.stopAdNetworks(this);
-            // in case user gets plus
-            ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
 
             // now we prepare a result for SettingsActivity since it won't know right away
             // given the purchase process is asynchronous
