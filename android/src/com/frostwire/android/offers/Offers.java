@@ -267,8 +267,6 @@ public final class Offers {
     public static class AdNetworkHelper {
         /**
          * Is the network enabled in the configuration?
-         * @param network
-         * @return
          */
         public static boolean enabled(AdNetwork network) {
             if (network.isDebugOn()) {
@@ -289,8 +287,6 @@ public final class Offers {
 
         /**
          * Mark the network enabled or disabled in the configuration
-         * @param network
-         * @param enabled
          */
         public static void enable(AdNetwork network, boolean enabled) {
             ConfigurationManager config = ConfigurationManager.instance();

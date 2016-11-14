@@ -231,7 +231,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (intent == null) {
             intent = getIntent();
         }
-
         return intent != null && intent.getBooleanExtra("gohome-" + ConfigurationManager.instance().getUUIDString(), false);
     }
 
@@ -307,18 +306,15 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (intent == null) {
             return;
         }
-
         if (isShutdown(intent)) {
             return;
         }
-
         if (isGoHome(intent)) {
             finish();
             return;
         }
 
         String action = intent.getAction();
-
         if (action != null) {
             if (action.equals(Constants.ACTION_SHOW_TRANSFERS)) {
                 intent.setAction(null);
@@ -335,7 +331,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 showShutdownDialog();
             }
         }
-
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
             controller.showTransfers(TransferStatus.COMPLETED);
             TransferManager.instance().clearDownloadsToReview();
@@ -352,7 +347,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 LOG.warn("Error handling download complete notification", e);
             }
         }
-
         if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
             finish();
         }
@@ -361,7 +355,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void openTorrentUrl(Intent intent) {
         try {
             //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
-
             //Show me the transfer tab
             Intent i = new Intent(this, MainActivity.class);
             i.setAction(Constants.ACTION_SHOW_TRANSFERS);
@@ -395,29 +388,23 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     @Override
     protected void onResume() {
         super.onResume();
-
         initDrawerListener();
         setupDrawer();
         initPlayerItemListener();
         initAdMenuItemListener();
-
         refreshPlayerItem();
         refreshMenuRemoveAdsItem();
-
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
             Offers.initAdNetworks(this);
         } else if (!isShutdown()){
             controller.startWizardActivity();
         }
-
         checkLastSeenVersion();
         registerMainBroadcastReceiver();
         syncSlideMenu();
-
         //uncomment to test social links dialog
         //UIUtils.showSocialLinksDialog(this, true, null, "");
-
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
             checkExternalStoragePermissionsOrBindMusicService();
         }
@@ -811,17 +798,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void updateHeader(Fragment fragment) {
         try {
             ActionBar actionBar = getActionBar();
-
             if (actionBar == null) {
                 LOG.warn("updateHeader(): Check your logic, no actionBar available");
                 return;
             }
-
             RelativeLayout placeholder = (RelativeLayout) actionBar.getCustomView();
             if (placeholder != null && placeholder.getChildCount() > 0) {
                 placeholder.removeAllViews();
             }
-
             if (fragment instanceof MainFragment) {
                 View header = ((MainFragment) fragment).getHeader(this);
                 if (placeholder != null && header != null) {
