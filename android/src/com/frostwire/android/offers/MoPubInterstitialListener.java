@@ -55,13 +55,7 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
 
     @Override
     public boolean show(Activity activity, String placement) {
-        if (!isAdReadyToDisplay()) {
-            LOG.info("MoPub show aborted, not ready yet");
-            return false;
-        }
-        // no need to use 'placement' here as these ads are pre-loaded by placement id.
-        LOG.info("MoPub show ?");
-        return interstitial.show();
+        return isAdReadyToDisplay() && interstitial.show();
     }
 
     @Override
@@ -91,12 +85,12 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
 
     @Override
     public void onInterstitialShown(MoPubInterstitial interstitial) {
-        LOG.info("onInterstitialShown - " + interstitial.toString());
+        //LOG.info("onInterstitialShown - " + interstitial.toString());
     }
 
     @Override
     public void onInterstitialClicked(MoPubInterstitial interstitial) {
-        LOG.info("onInterstitialClicked - " + interstitial.toString());
+        //LOG.info("onInterstitialClicked - " + interstitial.toString());
     }
 
     @Override
