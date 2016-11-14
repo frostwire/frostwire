@@ -37,7 +37,7 @@ class InMobiAdNetwork extends AbstractAdNetwork {
     }
 
     public void initialize(final Activity activity) {
-        if (abortInitializeIfNotEnabled(activity)) {
+        if (abortInitialize(activity)) {
             return;
         }
 
@@ -53,7 +53,7 @@ class InMobiAdNetwork extends AbstractAdNetwork {
                                 InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
                             }
                             LOG.info("InMobi.initialized.");
-                            markStarted();
+                            start();
                             LOG.info("Load InmobiInterstitial.");
                         } catch (Throwable e) {
                             // TODO: IMPORTANT review this problem, by aldenml
@@ -80,12 +80,9 @@ class InMobiAdNetwork extends AbstractAdNetwork {
         if (!started() || !enabled() || inmobiInterstitial == null || inmobiListener == null) {
             return false;
         }
-
         inmobiListener.shutdownAppAfter(shutdownActivityAfterwards);
         inmobiListener.dismissActivityAfterwards(dismissActivityAfterward);
-
         if (inmobiInterstitial.isReady()) {
-//            LOG.info("inmobiInterstitial.isReady()");
             try {
                 inmobiInterstitial.show();
                 return true;
@@ -102,7 +99,6 @@ class InMobiAdNetwork extends AbstractAdNetwork {
         if (!started() || !enabled()) {
             return; //not ready
         }
-
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

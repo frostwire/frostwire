@@ -39,8 +39,12 @@ class RemoveAdsNetwork extends AbstractAdNetwork {
 
     @Override
     public void initialize(Activity activity) {
+        if (abortInitialize(activity)) {
+            return;
+        }
+
         if (enabled()) {
-            markStarted();
+            start();
         }
         if (!started()) {
             LOG.info("RemoveAds initialize(): aborted. not enabled.");
@@ -57,10 +61,10 @@ class RemoveAdsNetwork extends AbstractAdNetwork {
         boolean enabled = false;
         try {
             //noinspection SimplifiableIfStatement (done like this on purpose for readability)
-            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Products.disabledAds(PlayStore.getInstance())) {
+            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
                 enabled = false;
             } else {
-                enabled = Offers.AdNetworkHelper.enabled(this);
+                enabled = super.enabled();
             }
         } catch (Throwable e) {
             e.printStackTrace();

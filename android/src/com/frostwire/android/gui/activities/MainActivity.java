@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -107,7 +108,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private static final String LAST_BACK_DIALOG_ID = "last_back_dialog";
     private static final String SHUTDOWN_DIALOG_ID = "shutdown_dialog";
     private static boolean firstTime = true;
-    public static int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
+    public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
     private final Map<Integer, DangerousPermissionsChecker> permissionsCheckers;
     private MainController controller;
     private DrawerLayout drawerLayout;
@@ -425,7 +426,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     @Override
     protected void onPause() {
         super.onPause();
-
         if (mainBroadcastReceiver != null) {
             try {
                 unregisterReceiver(mainBroadcastReceiver);
@@ -540,6 +540,9 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             MusicUtils.unbindFromService(mToken);
             mToken = null;
         }
+
+        // necessary unregisters broadcast its internal receivers, avoids leaks.
+        Offers.destroyMopubInterstitials(this);
     }
 
     private void saveLastFragment(Bundle outState) {
@@ -598,7 +601,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
             Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, false, false);
         }
-
         if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -797,8 +799,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void restoreFragmentsStack(Bundle savedInstanceState) {
         try {
             int[] stack = savedInstanceState.getIntArray(FRAGMENTS_STACK_KEY);
-            for (int id : stack) {
-                fragmentsStack.push(id);
+            if (stack != null) {
+                for (int id : stack) {
+                    fragmentsStack.push(id);
+                }
             }
         } catch (Throwable ignored) {
         }
@@ -806,7 +810,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void updateHeader(Fragment fragment) {
         try {
-            RelativeLayout placeholder = (RelativeLayout) getActionBar().getCustomView();
+            ActionBar actionBar = getActionBar();
+
+            if (actionBar == null) {
+                LOG.warn("updateHeader(): Check your logic, no actionBar available");
+                return;
+            }
+
+            RelativeLayout placeholder = (RelativeLayout) actionBar.getCustomView();
             if (placeholder != null && placeholder.getChildCount() > 0) {
                 placeholder.removeAllViews();
             }
@@ -927,7 +938,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     //@Override commented override since we are in API 16, but it will in API 23
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         DangerousPermissionsChecker checker = permissionsCheckers.get(requestCode);
         if (checker != null) {
             checker.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -993,10 +1004,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
             byte[] buffer = new byte[16384]; // MAGIC_NUMBER
             int bytesRead;
-            while ((bytesRead = inStream.read(buffer)) != -1) {
-                outStream.write(buffer, 0, bytesRead);
+            if (inStream != null && outStream != null) {
+                while ((bytesRead = inStream.read(buffer)) != -1) {
+                    outStream.write(buffer, 0, bytesRead);
+                }
             }
-
         } catch (Throwable e) {
             LOG.error("Error when copying file from " + uri + " to temp/" + name, e);
             return null;

@@ -81,19 +81,6 @@ public final class Offers {
         if (AD_NETWORKS == null) {
             return;
         }
-        /*final MobFoxAdNetwork adNetwork = (MobFoxAdNetwork) AD_NETWORKS.get(Constants.AD_NETWORK_SHORTCODE_MOBFOX);
-        if (adNetwork != null && adNetwork.enabled() && adNetwork.started()) {
-            final InterstitialAd interstitialAd = adNetwork.getInterstitialAd();
-            if (interstitialAd != null) {
-
-                // if permissions were not granted...
-                if (grantResults.length > 0 && grantResults[0] != 0) {
-                    Banner.setGetLocation(false);
-                    adNetwork.dontAskForLocationPermissions();
-                }
-                interstitialAd.onRequestPermissionsResult(requestCode, permissions, grantResults);
-            }
-        }*/
     }
 
     private static Map<String, AdNetwork> getAllAdNetworks() {
@@ -105,6 +92,10 @@ public final class Offers {
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
         }
         return AD_NETWORKS;
+    }
+
+    public static void destroyMopubInterstitials(Context context) {
+        MOPUB.stop(context);
     }
 
     public static void stopAdNetworks(Context context) {
@@ -143,6 +134,8 @@ public final class Offers {
                 }
             }
         }
+
+
         if (!interstitialShown) {
             if (dismissAfterwards) {
                 activity.finish();
@@ -272,8 +265,6 @@ public final class Offers {
     }
 
     public static class AdNetworkHelper {
-        private static Map<AdNetwork, Boolean> STARTED_NETWORKS = new HashMap<>();
-
         /**
          * Is the network enabled in the configuration?
          * @param network
@@ -287,8 +278,9 @@ public final class Offers {
             ConfigurationManager config;
             boolean enabled = false;
             try {
+                boolean adsDisabled = Products.disabledAds(PlayStore.getInstance());
                 config = ConfigurationManager.instance();
-                enabled = config.getBoolean(network.getInUsePreferenceKey());
+                enabled = config.getBoolean(network.getInUsePreferenceKey()) && !adsDisabled;
             } catch (Throwable e) {
                 LOG.error(e.getMessage(), e);
             }
@@ -334,6 +326,10 @@ public final class Offers {
                 }
 
                 if (finishAfterDismiss) {
+                    if (adNetwork != null) {
+                        adNetwork.stop(activity);
+                    }
+
                     if (activity instanceof MainActivity) {
                         activity.finish();
                     } else {
@@ -352,25 +348,6 @@ public final class Offers {
                     UIUtils.sendShutdownIntent(fallbackContext);
                 }
             }
-        }
-
-        public static boolean started(AdNetwork adNetwork) {
-            if (!STARTED_NETWORKS.containsKey(adNetwork)) {
-                return false;
-            }
-            return STARTED_NETWORKS.get(adNetwork);
-        }
-
-        public static void markStarted(AdNetwork adNetwork) {
-            if (adNetwork.enabled()) {
-                STARTED_NETWORKS.put(adNetwork, Boolean.TRUE);
-            } else {
-                LOG.warn("AdNetworkHelper.start() failed, network (" + adNetwork.getShortCode() + ") is not enabled");
-            }
-        }
-
-        public static void stop(AdNetwork adNetwork) {
-            STARTED_NETWORKS.put(adNetwork, Boolean.FALSE);
         }
     }
 }

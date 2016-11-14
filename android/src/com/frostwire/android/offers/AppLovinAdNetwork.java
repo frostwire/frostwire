@@ -37,7 +37,7 @@ class AppLovinAdNetwork extends AbstractAdNetwork {
 
     @Override
     public void initialize(final Activity activity) {
-        if (abortInitializeIfNotEnabled(activity)) {
+        if (abortInitialize(activity)) {
             return;
         }
 
@@ -52,7 +52,7 @@ class AppLovinAdNetwork extends AbstractAdNetwork {
                         AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(DEBUG_MODE);
                         LOG.info("AppLovin initialized.");
                         loadNewInterstitial(activity);
-                        markStarted();
+                        start();
                     }
                 } catch (Throwable e) {
                     LOG.error(e.getMessage(), e);

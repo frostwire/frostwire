@@ -28,7 +28,6 @@ import com.mopub.mobileads.MoPubInterstitial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.RunnableFuture;
 
 /**
  * Created on Nov/8/16 (2016 US election day)
@@ -41,24 +40,20 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
     private static final Logger LOG = Logger.getLogger(MoPubAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
     private Map<String,String> placements;
-    private boolean isTablet;
-
-
-    private Map<String, MoPubInterstitialListener> interstitialListeners;
     private Map<String, MoPubInterstitial> interstitials;
 
     @Override
     public void initialize(Activity activity) {
-        if (abortInitializeIfNotEnabled(activity)) {
+        if (abortInitialize(activity)) {
             return;
         }
         initPlacementMappings(activity);
-        markStarted();
+        start();
         loadNewInterstitial(activity);
     }
 
     private void initPlacementMappings(Activity activity) {
-        isTablet = UIUtils.isTablet(activity);
+        boolean isTablet = UIUtils.isTablet(activity);
         placements = new HashMap<>();
 
         if (!isTablet) {
@@ -79,14 +74,17 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
         }
         MoPubInterstitial interstitial = interstitials.get(placement);
         MoPubInterstitialListener listener = (MoPubInterstitialListener) interstitial.getInterstitialAdListener();
-        listener.shutdownAppAfter(shutdownActivityAfterwards);
-        listener.dismissActivityAfterwards(dismissActivityAfterward);
-        return interstitial.show();
+        if (listener != null) {
+            listener.shutdownAppAfter(shutdownActivityAfterwards);
+            listener.dismissActivityAfterwards(dismissActivityAfterward);
+        }
+        return listener != null && interstitial.isReady() && interstitial.show();
     }
 
     @Override
     public void loadNewInterstitial(final Activity activity) {
         if (!started() || !enabled()) {
+            LOG.info("loadNewInterstitial() aborted. Network not started or not enabled");
             return; //not ready
         }
         if (placements.isEmpty()) {
@@ -103,6 +101,10 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
     public void loadMoPubInterstitial(final Activity activity, final String placement) {
         if (activity == null) {
             LOG.info("Aborted loading interstitial ("+placement+"), no Activity");
+            return;
+        }
+        if (!started() || !enabled()) {
+            LOG.info("loadMoPubInterstitial(placement="+placement+") aborted. Network not started or not enabled");
             return;
         }
         activity.runOnUiThread(new Runnable() {
@@ -136,7 +138,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
     @Override
     public void stop(Context context) {
         super.stop(context);
-        if (placements.isEmpty() || interstitials.isEmpty()) {
+        if (placements == null || interstitials == null || placements.isEmpty() || interstitials.isEmpty()) {
             return;
         }
         Set<String> placementKeys = placements.keySet();

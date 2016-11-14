@@ -30,8 +30,6 @@ import com.frostwire.util.Logger;
 public abstract class AbstractAdNetwork implements AdNetwork {
 
     private static Logger LOG = Logger.getLogger(AbstractAdNetwork.class);
-
-
     public abstract void initialize(Activity activity);
     public abstract boolean showInterstitial(Activity activity, String placement, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward);
     public abstract void loadNewInterstitial(Activity activity);
@@ -39,10 +37,14 @@ public abstract class AbstractAdNetwork implements AdNetwork {
     public abstract String getInUsePreferenceKey();
     public abstract boolean isDebugOn();
 
+    private long lastStopped = -1;
+    private boolean started;
+
     @Override
     public void stop(Context context) {
-        Offers.AdNetworkHelper.stop(this);
-        LOG.info("stop() - " + getShortCode() + " stopped");
+        started = false;
+        lastStopped = System.currentTimeMillis();
+        LOG.info(getClass().getSimpleName() + ".stop() - " + getShortCode() + " stopped");
     }
 
     @Override
@@ -56,14 +58,13 @@ public abstract class AbstractAdNetwork implements AdNetwork {
     }
 
     @Override
-    public boolean started() {
-        return Offers.AdNetworkHelper.started(this);
+    public final boolean started() {
+        return started;
     }
 
-    @Override
-    public void markStarted() {
-        Offers.AdNetworkHelper.markStarted(this);
-        LOG.info("start() - " + getShortCode() + " started");
+    public final void start() {
+        started = true;
+        LOG.info(getClass().getSimpleName() + ".start() - " + getShortCode() + " started");
     }
 
     @Override
@@ -81,7 +82,7 @@ public abstract class AbstractAdNetwork implements AdNetwork {
         }
     }
 
-    protected boolean abortInitializeIfNotEnabled(Context context) {
+    protected final boolean abortInitialize(Context context) {
         if (!enabled()) {
             if (!started()) {
                 LOG.info(getClass().getSimpleName() + " initialize(): aborted. AdNetwork Not enabled.");
@@ -91,6 +92,18 @@ public abstract class AbstractAdNetwork implements AdNetwork {
                 stop(context);
             }
             return true;
+        } else if (started()) {
+            LOG.info(getClass().getSimpleName() + " initialize(): aborted. AdNetwork already initialized.");
+            return true;
+        } else if (!started()) {
+            // We might have been recently stopped and they're trying to request our
+            // initialization by mistake.
+            // e.g. Issue with MainActivity.onResume() called before an
+            // ad-listener's onDismiss() is called. MoPub has this problem.
+            long now = System.currentTimeMillis();
+            boolean tooEarlyToReinizialize = now - lastStopped < 2000;
+            LOG.info(getClass().getSimpleName() + " abortInitialize()? now - lastStopped = " + (now - lastStopped) + " < 2000 == " + tooEarlyToReinizialize);
+            return tooEarlyToReinizialize;
         }
         return false;
     }
