@@ -59,6 +59,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.InsetsUIResource;
 
+import com.frostwire.alexandria.db.LibraryDatabase;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
@@ -335,6 +336,12 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private void actionStartRename() {
         cancelEdit();
         int index = _list.getSelectedIndex();
+
+        Playlist playlist = ((LibraryPlaylistsListCell) _list.getSelectedValue()).getPlaylist();
+        if (playlist != null && playlist.getId() == LibraryDatabase.STARRED_PLAYLIST_ID){
+            return;
+        }
+
         if (index != -1) {
             startEdit(index);
         }
@@ -763,7 +770,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
 
             Playlist selectedPlaylist = getSelectedPlaylist();
 
-            if (selectedPlaylist != null) {
+            if (selectedPlaylist != null && selectedPlaylist.getId() != LibraryDatabase.STARRED_PLAYLIST_ID) {
                 DialogOption showConfirmDialog = GUIMediator.showYesNoMessage(I18n.tr("Are you sure you want to delete the playlist?\n(No files will be deleted)"), I18n.tr("Are you sure?"), JOptionPane.QUESTION_MESSAGE);
 
                 if (showConfirmDialog != DialogOption.YES)
@@ -807,7 +814,9 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            startEdit(_list.getSelectedIndex());
+            if (((LibraryPlaylistsListCell) _list.getSelectedValue()).getPlaylist().getId() != LibraryDatabase.STARRED_PLAYLIST_ID) {
+                startEdit(_list.getSelectedIndex());
+            }
         }
     }
 
