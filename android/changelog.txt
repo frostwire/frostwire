@@ -1,7 +1,8 @@
-FrostWire 1.8.5 - NOV/11/2016
+FrostWire 1.8.5 - NOV/14/2016
  - Search engines updates
  - http updates
- - Translation updates: Indonesian, Arabic
+ - Translation updates: Indonesian, Arabic, Czech
+ - jlibtorrent 1.2.0.4
  - jlibtorrent upgrades to openssl-1.1.0c
 
 FrostWire 1.8.4 - NOV/09/2016
