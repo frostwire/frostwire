@@ -458,7 +458,7 @@
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="player_paused_press_and_hold_to_stop">Player paused. (Tip: Press and hold to stop)</string>
     <string name="btc">BTC</string>
-    <string name="you_need_a_bitcoin_wallet_app">You need a Bitcoin wallet installed on you device to submit a BTC donation.</string>
+    <string name="you_need_a_bitcoin_wallet_app">You need a Bitcoin wallet installed on your device to submit a BTC donation.</string>
     <string name="transfers_select_all">all</string>
     <string name="transfers_select_downloading">downloading</string>
     <string name="transfers_select_completed">completed</string>
