@@ -334,7 +334,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
                 // screen. Definitely one of my favorite features.
                 final String name = isArtist() ? mArtistName : mProfileName;
                 final Long id = mArguments.getLong(Config.ID);
-                ApolloUtils.createShortcutIntent(name, mArtistName, id, mType, this);
+                ApolloUtils.createShortcutIntentAsync(name, mArtistName, id, mType, this);
                 return true;
             }
             case R.id.menu_shuffle: {

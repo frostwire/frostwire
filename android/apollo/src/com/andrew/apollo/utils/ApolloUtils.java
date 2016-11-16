@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.cache.ImageCache;
 import com.andrew.apollo.cache.ImageFetcher;
+import com.frostwire.android.gui.services.Engine;
 import com.andrew.apollo.ui.activities.ShortcutActivity;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
@@ -144,47 +145,66 @@ public final class ApolloUtils {
      * @param mimeType    The MIME type of the shortcut
      * @param context     The {@link Context} to use to
      */
-    public static void createShortcutIntent(final String displayName, final String artistName,
-                                            final Long id, final String mimeType, final Activity context) {
-        try {
-            final ImageFetcher fetcher = getImageFetcher(context);
-            Bitmap bitmap = null;
-            if (mimeType.equals(MediaStore.Audio.Albums.CONTENT_TYPE)) {
-                bitmap = fetcher.getCachedBitmap(
-                        ImageFetcher.generateAlbumCacheKey(displayName, artistName));
-            } else {
-                bitmap = fetcher.getCachedBitmap(displayName);
-            }
-            if (bitmap == null) {
-                bitmap = BitmapFactory.decodeResource(context.getResources(),
-                        R.drawable.default_artwork);
-            }
+    public static void createShortcutIntentAsync(final String displayName, final String artistName,
+                                                 final Long id, final String mimeType, final Activity context) {
+        Runnable task = new Runnable() {
+            public void run() {
+                final ImageFetcher fetcher = getImageFetcher(context);
+                Bitmap bitmap = null;
+                boolean success = true;
+                try {
+                    if (mimeType.equals(MediaStore.Audio.Albums.CONTENT_TYPE)) {
+                        bitmap = fetcher.getCachedBitmap(
+                                ImageFetcher.generateAlbumCacheKey(displayName, artistName));
+                    } else {
+                        bitmap = fetcher.getCachedBitmap(displayName);
+                    }
+                    if (bitmap == null) {
+                        bitmap = fetcher.getDefaultArtwork();
+                    }
 
-            // Intent used when the icon is touched
-            final Intent shortcutIntent = new Intent(context, ShortcutActivity.class);
-            shortcutIntent.setAction(Intent.ACTION_VIEW);
-            shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            shortcutIntent.putExtra(Config.ID, id);
-            shortcutIntent.putExtra(Config.NAME, displayName);
-            shortcutIntent.putExtra(Config.MIME_TYPE, mimeType);
+                    final Intent shortcutIntent = new Intent(context, ShortcutActivity.class);
+                    shortcutIntent.setAction(Intent.ACTION_VIEW);
+                    shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    shortcutIntent.putExtra(Config.ID, id);
+                    shortcutIntent.putExtra(Config.NAME, displayName);
+                    shortcutIntent.putExtra(Config.MIME_TYPE, mimeType);
 
-            // Intent that actually sets the shortcut
-            final Intent intent = new Intent();
-            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, BitmapUtils.resizeAndCropCenter(bitmap, 96));
-            intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, displayName);
-            intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-            context.sendBroadcast(intent);
-            AppMsg.makeText(context,
-                    context.getString(R.string.pinned_to_home_screen, displayName),
-                    AppMsg.STYLE_CONFIRM).show();
-        } catch (final Exception e) {
-            Log.e("ApolloUtils", "createShortcutIntent", e);
-            AppMsg.makeText(
-                    context,
-                    context.getString(R.string.could_not_be_pinned_to_home_screen, displayName),
-                    AppMsg.STYLE_ALERT).show();
-        }
+                    // Intent that actually sets the shortcut
+                    final Intent intent = new Intent();
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, BitmapUtils.resizeAndCropCenter(bitmap, 96));
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, displayName);
+                    intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+                    context.sendBroadcast(intent);
+                } catch (Exception e) {
+                    Log.e("ApolloUtils", "createShortcutIntent", e);
+                    success = false;
+                }
+
+                final boolean finalSuccess = success;
+
+                // UI thread portion
+                Runnable postExecute = new Runnable() {
+                    public void run() {
+                        if (finalSuccess) {
+                            AppMsg.makeText(context,
+                                    context.getString(R.string.pinned_to_home_screen, displayName),
+                                    AppMsg.STYLE_CONFIRM).show();
+                        } else {
+                            AppMsg.makeText(
+                                    context,
+                                    context.getString(R.string.could_not_be_pinned_to_home_screen, displayName),
+                                    AppMsg.STYLE_ALERT).show();
+                        }
+                    }
+                };
+                context.runOnUiThread(postExecute);
+            }
+        };
+        Engine.instance().getThreadPool().submit(task);
     }
+
+
 }
