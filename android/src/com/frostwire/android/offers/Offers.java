@@ -109,7 +109,7 @@ public final class Offers {
 
         boolean interstitialShown = false;
 
-        if (Offers.adsDisabled()) {
+        if (Offers.disabledAds()) {
             LOG.info("Skipping interstitial ads display, PlayStore reports no ads");
         } else {
             for (AdNetwork adNetwork : getActiveAdNetworks()) {
@@ -163,7 +163,7 @@ public final class Offers {
         }
     }
 
-    public static boolean adsDisabled() {
+    public static boolean disabledAds() {
         return Products.disabledAds(PlayStore.getInstance());
     }
 
@@ -175,8 +175,7 @@ public final class Offers {
         // Coded so explicitly for clarity.
         boolean isBasic = Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
         boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
-        boolean paidForAdsRemoval = Offers.adsDisabled();
-        return (isBasic || isDevelopment) && !paidForAdsRemoval;
+        return (isBasic || isDevelopment) && !Offers.disabledAds();
     }
 
     private static void tryBackToBackInterstitial(Activity activity) {
@@ -264,7 +263,7 @@ public final class Offers {
             ConfigurationManager config;
             boolean enabled = false;
             try {
-                boolean adsDisabled = Offers.adsDisabled();
+                boolean adsDisabled = Offers.disabledAds();
                 config = ConfigurationManager.instance();
                 enabled = config.getBoolean(network.getInUsePreferenceKey()) && !adsDisabled;
             } catch (Throwable e) {

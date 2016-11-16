@@ -234,12 +234,17 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         specialOfferLayout = NO_SPECIAL_OFFER;
 
         // If we're basic and we have not paid to remove ads, we pick the specialOfferLayout randomly.
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && Offers.removeAdsOffersEnabled()) {
-            specialOfferLayout = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 2 == 0 ? R.layout.view_remove_ads_notification : R.layout.view_less_results_notification;
-        }
-        // If we're basic and we paid... you should still know about plus :)
-        else if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && Offers.adsDisabled()) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            // If we're basic and we paid... you should still know about plus :)
             specialOfferLayout = R.layout.view_less_results_notification;
+
+            if (Offers.removeAdsOffersEnabled()) {
+                // offer to remove ads, or offer to upgrade to plus for more results
+                specialOfferLayout = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 2 == 0 ?
+                        R.layout.view_remove_ads_notification :
+                        R.layout.view_less_results_notification;
+            }
+
         }
         return specialOfferLayout;
     }

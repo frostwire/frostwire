@@ -33,8 +33,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.PromotionsAdapter;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
-import com.frostwire.android.offers.Products;
 import com.frostwire.frostclick.Slide;
 
 import java.util.Iterator;
@@ -67,7 +65,7 @@ public class PromotionsView extends LinearLayout {
     public void updateAdapter() {
         if (getSlides() != null) {
             List<Slide> slides = getSlides();
-            if (Offers.adsDisabled()) {
+            if (Offers.disabledAds()) {
                 // remove all ad slides flagged as advertisement
                 removeAds(slides);
             }

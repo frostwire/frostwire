@@ -657,7 +657,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
     }
 
     private void initAlbumArtBanner() {
-        if (Offers.adsDisabled()) {
+        if (Offers.disabledAds()) {
             return;
         }
 

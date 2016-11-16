@@ -70,8 +70,6 @@ import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
-import com.frostwire.android.offers.Products;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
@@ -711,7 +709,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         int visibility = View.GONE;
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
             // if they haven't paid for ads
-            if (!Offers.adsDisabled() &&
+            if (!Offers.disabledAds() &&
                 (playerItem == null || playerItem.getVisibility() == View.GONE)) {
                 visibility = View.VISIBLE;
             }
