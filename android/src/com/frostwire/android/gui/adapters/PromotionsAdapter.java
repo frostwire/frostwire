@@ -39,11 +39,9 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
-import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -55,7 +53,6 @@ import java.util.List;
  * @author marcelinkaaa
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
-    private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
     private static final int NO_SPECIAL_OFFER = 97999605;
     private final List<Slide> slides;
     private final PromotionDownloader promotionDownloader;
@@ -106,8 +103,13 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             }
         };
 
-        imageView.setOnClickListener(downloadPromoClickListener);
-        downloadTextView.setOnClickListener(downloadPromoClickListener);
+        if (imageView != null) {
+            imageView.setOnClickListener(downloadPromoClickListener);
+        }
+
+        if (downloadTextView != null) {
+            downloadTextView.setOnClickListener(downloadPromoClickListener);
+        }
 
         if (StringUtils.isNullOrEmpty(theSlide.videoURL)) {
             previewImageView.setVisibility(View.GONE);
@@ -178,7 +180,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             return View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
         }
 
-        return (!inLandscapeMode) ? getPortraitView(position, convertView, parent) : getLandscapeView(position, convertView, parent);
+        return (!inLandscapeMode) ? getPortraitView(position, convertView, parent) : super.getView(position, null, parent);
     }
 
     private View getPortraitView(int position, View convertView, ViewGroup parent) {
@@ -209,10 +211,6 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
 
         return convertView;
-    }
-
-    private View getLandscapeView(int position, View convertView, ViewGroup parent) {
-        return super.getView(position, null, parent);
     }
 
     public int lastPosition(boolean inLandscapeMode) {
