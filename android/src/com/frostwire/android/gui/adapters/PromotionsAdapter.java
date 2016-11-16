@@ -42,6 +42,8 @@ import com.frostwire.frostclick.Slide;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -170,28 +172,47 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     public View getView(int position, View convertView, ViewGroup parent) {
         // Plus (or when on landscape orientation) needs no special offer as we can't sell remove ads yet
         boolean inLandscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
-        if (inLandscapeMode || !Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            // we subtract 1 because of the "FROSTWIRE FEATURES" item view.
-            if (!inLandscapeMode && position == 0) {
-                convertView = View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
-            } else if (position == lastPosition(inLandscapeMode)) {
-                convertView = View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
-            } else {
-                convertView = super.getView(inLandscapeMode ? position : position - 1, null, parent);
-            }
-        } else {
+
+        // "ALL FREE DOWNLOADS" button shown last
+        if (position == lastPosition(inLandscapeMode)) {
+            return View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
+        }
+
+        return (!inLandscapeMode) ? getPortraitView(position, convertView, parent) : getLandscapeView(position, convertView, parent);
+    }
+
+    private View getPortraitView(int position, View convertView, ViewGroup parent) {
+        // OPTIONAL OFFER ON TOP
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            // if you paid for ads, I tell you to go plus
             int specialOfferLayout = pickSpecialOfferLayout();
-            if (position == 0) {
-                convertView = View.inflate(getContext(), specialOfferLayout, null);
-            } else if (position == lastPosition(inLandscapeMode)) {
-            convertView = View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
-            } else if (position == 1) {
-                convertView = View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
+
+            if (position == 0 && specialOfferLayout != NO_SPECIAL_OFFER) {
+                return View.inflate(getContext(), specialOfferLayout, null);
             } else {
-                convertView = super.getView(position - 2, null, parent);
+                return super.getView(position - 1, null, parent);
             }
         }
+
+        // "FROSTWIRE FEATURES" view logic.
+        // if you're plus, i can't offer to remove ads, nor to be plus
+        int offsetFeaturesTitleHeader = 0;
+
+        // If you're basic, I'll always tell you about upgrading to plus.
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            offsetFeaturesTitleHeader++;
+        }
+        if (position == offsetFeaturesTitleHeader) {
+            return View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
+        }
+        // "FROSTWIRE FEATURES" view logic.
+
+
         return convertView;
+    }
+
+    private View getLandscapeView(int position, View convertView, ViewGroup parent) {
+        return super.getView(position, null, parent);
     }
 
     public int lastPosition(boolean inLandscapeMode) {
@@ -201,7 +222,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
         int lastPosition = slides.size();
         // not sideways and not plus, user gets offer + "FROSTWIRE FEATURES" rows.
-        if  (!inLandscapeMode && !Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+        if  (!inLandscapeMode && Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
             lastPosition += 2;
         }
         return lastPosition;
@@ -211,14 +232,12 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
      * Decide what the special offer layout we should use.
      */
     private int pickSpecialOfferLayout() {
-        // TODO: Throttle me.
-
         // Optimistic: If we're plus, we can't offer ad removal yet.
         specialOfferLayout = NO_SPECIAL_OFFER;
 
         // If we're basic and we have not paid to remove ads, we pick the specialOfferLayout randomly.
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && Offers.removeAdsOffersEnabled()) {
-            specialOfferLayout = Math.random() % 2 == 0 ? R.layout.view_remove_ads_notification : R.layout.view_less_results_notification;
+            specialOfferLayout = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 2 == 0 ? R.layout.view_remove_ads_notification : R.layout.view_less_results_notification;
         }
         // If we're basic and we paid... you should still know about plus :)
         else if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && Offers.adsDisabled()) {
