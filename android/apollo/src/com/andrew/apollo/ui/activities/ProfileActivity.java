@@ -41,6 +41,9 @@ import com.andrew.apollo.utils.*;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.ProfileTabCarousel.Listener;
 import com.frostwire.android.R;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * The {@link Activity} is used to display the data for specific
@@ -334,7 +337,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
                 // screen. Definitely one of my favorite features.
                 final String name = isArtist() ? mArtistName : mProfileName;
                 final Long id = mArguments.getLong(Config.ID);
-                ApolloUtils.createShortcutIntent(name, mArtistName, id, mType, this);
+                ApolloUtils.createShortcutIntentAsync(name, mArtistName, id, mType, Ref.weak((Activity) this));
                 return true;
             }
             case R.id.menu_shuffle: {
