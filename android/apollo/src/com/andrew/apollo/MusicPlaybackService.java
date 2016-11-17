@@ -52,6 +52,7 @@ import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -1563,33 +1564,54 @@ public class MusicPlaybackService extends Service {
                 break;
             case META_CHANGED:
             case QUEUE_CHANGED:
-                Bitmap albumArt = getAlbumArt();
-                if (albumArt != null) {
-                    // RemoteControlClient wants to recycle the bitmaps thrown at it, so we need
-                    // to make sure not to hand out our cache copy
-                    Bitmap.Config config = albumArt.getConfig();
-                    if (config == null) {
-                        config = Bitmap.Config.ARGB_8888;
-                    }
-                    albumArt = albumArt.copy(config, false);
-                }
-                mRemoteControlClient
-                        .editMetadata(true)
-                        .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, getArtistName())
-                        .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST,
-                                getAlbumArtistName())
-                        .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, getAlbumName())
-                        .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, getTrackName())
-                        .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration())
-                        .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArt)
-                        .apply();
-
-                // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
-                // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
-                mRemoteControlClient.setPlaybackState(playState);
+                changeQueueAsync(playState);
                 break;
         }
     }
+
+    /**
+     * Function that asynchronously gets bitmap and then updates the Remote Control Client with that bitmap
+     *
+     * @param playState update RemoteControlClient to that state
+     */
+    private void changeQueueAsync(final int playState) {
+        Runnable task = new Runnable() {
+            public void run() {
+                // background portion
+                Bitmap albumArt = getAlbumArt();
+                // RemoteControlClient wants to recycle the bitmaps thrown at it, so we need
+                // to make sure not to hand out our cache copy
+                Bitmap.Config config = albumArt.getConfig();
+                if (config == null) {
+                    config = Bitmap.Config.ARGB_8888;
+                }
+                final Bitmap albumArtCopy = albumArt.copy(config, false);
+
+                // UI thread portion
+                Runnable postExecute = new Runnable() {
+                    public void run() {
+                        mRemoteControlClient
+                                .editMetadata(true)
+                                .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, getArtistName())
+                                .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST,
+                                        getAlbumArtistName())
+                                .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, getAlbumName())
+                                .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, getTrackName())
+                                .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration())
+                                .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy)
+                                .apply();
+
+                        // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
+                        // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
+                        mRemoteControlClient.setPlaybackState(playState);
+                    }
+                };
+                mPlayerHandler.post(postExecute);
+            }
+        };
+        Engine.instance().getThreadPool().submit(task);
+    }
+
 
     /**
      * Saves the queue
