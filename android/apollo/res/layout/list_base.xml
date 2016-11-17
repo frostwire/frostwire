@@ -41,7 +41,7 @@
         android:cacheColorHint="@color/transparent"
         android:drawSelectorOnTop="false"
         android:fadingEdge="vertical"
-        android:fastScrollAlwaysVisible="true"
+        android:fastScrollAlwaysVisible="false"
         android:fastScrollEnabled="true"
         android:paddingLeft="@dimen/fast_scroll_padding_left"
         android:paddingRight="@dimen/fast_scroll_padding_right"

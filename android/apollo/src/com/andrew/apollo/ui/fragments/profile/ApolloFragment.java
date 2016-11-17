@@ -595,7 +595,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             list.setOnScrollListener(new VerticalScrollListener(null, mProfileTabCarousel, 0));
             // Remove the scrollbars and padding for the fast scroll
             list.setVerticalScrollBarEnabled(false);
-            list.setFastScrollEnabled(false);
             list.setPadding(0, 0, 0, 0);
         }
     }
