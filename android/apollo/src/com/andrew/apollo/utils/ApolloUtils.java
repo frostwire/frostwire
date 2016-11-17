@@ -32,6 +32,9 @@ import com.frostwire.android.gui.services.Engine;
 import com.andrew.apollo.ui.activities.ShortcutActivity;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Mostly general and UI helpers.
@@ -146,10 +149,10 @@ public final class ApolloUtils {
      * @param context     The {@link Context} to use to
      */
     public static void createShortcutIntentAsync(final String displayName, final String artistName,
-                                                 final Long id, final String mimeType, final Activity context) {
+                                                 final Long id, final String mimeType, final WeakReference<Activity> context) {
         Runnable task = new Runnable() {
             public void run() {
-                final ImageFetcher fetcher = getImageFetcher(context);
+                final ImageFetcher fetcher = getImageFetcher(context.get());
                 Bitmap bitmap = null;
                 boolean success = true;
                 try {
@@ -162,22 +165,24 @@ public final class ApolloUtils {
                     if (bitmap == null) {
                         bitmap = fetcher.getDefaultArtwork();
                     }
+                    //check if activity context is still valid
+                    if(Ref.alive(context)) {
+                        final Intent shortcutIntent = new Intent(context.get(), ShortcutActivity.class);
+                        shortcutIntent.setAction(Intent.ACTION_VIEW);
+                        shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        shortcutIntent.putExtra(Config.ID, id);
+                        shortcutIntent.putExtra(Config.NAME, displayName);
+                        shortcutIntent.putExtra(Config.MIME_TYPE, mimeType);
 
-                    final Intent shortcutIntent = new Intent(context, ShortcutActivity.class);
-                    shortcutIntent.setAction(Intent.ACTION_VIEW);
-                    shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    shortcutIntent.putExtra(Config.ID, id);
-                    shortcutIntent.putExtra(Config.NAME, displayName);
-                    shortcutIntent.putExtra(Config.MIME_TYPE, mimeType);
-
-                    // Intent that actually sets the shortcut
-                    final Intent intent = new Intent();
-                    intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, BitmapUtils.resizeAndCropCenter(bitmap, 96));
-                    intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-                    intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, displayName);
-                    intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-                    context.sendBroadcast(intent);
+                        // Intent that actually sets the shortcut
+                        final Intent intent = new Intent();
+                        intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, BitmapUtils.resizeAndCropCenter(bitmap, 96));
+                        intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+                        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, displayName);
+                        intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+                        context.get().sendBroadcast(intent);
+                    }
                 } catch (Exception e) {
                     Log.e("ApolloUtils", "createShortcutIntent", e);
                     success = false;
@@ -185,22 +190,24 @@ public final class ApolloUtils {
 
                 final boolean finalSuccess = success;
 
-                // UI thread portion
-                Runnable postExecute = new Runnable() {
-                    public void run() {
-                        if (finalSuccess) {
-                            AppMsg.makeText(context,
-                                    context.getString(R.string.pinned_to_home_screen, displayName),
-                                    AppMsg.STYLE_CONFIRM).show();
-                        } else {
-                            AppMsg.makeText(
-                                    context,
-                                    context.getString(R.string.could_not_be_pinned_to_home_screen, displayName),
-                                    AppMsg.STYLE_ALERT).show();
+                if (Ref.alive(context)) {
+                    // UI thread portion
+                    Runnable postExecute = new Runnable() {
+                        public void run() {
+                            if (finalSuccess) {
+                                AppMsg.makeText(context.get(),
+                                        context.get().getString(R.string.pinned_to_home_screen, displayName),
+                                        AppMsg.STYLE_CONFIRM).show();
+                            } else {
+                                AppMsg.makeText(
+                                        context.get(),
+                                        context.get().getString(R.string.could_not_be_pinned_to_home_screen, displayName),
+                                        AppMsg.STYLE_ALERT).show();
+                            }
                         }
-                    }
-                };
-                context.runOnUiThread(postExecute);
+                    };
+                    context.get().runOnUiThread(postExecute);
+                }
             }
         };
         Engine.instance().getThreadPool().submit(task);
