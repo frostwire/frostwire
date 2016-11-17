@@ -40,6 +40,11 @@ public class NotificationHelper {
     private static final int APOLLO_MUSIC_SERVICE = 1;
 
     /**
+     * Used to allow player controls on lock screen notification on API 21+ phones
+     */
+    private static final int VISIBILITY_PUBLIC = 1;
+
+    /**
      * NotificationManager
      */
     private final NotificationManager mNotificationManager;
@@ -97,6 +102,7 @@ public class NotificationHelper {
                 .setSmallIcon(getNotificationIcon())
                 .setContentIntent(pendingintent)
                 .setPriority(Notification.PRIORITY_DEFAULT)
+                .setVisibility(VISIBILITY_PUBLIC)
                 .setContent(mNotificationTemplate)
                 .build();
         // Control playback from the notification
