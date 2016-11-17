@@ -112,6 +112,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private JTextField _textName;
 
     private JPopupMenu _popup;
+    private JPopupMenu starredPlaylistPopupMenu;
     private Action refreshAction = new RefreshAction();
     private Action refreshID3TagsAction = new RefreshID3TagsAction();
     private Action deleteAction = new DeleteAction();
@@ -156,12 +157,34 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         GUIMediator.addRefreshListener(this);
 
         setupPopupMenu();
+        setupStarredPlaylistPopupMenu();
         setupModel();
         setupList();
 
         _scrollPane = new JScrollPane(_list);
 
         add(_scrollPane);
+    }
+
+    private void setupStarredPlaylistPopupMenu() {
+        starredPlaylistPopupMenu = new SkinPopupMenu();
+        starredPlaylistPopupMenu.add(new SkinMenuItem(refreshAction));
+        starredPlaylistPopupMenu.add(new SkinMenuItem(refreshID3TagsAction));
+        starredPlaylistPopupMenu.addSeparator();
+        starredPlaylistPopupMenu.add(new SkinMenuItem(importToPlaylistAction));
+        starredPlaylistPopupMenu.add(new SkinMenuItem(importToNewPlaylistAction));
+        starredPlaylistPopupMenu.addSeparator();
+        starredPlaylistPopupMenu.add(new SkinMenuItem(copyPlaylistFilesAction));
+        starredPlaylistPopupMenu.add(new SkinMenuItem(exportPlaylistAction));
+        starredPlaylistPopupMenu.addSeparator();
+
+        if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
+            starredPlaylistPopupMenu.add(new SkinMenuItem(exportToiTunesAction));
+        }
+
+        starredPlaylistPopupMenu.addSeparator();
+        starredPlaylistPopupMenu.add(new SkinMenuItem(new ConfigureOptionsAction(OptionsConstructor.LIBRARY_KEY,
+                I18n.tr("Configure Options"), I18n.tr("You can configure the FrostWire\'s Options."))));
     }
 
     private void setupPopupMenu() {
@@ -687,7 +710,16 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
          */
         public void handlePopupMenu(MouseEvent e) {
             _list.setSelectedIndex(_list.locationToIndex(e.getPoint()));
-            _popup.show(_list, e.getX(), e.getY());
+            LibraryPlaylistsListCell cell = (LibraryPlaylistsListCell) _list.getSelectedValue();
+
+            JPopupMenu popup;
+            if ( cell.getPlaylist().getId() == LibraryDatabase.STARRED_PLAYLIST_ID) {
+                popup = starredPlaylistPopupMenu;
+            } else {
+                popup = _popup;
+            }
+
+            popup.show(_list, e.getX(), e.getY());
         }
     }
 
