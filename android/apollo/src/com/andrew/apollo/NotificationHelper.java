@@ -97,6 +97,7 @@ public class NotificationHelper {
                 .setSmallIcon(getNotificationIcon())
                 .setContentIntent(pendingintent)
                 .setPriority(Notification.PRIORITY_DEFAULT)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setContent(mNotificationTemplate)
                 .build();
         // Control playback from the notification
