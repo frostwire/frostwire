@@ -1,10 +1,10 @@
-FrostWire 1.8.5 - NOV/17/2016
+FrostWire 1.8.5 - NOV/18/2016
  - Search engines updates
  - http updates
  - Music Player controls available on lock screen notification for Android 5.0 and above 
  - Normalized look of scrollbars on music player
  - UI updates on expanded player notification, play button available, expanded form has white background
- - Translation updates: Indonesian, Arabic, Czech, Danish, Greek, Japanese, Korean
+ - Translation updates: Indonesian, Arabic, Czech, Danish, Greek, Japanese, Korean, Turkish
  - jlibtorrent 1.2.0.4
  - jlibtorrent upgrades to openssl-1.1.0c
  - Crash fixes
