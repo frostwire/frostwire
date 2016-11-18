@@ -59,6 +59,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.InsetsUIResource;
 
+import com.frostwire.alexandria.db.LibraryDatabase;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
@@ -99,6 +100,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private int _selectedIndexToRename;
 
     private LibraryPlaylistsListCell _newPlaylistCell;
+    private LibraryPlaylistsListCell starredPlaylistCell;
 
     private ActionListener _selectedPlaylistAction;
 
@@ -110,6 +112,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private JTextField _textName;
 
     private JPopupMenu _popup;
+    private JPopupMenu starredPlaylistPopupMenu;
     private Action refreshAction = new RefreshAction();
     private Action refreshID3TagsAction = new RefreshID3TagsAction();
     private Action deleteAction = new DeleteAction();
@@ -154,12 +157,34 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         GUIMediator.addRefreshListener(this);
 
         setupPopupMenu();
+        setupStarredPlaylistPopupMenu();
         setupModel();
         setupList();
 
         _scrollPane = new JScrollPane(_list);
 
         add(_scrollPane);
+    }
+
+    private void setupStarredPlaylistPopupMenu() {
+        starredPlaylistPopupMenu = new SkinPopupMenu();
+        starredPlaylistPopupMenu.add(new SkinMenuItem(refreshAction));
+        starredPlaylistPopupMenu.add(new SkinMenuItem(refreshID3TagsAction));
+        starredPlaylistPopupMenu.addSeparator();
+        starredPlaylistPopupMenu.add(new SkinMenuItem(importToPlaylistAction));
+        starredPlaylistPopupMenu.add(new SkinMenuItem(importToNewPlaylistAction));
+        starredPlaylistPopupMenu.addSeparator();
+        starredPlaylistPopupMenu.add(new SkinMenuItem(copyPlaylistFilesAction));
+        starredPlaylistPopupMenu.add(new SkinMenuItem(exportPlaylistAction));
+        starredPlaylistPopupMenu.addSeparator();
+
+        if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
+            starredPlaylistPopupMenu.add(new SkinMenuItem(exportToiTunesAction));
+        }
+
+        starredPlaylistPopupMenu.addSeparator();
+        starredPlaylistPopupMenu.add(new SkinMenuItem(new ConfigureOptionsAction(OptionsConstructor.LIBRARY_KEY,
+                I18n.tr("Configure Options"), I18n.tr("You can configure the FrostWire\'s Options."))));
     }
 
     private void setupPopupMenu() {
@@ -195,7 +220,14 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
 
         _selectedPlaylistAction = new SelectedPlaylistActionListener();
 
+        Playlist starredPlaylist = LibraryMediator.getLibrary().getStarredPlaylist();
+
+        starredPlaylistCell = new LibraryPlaylistsListCell(I18n.tr("Starred"), I18n.tr("Show all starred items"),
+                GUIMediator.getThemeImage("star_on"), starredPlaylist, _selectedPlaylistAction);
+
         _model.addElement(_newPlaylistCell);
+        _model.addElement(starredPlaylistCell);
+
         for (Playlist playlist : library.getPlaylists()) {
             LibraryPlaylistsListCell cell = new LibraryPlaylistsListCell(null, null, GUIMediator.getThemeImage("playlist"), playlist, _selectedPlaylistAction);
             _model.addElement(cell);
@@ -210,10 +242,10 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
 
             @Override
             public int compare(LibraryPlaylistsListCell o1, LibraryPlaylistsListCell o2) {
-                if (o1 == _newPlaylistCell) {
+                if (o1 == _newPlaylistCell || o1 == starredPlaylistCell) {
                     return -1;
                 }
-                if (o2 == _newPlaylistCell) {
+                if (o2 == _newPlaylistCell || o2 == starredPlaylistCell) {
                     return 1;
                 }
 
@@ -314,7 +346,11 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         Playlist playlist = cell.getPlaylist();
 
         if (playlist != null) {
-            playlist.refresh();
+            if (playlist.getId() == LibraryDatabase.STARRED_PLAYLIST_ID){
+                playlist = LibraryMediator.getLibrary().getStarredPlaylist();
+            } else {
+                playlist.refresh();
+            }
             LibraryMediator.instance().updateTableItems(playlist);
             String status = LibraryUtils.getPlaylistDurationInDDHHMMSS(playlist) + ", " + playlist.getItems().size() + " " + I18n.tr("tracks");
             LibraryMediator.instance().getLibrarySearch().setStatus(status);
@@ -326,6 +362,12 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private void actionStartRename() {
         cancelEdit();
         int index = _list.getSelectedIndex();
+
+        Playlist playlist = ((LibraryPlaylistsListCell) _list.getSelectedValue()).getPlaylist();
+        if (playlist != null && playlist.getId() == LibraryDatabase.STARRED_PLAYLIST_ID){
+            return;
+        }
+
         if (index != -1) {
             startEdit(index);
         }
@@ -668,7 +710,16 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
          */
         public void handlePopupMenu(MouseEvent e) {
             _list.setSelectedIndex(_list.locationToIndex(e.getPoint()));
-            _popup.show(_list, e.getX(), e.getY());
+            LibraryPlaylistsListCell cell = (LibraryPlaylistsListCell) _list.getSelectedValue();
+
+            JPopupMenu popup;
+            if ( cell.getPlaylist().getId() == LibraryDatabase.STARRED_PLAYLIST_ID) {
+                popup = starredPlaylistPopupMenu;
+            } else {
+                popup = _popup;
+            }
+
+            popup.show(_list, e.getX(), e.getY());
         }
     }
 
@@ -744,7 +795,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
 
             Playlist selectedPlaylist = getSelectedPlaylist();
 
-            if (selectedPlaylist != null) {
+            if (selectedPlaylist != null && selectedPlaylist.getId() != LibraryDatabase.STARRED_PLAYLIST_ID) {
                 DialogOption showConfirmDialog = GUIMediator.showYesNoMessage(I18n.tr("Are you sure you want to delete the playlist?\n(No files will be deleted)"), I18n.tr("Are you sure?"), JOptionPane.QUESTION_MESSAGE);
 
                 if (showConfirmDialog != DialogOption.YES)
@@ -788,7 +839,9 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            startEdit(_list.getSelectedIndex());
+            if (((LibraryPlaylistsListCell) _list.getSelectedValue()).getPlaylist().getId() != LibraryDatabase.STARRED_PLAYLIST_ID) {
+                startEdit(_list.getSelectedIndex());
+            }
         }
     }
 

@@ -93,7 +93,7 @@ public final class UISettings extends LimeProps {
 	        FACTORY.createIntSetting("UI_LIBRARY_MAIN_DIVIDER_LOCATION", -1);
 	
 	public static final IntSetting UI_LIBRARY_EXPLORER_DIVIDER_POSITION =
-	        FACTORY.createIntSetting("UI_LIBRARY_EXPLORER_DIVIDER_POSITION", 230);
+	        FACTORY.createIntSetting("UI_LIBRARY_EXPLORER_DIVIDER_POSITION", 168);
 	
 	/**
 	 * Setting for the divider location between incoming query monitors and
