@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -39,6 +40,7 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
 import java.util.Calendar;
@@ -53,6 +55,7 @@ import java.util.List;
  * @author marcelinkaaa
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
+    private static Logger LOG = Logger.getLogger(PromotionsAdapter.class);
     private static final int NO_SPECIAL_OFFER = 97999605;
     private final List<Slide> slides;
     private final PromotionDownloader promotionDownloader;
@@ -151,12 +154,12 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         final boolean landscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
         // if we are in landscape mode and the number of slides
         // is an uneven number we remove the last one
-        if (landscapeMode && slides.size() % 2 == 0) {
+        if (landscapeMode && slides.size() % 2 == 1) {
             slides.remove(slides.size()-1);
         }
 
         // +1 is for the last button item to see all promos on frostwire.com
-        return slides.size() + 1;
+        return slides.size() + (!landscapeMode ? 2 : 0);
     }
 
     @Override
@@ -184,33 +187,53 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     }
 
     private View getPortraitView(int position, View convertView, ViewGroup parent) {
+        // "FROSTWIRE FEATURES" view logic.
+        int offsetFeaturesTitleHeader = 0;
+
         // OPTIONAL OFFER ON TOP
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            offsetFeaturesTitleHeader++; // has to move down one slot since we'll have special offer above
+
             // if you paid for ads, I tell you to go plus
             int specialOfferLayout = pickSpecialOfferLayout();
 
             if (position == 0 && specialOfferLayout != NO_SPECIAL_OFFER) {
+                if (specialOfferLayout == R.layout.view_remove_ads_notification) {
+                    View removeAdsOfferView = setupRemoveAdsOfferView();
+                    if (removeAdsOfferView != null) {
+                        return removeAdsOfferView;
+                    }
+                }
                 return View.inflate(getContext(), specialOfferLayout, null);
-            } else {
+            } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
                 return super.getView(position - 1, null, parent);
             }
         }
 
-        // "FROSTWIRE FEATURES" view logic.
-        // if you're plus, i can't offer to remove ads, nor to be plus
-        int offsetFeaturesTitleHeader = 0;
-
-        // If you're basic, I'll always tell you about upgrading to plus.
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            offsetFeaturesTitleHeader++;
-        }
+        // "FROSTWIRE FEATURES" title view
         if (position == offsetFeaturesTitleHeader) {
             return View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
         }
-        // "FROSTWIRE FEATURES" view logic.
 
+        if (position == lastPosition(false)) {
+
+        }
 
         return convertView;
+    }
+
+    @Nullable
+    private View setupRemoveAdsOfferView() {
+        String pitch = BuyActivity.getRandomPitch(getContext().getResources(), true);
+        if (pitch != null) {
+            View specialOfferView = View.inflate(getContext(), R.layout.view_remove_ads_notification, null);
+            TextView pitchTitle = (TextView) specialOfferView.findViewById(R.id.view_remove_ads_notification_title);
+            if (pitchTitle != null && specialOfferView != null) {
+                pitchTitle.setText(pitch);
+                return specialOfferView;
+            }
+        }
+        return null;
     }
 
     public int lastPosition(boolean inLandscapeMode) {
@@ -218,10 +241,14 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             return 0;
         }
 
-        int lastPosition = slides.size();
+        int lastPosition = slides.size()-1;
         // not sideways and not plus, user gets offer + "FROSTWIRE FEATURES" rows.
+        if (!inLandscapeMode) {
+            lastPosition += 1;
+        }
+
         if  (!inLandscapeMode && Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            lastPosition += 2;
+            lastPosition += 1;
         }
         return lastPosition;
     }
@@ -239,10 +266,13 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             specialOfferLayout = R.layout.view_less_results_notification;
 
             if (Offers.removeAdsOffersEnabled()) {
+                LOG.info("pickSpecialOfferLayout: removeAdsOffersEnabled.");
                 // offer to remove ads, or offer to upgrade to plus for more results
                 specialOfferLayout = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 2 == 0 ?
                         R.layout.view_remove_ads_notification :
                         R.layout.view_less_results_notification;
+            } else {
+                LOG.info("pickSpecialOfferLayout: removeAdsOffersEnabled NOT enabled!");
             }
 
         }

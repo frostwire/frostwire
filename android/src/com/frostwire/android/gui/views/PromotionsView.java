@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.PromotionsAdapter;
 import com.frostwire.android.offers.Offers;
@@ -101,12 +102,20 @@ public class PromotionsView extends LinearLayout {
                     return;
                 }
                 PromotionsAdapter promoAdapter = (PromotionsAdapter) gridview.getAdapter();
-                if (position == 0) {
+                if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 0) {
                     promoAdapter.onSpecialOfferClick();
                     return;
                 }
 
                 boolean inLandscapeMode = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+
+                // FROSTWIRE FEATURES VIEW
+                if (!inLandscapeMode && ((!Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 0) ||
+                    (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 1))) {
+                    promoAdapter.onAllFeaturedDownloadsClick();
+                    return;
+                }
+
                 if (position ==  promoAdapter.lastPosition(inLandscapeMode)) {
                     promoAdapter.onAllFeaturedDownloadsClick();
                     return;

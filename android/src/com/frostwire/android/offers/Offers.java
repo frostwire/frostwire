@@ -40,26 +40,23 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public final class Offers {
-
     private static final Logger LOG = Logger.getLogger(Offers.class);
-    static final boolean DEBUG_MODE = false;
 
+    static final boolean DEBUG_MODE = false;
+    static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<Runnable>(), true);
     public static final String PLACEMENT_INTERSTITIAL_EXIT = "interstitial_exit";
     public static final String PLACEMENT_INTERSTITIAL_HOME = "interstitial_home";
     public static final String PLACEMENT_INTERSTITIAL_TRANSFERS = "interstitial_transfers";
-
-    private Offers() {
-    }
-
-    static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<Runnable>(), true);
     private static long lastInterstitialShownTimestamp = -1;
-
+    private static Map<String,AdNetwork> AD_NETWORKS;
     private final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
     private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
+    private final static Long STARTUP_TIME = System.currentTimeMillis();
 
-    private static Map<String,AdNetwork> AD_NETWORKS;
+    private Offers() {
+    }
 
     public static void initAdNetworks(Activity activity) {
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
@@ -106,7 +103,6 @@ public final class Offers {
                                         String placement,
                                         final boolean shutdownAfterwards,
                                         final boolean dismissAfterwards) {
-
         boolean interstitialShown = false;
 
         if (Offers.disabledAds()) {
@@ -125,7 +121,6 @@ public final class Offers {
                 }
             }
         }
-
 
         if (!interstitialShown) {
             if (dismissAfterwards) {
@@ -169,13 +164,21 @@ public final class Offers {
 
     /**
      * @return true only for flavor basic or for plus_debug and we haven't paid for ad removals, or
-     * it's plus supporting frostwire with ads
+     * it's plus supporting frostwire with ads.
+     * If it's been less than 2 seconds since the app started, we always return false as there's not
+     * enough time to check if user has purchased anything
      */
     public static boolean removeAdsOffersEnabled() {
+        long now = System.currentTimeMillis();
+        if (now - Offers.STARTUP_TIME < 2000) {
+            // not enough time to ask if user has bought products, better to avoid false positives for users that paid.
+            return false;
+        }
         // Coded so explicitly for clarity.
         boolean isBasic = Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
         boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
-        return (isBasic || isDevelopment) && !Offers.disabledAds();
+        boolean notDisabledAds = !Offers.disabledAds();
+        return (isBasic || isDevelopment) && notDisabledAds;
     }
 
     private static void tryBackToBackInterstitial(Activity activity) {

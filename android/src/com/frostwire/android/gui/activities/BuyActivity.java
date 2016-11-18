@@ -19,7 +19,9 @@
 package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.*;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -105,10 +107,13 @@ public class BuyActivity extends AbstractActivity {
 
     private String getActionBarTitle() {
         final String titlePrefix = getString(R.string.remove_ads);
-        return titlePrefix + ". " + getRandomPitch(false) + ".";
+        return titlePrefix + ". " + getRandomPitch(getResources(), false) + ".";
     }
 
-    private String getRandomPitch(final boolean avoidSupportPitches) {
+    public static String getRandomPitch(Resources resources, final boolean avoidSupportPitches) {
+        if (resources == null) {
+            return null;
+        }
         // put "support" pitches at the beginning and modify offset2
         final int[] pitches = {
                 R.string.support_frostwire,
@@ -128,7 +133,7 @@ public class BuyActivity extends AbstractActivity {
         int offset = !avoidSupportPitches ? offset1 : offset2;
         int suffixId = pitches[offset + new Random().nextInt(pitches.length - offset)];
 
-        return getString(suffixId);
+        return resources.getString(suffixId);
     }
 
     private void initOfferLayer(boolean interstitialMode) {
@@ -154,7 +159,7 @@ public class BuyActivity extends AbstractActivity {
         offerLayout.setOnClickListener(offerClickListener);
 
         final TextView randomPitch = findView(R.id.activity_buy_interstitial_random_pitch);
-        randomPitch.setText(getRandomPitch(true));
+        randomPitch.setText(getRandomPitch(getResources(), true));
     }
 
     @Override

@@ -136,14 +136,16 @@ public final class SearchFragment extends AbstractFragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setupAdapter();
+        setupPromoSlides();
+        setRetainInstance(true);
+    }
 
+    private void setupPromoSlides() {
         if (slides != null) {
             promotions.setSlides(slides);
         } else {
             new LoadSlidesTask(this).execute();
         }
-
-        setRetainInstance(true);
     }
 
     @Override
@@ -172,6 +174,8 @@ public final class SearchFragment extends AbstractFragment implements
 
         if (adapter != null && (adapter.getCount() > 0 || adapter.getTotalCount() > 0)) {
             refreshFileTypeCounters(true);
+        } else {
+            setupPromoSlides();
         }
     }
 
