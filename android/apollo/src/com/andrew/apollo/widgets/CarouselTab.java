@@ -22,9 +22,11 @@ import android.widget.TextView;
 
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.utils.ApolloUtils;
+import com.andrew.apollo.utils.BitmapUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.util.ImageLoader;
+import com.squareup.picasso.Transformation;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
@@ -82,7 +84,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
 
     /**
      * Used to set the artist image in the artist profile.
-     * 
+     *
      * @param context The {@link Context} to use.
      * @param artist The name of the artist in the profile the user is viewing.
      */
@@ -95,23 +97,40 @@ public class CarouselTab extends FrameLayoutWithOverlay {
     }
 
     /**
+     * Transformation used to blur image in ImageLoader
+     */
+    private Transformation blur = new Transformation() {
+        @Override
+        public Bitmap transform(Bitmap source) {
+            Bitmap blurred = BitmapUtils.createBlurredBitmap(source);
+            source.recycle();
+            return blurred;
+        }
+
+        @Override
+        public String key() {
+            return "blurred";
+        }
+    };
+
+    /**
      * Used to blur the artist image in the album profile.
-     * 
+     *
      * @param context The {@link Context} to use.
      * @param artist The artist nmae used to fetch the cached artist image.
      * @param album The album name used to fetch the album art in case the
      *            artist image is missing.
      */
-    public void blurPhoto(final Activity context, final String artist,
-            final String album) {
+    public void blurPhoto(final Activity context, final String artist, final String album) {
         final ImageLoader loader = ImageLoader.getInstance(context.getApplicationContext());
-        loader.loadAndBlurWithAlternative(ImageLoader.getArtistArtUri(artist),
-                ImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),mPhoto);
+        loader.loadAndTransformWithAlternative(ImageLoader.getArtistArtUri(artist),
+                ImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
+                blur, mPhoto);
     }
 
     /**
      * Used to set the album art in the album profile.
-     * 
+     *
      * @param context The {@link Context} to use.
      * @param album The name of the album in the profile the user is viewing.
      */
@@ -127,7 +146,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
 
     /**
      * Used to fetch for the album art via Last.fm.
-     * 
+     *
      * @param context The {@link Context} to use.
      * @param album The name of the album in the profile the user is viewing.
      * @param artist The name of the album artist in the profile the user is viewing
@@ -143,7 +162,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
 
     /**
      * Used to set the album art in the artist profile.
-     * 
+     *
      * @param context The {@link Context} to use.
      * @param artist The name of the artist in the profile the user is viewing.
      */
@@ -170,7 +189,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
 
     /**
      * Used to set the header image for playlists and genres.
-     * 
+     *
      * @param context The {@link Context} to use.
      * @param profileName The key used to fetch the image.
      */

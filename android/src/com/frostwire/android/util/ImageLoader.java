@@ -32,7 +32,6 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
-import com.andrew.apollo.utils.BitmapUtils;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.squareup.picasso.*;
@@ -150,29 +149,15 @@ public final class ImageLoader {
         picasso.setIndicatorsEnabled(false);
     }
 
-    private Transformation blur = new Transformation() {
-        @Override
-        public Bitmap transform(Bitmap source) {
-            Bitmap blurred = BitmapUtils.createBlurredBitmap(source);
-            source.recycle();
-            return blurred;
-        }
-
-        @Override
-        public String key() {
-            return "blurred";
-        }
-    };
-
-    public void loadAndBlur(Uri uri, ImageView mPhoto) {
-        picasso.load(uri).fit().transform(blur).into(mPhoto);
+    public void loadAndTransform(Uri uri, Transformation transformation, ImageView imageView) {
+        picasso.load(uri).fit().transform(transformation).into(imageView);
     }
 
-    public void loadAndBlurWithAlternative(final Uri primaryUri, final Uri secondaryUri, final ImageView mPhoto) {
-        picasso.load(primaryUri).fit().transform(blur).into(mPhoto, new Callback.EmptyCallback() {
+    public void loadAndTransformWithAlternative(final Uri primaryUri, final Uri secondaryUri, final Transformation transformation, final ImageView mPhoto) {
+        picasso.load(primaryUri).fit().transform(transformation).into(mPhoto, new Callback.EmptyCallback() {
             @Override
             public void onError() {
-                loadAndBlur(secondaryUri, mPhoto);
+                loadAndTransform(secondaryUri, transformation, mPhoto);
             }
         });
     }
