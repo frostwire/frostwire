@@ -209,25 +209,16 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         root.add(node);
     }
 
-    public DirectoryHolder getSelectedDirectoryHolder() {
+    DirectoryHolder getSelectedDirectoryHolder() {
         LibraryNode node = (LibraryNode) tree.getLastSelectedPathComponent();
         return node != null && node instanceof DirectoryHolderNode ? ((DirectoryHolderNode) node).getDirectoryHolder() : null;
-    }
-
-    public Dimension getRowDimension() {
-        Rectangle rect = tree.getUI().getPathBounds(tree, new TreePath(root));
-        return rect.getSize();
-    }
-
-    public int getRowsCount() {
-        return tree.getUI().getRowCount(tree);
     }
 
     public void clearSelection() {
         tree.clearSelection();
     }
 
-    public void refreshSelection() {
+    void refreshSelection() {
         refreshSelection(false);
     }
 
@@ -249,7 +240,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
         private final MediaTypeSavedFilesDirectoryHolder _mtsfdh;
 
-        public SearchByMediaTypeRunnable(MediaTypeSavedFilesDirectoryHolder mtsfdh) {
+        SearchByMediaTypeRunnable(MediaTypeSavedFilesDirectoryHolder mtsfdh) {
             _mtsfdh = mtsfdh;
         }
 
@@ -348,7 +339,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         }
     }
 
-    public void selectMediaTypeSavedFilesDirectoryHolderbyType(MediaType mediaType) {
+    private void selectMediaTypeSavedFilesDirectoryHolderbyType(MediaType mediaType) {
         try {
             LibraryNode selectedValue = (LibraryNode) tree.getLastSelectedPathComponent();
             if (selectedValue != null && selectedValue instanceof DirectoryHolderNode && ((DirectoryHolderNode) selectedValue).getDirectoryHolder() instanceof MediaTypeSavedFilesDirectoryHolder
@@ -385,11 +376,11 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         }
     }
 
-    public void selectAudio() {
+    void selectAudio() {
         selectMediaTypeSavedFilesDirectoryHolderbyType(MediaType.getAudioMediaType());
     }
 
-    public void selectStarred() {
+    void selectStarred() {
         try {
             if (selectionListenerForSameItem(StarredDirectoryHolder.class)) {
                 return;
@@ -458,7 +449,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         }
     }
 
-    public boolean selectionListenerForSameItem(Class<?> clazz) {
+    private boolean selectionListenerForSameItem(Class<?> clazz) {
         LibraryNode selectedValue = (LibraryNode) tree.getLastSelectedPathComponent();
 
         if (selectedValue != null && selectedValue instanceof DirectoryHolderNode && clazz.isInstance(((DirectoryHolderNode) selectedValue).getDirectoryHolder())) {
@@ -473,7 +464,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         return false;
     }
 
-    public List<MediaTypeSavedFilesDirectoryHolder> getMediaTypeSavedFilesDirectoryHolders() {
+    List<MediaTypeSavedFilesDirectoryHolder> getMediaTypeSavedFilesDirectoryHolders() {
         List<MediaTypeSavedFilesDirectoryHolder> holders = new ArrayList<MediaTypeSavedFilesDirectoryHolder>();
         Enumeration<?> e = root.depthFirstEnumeration();
         while (e.hasMoreElements()) {
@@ -537,7 +528,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
     private class ExploreAction extends AbstractAction {
 
-        public ExploreAction() {
+        ExploreAction() {
             putValue(Action.NAME, I18n.tr("Explore"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Open Library Folder"));
             putValue(LimeAction.ICON_NAME, "LIBRARY_EXPLORE");
