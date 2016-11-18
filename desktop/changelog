@@ -1,3 +1,9 @@
+frostwire (6.4.2) stable; urgency=high
+  * Starred playlist moved down to playlist explorer
+  * Playlist explorer right click popups show as least actions as possible
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 18 Nov 2016 10:03:21 -0600
+
 frostwire (6.4.1) stable; urgency=high
   * New jlibtorrent 1.2.0.4
   * Fixes YT search
