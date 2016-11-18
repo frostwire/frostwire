@@ -14,17 +14,17 @@ package com.andrew.apollo.widgets;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.utils.ApolloUtils;
-import com.andrew.apollo.utils.BitmapUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.util.ImageLoader;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
@@ -104,29 +104,9 @@ public class CarouselTab extends FrameLayoutWithOverlay {
      */
     public void blurPhoto(final Activity context, final String artist,
             final String album) {
-        //FIXME: this should go into an AsyncTask
-
-        // First check for the artist image
-        Bitmap artistImage = mFetcher.getCachedBitmap(artist);
-        // Second check for cached artwork
-        if (artistImage == null) {
-            artistImage = mFetcher.getCachedArtwork(album, artist);
-        }
-        // If all else, use the default image
-        if (artistImage == null) {
-            artistImage = BitmapFactory.decodeResource(getResources(), R.drawable.theme_preview);
-        }
-
-        // Gubatron: this can fail on some devices with an internal NPE
-        // trying to copy the bitmap right to do the effect. let's protect it
-        if (artistImage != null) {
-            try {
-                final Bitmap blur = BitmapUtils.createBlurredBitmap(artistImage);
-                mPhoto.setImageBitmap(blur);
-            } catch (Throwable t) {
-                //don't blur if you can't.
-            }
-        }
+        final ImageLoader loader = ImageLoader.getInstance(context.getApplicationContext());
+        loader.loadAndBlurWithAlternative(ImageLoader.getArtistArtUri(artist),
+                ImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),mPhoto);
     }
 
     /**
