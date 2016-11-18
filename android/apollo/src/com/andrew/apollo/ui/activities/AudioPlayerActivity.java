@@ -661,6 +661,10 @@ public class AudioPlayerActivity extends FragmentActivity implements
             return;
         }
 
+        if (mAlbumArtAd != null && mAlbumArtAd.getVisibility() == View.VISIBLE) {
+            return;
+        }
+
         final int mopubAlbumArtBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD);
         final int r = new Random().nextInt(100)+1;
         LOG.info("mopubAlbumArtBannerThreshold: " + mopubAlbumArtBannerThreshold + " - dice roll: " + r + " - skip initAlbumArt? " + (r > mopubAlbumArtBannerThreshold));
