@@ -116,7 +116,7 @@ public class PromotionsView extends LinearLayout {
                     return;
                 }
 
-                if (position ==  promoAdapter.lastPosition(inLandscapeMode)) {
+                if (position ==  promoAdapter.getCount()-1) {
                     promoAdapter.onAllFeaturedDownloadsClick();
                     return;
                 }

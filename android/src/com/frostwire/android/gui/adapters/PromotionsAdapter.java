@@ -66,6 +66,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     public PromotionsAdapter(Context ctx, List<Slide> slides, PromotionDownloader promotionDownloader) {
         super(ctx, R.layout.view_promotions_item);
         this.slides = slides;
+        final boolean landscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
         this.imageLoader = ImageLoader.getInstance(ctx);
         this.promotionDownloader = promotionDownloader;
     }
@@ -151,15 +152,15 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @Override
     public int getCount() {
-        final boolean landscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
-        // if we are in landscape mode and the number of slides
-        // is an uneven number we remove the last one
-        if (landscapeMode && slides.size() % 2 == 1) {
-            slides.remove(slides.size()-1);
+        boolean inLandscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
+        int addSpecialOffer = (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) ? 1 : 0;
+        int addFrostWireFeaturesTitle = !inLandscapeMode ? 1 : 0;
+        int slideCount = (slides != null) ? slides.size() : 0;
+        if (inLandscapeMode && slideCount % 2 == 0) {
+            slideCount--;
         }
-
-        // +1 is for the last button item to see all promos on frostwire.com
-        return slides.size() + (!landscapeMode ? 2 : 0);
+        int addAllFeaturesButtonAtTheEnd = 1;
+        return addSpecialOffer + addFrostWireFeaturesTitle + slideCount + addAllFeaturesButtonAtTheEnd;
     }
 
     @Override
@@ -177,19 +178,17 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     public View getView(int position, View convertView, ViewGroup parent) {
         // Plus (or when on landscape orientation) needs no special offer as we can't sell remove ads yet
         boolean inLandscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
-
         // "ALL FREE DOWNLOADS" button shown last
-        if (position == lastPosition(inLandscapeMode)) {
+        if (position == getCount() - 1) {
             return View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
         }
-
-        return (!inLandscapeMode) ? getPortraitView(position, convertView, parent) : super.getView(position, null, parent);
+        return (!inLandscapeMode) ? getPortraitView(position, convertView, parent) :
+                getLandscapeView(position, convertView, parent);
     }
 
     private View getPortraitView(int position, View convertView, ViewGroup parent) {
         // "FROSTWIRE FEATURES" view logic.
         int offsetFeaturesTitleHeader = 0;
-
         // OPTIONAL OFFER ON TOP
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
             offsetFeaturesTitleHeader++; // has to move down one slot since we'll have special offer above
@@ -206,20 +205,22 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                 }
                 return View.inflate(getContext(), specialOfferLayout, null);
             } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
-                return super.getView(position - 1, null, parent);
+                return super.getView(position - 2, null, parent);
             }
         }
-
         // "FROSTWIRE FEATURES" title view
         if (position == offsetFeaturesTitleHeader) {
             return View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
         }
+        return super.getView(position - 1, null, parent);
+    }
 
-        if (position == lastPosition(false)) {
-
+    private View getLandscapeView(int position, View convertView, ViewGroup parent) {
+        try {
+            return super.getView(position, null, parent);
+        } catch (Throwable t) {
+            return convertView;
         }
-
-        return convertView;
     }
 
     @Nullable
@@ -234,23 +235,6 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             }
         }
         return null;
-    }
-
-    public int lastPosition(boolean inLandscapeMode) {
-        if (slides == null) {
-            return 0;
-        }
-
-        int lastPosition = slides.size()-1;
-        // not sideways and not plus, user gets offer + "FROSTWIRE FEATURES" rows.
-        if (!inLandscapeMode) {
-            lastPosition += 1;
-        }
-
-        if  (!inLandscapeMode && Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            lastPosition += 1;
-        }
-        return lastPosition;
     }
 
     /**
