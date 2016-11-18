@@ -876,8 +876,7 @@ public class MusicPlaybackService extends Service {
         }
 
         if (!mAnyActivityInForeground && isPlaying()) {
-            mNotificationHelper.buildNotification(getAlbumName(), getArtistName(),
-                    getTrackName(), getAlbumId(), getAlbumArt(), isPlaying());
+            updateNotificationAsync();
         } else if (mAnyActivityInForeground) {
             mNotificationHelper.killNotification();
             if (!isPlaying()) {
@@ -885,6 +884,28 @@ public class MusicPlaybackService extends Service {
             }
         }
     }
+
+
+    /**
+     * Asynchronous bitmap fetching for building the notification
+     */
+    private void updateNotificationAsync() {
+        Runnable task = new Runnable() {
+            public void run() {
+                // background portion
+                final Bitmap bitmap = getAlbumArt();
+
+                Runnable postExecute = new Runnable() {
+                    public void run() {
+                        mNotificationHelper.buildNotification(getAlbumName(), getArtistName(), getTrackName(), getAlbumId(), bitmap, isPlaying());
+                    }
+                };
+                mPlayerHandler.post(postExecute);
+            }
+        };
+        Engine.instance().getThreadPool().submit(task);
+    }
+
 
     /**
      * @return A card ID used to save and restore playlists, i.e., the queue.
