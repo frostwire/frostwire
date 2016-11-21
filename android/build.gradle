@@ -80,7 +80,7 @@ android {
     defaultConfig {
         versionName project.ext.versionName
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -101,7 +101,7 @@ android {
             }
         }
 
-        androidTest.setRoot('androidTest')
+        //androidTest.setRoot('androidTest')
 
         plus1.res.srcDirs = ['res-plus1']
     }
@@ -160,9 +160,9 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    }
+    //androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+    //    exclude group: 'com.android.support', module: 'support-annotations'
+    //}
 }
 
 class DeployRelease extends DefaultTask {
