@@ -22,30 +22,36 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:baselineAligned="false" >
-    
-    <ImageButton
-        android:id="@+id/view_transfers_header_button_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="8dp"
-        android:background="@null"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_menu_moreoverflow" />
 
-	<ImageButton
-        android:id="@+id/view_transfers_header_button_add_transfer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="5dp"
-        android:layout_toLeftOf="@+id/view_transfers_header_button_menu"
-        android:background="@null"
-        android:contentDescription="@null"
-        android:src="@drawable/add_transfer" />
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginRight="8dp"
+		android:layout_alignParentRight="true">
+
+		<ImageButton
+			android:id="@+id/view_transfers_header_button_add_transfer"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="@null"
+			android:contentDescription="@null"
+			android:src="@drawable/add_transfer" />
+
+		<ImageButton
+			android:id="@+id/view_transfers_header_button_menu"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="5dp"
+			android:background="@null"
+			android:contentDescription="@null"
+			android:src="@drawable/ic_menu_moreoverflow"
+			android:visibility="visible" />
+
+
+
+
+	</LinearLayout>
+
 
 	<TextView
         android:id="@+id/view_transfers_header_text_title"

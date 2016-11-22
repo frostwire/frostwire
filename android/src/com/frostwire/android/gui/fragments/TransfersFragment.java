@@ -84,6 +84,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private Handler vpnRichToastHandler;
 
     private boolean showTorrentSettingsOnClick;
+    private ImageButton buttonMenu;
+
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -159,6 +161,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         int uploads = TransferManager.instance().getActiveUploads();
 
         updateStatusBar(sDown, sUp, downloads, uploads);
+        updateButtonMenuVisibility();
     }
 
     private void updateStatusBar(String sDown, String sUp, int downloads, int uploads) {
@@ -228,13 +231,24 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         TextView text = (TextView) header.findViewById(R.id.view_transfers_header_text_title);
         text.setText(R.string.transfers);
 
-        ImageButton buttonMenu = (ImageButton) header.findViewById(R.id.view_transfers_header_button_menu);
+        buttonMenu = (ImageButton) header.findViewById(R.id.view_transfers_header_button_menu);
         buttonMenu.setOnClickListener(buttonMenuListener);
+        updateButtonMenuVisibility();
 
         ImageButton buttonAddTransfer = (ImageButton) header.findViewById(R.id.view_transfers_header_button_add_transfer);
         buttonAddTransfer.setOnClickListener(buttonAddTransferListener);
 
         return header;
+    }
+
+    private void updateButtonMenuVisibility() {
+        if(buttonMenu!=null) {
+            buttonMenu.setVisibility(areThereAnyTransfersToWorkOn() ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private boolean areThereAnyTransfersToWorkOn() {
+            return TransferManager.instance().getTransfers().size() > 0;
     }
 
     public void selectStatusTabToThe(boolean right) {
@@ -460,6 +474,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                     break;
             }
             setupAdapter();
+            updateButtonMenuVisibility();
         }
     }
 
@@ -578,6 +593,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         } else {
             UIUtils.showLongMessage(getActivity(), R.string.please_enter_valid_url);
         }
+        updateButtonMenuVisibility();
     }
 
     private void startCloudTransfer(String text) {
@@ -626,6 +642,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                             UIUtils.showLongMessage(getActivity(), R.string.magnet_url_added);
                             clipboard.setPrimaryClip(ClipData.newPlainText("", ""));
                             toggleAddTransferControls();
+                            updateButtonMenuVisibility();
                         }
                     }
                 }
