@@ -228,28 +228,25 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
         View header = inflater.inflate(R.layout.view_transfers_header, null);
 
-        TextView text = (TextView) header.findViewById(R.id.view_transfers_header_text_title);
+        TextView text = findView(header, R.id.view_transfers_header_text_title);
         text.setText(R.string.transfers);
 
-        buttonMenu = (ImageButton) header.findViewById(R.id.view_transfers_header_button_menu);
+        buttonMenu = findView(header, R.id.view_transfers_header_button_menu);
         buttonMenu.setOnClickListener(buttonMenuListener);
         updateButtonMenuVisibility();
 
-        ImageButton buttonAddTransfer = (ImageButton) header.findViewById(R.id.view_transfers_header_button_add_transfer);
+        ImageButton buttonAddTransfer = findView(header, R.id.view_transfers_header_button_add_transfer);
         buttonAddTransfer.setOnClickListener(buttonAddTransferListener);
 
         return header;
     }
 
     private void updateButtonMenuVisibility() {
-        if(buttonMenu!=null) {
-            buttonMenu.setVisibility(areThereAnyTransfersToWorkOn() ? View.VISIBLE : View.GONE);
+        if (buttonMenu != null) {
+            buttonMenu.setVisibility(TransferManager.instance().getTransfers().size() > 0 ? View.VISIBLE : View.GONE);
         }
     }
 
-    private boolean areThereAnyTransfersToWorkOn() {
-            return TransferManager.instance().getTransfers().size() > 0;
-    }
 
     public void selectStatusTabToThe(boolean right) {
         final TransferStatus[] allStatusesArray = TransferStatus.getAllStatusesArray();
