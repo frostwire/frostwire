@@ -66,7 +66,7 @@ public class SwipeLayout extends LinearLayout {
             });
         }
 
-        return detector.onTouchEvent(ev) || super.dispatchTouchEvent(ev);
+        return (detector != null && detector.onTouchEvent(ev)) || super.dispatchTouchEvent(ev);
     }
 
     public OnSwipeListener getOnSwipeListener() {
