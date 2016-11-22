@@ -190,6 +190,7 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
         mAllowedVerticalScrollLength = tabHeight - mTabDisplayLabelHeight;
         setMeasuredDimension(resolveSize(screenWidth, widthMeasureSpec),
                 resolveSize(tabHeight, heightMeasureSpec));
+        updateAlphaLayers();
     }
 
     /**
