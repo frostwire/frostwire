@@ -1,3 +1,6 @@
+FrostWire 1.8.6 - NOV/23/2016
+ - Transfer action bar hides menu button if no transfers present.
+
 FrostWire 1.8.5 - NOV/21/2016
  - Search engines updates
  - http updates
