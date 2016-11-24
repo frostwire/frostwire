@@ -149,19 +149,22 @@ public final class ImageLoader {
         picasso.setIndicatorsEnabled(false);
     }
 
-    public void loadAndTransform(Uri uri, Transformation transformation, ImageView imageView) {
-        picasso.load(uri).fit().transform(transformation).into(imageView);
-    }
-
-    public void loadAndTransformWithAlternative(final Uri primaryUri, final Uri secondaryUri, final Transformation transformation, final ImageView mPhoto) {
-        picasso.load(primaryUri).fit().transform(transformation).into(mPhoto, new Callback.EmptyCallback() {
+    public void loadAndTransform(final Uri primaryUri, final Uri secondaryUri, final Transformation transformation, final ImageView imageView) {
+        Callback.EmptyCallback callback = new Callback.EmptyCallback() {
             @Override
             public void onError() {
-                loadAndTransform(secondaryUri, transformation, mPhoto);
+                if (secondaryUri != null) {
+                    loadAndTransform(secondaryUri, transformation, imageView);
+                }
             }
-        });
+        };
+        picasso.load(primaryUri).fit().transform(transformation).into(imageView, callback);
     }
 
+
+    public void loadAndTransform(Uri uri, Transformation transformation, ImageView imageView) {
+        loadAndTransform(uri, null, transformation, imageView);
+    }
 
     public void load(Uri uri, ImageView target) {
         picasso.load(uri).noFade().into(target);
