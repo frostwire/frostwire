@@ -18,12 +18,12 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -114,7 +114,6 @@ public final class SearchFragment extends AbstractFragment implements
     private final FileTypeCounter fileTypeCounter;
     private final SparseArray<Byte> toTheRightOf = new SparseArray<>(6);
     private final SparseArray<Byte> toTheLeftOf = new SparseArray<>(6);
-    private ListViewScrollDirectionDetector listScrollDirectionDetector;
 
     public SearchFragment() {
         super(R.layout.fragment_search);
@@ -300,8 +299,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         list.setAdapter(adapter);
-
-        listScrollDirectionDetector = new ListViewScrollDirectionDetector(list, new ScrollDirectionListener() {
+        new ListViewScrollDirectionDetector(list, new ScrollDirectionListener() {
             @Override
             public void onScrollUp() {
                 onSearchScrollUp();
@@ -312,17 +310,30 @@ public final class SearchFragment extends AbstractFragment implements
                 onSearchScrollDown();
             }
         });
-
     }
 
     private void onSearchScrollDown() {
-        LOG.info("onSearchScrollDown()");
+        hideSearchBox();
     }
 
     private void onSearchScrollUp() {
-        LOG.info("onSearchScrollUp()");
+        //listScrollDirectionDetector.disable(600);
+        showSearchBox();
     }
 
+    private void showSearchBox() {
+        if (searchInput.getVisibility() == View.VISIBLE) {
+            return;
+        }
+        searchInput.setVisibility(View.VISIBLE);
+    }
+
+    private void hideSearchBox() {
+        if (searchInput.getVisibility() == View.GONE) {
+            return;
+        }
+        searchInput.setVisibility(View.GONE);
+    }
 
     private void refreshFileTypeCounters(boolean fileTypeCountersVisible) {
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_APPLICATIONS, fileTypeCounter.fsr.numApplications);
@@ -621,7 +632,7 @@ public final class SearchFragment extends AbstractFragment implements
 
                 // yes, these requests are done only once per session.
                 //LOG.info("SearchFragment.LoadSlidesTask performed http request to " + url);
-                return slides.slides;
+                return slides != null ? slides.slides : null;
             } catch (Throwable e) {
                 LOG.error("Error loading slides from url", e);
             }
@@ -630,8 +641,8 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         protected void onPostExecute(List<Slide> result) {
-            SearchFragment f = fragment.get();
-            if (f != null && result != null && !result.isEmpty()) {
+            SearchFragment f;
+            if (result != null && !result.isEmpty() && (f=fragment.get()) != null) {
                 f.slides = result;
                 f.promotions.setSlides(result);
             }
@@ -683,6 +694,28 @@ public final class SearchFragment extends AbstractFragment implements
                 owner.startActivity(intent);
             } catch (Throwable ignored) {
             }
+        }
+    }
+
+    private abstract class AnimatorAdapter implements Animator.AnimatorListener {
+        @Override
+        public void onAnimationStart(Animator animator) {
+
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animator) {
+
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animator) {
+
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animator) {
+
         }
     }
 }
