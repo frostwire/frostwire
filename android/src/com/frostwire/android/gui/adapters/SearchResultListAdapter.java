@@ -52,7 +52,10 @@ import com.frostwire.uxstats.UXStats;
 import org.apache.commons.io.FilenameUtils;
 
 import java.lang.ref.WeakReference;
+import java.security.Key;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -69,6 +72,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     private int fileType;
 
     private ImageLoader thumbLoader;
+    private final List<KeywordFilter> keywordFilters;
 
     protected SearchResultListAdapter(Context context) {
         super(context, R.layout.view_bittorrent_search_result_list_item);
@@ -76,6 +80,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         this.previewClickListener = new PreviewClickListener(context, this);
         this.fileType = NO_FILE_TYPE;
         this.thumbLoader = ImageLoader.getInstance(context);
+        keywordFilters = new LinkedList<>();
     }
 
     public int getFileType() {
@@ -206,9 +211,16 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                 mt = null;
             }
 
+            if (isFileSearchResultMediaTypeMatching(sr, mt)) {
 
-            if (accept(sr, mt)) {
-                l.add(sr);
+                List<KeywordFilter> keywordFilters = getKeywordFilters();
+                if (keywordFilters.isEmpty()) {
+                    l.add(sr);
+                } else {
+                    if (KeywordFilter.passesFilterPipeline(sr, keywordFilters)) {
+                        l.add(sr);
+                    }
+                }
             }
             fsr.increment(mt);
         }
@@ -216,12 +228,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         return fsr;
     }
 
-    private boolean accept(SearchResult sr, MediaType mt) {
-        // TODO: Will have a addFilter(Filter f) method in this adapter
-        // and we will have a KeywordFilter (+|-):keyword:<value>
-        // these filters will be parsed before we start the search and added
-        // to this SearchResultListAdapter's, at the start of a search, or during
-        // an ongoing search and then calling notifyDataSetInvalidated();
+    private boolean isFileSearchResultMediaTypeMatching(SearchResult sr, MediaType mt) {
         return sr instanceof FileSearchResult && mt != null && mt.getId() == fileType;
     }
 
@@ -255,6 +262,10 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             default:
                 return R.drawable.list_item_question_mark;
         }
+    }
+
+    public List<KeywordFilter> getKeywordFilters() {
+        return keywordFilters;
     }
 
     private static class OnLinkClickListener implements OnClickListener {
