@@ -250,7 +250,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             specialOfferLayout = R.layout.view_less_results_notification;
 
             if (Offers.removeAdsOffersEnabled()) {
-                LOG.info("pickSpecialOfferLayout: removeAdsOffersEnabled.");
+                //LOG.info("pickSpecialOfferLayout: removeAdsOffersEnabled.");
                 // offer to remove ads, or offer to upgrade to plus for more results
                 specialOfferLayout = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 2 == 0 ?
                         R.layout.view_remove_ads_notification :
