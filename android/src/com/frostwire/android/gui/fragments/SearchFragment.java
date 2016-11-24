@@ -54,6 +54,8 @@ import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.ListViewScrollDirectionDetector;
+import com.frostwire.android.gui.util.ScrollDirectionListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.AbstractFragment;
@@ -112,6 +114,7 @@ public final class SearchFragment extends AbstractFragment implements
     private final FileTypeCounter fileTypeCounter;
     private final SparseArray<Byte> toTheRightOf = new SparseArray<>(6);
     private final SparseArray<Byte> toTheLeftOf = new SparseArray<>(6);
+    private ListViewScrollDirectionDetector listScrollDirectionDetector;
 
     public SearchFragment() {
         super(R.layout.fragment_search);
@@ -297,7 +300,29 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         list.setAdapter(adapter);
+
+        listScrollDirectionDetector = new ListViewScrollDirectionDetector(list, new ScrollDirectionListener() {
+            @Override
+            public void onScrollUp() {
+                onSearchScrollUp();
+            }
+
+            @Override
+            public void onScrollDown() {
+                onSearchScrollDown();
+            }
+        });
+
     }
+
+    private void onSearchScrollDown() {
+        LOG.info("onSearchScrollDown()");
+    }
+
+    private void onSearchScrollUp() {
+        LOG.info("onSearchScrollUp()");
+    }
+
 
     private void refreshFileTypeCounters(boolean fileTypeCountersVisible) {
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_APPLICATIONS, fileTypeCounter.fsr.numApplications);

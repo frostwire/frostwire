@@ -217,6 +217,11 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     private boolean accept(SearchResult sr, MediaType mt) {
+        // TODO: Will have a addFilter(Filter f) method in this adapter
+        // and we will have a KeywordFilter (+|-):keyword:<value>
+        // these filters will be parsed before we start the search and added
+        // to this SearchResultListAdapter's, at the start of a search, or during
+        // an ongoing search and then calling notifyDataSetInvalidated();
         return sr instanceof FileSearchResult && mt != null && mt.getId() == fileType;
     }
 
