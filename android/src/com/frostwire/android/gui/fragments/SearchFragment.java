@@ -42,6 +42,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
+import com.frostwire.android.gui.adapters.KeywordFilter;
 import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
@@ -363,6 +364,7 @@ public final class SearchFragment extends AbstractFragment implements
         refreshFileTypeCounters(false);
         currentQuery = query;
         LocalSearchEngine.instance().performSearch(query);
+        adapter.setKeywordFiltersPipeline(KeywordFilter.parseKeywordFilters(query));
         searchProgress.setProgressEnabled(true);
         showSearchView(getView());
         UXStats.instance().log(UXAction.SEARCH_STARTED_ENTER_KEY);

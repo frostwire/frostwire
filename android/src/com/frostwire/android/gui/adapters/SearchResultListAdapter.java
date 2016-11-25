@@ -52,9 +52,7 @@ import com.frostwire.uxstats.UXStats;
 import org.apache.commons.io.FilenameUtils;
 
 import java.lang.ref.WeakReference;
-import java.security.Key;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -72,7 +70,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     private int fileType;
 
     private ImageLoader thumbLoader;
-    private final List<KeywordFilter> keywordFilters;
+    private final List<KeywordFilter> keywordFiltersPipeline;
 
     protected SearchResultListAdapter(Context context) {
         super(context, R.layout.view_bittorrent_search_result_list_item);
@@ -80,7 +78,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         this.previewClickListener = new PreviewClickListener(context, this);
         this.fileType = NO_FILE_TYPE;
         this.thumbLoader = ImageLoader.getInstance(context);
-        keywordFilters = new LinkedList<>();
+        this.keywordFiltersPipeline = new LinkedList<>();
     }
 
     public int getFileType() {
@@ -212,8 +210,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             }
 
             if (isFileSearchResultMediaTypeMatching(sr, mt)) {
-
-                List<KeywordFilter> keywordFilters = getKeywordFilters();
+                List<KeywordFilter> keywordFilters = getKeywordFiltersPipeline();
                 if (keywordFilters.isEmpty()) {
                     l.add(sr);
                 } else {
@@ -264,12 +261,16 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         }
     }
 
-    public List<KeywordFilter> getKeywordFilters() {
-        return keywordFilters;
+    public List<KeywordFilter> getKeywordFiltersPipeline() {
+        return keywordFiltersPipeline;
+    }
+
+    public void setKeywordFiltersPipeline(List<KeywordFilter> keywordFiltersPipeline) {
+        this.keywordFiltersPipeline.clear();
+        this.keywordFiltersPipeline.addAll(keywordFiltersPipeline);
     }
 
     private static class OnLinkClickListener implements OnClickListener {
-
         @Override
         public void onClick(View v) {
             String url = (String) v.getTag();
