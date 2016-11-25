@@ -22,6 +22,8 @@ import android.support.annotation.NonNull;
 
 import com.frostwire.licenses.License;
 import com.frostwire.licenses.Licenses;
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
 
@@ -39,11 +41,35 @@ import java.util.List;
 public class KeywordFilter {
     private final boolean inclusive;
     private final String keyword;
+    private static final String KEYWORD_FILTER_PATTERN = "(?is)(?<inclusive>\\+|-)?(:keyword:)(?<keyword>[^\\s-]*)";
 
     public KeywordFilter(boolean inclusive, String keyword) {
         this.inclusive = inclusive;
         this.keyword = keyword.toLowerCase();
+    }
 
+    /**
+     *
+     * @param searchTerms must match [+,-]:keyword:<theKeyword>
+     * @return
+     */
+    public static List<KeywordFilter> parseKeywordFilters(String searchTerms) {
+        List<KeywordFilter> pipeline = new LinkedList<>();
+        Pattern pattern = Pattern.compile(KEYWORD_FILTER_PATTERN);
+        Matcher matcher = pattern.matcher(searchTerms);
+
+        while (matcher.find()) {
+            boolean inclusive = true;
+            String inclusiveMatch = matcher.group("inclusive");
+            if (inclusiveMatch != null && inclusiveMatch.equals("-")) {
+                inclusive = false;
+            }
+            String keyword = matcher.group("keyword");
+            if (keyword != null) {
+                pipeline.add(new KeywordFilter(inclusive, keyword));
+            }
+        }
+        return pipeline;
     }
 
     public boolean accept(@NonNull final String lowercaseHaystack) {
@@ -77,7 +103,6 @@ public class KeywordFilter {
         while (accepted && it.hasNext()) {
             KeywordFilter filter = it.next();
             accepted &= filter.accept(haystack);
-            System.out.println("KeywordFilter.passesFilterPipeline (pipe = " + filter.keyword + ")");
         }
         return accepted;
     }
@@ -235,6 +260,13 @@ public class KeywordFilter {
             return true;
         }
 
+        private static boolean testParseKeywordFilters() {
+            //parseKeywordFilters
+            List<KeywordFilter> keywordFilters = parseKeywordFilters("yaba daba doo +:keyword:thein -:keyword:theout +:keyward:notamatch :keyword:home");
+            assertTrue("parse keywords detection test", keywordFilters.size() == 3);
+            return true;
+        }
+
         public static void main(String[] args) {
             if (!KeywordFilterTests.testInclusiveFilters()) {
                 return;
@@ -243,6 +275,10 @@ public class KeywordFilter {
                 return;
             }
             if (!KeywordFilterTests.testMixedFilters()) {
+                return;
+            }
+
+            if (!KeywordFilterTests.testParseKeywordFilters()) {
                 return;
             }
 
