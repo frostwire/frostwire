@@ -153,8 +153,8 @@ public class KeywordFilter {
                 return false;
             }
 
-            KeywordFilter MITnottherefilter = new KeywordFilter(true, "notthere");
-            if (!assertFalse("'notthere' keyword inclusion fail test", MITnottherefilter.accept(haystack))) {
+            KeywordFilter notthereFilter = new KeywordFilter(true, "notthere");
+            if (!assertFalse("'notthere' keyword inclusion fail test", notthereFilter.accept(haystack))) {
                 return false;
             }
 
@@ -172,7 +172,7 @@ public class KeywordFilter {
 
             List<KeywordFilter> failPipeline = new LinkedList<>();
             failPipeline.add(MITfilter);
-            failPipeline.add(MITnottherefilter);
+            failPipeline.add(notthereFilter);
             failPipeline.add(athensFilter); // this one shouldn't even be checked as it should short circuit
             if (!assertFalse("inclusion pipeline fail test", KeywordFilter.passesFilterPipeline(fsr, failPipeline))) {
                 return false;
@@ -187,17 +187,51 @@ public class KeywordFilter {
                 return false;
             }
 
-            KeywordFilter MITnottherefilter = new KeywordFilter(false, "notthere");
-            if (!assertTrue("'notthere' keyword exclusion test", MITnottherefilter.accept(haystack))) {
+            KeywordFilter notthereFilter = new KeywordFilter(false, "notthere");
+            if (!assertTrue("'notthere' keyword exclusion test", notthereFilter.accept(haystack))) {
                 return false;
             }
 
-            KeywordFilter MITfrostwirefilter = new KeywordFilter(false, "frostwire");
-            if (!assertTrue("'frostwire' keyword exclusion test", MITnottherefilter.accept(haystack))) {
+            KeywordFilter frostwireFilter = new KeywordFilter(false, "frostwire");
+            if (!assertTrue("'frostwire' keyword exclusion test", notthereFilter.accept(haystack))) {
                 return false;
             }
 
-            //TODO pipeline tests
+            List<KeywordFilter> acceptablePipeline = new LinkedList<>();
+            acceptablePipeline.add(notthereFilter);
+            acceptablePipeline.add(frostwireFilter);
+            if (!assertTrue("exclusion pipeline test", passesFilterPipeline(fsr,acceptablePipeline))) {
+               return false;
+            }
+
+            KeywordFilter athensFilter = new KeywordFilter(false, "athens");
+            if (!assertFalse("'athens' exclusion fail test", athensFilter.accept(haystack))) {
+                return false;
+            }
+
+            List<KeywordFilter> failPipeline = new LinkedList<>();
+            failPipeline.add(frostwireFilter);
+            failPipeline.add(athensFilter);
+            failPipeline.add(MITfilter);
+            failPipeline.add(notthereFilter);
+            if (!assertFalse("exclusion pipeline fail test", passesFilterPipeline(fsr, failPipeline))) {
+                return false;
+            }
+            return true;
+        }
+
+        private static boolean testMixedFilters() {
+            final String haystack = KeywordFilter.getSearchResultHaystack(fsr);
+            KeywordFilter MITfilter = new KeywordFilter(true, "MIT");
+            KeywordFilter frostwireExclusionFilter = new KeywordFilter(false, "frostwire");
+            KeywordFilter athensFilter = new KeywordFilter(true, "athens");
+            List<KeywordFilter> mixedPipeline = new LinkedList<>();
+            mixedPipeline.add(MITfilter);
+            mixedPipeline.add(frostwireExclusionFilter);
+            mixedPipeline.add(athensFilter);
+            if (!assertTrue("mixed pipeline test", passesFilterPipeline(fsr, mixedPipeline))) {
+                return false;
+            }
             return true;
         }
 
@@ -205,11 +239,12 @@ public class KeywordFilter {
             if (!KeywordFilterTests.testInclusiveFilters()) {
                 return;
             }
-
             if (!KeywordFilterTests.testExclusiveFilters()) {
                 return;
             }
-
+            if (!KeywordFilterTests.testMixedFilters()) {
+                return;
+            }
 
             System.out.println("PASSED ALL TESTS");
         }
