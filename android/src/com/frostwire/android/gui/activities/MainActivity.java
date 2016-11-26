@@ -44,7 +44,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.andrew.apollo.IApolloService;
-import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.AndroidPlatform;
@@ -67,7 +66,6 @@ import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
@@ -604,6 +602,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void setupFragments() {
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
+        search.connectDrawerLayoutFilterView((DrawerLayout) findView(R.id.activity_main_drawer_layout), findView(R.id.activity_main_keyword_filter_drawer_view));
         library = (BrowsePeerFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_browse_peer);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
     }
@@ -616,7 +615,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void setupInitialFragment(Bundle savedInstanceState) {
         Fragment fragment = null;
-
         if (savedInstanceState != null) {
             fragment = getFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
             restoreFragmentsStack(savedInstanceState);
@@ -625,7 +623,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             fragment = search;
             setCheckedItem(R.id.menu_main_search);
         }
-
         switchContent(fragment);
     }
 
@@ -773,7 +770,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void setupDrawer() {
-        DrawerLayout drawerLayout = findView(R.id.drawer_layout);
+        DrawerLayout drawerLayout = findView(R.id.activity_main_drawer_layout);
         Toolbar toolbar = findToolbar();
         navigationMenu = new NavigationMenu(controller, drawerLayout, toolbar);
     }
