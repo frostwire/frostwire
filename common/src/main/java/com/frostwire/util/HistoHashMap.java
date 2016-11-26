@@ -1,4 +1,4 @@
-package com.frostwire.gui.library;
+package com.frostwire.util;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -8,8 +8,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class HistoHashMap<K> {
-    private final Map<K,Integer> map = new HashMap<K, Integer>();
+    private final Map<K,Integer> map = new HashMap<>();
 
+    /**
+     * (Cheap operation)
+     * @param key
+     * @return
+     */
     public int update(K key) {
         int r = 1;
         if (map.containsKey(key)) {
@@ -22,7 +27,12 @@ public class HistoHashMap<K> {
     public Integer get(K key) {
         return map.get(key);
     }
-    
+
+    /**
+     * (Expensive operation)
+     * Returns the inner map as a sorted Entry array.
+     * @return
+     */
     public Entry<K,Integer>[] histogram() {
         Set<Entry<K, Integer>> entrySet = map.entrySet();
         @SuppressWarnings("unchecked")
@@ -34,5 +44,13 @@ public class HistoHashMap<K> {
             }
         });
         return array;
+    }
+
+    public int getKeyCount() {
+        return map.size();
+    }
+
+    public void reset() {
+        map.clear();
     }
 }

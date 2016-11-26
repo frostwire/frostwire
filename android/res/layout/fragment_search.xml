@@ -61,7 +61,8 @@
             android:id="@+id/fragment_search_swipe"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_weight="1.0">
         
         <FrameLayout
             android:id="@+id/fragment_search_framelayout"
@@ -85,7 +86,5 @@
                 android:background="@color/basic_white"
                 android:fastScrollEnabled="true"/>
         </FrameLayout>
-
     </com.frostwire.android.gui.views.SwipeLayout>
-
 </LinearLayout>

@@ -604,6 +604,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void setupFragments() {
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
+        search.connectDrawerLayoutFilterView((DrawerLayout) findView(R.id.activity_main_drawer_layout), findView(R.id.activity_main_keyword_filter_drawer_view));
         library = (BrowsePeerFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_browse_peer);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
     }
@@ -616,7 +617,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void setupInitialFragment(Bundle savedInstanceState) {
         Fragment fragment = null;
-
         if (savedInstanceState != null) {
             fragment = getFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
             restoreFragmentsStack(savedInstanceState);
@@ -625,7 +625,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             fragment = search;
             setCheckedItem(R.id.menu_main_search);
         }
-
         switchContent(fragment);
     }
 
@@ -773,7 +772,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void setupDrawer() {
-        DrawerLayout drawerLayout = findView(R.id.drawer_layout);
+        DrawerLayout drawerLayout = findView(R.id.activity_main_drawer_layout);
         Toolbar toolbar = findToolbar();
         navigationMenu = new NavigationMenu(controller, drawerLayout, toolbar);
     }

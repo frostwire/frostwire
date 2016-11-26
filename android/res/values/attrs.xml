@@ -19,9 +19,18 @@
  */
 -->
 <resources>
+
     <declare-styleable name="MediaPlaybackStatusOverlayView">
         <attr name="circleStrokeWidth" format="integer"/>
     </declare-styleable>
+
+    <declare-styleable name="KeywordTagView">
+        <attr name="keyword_tag_inclusive" format="boolean"/>
+        <attr name="keyword_tag_keyword" format="string"/>
+        <attr name="keyword_tag_count" format="integer"/>
+        <attr name="keyword_tag_dismissable" format="boolean"/>
+    </declare-styleable>
+    
     <declare-styleable name="ProductCardView">
         <attr name="product_card_title_bold" format="string"/>
         <attr name="product_card_title_normal" format="string"/>
@@ -32,64 +41,64 @@
         <attr name="product_card_selected" format="boolean"/>
     </declare-styleable>
 
-	<declare-styleable name="RichNotification">
-	    <attr name="rich_notification_icon" format="reference"/>
-	    <attr name="rich_notification_title" format="string"/>
-	    <attr name="rich_notification_title_underlined" format="boolean"/>
-	    <attr name="rich_notification_description" format="string"/>
+    <declare-styleable name="RichNotification">
+        <attr name="rich_notification_icon" format="reference"/>
+        <attr name="rich_notification_title" format="string"/>
+        <attr name="rich_notification_title_underlined" format="boolean"/>
+        <attr name="rich_notification_description" format="string"/>
         <attr name="rich_notification_number_of_action_links" format="integer"/>
         <attr name="rich_notification_action_links_horizontal_margin" format="integer"/>
-	</declare-styleable>
-	
+    </declare-styleable>
+
     <declare-styleable name="ButtonActionPreference">
-        <attr name="button_text" format="string" />
+        <attr name="button_text" format="string"/>
     </declare-styleable>
 
     <declare-styleable name="fwPickerPreference">
-        <attr name="picker_startRange" format="integer" />
-        <attr name="picker_endRange" format="integer" />
-        <attr name="picker_defaultValue" format="integer" />
+        <attr name="picker_startRange" format="integer"/>
+        <attr name="picker_endRange" format="integer"/>
+        <attr name="picker_defaultValue" format="integer"/>
     </declare-styleable>
 
     <declare-styleable name="fwSeekbarPreference">
-        <attr name="seekbar_startRange" format="integer" />
-        <attr name="seekbar_endRange" format="integer" />
-        <attr name="seekbar_defaultValue" format="integer" />
-        <attr name="seekbar_maxValue" format="integer" />
-        <attr name="seekbar_wrap" format="boolean" />
-        <attr name="seekbar_isByteRate" format="boolean" />
-        <attr name="seekbar_pluralUnitResourceId" format="reference" />
-        <attr name="seekbar_hasUnlimited" format="boolean" />
-        <attr name="seekbar_unlimitedValue" format="integer" />
+        <attr name="seekbar_startRange" format="integer"/>
+        <attr name="seekbar_endRange" format="integer"/>
+        <attr name="seekbar_defaultValue" format="integer"/>
+        <attr name="seekbar_maxValue" format="integer"/>
+        <attr name="seekbar_wrap" format="boolean"/>
+        <attr name="seekbar_isByteRate" format="boolean"/>
+        <attr name="seekbar_pluralUnitResourceId" format="reference"/>
+        <attr name="seekbar_hasUnlimited" format="boolean"/>
+        <attr name="seekbar_unlimitedValue" format="integer"/>
     </declare-styleable>
     <declare-styleable name="ClearableEditTextView">
-        <attr name="clearable_hint" format="string" />
+        <attr name="clearable_hint" format="string"/>
     </declare-styleable>
 
     <declare-styleable name="SlidingMenu">
         <attr name="mode">
-            <enum name="left" value="0" />
-            <enum name="right" value="1" />
+            <enum name="left" value="0"/>
+            <enum name="right" value="1"/>
         </attr>
-        <attr name="viewAbove" format="reference" />
-        <attr name="viewBehind" format="reference" />
-        <attr name="behindOffset" format="dimension" />
-        <attr name="behindWidth" format="dimension" />
-        <attr name="behindScrollScale" format="float" />
+        <attr name="viewAbove" format="reference"/>
+        <attr name="viewBehind" format="reference"/>
+        <attr name="behindOffset" format="dimension"/>
+        <attr name="behindWidth" format="dimension"/>
+        <attr name="behindScrollScale" format="float"/>
         <attr name="touchModeAbove">
-            <enum name="margin" value="0" />
-            <enum name="fullscreen" value="1" />
+            <enum name="margin" value="0"/>
+            <enum name="fullscreen" value="1"/>
         </attr>
         <attr name="touchModeBehind">
-            <enum name="margin" value="0" />
-            <enum name="fullscreen" value="1" />
+            <enum name="margin" value="0"/>
+            <enum name="fullscreen" value="1"/>
         </attr>
-        <attr name="shadowDrawable" format="reference" />
-        <attr name="shadowWidth" format="dimension" />
-        <attr name="fadeEnabled" format="boolean" />
-        <attr name="fadeDegree" format="float" />
-        <attr name="selectorEnabled" format="boolean" />
-        <attr name="selectorDrawable" format="reference" />
+        <attr name="shadowDrawable" format="reference"/>
+        <attr name="shadowWidth" format="dimension"/>
+        <attr name="fadeEnabled" format="boolean"/>
+        <attr name="fadeDegree" format="float"/>
+        <attr name="selectorEnabled" format="boolean"/>
+        <attr name="selectorDrawable" format="reference"/>
     </declare-styleable>
 
 </resources>
