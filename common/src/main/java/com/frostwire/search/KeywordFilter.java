@@ -16,16 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.android.gui.adapters;
-
-import android.support.annotation.NonNull;
+package com.frostwire.search;
 
 import com.frostwire.licenses.License;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
-import com.frostwire.search.FileSearchResult;
-import com.frostwire.search.SearchResult;
 
 import java.io.PrintStream;
 import java.util.Iterator;
@@ -66,6 +62,14 @@ public class KeywordFilter {
         }
     }
 
+    public boolean isInclusive() {
+        return inclusive;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
     @Override
     public String toString() {
         return stringForm;
@@ -93,12 +97,12 @@ public class KeywordFilter {
         return pipeline;
     }
 
-    public boolean accept(@NonNull final String lowercaseHaystack) {
+    public boolean accept(final String lowercaseHaystack) {
         boolean found = lowercaseHaystack.contains(keyword);
         return ((inclusive && found) || (!inclusive && !found));
     }
 
-    private static String getSearchResultHaystack(@NonNull SearchResult sr) {
+    private static String getSearchResultHaystack(SearchResult sr) {
         StringBuilder queryString = new StringBuilder();
         if (sr.getSource() == null) {
             System.err.println("WARNING: " + sr.getClass().getSimpleName() + " has no source!");
@@ -122,7 +126,7 @@ public class KeywordFilter {
         return queryString.toString().toLowerCase();
     }
 
-    public static boolean passesFilterPipeline(@NonNull final SearchResult sr, @NonNull final List<KeywordFilter> filterPipeline) {
+    public static boolean passesFilterPipeline(final SearchResult sr, final List<KeywordFilter> filterPipeline) {
         boolean accepted = true;
         String haystack = getSearchResultHaystack(sr);
         Iterator<KeywordFilter> it = filterPipeline.iterator();
@@ -261,7 +265,7 @@ public class KeywordFilter {
             acceptablePipeline.add(notthereFilter);
             acceptablePipeline.add(frostwireFilter);
             if (!assertTrue("exclusion pipeline test", passesFilterPipeline(fsr,acceptablePipeline))) {
-               return false;
+                return false;
             }
 
             KeywordFilter athensFilter = new KeywordFilter(false, "athens");
