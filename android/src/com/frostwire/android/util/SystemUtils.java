@@ -77,6 +77,8 @@ public final class SystemUtils {
 
         try {
             StatFs statFs = new StatFs(dir.getAbsolutePath());
+            // TODO: upgrade these deprecated calls whenever we move past API 18
+            // to getBlockCountLong() and getBlockSizeLong().
             long available = ((long) statFs.getBlockCount()) * statFs.getBlockSize();
             // Target 2% of the total space.
             size = available / 50;
