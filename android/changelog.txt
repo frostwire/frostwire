@@ -1,4 +1,6 @@
-FrostWire 1.8.6 - NOV/24/2016
+FrostWire 1.8.6 - NOV/29/2016
+ - Fixes checkbox/menu selection options bug on My files.
+ - Fixes possible crash when browsing albums in My Music.
  - New [+|-]:keyword:<fooKeyword> keyword filter support on search.
  - Transfer action bar hides menu button if no transfers present.
 
