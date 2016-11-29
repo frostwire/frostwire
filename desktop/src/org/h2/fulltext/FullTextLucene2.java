@@ -47,6 +47,7 @@ import org.apache.lucene.search.Hits;
  * This class implements the full text search based on Apache Lucene.
  * Most methods can be called using SQL statements as well.
  */
+@SuppressWarnings("deprecation")
 public class FullTextLucene2 extends FullText {
 
     /**
