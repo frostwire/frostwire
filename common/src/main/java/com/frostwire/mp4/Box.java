@@ -200,6 +200,7 @@ public class Box {
         return Bits.make4cc(type);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends Box> LinkedList<T> find(LinkedList<Box> boxes, int type) {
         LinkedList<T> l = new LinkedList<>();
 
@@ -223,9 +224,8 @@ public class Box {
         return l;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends Box> T findFirst(LinkedList<Box> boxes, int type) {
-        T r = null;
-
         for (Box b : boxes) {
             if (b.type == type) {
                 return (T) b;
