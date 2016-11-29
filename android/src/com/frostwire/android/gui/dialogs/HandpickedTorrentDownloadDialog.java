@@ -125,14 +125,6 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
         return new OnStartDownloadsClickListener(getActivity(), dlg);
     }
 
-    /*
-    @Override
-    void prepareArguments(int dialogIcon, String dialogTitle, String dialogText, String listDataInJSON, SelectionMode selectionMode) {
-        super.prepareArguments(dialogIcon, dialogTitle, dialogText, listDataInJSON, selectionMode);
-        onSaveInstanceState(getArguments());
-    }
-    */
-
     @Override
     public List<TorrentFileEntry> deserializeData(String listDataInJSON) {
         final TorrentFileEntryList torrentFileEntryList = JsonUtils.toObject(listDataInJSON, TorrentFileEntryList.class);
