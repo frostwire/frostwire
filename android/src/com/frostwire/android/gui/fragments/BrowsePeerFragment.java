@@ -72,7 +72,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private View header;
     private long lastAdapterRefresh;
     private String previousFilter;
-    private Set<FileListAdapter.FileDescriptorItem> previouslyChecked;
+    private HashMap<Byte, Set<FileListAdapter.FileDescriptorItem>> checkedItemsMap;
 
     // given the byte:fileType as the index, this array will match the corresponding UXAction code.
     // no if's necessary, random access -> O(1)
@@ -109,6 +109,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         toTheLeftOf.put(Constants.FILE_TYPE_RINGTONES, Constants.FILE_TYPE_AUDIO);    //0x05 - Ringtones <- Audio
         toTheLeftOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_DOCUMENTS); //0x06 - Torrents <- Documents
 
+        checkedItemsMap = new HashMap<>();
         radioButtonFileTypeMap = new HashMap<>();  // see initRadioButton(...)
     }
 
@@ -161,6 +162,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     private void restorePreviouslyChecked() {
+        Set<FileListAdapter.FileDescriptorItem> previouslyChecked = checkedItemsMap.get(adapter.getFileType());
         if (previouslyChecked != null && !previouslyChecked.isEmpty()) {
             adapter.setChecked(previouslyChecked);
         }
@@ -176,9 +178,11 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         if (adapter != null) {
             final Set<FileListAdapter.FileDescriptorItem> checked = adapter.getChecked();
             if (checked != null && !checked.isEmpty()) {
-                previouslyChecked = new HashSet<>(checked);
-            } else {
-                previouslyChecked = null;
+                Set<FileListAdapter.FileDescriptorItem> checkedCopy = new HashSet<>();
+                for (FileListAdapter.FileDescriptorItem fileDescriptorItem : checked) {
+                    checkedCopy.add(fileDescriptorItem);
+                }
+                checkedItemsMap.put(adapter.getFileType(), checkedCopy);
             }
         }
     }
