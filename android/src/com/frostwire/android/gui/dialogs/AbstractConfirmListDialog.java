@@ -88,7 +88,6 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
     protected final static String TAG = "confirm_list_dialog";
 
-    private String dialogText;
     private SelectionMode selectionMode;
     private Dialog dlg;
     private OnCancelListener onCancelListener;
@@ -295,6 +294,14 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
     void setOnYesListener(OnClickListener listener) {
         onYesListener = listener;
+    }
+
+    @SuppressWarnings("unused")
+    /**
+     * In case we want to do something before dismissing the dialog. (Unused at the moment)
+     */
+    void setOnCancelListener(OnCancelListener l) {
+        onCancelListener = l;
     }
 
     public Set<T> getChecked() {
