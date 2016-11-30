@@ -20,9 +20,13 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.inmobi.ads.InMobiInterstitial;
 import com.inmobi.sdk.InMobiSdk;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class InMobiAdNetwork extends AbstractAdNetwork {
 
@@ -31,39 +35,46 @@ class InMobiAdNetwork extends AbstractAdNetwork {
 
     private InMobiInterstitialListener inmobiListener;
     private InMobiInterstitial inmobiInterstitial;
-    private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150L;
+
+    // as it was before
+    //private final String INMOBI_INTERSTITIAL_PROPERTY_ID = "c1e6be702d614523b725af8b86f99e8f";
+    //private final long INTERSTITIAL_PLACEMENT_ID = 1431974497868150L;
+
+    // as it looks in the integration docs now with the auto generated IDs.
+    private final String INMOBI_INTERSTITIAL_PROPERTY_ID = "49c2c20fd5354ab6b3f9418e25ccc351";
+    private final long INTERSTITIAL_PLACEMENT_ID = 1471550843414L;
+
+    private final AtomicBoolean loadingInterstitial;
 
     InMobiAdNetwork() {
+        loadingInterstitial = new AtomicBoolean(false);
     }
 
     public void initialize(final Activity activity) {
         if (abortInitialize(activity)) {
             return;
         }
-
         if (!started()) {
             try {
-                activity.runOnUiThread(new Runnable() {
+                Runnable sdkInitializer = new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            LOG.info("InMobi.initialize()...");
-                            InMobiSdk.init(activity, Constants.INMOBI_INTERSTITIAL_PROPERTY_ID);
+                            LOG.info("InMobiSdk.init...");
+                            InMobiSdk.init(activity, INMOBI_INTERSTITIAL_PROPERTY_ID);
                             if (DEBUG_MODE) {
                                 InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG);
                             }
-                            LOG.info("InMobi.initialized.");
+                            LOG.info("InMobiSdk.initialized.");
                             start();
-                            LOG.info("Load InmobiInterstitial.");
-                        } catch (Throwable e) {
-                            // TODO: IMPORTANT review this problem, by aldenml
-                            e.printStackTrace();
+                            loadNewInterstitial(activity);
+                        } catch (Throwable t) {
+                            LOG.error("InMobiAdNetwork.initialize() failed", t);
+                            finishedLoadingInterstitial();
                         }
                     }
-                });
-
-                // this one makes sure it runs on the UI thread, enqueued after
-                loadNewInterstitial(activity);
+                };
+                activity.runOnUiThread(sdkInitializer);
             } catch (Throwable t) {
                 t.printStackTrace();
                 stop(activity);
@@ -71,6 +82,19 @@ class InMobiAdNetwork extends AbstractAdNetwork {
         }
     }
 
+    public void startedLoadingInterstitial() {
+        //LOG.info("startedLoadingInterstitial");
+        loadingInterstitial.set(true);
+    }
+
+    public void finishedLoadingInterstitial() {
+        //LOG.info("finishedLoadingInterstitial");
+        loadingInterstitial.set(false);
+    }
+
+    public boolean loadingInterstitial() {
+        return loadingInterstitial.get();
+    }
 
     @Override
     public boolean showInterstitial(Activity activity,
@@ -97,22 +121,29 @@ class InMobiAdNetwork extends AbstractAdNetwork {
     @Override
     public void loadNewInterstitial(final Activity activity) {
         if (!started() || !enabled()) {
+            LOG.warn("InMobiAdNetwork.loadNewInsterstitial() aborted. started = " + started() + "; enabled = "  + enabled());
             return; //not ready
         }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    inmobiListener = new InMobiInterstitialListener(InMobiAdNetwork.this, activity);
-                    inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
-                    inmobiInterstitial.load();
-                } catch (Throwable t) {
-                    LOG.warn("InmobiAdNetwork.loadInterstitial() failed", t);
-                    // don't crash, keep going.
-                    // possible android.util.AndroidRuntimeException: android.content.pm.PackageManager$NameNotFoundException: com.google.android.webview
-                }
-            }
-        });
+        if (loadingInterstitial()) {
+            LOG.warn("InMobiAdNetwork.loadNewInsterstitial() aborted. Still busy loading an interstitial");
+            return;
+        }
+        if (!UIUtils.inUIThread()) {
+            LOG.warn("InMobiAdNetwork.loadNewInsterstitial() aborted. Not being invoked from UI thread");
+            return;
+        }
+        startedLoadingInterstitial();
+        try {
+            inmobiListener = new InMobiInterstitialListener(InMobiAdNetwork.this, activity);
+            inmobiInterstitial = new InMobiInterstitial(activity, INTERSTITIAL_PLACEMENT_ID, inmobiListener);
+            LOG.info("InMobiAdNetwork.loadNewInterstitial() -> interstitial.load()!!!!");
+            inmobiInterstitial.load(); // finishedLoadingInterstitial() will be called from listener.
+        } catch (Throwable t) {
+            finishedLoadingInterstitial();
+            LOG.error("InMobiAdNetwork.loadInterstitial() failed", t);
+            // don't crash, keep going.
+            // possible android.util.AndroidRuntimeException: android.content.pm.PackageManager$NameNotFoundException: com.google.android.webview
+        }
     }
 
     @Override

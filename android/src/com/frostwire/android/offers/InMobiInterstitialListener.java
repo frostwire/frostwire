@@ -30,8 +30,8 @@ import com.inmobi.ads.InMobiInterstitial;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
-class InMobiInterstitialListener implements InterstitialListener, InMobiInterstitial.InterstitialAdListener {
-    private static final Logger LOG = Logger.getLogger(InMobiInterstitial.InterstitialAdListener.class);
+class InMobiInterstitialListener implements InterstitialListener, InMobiInterstitial.InterstitialAdListener2 {
+    private static final Logger LOG = Logger.getLogger(InMobiInterstitialListener.class);
     private final WeakReference<? extends Activity> activityRef;
     private final Application app;
     private final InMobiAdNetwork adNetwork;
@@ -40,7 +40,7 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     private boolean ready;
     private static final int MAX_INTERSTITIAL_LOAD_RETRIES = 5;
     private static int INTERSTITIAL_RETRIES_LEFT = MAX_INTERSTITIAL_LOAD_RETRIES;
-    private static int INTERSTITIAL_RELOAD_WAIT_IN_SECS = 20;
+    private static int INTERSTITIAL_RELOAD_WAIT_IN_SECS = 60;
 
     InMobiInterstitialListener(InMobiAdNetwork adNetwork, Activity hostActivity) {
         activityRef = new WeakReference<>(hostActivity);
@@ -57,13 +57,21 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     public void onAdLoadFailed(final InMobiInterstitial imInterstitial, InMobiAdRequestStatus imErrorCode) {
         ready = false;
         LOG.info("InMobiListener.onAdLoadFailed - errorCode: " + imErrorCode.getStatusCode() + " - " + imErrorCode.getMessage());
+        adNetwork.finishedLoadingInterstitial();
         reloadInterstitialLater(imInterstitial, INTERSTITIAL_RELOAD_WAIT_IN_SECS);
+    }
+
+    @Override
+    public void onAdReceived(InMobiInterstitial inMobiInterstitial) {
+        LOG.info("InMobiListener.onAdReceived");
+        adNetwork.finishedLoadingInterstitial();
     }
 
     @Override
     public void onAdLoadSucceeded(InMobiInterstitial imInterstitial) {
         ready = true;
         INTERSTITIAL_RETRIES_LEFT = MAX_INTERSTITIAL_LOAD_RETRIES;
+        adNetwork.finishedLoadingInterstitial();
         LOG.info("InMobiListener.onAdLoadSucceeded");
     }
 
@@ -85,6 +93,16 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
 
     @Override
     public void onAdRewardActionCompleted(InMobiInterstitial inMobiInterstitial, Map<Object, Object> map) {
+    }
+
+    @Override
+    public void onAdDisplayFailed(InMobiInterstitial inMobiInterstitial) {
+
+    }
+
+    @Override
+    public void onAdWillDisplay(InMobiInterstitial inMobiInterstitial) {
+
     }
 
     @Override
@@ -120,7 +138,7 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
         }
         INTERSTITIAL_RETRIES_LEFT--;
         Handler h = new Handler(Looper.getMainLooper());
-        h.postDelayed(new InterstitialReloader(imInterstitial), secondsLater*1000);
+        h.postDelayed(new InterstitialReloader(adNetwork, imInterstitial), secondsLater*1000);
     }
 
     private void wrapItUp(InMobiInterstitial imInterstitial) {
@@ -131,18 +149,31 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
     }
 
     private static class InterstitialReloader implements Runnable {
+        private final WeakReference<InMobiAdNetwork> adNetworkRef;
         private final WeakReference<InMobiInterstitial> interstitialRef;
 
-        InterstitialReloader(InMobiInterstitial interstitial) {
+        InterstitialReloader(InMobiAdNetwork adNetwork, InMobiInterstitial interstitial) {
+            adNetworkRef = Ref.weak(adNetwork);
             interstitialRef = Ref.weak(interstitial);
         }
 
         @Override
         public void run() {
+            if (!Ref.alive(adNetworkRef)) {
+                LOG.info("Can't reload interstitial, lost reference to ad network. aborting.");
+                return;
+            }
             if (!Ref.alive(interstitialRef)) {
                 LOG.info("Can't reload interstitial, lost reference to interstitial. aborting.");
                 return;
             }
+            InMobiAdNetwork adNetwork = adNetworkRef.get();
+
+            if (adNetwork.loadingInterstitial()) {
+                LOG.info("Aborted interstitial reload, InMobiAdNetwork still busy loading interstitial");
+                return;
+            }
+
             InMobiInterstitial imInterstitial = interstitialRef.get();
             try {
                 LOG.info("Reloading ads (Attempts left: " + INTERSTITIAL_RETRIES_LEFT + ")");

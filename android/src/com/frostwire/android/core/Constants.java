@@ -173,8 +173,6 @@ public final class Constants {
 
     public static final long LIBRARIAN_FILE_COUNT_CACHE_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
-    public static final String INMOBI_INTERSTITIAL_PROPERTY_ID = "c1e6be702d614523b725af8b86f99e8f";
-
     public static final int NOTIFIED_BLOOM_FILTER_BITSET_SIZE = 320000; //40 kilobytes
     public static final int NOTIFIED_BLOOM_FILTER_EXPECTED_ELEMENTS = 10000;
 

@@ -54,11 +54,18 @@ public final class Offers {
     private final static InMobiAdNetwork IN_MOBI = new InMobiAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
     private final static Long STARTUP_TIME = System.currentTimeMillis();
+    private static long lastInitAdnetworksInvocationTimestamp;
 
     private Offers() {
     }
 
     public static void initAdNetworks(Activity activity) {
+        long now = System.currentTimeMillis();
+        if (now - lastInitAdnetworksInvocationTimestamp < 5000) {
+            LOG.info("Offers.initAdNetworks() aborted, too soon to reinitialize networks.");
+            return;
+        }
+        lastInitAdnetworksInvocationTimestamp = now;
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
             if (adNetwork != null) { // because of a typo on config file this can happen
                 adNetwork.initialize(activity);
