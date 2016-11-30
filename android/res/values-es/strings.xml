@@ -375,8 +375,6 @@
     <string name="donate_5">Donar $5</string>
     <string name="donate_10">Donar $10</string>
     <string name="donate_25">Donar $25</string>
-    <string name="one_file_shared">Un archivo ha sido compartido con otros dispositivos FrostWire en la misma red Wi-Fi.</string>
-    <string name="n_files_shared">%d archivos han sido compartido con otros dispositivos FrostWire en la misma red Wi-Fi.</string>
     <string name="playing_now_colon">Tocando ahora:</string>
     <string name="my_filetype">Mis %s</string>
     <string name="paused">Pausado</string>
@@ -615,4 +613,6 @@
     <string name="terms_of_use">Términos de Uso</string>
     <string name="haptic_feedback">Retroalimentación Táctil</string>
     <string name="advertisement">publicidad</string>
+    <string name="all_free_downloads">Descargas Gratuitas</string>
+    <string name="frostwire_features">FROSTWIRE PRESENTA</string>
 </resources>
