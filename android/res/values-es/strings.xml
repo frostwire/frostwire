@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /* 
- * Creado por Angel Leon (@gubatron), Alden Torres (aldenml) 
- * Derechos de Autor (c) 2011-2016, FrostWire(R). Todos los derechos reservados.
+ * Creado por Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Derechos de Autor (c) 2011-2017, FrostWire(R). Todos los derechos reservados.
  * 
  * Este programa es gratuito: puedes distribuirlo y/o modificarlo 
  * bajo los términos de la Licencia General Pública de GNU tal y como lo publica 
@@ -19,6 +19,12 @@
  */ 
 -->
 <resources>
+    <!-- Important: Android tiene bugs con HTML, no dejes etiquetas HTML pegadas al texto, deja espacios. De otro modo android cuenta las etiquetas como parte de la longitud del texto y luego las lineas se cortan de forma prematura. -->
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Una conexión desprotegida significa que todo lo que haces en línea (incluyendo <b>búsquedas, mensajería, y descargas</b>) podrían ser monitoreadas por cualquiera en tu red e incluso por tu proveedor de Internet.<br><br>Recomendamos usar ExpressVPN para encriptar tu conexión y <b>proteger tu privacidad</b>.]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Estás conectado a Internet usando un VPN. <br><br> Si no lo estás, te recomendamos usar <b>ExpressVPN</b> para encriptar tu conexión y <b>proteger tu privacidad</b>. ]]></string>
+    <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Tu privacidad es un derecho humano fundamental.</b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p><b> *NO HACE FALTA TENER UN VPN para usar FrostWire </b> pero LO RECOMENDAMOS ENORMEMENTE para proteger tu privacidad.</p>]]></string>
+    <!-- NON HTML TAGS -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Configuración</string>
     <string name="activity_browse_peer_name">Explorar</string>
@@ -533,20 +539,14 @@
     <string name="unprotected_connection">Conexión desprotegida</string>
     <string name="protect_my_privacy">Protege mi privacidad</string>
     <string name="storage_picker_treeuri_error">Error inesperado seleccionando ruta de almacenamiento</string>
-    <string name="protected_connections_visibility_bullet">Gracias por proteger tu privacidad al usar un VPN. Tu conexión es segura.</string>
-    <string name="unprotected_connections_visibility_bullet">Una conexión desprotegida hace visible todo lo que haces en línea a los ojos de tu proveedor de Internet y de todos los que se conectan a tu red. Esto incluye tus búsquedas, navegación web, mensajería, correos electrónicos y descargas.</string>
     <string name="storage_picker_treeuri_null">La ruta de almacenamiento no fue seleccionada</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire no puede escribir en la ruta de almacenamiento seleccionada</string>
     <string name="storage_path">Ruta de almacenamiento</string>
-    <!-- Important: Android tiene bugs con HTML, no dejes etiquetas HTML pegadas al texto, deja espacios. De otro modo android cuenta las etiquetas como parte de la longitud del texto y luego las lineas se cortan de forma prematura. -->
-    <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Tu privacidad es un derecho humano fundamental.</b>]]></string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p><b> *NO HACE FALTA TENER UN VPN para usar FrostWire </b> pero LO RECOMENDAMOS ENORMEMENTE para proteger tu privacidad.</p>]]></string>
     <string name="selected">seleccionado</string>
     <string name="bittorrent_off">BitTorrent apagado</string>
     <string name="vpn_money_back">garantía de 30 días de devolución de dinero</string>
     <string name="vpn_what_you_get_with">Qué obtienes con </string>
     <string name="activity_VPN">Conexión</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Una conexión desprotegida significa que todo lo que haces en línea (incluyendo <b>búsquedas, mensajería, y descargas</b>) podrían ser monitoreadas por cualquiera en tu red e incluso por tu proveedor de Internet.<br><br>Recomendamos usar ExpressVPN para encriptar tu conexión y <b>proteger tu privacidad</b>.]]></string>
     <string name="vpn_client_feature_2">Velocidad de descarga ilimitada</string>
     <string name="vpn_price">desde $%1$.2f dólares mensuales</string>
     <string name="connection_header_title">Estado de conexión:</string>
@@ -565,7 +565,6 @@
     <string name="visit_vpn_client">Visita ExpressVPN</string>
     <string name="enable_experimental">Funciones experimentales</string>
     <string name="get_express_VPN">Obtén ExpressVPN</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Estás conectado a Internet usando un VPN. <br><br> Si no lo estás, te recomendamos usar <b>ExpressVPN</b> para encriptar tu conexión y <b>proteger tu privacidad</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">La ruta seleccionada no es un directorio</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">El archivo no pudo ser compartido. BitTorrent permanecerá desconectado.</string>
     <string name="the_file_could_not_be_seeded_enable_seeding">El archivo no pudo ser compartido. Habilite la capacidad de Compartir en las preferencias.</string>
@@ -579,7 +578,7 @@
     <string name="sd_permission_no_accessible_path">La ruta que ha seleccionado en la tarjeta SD no es accesible como antes. Presione OK para seleccionarla de nuevo.</string>
     <string name="wifi_network_unavailable">Red WiFi No Disponible</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Seleccione los archivos que desea descargar de este torrent</string>
-    <string name="seeding_is_currently_disabled">Compartir está desabilitado en sus preferencias. Le gustaria que activara la capacidad de compartir para que Ud. pueda compartir este archivo?</string>
+    <string name="seeding_is_currently_disabled">Compartir está desabilitado en sus preferencias. Le gustaría que activara la capacidad de compartir para que Ud. pueda compartir este archivo?</string>
     <string name="fetching_torrent_ellipsis">Obteniendo torrent…</string>
     <string name="enable_seeding">Habilitar Compartir</string>
     <string name="error_connection_timed_out">Error: Se agotó el tiempo de conexión. Intenta nuevamente.</string>
