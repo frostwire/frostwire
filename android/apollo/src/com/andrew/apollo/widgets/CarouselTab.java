@@ -97,21 +97,19 @@ public class CarouselTab extends FrameLayoutWithOverlay {
     }
 
     /**
-     * Transformation used to blur image in ImageLoader
+     * Filter used to blur image in ImageLoader
      */
-    private Transformation blur = new Transformation() {
+    private class BlurFilter implements ImageLoader.Filter {
         @Override
-        public Bitmap transform(Bitmap source) {
-            Bitmap blurred = BitmapUtils.createBlurredBitmap(getContext(), source);
-            source.recycle();
-            return blurred;
+        public Bitmap filter(Bitmap source) {
+            return BitmapUtils.createBlurredBitmap(getContext(), source);
         }
 
         @Override
-        public String key() {
-            return "blurred";
+        public String params() {
+            return "default_blur";
         }
-    };
+    }
 
     /**
      * Used to blur the artist image in the album profile.
@@ -123,9 +121,10 @@ public class CarouselTab extends FrameLayoutWithOverlay {
      */
     public void blurPhoto(final Activity context, final String artist, final String album) {
         final ImageLoader loader = ImageLoader.getInstance(context.getApplicationContext());
-        loader.loadAndTransform(ImageLoader.getArtistArtUri(artist),
+        ImageLoader.Filter filter = new BlurFilter();
+        loader.loadAndFilter(ImageLoader.getArtistArtUri(artist),
                 ImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
-                blur, mPhoto, false);
+                filter, mPhoto, false);
     }
 
     /**

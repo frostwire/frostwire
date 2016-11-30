@@ -149,28 +149,44 @@ public final class ImageLoader {
         picasso.setIndicatorsEnabled(false);
     }
 
-    public void loadAndTransform(final Uri primaryUri, final Uri secondaryUri, final Transformation transformation, final ImageView imageView, final boolean cache) {
+    public void loadAndFilter(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {
         Callback.EmptyCallback callback = new Callback.EmptyCallback() {
             @Override
             public void onError() {
                 if (secondaryUri != null) {
-                    loadAndTransform(secondaryUri, transformation, imageView, cache);
+                    loadAndFilter(secondaryUri, filter, imageView, cache);
                 }
             }
         };
 
         if (cache) {
-            picasso.load(primaryUri).fit().transform(transformation).into(imageView, callback);
+            picasso.load(primaryUri).fit().transform(packInTransformation(filter)).into(imageView, callback);
         } else {
-            picasso.load(primaryUri).fit().transform(transformation)
+            picasso.load(primaryUri).fit().transform(packInTransformation(filter))
                     .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                     .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE).into(imageView, callback);
         }
     }
 
 
-    public void loadAndTransform(Uri uri, Transformation transformation, ImageView imageView, boolean cache) {
-        loadAndTransform(uri, null, transformation, imageView, cache);
+    public void loadAndFilter(Uri uri, Filter transformation, ImageView imageView, boolean cache) {
+        loadAndFilter(uri, null, transformation, imageView, cache);
+    }
+
+    private Transformation packInTransformation(final Filter filter) {
+        return new Transformation() {
+            @Override
+            public Bitmap transform(Bitmap source) {
+                Bitmap transformed = filter.filter(source);
+                source.recycle();
+                return transformed;
+            }
+
+            @Override
+            public String key() {
+                return filter.params();
+            }
+        };
     }
 
     public void load(Uri uri, ImageView target) {
@@ -227,6 +243,12 @@ public final class ImageLoader {
     public void shutdown() {
         shutdown = true;
         picasso.shutdown();
+    }
+
+    public interface Filter {
+        Bitmap filter(Bitmap source);
+
+        String params();
     }
 
     private static final class ImageRequestHandler extends RequestHandler {
