@@ -179,6 +179,7 @@ class InMobiInterstitialListener implements InterstitialListener, InMobiIntersti
                 LOG.info("Reloading ads (Attempts left: " + INTERSTITIAL_RETRIES_LEFT + ")");
                 if (imInterstitial != null) {
                     try {
+                        adNetwork.startedLoadingInterstitial();
                         imInterstitial.load();
                     } catch (Throwable t) {
                         LOG.info("InMobiListener.onAdLoadFailed reload failed", t);
