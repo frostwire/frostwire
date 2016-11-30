@@ -1,6 +1,8 @@
 frostwire (6.4.2) stable; urgency=high
   * Starred playlist moved down to playlist explorer
   * Playlist explorer right click popups show as least actions as possible
+  * H2 database update (1.4.193)
+  * gson upgraded to 2.8.0
 
  -- FrostWire Team <contact@frostwire.com>  Fri, 18 Nov 2016 10:03:21 -0600
 
