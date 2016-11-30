@@ -79,7 +79,8 @@ android {
 
     defaultConfig {
         versionName project.ext.versionName
-
+        renderscriptTargetApi 16
+        renderscriptSupportModeEnabled true
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 

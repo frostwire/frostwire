@@ -31,6 +31,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
+
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.squareup.picasso.*;
@@ -148,6 +149,43 @@ public final class ImageLoader {
         picasso.setIndicatorsEnabled(false);
     }
 
+    public void load(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {
+        Transformation transformation = new Transformation() {
+            @Override
+            public Bitmap transform(Bitmap source) {
+                Bitmap transformed = filter.filter(source);
+                source.recycle();
+                return transformed;
+            }
+
+            @Override
+            public String key() {
+                return filter.params();
+            }
+        };
+
+        Callback.EmptyCallback callback = new Callback.EmptyCallback() {
+            @Override
+            public void onError() {
+                if (secondaryUri != null) {
+                    load(secondaryUri, filter, imageView, cache);
+                }
+            }
+        };
+
+        if (cache) {
+            picasso.load(primaryUri).fit().transform(transformation).into(imageView, callback);
+        } else {
+            picasso.load(primaryUri).fit().transform(transformation)
+                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE).into(imageView, callback);
+        }
+    }
+
+    public void load(Uri uri, Filter filter, ImageView imageView, boolean cache) {
+        load(uri, null, filter, imageView, cache);
+    }
+
     public void load(Uri uri, ImageView target) {
         picasso.load(uri).noFade().into(target);
     }
@@ -202,6 +240,12 @@ public final class ImageLoader {
     public void shutdown() {
         shutdown = true;
         picasso.shutdown();
+    }
+
+    public interface Filter {
+        Bitmap filter(Bitmap source);
+
+        String params();
     }
 
     private static final class ImageRequestHandler extends RequestHandler {
