@@ -149,32 +149,8 @@ public final class ImageLoader {
         picasso.setIndicatorsEnabled(false);
     }
 
-    public void loadAndFilter(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {
-        Callback.EmptyCallback callback = new Callback.EmptyCallback() {
-            @Override
-            public void onError() {
-                if (secondaryUri != null) {
-                    loadAndFilter(secondaryUri, filter, imageView, cache);
-                }
-            }
-        };
-
-        if (cache) {
-            picasso.load(primaryUri).fit().transform(packInTransformation(filter)).into(imageView, callback);
-        } else {
-            picasso.load(primaryUri).fit().transform(packInTransformation(filter))
-                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
-                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE).into(imageView, callback);
-        }
-    }
-
-
-    public void loadAndFilter(Uri uri, Filter transformation, ImageView imageView, boolean cache) {
-        loadAndFilter(uri, null, transformation, imageView, cache);
-    }
-
-    private Transformation packInTransformation(final Filter filter) {
-        return new Transformation() {
+    public void load(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {
+        Transformation transformation = new Transformation() {
             @Override
             public Bitmap transform(Bitmap source) {
                 Bitmap transformed = filter.filter(source);
@@ -187,6 +163,27 @@ public final class ImageLoader {
                 return filter.params();
             }
         };
+
+        Callback.EmptyCallback callback = new Callback.EmptyCallback() {
+            @Override
+            public void onError() {
+                if (secondaryUri != null) {
+                    load(secondaryUri, filter, imageView, cache);
+                }
+            }
+        };
+
+        if (cache) {
+            picasso.load(primaryUri).fit().transform(transformation).into(imageView, callback);
+        } else {
+            picasso.load(primaryUri).fit().transform(transformation)
+                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE).into(imageView, callback);
+        }
+    }
+
+    public void load(Uri uri, Filter filter, ImageView imageView, boolean cache) {
+        load(uri, null, filter, imageView, cache);
     }
 
     public void load(Uri uri, ImageView target) {

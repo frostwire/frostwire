@@ -26,7 +26,6 @@ import com.andrew.apollo.utils.BitmapUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.util.ImageLoader;
-import com.squareup.picasso.Transformation;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
@@ -122,7 +121,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
     public void blurPhoto(final Activity context, final String artist, final String album) {
         final ImageLoader loader = ImageLoader.getInstance(context.getApplicationContext());
         ImageLoader.Filter filter = new BlurFilter();
-        loader.loadAndFilter(ImageLoader.getArtistArtUri(artist),
+        loader.load(ImageLoader.getArtistArtUri(artist),
                 ImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
                 filter, mPhoto, false);
     }
