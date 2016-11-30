@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,13 +24,14 @@ import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class ArchiveorgSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
+public final class ArchiveorgSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
     private final String identifier;
     private final String title;
@@ -43,7 +44,7 @@ public class ArchiveorgSearchResult extends AbstractSearchResult implements Craw
         this.identifier = item.identifier;
         this.domainName = domainName;
         this.detailsUrl = "http://" + domainName + "/details/" + item.identifier;
-        this.title = item.title;
+        this.title = buildTitle(item.title);
         this.licence = Licenses.creativeCommonsByUrl(item.licenseurl);
         this.creationTime = parsePublicDate(item.publicdate);
     }
@@ -80,6 +81,19 @@ public class ArchiveorgSearchResult extends AbstractSearchResult implements Craw
     @Override
     public boolean isComplete() {
         return false;
+    }
+
+    private static String buildTitle(Object obj) {
+        if (obj instanceof String) {
+            return (String) obj;
+        } else if (obj instanceof ArrayList<?>) {
+            ArrayList<?> l = (ArrayList<?>) obj;
+            if (l.size() > 0) {
+                return l.get(0).toString();
+            }
+        }
+
+        return "<unknown>";
     }
 
     private long parsePublicDate(String publicdate) {

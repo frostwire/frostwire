@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,14 +21,12 @@ package com.frostwire.search.archiveorg;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public class ArchiveorgItem {
+public final class ArchiveorgItem {
 
-    public String title;
+    public Object title;
     public String mediatype;
     public String description;
     public String licenseurl;
