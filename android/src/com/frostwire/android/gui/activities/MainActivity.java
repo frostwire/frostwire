@@ -152,6 +152,9 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     public void onBackPressed() {
         if (navigationMenu.isOpen()) {
             navigationMenu.hide();
+        } else if (currentFragment == library && library.inSpecialState()) {
+            swapDrawerForBack(false);
+            library.endSpecialState();
         } else if (fragmentsStack.size() > 1) {
             try {
                 fragmentsStack.pop();
@@ -842,4 +845,22 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
         return "file://" + target.getAbsolutePath();
     }
+
+    /**
+     * @param drawerForBack - if true, swaps drawer for back, otherwise back for drawer
+     */
+    public void swapDrawerForBack(boolean drawerForBack) {
+        drawerToggle.setHomeAsUpIndicator(R.drawable.ic_ab_back_material);
+        drawerToggle.setDrawerIndicatorEnabled(!drawerForBack);
+        if (drawerForBack) {
+            drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                }
+            });
+        }
+        drawerLayout.setDrawerLockMode(drawerForBack ? DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED);
+    }
+
 }

@@ -23,6 +23,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/listview_item_background_selector"
     android:orientation="horizontal"
+    android:animateLayoutChanges="true"
     android:paddingBottom="1px"
     android:paddingTop="1px">
 

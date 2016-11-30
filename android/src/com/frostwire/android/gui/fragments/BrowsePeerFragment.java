@@ -19,19 +19,37 @@ package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.*;
+import android.content.AsyncTaskLoader;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.Loader;
 import android.content.res.Resources;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.SparseArray;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Filter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.andrew.apollo.MusicPlaybackService;
@@ -43,19 +61,26 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Finger;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
+import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
-import com.frostwire.android.gui.views.BrowsePeerSearchBarView;
-import com.frostwire.android.gui.views.BrowsePeerSearchBarView.OnActionListener;
+import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.FileTypeRadioButtonSelectorFactory;
+import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author gubatron
@@ -64,16 +89,84 @@ import java.util.*;
 public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment {
     private static final Logger LOG = Logger.getLogger(BrowsePeerFragment.class);
     private static final int LOADER_FILES_ID = 0;
+    private static final int PERCENTAGE_CHANCE_OF_CHECK_MODE_UI_HINT = 50;
+
     private final BroadcastReceiver broadcastReceiver;
-    private BrowsePeerSearchBarView filesBar;
+    private LinearLayout selectAllContainer;
+    private TextView selectAllLabel;
+    private CheckBox selectAllCheckBox;
+    private RadioGroup fileTypeButtons;
     private SwipeRefreshLayout swipeRefresh;
     private ListView list;
     private FileListAdapter adapter;
     private Peer peer;
+    private ViewState fragmentState = ViewState.NORMAL;
+    private ViewState beforeCheckState = ViewState.NORMAL;
     private View header;
     private long lastAdapterRefresh;
-    private String previousFilter;
+    private String filterString;
     private HashMap<Byte, Set<FileListAdapter.FileDescriptorItem>> checkedItemsMap;
+    private SwipeLayout swipe;
+
+    //-----header
+    private ImageView checkButton;
+    private ImageView searchButton;
+    private EditText searchBar;
+    private View textContainer;
+    private ImageView menuButton;
+    private ImageView firstActionButton;
+    private ImageView secondActionButton;
+
+    private ImageView overlay;
+
+    private CompoundButton.OnCheckedChangeListener checkListener = new CompoundButton.OnCheckedChangeListener() {
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (adapter != null) {
+                if (isChecked) {
+                    adapter.checkAll();
+                    selectAllLabel.setText(R.string.deselect_all);
+                } else {
+                    adapter.clearChecked();
+                    selectAllLabel.setText(R.string.select_all);
+                }
+                if (adapter.getCheckedCount() > 0) {
+                    menuButton.setVisibility(View.VISIBLE);
+                } else {
+                    menuButton.setVisibility(View.GONE);
+                }
+                updateHeader();
+            }
+        }
+    };
+
+    private SwipeLayout.OnSwipeListener swipeListener = new SwipeLayout.OnSwipeListener() {
+        @Override
+        public void onSwipeLeft() {
+            switchToThe(true);
+        }
+
+        @Override
+        public void onSwipeRight() {
+            switchToThe(false);
+        }
+    };
+
+    private TextWatcher textChangeFilterWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            performFilter(charSequence.toString());
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    };
 
     // given the byte:fileType as the index, this array will match the corresponding UXAction code.
     // no if's necessary, random access -> O(1)
@@ -134,7 +227,10 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         if (loader.getId() == LOADER_FILES_ID) {
             updateFiles((Object[]) data);
         }
-        updateHeader();
+        if (StringUtils.isNullOrEmpty(filterString)) {
+            updateHeader();
+        }
+
         if (swipeRefresh != null) {
             swipeRefresh.setRefreshing(false);
         }
@@ -150,22 +246,49 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         initBroadcastReceiver();
         if (adapter != null) {
             restorePreviouslyChecked();
-            restorePreviousFilter();
+            restoreFilterString();
             browseFilesButtonClick(adapter.getFileType());
         }
+
+        if (fragmentState == ViewState.CHECK) {
+            enterCheckState();
+        } else if (fragmentState == ViewState.FILTERING) {
+            enterFilteringState();
+        } else if (fragmentState == ViewState.FILTERED) {
+            enterFilteredState();
+        }
+
         updateHeader();
+        restoreListViewScrollPosition();
     }
 
     private void restorePreviouslyChecked() {
         Set<FileListAdapter.FileDescriptorItem> previouslyChecked = checkedItemsMap.get(adapter.getFileType());
-        if (previouslyChecked != null && !previouslyChecked.isEmpty()) {
-            adapter.setChecked(previouslyChecked);
+        if (previouslyChecked != null) {
+            if (!previouslyChecked.isEmpty()) {
+                adapter.setChecked(previouslyChecked);
+            }
+            changeSelectAllCheckBoxSilently(previouslyChecked.size() == adapter.getCount());
+        } else {
+            changeSelectAllCheckBoxSilently(false);
         }
     }
 
-    private void restorePreviousFilter() {
-        if (previousFilter != null && filesBar != null) {
-            filesBar.setText(previousFilter);
+    private void changeSelectAllCheckBoxSilently(boolean newState) {
+        selectAllCheckBox.setOnCheckedChangeListener(null);
+        selectAllCheckBox.setChecked(newState);
+        selectAllCheckBox.setOnCheckedChangeListener(checkListener);
+        if (newState) {
+            selectAllLabel.setText(R.string.deselect_all);
+        } else {
+            selectAllLabel.setText(R.string.select_all);
+        }
+    }
+
+    private void restoreFilterString() {
+        if (filterString != null && searchBar != null) {
+            searchBar.setText(filterString);
+            performFilter(filterString);
         }
     }
 
@@ -182,14 +305,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         }
     }
 
-    private void savePreviousFilter() {
-        if (!StringUtils.isNullOrEmpty(filesBar.getText())) {
-            previousFilter = filesBar.getText();
+    private void saveFilterString() {
+        if (searchBar != null) {
+            String filter = searchBar.getText().toString();
+            if (!StringUtils.isNullOrEmpty(filter)) {
+                filterString = filter;
+            }
         }
-    }
-
-    private void clearPreviousFilter() {
-        previousFilter = null;
     }
 
     private void initBroadcastReceiver() {
@@ -209,16 +331,65 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public void onPause() {
         super.onPause();
         savePreviouslyCheckedFileDescriptors();
-        savePreviousFilter();
+        saveFilterString();
         MusicUtils.stopSimplePlayer();
         getActivity().unregisterReceiver(broadcastReceiver);
     }
 
     @Override
     public View getHeader(Activity activity) {
+
+        if(searchBar != null) {
+            //need to mute this in case of drawer changes requesting recreation of header
+            searchBar.setOnFocusChangeListener(null);
+        }
         LayoutInflater inflater = LayoutInflater.from(activity);
         header = inflater.inflate(R.layout.view_browse_peer_header, null);
+        checkButton = findView(header, R.id.view_browse_peer_header_check_mode_button);
+        searchButton = findView(header, R.id.view_browse_peer_header_search_button);
+        searchBar = findView(header, R.id.view_browse_peer_header_search_bar);
+        textContainer = findView(header, R.id.view_browse_peer_header_text_container);
+        menuButton = findView(header, R.id.view_browse_peer_header_menu_button);
+        firstActionButton = findView(header, R.id.view_browse_peer_header_action_button_1);
+        secondActionButton = findView(header, R.id.view_browse_peer_header_action_button_2);
+
+        checkButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (fragmentState == ViewState.CHECK) {
+                    getActivity().onBackPressed();
+                } else {
+                    if (adapter.getFileType() != Constants.FILE_TYPE_RINGTONES) {
+                        enterCheckState();
+                        randomlyShowUIHint();
+                    }
+                }
+            }
+        });
+
+        searchButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (fragmentState.equals(ViewState.FILTERING)) {
+                    getActivity().onBackPressed();
+                } else {
+                    enterFilteringState();
+                }
+            }
+        });
+
+        menuButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                adapter.showMenuForSelectedItems();
+            }
+        });
+
         updateHeader();
+        if(fragmentState == ViewState.FILTERING) {
+            enableSearchBar(true);
+        }
+
         return header;
     }
 
@@ -228,27 +399,15 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     @Override
     protected void initComponents(View v) {
-        filesBar = findView(v, R.id.fragment_browse_peer_files_bar);
-        filesBar.setOnActionListener(new OnActionListener() {
-            public void onCheckAll(View v, boolean isChecked) {
-                if (adapter != null) {
-                    if (isChecked) {
-                        adapter.checkAll();
-                    } else {
-                        adapter.clearChecked();
-                    }
-                }
-            }
 
-            public void onFilter(View v, String str) {
-                performFilter(str);
-            }
+        selectAllContainer = findView(v, R.id.fragment_browse_peer_selection_mode_container);
+        selectAllLabel = findView(v, R.id.fragment_browse_peer_selection_mode_label);
+        selectAllCheckBox = findView(v, R.id.fragment_browse_peer_selection_mode_checkbox);
 
-            @Override
-            public void onClear() {
-                clearPreviousFilter();
-            }
-        });
+        selectAllCheckBox.setOnCheckedChangeListener(checkListener);
+        fileTypeButtons = findView(v, R.id.fragment_browse_peer_radiogroup_browse_type);
+
+
         swipeRefresh = findView(v, R.id.fragment_browse_peer_swipe_refresh);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -262,31 +421,35 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
         });
         list = findView(v, R.id.fragment_browse_peer_list);
-        SwipeLayout swipe = findView(v, R.id.fragment_browse_peer_swipe);
-        swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
-            @Override
-            public void onSwipeLeft() {
-                switchToThe(true);
-            }
+        swipe = findView(v, R.id.fragment_browse_peer_swipe);
+        swipe.setOnSwipeListener(swipeListener);
 
-            @Override
-            public void onSwipeRight() {
-                switchToThe(false);
-            }
-        });
         initRadioButton(v, R.id.fragment_browse_peer_radio_audio, Constants.FILE_TYPE_AUDIO);
         initRadioButton(v, R.id.fragment_browse_peer_radio_ringtones, Constants.FILE_TYPE_RINGTONES);
         initRadioButton(v, R.id.fragment_browse_peer_radio_videos, Constants.FILE_TYPE_VIDEOS);
         initRadioButton(v, R.id.fragment_browse_peer_radio_pictures, Constants.FILE_TYPE_PICTURES);
         initRadioButton(v, R.id.fragment_browse_peer_radio_documents, Constants.FILE_TYPE_DOCUMENTS);
         initRadioButton(v, R.id.fragment_browse_peer_radio_torrents, Constants.FILE_TYPE_TORRENTS);
+
+        //fake button for spacing
+        RadioButton button = findView(v, R.id.fragment_browse_peer_selection_mode_fake_spacer);
+        Resources r = button.getResources();
+        FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory =
+                new FileTypeRadioButtonSelectorFactory(Constants.FILE_TYPE_AUDIO,
+                        r,
+                        FileTypeRadioButtonSelectorFactory.RadioButtonContainerType.BROWSE);
+        fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
+        button.setClickable(false);
+
+        overlay = findView(v, R.id.fragment_browse_peer_content_overlay);
+        overlay.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().onBackPressed();
+            }
+        });
     }
 
-    private void updateCheckAllStatusInSearchBar() {
-        if (adapter != null && filesBar != null) {
-            filesBar.setCheckAllVisible(adapter.getFileType() != Constants.FILE_TYPE_RINGTONES);
-        }
-    }
 
     private RadioButton initRadioButton(View v, int viewId, final byte fileType) {
         RadioButton button = findView(v, viewId);
@@ -305,14 +468,20 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         return button;
     }
 
+    private void randomlyShowUIHint() {
+        int roll = new Random().nextInt(100);
+        if (roll < PERCENTAGE_CHANCE_OF_CHECK_MODE_UI_HINT) {
+            UIUtils.showShortMessage(getView(), R.string.checkmode_hint_message);
+        }
+    }
+
     private void browseFilesButtonClick(byte fileType) {
         if (adapter != null) {
             savePreviouslyCheckedFileDescriptors();
-            savePreviousFilter();
+            saveFilterString();
             saveListViewVisiblePosition(adapter.getFileType());
             adapter.clear();
         }
-        filesBar.clearCheckAll();
         reloadFiles(fileType);
         logBrowseAction(fileType);
     }
@@ -378,17 +547,124 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     break;
             }
             String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
+
+            int filterNumTotal = adapter.getCount();
+
             TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
             TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
-            title.setText(fileTypeStr);
-            total.setText("(" + String.valueOf(numTotal) + ")");
+
+            if (fragmentState == ViewState.CHECK) {
+                title.setText(adapter.getCheckedCount() + " " + getResources().getString(R.string.selected));
+                total.setText("");
+            } else {
+                if (StringUtils.isNullOrEmpty(filterString)) {
+                    title.setText(fileTypeStr);
+                    total.setText("(" + String.valueOf(numTotal) + ")");
+                } else {
+                    title.setText(filterString);
+                    total.setText("(" + filterNumTotal + "/" + String.valueOf(numTotal) + ")");
+                }
+            }
         }
         if (adapter == null) {
             browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
         }
         MusicUtils.stopSimplePlayer();
-        updateCheckAllStatusInSearchBar();
-        restoreListViewScrollPosition();
+        updateViewsToState();
+    }
+
+    private void updateViewsToState() {
+        if (header != null) {
+            if (fragmentState == ViewState.FILTERING) {
+                searchBar.setVisibility(View.VISIBLE);
+                searchButton.setVisibility(View.GONE);
+                firstActionButton.setVisibility(View.GONE);
+                secondActionButton.setVisibility(View.GONE);
+                menuButton.setVisibility(View.GONE);
+                checkButton.setVisibility(View.GONE);
+                textContainer.setVisibility(View.GONE);
+                selectAllContainer.setVisibility(View.GONE);
+                overlay.setVisibility(View.VISIBLE);
+            } else if (fragmentState == ViewState.CHECK) {
+                searchButton.setVisibility(View.GONE);
+                searchBar.setVisibility(View.GONE);
+                if (adapter.getCheckedCount() > 0) {
+                    menuButton.setVisibility(View.VISIBLE);
+                } else {
+                    menuButton.setVisibility(View.GONE);
+                }
+                selectAllContainer.setVisibility(View.VISIBLE);
+                fileTypeButtons.setVisibility(View.GONE);
+                checkButton.setVisibility(View.GONE);
+                overlay.setVisibility(View.GONE);
+                getSelectedItemsOptions();
+            } else if (fragmentState == ViewState.FILTERED) {
+                searchBar.setVisibility(View.GONE);
+                searchButton.setVisibility(View.VISIBLE);
+                firstActionButton.setVisibility(View.GONE);
+                secondActionButton.setVisibility(View.GONE);
+                menuButton.setVisibility(View.GONE);
+                if (adapter != null) {
+                    checkButton.setVisibility(adapter.getFileType() != Constants.FILE_TYPE_RINGTONES ? View.VISIBLE : View.GONE);
+                }
+                textContainer.setVisibility(View.VISIBLE);
+                selectAllContainer.setVisibility(View.GONE);
+                fileTypeButtons.setVisibility(View.VISIBLE);
+                overlay.setVisibility(View.GONE);
+            } else { // NORMAL
+                searchBar.setVisibility(View.GONE);
+                searchButton.setVisibility(View.VISIBLE);
+                firstActionButton.setVisibility(View.GONE);
+                secondActionButton.setVisibility(View.GONE);
+                menuButton.setVisibility(View.GONE);
+                if (adapter != null) {
+                    checkButton.setVisibility(adapter.getFileType() != Constants.FILE_TYPE_RINGTONES ? View.VISIBLE : View.GONE);
+                }
+                textContainer.setVisibility(View.VISIBLE);
+                selectAllContainer.setVisibility(View.GONE);
+                fileTypeButtons.setVisibility(View.VISIBLE);
+                overlay.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void getSelectedItemsOptions() {
+        MenuAdapter menu = adapter.getMenuForSelectedItems();
+        if (menu != null) {
+            final MenuAction lastMenuItem = menu.getItem(menu.getCount() - 1);
+            Drawable icon = lastMenuItem.getImage();
+            icon.setColorFilter(new PorterDuffColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP));
+            firstActionButton.setImageDrawable(icon);
+            firstActionButton.setVisibility(View.VISIBLE);
+            firstActionButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    lastMenuItem.onClick();
+                }
+            });
+            if (menu.getCount() <= 2) {// just show the actions don't show the menu
+                menuButton.setVisibility(View.GONE);
+                if (menu.getCount() == 2) {
+                    final MenuAction secondToLastMenuItem = menu.getItem(0);
+                    icon = secondToLastMenuItem.getImage();
+                    icon.setColorFilter(new PorterDuffColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP));
+                    secondActionButton.setImageDrawable(icon);
+                    secondActionButton.setVisibility(View.VISIBLE);
+                    secondActionButton.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            secondToLastMenuItem.onClick();
+                        }
+                    });
+                } else {
+                    secondActionButton.setVisibility(View.GONE);
+                }
+            }
+        } else {
+            menuButton.setVisibility(View.GONE);
+            firstActionButton.setVisibility(View.GONE);
+            secondActionButton.setVisibility(View.GONE);
+        }
     }
 
     private void restoreListViewScrollPosition() {
@@ -408,26 +684,44 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             byte fileType = (Byte) data[0];
             @SuppressWarnings("unchecked")
             List<FileDescriptor> items = (List<FileDescriptor>) data[1];
+            //todo dont recreate adapter - resuse old
             adapter = new FileListAdapter(getActivity(), items, fileType) {
-                @Override
-                protected void onItemChecked(CompoundButton v, boolean isChecked) {
-                    if (!isChecked) {
-                        filesBar.clearCheckAll();
-                    }
-                    super.onItemChecked(v, isChecked);
-                }
-
                 @Override
                 protected void onLocalPlay() {
                     if (adapter != null) {
                         saveListViewVisiblePosition(adapter.getFileType());
                     }
                 }
+
+                @Override
+                protected boolean onItemLongClicked(View v) {
+                    if (adapter.getFileType() == Constants.FILE_TYPE_RINGTONES) {
+                        UIUtils.showShortMessage(getActivity(), R.string.checkmode_invalid_type_message);
+                    } else if (fragmentState != ViewState.CHECK) {
+                        enterCheckState();
+                    } else {
+                        onItemClicked(v);
+                    }
+                    return true;
+                }
             };
+            adapter.setCheckState(fragmentState == ViewState.CHECK);
+            adapter.setOnItemCheckedListener(new AbstractListAdapter.OnItemCheckedListener<FileListAdapter.FileDescriptorItem>() {
+                @Override
+                public void onItemChecked(CompoundButton v, FileListAdapter.FileDescriptorItem item, boolean checked) {
+                    changeSelectAllCheckBoxSilently(adapter.getCheckedCount() == adapter.getCount());
+                    if (adapter.getCheckedCount() > 0) {
+                        menuButton.setVisibility(View.VISIBLE);
+                    } else {
+                        menuButton.setVisibility(View.GONE);
+                    }
+                    updateHeader();
+                }
+            });
             restorePreviouslyChecked();
-            restorePreviousFilter();
-            if (previousFilter != null) {
-                performFilter(previousFilter);
+            restoreFilterString();
+            if (filterString != null) {
+                performFilter(filterString);
             } else {
                 updateAdapter();
             }
@@ -442,12 +736,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     private void performFilter(String filterString) {
-        this.previousFilter = filterString;
+        this.filterString = filterString;
         if (adapter != null && filterString != null) {
             adapter.getFilter().filter(filterString, new Filter.FilterListener() {
                 @Override
                 public void onFilterComplete(int i) {
                     updateAdapter();
+                    updateHeader();
                 }
             });
         }
@@ -484,6 +779,122 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             currentButton.setChecked(false);
             nextButton.setChecked(true);
             nextButton.callOnClick();
+        }
+
+    }
+
+    public boolean inSpecialState() {
+        return fragmentState != ViewState.NORMAL;
+    }
+
+    public void endSpecialState() {
+        if (fragmentState == ViewState.CHECK) {
+            endCheckState();
+        } else if (fragmentState == ViewState.FILTERING) {
+            endFilteringState();
+        } else if (fragmentState == ViewState.FILTERED) {
+            endFilteredState();
+        }
+    }
+
+    public void enterCheckState() {
+        if (fragmentState != ViewState.CHECK) {
+            beforeCheckState = fragmentState; //might get called multiple times when in/out of background
+        }
+        fragmentState = ViewState.CHECK;
+        ((MainActivity) getActivity()).swapDrawerForBack(true);
+        enableSwipe(false);
+        adapter.setCheckState(true);
+        updateViewsToState();
+    }
+
+    public void endCheckState() {
+        fragmentState = beforeCheckState;
+        if (beforeCheckState == ViewState.FILTERED) {
+            ((MainActivity) getActivity()).swapDrawerForBack(true);
+        }
+        enableSwipe(true);
+        adapter.setCheckState(false);
+        adapter.clearChecked();
+        changeSelectAllCheckBoxSilently(false);
+        updateViewsToState();
+    }
+
+    public void enterFilteringState() {
+        fragmentState = ViewState.FILTERING;
+        ((MainActivity) getActivity()).swapDrawerForBack(true);
+        updateViewsToState();
+        enableSearchBar(true);
+    }
+
+    public void endFilteringState() {
+        fragmentState = ViewState.NORMAL;
+        enableSearchBar(false);
+        filterString = null;
+        reloadFiles(adapter.getFileType());
+        updateViewsToState();
+    }
+
+    public void enterFilteredState() {
+        fragmentState = ViewState.FILTERED;
+        enableSearchBar(false);
+        ((MainActivity) getActivity()).swapDrawerForBack(true);
+        updateViewsToState();
+    }
+
+    public void endFilteredState() {
+        fragmentState = ViewState.NORMAL;
+        enableSearchBar(false);
+        filterString = null;
+        reloadFiles(adapter.getFileType());
+        updateViewsToState();
+    }
+
+    private void enableSwipe(boolean enabled) {
+        swipe.setOnSwipeListener(enabled ? swipeListener : null);
+    }
+
+    private void enableSearchBar(boolean enabled) {
+        if (enabled) {
+            searchBar.setText(filterString);
+
+            searchBar.requestFocus();
+            searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean hasFocus) {
+                    if (!hasFocus) {
+                        getActivity().onBackPressed();
+                    }
+                }
+            });
+            searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        //do stuff
+                        String filter = textView.getText().toString();
+                        if (!StringUtils.isNullOrEmpty(filter)) {
+                            enterFilteredState();
+                            performFilter(filter);
+                            //mute change
+                            searchBar.setOnFocusChangeListener(null);
+                        }
+                        searchBar.clearFocus();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            searchBar.addTextChangedListener(textChangeFilterWatcher);
+
+            final InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.showSoftInput(searchBar, InputMethodManager.SHOW_IMPLICIT);
+        } else {
+            searchBar.removeTextChangedListener(textChangeFilterWatcher);
+            searchBar.setOnFocusChangeListener(null);
+            searchBar.setText(null);
+            searchBar.requestFocus();
+            UIUtils.hideKeyboardFromActivity(getActivity());
         }
     }
 
@@ -552,4 +963,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             browseFilesButtonClick(adapter.getFileType());
         }
     }
+
+    private enum ViewState {
+        NORMAL, CHECK, FILTERING, FILTERED
+    }
+
 }
