@@ -149,21 +149,28 @@ public final class ImageLoader {
         picasso.setIndicatorsEnabled(false);
     }
 
-    public void loadAndTransform(final Uri primaryUri, final Uri secondaryUri, final Transformation transformation, final ImageView imageView) {
+    public void loadAndTransform(final Uri primaryUri, final Uri secondaryUri, final Transformation transformation, final ImageView imageView, final boolean cache) {
         Callback.EmptyCallback callback = new Callback.EmptyCallback() {
             @Override
             public void onError() {
                 if (secondaryUri != null) {
-                    loadAndTransform(secondaryUri, transformation, imageView);
+                    loadAndTransform(secondaryUri, transformation, imageView, cache);
                 }
             }
         };
-        picasso.load(primaryUri).fit().transform(transformation).into(imageView, callback);
+
+        if (cache) {
+            picasso.load(primaryUri).fit().transform(transformation).into(imageView, callback);
+        } else {
+            picasso.load(primaryUri).fit().transform(transformation)
+                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE).into(imageView, callback);
+        }
     }
 
 
-    public void loadAndTransform(Uri uri, Transformation transformation, ImageView imageView) {
-        loadAndTransform(uri, null, transformation, imageView);
+    public void loadAndTransform(Uri uri, Transformation transformation, ImageView imageView, boolean cache) {
+        loadAndTransform(uri, null, transformation, imageView, cache);
     }
 
     public void load(Uri uri, ImageView target) {

@@ -125,7 +125,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
         final ImageLoader loader = ImageLoader.getInstance(context.getApplicationContext());
         loader.loadAndTransform(ImageLoader.getArtistArtUri(artist),
                 ImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
-                blur, mPhoto);
+                blur, mPhoto, false);
     }
 
     /**
