@@ -102,7 +102,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
     private Transformation blur = new Transformation() {
         @Override
         public Bitmap transform(Bitmap source) {
-            Bitmap blurred = BitmapUtils.createBlurredBitmap(source);
+            Bitmap blurred = BitmapUtils.createBlurredBitmap(getContext(), source);
             source.recycle();
             return blurred;
         }
