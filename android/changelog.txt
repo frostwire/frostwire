@@ -6,6 +6,7 @@ FrostWire 1.8.6 - NOV/30/2016
  - Transfer action bar hides menu button if no transfers present
  - Image loading/caching optimizations
  - Async GPU based Image Blurring on albums
+ - gson JSON parsing library upgraded to 2.8.0
 
 FrostWire 1.8.5 - NOV/21/2016
  - Search engines updates
