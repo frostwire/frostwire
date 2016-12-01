@@ -115,7 +115,6 @@
     <string name="downloads">下载</string>
     <string name="minimize_frostwire">FrostWire最小化</string>
     <string name="are_you_sure_you_wanna_leave">确定想回到主页界面?</string>
-    <string name="set_as_ringtone">设为铃声</string>
     <string name="set_as_wallpaper">设为墙纸</string>
     <string name="failed_to_set_wallpaper">无法设为墙纸</string>
     <string name="tell_others_chooser">推文 / 短信/ 邮箱</string>
@@ -364,7 +363,6 @@
     <string name="transfer_status_demuxing">多路抽取中</string>
     <string name="app_shutdown_dlg_message">這將關閉所有傳輸和後台服務。您確定？</string>
     <string name="ten_dollars">$10 美元</string>
-    <string name="one_file_shared">一個檔案已經分享到在同一 Wi-Fi 網絡上的 FrostWire 裝置。</string>
     <string name="saving_to_internal_memory">儲存到內置記憶體</string>
     <string name="dialog_desktop_upload_request_text_text">%1$s 要向您發送共計 %3$s 的 %2$s</string>
     <string name="my_filetype">我的%s</string>
@@ -457,7 +455,6 @@
     <string name="storage_setting_warning">警告：如果您卸載 FrostWire，通過 FrostWire 下載到 SD 卡的所有檔案將會被 ANDROID 刪除。</string>
     <string name="canceling">取消中</string>
     <string name="http_download_status_save_dir_error">儲存目錄不存在或無法創建</string>
-    <string name="n_files_shared">%d 個檔案已經分享到在相同 Wi-Fi 網絡上的 FrostWire 裝置。</string>
     <string name="install_bitcoin_wallet">安裝比特幣錢包 (Bitcoin Wallet)</string>
     <string name="device_storage">裝置容量</string>
     <string name="use_yify_summary">Yify 基於磁力，僅適用於 Wi-Fi</string>

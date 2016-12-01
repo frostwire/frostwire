@@ -1,28 +1,25 @@
-        <!--
-        /*
-         * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
-         * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
-         *
-         * This program is free software: you can redistribute it and/or modify
-         * it under the terms of the GNU General Public License as published by
-         * the Free Software Foundation, either version 3 of the License, or
-         * (at your option) any later version.
-         *
-         * This program is distributed in the hope that it will be useful,
-         * but WITHOUT ANY WARRANTY; without even the implied warranty of
-         * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-         * GNU General Public License for more details.
-         *
-         * You should have received a copy of the GNU General Public License
-         * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-         */
-        -->
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
 <resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * Chociaż bardzo zalecamy, <b> nie musisz mieć VPN aby korzystać z FrostWire. </b></p>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nie zabezpieczone połączenie oznacza że wszystko co robisz na internecie (łącznie z <b>wyszukiwaniami, przesyłaniem wiadomości lub ściąganiem plików</b>) może być monitorowane przez każdego na twojej sieci oraz twojego usługodawce internetowego.<br><br>Aby efektywnie zabezpieczyć połączenie i <b>uchronić prywatnośc na internetcie</b>, polecamy ExpressVPN</b>.]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Łączysz się z internetem używając VPN. Jeżeli jeszcze nie używasz <b>ExpressVPN</b>, to gorąco polecamy ten serwis do zabezpieczania twojego połączenia internetowego i <b>ochrony prywatności</b>.]]></string>
-
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ustawienia</string>
@@ -371,8 +368,6 @@
     <string name="donate_5">Podaruj $5</string>
     <string name="donate_10">Podaruj $10</string>
     <string name="donate_25">Podaruj $25</string>
-    <string name="one_file_shared">Jeden plik został udostępniony dla wszystkich urządzeń FrostWire w tej samej sieci Wi-Fi.</string>
-    <string name="n_files_shared">%d plików zostało udostępnionych dla wszystkich urządzeń FrostWire w tej samej sieci Wi-Fi</string>
     <string name="playing_now_colon">Odtwarzane teraz:</string>
     <string name="my_filetype">Moje %s</string>
     <string name="paused">Wstrzymano</string>
@@ -467,7 +462,6 @@
     <string name="cant_open_file_does_not_exist">Nie mogę otworzyć %1$s, plik nie istnieje.</string>
     <string name="saving_to_sd_card">Zapisuje na kartę SD.</string>
     <string name="help_translate_frostwire">Pomóż tłumaczyć FrostWire</string>
-    <string name="queued_for_checking">Zakolejkowane do sprawdzenia</string>
     <string name="checking_ellipsis">Sprawdzanie…</string>
     <string name="downloading_metadata">Pobieranie metadanych</string>
     <string name="error_moving_incomplete">Błąd: Przenoszenie niekompletne</string>

@@ -367,8 +367,6 @@
     <string name="donate_5">Don $5</string>
     <string name="donate_10">Don $10</string>
     <string name="donate_25">Don $25</string>
-    <string name="one_file_shared">Un dossier a été partagé avec d\'autres appareils sur le même réseau Wi-Fi FrostWire.</string>
-    <string name="n_files_shared">fichiers %D ont été partagés avec d\'autres appareils sur le même réseau Wi-Fi FrostWire.</string>
     <string name="playing_now_colon">Joue en ce moment:</string>
     <string name="my_filetype">Mon %s</string>
     <string name="paused">En pause</string>

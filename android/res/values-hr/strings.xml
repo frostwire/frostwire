@@ -295,7 +295,6 @@
     <string name="activity_uploads_title_text">Slanja</string>
     <string name="torrent_max_peers">Maksimalni broj preuzimatelja</string>
     <string name="clear_search_cache">Ocisti predmemoriju tražilice</string>
-    <string name="share_indication_dialog_title">Kako dijeliti/od-dijeliti datoteke</string>
     <string name="drawer_close">Zatvori navigacijsku ladicu</string>
     <string name="saving_to_internal_memory_description">Imate i SD karticu (%1$s dostupno)</string>
     <string name="type_here_to_search">Pišite ovdje kako biste počeli pretraživati</string>
@@ -312,7 +311,6 @@
     <string name="storage_preference_title">Odaberi lokaciju spremanja</string>
     <string name="loading_all">Učitavam sve</string>
     <string name="torrent_max_total_connections">Maksimum ukupnih konekcija</string>
-    <string name="one_file_shared">Jedna datoteka je bila dijeljenja sa FrostWire uredjajima na istoj Wi-Fi mreži.</string>
     <string name="delete_n_torrents_indexed">Obrisano %d indeksiranih torrenata</string>
     <string name="dialog_desktop_upload_request_text_text">%1$s vam želi poslati %2$s ukupno %3$s</string>
     <string name="please_check_connection_status_before_resuming_download">Molimo provjerite status vaše internetske veze prije nastavka.</string>
@@ -362,7 +360,6 @@
     <string name="clear_torrent_index_summary">Očisti indeks torrenata</string>
     <string name="send_my_geo_location_summary">Pingovi će poslati vašu prosječnu geografsku lokaciju kako bi našli okolne preuzimatelje.</string>
     <string name="wants_to_share_a_file">želi dijeliti datoteku</string>
-    <string name="dialog_share_indicator_check_text">Pokaži ovu pomoć sljedeći put</string>
     <string name="not_connected">Nije povezan</string>
     <string name="media_type_documents">Knjige/dokumenti</string>
     <string name="checking_ellipsis">Provjeravam&#8230;</string>
@@ -409,7 +406,6 @@
     <string name="free_download">Besplatno preuzimanje</string>
     <string name="internet_discovery_summary">Spoji se na daljinske preuzimatelje na Internetu.</string>
     <string name="couldnt_share_file">Ne mogu dijeliti ovu datoteku. Pronađena je čudna putanja.</string>
-    <string name="dialog_share_indicator_text_text">Browse yourself, Share or Unshare multiple files using the check boxes then touching any checked file.\n\nUse the padlock icons to share or unshare individual files.</string>
     <string name="seeding_wifi_settings_explanation">Dijeli samo putem Wi-Fi veze. Izbjegnite dodatne naplate vašeg operatera.</string>
     <string name="storage_setting_confirm_dialog_title">SD KARTICA</string>
     <string name="mobile_data">Mobilni podatci</string>
@@ -423,7 +419,6 @@
     <string name="sent_file_to_chat">Datoteka poslana u Chat</string>
     <string name="http_download_status_save_dir_error">Mapa za spremanje ne postoji ili ne može biti stvorena</string>
     <string name="view_transfer_list_item_group_indicator_description">Više/manje informacija</string>
-    <string name="n_files_shared">%d datoteka su podijeljenje FrostWire uređajima na istoj Wi-Fi mreži.</string>
     <string name="install_bitcoin_wallet">Instaliraj Bitcoin lisnicu</string>
     <string name="device_storage">Spremište uređaja</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">Idemo Vas postaviti prije nego što počnemo.</string>

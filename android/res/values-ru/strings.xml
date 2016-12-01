@@ -366,8 +366,6 @@
     <string name="donate_5">Пожертвовать $5</string>
     <string name="donate_10">Пожертвовать $10</string>
     <string name="donate_25">Пожертвовать $25</string>
-    <string name="one_file_shared">Один файл теперь доступен для устройств Frostwire в этой Wi-Fi сети.</string>
-    <string name="n_files_shared">%d файлов, теперь доступны для устройств с Frostwire в этой Wi-Fi сети.</string>
     <string name="playing_now_colon">Сейчас играет:</string>
     <string name="my_filetype">Мои %s</string>
     <string name="paused">На паузе</string>
