@@ -20,6 +20,7 @@
 <resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * Chociaż bardzo zalecamy, <b> nie musisz mieć VPN aby korzystać z FrostWire. </b></p>]]></string>
+
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ustawienia</string>
@@ -520,8 +521,6 @@
     <string name="thank_you">Wielkie Dzięki!</string>
     <string name="rate_our_app">Oceń Aplikację</string>
     <string name="your_privacy_is_a_fundamental_right_html">Twoja prywatność jest podstawowym prawem człowieka.</string>
-    <string name="unprotected_connections_visibility_bullet">Niezabezpieczone połączenie sprawia, że wszystko co robisz w Internecie, jak wyszukiwania, przeglądanie stron internetowych, wysłane wiadomości, e-maile i pobrane pliki, jest widoczne dla dostawcy Internetu jak i wszystkich w Twojej sieci. Rozważ VPN.</string>
-    <string name="protected_connections_visibility_bullet">Cieszymy się że ochraniasz swoją prywatność używając VPN. Twoje połączenie jest bezpieczne.</string>
     <string name="learn_more">Dowiedz się więcej</string>
     <string name="vpn_not_found">Brak VPNu. Polecamy zaszyfrowanie polączenia.</string>
     <string name="error_connection_timed_out">Błąd: przekroczono limit czasu połączenia. Spróbuj jeszcze raz. </string>
