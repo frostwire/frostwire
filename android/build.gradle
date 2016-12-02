@@ -111,6 +111,10 @@ android {
         abortOnError false
     }
 
+    packagingOptions {
+        exclude 'lib/arm64-v8a**'
+    }
+
     dexOptions {
         javaMaxHeapSize "2g"
         jumboMode = true
