@@ -26,7 +26,6 @@ import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -90,7 +89,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     @Override
     protected final void populateView(View view, FileDescriptorItem item) {
-        byte fileType = item.fd.fileType;
         if (fileType == Constants.FILE_TYPE_PICTURES || fileType == Constants.FILE_TYPE_VIDEOS || fileType == Constants.FILE_TYPE_APPLICATIONS || fileType == Constants.FILE_TYPE_AUDIO) {
             populateViewThumbnail(view, item);
         } else {
