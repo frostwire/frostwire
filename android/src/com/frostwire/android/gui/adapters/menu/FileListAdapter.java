@@ -70,7 +70,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private final DownloadButtonClickListener downloadButtonClickListener;
 
     protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType) {
-        super(context, getViewItemId(fileType), convertFiles(files));
+        super(context, R.layout.view_browse_thumbnail_peer_list_item, convertFiles(files));
         setShowMenuOnClick(true);
 
         FileListFilter fileListFilter = new FileListFilter();
@@ -90,7 +90,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     @Override
     protected final void populateView(View view, FileDescriptorItem item) {
-        if (getViewItemId() == R.layout.view_browse_thumbnail_peer_list_item) {
+        byte fileType = item.fd.fileType;
+        if (fileType == Constants.FILE_TYPE_PICTURES || fileType == Constants.FILE_TYPE_VIDEOS || fileType == Constants.FILE_TYPE_APPLICATIONS || fileType == Constants.FILE_TYPE_AUDIO) {
             populateViewThumbnail(view, item);
         } else {
             populateViewPlain(view, item);
@@ -306,8 +307,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         TextView title = findView(view, R.id.view_browse_peer_list_item_file_title);
         title.setText(fd.title);
 
-        populateContainerAction(view);
-
         TextView fileExtra = findView(view, R.id.view_browse_peer_list_item_extra_text);
         if (fd.fileType == Constants.FILE_TYPE_AUDIO || fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
             fileExtra.setText(fd.artist);
@@ -320,7 +319,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         TextView fileSize = findView(view, R.id.view_browse_peer_list_item_file_size);
         fileSize.setText(UIUtils.getBytesInHuman(fd.fileSize));
 
-        BrowseThumbnailImageButton downloadButton = findView(view, R.id.view_browse_peer_list_item_download);
+        BrowseThumbnailImageButton downloadButton = findView(view, R.id.view_browse_peer_list_item_file_thumbnail);
 
         if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD()) || fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD())) {
             downloadButton.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.STOP);
@@ -378,11 +377,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         size.setTextColor(res.getColor(R.color.browse_peer_listview_item_inactive_foreground));
     }
 
-    private void populateContainerAction(View view) {
-        ImageButton preview = findView(view, R.id.view_browse_peer_list_item_button_preview);
-        preview.setVisibility(View.GONE);
-    }
-
     private boolean showSingleOptions(List<FileDescriptor> checked, FileDescriptor fd) {
         //if ringtone - ignore other checked items
         if (fd.fileType == Constants.FILE_TYPE_RINGTONES) {
@@ -393,14 +387,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             return false;
         }
         return checked.size() != 1 || checked.get(0).equals(fd);
-    }
-
-    private static int getViewItemId(byte fileType) {
-        if (fileType == Constants.FILE_TYPE_PICTURES || fileType == Constants.FILE_TYPE_VIDEOS || fileType == Constants.FILE_TYPE_APPLICATIONS || fileType == Constants.FILE_TYPE_AUDIO) {
-            return R.layout.view_browse_thumbnail_peer_list_item;
-        } else {
-            return R.layout.view_browse_peer_list_item;
-        }
     }
 
     private static ArrayList<FileDescriptor> convertItems(Collection<FileDescriptorItem> items) {
