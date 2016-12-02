@@ -89,11 +89,15 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     @Override
     protected final void populateView(View view, FileDescriptorItem item) {
-        if (fileType == Constants.FILE_TYPE_PICTURES || fileType == Constants.FILE_TYPE_VIDEOS || fileType == Constants.FILE_TYPE_APPLICATIONS || fileType == Constants.FILE_TYPE_AUDIO) {
+        if (hasThumbnailView()) {
             populateViewThumbnail(view, item);
         } else {
             populateViewPlain(view, item);
         }
+    }
+
+    private boolean hasThumbnailView() {
+        return !in(fileType, Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_TORRENTS);
     }
 
     @Override
