@@ -32,6 +32,9 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -55,7 +58,7 @@ import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.util.ListViewScrollDirectionDetector;
+import com.frostwire.android.gui.util.DirectionDetectorScrollListener;
 import com.frostwire.android.gui.util.ScrollDirectionListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
@@ -298,9 +301,14 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             });
         }
-
         list.setAdapter(adapter);
-        new ListViewScrollDirectionDetector(list, new ScrollDirectionListener() {
+        list.setOnScrollListener(
+                DirectionDetectorScrollListener.createOnScrollListener(
+                        createScrollDirectionListener()));
+    }
+
+    private ScrollDirectionListener createScrollDirectionListener() {
+        return new ScrollDirectionListener() {
             @Override
             public void onScrollUp() {
                 onSearchScrollUp();
@@ -310,7 +318,7 @@ public final class SearchFragment extends AbstractFragment implements
             public void onScrollDown() {
                 onSearchScrollDown();
             }
-        });
+        };
     }
 
     private void onSearchScrollDown() {
@@ -318,7 +326,6 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void onSearchScrollUp() {
-        //listScrollDirectionDetector.disable(600);
         showSearchBox();
     }
 
@@ -327,6 +334,7 @@ public final class SearchFragment extends AbstractFragment implements
             return;
         }
         searchInput.setVisibility(View.VISIBLE);
+        adapter.notifyDataSetInvalidated();
     }
 
     private void hideSearchBox() {
@@ -334,6 +342,7 @@ public final class SearchFragment extends AbstractFragment implements
             return;
         }
         searchInput.setVisibility(View.GONE);
+        adapter.notifyDataSetInvalidated();
     }
 
     private void refreshFileTypeCounters(boolean fileTypeCountersVisible) {
@@ -343,7 +352,6 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_PICTURES, fileTypeCounter.fsr.numPictures);
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_TORRENTS, fileTypeCounter.fsr.numTorrents);
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_VIDEOS, fileTypeCounter.fsr.numVideo);
-
         searchInput.setFileTypeCountersVisible(fileTypeCountersVisible);
     }
 
@@ -699,7 +707,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
     }
 
-    private abstract class AnimatorAdapter implements Animator.AnimatorListener {
+    public abstract class AnimatorAdapter implements Animator.AnimatorListener {
         @Override
         public void onAnimationStart(Animator animator) {
 

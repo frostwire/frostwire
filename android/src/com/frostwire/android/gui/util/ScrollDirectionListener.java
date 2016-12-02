@@ -26,5 +26,4 @@ package com.frostwire.android.gui.util;
 public interface ScrollDirectionListener {
     void onScrollUp();
     void onScrollDown();
-
 }
