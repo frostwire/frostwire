@@ -113,6 +113,8 @@ android {
 
     packagingOptions {
         exclude 'lib/arm64-v8a**'
+        exclude 'lib/mips**'
+        exclude 'lib/x86_64**'
     }
 
     dexOptions {
