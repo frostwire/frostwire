@@ -57,7 +57,7 @@ public final class DirectionDetectorScrollListener {
                     disable(250L, enabled);
                     return;
                 }
-                boolean scrollingDown = firstVisibleItem > 2 && firstVisibleItem >= lastFirstVisibleItem;
+                boolean scrollingDown = firstVisibleItem > 4 && firstVisibleItem >= lastFirstVisibleItem;
                 boolean scrollingUp = firstVisibleItem < (totalItemCount - visibleItemCount) && firstVisibleItem <= lastFirstVisibleItem;
                 lastFirstVisibleItem = firstVisibleItem;
                 if (enabledScrolldown.get() && scrollingDown && !scrollingUp) {

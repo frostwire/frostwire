@@ -334,7 +334,6 @@ public final class SearchFragment extends AbstractFragment implements
             return;
         }
         searchInput.setVisibility(View.VISIBLE);
-        adapter.notifyDataSetInvalidated();
     }
 
     private void hideSearchBox() {
@@ -342,7 +341,6 @@ public final class SearchFragment extends AbstractFragment implements
             return;
         }
         searchInput.setVisibility(View.GONE);
-        adapter.notifyDataSetInvalidated();
     }
 
     private void refreshFileTypeCounters(boolean fileTypeCountersVisible) {
