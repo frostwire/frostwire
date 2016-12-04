@@ -16,8 +16,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import java.nio.IntBuffer;
-
 /**
  * {@link Bitmap} specific helpers.
  *
@@ -25,14 +23,9 @@ import java.nio.IntBuffer;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class BitmapUtils {
-
-    private static final float[] BOX_BLUR_KERNEL = new float[] {
-            0.0f, 0.2f, 0.0f,
-            0.2f, 0.2f, 0.2f,
-            0.0f, 0.2f, 0.0f,
-    };
-
-    /** This class is never instantiated */
+    /**
+     * This class is never instantiated
+     */
     private BitmapUtils() {
     }
 
@@ -40,10 +33,10 @@ public final class BitmapUtils {
      * This is only used when the launcher shortcut is created.
      *
      * @param bitmap The artist, album, genre, or playlist image that's going to
-     *            be cropped.
-     * @param size The new size.
+     *               be cropped.
+     * @param size   The new size.
      * @return A {@link Bitmap} that has been resized and cropped for a launcher
-     *         shortcut.
+     * shortcut.
      */
     public static final Bitmap resizeAndCropCenter(final Bitmap bitmap, final int size) {
         final int w = bitmap.getWidth();
@@ -52,7 +45,7 @@ public final class BitmapUtils {
             return bitmap;
         }
 
-        final float mScale = (float)size / Math.min(w, h);
+        final float mScale = (float) size / Math.min(w, h);
 
         final Bitmap mTarget = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         final int mWidth = Math.round(mScale * bitmap.getWidth());
@@ -62,147 +55,232 @@ public final class BitmapUtils {
         mCanvas.scale(mScale, mScale);
         final Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG);
         mCanvas.drawBitmap(bitmap, 0, 0, paint);
-        // TODO: perhaps recycle the input bitmap, this method is only used to put a Bitmap
-        // inside an INTENT.
+        bitmap.recycle();
         return mTarget;
     }
 
-    /** Input image will be recycled, make sure to keep a copy elsewhere if you will need it */
-    public static Bitmap blurBitmap(Bitmap image, boolean recycle) {
-        if (image == null) {
-            return null;
+
+    public static final Bitmap stackBlur(final Bitmap inputBitmap, int blurRadius, boolean recycle) {
+        // Stack Blur v1.0 from
+        // http://www.quasimondo.com/StackBlurForCanvas/StackBlurDemo.html
+        //
+        // Java Author: Mario Klingemann <mario at quasimondo.com>
+        // http://incubator.quasimondo.com
+        // created Feburary 29, 2004
+        // Android port : Yahel Bouaziz <yahel at kayenko.com>
+        // http://www.kayenko.com
+        // ported april 5th, 2012
+
+        // This is a compromise between Gaussian Blur and Box blur
+        // It creates much better looking blurs than Box Blur, but is
+        // 7x faster than my Gaussian Blur implementation.
+        //
+        // I called it Stack Blur because this describes best how this
+        // filter works internally: it creates a kind of moving stack
+        // of colors whilst scanning through the image. Thereby it
+        // just has to add one new block of color to the right side
+        // of the stack and remove the leftmost color. The remaining
+        // colors on the topmost layer of the stack are either added on
+        // or reduced by one, depending on if they are on the right or
+        // on the left side of the stack.
+        //
+        // If you are using this algorithm in your code please add
+        // the following line:
+        //
+        // Stack Blur Algorithm by Mario Klingemann <mario@quasimondo.com>
+
+        final Bitmap mBitmap = inputBitmap.copy(inputBitmap.getConfig(), true);
+
+        final int w = mBitmap.getWidth();
+        final int h = mBitmap.getHeight();
+
+        final int[] pix = new int[w * h];
+        mBitmap.getPixels(pix, 0, w, 0, 0, w, h);
+
+        final int wm = w - 1;
+        final int hm = h - 1;
+        final int wh = w * h;
+        final int div = blurRadius + blurRadius + 1;
+
+        final int r[] = new int[wh];
+        final int g[] = new int[wh];
+        final int b[] = new int[wh];
+        final int vmin[] = new int[Math.max(w, h)];
+        int rsum, gsum, bsum, x, y, i, p, yp, yi, yw;
+
+        int divsum = div + 1 >> 1;
+        divsum *= divsum;
+        final int dv[] = new int[256 * divsum];
+        for (i = 0; i < 256 * divsum; i++) {
+            dv[i] = i / divsum;
         }
-        // 3 passes approximates gaussian blur, let's do 2
-        image = convoluteBitmap(image, BOX_BLUR_KERNEL, recycle);
-        return convoluteBitmap(image, BOX_BLUR_KERNEL, recycle);
-    }
 
-    /** Given an X,Y coordinate and the dimensions of our Matrix, it returns the corresponding offset on a linear array */
-    private static int xy2i(int x, int y, int w, int h) {
-        int offset = x*w + y;
-        if (offset >= w*h) { offset = (w*h)-1; }
-        return offset;
-    }
+        yw = yi = 0;
 
-    /**
-     * Note: This convolution algorithm crops out the edges. Other options are wrapping and extending.
-     * See https://www.wikiwand.com/en/Kernel_(image_processing)#/Edge_Handling
-     * @param inputBitmap
-     * @param kernel
-     * @param recycle
-     * @return
-     */
-    public static Bitmap convoluteBitmap(Bitmap inputBitmap, float[] kernel, boolean recycle) {
-        int w = inputBitmap.getWidth();
-        int h = inputBitmap.getHeight();
-        int[] pixels = new int[w * h];
-        inputBitmap.getPixels(pixels, 0, w, 0, 0, w, h);
-        for (int x = 1; x < w-1; x++) {
-            for (int y = 1; y < h-1; y++) {
-                convolutePixel(pixels, x, y, w, h, kernel);
+        final int[][] stack = new int[div][3];
+        int stackpointer;
+        int stackstart;
+        int[] sir;
+        int rbs;
+        final int r1 = blurRadius + 1;
+        int routsum, goutsum, boutsum;
+        int rinsum, ginsum, binsum;
+
+        for (y = 0; y < h; y++) {
+            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
+            for (i = -blurRadius; i <= blurRadius; i++) {
+                p = pix[yi + Math.min(wm, Math.max(i, 0))];
+                sir = stack[i + blurRadius];
+                sir[0] = (p & 0xff0000) >> 16;
+                sir[1] = (p & 0x00ff00) >> 8;
+                sir[2] = p & 0x0000ff;
+                rbs = r1 - Math.abs(i);
+                rsum += sir[0] * rbs;
+                gsum += sir[1] * rbs;
+                bsum += sir[2] * rbs;
+                if (i > 0) {
+                    rinsum += sir[0];
+                    ginsum += sir[1];
+                    binsum += sir[2];
+                } else {
+                    routsum += sir[0];
+                    goutsum += sir[1];
+                    boutsum += sir[2];
+                }
+            }
+            stackpointer = blurRadius;
+
+            for (x = 0; x < w; x++) {
+
+                r[yi] = dv[rsum];
+                g[yi] = dv[gsum];
+                b[yi] = dv[bsum];
+
+                rsum -= routsum;
+                gsum -= goutsum;
+                bsum -= boutsum;
+
+                stackstart = stackpointer - blurRadius + div;
+                sir = stack[stackstart % div];
+
+                routsum -= sir[0];
+                goutsum -= sir[1];
+                boutsum -= sir[2];
+
+                if (y == 0) {
+                    vmin[x] = Math.min(x + blurRadius + 1, wm);
+                }
+                p = pix[yw + vmin[x]];
+
+                sir[0] = (p & 0xff0000) >> 16;
+                sir[1] = (p & 0x00ff00) >> 8;
+                sir[2] = p & 0x0000ff;
+
+                rinsum += sir[0];
+                ginsum += sir[1];
+                binsum += sir[2];
+
+                rsum += rinsum;
+                gsum += ginsum;
+                bsum += binsum;
+
+                stackpointer = (stackpointer + 1) % div;
+                sir = stack[stackpointer % div];
+
+                routsum += sir[0];
+                goutsum += sir[1];
+                boutsum += sir[2];
+
+                rinsum -= sir[0];
+                ginsum -= sir[1];
+                binsum -= sir[2];
+
+                yi++;
+            }
+            yw += w;
+        }
+
+        for (x = 0; x < w; x++) {
+            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
+            yp = -blurRadius * w;
+            for (i = -blurRadius; i <= blurRadius; i++) {
+                yi = Math.max(0, yp) + x;
+
+                sir = stack[i + blurRadius];
+
+                sir[0] = r[yi];
+                sir[1] = g[yi];
+                sir[2] = b[yi];
+
+                rbs = r1 - Math.abs(i);
+
+                rsum += r[yi] * rbs;
+                gsum += g[yi] * rbs;
+                bsum += b[yi] * rbs;
+
+                if (i > 0) {
+                    rinsum += sir[0];
+                    ginsum += sir[1];
+                    binsum += sir[2];
+                } else {
+                    routsum += sir[0];
+                    goutsum += sir[1];
+                    boutsum += sir[2];
+                }
+
+                if (i < hm) {
+                    yp += w;
+                }
+            }
+            yi = x;
+            stackpointer = blurRadius;
+            for (y = 0; y < h; y++) {
+                pix[yi] = 0xff000000 | dv[rsum] << 16 | dv[gsum] << 8 | dv[bsum];
+
+                rsum -= routsum;
+                gsum -= goutsum;
+                bsum -= boutsum;
+
+                stackstart = stackpointer - blurRadius + div;
+                sir = stack[stackstart % div];
+
+                routsum -= sir[0];
+                goutsum -= sir[1];
+                boutsum -= sir[2];
+
+                if (x == 0) {
+                    vmin[y] = Math.min(y + r1, hm) * w;
+                }
+                p = x + vmin[y];
+
+                sir[0] = r[p];
+                sir[1] = g[p];
+                sir[2] = b[p];
+
+                rinsum += sir[0];
+                ginsum += sir[1];
+                binsum += sir[2];
+
+                rsum += rinsum;
+                gsum += ginsum;
+                bsum += binsum;
+
+                stackpointer = (stackpointer + 1) % div;
+                sir = stack[stackpointer];
+
+                routsum += sir[0];
+                goutsum += sir[1];
+                boutsum += sir[2];
+
+                rinsum -= sir[0];
+                ginsum -= sir[1];
+                binsum -= sir[2];
+
+                yi += w;
             }
         }
-        if (recycle) {
-            inputBitmap.recycle();
-        }
-        IntBuffer buffer = IntBuffer.wrap(pixels);
-        buffer.rewind();
-        Bitmap convolutedSmallBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        convolutedSmallBitmap.copyPixelsFromBuffer(buffer);
-        return convolutedSmallBitmap;
-    }
 
-    /** It assumes the given kernel is a 3x3 matrix
-     *
-     * Given a pixel array, it takes a 3x3 matrix 'A' around the given
-     * (x,y) coordinate and it applies the following convolution
-     * operation against a 3x3 kernel to obtain the transformed value at x,y
-     *   kernel                 A
-     * [ a b c ]           [ 1 2 3 ]
-     * [ d e f ] CONVOLUTE [ 4 5 6 ] => [x,y]' = (i*1)+(h*2)+(g*3)+(f*4)+(e*5)+(d*6)+(c*7)+(b*8)+(a*9)
-     * [ g h i ]           [ 7 8 9 ]
-     *
-     *
-     * @param pixels - the entire bitmap in a pixel array
-     * @param x - x coordinate being convoluted
-     * @param y - y coordinate being convoluted
-     * @param w - entire bitmap's width
-     * @param h - entire bitmap's height
-     * @param kernel - 3x3 convolution kernel as a one dimensional float array
-     */
-    private static void convolutePixel(int[] pixels, int x, int y, int w, int h, float[] kernel) {
-        if (x == 0 || y == 0 || x == w-1 || y == h-1) {
-            return;
-        }
-        // Populate convolution matrix around given X,Y coordinate, a 3x3 matrix of values around us.
-        int[] A = new int[9]; //3x3 matrix around the given x,y coordinate
-        A[xy2i(0, 0, 3, 3)] = pixels[xy2i(x - 1, y - 1, w, h)];
-        A[xy2i(1, 0, 3, 3)] = pixels[xy2i(x, y - 1, w, h)];
-        A[xy2i(2, 0, 3, 3)] = pixels[xy2i(x + 1, y - 1, w, h)];
-        A[xy2i(0, 1, 3, 3)] = pixels[xy2i(x - 1, y, w, h)];
-        A[xy2i(1, 1, 3, 3)] = pixels[xy2i(x, y, w, h)];
-        A[xy2i(2, 1, 3, 3)] = pixels[xy2i(x + 1, y, w, h)];
-        A[xy2i(0, 2, 3, 3)] = pixels[xy2i(x - 1, y + 1, w, h)];
-        A[xy2i(1, 2, 3, 3)] = pixels[xy2i(x, y + 1, w, h)];
-        A[xy2i(2, 2, 3, 3)] = pixels[xy2i(x + 1, y + 1, w, h)];
-        // convolution operation (not matrix multiplication)
-
-        pixels[xy2i(x, y, w, h)] =
-                PixelARGB_8888.multiplyByFloat(kernel[xy2i(2, 2, 3, 3)], A[xy2i(0, 0, 3, 3)], true) +
-                PixelARGB_8888.multiplyByFloat(kernel[xy2i(1, 2, 3, 3)], A[xy2i(1, 0, 3, 3)], true) +
-                PixelARGB_8888.multiplyByFloat(kernel[xy2i(0, 2, 3, 3)], A[xy2i(2, 0, 3, 3)], true) +
-
-                PixelARGB_8888.multiplyByFloat(kernel[xy2i(2, 1, 3, 3)], A[xy2i(0, 1, 3, 3)], true) +
-
-                PixelARGB_8888.multiplyByFloat(kernel[xy2i(1, 1, 3, 3)], A[xy2i(1, 1, 3, 3)], true) +
-
-                PixelARGB_8888.multiplyByFloat(kernel[xy2i(0, 1, 3, 3)], A[xy2i(2, 1, 3, 3)], true) +
-
-                PixelARGB_8888.multiplyByFloat(kernel[xy2i(2, 0, 3, 3)], A[xy2i(0, 2, 3, 3)], true) +
-                PixelARGB_8888.multiplyByFloat(kernel[xy2i(1, 0, 3, 3)], A[xy2i(1, 2, 3, 3)], true) +
-                PixelARGB_8888.multiplyByFloat(kernel[xy2i(0, 0, 3, 3)], A[xy2i(2, 2, 3, 3)], true);
-    }
-
-    /** ARGB_8888 Pixel abstraction */
-    public static class PixelARGB_8888 {
-        public final byte a;
-        public final byte r;
-        public final byte g;
-        public final byte b;
-        public final int intVal;
-
-        public PixelARGB_8888(final int argb32bitInt) {
-            a = (byte) ((argb32bitInt >> 24) & 0xff);
-            r = (byte) ((argb32bitInt >> 16) & 0xff);
-            g = (byte) ((argb32bitInt >> 8) & 0xff);
-            b = (byte) (argb32bitInt & 0xff);
-            intVal = argb32bitInt;
-        }
-
-        public PixelARGB_8888(byte a, byte r, byte g, byte b) {
-            this.a = a;
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            intVal = (a << 24) + (r << 16) + (g << 8) + b;
-        }
-
-        public static int multiplyByFloat(float factor, int arg32bitInt) {
-            return multiplyByFloat(factor, arg32bitInt, false);
-        }
-
-        public static int multiplyByFloat(float factor, int argb32bitInt, boolean multiplyAlphaChannel) {
-            PixelARGB_8888 original = new PixelARGB_8888(argb32bitInt);
-            byte alpha = original.a;
-            if (multiplyAlphaChannel) {
-                alpha = (byte) (original.a * factor);
-            }
-            PixelARGB_8888 multiplied = new PixelARGB_8888(
-                    alpha,
-                    (byte) (factor * original.r),
-                    (byte) (factor * original.g),
-                    (byte) (factor * original.b));
-            return multiplied.intVal;
-        }
+        mBitmap.setPixels(pix, 0, w, 0, 0, w, h);
+        return mBitmap;
     }
 }
