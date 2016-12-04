@@ -101,7 +101,17 @@ public class CarouselTab extends FrameLayoutWithOverlay {
     private class BlurFilter implements ImageLoader.Filter {
         @Override
         public Bitmap filter(Bitmap source) {
-            return BitmapUtils.createBlurredBitmap(getContext(), source);
+            // scale down image to operate in less pixels
+            final int origW = source.getWidth();
+            final int origH = source.getHeight();
+            final int scalW = (int) (origW * 0.4f);
+            final int scalH = (int) (origH * 0.4f);
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(source, scalW, scalH, true);
+            source.recycle();
+
+            Bitmap blurredBitmap = BitmapUtils.blurBitmap(scaledBitmap, true);
+            scaledBitmap.recycle();
+            return blurredBitmap;
         }
 
         @Override
@@ -122,8 +132,10 @@ public class CarouselTab extends FrameLayoutWithOverlay {
         final ImageLoader loader = ImageLoader.getInstance(context.getApplicationContext());
         ImageLoader.Filter filter = new BlurFilter();
         loader.load(ImageLoader.getArtistArtUri(artist),
-                ImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
-                filter, mPhoto, false);
+                    ImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
+                    filter,
+                    mPhoto,
+                    false);
     }
 
     /**
