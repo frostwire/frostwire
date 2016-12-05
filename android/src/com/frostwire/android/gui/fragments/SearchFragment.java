@@ -193,10 +193,17 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput = findView(view, R.id.fragment_search_input);
         searchInput.setShowKeyboardOnPaste(true);
         searchInput.setOnSearchListener(new SearchInputOnSearchListener((LinearLayout) view, this));
+
+        // Whenever we click on a media type radio button this is triggered.
+        // it is also triggered when we swip to the left or right, as this gesture
+        // is handled by issuing a media type radio button click.
         searchInput.setOnRadioButtonsListener(new SearchInputView.RadioButtonsListener() {
             @Override
             public void onClick(int mediaType) {
-                onSearchScrollUp();
+                if (searchProgress.getVisibility() == View.GONE ||
+                    (list != null && list.getFirstVisiblePosition() < 2)) {
+                    onSearchScrollUp();
+                }
             }
         });
 
@@ -220,7 +227,6 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             }
         });
-
         list = findView(view, R.id.fragment_search_list);
         SwipeLayout swipe = findView(view, R.id.fragment_search_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
@@ -234,7 +240,6 @@ public final class SearchFragment extends AbstractFragment implements
                 switchToThe(false);
             }
         });
-
         showSearchView(view);
         showRatingsReminder(view);
     }

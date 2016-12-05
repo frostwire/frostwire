@@ -59,7 +59,6 @@ public class SearchProgressView extends LinearLayout {
     public void setProgressEnabled(boolean enabled) {
         if (this.progressEnabled != enabled) {
             this.progressEnabled = enabled;
-
             if (enabled) {
                 startProgress();
             } else {
@@ -76,7 +75,6 @@ public class SearchProgressView extends LinearLayout {
         if (textTryOtherKeywords != null) {
             textTryOtherKeywords.setVisibility(View.VISIBLE);
         }
-
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
             textTryFrostWirePlus.setVisibility(View.VISIBLE);
         }
@@ -86,7 +84,6 @@ public class SearchProgressView extends LinearLayout {
         if (textTryOtherKeywords != null) {
             textTryOtherKeywords.setVisibility(View.GONE);
         }
-
         if (textTryFrostWirePlus != null) {
             textTryFrostWirePlus.setVisibility(View.GONE);
         }
