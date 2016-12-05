@@ -60,7 +60,7 @@ public final class BitmapUtils {
     }
 
 
-    public static final Bitmap stackBlur(final Bitmap inputBitmap, int blurRadius, boolean recycle) {
+    public static final Bitmap stackBlur(final Bitmap inputBitmap, int blurRadius) {
         // Stack Blur v1.0 from
         // http://www.quasimondo.com/StackBlurForCanvas/StackBlurDemo.html
         //

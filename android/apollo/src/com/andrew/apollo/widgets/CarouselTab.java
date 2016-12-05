@@ -107,7 +107,10 @@ public class CarouselTab extends FrameLayoutWithOverlay {
             final int scaledW = (int) (origW * 0.5f);
             final int scaledH = (int) (origH * 0.5f);
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(source, scaledW, scaledH, true);
-            return BitmapUtils.stackBlur(scaledBitmap, 16, true);
+            source.recycle();
+            Bitmap blurredBitmap = BitmapUtils.stackBlur(scaledBitmap, 16);
+            scaledBitmap.recycle();
+            return blurredBitmap;
         }
 
         @Override
