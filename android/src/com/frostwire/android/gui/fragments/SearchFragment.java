@@ -104,7 +104,6 @@ public final class SearchFragment extends AbstractFragment implements
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
     private SearchResultListAdapter adapter;
     private List<Slide> slides;
-
     private SearchInputView searchInput;
     private ProgressBar deepSearchProgress;
     private PromotionsView promotions;
@@ -119,7 +118,6 @@ public final class SearchFragment extends AbstractFragment implements
         super(R.layout.fragment_search);
         fileTypeCounter = new FileTypeCounter();
         currentQuery = null;
-
         toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS);
         toTheRightOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_PICTURES);
         toTheRightOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_APPLICATIONS);
@@ -152,7 +150,6 @@ public final class SearchFragment extends AbstractFragment implements
 
     @Override
     public View getHeader(Activity activity) {
-
         LayoutInflater inflater = LayoutInflater.from(activity);
         @SuppressLint("InflateParams") TextView header = (TextView) inflater.inflate(R.layout.view_main_fragment_simple_header, null);
         header.setText(R.string.search);
@@ -189,7 +186,6 @@ public final class SearchFragment extends AbstractFragment implements
 
     @Override
     public void onShow() {
-
     }
 
     @Override
@@ -197,6 +193,12 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput = findView(view, R.id.fragment_search_input);
         searchInput.setShowKeyboardOnPaste(true);
         searchInput.setOnSearchListener(new SearchInputOnSearchListener((LinearLayout) view, this));
+        searchInput.setOnRadioButtonsListener(new SearchInputView.RadioButtonsListener() {
+            @Override
+            public void onClick(int mediaType) {
+                onSearchScrollUp();
+            }
+        });
 
         deepSearchProgress = findView(view, R.id.fragment_search_deepsearch_progress);
         deepSearchProgress.setVisibility(View.GONE);
@@ -224,13 +226,11 @@ public final class SearchFragment extends AbstractFragment implements
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override
             public void onSwipeLeft() {
-                showSearchBox();
                 switchToThe(true);
             }
 
             @Override
             public void onSwipeRight() {
-                showSearchBox();
                 switchToThe(false);
             }
         });

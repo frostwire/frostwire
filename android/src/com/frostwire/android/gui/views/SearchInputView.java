@@ -41,18 +41,13 @@ import com.frostwire.uxstats.UXStats;
  *
  */
 public class SearchInputView extends LinearLayout {
-
     private final TextInputClickListener textInputListener;
     private final SuggestionsAdapter adapter;
-
     private ClearableEditTextView textInput;
-
     private View dummyFocusView;
-
     private OnSearchListener onSearchListener;
-
     private int mediaTypeId;
-    
+    private RadioButtonsListener radioButtonsListener;
     private final SparseIntArray mediaTypeToRadioButtonMap;
 
     public SearchInputView(Context context, AttributeSet set) {
@@ -104,6 +99,14 @@ public class SearchInputView extends LinearLayout {
 
     public void hideTextInput() {
         textInput.setVisibility(View.GONE);
+    }
+
+    public void setOnRadioButtonsListener(RadioButtonsListener listener) {
+        radioButtonsListener = listener;
+    }
+
+    public RadioButtonsListener getOnRadioButtonsListener() {
+        return radioButtonsListener;
     }
 
     @Override
@@ -216,6 +219,10 @@ public class SearchInputView extends LinearLayout {
         onMediaTypeSelected(mediaTypeId);
         SearchInputView.this.mediaTypeId = mediaTypeId;
         ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId);
+
+        if (radioButtonsListener != null) {
+            radioButtonsListener.onClick(mediaTypeId);
+        }
     }
 
     public interface OnSearchListener {
@@ -322,5 +329,9 @@ public class SearchInputView extends LinearLayout {
             owner.radioButtonFileTypeClick(fileType);
             UXStats.instance().log(UXAction.SEARCH_RESULT_FILE_TYPE_CLICK);
         }
+    }
+
+    public interface RadioButtonsListener {
+        void onClick(int mediaType);
     }
 }
