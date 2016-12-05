@@ -200,7 +200,7 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput.setOnRadioButtonsListener(new SearchInputView.RadioButtonsListener() {
             @Override
             public void onClick(int mediaType) {
-                if (searchProgress.getVisibility() == View.GONE ||
+                if (searchProgress.getVisibility() == View.VISIBLE ||
                     (list != null && list.getFirstVisiblePosition() < 2)) {
                     onSearchScrollUp();
                 }
