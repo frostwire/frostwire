@@ -318,10 +318,12 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void onSearchScrollDown() {
+        getActivity().getActionBar().hide();
         hideSearchBox();
     }
 
     private void onSearchScrollUp() {
+        getActivity().getActionBar().show();
         showSearchBox();
     }
 
