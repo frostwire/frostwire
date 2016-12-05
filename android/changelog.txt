@@ -1,4 +1,5 @@
-FrostWire 1.8.6 - DEC/03/2016
+FrostWire 1.8.6 - DEC/04/2016
+ - Search window title bar and text bar hides when scrolling down on search results
  - New Ukranian translation
  - Fixes Archive.org search
  - Fixes checkbox/menu selection options bug on My files
