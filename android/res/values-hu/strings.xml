@@ -19,7 +19,9 @@
  */
 -->
 <resources>
-
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Egy védett kapcsolat azt jelenti, mindent, amit csinál az interneten (beleértve a <b>keresést, üzenetküldő és letöltések</b>) lehet követni bárki a hálózaton, és még az internet-szolgáltató.<br><br>Javasoljuk a ExpressVPN hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bár ajánlott a letöltéseket, <b>akkor nem kell egy VPN használata FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Te kapcsolódik az internethez VPN. <br><br> Ha még nem, javasoljuk a <b>ExpressVPN</b> hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>. ]]></string>
     <string name="vpn_not_found">Nem VPN. Tekintsük titkosítása kapcsolatot.</string>
     <string name="azureus_peer_manager_status_finished">Befejezett</string>
     <string name="activity_mediaplayer_name">Médialejátszó</string>
@@ -227,7 +229,6 @@
     <string name="wifi_sharing">Wi-Fi megosztási</string>
     <string name="use_clearbits">Használja ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">Maximális teljes kapcsolatok</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Egy védett kapcsolat azt jelenti, mindent, amit csinál az interneten (beleértve a <b>keresést, üzenetküldő és letöltések</b>) lehet követni bárki a hálózaton, és még az internet-szolgáltató.<br><br>Javasoljuk a ExpressVPN hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>.]]></string>
     <string name="toast_on_disconnect">Leválasztva a BitTorrent. Minden BitTorrent transzferek abbahagyta.</string>
     <string name="transfers_select_downloading">letöltését</string>
     <string name="clear_torrent_index_summary">Tiszta torrent index</string>
@@ -381,7 +382,6 @@
     <string name="save_bandwidth">Mentés sávszélesség</string>
     <string name="accept_connection_from">Csatlakozásának elfogadásához</string>
     <string name="vpn_client_feature_4">24/7 ügyfélszolgálat</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bár ajánlott a letöltéseket, <b>akkor nem kell egy VPN használata FrostWire. </b>]]></string>
     <string name="vpn_client_feature_1">Katonai szintű titkosítást</string>
     <string name="transfers_context_resume_all_torrent_transfers">Folytatás minden torrent transzferek</string>
     <string name="vpn_client_feature_3">Magán és logless böngészés</string>
@@ -598,7 +598,6 @@
     <string name="application">Alkalmazhatóság</string>
     <string name="update_title">Frissítse idő!</string>
     <string name="use_btjunkie">Használja BTJunkie</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Te kapcsolódik az internethez VPN. <br><br> Ha még nem, javasoljuk a <b>ExpressVPN</b> hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>. ]]></string>
     <string name="peer_http_download_status_downloading">A letöltés</string>
     <string name="picture">Kép</string>
     <string name="files_shared">megosztott fájlok</string>
