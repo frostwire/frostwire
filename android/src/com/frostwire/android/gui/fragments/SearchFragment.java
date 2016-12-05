@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -32,9 +31,6 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -702,28 +698,6 @@ public final class SearchFragment extends AbstractFragment implements
                 owner.startActivity(intent);
             } catch (Throwable ignored) {
             }
-        }
-    }
-
-    public abstract class AnimatorAdapter implements Animator.AnimatorListener {
-        @Override
-        public void onAnimationStart(Animator animator) {
-
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animator) {
-
-        }
-
-        @Override
-        public void onAnimationCancel(Animator animator) {
-
-        }
-
-        @Override
-        public void onAnimationRepeat(Animator animator) {
-
         }
     }
 }
