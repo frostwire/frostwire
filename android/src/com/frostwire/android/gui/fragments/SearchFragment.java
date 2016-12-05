@@ -224,11 +224,13 @@ public final class SearchFragment extends AbstractFragment implements
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override
             public void onSwipeLeft() {
+                showSearchBox();
                 switchToThe(true);
             }
 
             @Override
             public void onSwipeRight() {
+                showSearchBox();
                 switchToThe(false);
             }
         });
@@ -328,17 +330,11 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void showSearchBox() {
-        if (searchInput.getVisibility() == View.VISIBLE) {
-            return;
-        }
-        searchInput.setVisibility(View.VISIBLE);
+        searchInput.showTextInput();
     }
 
     private void hideSearchBox() {
-        if (searchInput.getVisibility() == View.GONE) {
-            return;
-        }
-        searchInput.setVisibility(View.GONE);
+        searchInput.hideTextInput();
     }
 
     private void refreshFileTypeCounters(boolean fileTypeCountersVisible) {

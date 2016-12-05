@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,10 +57,8 @@ public class SearchInputView extends LinearLayout {
 
     public SearchInputView(Context context, AttributeSet set) {
         super(context, set);
-
         this.textInputListener = new TextInputClickListener(this);
         this.adapter = new SuggestionsAdapter(context);
-        
         mediaTypeToRadioButtonMap = new SparseIntArray(6);
     }
 
@@ -100,6 +98,14 @@ public class SearchInputView extends LinearLayout {
         textInput.setHint(newHint);
     }
 
+    public void showTextInput() {
+        textInput.setVisibility(View.VISIBLE);
+    }
+
+    public void hideTextInput() {
+        textInput.setVisibility(View.GONE);
+    }
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -111,9 +117,7 @@ public class SearchInputView extends LinearLayout {
         }
 
         mediaTypeId = ConfigurationManager.instance().getLastMediaTypeFilter();
-
         textInput = (ClearableEditTextView) findViewById(R.id.view_search_input_text_input);
-
         textInput.setOnKeyListener(textInputListener);
         textInput.setOnActionListener(textInputListener);
         textInput.setOnItemClickListener(textInputListener);
@@ -141,12 +145,10 @@ public class SearchInputView extends LinearLayout {
         textInput.setListSelection(-1);
         textInput.dismissDropDown();
         adapter.discardLastResult();
-
         String query = textInput.getText().toString().trim();
         if (query.length() > 0) {
             onSearch(query, mediaTypeId);
         }
-
         dummyFocusView.requestFocus();
     }
 
