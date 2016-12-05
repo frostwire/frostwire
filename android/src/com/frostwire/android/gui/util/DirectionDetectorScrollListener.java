@@ -21,12 +21,14 @@ package com.frostwire.android.gui.util;
 import android.widget.AbsListView;
 
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.util.Logger;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created on 11/23/16.
+ *
  * @author gubatron
  * @author aldenml
  */
@@ -35,39 +37,105 @@ public final class DirectionDetectorScrollListener {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(DirectionDetectorScrollListener.class);
 
+    private static final class EventCandidates {
+        private byte ups;
+        private byte downs;
+        EventCandidates() { reset(); }
+        void reset() { ups = downs = 0; }
+        void up() {          ups++;
+        }
+        void down() {
+            downs++;
+        }
+        byte total() {
+            return (byte) (ups + downs);
+        }
+        byte delta() {
+            return (byte) Math.abs(ups - downs);
+        }
+        byte ups() {
+            return ups;
+        }
+        byte downs() {
+            return downs;
+        }
+        public String toString() {
+            return "EventCandidates: total=" + total() + " ups=" + ups + " downs=" + downs + " delta=" + delta();
+        }
+    }
+
     public static AbsListView.OnScrollListener createOnScrollListener(final ScrollDirectionListener scrollDirectionListener) {
         return new AbsListView.OnScrollListener() {
             private int lastFirstVisibleItem;
-            private int lastVisibleItemCount;
             private AtomicBoolean enabled = new AtomicBoolean(true);
+            private AtomicBoolean inMotion = new AtomicBoolean(false);
             private AtomicBoolean enabledScrolldown = new AtomicBoolean(true);
-            private AtomicBoolean enabledScrollup = new AtomicBoolean(false);
+            private AtomicBoolean enabledScrollup = new AtomicBoolean(true);
+            private final EventCandidates candidates = new EventCandidates();
+            private final int MIN_CANDIDATES = 4;
+            private final long DISABLE_INTERVAL_ON_EVENT = 100L;
+
+
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+                switch (scrollState) {
+                    case SCROLL_STATE_IDLE:
+                        inMotion.set(false);
+
+                        // We're not truly idle unless we're this way a little longer.
+                        Runnable r = new Runnable() {
+                            public void run() {
+                                try {
+                                    Thread.currentThread().sleep(400);
+                                } catch (Throwable ignored) {}
+                                if (!inMotion.get()) {
+                                    onIdle();
+                                }
+                            }
+                        };
+                        Engine.instance().getThreadPool().submit(r);
+                        break;
+                    case SCROLL_STATE_FLING:
+                        inMotion.set(true);
+                        onFling();
+                        break;
+                    case SCROLL_STATE_TOUCH_SCROLL:
+                        inMotion.set(true);
+                        onTouchScroll();
+                        break;
+                }
             }
+
+            private void onFling() {
+                checkCandidates();
+            }
+
+            private void onTouchScroll() {
+                checkCandidates();
+            }
+
+            private void onIdle() {
+                candidates.reset();
+            }
+
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (!enabled.get() || scrollDirectionListener == null) {
                     return;
                 }
-                // layout changes during scrolling
-                if (visibleItemCount != lastVisibleItemCount) {
-                    // more vertical space might mean we're going down
-                    lastVisibleItemCount = visibleItemCount;
-                    disable(250L, enabled);
-                    return;
-                }
-                boolean scrollingDown = firstVisibleItem > 4 && firstVisibleItem >= lastFirstVisibleItem;
-                boolean scrollingUp = firstVisibleItem < (totalItemCount - visibleItemCount) && firstVisibleItem <= lastFirstVisibleItem;
+
+                boolean scrollingDown = firstVisibleItem > lastFirstVisibleItem; //firstVisibleItem > 4 && firstVisibleItem >= lastFirstVisibleItem;
+                boolean scrollingUp = firstVisibleItem < lastFirstVisibleItem; //firstVisibleItem < (totalItemCount - visibleItemCount) && firstVisibleItem <= lastFirstVisibleItem;
                 lastFirstVisibleItem = firstVisibleItem;
-                if (enabledScrolldown.get() && scrollingDown && !scrollingUp) {
-                    disable(400L, enabledScrollup);
-                    scrollDirectionListener.onScrollDown();
-                } else if (enabledScrollup.get() && scrollingUp && !scrollingDown) {
-                    disable(400L, enabledScrolldown);
-                    scrollDirectionListener.onScrollUp();
+                if (enabledScrolldown.get() && scrollingDown) {
+                    candidates.down();
+                } else if (enabledScrollup.get() && scrollingUp) {
+                    candidates.up();
                 }
+
+                checkCandidates();
             }
+
             /** sets the given flag to false temporarily for interval milliseconds */
             private void disable(final long interval, final AtomicBoolean flag) {
                 // stop listening for 500 seconds to be able to detect rate of change.
@@ -84,6 +152,24 @@ public final class DirectionDetectorScrollListener {
                     }
                 });
             }
+
+            private void checkCandidates() {
+                if (candidates.total() >= MIN_CANDIDATES) {
+                    // democratic check
+                    if (candidates.delta() > candidates.total() * 0.5) {
+                        boolean scrollingUp = candidates.ups() > candidates.downs();
+                        candidates.reset();
+                        disable(DISABLE_INTERVAL_ON_EVENT,
+                                scrollingUp ? enabledScrollup : enabledScrolldown);
+                        if (scrollingUp) {
+                            scrollDirectionListener.onScrollUp();
+                        } else {
+                            scrollDirectionListener.onScrollDown();
+                        }
+                    }
+                }
+            }
+
         };
     }
 }
