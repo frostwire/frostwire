@@ -19,6 +19,9 @@
  */
 -->
 <resources>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ O conexiune neprotejat înseamnă tot ceea ce face on-line (inclusiv <b>căutări, mesagerie și descărcări</b>) poate fi monitorizată de oricine din rețea și poate chiar și de către furnizorul de servicii Internet.<br><br>Vă recomandăm să utilizați ExpressVPN pentru a cripta conexiunea și <b>proteja confidențialitatea</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Cu toate că este recomandat pentru descărcarea, <b>nu aveți nevoie de un VPN pentru a utiliza FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sunteți conectat la Internet folosind un VPN. <br><br> Daca nu sunteti deja, vă recomandăm să folosiți <b>ExpressVPN</b> pentru a cripta conexiunea și <b>proteja confidențialitatea</b>. ]]></string>
     <string name="vpn_not_found">Nici VPN. Luați în considerare criptarea conexiunii.</string>
     <string name="azureus_peer_manager_status_finished">Terminat</string>
     <string name="activity_mediaplayer_name">Media Player</string>
@@ -226,7 +229,6 @@
     <string name="wifi_sharing">Wi-Fi Sharing</string>
     <string name="use_clearbits">Utilizați ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">Maxima total Conexiuni</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ O conexiune neprotejat înseamnă tot ceea ce face on-line (inclusiv <b>căutări, mesagerie și descărcări</b>) poate fi monitorizată de oricine din rețea și poate chiar și de către furnizorul de servicii Internet.<br><br>Vă recomandăm să utilizați ExpressVPN pentru a cripta conexiunea și <b>proteja confidențialitatea</b>.]]></string>
     <string name="toast_on_disconnect">Deconectată de la BitTorrent. Toate transferurile BitTorrent s-au oprit.</string>
     <string name="transfers_select_downloading">descărcarea</string>
     <string name="clear_torrent_index_summary">Șterge Index Torrent</string>
@@ -380,7 +382,6 @@
     <string name="save_bandwidth">Salvați Lățime de bandă</string>
     <string name="accept_connection_from">Accepta conexiunea cu</string>
     <string name="vpn_client_feature_4">24/7 suport pentru clienți</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Cu toate că este recomandat pentru descărcarea, <b>nu aveți nevoie de un VPN pentru a utiliza FrostWire. </b>]]></string>
     <string name="vpn_client_feature_1">Criptare de grad militar</string>
     <string name="transfers_context_resume_all_torrent_transfers">Relua toate transferurile torrent</string>
     <string name="vpn_client_feature_3">Navigare privată și logless</string>
@@ -597,7 +598,6 @@
     <string name="application">Aplicație</string>
     <string name="update_title">Actualizați-timp!</string>
     <string name="use_btjunkie">Utilizați BTJunkie</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sunteți conectat la Internet folosind un VPN. <br><br> Daca nu sunteti deja, vă recomandăm să folosiți <b>ExpressVPN</b> pentru a cripta conexiunea și <b>proteja confidențialitatea</b>. ]]></string>
     <string name="peer_http_download_status_downloading">Descărcarea</string>
     <string name="picture">Imagine</string>
     <string name="files_shared">fișiere partajate</string>
