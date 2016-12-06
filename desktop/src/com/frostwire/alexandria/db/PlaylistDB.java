@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.limegroup.gnutella.gui.I18n.tr;
-
 public class PlaylistDB {
 
     private PlaylistDB() { } // don't allow explicit constructions
@@ -90,7 +88,7 @@ public class PlaylistDB {
 
         List<List<Object>> result = db.query(query, true);
 
-        Playlist playlist = new Playlist(db, LibraryDatabase.STARRED_PLAYLIST_ID, tr("starred"), tr("starred"));
+        Playlist playlist = new Playlist(db, LibraryDatabase.STARRED_PLAYLIST_ID, "starred", "starred");
 
         List<PlaylistItem> items = new ArrayList<>(result.size());
         Set<String> paths = new HashSet<>();
