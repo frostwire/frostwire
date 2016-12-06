@@ -18,6 +18,9 @@
 
 package com.frostwire.gui.library;
 
+import com.frostwire.alexandria.PlaylistItem;
+import com.limegroup.gnutella.gui.dnd.FileTransferable;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -28,9 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.frostwire.alexandria.PlaylistItem;
-import com.limegroup.gnutella.gui.dnd.FileTransferable;
-
 /**
  * 
  * @author gubatron
@@ -39,8 +39,8 @@ import com.limegroup.gnutella.gui.dnd.FileTransferable;
  */
 public final class LibraryPlaylistsTableTransferable implements Transferable {
 
-    public static final DataFlavor ITEM_ARRAY = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.Item Array");
-    public static final DataFlavor PLAYLIST_ITEM_ARRAY = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.PlaylistItemArray");
+    static final DataFlavor ITEM_ARRAY = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.Item Array");
+    static final DataFlavor PLAYLIST_ITEM_ARRAY = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.PlaylistItemArray");
 
     private final List<LibraryPlaylistsTableTransferable.Item> items;
 
@@ -48,7 +48,7 @@ public final class LibraryPlaylistsTableTransferable implements Transferable {
     private final FileTransferable fileTransferable;
     private final int[] selectedIndexes;
 
-    public LibraryPlaylistsTableTransferable(List<PlaylistItem> playlistItems, int playlistID, int[] selectedIndexes) {
+    LibraryPlaylistsTableTransferable(List<PlaylistItem> playlistItems, int playlistID, int[] selectedIndexes) {
         items = LibraryUtils.convertToItems(playlistItems);
 
         List<File> files = new ArrayList<File>(items.size());
@@ -61,7 +61,7 @@ public final class LibraryPlaylistsTableTransferable implements Transferable {
         this.selectedIndexes = selectedIndexes;
     }
 
-    public LibraryPlaylistsTableTransferable(List<PlaylistItem> playlistItems) {
+    LibraryPlaylistsTableTransferable(List<PlaylistItem> playlistItems) {
         items = LibraryUtils.convertToItems(playlistItems);
 
         List<File> files = new ArrayList<File>(items.size());
@@ -105,12 +105,10 @@ public final class LibraryPlaylistsTableTransferable implements Transferable {
     }
 
     public static final class PlaylistItemContainer implements Serializable {
-
-        public final int playlistID;
-        public final int[] selectedIndexes;
+        final int playlistID;
+        final int[] selectedIndexes;
         public final List<Item> items;
-
-        public PlaylistItemContainer(int playlistID, int[] selectedIndexes, List<Item> items) {
+        PlaylistItemContainer(int playlistID, int[] selectedIndexes, List<Item> items) {
             this.playlistID = playlistID;
             this.selectedIndexes = selectedIndexes;
             this.items = items;
@@ -118,25 +116,23 @@ public final class LibraryPlaylistsTableTransferable implements Transferable {
     }
 
     public static final class Item implements Serializable {
-
-        public Item() {
+        Item() {
         }
-
         public int id;
         public String filePath;
         public String fileName;
         public long fileSize;
-        public String fileExtension;
+        String fileExtension;
         public String trackTitle;
-        public float trackDurationInSecs;
-        public String trackArtist;
-        public String trackAlbum;
-        public String coverArtPath;
-        public String trackBitrate;
-        public String trackComment;
-        public String trackGenre;
-        public String trackNumber;
-        public String trackYear;
+        float trackDurationInSecs;
+        String trackArtist;
+        String trackAlbum;
+        String coverArtPath;
+        String trackBitrate;
+        String trackComment;
+        String trackGenre;
+        String trackNumber;
+        String trackYear;
         public boolean starred;
     }
 }

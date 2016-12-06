@@ -18,22 +18,18 @@
 
 package com.frostwire.gui.library;
 
-import java.awt.Rectangle;
-import java.awt.datatransfer.Transferable;
-import java.awt.dnd.InvalidDnDOperationException;
-import java.io.File;
-
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.TransferHandler;
-
-import org.limewire.util.OSUtils;
-
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.gui.library.LibraryPlaylists.LibraryPlaylistsListCell;
 import com.frostwire.gui.player.MediaPlayer;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.InvalidDnDOperationException;
+import java.io.File;
 
 /**
  * 
@@ -131,6 +127,7 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
                     return false;
                 }
             } else {
+                // importing to starred playlist
                 try {
                     Transferable transferable = support.getTransferable();
                     if (DNDUtils.contains(transferable.getTransferDataFlavors(), LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
@@ -141,6 +138,7 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
                         if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {
                             LibraryUtils.asyncAddToPlaylist(playlist, files[0]);
                         } else {
+                            // importing a regular file
                             LibraryUtils.asyncAddToPlaylist(playlist, files);
                         }
                     }

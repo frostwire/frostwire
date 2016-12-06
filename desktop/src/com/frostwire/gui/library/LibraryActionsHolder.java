@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ import java.io.File;
  */
 public class LibraryActionsHolder extends AbstractActionsHolder {
 
-    public LibraryActionsHolder(DataLine<?> dataLine, boolean playing) {
+    LibraryActionsHolder(DataLine<?> dataLine, boolean playing) {
         super(dataLine, playing);
     }
 
@@ -41,11 +41,7 @@ public class LibraryActionsHolder extends AbstractActionsHolder {
         Object dl = getDataLine();
         if (dl instanceof LibraryFilesTableDataLine) {
             return MediaPlayer.isPlayableFile(((LibraryFilesTableDataLine) dl).getFile());
-        } else if (dl instanceof LibraryPlaylistsTableDataLine) {
-            return true;
-        } else {
-            return false;
-        }
+        } else return dl instanceof LibraryPlaylistsTableDataLine;
     }
 
     @Override

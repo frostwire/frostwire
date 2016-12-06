@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +19,14 @@
 package com.frostwire.gui.library;
 
 /**
- * Wraps the current dataline to be displayed in the table to pass it to the
- * {@link PlaylistItemNameRenderer}
- * 
+ * Wraps the current DataLine to be displayed in the table to pass it to the
  * @author gubatron
  * @author aldenml
  * 
  */
 class PlaylistItemStarProperty extends PlaylistItemProperty<PlaylistItemStarProperty> {
 
-    public PlaylistItemStarProperty(LibraryPlaylistsTableDataLine line, boolean isPlaying, boolean exists) {
+    PlaylistItemStarProperty(LibraryPlaylistsTableDataLine line, boolean isPlaying, boolean exists) {
         super(line, isPlaying, exists);
     }
     

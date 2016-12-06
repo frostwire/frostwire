@@ -18,30 +18,6 @@
 
 package com.frostwire.gui.library;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.event.MouseInputListener;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-
-import org.limewire.util.OSUtils;
-
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.alexandria.db.LibraryDatabase;
@@ -55,11 +31,7 @@ import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
-import com.limegroup.gnutella.gui.ButtonRow;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.PaddedPanel;
-import com.limegroup.gnutella.gui.iTunesMediator;
+import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.actions.SearchAction;
 import com.limegroup.gnutella.gui.search.GenericCellEditor;
@@ -67,6 +39,19 @@ import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.gui.util.GUILauncher;
 import com.limegroup.gnutella.gui.util.GUILauncher.LaunchableProvider;
 import com.limegroup.gnutella.util.QueryUtils;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import javax.swing.event.MouseInputListener;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class wraps the JTable that displays files in the library,
@@ -84,21 +69,17 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
     /**
      * Variables so the PopupMenu & ButtonRow can have the same listeners
      */
-    public static Action LAUNCH_ACTION;
-    public static Action LAUNCH_OS_ACTION;
-    public static Action OPEN_IN_FOLDER_ACTION;
-    public static Action CREATE_TORRENT_ACTION;
-    public static Action DELETE_ACTION;
-    public static Action SEND_TO_ITUNES_ACTION;
+    private static Action LAUNCH_ACTION;
+    private static Action LAUNCH_OS_ACTION;
+    private static Action OPEN_IN_FOLDER_ACTION;
+    private static Action CREATE_TORRENT_ACTION;
+    private static Action DELETE_ACTION;
+    private static Action SEND_TO_ITUNES_ACTION;
 
     private Action importToPlaylistAction = new ImportToPlaylistAction();
-
     private Action exportPlaylistAction = new ExportPlaylistAction();
-
     private Action cleanupPlaylistAction = new CleanupPlaylistAction();
-
     private Action refreshID3TagsAction = new RefreshID3TagsAction();
-
     private Action COPY_PLAYLIST_FILES_TO_FOLDER_ACTION = new LibraryPlaylists.CopyPlaylistFilesAction();
 
     /**
@@ -113,7 +94,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
         return INSTANCE;
     }
 
-    public Playlist getCurrentPlaylist() {
+    Playlist getCurrentPlaylist() {
         return currentPlaylist;
     }
 
@@ -466,9 +447,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
      * Delete selected items from a playlist (not from disk)
      */
     public void removeSelection() {
-
         LibraryPlaylistsTableDataLine[] lines = getSelectedLibraryLines();
-
         if (currentPlaylist != null && currentPlaylist.getId() == LibraryDatabase.STARRED_PLAYLIST_ID) {
             for (LibraryPlaylistsTableDataLine line : lines) {
                 PlaylistItem playlistItem = line.getInitializeObject();
@@ -477,9 +456,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
             }
 
             LibraryMediator.instance().getLibraryExplorer().refreshSelection();
-
         } else {
-
             for (LibraryPlaylistsTableDataLine line : lines) {
                 PlaylistItem playlistItem = line.getInitializeObject();
                 playlistItem.delete();
@@ -756,19 +733,14 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
     }
 
     private final class RemoveFromPlaylistAction extends AbstractAction {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = -8704093935791256631L;
-
-        public RemoveFromPlaylistAction() {
+        RemoveFromPlaylistAction() {
             putValue(Action.NAME, I18n.tr("Delete"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Delete Selected Files from this playlist"));
             putValue(LimeAction.ICON_NAME, "LIBRARY_DELETE");
         }
 
         public void actionPerformed(ActionEvent ae) {
+            // REMOVE_LISTENER is this, see LibraryPlaylistsTableMediator.this.removeSelection
             REMOVE_LISTENER.actionPerformed(ae);
         }
     }

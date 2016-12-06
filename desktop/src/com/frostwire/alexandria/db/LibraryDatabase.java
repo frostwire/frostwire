@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ public class LibraryDatabase {
     public static final int OBJECT_NOT_SAVED_ID = -1;
     public static final int OBJECT_INVALID_ID = -2;
     public static final int STARRED_PLAYLIST_ID = -3;
-    public static final int LIBRARY_DATABASE_VERSION = 4;
+    private static final int LIBRARY_DATABASE_VERSION = 4;
     
     private final File _databaseFile;
     private final String _name;
@@ -143,7 +143,7 @@ public class LibraryDatabase {
         }
     }
 
-    protected void onUpdateDatabase(Connection connection, int oldVersion, int newVersion) {
+    private void onUpdateDatabase(Connection connection, int oldVersion, int newVersion) {
         if (oldVersion == 1 && newVersion > 2) {
             setupLuceneIndex(connection);
         }
@@ -224,14 +224,14 @@ public class LibraryDatabase {
 
     private List<List<Object>> convertResultSetToList(ResultSet resultSet) throws SQLException {
         ResultSetMetaData meta = resultSet.getMetaData();
-        int numColums = meta.getColumnCount();
+        int numColumns = meta.getColumnCount();
         int i;
 
         List<List<Object>> result = new LinkedList<>();
 
         while (resultSet.next()) {
-            List<Object> row = new ArrayList<>(numColums);
-            for (i = 1; i <= numColums; i++) {
+            List<Object> row = new ArrayList<>(numColumns);
+            for (i = 1; i <= numColumns; i++) {
                 row.add(resultSet.getObject(i));
             }
             result.add(row);

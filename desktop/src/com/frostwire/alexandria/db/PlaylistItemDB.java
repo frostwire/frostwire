@@ -81,7 +81,6 @@ public class PlaylistItemDB {
         if (obj.getId() == LibraryDatabase.OBJECT_INVALID_ID || obj.getPlaylist() == null) {
             return;
         }
-
         if (obj.getId() == LibraryDatabase.OBJECT_NOT_SAVED_ID) {
             obj.setStarred(isStarred(db, obj) || obj.isStarred());
             Object[] sqlAndValues = createPlaylistItemInsert(obj);
@@ -98,6 +97,7 @@ public class PlaylistItemDB {
     }
 
     public static void delete(LibraryDatabase db, PlaylistItem obj) {
+        final List<List<Object>> query = db.query("SELECT playlistItemId, starred FROM PlaylistItems WHERE playlistId = -3");
         db.update("DELETE FROM PlaylistItems WHERE playlistItemId = ?", obj.getId());
     }
     
@@ -141,9 +141,7 @@ public class PlaylistItemDB {
 
     private static Object[] updateStarred(PlaylistItem item) {
         String sql = "UPDATE PlaylistItems SET starred = ? WHERE filePath = LEFT(?, 10000)";
-
         Object[] values = new Object[] { item.isStarred(), item.getFilePath() };
-
         return new Object[] { sql, values };
     }
     

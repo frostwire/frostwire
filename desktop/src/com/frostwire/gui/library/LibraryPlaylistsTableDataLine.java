@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,49 +51,49 @@ public final class LibraryPlaylistsTableDataLine extends AbstractLibraryTableDat
     /**
      * Title column
      */
-    static final int TITLE_IDX = 3;
+    private static final int TITLE_IDX = 3;
     private static final LimeTableColumn TITLE_COLUMN = new LimeTableColumn(TITLE_IDX, "PLAYLIST_TABLE_TITLE", I18n.tr("Title"), 80, true, NameHolder.class);
 
     /**
      * Artist column
      */
-    static final int ARTIST_IDX = 4;
+    private static final int ARTIST_IDX = 4;
     private static final LimeTableColumn ARTIST_COLUMN = new LimeTableColumn(ARTIST_IDX, "PLAYLIST_TABLE_ARTIST", I18n.tr("Artist"), 80, true, PlaylistItemStringProperty.class);
 
     /**
      * Length column (in hour:minutes:seconds format)
      */
-    static final int LENGTH_IDX = 5;
+    private static final int LENGTH_IDX = 5;
     private static final LimeTableColumn LENGTH_COLUMN = new LimeTableColumn(LENGTH_IDX, "PLAYLIST_TABLE_LENGTH", I18n.tr("Length"), 150, true, PlaylistItemStringProperty.class);
 
     /**
      * Album column
      */
-    static final int ALBUM_IDX = 6;
+    private static final int ALBUM_IDX = 6;
     private static final LimeTableColumn ALBUM_COLUMN = new LimeTableColumn(ALBUM_IDX, "PLAYLIST_TABLE_ALBUM", I18n.tr("Album"), 120, true, PlaylistItemStringProperty.class);
 
     /**
      * Track column
      */
-    static final int TRACK_IDX = 7;
+    private static final int TRACK_IDX = 7;
     private static final LimeTableColumn TRACK_COLUMN = new LimeTableColumn(TRACK_IDX, "PLAYLIST_TABLE_TRACK", I18n.tr("Track"), 20, true, PlaylistItemTrackProperty.class);
 
     /**
      * Genre column
      */
-    static final int GENRE_IDX = 8;
+    private static final int GENRE_IDX = 8;
     private static final LimeTableColumn GENRE_COLUMN = new LimeTableColumn(GENRE_IDX, "PLAYLIST_TABLE_GENRE", I18n.tr("Genre"), 80, true, PlaylistItemStringProperty.class);
 
     /**
      * Bitrate column info
      */
-    static final int BITRATE_IDX = 9;
+    private static final int BITRATE_IDX = 9;
     private static final LimeTableColumn BITRATE_COLUMN = new LimeTableColumn(BITRATE_IDX, "PLAYLIST_TABLE_BITRATE", I18n.tr("Bitrate"), 60, true, PlaylistItemBitRateProperty.class);
 
     /**
      * Comment column info
      */
-    static final int COMMENT_IDX = 10;
+    private static final int COMMENT_IDX = 10;
     private static final LimeTableColumn COMMENT_COLUMN = new LimeTableColumn(COMMENT_IDX, "PLAYLIST_TABLE_COMMENT", I18n.tr("Comment"), 20, false, PlaylistItemStringProperty.class);
 
     /**
@@ -111,13 +111,13 @@ public final class LibraryPlaylistsTableDataLine extends AbstractLibraryTableDat
     /**
      * Year column
      */
-    static final int YEAR_IDX = 13;
+    private static final int YEAR_IDX = 13;
     private static final LimeTableColumn YEAR_COLUMN = new LimeTableColumn(YEAR_IDX, "PLAYLIST_TABLE_YEAR", I18n.tr("Year"), 30, false, PlaylistItemStringProperty.class);
 
     /**
      * Total number of columns
      */
-    static final int NUMBER_OF_COLUMNS = 14;
+    private static final int NUMBER_OF_COLUMNS = 14;
 
     /**
      * Number of columns
@@ -137,7 +137,7 @@ public final class LibraryPlaylistsTableDataLine extends AbstractLibraryTableDat
     private String bitrate;
 
     /**
-     * Sets up the dataline for use with the playlist.
+     * Sets up the DataLine for use with the playlist.
      */
     public void initialize(PlaylistItem item) {
         super.initialize(item);
@@ -197,11 +197,7 @@ public final class LibraryPlaylistsTableDataLine extends AbstractLibraryTableDat
     }
 
     private boolean isPlaying() {
-        if (initializer != null) {
-            return MediaPlayer.instance().isThisBeingPlayed(initializer);
-        }
-
-        return false;
+        return initializer != null && MediaPlayer.instance().isThisBeingPlayed(initializer);
     }
 
     /**
@@ -256,7 +252,7 @@ public final class LibraryPlaylistsTableDataLine extends AbstractLibraryTableDat
     /**
      * @return the PlayListItem for this table row
      */
-    public PlaylistItem getPlayListItem() {
+    PlaylistItem getPlayListItem() {
         return initializer;
     }
 

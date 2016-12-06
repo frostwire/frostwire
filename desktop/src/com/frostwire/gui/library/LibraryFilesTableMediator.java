@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -759,7 +759,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
          */
         private static final long serialVersionUID = 949208465372392591L;
 
-        public LaunchAction() {
+        LaunchAction() {
             putValue(Action.NAME, I18n.tr("Launch"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Launch Selected Files"));
             putValue(LimeAction.ICON_NAME, "LIBRARY_LAUNCH");
@@ -777,7 +777,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
          */
         private static final long serialVersionUID = 949208465372392592L;
 
-        public LaunchOSAction() {
+        LaunchOSAction() {
             String os = "OS";
             if (OSUtils.isWindows()) {
                 os = "Windows";
@@ -803,7 +803,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
          */
         private static final long serialVersionUID = 1693310684299300459L;
 
-        public OpenInFolderAction() {
+        OpenInFolderAction() {
             putValue(Action.NAME, I18n.tr("Explore"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Explore"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Open Folder Containing the File"));
@@ -827,7 +827,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
         private static final long serialVersionUID = 1898917632888388860L;
 
-        public CreateTorrentAction() {
+        CreateTorrentAction() {
             super(I18n.tr("Create New Torrent"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Create a new .torrent file"));
         }
@@ -862,7 +862,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
          */
         private static final long serialVersionUID = -8704093935791256631L;
 
-        public RemoveAction() {
+        RemoveAction() {
             putValue(Action.NAME, I18n.tr("Delete"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Delete Selected Files"));
             putValue(LimeAction.ICON_NAME, "LIBRARY_DELETE");
@@ -877,7 +877,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
         private static final long serialVersionUID = 4726989286129406765L;
 
-        public SendAudioFilesToiTunes() {
+        SendAudioFilesToiTunes() {
         	if(!OSUtils.isLinux()) {
         		putValue(Action.NAME, I18n.tr("Send to iTunes"));
         		putValue(Action.SHORT_DESCRIPTION, I18n.tr("Send audio files to iTunes"));
@@ -887,9 +887,8 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         @Override
         public void actionPerformed(ActionEvent e) {
             int[] rows = TABLE.getSelectedRows();
-            List<File> files = new ArrayList<File>();
-            for (int i = 0; i < rows.length; i++) {
-                int index = rows[i]; // current index to add
+            List<File> files = new ArrayList<>();
+            for (int index : rows) {
                 File file = DATA_MODEL.getFile(index);
                 files.add(file);
             }
@@ -904,21 +903,20 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
         private boolean isDemuxing = false;
 
-        public DemuxMP4AudioAction() {
+        DemuxMP4AudioAction() {
             putValue(Action.NAME, I18n.tr("Extract Audio"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Extract .m4a Audio from this .mp4 video"));
             demuxedFiles = new ArrayList<File>();
         }
 
-        public boolean isDemuxing() {
+        boolean isDemuxing() {
             return isDemuxing;
         }
 
         private List<File> getSelectedFiles() {
             int[] rows = TABLE.getSelectedRows();
             List<File> files = new ArrayList<File>(rows.length);
-            for (int i = 0; i < rows.length; i++) {
-                int index = rows[i]; // current index to add
+            for (int index : rows) {
                 File file = DATA_MODEL.getFile(index);
                 files.add(file);
             }
@@ -1069,7 +1067,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
         private final File _file;
 
-        public FileProvider(File file) {
+        FileProvider(File file) {
             _file = file;
         }
 
@@ -1084,7 +1082,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         resetAudioPlayerFileView();
     }
 
-    public void resetAudioPlayerFileView() {
+    void resetAudioPlayerFileView() {
         Playlist playlist = MediaPlayer.instance().getCurrentPlaylist();
         if (playlist == null) {
             MediaPlayer.instance().setPlaylistFilesView(getFilesView());
@@ -1100,7 +1098,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         }
     }
 
-    public static boolean hasExtension(String filename, String... extensionsWithoutDot) {
+    private static boolean hasExtension(String filename, String... extensionsWithoutDot) {
 
         String extension = FilenameUtils.getExtension(filename).toLowerCase();
 

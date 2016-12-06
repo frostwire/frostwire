@@ -17,20 +17,6 @@
  */
 package com.frostwire.gui.library;
 
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.InvalidDnDOperationException;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.TransferHandler;
-
-import org.limewire.util.OSUtils;
-
 import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.alexandria.db.LibraryDatabase;
 import com.frostwire.gui.library.LibraryPlaylistsTableTransferable.PlaylistItemContainer;
@@ -38,6 +24,16 @@ import com.frostwire.gui.player.MediaPlayer;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.dnd.MulticastTransferHandler;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.InvalidDnDOperationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 class LibraryPlaylistsTableTransferHandler extends TransferHandler {
 
@@ -67,9 +63,7 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
         int index = dl.getRow();
         
         try {
-            
             if (support.isDataFlavorSupported(LibraryPlaylistsTableTransferable.PLAYLIST_ITEM_ARRAY)) {
-                
                 Transferable transferable = support.getTransferable();
                 PlaylistItemContainer container;
                 
@@ -81,7 +75,6 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
                     return false;
                 }
             } else {
-                
                 int max = mediator.getTable().getModel().getRowCount();
                 if (index < 0 || index > max)
                    index = max;

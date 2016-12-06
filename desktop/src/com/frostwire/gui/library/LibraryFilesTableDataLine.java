@@ -126,7 +126,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
      */
     private boolean _iconScheduledForLoad = false;
 
-    public LibraryFilesTableDataLine(LibraryFilesTableModel ltm) {
+    LibraryFilesTableDataLine(LibraryFilesTableModel ltm) {
         super();
         _model = ltm;
     }
@@ -152,7 +152,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         String fullPath = file.getPath();
         try {
             fullPath = file.getCanonicalPath();
-        } catch (IOException ioe) {
+        } catch (IOException ignored) {
         }
 
         _name = initializer.getName();
