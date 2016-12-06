@@ -545,7 +545,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     private boolean selectionHasMP4s(File saveLocation) {
-        return saveLocation != null && (LibraryUtils.directoryContainsExtension(saveLocation, 4, "mp4") || (saveLocation.isFile() && FileUtils.hasExtension(saveLocation.getAbsolutePath(), "mp4")));
+        return saveLocation != null && (LibraryUtils.directoryContainsExtension(saveLocation, "mp4") || (saveLocation.isFile() && FileUtils.hasExtension(saveLocation.getAbsolutePath(), "mp4")));
     }
 
     private boolean selectionIsSingleFile(File saveLocation) {
@@ -559,7 +559,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         File saveLocation = d.getSaveLocation();
 
         //in case it's a single picked .torrent/magnet download
-        if (saveLocation != null && saveLocation.isDirectory() && LibraryUtils.directoryContainsASinglePlayableFile(saveLocation, 4)) {
+        if (saveLocation != null && saveLocation.isDirectory() && LibraryUtils.directoryContainsASinglePlayableFile(saveLocation)) {
             try {
                 saveLocation = saveLocation.listFiles()[0];
             } catch (Throwable t) {
@@ -567,7 +567,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             }
         }
 
-        return saveLocation != null && (LibraryUtils.directoryContainsPlayableExtensions(saveLocation, 4) || (saveLocation.isFile() && MediaPlayer.isPlayableFile(saveLocation)));
+        return saveLocation != null && (LibraryUtils.directoryContainsPlayableExtensions(saveLocation) || (saveLocation.isFile() && MediaPlayer.isPlayableFile(saveLocation)));
     }
 
     private boolean isHttpTransfer(BTDownload d) {

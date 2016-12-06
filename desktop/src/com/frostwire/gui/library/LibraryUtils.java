@@ -38,7 +38,6 @@ import org.limewire.concurrent.ExecutorsHelper;
 import org.limewire.util.FileUtils;
 import org.limewire.util.StringUtils;
 
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
@@ -53,16 +52,7 @@ import java.util.concurrent.ExecutorService;
  */
 public class LibraryUtils {
 
-    public static final Icon FILE_UNSHARED_ICON;
-    public static final Icon FILE_SHARING_ICON;
-    public static final Icon FILE_SHARED_ICON;
-
-    static {
-        FILE_UNSHARED_ICON = GUIMediator.getThemeImage("file_unshared");
-        FILE_SHARING_ICON = GUIMediator.getThemeImage("file_sharing");
-        FILE_SHARED_ICON = GUIMediator.getThemeImage("file_shared");
-    }
-
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(LibraryUtils.class);
 
     private static final ExecutorService executor;
@@ -71,8 +61,8 @@ public class LibraryUtils {
         executor = ExecutorsHelper.newProcessingQueue("LibraryUtils-Executor");
     }
 
-    private static void addPlaylistItem(Playlist playlist, File file, boolean starred) {
-        addPlaylistItem(playlist, file, starred, -1);
+    private static void addPlaylistItem(Playlist playlist, File file) {
+        addPlaylistItem(playlist, file, false, -1);
     }
 
     private static void addPlaylistItem(Playlist playlist, File file, boolean starred, int index) {
@@ -117,10 +107,10 @@ public class LibraryUtils {
 
         StringBuilder result = new StringBuilder();
 
-        String DD = "";
-        String HH = "";
-        String MM = "";
-        String SS = "";
+        String DD;
+        String HH;
+        String MM;
+        String SS;
 
         //math
         int days = s / 86400;
@@ -159,7 +149,7 @@ public class LibraryUtils {
         return result.toString();
     }
 
-    public static void createNewPlaylist(final List<? extends AbstractLibraryTableDataLine<?>> lines) {
+    static void createNewPlaylist(final List<? extends AbstractLibraryTableDataLine<?>> lines) {
         DialogFinishedListener dialogListener = new DialogFinishedListener() {
             @Override
             public void onDialogCancelled() {
@@ -198,7 +188,7 @@ public class LibraryUtils {
         createNewPlaylist(files, false);
     }
 
-    public static void createNewPlaylist(final File[] files, final boolean starred) {
+    static void createNewPlaylist(final File[] files, final boolean starred) {
         final DialogFinishedListener listener = new DialogFinishedListener() {
             @Override
             public void onDialogCancelled() {
@@ -209,7 +199,7 @@ public class LibraryUtils {
                 if (StringUtils.isNullOrEmpty(playlistName, true)) {
                     return;
                 }
-                if (playlistName != null && playlistName.length() > 0) {
+                if (playlistName.length() > 0) {
                     GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
                     final Playlist playlist = LibraryMediator.getLibrary().newPlaylist(playlistName, playlistName);
                     playlist.save();
@@ -258,11 +248,11 @@ public class LibraryUtils {
         });
     }
 
-    public static void createNewPlaylist(final PlaylistItem[] playlistItems) {
+    static void createNewPlaylist(final PlaylistItem[] playlistItems) {
         createNewPlaylist(playlistItems, false);
     }
 
-    public static void createNewPlaylist(final PlaylistItem[] playlistItems, boolean starred) {
+    static void createNewPlaylist(final PlaylistItem[] playlistItems, boolean starred) {
         if (starred) {
             createStarredPlaylist(playlistItems);
         } else {
@@ -326,11 +316,11 @@ public class LibraryUtils {
         t.start();
     }
 
-    public static void createNewPlaylist(File m3uFile) {
+    static void createNewPlaylist(File m3uFile) {
         createNewPlaylist(m3uFile, false);
     }
 
-    public static void createNewPlaylist(File m3uFile, boolean starred) {
+    static void createNewPlaylist(File m3uFile, boolean starred) {
         try {
             List<File> files = M3UPlaylist.load(m3uFile.getAbsolutePath());
             createNewPlaylist(files.toArray(new File[0]), starred);
@@ -340,7 +330,7 @@ public class LibraryUtils {
         }
     }
 
-    public static void asyncAddToPlaylist(final Playlist playlist, final List<? extends AbstractLibraryTableDataLine<?>> lines) {
+    static void asyncAddToPlaylist(final Playlist playlist, final List<? extends AbstractLibraryTableDataLine<?>> lines) {
         LibraryMediator.instance().getLibraryPlaylists().markBeginImport(playlist);
         Thread t = new Thread(new Runnable() {
             public void run() {
@@ -359,7 +349,7 @@ public class LibraryUtils {
         asyncAddToPlaylist(playlist, files, -1);
     }
 
-    public static void asyncAddToPlaylist(final Playlist playlist, final File[] files, final int index) {
+    static void asyncAddToPlaylist(final Playlist playlist, final File[] files, final int index) {
         LibraryMediator.instance().getLibraryPlaylists().markBeginImport(playlist);
         Thread t = new Thread(new Runnable() {
             public void run() {
@@ -386,11 +376,11 @@ public class LibraryUtils {
         });
     }
 
-    public static void asyncAddToPlaylist(Playlist playlist, PlaylistItem[] playlistItems) {
+    static void asyncAddToPlaylist(Playlist playlist, PlaylistItem[] playlistItems) {
         asyncAddToPlaylist(playlist, playlistItems, -1);
     }
 
-    public static void asyncAddToPlaylist(final Playlist playlist, final PlaylistItem[] playlistItems, final int index) {
+    static void asyncAddToPlaylist(final Playlist playlist, final PlaylistItem[] playlistItems, final int index) {
         Thread t = new Thread(new Runnable() {
             public void run() {
                 addToPlaylist(playlist, playlistItems, index);
@@ -406,11 +396,11 @@ public class LibraryUtils {
         t.start();
     }
 
-    public static void asyncAddToPlaylist(Playlist playlist, File m3uFile) {
+    static void asyncAddToPlaylist(Playlist playlist, File m3uFile) {
         asyncAddToPlaylist(playlist, m3uFile, -1);
     }
 
-    public static void asyncAddToPlaylist(Playlist playlist, File m3uFile, int index) {
+    static void asyncAddToPlaylist(Playlist playlist, File m3uFile, int index) {
         try {
             List<File> files = M3UPlaylist.load(m3uFile.getAbsolutePath());
             asyncAddToPlaylist(playlist, files.toArray(new File[0]), index);
@@ -419,7 +409,7 @@ public class LibraryUtils {
         }
     }
 
-    public static List<LibraryPlaylistsTableTransferable.Item> convertToItems(List<PlaylistItem> playlistItems) {
+    static List<LibraryPlaylistsTableTransferable.Item> convertToItems(List<PlaylistItem> playlistItems) {
         List<LibraryPlaylistsTableTransferable.Item> items = new ArrayList<>(playlistItems.size());
         for (PlaylistItem playlistItem : playlistItems) {
             Item item = new LibraryPlaylistsTableTransferable.Item();
@@ -444,8 +434,8 @@ public class LibraryUtils {
         return items;
     }
 
-    public static PlaylistItem[] convertToPlaylistItems(LibraryPlaylistsTableTransferable.Item[] items) {
-        List<PlaylistItem> playlistItems = new ArrayList<PlaylistItem>(items.length);
+    static PlaylistItem[] convertToPlaylistItems(LibraryPlaylistsTableTransferable.Item[] items) {
+        List<PlaylistItem> playlistItems = new ArrayList<>(items.length);
         for (LibraryPlaylistsTableTransferable.Item item : items) {
             PlaylistItem playlistItem = new PlaylistItem(null, item.id, item.filePath, item.fileName, item.fileSize, item.fileExtension, item.trackTitle, item.trackDurationInSecs, item.trackArtist, item.trackAlbum, item.coverArtPath, item.trackBitrate, item.trackComment, item.trackGenre,
                     item.trackNumber, item.trackYear, item.starred);
@@ -454,7 +444,7 @@ public class LibraryUtils {
         return playlistItems.toArray(new PlaylistItem[0]);
     }
 
-    public static PlaylistItem[] convertToPlaylistItems(LibraryPlaylistsTableTransferable.PlaylistItemContainer itemContainer) {
+    static PlaylistItem[] convertToPlaylistItems(LibraryPlaylistsTableTransferable.PlaylistItemContainer itemContainer) {
         List<PlaylistItem> playlistItems = new ArrayList<>(itemContainer.items.size());
         for (LibraryPlaylistsTableTransferable.Item item : itemContainer.items) {
             PlaylistItem playlistItem = new PlaylistItem(null, item.id, item.filePath, item.fileName, item.fileSize, item.fileExtension, item.trackTitle, item.trackDurationInSecs, item.trackArtist, item.trackAlbum, item.coverArtPath, item.trackBitrate, item.trackComment, item.trackGenre,
@@ -468,7 +458,7 @@ public class LibraryUtils {
         for (int i = 0; i < lines.size() && !playlist.isDeleted(); i++) {
             AbstractLibraryTableDataLine<?> line = lines.get(i);
             if (MediaPlayer.isPlayableFile(line.getFile())) {
-                LibraryUtils.addPlaylistItem(playlist, line.getFile(), false);
+                LibraryUtils.addPlaylistItem(playlist, line.getFile());
             }
         }
     }
@@ -547,7 +537,7 @@ public class LibraryUtils {
         }
     }
 
-    public static String getPlaylistDurationInDDHHMMSS(Playlist playlist) {
+    static String getPlaylistDurationInDDHHMMSS(Playlist playlist) {
         List<PlaylistItem> items = playlist.getItems();
         float totalSecs = 0;
         for (PlaylistItem item : items) {
@@ -557,13 +547,13 @@ public class LibraryUtils {
         return getSecondsInDDHHMMSS((int) totalSecs);
     }
 
-    public static boolean directoryContainsPlayableExtensions(File directory, int depth) {
+    public static boolean directoryContainsPlayableExtensions(File directory) {
         Set<File> ignore = TorrentUtil.getIgnorableFiles();
-        return directoryContainsExtension(directory, depth, ignore, MediaPlayer.getPlayableExtensions());
+        return directoryContainsExtension(directory, 4, ignore, MediaPlayer.getPlayableExtensions());
     }
 
-    public static boolean directoryContainsASinglePlayableFile(File directory, int depth) {
-        return directoryContainsPlayableExtensions(directory, depth) && (directory.listFiles().length == 1);
+    public static boolean directoryContainsASinglePlayableFile(File directory) {
+        return directoryContainsPlayableExtensions(directory) && (directory.listFiles().length == 1);
     }
 
     public static boolean directoryContainsAudio(File directory) {
@@ -571,9 +561,9 @@ public class LibraryUtils {
         return directoryContainsExtension(directory, 4, ignore, MediaPlayer.getPlayableExtensions());
     }
 
-    public static boolean directoryContainsExtension(File directory, int depth, String extensionWithoutDot) {
+    public static boolean directoryContainsExtension(File directory, String extensionWithoutDot) {
         Set<File> ignore = TorrentUtil.getIgnorableFiles();
-        return directoryContainsExtension(directory, depth, ignore, extensionWithoutDot);
+        return directoryContainsExtension(directory, 4, ignore, extensionWithoutDot);
     }
 
     private static boolean directoryContainsExtension(File directory, int depth, Set<File> ignore, String... extensionWithoutDot) {
@@ -682,11 +672,11 @@ public class LibraryUtils {
         }
     }
 
-    public static void refreshID3Tags(Playlist playlist) {
+    static void refreshID3Tags(Playlist playlist) {
         refreshID3Tags(playlist, playlist.getItems());
     }
 
-    public static void refreshID3Tags(final Playlist playlist, final List<PlaylistItem> items) {
+    static void refreshID3Tags(final Playlist playlist, final List<PlaylistItem> items) {
         executor.execute(new Runnable() {
             public void run() {
                 for (PlaylistItem item : items) {
@@ -729,13 +719,13 @@ public class LibraryUtils {
         return selectedPlaylist != null && selectedPlaylist.equals(playlist);
     }
 
-    public static boolean isRefreshKeyEvent(KeyEvent e) {
+    static boolean isRefreshKeyEvent(KeyEvent e) {
         int keyCode = e.getKeyCode();
         boolean ctrlCmdDown = e.isControlDown() || e.isAltGraphDown() || e.isMetaDown();
         return keyCode == KeyEvent.VK_F5 || (ctrlCmdDown && keyCode == KeyEvent.VK_R);
     }
 
-    public static void movePlaylistItemsToIndex(Playlist playlist, int[] selectedIndexes, int index) {
+    static void movePlaylistItemsToIndex(Playlist playlist, int[] selectedIndexes, int index) {
 
         List<PlaylistItem> items = playlist.getItems();
         int targetIndex = index;

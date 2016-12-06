@@ -437,7 +437,7 @@ final class BTDownloadActions {
         public void actionPerformed(ActionEvent e) {
             File file = BTDownloadMediator.instance().getSelectedDownloaders()[0].getSaveLocation();
 
-            if (file.isDirectory() && LibraryUtils.directoryContainsASinglePlayableFile(file, 4)) {
+            if (file.isDirectory() && LibraryUtils.directoryContainsASinglePlayableFile(file)) {
                 try {
                     file = file.listFiles()[0];
                 } catch (Throwable t) {
