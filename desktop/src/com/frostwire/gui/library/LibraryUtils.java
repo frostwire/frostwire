@@ -384,6 +384,7 @@ public class LibraryUtils {
         Thread t = new Thread(new Runnable() {
             public void run() {
                 addToPlaylist(playlist, playlistItems, index);
+                playlist.refresh();
                 playlist.save();
                 GUIMediator.safeInvokeLater(new Runnable() {
                     public void run() {
@@ -482,11 +483,11 @@ public class LibraryUtils {
     }
 
     private static void addToPlaylist(Playlist playlist, PlaylistItem[] playlistItems) {
-        addToPlaylist(playlist, playlistItems, false, -1);
+        addToPlaylist(playlist, playlistItems, playlist.isStarred(), -1);
     }
 
     private static void addToPlaylist(Playlist playlist, PlaylistItem[] playlistItems, int index) {
-        addToPlaylist(playlist, playlistItems, false, index);
+        addToPlaylist(playlist, playlistItems, playlist.isStarred(), index);
     }
 
     private static void addToPlaylist(Playlist playlist, PlaylistItem[] playlistItems, boolean starred, int index) {
@@ -498,10 +499,8 @@ public class LibraryUtils {
                 playlistItems[i].setId(LibraryDatabase.OBJECT_NOT_SAVED_ID);
                 playlistItems[i].setPlaylist(playlist);
                 items.add(index + i, playlistItems[i]);
-                if (starred) {
-                    playlistItems[i].setStarred(true);
-                    playlistItems[i].save();
-                }
+                playlistItems[i].setStarred(starred || playlist.isStarred());
+                playlistItems[i].save();
             }
             for (int i = 0; i < toRemove.size() && !playlist.isDeleted(); i++) {
                 int id = toRemove.get(i);
@@ -512,7 +511,6 @@ public class LibraryUtils {
                     }
                 }
             }
-
             // update sort indexes now that the ordering in the list is correct
             items = playlist.getItems();
             for (int i = 0; i < items.size(); i++) {
@@ -520,18 +518,12 @@ public class LibraryUtils {
                 item.setSortIndexByTrackNumber(i + 1); // set index 1-based
                 item.save();
             }
-
         } else {
             for (int i = 0; i < playlistItems.length && !playlist.isDeleted(); i++) {
-
                 playlistItems[i].setPlaylist(playlist);
                 items.add(playlistItems[i]);
                 playlistItems[i].setSortIndexByTrackNumber(items.size()); // set sort index to be at the end (1-based)
-
-                if (starred) {
-                    playlistItems[i].setStarred(true);
-                }
-
+                playlistItems[i].setStarred(starred || playlist.isStarred());
                 playlistItems[i].save();
             }
         }
