@@ -307,7 +307,8 @@ public final class SearchFragment extends AbstractFragment implements
         list.setAdapter(adapter);
         list.setOnScrollListener(
                 DirectionDetectorScrollListener.createOnScrollListener(
-                        createScrollDirectionListener()));
+                        createScrollDirectionListener(),
+                        Engine.instance().getThreadPool()));
     }
 
     private ScrollDirectionListener createScrollDirectionListener() {

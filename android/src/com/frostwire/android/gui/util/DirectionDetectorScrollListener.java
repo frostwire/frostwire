@@ -20,9 +20,7 @@ package com.frostwire.android.gui.util;
 
 import android.widget.AbsListView;
 
-import com.frostwire.android.gui.services.Engine;
-import com.frostwire.util.Logger;
-
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -33,9 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public final class DirectionDetectorScrollListener {
-    @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger(DirectionDetectorScrollListener.class);
-
     private static final class ScrollDirectionVotes {
         private byte ups;
         private byte downs;
@@ -64,6 +59,10 @@ public final class DirectionDetectorScrollListener {
     }
 
     public static AbsListView.OnScrollListener createOnScrollListener(final ScrollDirectionListener scrollDirectionListener) {
+        return createOnScrollListener(scrollDirectionListener, null);
+    }
+
+    public static AbsListView.OnScrollListener createOnScrollListener(final ScrollDirectionListener scrollDirectionListener, final ExecutorService threadPool) {
         return new AbsListView.OnScrollListener() {
             private final ScrollDirectionVotes votes = new ScrollDirectionVotes();
             private final int MIN_VOTES = 4;
@@ -80,17 +79,13 @@ public final class DirectionDetectorScrollListener {
                     case SCROLL_STATE_IDLE:
                         inMotion.set(false);
                         // wait a little longer to call victory
-                        Runnable r = new Runnable() {
+                        submitRunnable(400, new Runnable() {
                             public void run() {
-                                try {
-                                    Thread.sleep(400);
-                                } catch (Throwable ignored) {}
                                 if (!inMotion.get()) {
                                     onIdle();
                                 }
                             }
-                        };
-                        Engine.instance().getThreadPool().submit(r);
+                        });
                         break;
                     case SCROLL_STATE_FLING:
                         inMotion.set(true);
@@ -100,6 +95,21 @@ public final class DirectionDetectorScrollListener {
                         inMotion.set(true);
                         onTouchScroll();
                         break;
+                }
+            }
+
+            private void submitRunnable(long delay, Runnable r) {
+                if (delay > 0) {
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (threadPool != null) {
+                    threadPool.submit(r);
+                } else {
+                    new Thread(r).start();
                 }
             }
 
@@ -135,14 +145,9 @@ public final class DirectionDetectorScrollListener {
             private void disable(final long interval, final AtomicBoolean flag) {
                 // stop listening for 500 seconds to be able to detect rate of change.
                 flag.set(false);
-                Engine.instance().getThreadPool().submit(new Runnable() {
+                submitRunnable(interval, new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            Thread.sleep(interval);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                         flag.set(true);
                     }
                 });
