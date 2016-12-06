@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -355,7 +355,7 @@ public class LibraryUtils {
             public void run() {
                 try {
                     Set<File> ignore = TorrentUtil.getIgnorableFiles();
-                    addToPlaylist(playlist, files, false, index, ignore);
+                    addToPlaylist(playlist, files, playlist.isStarred(), index, ignore);
                     playlist.save();
                 } finally {
                     asyncAddToPlaylistFinalizer(playlist);
@@ -553,7 +553,8 @@ public class LibraryUtils {
     }
 
     public static boolean directoryContainsASinglePlayableFile(File directory) {
-        return directoryContainsPlayableExtensions(directory) && (directory.listFiles().length == 1);
+        final File[] files = directory.listFiles();
+        return directoryContainsPlayableExtensions(directory) && (files != null && files.length == 1);
     }
 
     public static boolean directoryContainsAudio(File directory) {
@@ -561,6 +562,7 @@ public class LibraryUtils {
         return directoryContainsExtension(directory, 4, ignore, MediaPlayer.getPlayableExtensions());
     }
 
+    @SuppressWarnings("SameParameterValue")
     public static boolean directoryContainsExtension(File directory, String extensionWithoutDot) {
         Set<File> ignore = TorrentUtil.getIgnorableFiles();
         return directoryContainsExtension(directory, 4, ignore, extensionWithoutDot);
@@ -572,7 +574,12 @@ public class LibraryUtils {
                 return false;
             }
 
-            for (File childFile : directory.listFiles()) {
+            File[] files = directory.listFiles();
+            if (files == null || files.length == 0) {
+                return false;
+            }
+
+            for (File childFile : files) {
                 if (!childFile.isDirectory()) {
                     if (FileUtils.hasExtension(childFile.getAbsolutePath(), extensionWithoutDot) && !ignore.contains(childFile)) {
                         return true;
