@@ -1,4 +1,6 @@
 /*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,9 +17,9 @@
 
 package com.frostwire.gui.player;
 
-import java.io.File;
-
 import com.frostwire.alexandria.PlaylistItem;
+
+import java.io.File;
 
 /**
  *  A wrapper for the source of an audio file that is currently playing
@@ -34,8 +36,8 @@ public class MediaSource {
     
     // NOTE: these can be initialized by derived classes
     // to customize display text
-    protected String titleText = "";
-    protected String toolTipText = "";
+    String titleText = "";
+    String toolTipText = "";
     
     public MediaSource(File file) {
         if (file == null) {
@@ -88,7 +90,7 @@ public class MediaSource {
 
     @Override
     public String toString() {
-        String name = null;
+        String name;
         if (getFile() != null) {
             name = getFile().getName();
         } else {
@@ -111,6 +113,10 @@ public class MediaSource {
 
     @Override
     public boolean equals(Object obj) {
+        if (!(obj instanceof MediaSource)) {
+            return false;
+        }
+
         MediaSource o = (MediaSource) obj;
         if (file != null && o.file != null) {
             return file.equals(o.file);
@@ -118,16 +124,14 @@ public class MediaSource {
         if (url != null && o.url != null) {
             return url.equals(o.url);
         }
-        if (playlistItem != null && o.playlistItem != null) {
-            return playlistItem.equals(o.playlistItem);
-        }
-        return false;
+        return playlistItem != null && o.playlistItem != null && playlistItem.equals(o.playlistItem);
     }
     
     public String getTitleText() {
     	    return titleText;
     }
     
+    @SuppressWarnings("unused")
     public String getToolTipText() {
     	    return toolTipText;
     }

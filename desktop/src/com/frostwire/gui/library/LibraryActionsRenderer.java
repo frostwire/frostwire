@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 
 package com.frostwire.gui.library;
 
-import java.util.List;
-
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
 import com.limegroup.gnutella.gui.tables.AbstractActionsRenderer;
+
+import java.util.List;
 
 /**
  * 
@@ -38,21 +38,18 @@ public final class LibraryActionsRenderer extends AbstractActionsRenderer {
 
             MediaSource mediaSource = null;
             List<MediaSource> filesView = null;
-            boolean playNextSong = false;
             Object dataLine = actionsHolder.getDataLine();
 
             if (dataLine instanceof LibraryFilesTableDataLine) {
                 mediaSource = new MediaSource(((LibraryFilesTableDataLine) dataLine).getFile());
                 filesView = LibraryFilesTableMediator.instance().getFilesView();
-                playNextSong = true;
             } else if (dataLine instanceof LibraryPlaylistsTableDataLine) {
                 mediaSource = new MediaSource(((LibraryPlaylistsTableDataLine) dataLine).getPlayListItem());
                 filesView = LibraryPlaylistsTableMediator.instance().getFilesView();
-                playNextSong = true;
             }
 
             if (mediaSource != null && !actionsHolder.isPlaying()) {
-                MediaPlayer.instance().asyncLoadMedia(mediaSource, true, false, playNextSong, null, filesView);
+                MediaPlayer.instance().asyncLoadMedia(mediaSource, true, false, true, null, filesView);
             }
         }        
     }

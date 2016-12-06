@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,14 +62,14 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
 
     private static final LibraryActionsRenderer ACTION_RENDERER = new LibraryActionsRenderer();
 
-    protected Action SEND_TO_FRIEND_ACTION;
-    protected Action OPTIONS_ACTION;
+    Action SEND_TO_FRIEND_ACTION;
+    Action OPTIONS_ACTION;
 
     private int needToScrollTo;
 
     private AdjustmentListener adjustmentListener;
 
-    protected AbstractLibraryTableMediator(String id) {
+    AbstractLibraryTableMediator(String id) {
         super(id);
         GUIMediator.addRefreshListener(this);
         mediaType = MediaType.getAnyTypeMediaType();
@@ -85,16 +85,16 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         return ACTION_RENDERER;
     }
 
-    public List<AbstractLibraryTableDataLine<I>> getSelectedLines() {
+    List<AbstractLibraryTableDataLine<I>> getSelectedLines() {
         int[] selected = TABLE.getSelectedRows();
-        List<AbstractLibraryTableDataLine<I>> lines = new ArrayList<AbstractLibraryTableDataLine<I>>(selected.length);
-        for (int i = 0; i < selected.length; i++) {
-            lines.add(DATA_MODEL.get(selected[i]));
+        List<AbstractLibraryTableDataLine<I>> lines = new ArrayList<>(selected.length);
+        for (int aSelected : selected) {
+            lines.add(DATA_MODEL.get(aSelected));
         }
         return lines;
     }
 
-    public int[] getSelectedIndexes() {
+    int[] getSelectedIndexes() {
         if (TABLE != null) {
             return TABLE.getSelectedRows();
         } else {
@@ -102,7 +102,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         }
     }
 
-    public I getItemAt(int row) {
+    private I getItemAt(int row) {
         try {
             return DATA_MODEL.get(row).getInitializeObject();
         } catch (Exception e) {
@@ -112,10 +112,8 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
 
     /**
      * This method selects the given item and ensures that it's visible (scrolls to it)
-     * @param item
-     * @return
      */
-    public boolean setItemSelected(I item) {
+    boolean setItemSelected(I item) {
         int i = DATA_MODEL.getRow(item);
 
         if (i != -1) {
@@ -128,10 +126,8 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
 
     /**
      * Convenience method to select an item at the given row.
-     * 
-     * @param row
-     * @return
      */
+    @SuppressWarnings("unused")
     public boolean selectItemAt(int row) {
         return setItemSelected(getItemAt(row));
     }
@@ -158,7 +154,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         return mediaType;
     }
 
-    public void setMediaType(MediaType mediaType) {
+    void setMediaType(MediaType mediaType) {
         this.mediaType = mediaType;
     }
 
@@ -169,7 +165,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         OPTIONS_ACTION = new ConfigureOptionsAction(OptionsConstructor.LIBRARY_KEY, I18n.tr("Options"), I18n.tr("You can configure the folders you share in FrostWire\'s Options."));
     }
 
-    protected SkinMenu createAddToPlaylistSubMenu() {
+    SkinMenu createAddToPlaylistSubMenu() {
         SkinMenu menu = new SkinMenu(I18n.tr("Add to playlist"));
 
         menu.add(new SkinMenuItem(new CreateNewPlaylistAction()));
@@ -194,6 +190,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         return menu;
     }
 
+    @SuppressWarnings("unused")
     private void adjustmentListener_adjustmentValueChanged(AdjustmentEvent e) {
         try {
             int value = needToScrollTo;
@@ -213,7 +210,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
 
         private static final long serialVersionUID = 3460908036485828909L;
 
-        public CreateNewPlaylistAction() {
+        CreateNewPlaylistAction() {
             super(I18n.tr("Create New Playlist"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Create and add to a new playlist"));
         }
@@ -234,7 +231,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         private static final int MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU = 80;
         private Playlist playlist;
 
-        public AddToPlaylistAction(Playlist playlist) {
+        AddToPlaylistAction(Playlist playlist) {
             super(getTruncatedString(playlist.getName(),MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Add to playlist") + " \"" + playlist.getName() + "\"");
             this.playlist = playlist;
@@ -246,7 +243,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         }
     }
 
-    public static String getTruncatedString(String string, int MAX_LENGTH) {
+    private static String getTruncatedString(String string, int MAX_LENGTH) {
         return string.length() > MAX_LENGTH ? (string.substring(0, MAX_LENGTH-1) + "...") : string;            
     }
     
@@ -254,7 +251,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
 
         private static final long serialVersionUID = 1329472129818371471L;
 
-        public SendToFriendAction() {
+        SendToFriendAction() {
             super(I18n.tr("Send to friend"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Send"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Send to friend"));
@@ -291,7 +288,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         return 0;
     }
 
-    public void playCurrentSelection() {
+    void playCurrentSelection() {
         E line = DATA_MODEL.get(TABLE.getSelectedRow());
         if (line == null) {
             return;
@@ -312,7 +309,6 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
     @Override
     public void removeSelection() {
         super.removeSelection();
-
         LibraryMediator.instance().clearDirectoryHolderCaches();
     }
 }

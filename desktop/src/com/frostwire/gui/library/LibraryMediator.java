@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,7 +67,6 @@ public class LibraryMediator {
 
     private CardLayout _tablesViewLayout = new CardLayout();
     private JPanel _tablesPanel;
-    private JSplitPane splitPane;
 
     private Map<Object, Integer> scrollbarValues;
     private Object lastSelectedKey;
@@ -90,13 +89,13 @@ public class LibraryMediator {
     public LibraryMediator() {
         GUIMediator.setSplashScreenString(I18n.tr("Loading Library Window..."));
 
-        idScanned = new HashSet<Integer>();
+        idScanned = new HashSet<>();
 
         getComponent(); // creates MAIN_PANEL
 
-        scrollbarValues = new HashMap<Object, Integer>();
+        scrollbarValues = new HashMap<>();
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getLibraryLeftPanel(), getLibraryRightPanel());
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getLibraryLeftPanel(), getLibraryRightPanel());
         splitPane.setContinuousLayout(true);
         splitPane.setResizeWeight(0.5);
         splitPane.addPropertyChangeListener(JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
@@ -117,7 +116,7 @@ public class LibraryMediator {
         MAIN_PANEL.add(splitPane);
     }
 
-    protected Object getSelectedKey() {
+    private Object getSelectedKey() {
         if (getSelectedPlaylist() != null) {
             return getSelectedPlaylist();
         } else {
@@ -139,7 +138,7 @@ public class LibraryMediator {
         return libraryExplorer;
     }
 
-    public LibraryPlaylists getLibraryPlaylists() {
+    LibraryPlaylists getLibraryPlaylists() {
         if (libraryPlaylists == null) {
             libraryPlaylists = new LibraryPlaylists();
         }
@@ -147,10 +146,8 @@ public class LibraryMediator {
     }
 
     /**
-     * Returns null if none is selected.
-     * @return
      */
-    public Playlist getSelectedPlaylist() {
+    Playlist getSelectedPlaylist() {
         return getLibraryPlaylists().getSelectedPlaylist();
     }
 
@@ -176,7 +173,7 @@ public class LibraryMediator {
         return MAIN_PANEL;
     }
 
-    public void showView(final String key) {
+    private void showView(final String key) {
         GUIMediator.safeInvokeAndWait(new Runnable() {
 
             @Override
@@ -186,16 +183,24 @@ public class LibraryMediator {
             }
         });
 
-        if (key.equals(FILES_TABLE_KEY)) {
-            currentMediator = LibraryFilesTableMediator.instance();
-        } else if (key.equals(PLAYLISTS_TABLE_KEY)) {
-            currentMediator = LibraryPlaylistsTableMediator.instance();
-        } else {
-            currentMediator = null;
+        switch (key) {
+            case FILES_TABLE_KEY:
+                currentMediator = LibraryFilesTableMediator.instance();
+                break;
+            case PLAYLISTS_TABLE_KEY:
+                currentMediator = LibraryPlaylistsTableMediator.instance();
+                break;
+            default:
+                currentMediator = null;
+                break;
         }
     }
 
     private void rememberScrollbarsOnMediators(String key) {
+        if (key == null) {
+            return;
+        }
+
         AbstractLibraryTableMediator<?, ?, ?> tableMediator = null;
         AbstractLibraryListPanel listPanel = null;
 
@@ -208,7 +213,6 @@ public class LibraryMediator {
         }
 
         if (tableMediator == null || listPanel == null) {
-            //nice antipattern here.
             return;
         }
 
@@ -226,7 +230,7 @@ public class LibraryMediator {
         }
     }
 
-    public void updateTableFiles(DirectoryHolder dirHolder) {
+    void updateTableFiles(DirectoryHolder dirHolder) {
         clearLibraryTable();
         showView(FILES_TABLE_KEY);
         LibraryFilesTableMediator.instance().updateTableFiles(dirHolder);
@@ -236,26 +240,26 @@ public class LibraryMediator {
         getLibraryExplorer().clearDirectoryHolderCaches();
     }
 
-    public void updateTableItems(Playlist playlist) {
+    void updateTableItems(Playlist playlist) {
         clearLibraryTable();
         showView(PLAYLISTS_TABLE_KEY);
         LibraryPlaylistsTableMediator.instance().updateTableItems(playlist);
     }
 
-    public void clearLibraryTable() {
+    void clearLibraryTable() {
         LibraryFilesTableMediator.instance().clearTable();
         LibraryPlaylistsTableMediator.instance().clearTable();
         getLibrarySearch().clear();
     }
 
-    public void addFilesToLibraryTable(List<File> files) {
+    void addFilesToLibraryTable(List<File> files) {
         for (File file : files) {
             LibraryFilesTableMediator.instance().add(file);
         }
         getLibrarySearch().addResults(files.size());
     }
 
-    public void addItemsToLibraryTable(List<PlaylistItem> items) {
+    void addItemsToLibraryTable(List<PlaylistItem> items) {
         for (PlaylistItem item : items) {
             LibraryPlaylistsTableMediator.instance().add(item);
         }
@@ -355,11 +359,17 @@ public class LibraryMediator {
     }
 
     public void scan(int hashCode, File location) {
+        if (location == null) {
+            return;
+        }
         idScanned.add(hashCode);
 
         if (location.isDirectory()) {
-            for (File file : location.listFiles()) {
-                scan(hashCode, file);
+            final File[] files = location.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    scan(hashCode, file);
+                }
             }
         } else {
             List<MediaTypeSavedFilesDirectoryHolder> holders = getLibraryExplorer().getMediaTypeSavedFilesDirectoryHolders();
@@ -376,9 +386,8 @@ public class LibraryMediator {
      * If a file has been selected on the right hand side, this method will select such file.
      * 
      * If there's a radio station, or if there's more than one file selected, or none, it will return null.
-     * @return
      */
-    public File getSelectedFile() {
+    File getSelectedFile() {
         File toExplore = null;
 
         DirectoryHolder selectedDirectoryHolder = LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder();
