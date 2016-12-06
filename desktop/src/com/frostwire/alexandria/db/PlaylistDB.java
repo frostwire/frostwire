@@ -1,12 +1,14 @@
 package com.frostwire.alexandria.db;
 
+import com.frostwire.alexandria.Playlist;
+import com.frostwire.alexandria.PlaylistItem;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.frostwire.alexandria.Playlist;
-import com.frostwire.alexandria.PlaylistItem;
+import static com.limegroup.gnutella.gui.I18n.tr;
 
 public class PlaylistDB {
 
@@ -88,7 +90,7 @@ public class PlaylistDB {
 
         List<List<Object>> result = db.query(query, true);
 
-        Playlist playlist = new Playlist(db, LibraryDatabase.STARRED_PLAYLIST_ID, "starred", "starred");
+        Playlist playlist = new Playlist(db, LibraryDatabase.STARRED_PLAYLIST_ID, tr("starred"), tr("starred"));
 
         List<PlaylistItem> items = new ArrayList<>(result.size());
         Set<String> paths = new HashSet<>();
