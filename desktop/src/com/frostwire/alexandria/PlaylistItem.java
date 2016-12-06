@@ -225,7 +225,7 @@ public class PlaylistItem extends LibraryDatabaseEntity {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof PlaylistItem && this.id == ((PlaylistItem) obj).id;
+        return obj != null && obj instanceof PlaylistItem && this.id == ((PlaylistItem) obj).id;
     }
 
     @Override
