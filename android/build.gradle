@@ -149,7 +149,7 @@ dependencies {
     compile "com.android.support:design:25.0.1"
     compile "com.google.android.gms:play-services-ads-lite:10.0.1"
     compile "com.google.android.gms:play-services-base:10.0.1"
-    compile "com.inmobi.monetization:inmobi-ads:6.0.3"
+    compile "com.inmobi.monetization:inmobi-ads:6.0.4"
     compile("com.mopub:mopub-sdk-banner:4.11.0@aar") { transitive = true }
     compile("com.mopub:mopub-sdk-interstitial:4.11.0@aar") { transitive = true }
     compile 'com.squareup.picasso:picasso:2.5.2'
