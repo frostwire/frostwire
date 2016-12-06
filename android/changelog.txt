@@ -1,7 +1,7 @@
-FrostWire 1.8.6 - DEC/05/2016
+FrostWire 1.8.6 - DEC/06/2016
  - Search window title bar and text bar hides when scrolling down on search results
  - Ukranian, Romanian, Hungarian translations
- - Fixes Archive.org search
+ - Fixes Archive.org, SoundCloud search
  - Fixes checkbox/menu selection options bug on My files
  - Fixes possible crash when browsing albums in My Music
  - New [+|-]:keyword:<fooKeyword> keyword filter support on search
