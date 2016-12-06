@@ -62,7 +62,7 @@ public class LibraryUtils {
     }
 
     private static void addPlaylistItem(Playlist playlist, File file) {
-        addPlaylistItem(playlist, file, false, -1);
+        addPlaylistItem(playlist, file, playlist.isStarred(), -1);
     }
 
     private static void addPlaylistItem(Playlist playlist, File file, boolean starred, int index) {

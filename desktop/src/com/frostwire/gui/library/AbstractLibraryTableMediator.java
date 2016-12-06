@@ -30,7 +30,6 @@ import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.options.ConfigureOptionsAction;
@@ -47,6 +46,8 @@ import java.awt.event.AdjustmentListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.limegroup.gnutella.gui.I18n.tr;
 
 /**
  * @author gubatron
@@ -162,27 +163,21 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
     protected void buildListeners() {
         super.buildListeners();
         SEND_TO_FRIEND_ACTION = new SendToFriendAction();
-        OPTIONS_ACTION = new ConfigureOptionsAction(OptionsConstructor.LIBRARY_KEY, I18n.tr("Options"), I18n.tr("You can configure the folders you share in FrostWire\'s Options."));
+        OPTIONS_ACTION = new ConfigureOptionsAction(OptionsConstructor.LIBRARY_KEY, tr("Options"), tr("You can configure the folders you share in FrostWire\'s Options."));
     }
 
     SkinMenu createAddToPlaylistSubMenu() {
-        SkinMenu menu = new SkinMenu(I18n.tr("Add to playlist"));
-
+        SkinMenu menu = new SkinMenu(tr("Add to playlist"));
         menu.add(new SkinMenuItem(new CreateNewPlaylistAction()));
         Playlist currentPlaylist = LibraryMediator.instance().getSelectedPlaylist();
         Playlist starredPlaylist = LibraryMediator.getLibrary().getStarredPlaylist();
-
-        if (currentPlaylist==null || !currentPlaylist.equals(starredPlaylist)) {
-            //menu.add(new SkinMenuItem(new AddToStarredPlaylist(starredPlaylist)));
+        if (currentPlaylist == null || !currentPlaylist.equals(starredPlaylist)) {
+            addToStarredPlaylistMenuItem(menu, starredPlaylist);
         }
-
         Library library = LibraryMediator.getLibrary();
         List<Playlist> playlists = library.getPlaylists();
-
-
         if (playlists.size() > 0) {
             menu.addSeparator();
-
             for (Playlist playlist : library.getPlaylists()) {
                 if (currentPlaylist != null && currentPlaylist.equals(playlist)) {
                     continue;
@@ -190,8 +185,14 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
                 menu.add(new SkinMenuItem(new AddToPlaylistAction(playlist)));
             }
         }
-
         return menu;
+    }
+
+    private void addToStarredPlaylistMenuItem(SkinMenu menu, Playlist starredPlaylist) {
+        AddToPlaylistAction addToStarredAction = new AddToPlaylistAction(starredPlaylist);
+        addToStarredAction.putValue(Action.SMALL_ICON, GUIMediator.getThemeImage("star_on"));
+        addToStarredAction.setName(tr("Add to") + " " + tr(starredPlaylist.getName()));
+        menu.add(new SkinMenuItem(addToStarredAction));
     }
 
     @SuppressWarnings("unused")
@@ -215,8 +216,8 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         private static final long serialVersionUID = 3460908036485828909L;
 
         CreateNewPlaylistAction() {
-            super(I18n.tr("Create New Playlist"));
-            putValue(Action.LONG_DESCRIPTION, I18n.tr("Create and add to a new playlist"));
+            super(tr("Create New Playlist"));
+            putValue(Action.LONG_DESCRIPTION, tr("Create and add to a new playlist"));
         }
 
         @Override
@@ -231,19 +232,22 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
      *
      */
     private final class AddToPlaylistAction extends AbstractAction {
-        private static final long serialVersionUID = 4658698262279334616L;
         private static final int MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU = 80;
         private Playlist playlist;
 
         AddToPlaylistAction(Playlist playlist) {
             super(getTruncatedString(playlist.getName(),MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU));
-            putValue(Action.LONG_DESCRIPTION, I18n.tr("Add to playlist") + " \"" + playlist.getName() + "\"");
+            putValue(Action.LONG_DESCRIPTION, tr("Add to playlist") + " \"" + playlist.getName() + "\"");
             this.playlist = playlist;
         }
         
         @Override
         public void actionPerformed(ActionEvent e) {
             LibraryUtils.asyncAddToPlaylist(playlist, getSelectedLines());
+        }
+
+        public void setName(String name) {
+            putValue(Action.NAME, name);
         }
     }
 
@@ -256,9 +260,9 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         private static final long serialVersionUID = 1329472129818371471L;
 
         SendToFriendAction() {
-            super(I18n.tr("Send to friend"));
-            putValue(LimeAction.SHORT_NAME, I18n.tr("Send"));
-            putValue(Action.LONG_DESCRIPTION, I18n.tr("Send to friend"));
+            super(tr("Send to friend"));
+            putValue(LimeAction.SHORT_NAME, tr("Send"));
+            putValue(Action.LONG_DESCRIPTION, tr("Send to friend"));
             //putValue(Action.SMALL_ICON, GUIMediator.getThemeImage("share"));
             putValue(LimeAction.ICON_NAME, "LIBRARY_SEND");
         }
@@ -271,7 +275,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
               return;
             }
 
-            DialogOption result = GUIMediator.showYesNoMessage(I18n.tr("Do you want to send this file to a friend?") + "\n\n\"" + file.getName() + "\"", I18n.tr("Send files with FrostWire"), JOptionPane.QUESTION_MESSAGE);
+            DialogOption result = GUIMediator.showYesNoMessage(tr("Do you want to send this file to a friend?") + "\n\n\"" + file.getName() + "\"", tr("Send files with FrostWire"), JOptionPane.QUESTION_MESSAGE);
 
             if (result == DialogOption.YES) {
                 new SendFileProgressDialog(GUIMediator.getAppFrame(), file).setVisible(true);
