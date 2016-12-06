@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,27 +18,22 @@
 
 package com.frostwire.gui.library;
 
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.InvalidDnDOperationException;
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.JComponent;
-import javax.swing.JTree;
-import javax.swing.TransferHandler;
-import javax.swing.tree.TreePath;
-
-import org.limewire.util.OSUtils;
-
 import com.frostwire.alexandria.PlaylistItem;
-import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.alexandria.TransferHandlerUtils;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.settings.LibrarySettings;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author gubatron
@@ -79,37 +74,10 @@ final class LibraryFilesTransferHandler extends TransferHandler {
                     return false;
                 }
             }
-
-            if (support.isDataFlavorSupported(LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
-                return true;
-            } else if (DNDUtils.containsFileFlavors(support.getDataFlavors())) {
-                if (OSUtils.isMacOSX()) {
-                    return true;
-                }
-
-                try {
-                    File[] files = DNDUtils.getFiles(support.getTransferable());
-                    for (File file : files) {
-                        if (MediaPlayer.isPlayableFile(file)) {
-                            return true;
-                        } else if (file.isDirectory()) {
-                            if (LibraryUtils.directoryContainsAudio(file)) {
-                                return true;
-                            }
-                        }
-                    }
-                    if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {
-                        return true;
-                    }
-                } catch (InvalidDnDOperationException e) {
-                    // this case seems to be something special with the OS
-                    return true;
-                }
-            }
+            return TransferHandlerUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
         } catch (Throwable e) {
             LOG.error("Error in LibraryFilesTransferHandler processing", e);
         }
-
         return false;
     }
 
@@ -119,13 +87,10 @@ final class LibraryFilesTransferHandler extends TransferHandler {
             if (invokingFromCanImport && OSUtils.isMacOSX()) {
                 return true;
             }
-            
-            return isSharedFolderReceiver(dirHolder) && 
+            return isSharedFolderReceiver(dirHolder) &&
                 DNDUtils.containsFileFlavors(support.getDataFlavors()) &&
                 areAllFilesDirectories(DNDUtils.getFiles(support.getTransferable()));
         } catch (Exception e) {
-            
-            
             e.printStackTrace();
             return false;
         }
@@ -151,9 +116,7 @@ final class LibraryFilesTransferHandler extends TransferHandler {
         try {
             Transferable transferable = support.getTransferable();
             LibraryNode node = getNodeFromLocation(support.getDropLocation());
-
              {
-
                 if (node instanceof DirectoryHolderNode) {
                     DirectoryHolder dirHolder = ((DirectoryHolderNode)node).getDirectoryHolder();
                     if (droppingFoldersToAddToLibrary(support, dirHolder, false)) {

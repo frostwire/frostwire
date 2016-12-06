@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,15 +20,13 @@ package com.frostwire.gui.library;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
+import com.frostwire.alexandria.TransferHandlerUtils;
 import com.frostwire.gui.library.LibraryPlaylists.LibraryPlaylistsListCell;
-import com.frostwire.gui.player.MediaPlayer;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
-import org.limewire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Transferable;
-import java.awt.dnd.InvalidDnDOperationException;
 import java.io.File;
 
 /**
@@ -47,35 +45,7 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
 
     @Override
     public boolean canImport(TransferSupport support) {
-        if (support.isDataFlavorSupported(LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
-            return true;
-        } else if (DNDUtils.containsFileFlavors(support.getDataFlavors())) {
-            if (OSUtils.isMacOSX()) {
-                return true;
-            }
-            try {
-                File[] files = DNDUtils.getFiles(support.getTransferable());
-                for (File file : files) {
-                    if (MediaPlayer.isPlayableFile(file)) {
-                        return true;
-                    } else if (file.isDirectory()) {
-                        if (LibraryUtils.directoryContainsAudio(file)) {
-                            return true;
-                        }
-                    }
-                }
-                if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {
-                    return true;
-                }
-            } catch (InvalidDnDOperationException e) {
-                // this case seems to be something special with the OS
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-        return false;
+        return TransferHandlerUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
     }
 
     @Override
