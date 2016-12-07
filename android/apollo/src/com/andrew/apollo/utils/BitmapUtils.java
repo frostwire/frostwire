@@ -55,7 +55,6 @@ public final class BitmapUtils {
         mCanvas.scale(mScale, mScale);
         final Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG);
         mCanvas.drawBitmap(bitmap, 0, 0, paint);
-        bitmap.recycle();
         return mTarget;
     }
 
