@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
@@ -49,6 +50,7 @@ import com.frostwire.search.youtube.YouTubePackageSearchResult;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.lang.ref.WeakReference;
@@ -197,6 +199,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public FilteredSearchResults filter(List<SearchResult> results) {
         FilteredSearchResults fsr = new FilteredSearchResults();
         ArrayList<SearchResult> l = new ArrayList<>();
+        List<KeywordFilter> keywordFilters = getKeywordFiltersPipeline();
+
         for (SearchResult sr : results) {
             MediaType mt;
             String extension = FilenameUtils.getExtension(((FileSearchResult) sr).getFilename());
@@ -210,13 +214,10 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             }
 
             if (isFileSearchResultMediaTypeMatching(sr, mt)) {
-                List<KeywordFilter> keywordFilters = getKeywordFiltersPipeline();
                 if (keywordFilters.isEmpty()) {
                     l.add(sr);
-                } else {
-                    if (KeywordFilter.passesFilterPipeline(sr, keywordFilters)) {
-                        l.add(sr);
-                    }
+                } else if (KeywordFilter.passesFilterPipeline(sr, keywordFilters)) {
+                    l.add(sr);
                 }
             }
             fsr.increment(mt);
