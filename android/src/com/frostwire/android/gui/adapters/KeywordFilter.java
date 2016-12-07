@@ -52,8 +52,8 @@ public class KeywordFilter {
      * NOTE: If you use this constructor, make sure the stringForm passed matches the inclusive and keyword
      * parameters. The constructor performs no validations and this could lead to unwanted behavior when
      * asking for toString(), as the stringForm will be the one returned by toString().
-     * @param inclusive
-     * @param keyword
+     * @param inclusive - the keyword should be included or not
+     * @param keyword - the keyword
      * @param stringForm - How this keyword filter was parsed out from a search
      */
     public KeywordFilter(boolean inclusive, String keyword, String stringForm) {
@@ -72,9 +72,8 @@ public class KeywordFilter {
     }
 
     /**
-     *
      * @param searchTerms must match [+,-]:keyword:<theKeyword>
-     * @return
+     * @return The list of KeywordFilter objects found in the query string.
      */
     public static List<KeywordFilter> parseKeywordFilters(String searchTerms) {
         List<KeywordFilter> pipeline = new LinkedList<>();
@@ -129,22 +128,19 @@ public class KeywordFilter {
         Iterator<KeywordFilter> it = filterPipeline.iterator();
         while (accepted && it.hasNext()) {
             KeywordFilter filter = it.next();
-            accepted &= filter.accept(haystack);
+            accepted = filter.accept(haystack);
         }
         return accepted;
     }
 
     public static String cleanQuery(String query, List<KeywordFilter> keywordFilters) {
         for (KeywordFilter filter : keywordFilters) {
-            if (filter.stringForm != null) {
-                query = query.replace(filter.stringForm, "");
-            } else {
-                query = query.replace(filter.toString(), "");
-            }
+            query = query.replace(filter.toString(), "");
         }
         return query.trim();
     }
 
+    @SuppressWarnings("unused")
     private static class KeywordFilterTests {
         private static final FileSearchResult fsr = new FileSearchResult() {
             @Override
@@ -237,6 +233,7 @@ public class KeywordFilter {
             failPipeline.add(MITfilter);
             failPipeline.add(notthereFilter);
             failPipeline.add(athensFilter); // this one shouldn't even be checked as it should short circuit
+            //noinspection RedundantIfStatement
             if (!assertFalse("inclusion pipeline fail test", KeywordFilter.passesFilterPipeline(fsr, failPipeline))) {
                 return false;
             }
@@ -277,6 +274,7 @@ public class KeywordFilter {
             failPipeline.add(athensFilter);
             failPipeline.add(MITfilter);
             failPipeline.add(notthereFilter);
+            //noinspection RedundantIfStatement
             if (!assertFalse("exclusion pipeline fail test", passesFilterPipeline(fsr, failPipeline))) {
                 return false;
             }
@@ -291,6 +289,7 @@ public class KeywordFilter {
             mixedPipeline.add(MITfilter);
             mixedPipeline.add(frostwireExclusionFilter);
             mixedPipeline.add(athensFilter);
+            //noinspection RedundantIfStatement
             if (!assertTrue("mixed pipeline test", passesFilterPipeline(fsr, mixedPipeline))) {
                 return false;
             }
@@ -307,6 +306,7 @@ public class KeywordFilter {
             if (!assertTrue("parse keywords detection test 5", keywordFilters.get(2).keyword.equals("home"))) return false;
             if (!assertTrue("toString() test 1", keywordFilters.get(0).toString().equals("+:keyword:thein"))) return false;
             if (!assertTrue("toString() test 2", keywordFilters.get(1).toString().equals("-:keyword:theout"))) return false;
+            //noinspection RedundantIfStatement
             if (!assertTrue("toString() test 3", keywordFilters.get(2).toString().equals(":keyword:home"))) return false;
             return true;
         }
@@ -324,6 +324,7 @@ public class KeywordFilter {
             if (!assertTrue("constructor test 7", f.inclusive)) return false;
             if (!assertTrue("constructor test 8", f.keyword.equals("love"))) return false;
             if (!assertFalse("constructor test 9", f.toString().equals("+:keyword:love"))) return false;
+            //noinspection RedundantIfStatement
             if (!assertTrue("constructor test 9", f.toString().equals(":keyword:love"))) return false;
             return true;
         }
@@ -333,6 +334,7 @@ public class KeywordFilter {
             List<KeywordFilter> keywordFilters = parseKeywordFilters(query);
             if (!assertTrue("test cleanQuery 1", keywordFilters.size() == 3)) return false;
             String cleaned = cleanQuery(query, keywordFilters);
+            //noinspection RedundantIfStatement
             if (!assertTrue("test cleanQuery 2",
                     cleaned.equals("I know it is wet and the sun is not sunny, but we can have lots of good fun that is funny")))
                 return false;
