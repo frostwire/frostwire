@@ -383,8 +383,8 @@ public class LibraryUtils {
     static void asyncAddToPlaylist(final Playlist playlist, final PlaylistItem[] playlistItems, final int index) {
         Thread t = new Thread(new Runnable() {
             public void run() {
-                playlist.refresh();
                 addToPlaylist(playlist, playlistItems, index);
+                playlist.refresh();
                 playlist.save();
                 GUIMediator.safeInvokeLater(new Runnable() {
                     public void run() {
