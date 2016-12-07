@@ -19,7 +19,6 @@
 package com.frostwire.gui.library;
 
 import com.frostwire.alexandria.PlaylistItem;
-import com.frostwire.alexandria.TransferHandlerUtils;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -48,7 +47,7 @@ final class LibraryFilesTransferHandler extends TransferHandler {
 
     private final JTree tree;
 
-    public LibraryFilesTransferHandler(JTree tree) {
+    LibraryFilesTransferHandler(JTree tree) {
         this.tree = tree;
     }
 
@@ -64,17 +63,17 @@ final class LibraryFilesTransferHandler extends TransferHandler {
 
             if (node instanceof DirectoryHolderNode) {
                 DirectoryHolder dirHolder = ((DirectoryHolderNode) node).getDirectoryHolder();
-                
+
                 //dropping folder or folders on file types and finished downloads.
                 if (droppingFoldersToAddToLibrary(support, dirHolder,true)) {
                    return true;
                 }
-                
+
                 if ((!(dirHolder instanceof MediaTypeSavedFilesDirectoryHolder) || !((MediaTypeSavedFilesDirectoryHolder) dirHolder).getMediaType().equals(MediaType.getAudioMediaType())) && !(dirHolder instanceof StarredDirectoryHolder)) {
                     return false;
                 }
             }
-            return TransferHandlerUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
+            return DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
         } catch (Throwable e) {
             LOG.error("Error in LibraryFilesTransferHandler processing", e);
         }

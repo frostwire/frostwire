@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,16 +20,13 @@ package com.frostwire.gui.library;
 import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.alexandria.db.LibraryDatabase;
 import com.frostwire.gui.library.LibraryPlaylistsTableTransferable.PlaylistItemContainer;
-import com.frostwire.gui.player.MediaPlayer;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.dnd.MulticastTransferHandler;
-import org.limewire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.InvalidDnDOperationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,9 +39,8 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
     private final LibraryPlaylistsTableMediator mediator;
     private final TransferHandler fallbackTransferHandler;
 
-    public LibraryPlaylistsTableTransferHandler(LibraryPlaylistsTableMediator mediator) {
+    LibraryPlaylistsTableTransferHandler(LibraryPlaylistsTableMediator mediator) {
         this.mediator = mediator;
-        
         this.fallbackTransferHandler = new MulticastTransferHandler(DNDUtils.DEFAULT_TRANSFER_HANDLERS);
     }
 
@@ -110,9 +106,9 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
     @Override
     protected Transferable createTransferable(JComponent c) {
         List<AbstractLibraryTableDataLine<PlaylistItem>> lines = mediator.getSelectedLines();
-        List<PlaylistItem> playlistItems = new ArrayList<PlaylistItem>(lines.size());
-        for (int i = 0; i < lines.size(); i++) {
-            playlistItems.add(lines.get(i).getInitializeObject());
+        List<PlaylistItem> playlistItems = new ArrayList<>(lines.size());
+        for (AbstractLibraryTableDataLine<PlaylistItem> line : lines) {
+            playlistItems.add(line.getInitializeObject());
         }
         
         int[] selectedIndexes = mediator.getSelectedIndexes();
@@ -127,56 +123,23 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
         if (mediator.getCurrentPlaylist() != null && mediator.getCurrentPlaylist().getId() == LibraryDatabase.STARRED_PLAYLIST_ID) {
             return false;
         }
-
         if (support.isDataFlavorSupported(LibraryPlaylistsTableTransferable.PLAYLIST_ITEM_ARRAY)) {
-            
             Transferable transferable = support.getTransferable();
             PlaylistItemContainer container;
-            
             try {
                 container = (PlaylistItemContainer) transferable.getTransferData(LibraryPlaylistsTableTransferable.PLAYLIST_ITEM_ARRAY);
-                if ( mediator.getCurrentPlaylist().getId() == container.playlistID &&
-                     mediator.getDataModel().getSortColumn() == LibraryPlaylistsTableDataLine.SORT_INDEX_IDX &&
-                     mediator.getDataModel().isSortAscending() ) {
-                    
-                    // only allow playlist item D&D when you are dragging files 
+                if (mediator.getCurrentPlaylist().getId() == container.playlistID &&
+                    mediator.getDataModel().getSortColumn() == LibraryPlaylistsTableDataLine.SORT_INDEX_IDX &&
+                    mediator.getDataModel().isSortAscending()) {
+                    // only allow playlist item D&D when you are dragging files
                     // within the same playlist and sorting ascending by the correct column
                     return true; 
                 }
             } catch (Exception e) {
                 // continue on with false return below
             }
-            
-        } else if (support.isDataFlavorSupported(LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
-            return true;
-        } else if (DNDUtils.containsFileFlavors(support.getDataFlavors())) {
-        	if (OSUtils.isMacOSX()) {
-        		return true;
-        	}
-            try {
-                File[] files = DNDUtils.getFiles(support.getTransferable());
-                for (File file : files) {
-                    if (MediaPlayer.isPlayableFile(file)) {
-                        return true;
-                    } else if (file.isDirectory()) {
-                        if (LibraryUtils.directoryContainsAudio(file)) {
-                            return true;
-                        }
-                    }
-                }
-                if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {
-                    return true;
-                }
-                return fallback ? fallbackTransferHandler.canImport(support) : false;
-            } catch (InvalidDnDOperationException e) {
-                // this case seems to be something special with the OS
-                return true;
-            } catch (Exception e) {
-                return fallback ? fallbackTransferHandler.canImport(support) : false;
-            }
         }
-
-        return false;
+        return DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, fallbackTransferHandler, true);
     }
     
     private void importPlaylistItemArrayData(Transferable transferable, int index) throws UnsupportedFlavorException, IOException {

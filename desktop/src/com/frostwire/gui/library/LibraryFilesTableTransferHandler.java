@@ -18,7 +18,6 @@
 package com.frostwire.gui.library;
 
 import com.frostwire.alexandria.PlaylistItem;
-import com.frostwire.alexandria.TransferHandlerUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.dnd.FileTransferable;
@@ -94,6 +93,6 @@ class LibraryFilesTableTransferHandler extends TransferHandler {
         if (!mediator.getMediaType().equals(MediaType.getAudioMediaType())) {
             return fallback ? fallbackTransferHandler.canImport(support) : false;
         }
-        return TransferHandlerUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, fallbackTransferHandler, fallback);
+        return DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, fallbackTransferHandler, fallback);
     }
 }

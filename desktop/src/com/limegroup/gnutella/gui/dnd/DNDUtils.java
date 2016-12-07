@@ -15,20 +15,20 @@
 
 package com.limegroup.gnutella.gui.dnd;
 
+import com.frostwire.gui.player.MediaPlayer;
+import com.limegroup.gnutella.util.URIUtils;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringTokenizer;
-
-import com.limegroup.gnutella.util.URIUtils;
+import java.util.*;
 
 /**
  * Static helper class with DND tasks that provides methods for handling
@@ -154,5 +154,44 @@ public class DNDUtils {
             }
         }
         return files.toArray(new File[files.size()]);
+    }
+
+    public static boolean supportCanImport(DataFlavor dataFlavor, TransferHandler.TransferSupport support, TransferHandler fallbackTransferHandler, boolean fallback) {
+        if (support.isDataFlavorSupported(dataFlavor)) {
+            return true;
+        } else if (DNDUtils.containsFileFlavors(support.getDataFlavors())) {
+            if (OSUtils.isMacOSX()) {
+                return true;
+            }
+            try {
+                File[] files = DNDUtils.getFiles(support.getTransferable());
+                if (containsPlayableFile(files)) {
+                    return true;
+                }
+                if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {
+                    return true;
+                }
+                return fallback && fallbackTransferHandler != null ? fallbackTransferHandler.canImport(support) : false;
+            } catch (InvalidDnDOperationException e) {
+                // this case seems to be something special with the OS
+                return true;
+            } catch (Exception e) {
+                return fallback && fallbackTransferHandler != null ? fallbackTransferHandler.canImport(support) : false;
+            }
+        }
+        return false;
+    }
+
+    private static boolean containsPlayableFile(File[] files) {
+        for (File file : files) {
+            if (MediaPlayer.isPlayableFile(file)) {
+                return true;
+            } else if (file.isDirectory()) {
+                if (com.frostwire.gui.library.LibraryUtils.directoryContainsAudio(file)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

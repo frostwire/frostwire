@@ -20,7 +20,6 @@ package com.frostwire.gui.library;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
-import com.frostwire.alexandria.TransferHandlerUtils;
 import com.frostwire.gui.library.LibraryPlaylists.LibraryPlaylistsListCell;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 
@@ -39,13 +38,13 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
 
     private final JList<Object> list;
 
-    public LibraryPlaylistsTransferHandler(JList<Object> list) {
+    LibraryPlaylistsTransferHandler(JList<Object> list) {
         this.list = list;
     }
 
     @Override
     public boolean canImport(TransferSupport support) {
-        return TransferHandlerUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
+        return DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
     }
 
     @Override
