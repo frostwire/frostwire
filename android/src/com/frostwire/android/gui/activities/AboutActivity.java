@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,14 +18,14 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.ActionBar;
 import android.os.Bundle;
 import android.view.MenuItem;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.views.AbstractActivity2;
 
-public class AboutActivity extends AbstractActivity {
+public class AboutActivity extends AbstractActivity2 {
 
     public AboutActivity() {
         super(R.layout.activity_about);
@@ -33,11 +33,6 @@ public class AboutActivity extends AbstractActivity {
 
     @Override
     protected void initComponents(Bundle savedInstanceState) {
-        ActionBar bar = getActionBar();
-        if (bar != null) {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-            getActionBar().setIcon(android.R.color.transparent);
-        }
     }
 
     @Override

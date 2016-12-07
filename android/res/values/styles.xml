@@ -657,4 +657,21 @@
         <item name="android:padding">3dp</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="ToolbarNavigationButtonStyle" parent="@style/Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+
+    <style name="ToolbarStyle" parent="@style/Widget.AppCompat.Toolbar">
+        <item name="titleTextAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="subtitleTextAppearance">@android:style/TextAppearance.Small</item>
+        <item name="titleMargin">0dp</item>
+        <item name="contentInsetStart">0dp</item>
+        <item name="contentInsetStartWithNavigation">0dp</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+    </style>
+
 </resources>

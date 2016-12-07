@@ -53,7 +53,7 @@
 
     <application android:name="com.frostwire.android.gui.MainApplication"
                  android:allowBackup="true" android:icon="@mipmap/ic_launcher"
-                 android:label="@string/application_label" android:theme="@style/Theme.FrostWire">
+                 android:label="@string/application_label" android:theme="@style/Theme.FrostWire.NoMaterial">
 
         <meta-data android:name="com.google.android.gms.version"
                    android:value="@integer/google_play_services_version"/>
@@ -120,7 +120,7 @@
         <activity android:name="com.frostwire.android.gui.activities.BuyActivity"
                   android:label="@string/remove_ads"/>
         <activity android:name="com.frostwire.android.gui.activities.AboutActivity"
-                  android:label="@string/about"/>
+                  android:label="@string/about" android:theme="@style/Theme.FrostWire"/>
         <activity android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
                   android:label="@string/playing"
                   android:configChanges="orientation|screenSize"/>

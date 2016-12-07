@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,13 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Theme.FrostWire" parent="android:Theme.Holo.Light">
+    <style name="Theme.FrostWire" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="toolbarNavigationButtonStyle">@style/ToolbarNavigationButtonStyle</item>
+        <item name="toolbarStyle">@style/ToolbarStyle</item>
+    </style>
+
+    <style name="Theme.FrostWire.NoMaterial" parent="android:Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/ActionBar</item>
         <item name="android:homeAsUpIndicator">@drawable/home_as_up_padding</item>
         <item name="android:actionOverflowButtonStyle">@style/ActionButton.Overflow</item>
