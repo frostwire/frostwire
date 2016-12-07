@@ -41,11 +41,34 @@ import java.util.List;
 public class KeywordFilter {
     private final boolean inclusive;
     private final String keyword;
+    private final String stringForm;
     private static final String KEYWORD_FILTER_PATTERN = "(?is)(?<inclusive>\\+|-)?(:keyword:)(?<keyword>[^\\s-]*)";
 
     public KeywordFilter(boolean inclusive, String keyword) {
+        this(inclusive, keyword, null);
+    }
+
+    /**
+     * NOTE: If you use this constructor, make sure the stringForm passed matches the inclusive and keyword
+     * parameters. The constructor performs no validations and this could lead to unwanted behavior when
+     * asking for toString(), as the stringForm will be the one returned by toString().
+     * @param inclusive
+     * @param keyword
+     * @param stringForm - How this keyword filter was parsed out from a search
+     */
+    public KeywordFilter(boolean inclusive, String keyword, String stringForm) {
         this.inclusive = inclusive;
         this.keyword = keyword.toLowerCase();
+        if (stringForm != null) {
+            this.stringForm = stringForm;
+        } else {
+            this.stringForm = ((inclusive) ? "+":"-") + ":keyword:" + this.keyword;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return stringForm;
     }
 
     /**
@@ -57,7 +80,6 @@ public class KeywordFilter {
         List<KeywordFilter> pipeline = new LinkedList<>();
         Pattern pattern = Pattern.compile(KEYWORD_FILTER_PATTERN);
         Matcher matcher = pattern.matcher(searchTerms);
-
         while (matcher.find()) {
             boolean inclusive = true;
             String inclusiveMatch = matcher.group("inclusive");
@@ -66,7 +88,7 @@ public class KeywordFilter {
             }
             String keyword = matcher.group("keyword");
             if (keyword != null) {
-                pipeline.add(new KeywordFilter(inclusive, keyword));
+                pipeline.add(new KeywordFilter(inclusive, keyword, matcher.group(0)));
             }
         }
         return pipeline;
@@ -79,9 +101,14 @@ public class KeywordFilter {
 
     private static String getSearchResultHaystack(@NonNull SearchResult sr) {
         StringBuilder queryString = new StringBuilder();
+        if (sr.getSource() == null) {
+            System.err.println("WARNING: " + sr.getClass().getSimpleName() + " has no source!");
+        } else {
+            queryString.append(sr.getSource());
+            queryString.append(" ");
+        }
         queryString.append(sr.getDisplayName());
         queryString.append(" ");
-        queryString.append(sr.getSource());
         if (sr instanceof FileSearchResult) {
             queryString.append(" ");
             queryString.append(((FileSearchResult) sr).getFilename());
@@ -105,6 +132,17 @@ public class KeywordFilter {
             accepted &= filter.accept(haystack);
         }
         return accepted;
+    }
+
+    public static String cleanQuery(String query, List<KeywordFilter> keywordFilters) {
+        for (KeywordFilter filter : keywordFilters) {
+            if (filter.stringForm != null) {
+                query = query.replace(filter.stringForm, "");
+            } else {
+                query = query.replace(filter.toString(), "");
+            }
+        }
+        return query.trim();
     }
 
     private static class KeywordFilterTests {
@@ -246,7 +284,6 @@ public class KeywordFilter {
         }
 
         private static boolean testMixedFilters() {
-            final String haystack = KeywordFilter.getSearchResultHaystack(fsr);
             KeywordFilter MITfilter = new KeywordFilter(true, "MIT");
             KeywordFilter frostwireExclusionFilter = new KeywordFilter(false, "frostwire");
             KeywordFilter athensFilter = new KeywordFilter(true, "athens");
@@ -263,25 +300,52 @@ public class KeywordFilter {
         private static boolean testParseKeywordFilters() {
             //parseKeywordFilters
             List<KeywordFilter> keywordFilters = parseKeywordFilters("yaba daba doo +:keyword:thein -:keyword:theout +:keyward:notamatch :keyword:home");
-            assertTrue("parse keywords detection test", keywordFilters.size() == 3);
+            if (!assertTrue("parse keywords detection test 1", keywordFilters.size() == 3)) return false;
+            if (!assertTrue("parse keywords detection test 2", keywordFilters.get(0).inclusive)) return false;
+            if (!assertFalse("parse keywords detection test 3",keywordFilters.get(1).inclusive)) return false;
+            if (!assertTrue("parse keywords detection test 4", keywordFilters.get(2).inclusive)) return false;
+            if (!assertTrue("parse keywords detection test 5", keywordFilters.get(2).keyword.equals("home"))) return false;
+            if (!assertTrue("toString() test 1", keywordFilters.get(0).toString().equals("+:keyword:thein"))) return false;
+            if (!assertTrue("toString() test 2", keywordFilters.get(1).toString().equals("-:keyword:theout"))) return false;
+            if (!assertTrue("toString() test 3", keywordFilters.get(2).toString().equals(":keyword:home"))) return false;
+            return true;
+        }
+
+        private static boolean testConstructors() {
+            KeywordFilter f = new KeywordFilter(true, "wisdom");
+            if (!assertTrue("constructor test 1", f.inclusive)) return false;
+            if (!assertTrue("constructor test 2", f.keyword.equals("wisdom"))) return false;
+            if (!assertTrue("constructor test 3", f.toString().equals("+:keyword:wisdom"))) return false;
+            f = new KeywordFilter(false, "patience");
+            if (!assertFalse("constructor test 4", f.inclusive)) return false;
+            if (!assertTrue("constructor test 5", f.keyword.equals("patience"))) return false;
+            if (!assertTrue("constructor test 6", f.toString().equals("-:keyword:patience"))) return false;
+            f = new KeywordFilter(true, "love", ":keyword:love");
+            if (!assertTrue("constructor test 7", f.inclusive)) return false;
+            if (!assertTrue("constructor test 8", f.keyword.equals("love"))) return false;
+            if (!assertFalse("constructor test 9", f.toString().equals("+:keyword:love"))) return false;
+            if (!assertTrue("constructor test 9", f.toString().equals(":keyword:love"))) return false;
+            return true;
+        }
+
+        private static boolean testCleanQuery() {
+            String query = "I know it is wet and the sun is not sunny, but we can have lots of good fun that is funny :keyword:somesource -:keyword:mp4 +:keyword:pdf";
+            List<KeywordFilter> keywordFilters = parseKeywordFilters(query);
+            if (!assertTrue("test cleanQuery 1", keywordFilters.size() == 3)) return false;
+            String cleaned = cleanQuery(query, keywordFilters);
+            if (!assertTrue("test cleanQuery 2",
+                    cleaned.equals("I know it is wet and the sun is not sunny, but we can have lots of good fun that is funny")))
+                return false;
             return true;
         }
 
         public static void main(String[] args) {
-            if (!KeywordFilterTests.testInclusiveFilters()) {
-                return;
-            }
-            if (!KeywordFilterTests.testExclusiveFilters()) {
-                return;
-            }
-            if (!KeywordFilterTests.testMixedFilters()) {
-                return;
-            }
-
-            if (!KeywordFilterTests.testParseKeywordFilters()) {
-                return;
-            }
-
+            if (!KeywordFilterTests.testInclusiveFilters()) return;
+            if (!KeywordFilterTests.testExclusiveFilters()) return;
+            if (!KeywordFilterTests.testMixedFilters()) return;
+            if (!KeywordFilterTests.testParseKeywordFilters()) return;
+            if (!KeywordFilterTests.testConstructors()) return;
+            if (!KeywordFilterTests.testCleanQuery()) return;
             System.out.println("PASSED ALL TESTS");
         }
     }
