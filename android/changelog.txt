@@ -1,5 +1,5 @@
 FrostWire 1.8.6 - DEC/06/2016
- - Search window title bar and text bar hides when scrolling down on search results
+ - [Experimental] Distraction Free Search: Hide title bar and search box when scrolling down search results
  - Ukranian, Romanian, Hungarian translations
  - Fixes Archive.org, SoundCloud search
  - Fixes checkbox/menu selection options bug on My files
@@ -8,6 +8,7 @@ FrostWire 1.8.6 - DEC/06/2016
  - Transfer action bar hides menu button if no transfers present
  - Image loading/caching optimizations
  - gson JSON parsing library upgraded to 2.8.0
+ - library updates
 
 FrostWire 1.8.5 - NOV/21/2016
  - Search engines updates
