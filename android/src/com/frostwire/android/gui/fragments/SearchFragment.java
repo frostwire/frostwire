@@ -371,9 +371,15 @@ public final class SearchFragment extends AbstractFragment implements
         adapter.setFileType(mediaTypeId);
         fileTypeCounter.clear();
         refreshFileTypeCounters(false);
+
+        List<KeywordFilter> keywordFilters = KeywordFilter.parseKeywordFilters(query);
+        if (!keywordFilters.isEmpty()) {
+            query = KeywordFilter.cleanQuery(query, keywordFilters);
+            adapter.setKeywordFiltersPipeline(keywordFilters);
+        }
         currentQuery = query;
         LocalSearchEngine.instance().performSearch(query);
-        adapter.setKeywordFiltersPipeline(KeywordFilter.parseKeywordFilters(query));
+
         searchProgress.setProgressEnabled(true);
         showSearchView(getView());
         UXStats.instance().log(UXAction.SEARCH_STARTED_ENTER_KEY);
