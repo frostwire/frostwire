@@ -226,6 +226,11 @@
             android:layout="@layout/view_preference_simple_action"
             android:title="@string/haptic_feedback" />
         <CheckBoxPreference
+            android:key="frostwire.prefs.gui.distraction_free_search"
+            android:layout="@layout/view_preference_simple_action"
+            android:title="@string/distraction_free_search_results"
+            android:summary="@string/distraction_free_search_results_summary"/>
+        <CheckBoxPreference
             android:key="frostwire.prefs.uxstats.enabled"
             android:layout="@layout/view_preference_simple_action"
             android:summary="@string/anonymous_usage_statistics_summary"

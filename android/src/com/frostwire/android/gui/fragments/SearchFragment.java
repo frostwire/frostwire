@@ -305,10 +305,13 @@ public final class SearchFragment extends AbstractFragment implements
             });
         }
         list.setAdapter(adapter);
-        list.setOnScrollListener(
-                DirectionDetectorScrollListener.createOnScrollListener(
-                        createScrollDirectionListener(),
-                        Engine.instance().getThreadPool()));
+
+        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH)) {
+            list.setOnScrollListener(
+                    DirectionDetectorScrollListener.createOnScrollListener(
+                            createScrollDirectionListener(),
+                            Engine.instance().getThreadPool()));
+        }
     }
 
     private ScrollDirectionListener createScrollDirectionListener() {

@@ -641,4 +641,6 @@
     <string name="advertisement">advertisement</string>
     <string name="frostwire_features">FROSTWIRE FEATURES</string>
     <string name="all_free_downloads">All free downloads</string>
+    <string name="distraction_free_search_results">Distraction Free Search (beta)</string>
+    <string name="distraction_free_search_results_summary">Hide UI components to show more results. Needs app restart to take effect.</string>
 </resources>
