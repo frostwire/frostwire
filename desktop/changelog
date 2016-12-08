@@ -2,7 +2,7 @@ frostwire (6.4.2) stable; urgency=high
   * Fixes Archive.org, SoundCloud search.
   * Starred playlist moved down to playlist explorer
   * Playlist explorer right click popups show as least actions as possible
-  * Playlist managment bug fixes
+  * Playlist management bug fixes
   * H2 database update (1.4.193)
   * gson upgraded to 2.8.0
   * Cleanup, and performance upgrades
