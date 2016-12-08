@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (marcelinkaaa)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ *            Marcelina Knitter (marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,22 @@
 package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.view.*;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
-import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
@@ -50,13 +52,17 @@ import java.util.Random;
  * @author aldenml
  */
 public class BuyActivity extends AbstractActivity {
+
     private static final Logger LOG = Logger.getLogger(BuyActivity.class);
+
     public static final String INTERSTITIAL_MODE = "interstitialMode";
     public static final int PURCHASE_SUCCESSFUL_RESULT_CODE = 0xaadd;
     public static final String EXTRA_KEY_PURCHASE_TIMESTAMP = "purchase_timestamp";
+
     private static final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
     private static final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
     private static final String OFFER_ACCEPTED = "offer_accepted";
+    
     private ProductCardView card30days;
     private ProductCardView card1year;
     private ProductCardView card6months;
