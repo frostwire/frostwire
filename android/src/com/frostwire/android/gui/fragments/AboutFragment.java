@@ -1,6 +1,7 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+  *           Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,10 +29,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -43,14 +45,9 @@ import java.io.InputStream;
  * @author aldenml
  * @author marcelinkaaa
  */
-public class AboutFragment extends Fragment implements MainFragment {
+public class AboutFragment extends Fragment {
 
     public AboutFragment() {
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -88,7 +85,7 @@ public class AboutFragment extends Fragment implements MainFragment {
         final ImageButton redditButton = (ImageButton) view.findViewById(R.id.fragment_about_reddit_button);
         final ImageButton githubButton = (ImageButton) view.findViewById(R.id.fragment_about_github_button);
 
-        final String referrerParam  = "?ref=android_about";
+        final String referrerParam = "?ref=android_about";
 
         facebookButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,19 +150,6 @@ public class AboutFragment extends Fragment implements MainFragment {
 
     private void onLoveFrostWire() {
         UIUtils.openURL(getActivity(), Constants.FROSTWIRE_GIVE_URL + "plus-about");
-    }
-
-    @Override
-    public View getHeader(Activity activity) {
-        LayoutInflater inflater = LayoutInflater.from(activity);
-        TextView header = (TextView) inflater.inflate(R.layout.view_main_fragment_simple_header, null);
-        header.setText(R.string.about);
-
-        return header;
-    }
-
-    @Override
-    public void onShow() {
     }
 
     private String getAboutText() {
