@@ -65,6 +65,9 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
         initToolbar();
     }
 
+    protected void initComponents(Bundle savedInstanceState) {
+    }
+
     protected void initToolbar() {
         Toolbar toolbar = findView(R.id.toolbar_main);
         if (toolbar != null) {
@@ -72,8 +75,6 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
             toolbar.setTitle(getTitle());
         }
     }
-
-    protected abstract void initComponents(Bundle savedInstanceState);
 
     @SuppressWarnings("unchecked")
     protected final <T extends View> T findView(int id) {
