@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.frostwire.android.R;
@@ -63,6 +64,17 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
         setContentView(layoutResId);
         initComponents(savedInstanceState);
         initToolbar();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     protected void initComponents(Bundle savedInstanceState) {

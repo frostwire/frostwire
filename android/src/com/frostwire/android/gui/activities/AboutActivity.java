@@ -17,20 +17,12 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.view.MenuItem;
-
 import com.frostwire.android.R;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
 
 public class AboutActivity extends AbstractActivity2 {
 
     public AboutActivity() {
         super(R.layout.activity_about);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return UIUtils.finishOnHomeOptionItemSelected(this, item);
     }
 }
