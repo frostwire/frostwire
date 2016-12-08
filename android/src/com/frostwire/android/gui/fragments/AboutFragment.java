@@ -1,5 +1,5 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -31,9 +32,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.util.UIUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -43,7 +42,7 @@ import java.io.InputStream;
 /**
  * @author gubatron
  * @author aldenml
- * 
+ * @author marcelinkaaa
  */
 public class AboutFragment extends Fragment implements MainFragment {
 
@@ -54,22 +53,30 @@ public class AboutFragment extends Fragment implements MainFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_about, container, false);
 
+        //Title, build number and changelog setup
         final TextView title = (TextView) view.findViewById(R.id.fragment_about_title);
         final String basicOrPlus = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "Basic" : "Plus";
         title.setText("FrostWire " + basicOrPlus + " v" + Constants.FROSTWIRE_VERSION_STRING);
 
         final TextView buildNumber = (TextView) view.findViewById(R.id.fragment_about_build_number);
-        buildNumber.setText("\nbuild " + BuildConfig.VERSION_CODE + " - sdk level " + Build.VERSION.SDK_INT);
+        buildNumber.setText("build " + BuildConfig.VERSION_CODE + Build.VERSION.SDK_INT + ", ");
 
-        final TextView content = (TextView) view.findViewById(R.id.fragment_about_content);
-        content.setText(Html.fromHtml(getAboutText()));
-        content.setMovementMethod(LinkMovementMethod.getInstance());
+        final TextView changelog = (TextView) view.findViewById(R.id.fragment_about_changelog);
+        changelog.setPaintFlags(changelog.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
 
+        changelog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UIUtils.openURL(v.getContext(), Constants.CHANGELOG_URL);
+            }
+        });
+
+        //Love FrostWire button and social media icons
         final Button loveFrostWireButton = (Button) view.findViewById(R.id.fragment_about_love_frostwire);
         loveFrostWireButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,17 +84,15 @@ public class AboutFragment extends Fragment implements MainFragment {
                 onLoveFrostWire();
             }
         });
-        
-        final Button sendFeedbackButton = (Button) view.findViewById(R.id.fragment_about_send_feedback);
-        sendFeedbackButton.setOnClickListener(new OnFeedbackClickAdapter(this, null, ConfigurationManager.instance()));
 
-        final ImageButton fbButton = (ImageButton) view.findViewById(R.id.fragment_about_facebook_button);
+        final ImageButton facebookButton = (ImageButton) view.findViewById(R.id.fragment_about_facebook_button);
         final ImageButton twitterButton = (ImageButton) view.findViewById(R.id.fragment_about_twitter_button);
         final ImageButton redditButton = (ImageButton) view.findViewById(R.id.fragment_about_reddit_button);
+        final ImageButton githubButton = (ImageButton) view.findViewById(R.id.fragment_about_github_button);
 
         final String referrerParam  = "?ref=android_about";
 
-        fbButton.setOnClickListener(new View.OnClickListener() {
+        facebookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
@@ -108,10 +113,44 @@ public class AboutFragment extends Fragment implements MainFragment {
             }
         });
 
-        return view;
-    }
+        githubButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_GITHUB_PAGE + referrerParam);
+            }
+        });
 
-    private void onSendFeedback() {
+        //Remaining elements including text content
+        final TextView stickersShop = (TextView) view.findViewById(R.id.fragment_about_stickers);
+        final TextView sendFeedback = (TextView) view.findViewById(R.id.fragment_about_feedback);
+        final TextView translateHelp = (TextView) view.findViewById(R.id.fragment_about_translate);
+
+        stickersShop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UIUtils.openURL(v.getContext(), Constants.STICKERS_SHOP_URL);
+            }
+        });
+
+        sendFeedback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UIUtils.openURL(v.getContext(), Constants.CONTACT_US_URL);
+            }
+        });
+
+        translateHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UIUtils.openURL(v.getContext(), Constants.TRANSLATE_HELP_URL);
+            }
+        });
+
+        final TextView content = (TextView) view.findViewById(R.id.fragment_about_content);
+        content.setText(Html.fromHtml(getAboutText()));
+        content.setMovementMethod(LinkMovementMethod.getInstance());
+
+        return view;
     }
 
     private void onLoveFrostWire() {

@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,105 +39,164 @@
                 android:id="@+id/fragment_about_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="22dp"
                 android:gravity="center_horizontal"
                 android:text="@string/dummy_title"
-                android:textSize="22sp"
+                android:textSize="21sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/fragment_about_build_number"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-12dp"
+                android:layout_marginTop="5dp"
                 android:gravity="center_horizontal"
-                android:text="@string/dummy_build"
-                android:textColor="@color/app_text_secondary"
-                android:textSize="15dp" />
+                android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="80dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:gravity="center_vertical|center_horizontal"
-                android:orientation="horizontal"
-                android:weightSum="3">
+                <TextView
+                    android:id="@+id/fragment_about_build_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dummy_build"
+                    android:textColor="@color/app_text_secondary"
+                    android:textSize="@dimen/text_medium" />
 
-                <ImageButton
-                    android:id="@+id/fragment_about_facebook_button"
-                    android:layout_width="65dp"
-                    android:layout_height="65dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_weight="1"
-                    android:background="@color/transparent"
-                    android:cropToPadding="false"
-                    android:maxHeight="80dp"
-                    android:maxWidth="80dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/social_wizard_facebook" />
-
-
-                <ImageButton
-                    android:id="@+id/fragment_about_twitter_button"
-                    android:layout_width="65dp"
-                    android:layout_height="65dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_weight="1"
-                    android:background="@color/transparent"
-                    android:maxHeight="80dp"
-                    android:maxWidth="80dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/social_wizard_twitter" />
-
-
-                <ImageButton
-                    android:id="@+id/fragment_about_reddit_button"
-                    android:layout_width="65dp"
-                    android:layout_height="65dp"
-                    android:layout_weight="1"
-                    android:background="@color/transparent"
-                    android:maxHeight="80dp"
-                    android:maxWidth="80dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/social_wizard_reddit" />
-
+                <TextView
+                    android:id="@+id/fragment_about_changelog"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/changelog"
+                    android:textColor="@color/app_text_secondary"
+                    android:textSize="@dimen/text_medium" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/fragment_about_love_frostwire"
-                style="@style/BlueButton"
+                style="@style/PreferencesBlueButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="15dp"
-                android:layout_marginTop="15dp"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
+                android:layout_marginTop="30dp"
                 android:text="@string/love_frostwire" />
 
-            <Button
-                android:id="@+id/fragment_about_send_feedback"
-                style="@style/BlueButton"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginBottom="15dp"
-                android:layout_marginTop="15dp"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:text="@string/send_feedback" />
+                android:layout_marginBottom="20dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/fragment_about_facebook_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:src="@drawable/about_social_facebook" />
+
+                <ImageButton
+                    android:id="@+id/fragment_about_twitter_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="12dp"
+                    android:background="@color/transparent"
+                    android:src="@drawable/about_social_twitter" />
+
+                <ImageButton
+                    android:id="@+id/fragment_about_reddit_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="24dp"
+                    android:background="@color/transparent"
+                    android:src="@drawable/about_social_reddit" />
+
+                <ImageButton
+                    android:id="@+id/fragment_about_github_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:src="@drawable/about_social_github" />
+
+            </LinearLayout>
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/fragment_about_stickers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="18dp"
+            android:text="@string/frostwire_sticker_and_more"
+            android:textColor="@color/basic_blue_darker_highlight"
+            android:textSize="@dimen/text_medium"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/layout_divider_1_gray" />
+
+        <TextView
+            android:id="@+id/fragment_about_feedback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="18dp"
+            android:text="@string/send_feedback"
+            android:textColor="@color/basic_blue_darker_highlight"
+            android:textSize="@dimen/text_medium"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/layout_divider_1_gray" />
 
         <TextView
             android:id="@+id/fragment_about_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="45dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:layout_marginTop="23dp"
+            android:layout_marginTop="25dp"
             android:text="@string/dummy_title" />
-    </LinearLayout>
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/layout_divider_1_gray" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/body_background_gray"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingBottom="30dp"
+            android:paddingTop="30dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                android:text="@string/donate_your_time"
+                android:textAllCaps="true"
+                android:textSize="@dimen/text_medium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/fragment_about_translate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/help_translate_or_proofread_frostwire"
+                android:textColor="@color/basic_blue_darker_highlight"
+                android:textSize="@dimen/text_medium"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </LinearLayout>
 </ScrollView>
