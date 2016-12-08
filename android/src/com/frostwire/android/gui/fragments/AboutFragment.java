@@ -34,6 +34,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.AbstractFragment;
 
 import org.apache.commons.io.IOUtils;
 
@@ -45,14 +46,14 @@ import java.io.InputStream;
  * @author aldenml
  * @author marcelinkaaa
  */
-public class AboutFragment extends Fragment {
+public final class AboutFragment extends AbstractFragment {
 
     public AboutFragment() {
+        super(R.layout.fragment_about);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_about, container, false);
+    protected void initComponents(View view) {
 
         //Title, build number and changelog setup
         final TextView title = (TextView) view.findViewById(R.id.fragment_about_title);
@@ -144,8 +145,6 @@ public class AboutFragment extends Fragment {
         final TextView content = (TextView) view.findViewById(R.id.fragment_about_content);
         content.setText(Html.fromHtml(getAboutText()));
         content.setMovementMethod(LinkMovementMethod.getInstance());
-
-        return view;
     }
 
     private void onLoveFrostWire() {
