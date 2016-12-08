@@ -34,7 +34,6 @@ import com.frostwire.android.gui.views.AbstractFragment;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -52,107 +51,60 @@ public final class AboutFragment extends AbstractFragment {
     protected void initComponents(View rootView) {
 
         //Title, build number and changelog setup
-        final TextView title = findView(rootView, R.id.fragment_about_title);
-        final String basicOrPlus = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "Basic" : "Plus";
+        TextView title = findView(rootView, R.id.fragment_about_title);
+        String basicOrPlus = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "Basic" : "Plus";
         title.setText("FrostWire " + basicOrPlus + " v" + Constants.FROSTWIRE_VERSION_STRING);
 
-        final TextView buildNumber = findView(rootView, R.id.fragment_about_build_number);
+        TextView buildNumber = findView(rootView, R.id.fragment_about_build_number);
         buildNumber.setText("build " + BuildConfig.VERSION_CODE + ", sdk level " + Build.VERSION.SDK_INT);
 
-        final TextView changelog = findView(rootView, R.id.fragment_about_changelog);
-
-        changelog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.CHANGELOG_URL);
-            }
-        });
+        TextView changelog = findView(rootView, R.id.fragment_about_changelog);
+        setupClickUrl(changelog, Constants.CHANGELOG_URL);
 
         //Love FrostWire button and social media icons
-        final Button loveFrostWireButton = findView(rootView, R.id.fragment_about_love_frostwire);
-        loveFrostWireButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onLoveFrostWire();
-            }
-        });
+        Button loveFrostWireButton = findView(rootView, R.id.fragment_about_love_frostwire);
+        setupClickUrl(loveFrostWireButton, Constants.FROSTWIRE_GIVE_URL + "plus-about");
 
-        final ImageButton facebookButton = findView(rootView, R.id.fragment_about_facebook_button);
-        final ImageButton twitterButton = findView(rootView, R.id.fragment_about_twitter_button);
-        final ImageButton redditButton = findView(rootView, R.id.fragment_about_reddit_button);
-        final ImageButton githubButton = findView(rootView, R.id.fragment_about_github_button);
+        ImageButton facebookButton = findView(rootView, R.id.fragment_about_facebook_button);
+        ImageButton twitterButton = findView(rootView, R.id.fragment_about_twitter_button);
+        ImageButton redditButton = findView(rootView, R.id.fragment_about_reddit_button);
+        ImageButton githubButton = findView(rootView, R.id.fragment_about_github_button);
 
-        final String referrerParam = "?ref=android_about";
-
-        facebookButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
-            }
-        });
-
-        twitterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam);
-            }
-        });
-
-        redditButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam);
-            }
-        });
-
-        githubButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_GITHUB_PAGE + referrerParam);
-            }
-        });
+        String referrerParam = "?ref=android_about";
+        setupClickUrl(facebookButton, Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
+        setupClickUrl(twitterButton, Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam);
+        setupClickUrl(redditButton, Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam);
+        setupClickUrl(githubButton, Constants.SOCIAL_URL_GITHUB_PAGE + referrerParam);
 
         //Remaining elements including text content
-        final TextView stickersShop = findView(rootView, R.id.fragment_about_stickers);
-        final TextView sendFeedback = findView(rootView, R.id.fragment_about_feedback);
-        final TextView translateHelp = findView(rootView, R.id.fragment_about_translate);
+        TextView stickersShop = findView(rootView, R.id.fragment_about_stickers);
+        TextView sendFeedback = findView(rootView, R.id.fragment_about_feedback);
+        TextView translateHelp = findView(rootView, R.id.fragment_about_translate);
 
-        stickersShop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.STICKERS_SHOP_URL);
-            }
-        });
+        setupClickUrl(stickersShop, Constants.STICKERS_SHOP_URL);
+        setupClickUrl(sendFeedback, Constants.CONTACT_US_URL);
+        setupClickUrl(translateHelp, Constants.TRANSLATE_HELP_URL);
 
-        sendFeedback.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.CONTACT_US_URL);
-            }
-        });
-
-        translateHelp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.TRANSLATE_HELP_URL);
-            }
-        });
-
-        final TextView content = findView(rootView, R.id.fragment_about_content);
+        TextView content = findView(rootView, R.id.fragment_about_content);
         content.setText(Html.fromHtml(getAboutText()));
         content.setMovementMethod(LinkMovementMethod.getInstance());
-    }
-
-    private void onLoveFrostWire() {
-        UIUtils.openURL(getActivity(), Constants.FROSTWIRE_GIVE_URL + "plus-about");
     }
 
     private String getAboutText() {
         try {
             InputStream raw = getResources().openRawResource(R.raw.about);
             return IOUtils.toString(raw, "UTF-8");
-        } catch (IOException e) {
+        } catch (Throwable e) {
             return "";
         }
+    }
+
+    private static void setupClickUrl(View v, final String url) {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UIUtils.openURL(view.getContext(), url);
+            }
+        });
     }
 }
