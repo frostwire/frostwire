@@ -26,5 +26,5 @@ public interface ILogAlertListener
    * 
    * @param alert LogAlert that was generated
    */
-  public void alertRaised(LogAlert alert);
+  void alertRaised(LogAlert alert);
 }

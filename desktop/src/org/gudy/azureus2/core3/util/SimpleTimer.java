@@ -143,7 +143,7 @@ SimpleTimer
 	public interface
 	TimerTickReceiver
 	{
-		public void
+		void
 		tick(
                 long mono_now,
                 int tick_ount);

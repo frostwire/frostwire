@@ -23,7 +23,7 @@ package org.gudy.azureus2.core3.util;
 public interface 
 AEDiagnosticsEvidenceGenerator 
 {
-	public void
+	void
 	generate(
             IndentWriter writer);
 }

@@ -164,7 +164,7 @@ public class Timer
 						
 						long	now = SystemTime.getCurrentTime();
 						
-						TimerEvent	next_event = (TimerEvent)events.iterator().next();
+						TimerEvent	next_event = events.iterator().next();
 						
 						long	when = next_event.getWhen();
 						
@@ -256,7 +256,7 @@ public class Timer
 				
 				while (it.hasNext()){
 					
-					TimerEvent	event = (TimerEvent)it.next();
+					TimerEvent	event = it.next();
 					
 						// absolute events don't have their timings fiddled with
 					
@@ -331,7 +331,7 @@ public class Timer
 								
 				while ( it.hasNext()){
 					
-					TimerEvent	event = (TimerEvent)it.next();
+					TimerEvent	event = it.next();
 					
 						// absolute events don't have their timings fiddled with
 					

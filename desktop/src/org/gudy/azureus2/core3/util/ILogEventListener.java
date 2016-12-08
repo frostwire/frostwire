@@ -26,5 +26,5 @@ public interface ILogEventListener
    * 
    * @param event The newly generated LogEvent
    */
-  public void log(LogEvent event);
+  void log(LogEvent event);
 }

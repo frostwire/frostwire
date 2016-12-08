@@ -29,7 +29,7 @@ package org.gudy.azureus2.core3.util;
 public interface 
 TimerEventPerformer 
 {
-	public void
+	void
 	perform(
             TimerEvent event);
 }

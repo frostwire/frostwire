@@ -72,11 +72,11 @@ public class SystemTime {
 	}
 
 	protected interface SystemTimeProvider {
-		public long getTime();
+		long getTime();
 
-		public long getMonoTime();
+		long getMonoTime();
 		
-		public long
+		long
 		getSteppedMonoTime();
 	}
 
@@ -517,7 +517,7 @@ public class SystemTime {
 	}
 
 	public interface TickConsumer {
-		public void consume(long current_time);
+		void consume(long current_time);
 	}
 
 	public interface ChangeListener {
@@ -526,13 +526,13 @@ public class SystemTime {
 		 * @param current_time
 		 * @param change_millis
 		 */
-		public void clockChangeDetected(long current_time, long change_millis);
+        void clockChangeDetected(long current_time, long change_millis);
 		/**
 		 * Called after the change is visible to getCurrentTime callers
 		 * @param current_time
 		 * @param change_millis
 		 */
-		public void clockChangeCompleted(long current_time, long change_millis);
+        void clockChangeCompleted(long current_time, long change_millis);
 	}
 
 	public static long 

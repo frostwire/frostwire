@@ -158,7 +158,7 @@ AEThread2
 	
 	public boolean
 	isAlive() {
-		return wrapper == null ? false : wrapper.isAlive();
+		return wrapper != null && wrapper.isAlive();
 	}
 	
 	public boolean
