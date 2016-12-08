@@ -85,7 +85,6 @@ public class LibraryUtils {
                     mt.getTrack(),
                     mt.getYear(),
                     starred || playlist.isStarred());
-
             List<PlaylistItem> items = playlist.getItems();
             if (index != -1 && index < items.size()) {
                 // insert item
@@ -101,7 +100,6 @@ public class LibraryUtils {
                 item.setSortIndexByTrackNumber(items.size()); // fall back index would be it being the last track.
                 item.save(item.isStarred());
             }
-
             if (isPlaylistSelected(playlist)) {
                 // refresh UI
                 LibraryMediator.instance().getLibraryPlaylists().refreshSelection();
@@ -156,7 +154,6 @@ public class LibraryUtils {
             @Override
             public void onDialogCancelled() {
             }
-
             @Override
             public void onDialogOk(String playlistName) {
                 if (playlistName != null && playlistName.length() > 0) {
@@ -177,7 +174,6 @@ public class LibraryUtils {
                 }
             }
         };
-
         FrostwireInputDialog.showInputDialog(GUIMediator.getAppFrame(),
                 I18n.tr("Playlist name"),
                 I18n.tr("Playlist name"),
@@ -205,7 +201,6 @@ public class LibraryUtils {
                     GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
                     final Playlist playlist = LibraryMediator.getLibrary().newPlaylist(playlistName, playlistName);
                     playlist.save();
-
                     GUIMediator.safeInvokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -213,7 +208,6 @@ public class LibraryUtils {
                             LibraryMediator.instance().getLibraryPlaylists().markBeginImport(playlist);
                         }
                     });
-
                     Thread t = new Thread(new Runnable() {
                         public void run() {
                             try {
@@ -236,7 +230,6 @@ public class LibraryUtils {
             @Override
             public void run() {
                 File[] mediaFiles = files;
-
                 if (files.length == 1 && files[0].isDirectory()) {
                     mediaFiles = FileUtils.getFilesRecursive(files[0], null);
                 }
@@ -262,7 +255,6 @@ public class LibraryUtils {
                 @Override
                 public void onDialogCancelled() {
                 }
-
                 @Override
                 public void onDialogOk(String playlistName) {
                     if (playlistName != null && playlistName.length() > 0) {
@@ -288,10 +280,8 @@ public class LibraryUtils {
                         t.setDaemon(true);
                         t.start();
                     }
-
                 }
             };
-
             FrostwireInputDialog.showInputDialog(GUIMediator.getAppFrame(), I18n.tr("Playlist name"), I18n.tr("Playlist name"), GUIMediator.getThemeImage("playlist"), suggestPlaylistName(playlistItems), listener);
         }
 
@@ -482,7 +472,6 @@ public class LibraryUtils {
                 count += addToPlaylist(playlist, files[i].listFiles(), playlist.isStarred() || starred, index + count, ignore);
             }
         }
-
         return count;
     }
 
@@ -519,7 +508,6 @@ public class LibraryUtils {
                 item.save();
             }
         } else {
-            boolean comingFromStarredPlaylist = allItemsStarred(items);
             for (int i = 0; i < playlistItems.length && !playlist.isDeleted(); i++) {
                 items.add(playlistItems[i]);
                 playlistItems[i].setSortIndexByTrackNumber(items.size()); // set sort index to be at the end (1-based)
@@ -530,22 +518,12 @@ public class LibraryUtils {
         }
     }
 
-    private static boolean allItemsStarred(List<PlaylistItem> items) {
-        for (PlaylistItem item : items) {
-            if (!item.isStarred()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     static String getPlaylistDurationInDDHHMMSS(Playlist playlist) {
         List<PlaylistItem> items = playlist.getItems();
         float totalSecs = 0;
         for (PlaylistItem item : items) {
             totalSecs += item.getTrackDurationInSecs();
         }
-
         return getSecondsInDDHHMMSS((int) totalSecs);
     }
 
@@ -575,12 +553,10 @@ public class LibraryUtils {
             if (directory == null || !directory.isDirectory()) {
                 return false;
             }
-
             File[] files = directory.listFiles();
             if (files == null || files.length == 0) {
                 return false;
             }
-
             for (File childFile : files) {
                 if (!childFile.isDirectory()) {
                     if (FileUtils.hasExtension(childFile.getAbsolutePath(), extensionWithoutDot) && !ignore.contains(childFile)) {
@@ -597,7 +573,6 @@ public class LibraryUtils {
         } catch (NullPointerException e) {
             // NPE reported in bug manager, ignore until refactor
         }
-
         return false;
     }
 
@@ -606,7 +581,6 @@ public class LibraryUtils {
         HistoHashMap<String> artistsAlbums = new HistoHashMap<>();
         HistoHashMap<String> albumNames = new HistoHashMap<>();
         HistoHashMap<String> genres = new HistoHashMap<>();
-
         for (File mf : mediaFiles) {
             if (MediaPlayer.isPlayableFile(mf)) {
                 TagsData mt = new TagsReader(mf).parse();
@@ -616,23 +590,17 @@ public class LibraryUtils {
                 genres.update("(" + mt.getGenre() + ")");
             }
         }
-
         Entry<String, Integer>[] histogramArtistNames = artistNames.histogram();
         Entry<String, Integer>[] histogramArtistsAlbums = artistsAlbums.histogram();
         Entry<String, Integer>[] histogramAlbumNames = albumNames.histogram();
         Entry<String, Integer>[] histogramGenres = genres.histogram();
-
         String topArtistName = histogramArtistNames[histogramArtistNames.length - 1].getKey();
         int topArtistNameCount = histogramArtistNames[histogramArtistNames.length - 1].getValue();
-
         String topArtistAlbum = histogramArtistsAlbums[histogramArtistsAlbums.length - 1].getKey();
         int topArtistAlbumCount = histogramArtistsAlbums[histogramArtistsAlbums.length - 1].getValue();
-
         String topAlbumName = histogramAlbumNames[histogramAlbumNames.length - 1].getKey();
         int topAlbumNameCount = histogramAlbumNames[histogramAlbumNames.length - 1].getValue();
-
         String topGenre = histogramGenres[histogramGenres.length - 1].getKey();
-
         String suggestedPlaylistName = topArtistName;
         if (topArtistAlbumCount >= topArtistNameCount) {
             suggestedPlaylistName = topArtistAlbum;
@@ -642,11 +610,9 @@ public class LibraryUtils {
                 suggestedPlaylistName = topArtistName + " - " + suggestedPlaylistName;
             }
         }
-
         if (!topGenre.equals("()")) {
             suggestedPlaylistName = suggestedPlaylistName + " " + topGenre;
         }
-
         return suggestedPlaylistName;
     }
 
@@ -735,39 +701,32 @@ public class LibraryUtils {
     }
 
     static void movePlaylistItemsToIndex(Playlist playlist, int[] selectedIndexes, int index) {
-
         List<PlaylistItem> items = playlist.getItems();
         int targetIndex = index;
-
         // first, order items in list correctly
         for (int i = 0; i < selectedIndexes.length; i++) {
             int sourceIndex = selectedIndexes[i];
-
             if (sourceIndex != targetIndex) {
                 items.add(targetIndex, items.get(sourceIndex));
                 items.remove(sourceIndex < targetIndex ? sourceIndex : sourceIndex + 1);
-
                 // adjust remaining selected indexes if insertion point is greater than their location
                 for (int j = i + 1; j < selectedIndexes.length; j++) {
                     if (targetIndex > selectedIndexes[j]) {
                         selectedIndexes[j]--;
                     }
                 }
-
                 // update insertion point
                 if (sourceIndex > targetIndex) {
                     targetIndex++;
                 }
             }
         }
-
         // second, generate new indexes based list order
         for (int i = 0; i < items.size(); i++) {
             PlaylistItem item = items.get(i);
             item.setSortIndexByTrackNumber(i + 1); // set index (1-based)
             item.save();
         }
-
         // initiate UI refresh
         GUIMediator.safeInvokeLater(new Runnable() {
             public void run() {
