@@ -89,13 +89,11 @@ public final class TorrentUtil {
                 }
             }
         }
-
         return null;
     }
 
     private static Set<File> getIncompleteFiles() {
         Set<File> set = new HashSet<>();
-
         List<BTDownload> downloads = BTDownloadMediator.instance().getDownloads();
         for (BTDownload d : downloads) {
             if (d instanceof BittorrentDownload) {
@@ -104,13 +102,11 @@ public final class TorrentUtil {
                 set.addAll(dl.getIncompleteFiles());
             }
         }
-
         return set;
     }
 
     private static Set<File> getPartsFiles() {
         Set<File> set = new HashSet<>();
-
         List<BTDownload> downloads = BTDownloadMediator.instance().getDownloads();
         for (BTDownload d : downloads) {
             if (d instanceof BittorrentDownload) {
@@ -119,7 +115,6 @@ public final class TorrentUtil {
                 set.add(dl.partsFile());
             }
         }
-
         return set;
     }
 

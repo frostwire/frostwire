@@ -29,14 +29,18 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The Transfer Handler for any of the File tables in the library.
+ * @see LibraryFilesTransferHandler for the handler on the left hand side tree.
+ * @author gubatron
+ * @author aldenml
+ *
+ */
 class LibraryFilesTableTransferHandler extends TransferHandler {
-
-    private static final long serialVersionUID = -5962762524077270378L;
-
     private final LibraryFilesTableMediator mediator;
     private final TransferHandler fallbackTransferHandler;
 
-    public LibraryFilesTableTransferHandler(LibraryFilesTableMediator mediator) {
+    LibraryFilesTableTransferHandler(LibraryFilesTableMediator mediator) {
         this.mediator = mediator;
         this.fallbackTransferHandler = new MulticastTransferHandler(DNDUtils.DEFAULT_TRANSFER_HANDLERS);
     }
@@ -66,7 +70,7 @@ class LibraryFilesTableTransferHandler extends TransferHandler {
                     LibraryUtils.createNewPlaylist(files);
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return fallbackTransferHandler.importData(support);
         }
 
@@ -81,9 +85,9 @@ class LibraryFilesTableTransferHandler extends TransferHandler {
     @Override
     protected Transferable createTransferable(JComponent c) {
         List<AbstractLibraryTableDataLine<File>> lines = mediator.getSelectedLines();
-        List<File> files = new ArrayList<File>(lines.size());
-        for (int i = 0; i < lines.size(); i++) {
-            files.add(lines.get(i).getFile());
+        List<File> files = new ArrayList<>(lines.size());
+        for (AbstractLibraryTableDataLine<File> line : lines) {
+            files.add(line.getFile());
         }
         return new FileTransferable(files);
     }

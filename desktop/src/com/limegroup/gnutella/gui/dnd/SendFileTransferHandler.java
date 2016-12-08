@@ -26,18 +26,13 @@ import com.limegroup.gnutella.gui.I18n;
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Handles local files being dropped on limewire by asking the user if
  * s/he wants to share them.
  */
 public class SendFileTransferHandler extends LimeTransferHandler {
-
-    private static final long serialVersionUID = 6541019610960958928L;
-
     @Override
     public boolean canImport(JComponent c, DataFlavor[] flavors, DropInfo ddi) {
         return canImport(c, flavors);
@@ -55,9 +50,9 @@ public class SendFileTransferHandler extends LimeTransferHandler {
 
     @Override
     public boolean importData(JComponent comp, Transferable t) {
-        if (!canImport(comp, t.getTransferDataFlavors()))
+        if (!canImport(comp, t.getTransferDataFlavors())) {
             return false;
-
+        }
         try {
             final File[] files = DNDUtils.getFiles(t);
 
@@ -72,8 +67,7 @@ public class SendFileTransferHandler extends LimeTransferHandler {
                 });
                 return true;
             }
-        } catch (UnsupportedFlavorException e) {
-        } catch (IOException e) {
+        } catch (Throwable ignored) {
         }
         return false;
     }
@@ -84,20 +78,15 @@ public class SendFileTransferHandler extends LimeTransferHandler {
      * @param files
      * @return
      */
-    public static boolean handleFiles(final File[] files) {
-
+    private static boolean handleFiles(final File[] files) {
         String fileFolder = files[0].isFile() ? I18n.tr("file") : I18n.tr("folder");
         DialogOption result = GUIMediator.showYesNoMessage(I18n.tr("Do you want to send this {0} to a friend?", fileFolder) + "\n\n\"" + files[0].getName() + "\"", I18n.tr("Send files with FrostWire"), JOptionPane.QUESTION_MESSAGE);
-
         if (result == DialogOption.YES) {
             new SendFileProgressDialog(GUIMediator.getAppFrame(), files[0]).setVisible(true);
             GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
             UXStats.instance().log(UXAction.SHARING_TORRENT_CREATED_WITH_SEND_TO_FRIEND_FROM_DND);
             return true;
         }
-
         return false;
     }
-
-
 }

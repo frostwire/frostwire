@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package com.frostwire.gui.library.tags;
 /**
  * 
  * @author aldenml
- *
+ * @author gubatron
  */
 public class TagsData {
 
@@ -34,7 +34,7 @@ public class TagsData {
     private final String track;
     private final String year;
 
-    public TagsData(int duration, String bitrate, String title, String artist, String album, String comment, String genre, String track, String year) {
+    TagsData(int duration, String bitrate, String title, String artist, String album, String comment, String genre, String track, String year) {
         this.duration = duration;
         this.bitrate = bitrate;
         this.title = title;

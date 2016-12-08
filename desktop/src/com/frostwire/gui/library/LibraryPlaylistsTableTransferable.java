@@ -38,44 +38,42 @@ import java.util.List;
  *
  */
 public final class LibraryPlaylistsTableTransferable implements Transferable {
-
-    static final DataFlavor ITEM_ARRAY = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.Item Array");
+    static final DataFlavor ITEM_ARRAY          = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.Item Array");
     static final DataFlavor PLAYLIST_ITEM_ARRAY = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.PlaylistItemArray");
-
     private final List<LibraryPlaylistsTableTransferable.Item> items;
-
     private final int playlistID;
     private final FileTransferable fileTransferable;
     private final int[] selectedIndexes;
 
     LibraryPlaylistsTableTransferable(List<PlaylistItem> playlistItems, int playlistID, int[] selectedIndexes) {
         items = LibraryUtils.convertToItems(playlistItems);
-
-        List<File> files = new ArrayList<File>(items.size());
+        List<File> files = new ArrayList<>(items.size());
         for (PlaylistItem item : playlistItems) {
             files.add(new File(item.getFilePath()));
         }
         fileTransferable = new FileTransferable(files);
         this.playlistID = playlistID;
-
         this.selectedIndexes = selectedIndexes;
     }
 
     LibraryPlaylistsTableTransferable(List<PlaylistItem> playlistItems) {
         items = LibraryUtils.convertToItems(playlistItems);
-
-        List<File> files = new ArrayList<File>(items.size());
+        List<File> files = new ArrayList<>(items.size());
+        int playlistId = -1;
         for (PlaylistItem item : playlistItems) {
             files.add(new File(item.getFilePath()));
+            if (playlistId == -1 && item.getPlaylist() != null) {
+                playlistId = item.getPlaylist().getId();
+            }
         }
         fileTransferable = new FileTransferable(files);
         this.selectedIndexes = null;
-        this.playlistID = -1;
+        this.playlistID = playlistId;
     }
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        List<DataFlavor> list = new ArrayList<DataFlavor>();
+        List<DataFlavor> list = new ArrayList<>();
         list.addAll(Arrays.asList(fileTransferable.getTransferDataFlavors()));
         list.add(ITEM_ARRAY);
         if (selectedIndexes != null) {

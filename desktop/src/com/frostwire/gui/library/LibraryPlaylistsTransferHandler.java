@@ -29,15 +29,15 @@ import java.awt.datatransfer.Transferable;
 import java.io.File;
 
 /**
- * 
+ * Transfer Handler for the left hand side playlist tree.
+ * @see LibraryPlaylistsTableTransferHandler to see how drags and drops on the playlists tables are handled.
+ *
  * @author gubatron
  * @author aldenml
  *
  */
 class LibraryPlaylistsTransferHandler extends TransferHandler {
-
     private final JList<Object> list;
-
     LibraryPlaylistsTransferHandler(JList<Object> list) {
         this.list = list;
     }
@@ -52,7 +52,6 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
         if (!canImport(support)) {
             return false;
         }
-
         DropLocation location = support.getDropLocation();
         int index = list.locationToIndex(location.getDropPoint());
         if (index != -1) {
@@ -61,23 +60,18 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
                 index = 0;
             }
             LibraryPlaylistsListCell cell = (LibraryPlaylistsListCell) list.getModel().getElementAt(index);
-
-            //Playlist selectedPlaylist = getSelectedPlaylist();
             Playlist playlist = cell.getPlaylist();
             if (playlist == null) {
                 try {
                     Transferable transferable = support.getTransferable();
                     if (DNDUtils.contains(transferable.getTransferDataFlavors(), LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
                         Object transferData = transferable.getTransferData(LibraryPlaylistsTableTransferable.ITEM_ARRAY);
-                        
                         PlaylistItem[] playlistItems = null;
-                        
                         if (transferData instanceof LibraryPlaylistsTableTransferable.Item[]) {
                             playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.Item[]) transferData);
                         } else if (transferData instanceof LibraryPlaylistsTableTransferable.PlaylistItemContainer) {
                             playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.PlaylistItemContainer) transferData);
                         }
-                        
                         if (playlistItems != null) {
                             LibraryUtils.createNewPlaylist(playlistItems);
                         }
@@ -91,12 +85,11 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
                     }
                     list.setSelectedIndex(list.getModel().getSize() - 1);
                     LibraryMediator.instance().getLibraryPlaylists().refreshSelection();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                     return false;
                 }
             } else {
-                // importing to starred playlist
                 try {
                     Transferable transferable = support.getTransferable();
                     if (DNDUtils.contains(transferable.getTransferDataFlavors(), LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
@@ -111,16 +104,13 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
                             LibraryUtils.asyncAddToPlaylist(playlist, files);
                         }
                     }
-                    //_list.setSelectedIndex(index);
-                    //refreshSelection();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     return false;
                 }
             }
         } else {
             return false;
         }
-
         return false;
     }
 

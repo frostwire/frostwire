@@ -69,22 +69,33 @@ public class LibraryUtils {
         try {
             LibraryMediator.instance().getLibrarySearch().pushStatus(I18n.tr("Importing") + " " + file.getName());
             TagsData mt = new TagsReader(file).parse();
-            PlaylistItem item = playlist.newItem(file.getAbsolutePath(), file.getName(), file.length(), FilenameUtils.getExtension(file.getName()), mt.getTitle(), mt.getDuration(), mt.getArtist(), mt.getAlbum(), "",// TODO: cover art path
-                    mt.getBitrate(), mt.getComment(), mt.getGenre(), mt.getTrack(), mt.getYear(), starred);
+            PlaylistItem item = playlist.newItem(
+                    file.getAbsolutePath(),
+                    file.getName(),
+                    file.length(),
+                    FilenameUtils.getExtension(file.getName()),
+                    mt.getTitle(),
+                    mt.getDuration(),
+                    mt.getArtist(),
+                    mt.getAlbum(),
+                    "",// TODO: cover art path
+                    mt.getBitrate(),
+                    mt.getComment(),
+                    mt.getGenre(),
+                    mt.getTrack(),
+                    mt.getYear(),
+                    starred || playlist.isStarred());
 
             List<PlaylistItem> items = playlist.getItems();
             if (index != -1 && index < items.size()) {
-
                 // insert item
                 items.add(index, item);
-
                 // update all sort indexes from insertion point onwards
                 for (int i = index; i < items.size(); i++) {
                     PlaylistItem curItem = items.get(i);
                     curItem.setSortIndexByTrackNumber(i+1);
                     curItem.save();
                 }
-
             } else {
                 items.add(item);
                 item.setSortIndexByTrackNumber(items.size()); // fall back index would be it being the last track.
@@ -104,29 +115,23 @@ public class LibraryUtils {
         if (s < 0) {
             s = 0;
         }
-
         StringBuilder result = new StringBuilder();
-
         String DD;
         String HH;
         String MM;
         String SS;
-
         //math
         int days = s / 86400;
         int r = s % 86400;
-
         int hours = r / 3600;
         r = s % 3600;
         int minutes = r / 60;
         int seconds = r % 60;
-
         //padding
         DD = String.valueOf(days);
         HH = (hours < 10) ? "0" + hours : String.valueOf(hours);
         MM = (minutes < 10) ? "0" + minutes : String.valueOf(minutes);
         SS = (seconds < 10) ? "0" + seconds : String.valueOf(seconds);
-
         //lazy formatting
         if (days > 0) {
             result.append(DD);
@@ -136,16 +141,13 @@ public class LibraryUtils {
             }
             return result.toString();
         }
-
         if (hours > 0) {
             result.append(HH);
             result.append(":");
         }
-
         result.append(MM);
         result.append(":");
         result.append(SS);
-
         return result.toString();
     }
 

@@ -35,16 +35,14 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * The Transfer Handler on the left hand side tree node that help us navigate downloaded files by media type.
+ * @see LibraryFilesTableTransferHandler for the handler of the corresponding right hand side table.
  * @author gubatron
  * @author aldenml
  * 
  */
 final class LibraryFilesTransferHandler extends TransferHandler {
-
-    private static final long serialVersionUID = -3874985752229848555L;
-
     private static final Logger LOG = Logger.getLogger(LibraryFilesTransferHandler.class);
-
     private final JTree tree;
 
     LibraryFilesTransferHandler(JTree tree) {
@@ -53,27 +51,23 @@ final class LibraryFilesTransferHandler extends TransferHandler {
 
     @Override
     public boolean canImport(TransferSupport support) {
-
         try {
             LibraryNode node = getNodeFromLocation(support.getDropLocation());
-
             if (!(node instanceof DirectoryHolderNode)) {
                 return false;
             }
-
-            if (node instanceof DirectoryHolderNode) {
-                DirectoryHolder dirHolder = ((DirectoryHolderNode) node).getDirectoryHolder();
-
-                //dropping folder or folders on file types and finished downloads.
-                if (droppingFoldersToAddToLibrary(support, dirHolder,true)) {
-                   return true;
-                }
-
-                if ((!(dirHolder instanceof MediaTypeSavedFilesDirectoryHolder) || !((MediaTypeSavedFilesDirectoryHolder) dirHolder).getMediaType().equals(MediaType.getAudioMediaType())) && !(dirHolder instanceof StarredDirectoryHolder)) {
-                    return false;
-                }
+            DirectoryHolder dirHolder = ((DirectoryHolderNode) node).getDirectoryHolder();
+            // dropping folder or folders on file types and finished downloads.
+            if (droppingFoldersToAddToLibrary(support, dirHolder, true)) {
+                return true;
             }
-            return DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
+            if (!(dirHolder instanceof MediaTypeSavedFilesDirectoryHolder)) {
+                return false;
+            }
+            MediaTypeSavedFilesDirectoryHolder mediaTypeSavedFilesDirHolder = (MediaTypeSavedFilesDirectoryHolder) dirHolder;
+            MediaType mt = mediaTypeSavedFilesDirHolder.getMediaType();
+            return mt.equals(MediaType.getAudioMediaType()) &&
+                   DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
         } catch (Throwable e) {
             LOG.error("Error in LibraryFilesTransferHandler processing", e);
         }
@@ -111,7 +105,6 @@ final class LibraryFilesTransferHandler extends TransferHandler {
         if (!canImport(support)) {
             return false;
         }
-
         try {
             Transferable transferable = support.getTransferable();
             LibraryNode node = getNodeFromLocation(support.getDropLocation());
@@ -126,12 +119,10 @@ final class LibraryFilesTransferHandler extends TransferHandler {
                                 LibrarySettings.DIRECTORIES_TO_INCLUDE.add(f);
                                 LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.remove(f);
                             }
-                            
                             LibraryMediator.instance().clearDirectoryHolderCaches();
-                            
                             //show tools -> library option pane
                             GUIMediator.instance().setOptionsVisible(true, OptionsConstructor.LIBRARY_KEY);
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             e.printStackTrace();
                         }
                     }
@@ -150,7 +141,6 @@ final class LibraryFilesTransferHandler extends TransferHandler {
         } catch (Throwable e) {
             LOG.error("Error in LibraryFilesTransferHandler processing", e);
         }
-
         return false;
     }
 

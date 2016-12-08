@@ -32,10 +32,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Transfer Handler for the playlist tables on the right hand side of the library.
+ * @see LibraryPlaylistsTransferHandler for drag and drop handling on the left hand side playlist items.
+ *
+ * @author aldenml
+ * @author gubatron
+ */
 class LibraryPlaylistsTableTransferHandler extends TransferHandler {
-
-    private static final long serialVersionUID = -360187293186425556L;
-
     private final LibraryPlaylistsTableMediator mediator;
     private final TransferHandler fallbackTransferHandler;
 
@@ -54,27 +58,23 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
         if (!canImport(support, false)) {
             return fallbackTransferHandler.importData(support);
         }
-
         JTable.DropLocation dl = (JTable.DropLocation) support.getDropLocation();
         int index = dl.getRow();
-        
         try {
             if (support.isDataFlavorSupported(LibraryPlaylistsTableTransferable.PLAYLIST_ITEM_ARRAY)) {
                 Transferable transferable = support.getTransferable();
                 PlaylistItemContainer container;
-                
                 try {
                     container = (PlaylistItemContainer) transferable.getTransferData(LibraryPlaylistsTableTransferable.PLAYLIST_ITEM_ARRAY);
                     LibraryUtils.movePlaylistItemsToIndex(mediator.getCurrentPlaylist(), container.selectedIndexes, index);
-                    
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     return false;
                 }
             } else {
                 int max = mediator.getTable().getModel().getRowCount();
-                if (index < 0 || index > max)
-                   index = max;
-                
+                if (index < 0 || index > max) {
+                    index = max;
+                }
                 Transferable transferable = support.getTransferable();
                 if (DNDUtils.contains(transferable.getTransferDataFlavors(), LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
                     if (mediator.getCurrentPlaylist() != null) {
@@ -91,10 +91,9 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return fallbackTransferHandler.importData(support);
         }
-
         return false;
     }
 
@@ -110,15 +109,13 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
         for (AbstractLibraryTableDataLine<PlaylistItem> line : lines) {
             playlistItems.add(line.getInitializeObject());
         }
-        
         int[] selectedIndexes = mediator.getSelectedIndexes();
         return new LibraryPlaylistsTableTransferable(playlistItems, mediator.getCurrentPlaylist().getId(), selectedIndexes);
     }
 
     private boolean canImport(TransferSupport support, boolean fallback) {
-        //support.setShowDropLocation(false);
         if (!mediator.getMediaType().equals(MediaType.getAudioMediaType())) {
-            return fallback ? fallbackTransferHandler.canImport(support) : false;
+            return fallback && fallbackTransferHandler.canImport(support);
         }
         if (mediator.getCurrentPlaylist() != null && mediator.getCurrentPlaylist().getId() == LibraryDatabase.STARRED_PLAYLIST_ID) {
             return false;
@@ -135,7 +132,7 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
                     // within the same playlist and sorting ascending by the correct column
                     return true; 
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 // continue on with false return below
             }
         }

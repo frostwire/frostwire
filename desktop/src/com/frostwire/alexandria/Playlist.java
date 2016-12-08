@@ -17,14 +17,14 @@
 
 package com.frostwire.alexandria;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.frostwire.alexandria.db.LibraryDatabase;
 import com.frostwire.alexandria.db.LibraryDatabaseEntity;
 import com.frostwire.alexandria.db.PlaylistDB;
 import com.frostwire.alexandria.db.PlaylistItemDB;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -58,7 +58,7 @@ public class Playlist extends LibraryDatabaseEntity {
         this.deleted = false;
     }
 
-    public boolean isStarred() {
+    public final boolean isStarred() {
         return _id == LibraryDatabase.STARRED_PLAYLIST_ID;
     }
 
