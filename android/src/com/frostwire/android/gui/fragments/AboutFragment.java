@@ -19,7 +19,6 @@ package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -64,10 +63,9 @@ public class AboutFragment extends Fragment implements MainFragment {
         title.setText("FrostWire " + basicOrPlus + " v" + Constants.FROSTWIRE_VERSION_STRING);
 
         final TextView buildNumber = (TextView) view.findViewById(R.id.fragment_about_build_number);
-        buildNumber.setText("build " + BuildConfig.VERSION_CODE + Build.VERSION.SDK_INT + ", ");
+        buildNumber.setText("build " + BuildConfig.VERSION_CODE + ", sdk level " + Build.VERSION.SDK_INT);
 
         final TextView changelog = (TextView) view.findViewById(R.id.fragment_about_changelog);
-        changelog.setPaintFlags(changelog.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
 
         changelog.setOnClickListener(new View.OnClickListener() {
             @Override

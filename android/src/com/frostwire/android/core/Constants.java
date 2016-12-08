@@ -192,8 +192,8 @@ public final class Constants {
     public static final float EXPRESSVPN_STARTING_USD_PRICE = 8.32f;
 
     public static final String FROSTWIRE_GIVE_URL = "http://www.frostwire.com/give/?from=";
-    public static final String STICKERS_SHOP_URL = "http://shop.frostwire.com/six-frostwire-stickers/";
-    public static final String CONTACT_US_URL = "http://support.frostwire.com/hc/en-us/sections/201344753-Contact-Us";
+    public static final String STICKERS_SHOP_URL = "http://www.frostwire.com/stickers";
+    public static final String CONTACT_US_URL = "http://www.frostwire.com/contact";
     public static final String TRANSLATE_HELP_URL = "http://forum.frostwire.com/viewtopic.php?f=9&t=4922";
     public static final String CHANGELOG_URL = "https://github.com/frostwire/frostwire/blob/master/android/changelog.txt";
 
