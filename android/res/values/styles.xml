@@ -126,6 +126,16 @@
         <item name="android:listSelector">@drawable/listview_item_press_background_selector</item>
     </style>
 
+    <style name="PreferencesBlueButton">
+        <item name="android:background">@drawable/blue_light_button_background_selector</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:paddingLeft">42dp</item>
+        <item name="android:paddingRight">42dp</item>
+        <item name="android:textSize">@dimen/text_x_medium</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="PreferenceListSeparator">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
