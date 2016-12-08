@@ -85,14 +85,10 @@ public class PlaylistDB {
     
     public static Playlist getStarredPlaylist(LibraryDatabase db) {
         String query = "SELECT playlistItemId, filePath, fileName, fileSize, fileExtension, trackTitle, trackDurationInSecs, trackArtist, trackAlbum, coverArtPath, trackBitrate, trackComment, trackGenre, trackNumber, trackYear, starred " + "FROM PlaylistItems WHERE starred = ?";
-
         List<List<Object>> result = db.query(query, true);
-
-        Playlist playlist = new Playlist(db, LibraryDatabase.STARRED_PLAYLIST_ID, "starred", "starred");
-
+        Playlist playlist = new Playlist(db, LibraryDatabase.STARRED_PLAYLIST_ID, LibraryDatabase.STARRED_TABLE_NAME_DO_NOT_TRANSLATE_THIS, LibraryDatabase.STARRED_TABLE_NAME_DO_NOT_TRANSLATE_THIS);
         List<PlaylistItem> items = new ArrayList<>(result.size());
         Set<String> paths = new HashSet<>();
-
         for (List<Object> row : result) {
             PlaylistItem item = new PlaylistItem(playlist);
             PlaylistItemDB.fill(row, item);
@@ -101,9 +97,7 @@ public class PlaylistDB {
                 paths.add(item.getFilePath());
             }
         }
-
         playlist.getItems().addAll(items);
-
         return playlist;
     }
 

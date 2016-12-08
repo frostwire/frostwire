@@ -33,6 +33,8 @@ public class LibraryDatabase {
     public static final int OBJECT_INVALID_ID = -2;
     public static final int STARRED_PLAYLIST_ID = -3;
     private static final int LIBRARY_DATABASE_VERSION = 4;
+
+    public static final String STARRED_TABLE_NAME_DO_NOT_TRANSLATE_THIS = "starred";
     
     private final File _databaseFile;
     private final String _name;
