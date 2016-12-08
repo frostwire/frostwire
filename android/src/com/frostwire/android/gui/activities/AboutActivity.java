@@ -20,7 +20,7 @@ package com.frostwire.android.gui.activities;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity2;
 
-public class AboutActivity extends AbstractActivity2 {
+public final class AboutActivity extends AbstractActivity2 {
 
     public AboutActivity() {
         super(R.layout.activity_about);

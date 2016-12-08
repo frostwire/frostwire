@@ -51,18 +51,18 @@ import java.util.Random;
  * @author gubatron
  * @author aldenml
  */
-public class BuyActivity extends AbstractActivity {
+public final class BuyActivity extends AbstractActivity {
 
     private static final Logger LOG = Logger.getLogger(BuyActivity.class);
 
-    public static final String INTERSTITIAL_MODE = "interstitialMode";
+    public static final String INTERSTITIAL_MODE = "interstitial_mode";
     public static final int PURCHASE_SUCCESSFUL_RESULT_CODE = 0xaadd;
     public static final String EXTRA_KEY_PURCHASE_TIMESTAMP = "purchase_timestamp";
 
     private static final String LAST_SELECTED_CARD_ID_KEY = "last_selected_card_view_id";
     private static final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
     private static final String OFFER_ACCEPTED = "offer_accepted";
-    
+
     private ProductCardView card30days;
     private ProductCardView card1year;
     private ProductCardView card6months;
@@ -83,8 +83,7 @@ public class BuyActivity extends AbstractActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        final boolean interstitialMode = getIntent().hasExtra(INTERSTITIAL_MODE);
-        if (interstitialMode) {
+        if (isInterstitial()) {
             hideOSTitleBar();
         } else {
             final ActionBar bar = getActionBar();
@@ -99,7 +98,7 @@ public class BuyActivity extends AbstractActivity {
 
     @Override
     protected void initComponents(Bundle savedInstanceState) {
-        final boolean interstitialMode = getIntent().hasExtra(INTERSTITIAL_MODE);
+        final boolean interstitialMode = isInterstitial();
         offerAccepted = savedInstanceState != null &&
                 savedInstanceState.containsKey(OFFER_ACCEPTED) &&
                 savedInstanceState.getBoolean(OFFER_ACCEPTED, false);
@@ -176,8 +175,7 @@ public class BuyActivity extends AbstractActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = getIntent();
-        if (intent.hasExtra(INTERSTITIAL_MODE)) {
+        if (isInterstitial()) {
             onInterstitialActionBarDismiss();
         } else {
             finish();
@@ -192,8 +190,8 @@ public class BuyActivity extends AbstractActivity {
     }
 
     private void onInterstitialActionBarDismiss() {
-        final Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(INTERSTITIAL_MODE)) {
+        if (isInterstitial()) {
+            Intent intent = getIntent();
             boolean dismissActivityAfterward = intent.getBooleanExtra("dismissActivityAfterward", false);
             boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
 
@@ -441,6 +439,11 @@ public class BuyActivity extends AbstractActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return UIUtils.finishOnHomeOptionItemSelected(this, item);
+    }
+
+    private boolean isInterstitial() {
+        Intent intent = getIntent();
+        return intent != null && intent.getBooleanExtra(INTERSTITIAL_MODE, false);
     }
 
     private class InterstitialActionBarDismissButtonClickListener implements View.OnClickListener {
