@@ -1,4 +1,24 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.limegroup.gnutella.gui.dnd;
+
+import org.limewire.util.OSUtils;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -9,8 +29,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.limewire.util.OSUtils;
 
 /**
  * A Transferable that returns a javaFileListFlavor, built up from
@@ -27,16 +45,14 @@ public class FileTransferable implements Transferable {
     /**
 	 * Holds the data flavor used on linux desktops for file drags.
 	 */
-	public static final DataFlavor URIFlavor = createURIFlavor();
+	static final DataFlavor URIFlavor = createURIFlavor();
 	
-	public static final DataFlavor URIFlavor16 = createURIFlavor16();
+	static final DataFlavor URIFlavor16 = createURIFlavor16();
 	
-	public static final List<? extends FileTransfer> EMPTY_FILE_TRANSFER_LiST =
+	private static final List<? extends FileTransfer> EMPTY_FILE_TRANSFER_LiST =
 		Collections.emptyList();
-	
-	public static final List<File> EMPTY_FILE_LIST = Collections.emptyList();
-	
-	static DataFlavor createURIFlavor() {
+
+	private static DataFlavor createURIFlavor() {
 		try {
 			return new DataFlavor("text/uri-list;class=java.lang.String");
 		} catch (ClassNotFoundException cnfe) {
@@ -44,7 +60,7 @@ public class FileTransferable implements Transferable {
 		}
 	}
 
-	static DataFlavor createURIFlavor16() {
+	private static DataFlavor createURIFlavor16() {
 		try {
 			return new DataFlavor("text/uri-list;representationclass=java.lang.String");
 		} catch (ClassNotFoundException cnfe) {
@@ -61,8 +77,8 @@ public class FileTransferable implements Transferable {
      * @param realFiles
      * @param lazyFiles
      */
-	public FileTransferable(List<File> realFiles,
-			List<? extends FileTransfer> lazyFiles) {
+	FileTransferable(List<File> realFiles,
+					 List<? extends FileTransfer> lazyFiles) {
 		if (realFiles == null) { 
 			throw new NullPointerException("realFiles must not be null");
 		}
@@ -70,8 +86,8 @@ public class FileTransferable implements Transferable {
 			throw new NullPointerException("lazyFiles must not be empty");
 		}
 		// copy, given list might not me mutable
-        this.files = new ArrayList<File>(realFiles);
-        this.lazyFiles = new ArrayList<FileTransfer>(lazyFiles);
+        this.files = new ArrayList<>(realFiles);
+        this.lazyFiles = new ArrayList<>(lazyFiles);
     }
 
 	private List<File> getFiles() {
@@ -90,17 +106,18 @@ public class FileTransferable implements Transferable {
       throws UnsupportedFlavorException, IOException {
     	if (flavor.equals(DataFlavor.javaFileListFlavor)) {
     		return getFiles();
-    	} else if (URIFlavor.equals(flavor) || URIFlavor16.equals(flavor)) {
-    		StringBuilder sb = new StringBuilder();
-    		String lineSep = System.getProperty("line.separator");
-    		for (File file : getFiles()) {
-    			URI uri = file.toURI();
-    			if (sb.length() > 0) {
-    				sb.append(lineSep);
-    			}
-    			sb.append(uri.toString());
-    		}
-    		return sb.toString();
+        } else if ((URIFlavor != null && URIFlavor.equals(flavor)) ||
+                (URIFlavor16 != null && URIFlavor16.equals(flavor))) {
+            StringBuilder sb = new StringBuilder();
+            String lineSep = System.getProperty("line.separator");
+            for (File file : getFiles()) {
+                URI uri = file.toURI();
+                if (sb.length() > 0) {
+                    sb.append(lineSep);
+                }
+                sb.append(uri.toString());
+            }
+            return sb.toString();
     	}
     	else {
     		throw new UnsupportedFlavorException(flavor);
