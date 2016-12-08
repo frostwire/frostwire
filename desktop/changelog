@@ -2,10 +2,12 @@ frostwire (6.4.2) stable; urgency=high
   * Fixes Archive.org, SoundCloud search.
   * Starred playlist moved down to playlist explorer
   * Playlist explorer right click popups show as least actions as possible
+  * Playlist managment bug fixes
   * H2 database update (1.4.193)
   * gson upgraded to 2.8.0
+  * Cleanup, and performance upgrades
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 06 Dec 2016 09:15:03 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 08 Dec 2016 02:54:00 -0600
 
 frostwire (6.4.1) stable; urgency=high
   * New jlibtorrent 1.2.0.4
