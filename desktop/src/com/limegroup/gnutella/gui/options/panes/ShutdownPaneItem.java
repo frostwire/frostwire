@@ -110,11 +110,11 @@ public class ShutdownPaneItem extends AbstractPaneItem {
      */
     public void initOptions() {
         if (ApplicationSettings.MINIMIZE_TO_TRAY.getValue()) {
-            if (OSUtils.supportsTray() && !ResourceManager.instance().isTrayIconAvailable()) {
-                //shutdownAfterTransfers.setSelected(true);
-            } else {
+//            if (OSUtils.supportsTray() && !ResourceManager.instance().isTrayIconAvailable()) {
+//                //shutdownAfterTransfers.setSelected(true);
+//            } else {
                 minimizeToTray.setSelected(true);
-            }
+//            }
         } else {
             shutdownImmediately.setSelected(true);
         }

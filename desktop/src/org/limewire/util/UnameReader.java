@@ -52,10 +52,10 @@ public final class UnameReader {
 				output = line;
 			    
 			    try {
-			        exit = proc.exitValue();
-			        if (exit == 0)  {
-			            // Process finished
-			        }
+//			        exit = proc.exitValue();
+//			        if (exit == 0)  {
+//			            // Process finished
+//			        }
 			    } catch (IllegalThreadStateException t) {
 			        proc.destroy();
 			    }

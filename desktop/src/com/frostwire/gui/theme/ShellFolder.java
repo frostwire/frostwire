@@ -328,8 +328,6 @@ abstract class ShellFolder extends File {
     public void deleteOnExit() {
         if (isFileSystem()) {
             super.deleteOnExit();
-        } else {
-            // Do nothing       // ((Fix?))
         }
     }
 
