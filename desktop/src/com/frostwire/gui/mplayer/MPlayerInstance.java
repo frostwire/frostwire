@@ -21,35 +21,22 @@
 
 package com.frostwire.gui.mplayer;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import com.frostwire.mplayer.Language;
+import com.frostwire.mplayer.LanguageSource;
+import com.frostwire.mplayer.PlayerPreferences;
+import com.limegroup.gnutella.gui.MPlayerMediator;
+import org.gudy.azureus2.core3.util.*;
+import org.limewire.util.FileUtils;
+import org.limewire.util.OSUtils;
+import org.limewire.util.SystemUtils;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import org.gudy.azureus2.core3.util.AESemaphore;
-import org.gudy.azureus2.core3.util.Constants;
-import org.gudy.azureus2.core3.util.Debug;
-import org.gudy.azureus2.core3.util.SimpleTimer;
-import org.gudy.azureus2.core3.util.SystemTime;
-import org.gudy.azureus2.core3.util.TimerEvent;
-import org.gudy.azureus2.core3.util.TimerEventPerformer;
-import org.limewire.util.FileUtils;
-import org.limewire.util.OSUtils;
-import org.limewire.util.SystemUtils;
-
-import com.frostwire.mplayer.Language;
-import com.frostwire.mplayer.LanguageSource;
-import com.frostwire.mplayer.PlayerPreferences;
-import com.limegroup.gnutella.gui.MPlayerMediator;
 
 
 public class 
@@ -883,25 +870,14 @@ MPlayerInstance
 		
 		stop_sem.reserve();
 	}
-	
-	private static void
-	killProcesses(
-		boolean	delay )
-	{
-		if ( Constants.isOSX ){
 
+	private static void killProcesses(boolean delay) {
+		if ( Constants.isOSX ){
 			String	process_name = BINARY_PATH.getName();
-			
-			if ( LOG ){
-				//System.out.println( "running killall -9 " + process_name );
-			}
-	
-			if ( delay ){
-				
-				try{
+			if (delay) {
+				try {
 					Thread.sleep(250);
-					
-				}catch( Throwable e ){
+				} catch (Throwable e) {
 				}
 			}
 			
