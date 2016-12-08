@@ -99,7 +99,7 @@ public class LibraryUtils {
             } else {
                 items.add(item);
                 item.setSortIndexByTrackNumber(items.size()); // fall back index would be it being the last track.
-                item.save();
+                item.save(item.isStarred());
             }
 
             if (isPlaylistSelected(playlist)) {
@@ -385,8 +385,10 @@ public class LibraryUtils {
     static void asyncAddToPlaylist(final Playlist playlist, final PlaylistItem[] playlistItems, final int index) {
         Thread t = new Thread(new Runnable() {
             public void run() {
-                addToPlaylist(playlist, playlistItems, index);
-                playlist.refresh();
+                addToPlaylist(playlist, playlistItems, playlist.isStarred(), index);
+                if (playlist.isStarred()) {
+                    playlist.refresh();
+                }
                 playlist.save();
                 GUIMediator.safeInvokeLater(new Runnable() {
                     public void run() {
@@ -488,10 +490,6 @@ public class LibraryUtils {
         addToPlaylist(playlist, playlistItems, playlist.isStarred(), -1);
     }
 
-    private static void addToPlaylist(Playlist playlist, PlaylistItem[] playlistItems, int index) {
-        addToPlaylist(playlist, playlistItems, playlist.isStarred(), index);
-    }
-
     private static void addToPlaylist(Playlist playlist, PlaylistItem[] playlistItems, boolean starred, int index) {
         List<PlaylistItem> items = playlist.getItems();
         if (index != -1 && index <= items.size()) {
@@ -521,14 +519,24 @@ public class LibraryUtils {
                 item.save();
             }
         } else {
+            boolean comingFromStarredPlaylist = allItemsStarred(items);
             for (int i = 0; i < playlistItems.length && !playlist.isDeleted(); i++) {
-                playlistItems[i].setPlaylist(playlist);
                 items.add(playlistItems[i]);
                 playlistItems[i].setSortIndexByTrackNumber(items.size()); // set sort index to be at the end (1-based)
-                playlistItems[i].setStarred(starred || playlist.isStarred());
+                playlistItems[i].setStarred(playlistItems[i].isStarred() || starred || playlist.isStarred());
+                playlistItems[i].setPlaylist(playlist);
                 playlistItems[i].save();
             }
         }
+    }
+
+    private static boolean allItemsStarred(List<PlaylistItem> items) {
+        for (PlaylistItem item : items) {
+            if (!item.isStarred()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     static String getPlaylistDurationInDDHHMMSS(Playlist playlist) {

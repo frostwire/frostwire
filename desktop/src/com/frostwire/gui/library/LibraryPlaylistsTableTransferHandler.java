@@ -18,7 +18,6 @@
 package com.frostwire.gui.library;
 
 import com.frostwire.alexandria.PlaylistItem;
-import com.frostwire.alexandria.db.LibraryDatabase;
 import com.frostwire.gui.library.LibraryPlaylistsTableTransferable.PlaylistItemContainer;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
@@ -117,9 +116,7 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
         if (!mediator.getMediaType().equals(MediaType.getAudioMediaType())) {
             return fallback && fallbackTransferHandler.canImport(support);
         }
-        if (mediator.getCurrentPlaylist() != null && mediator.getCurrentPlaylist().getId() == LibraryDatabase.STARRED_PLAYLIST_ID) {
-            return false;
-        }
+
         if (support.isDataFlavorSupported(LibraryPlaylistsTableTransferable.PLAYLIST_ITEM_ARRAY)) {
             Transferable transferable = support.getTransferable();
             PlaylistItemContainer container;
@@ -140,7 +137,7 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
     }
     
     private void importPlaylistItemArrayData(Transferable transferable, int index) throws UnsupportedFlavorException, IOException {
-        PlaylistItem[] playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.Item[]) transferable.getTransferData(LibraryPlaylistsTableTransferable.ITEM_ARRAY));
+        PlaylistItem[] playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.Item[]) transferable.getTransferData(LibraryPlaylistsTableTransferable.PLAYLIST_ITEM_ARRAY));
         LibraryUtils.asyncAddToPlaylist(mediator.getCurrentPlaylist(), playlistItems, index);
     }
 }

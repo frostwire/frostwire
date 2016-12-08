@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import com.frostwire.alexandria.Playlist;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
-import com.frostwire.util.Logger;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -56,8 +55,6 @@ import java.util.List;
  */
 public class LibraryExplorer extends AbstractLibraryListPanel {
 
-    private static final Logger LOG = Logger.getLogger(LibraryExplorer.class);
-
     private DefaultTreeModel model;
     private JTree tree;
 
@@ -68,7 +65,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
     private TreeSelectionListener treeSelectionListener;
 
-    public LibraryExplorer() {
+    LibraryExplorer() {
         setupUI();
     }
 
@@ -77,19 +74,14 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         tree.repaint();
     }
 
-    public void refreshSelection(boolean clearCache) {
+    void refreshSelection(boolean clearCache) {
         LibraryNode node = (LibraryNode) tree.getLastSelectedPathComponent();
-
         String searchPrompt = null;
-
         if (node == null) {
             return;
         }
-
         LibraryMediator.instance().clearLibraryTable();
-
         DirectoryHolder directoryHolder = getSelectedDirectoryHolder();
-
         //STARRED
         if (directoryHolder instanceof StarredDirectoryHolder) {
             Playlist playlist = LibraryMediator.getLibrary().getStarredPlaylist();
@@ -115,19 +107,13 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
             if (clearCache) {
                 mtsfdh.clearCache();
             }
-
             LibraryMediator.instance().updateTableFiles(directoryHolder);
-
             BackgroundExecutorService.schedule(new SearchByMediaTypeRunnable(mtsfdh));
-
         }
-
         saveLastSelectedDirectoryHolder();
-
         if (searchPrompt == null) {
             searchPrompt = I18n.tr("Search your") + " " + node.getUserObject();
         }
-
         LibraryMediator.instance().getLibrarySearch().clear();
         LibraryMediator.instance().getLibrarySearch().setSearchPrompt(searchPrompt);
     }

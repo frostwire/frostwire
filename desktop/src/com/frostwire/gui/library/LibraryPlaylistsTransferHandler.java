@@ -25,6 +25,7 @@ import com.limegroup.gnutella.gui.dnd.DNDUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 
@@ -55,44 +56,18 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
         DropLocation location = support.getDropLocation();
         int index = list.locationToIndex(location.getDropPoint());
         if (index != -1) {
-            Rectangle rect = list.getUI().getCellBounds(list, index, index);
-            if (!rect.contains(location.getDropPoint())) {
-                index = 0;
-            }
-            LibraryPlaylistsListCell cell = (LibraryPlaylistsListCell) list.getModel().getElementAt(index);
-            Playlist playlist = cell.getPlaylist();
+            // depending on the mouse position detect which playlist item the drop was done
+            Playlist playlist = getTargetPlaylist(location, index);
+
             if (playlist == null) {
-                try {
-                    Transferable transferable = support.getTransferable();
-                    if (DNDUtils.contains(transferable.getTransferDataFlavors(), LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
-                        Object transferData = transferable.getTransferData(LibraryPlaylistsTableTransferable.ITEM_ARRAY);
-                        PlaylistItem[] playlistItems = null;
-                        if (transferData instanceof LibraryPlaylistsTableTransferable.Item[]) {
-                            playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.Item[]) transferData);
-                        } else if (transferData instanceof LibraryPlaylistsTableTransferable.PlaylistItemContainer) {
-                            playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.PlaylistItemContainer) transferData);
-                        }
-                        if (playlistItems != null) {
-                            LibraryUtils.createNewPlaylist(playlistItems);
-                        }
-                    } else {
-                        File[] files = DNDUtils.getFiles(support.getTransferable());
-                        if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {
-                            LibraryUtils.createNewPlaylist(files[0]);
-                        } else {
-                            LibraryUtils.createNewPlaylist(files);
-                        }
-                    }
-                    list.setSelectedIndex(list.getModel().getSize() - 1);
-                    LibraryMediator.instance().getLibraryPlaylists().refreshSelection();
-                } catch (Throwable e) {
-                    e.printStackTrace();
+                if (createNewPlaylist(support)) {
                     return false;
                 }
             } else {
                 try {
                     Transferable transferable = support.getTransferable();
-                    if (DNDUtils.contains(transferable.getTransferDataFlavors(), LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
+                    final DataFlavor[] dataFlavors = transferable.getTransferDataFlavors();
+                    if (DNDUtils.contains(dataFlavors, LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
                         PlaylistItem[] playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.PlaylistItemContainer) transferable.getTransferData(LibraryPlaylistsTableTransferable.ITEM_ARRAY));
                         LibraryUtils.asyncAddToPlaylist(playlist, playlistItems);
                     } else {
@@ -110,6 +85,46 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
             }
         } else {
             return false;
+        }
+        return false;
+    }
+
+    private Playlist getTargetPlaylist(DropLocation location, int index) {
+        Rectangle rect = list.getUI().getCellBounds(list, index, index);
+        if (!rect.contains(location.getDropPoint())) {
+            index = 0;
+        }
+        LibraryPlaylistsListCell cell = (LibraryPlaylistsListCell) list.getModel().getElementAt(index);
+        return cell.getPlaylist();
+    }
+
+    private boolean createNewPlaylist(TransferSupport support) {
+        try {
+            Transferable transferable = support.getTransferable();
+            if (DNDUtils.contains(transferable.getTransferDataFlavors(), LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
+                Object transferData = transferable.getTransferData(LibraryPlaylistsTableTransferable.ITEM_ARRAY);
+                PlaylistItem[] playlistItems = null;
+                if (transferData instanceof LibraryPlaylistsTableTransferable.Item[]) {
+                    playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.Item[]) transferData);
+                } else if (transferData instanceof LibraryPlaylistsTableTransferable.PlaylistItemContainer) {
+                    playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.PlaylistItemContainer) transferData);
+                }
+                if (playlistItems != null) {
+                    LibraryUtils.createNewPlaylist(playlistItems);
+                }
+            } else {
+                File[] files = DNDUtils.getFiles(support.getTransferable());
+                if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {
+                    LibraryUtils.createNewPlaylist(files[0]);
+                } else {
+                    LibraryUtils.createNewPlaylist(files);
+                }
+            }
+            list.setSelectedIndex(list.getModel().getSize() - 1);
+            LibraryMediator.instance().getLibraryPlaylists().refreshSelection();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return true;
         }
         return false;
     }

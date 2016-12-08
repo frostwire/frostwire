@@ -77,7 +77,7 @@ public class PlaylistItemDB {
         obj.setSortIndexByTrackNumber(sortIndex);
     }
 
-    public static void save(LibraryDatabase db, PlaylistItem obj) {
+    public static void save(LibraryDatabase db, PlaylistItem obj, boolean updateStarred) {
         if (obj.getId() == LibraryDatabase.OBJECT_INVALID_ID || obj.getPlaylist() == null) {
             return;
         }
@@ -86,18 +86,21 @@ public class PlaylistItemDB {
             Object[] sqlAndValues = createPlaylistItemInsert(obj);
             int id = db.insert((String) sqlAndValues[0], (Object[]) sqlAndValues[1]);
             obj.setId(id);
-            sqlAndValues = updateStarred(obj);
-            db.update((String) sqlAndValues[0], (Object[]) sqlAndValues[1]);
+            if (updateStarred) {
+                sqlAndValues = updateStarred(obj);
+                db.update((String) sqlAndValues[0], (Object[]) sqlAndValues[1]);
+            }
         } else {
             Object[] sqlAndValues = createPlaylistItemUpdate(obj);
             db.update((String) sqlAndValues[0], (Object[]) sqlAndValues[1]);
-            sqlAndValues = updateStarred(obj);
-            db.update((String) sqlAndValues[0], (Object[]) sqlAndValues[1]);
+            if (updateStarred) {
+                sqlAndValues = updateStarred(obj);
+                db.update((String) sqlAndValues[0], (Object[]) sqlAndValues[1]);
+            }
         }
     }
 
     public static void delete(LibraryDatabase db, PlaylistItem obj) {
-        final List<List<Object>> query = db.query("SELECT playlistItemId, starred FROM PlaylistItems WHERE playlistId = -3");
         db.update("DELETE FROM PlaylistItems WHERE playlistItemId = ?", obj.getId());
     }
     

@@ -452,7 +452,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
             for (LibraryPlaylistsTableDataLine line : lines) {
                 PlaylistItem playlistItem = line.getInitializeObject();
                 playlistItem.setStarred(false);
-                playlistItem.save();
+                playlistItem.save(true);
             }
 
             LibraryMediator.instance().getLibraryExplorer().refreshSelection();

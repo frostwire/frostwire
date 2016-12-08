@@ -212,8 +212,12 @@ public class PlaylistItem extends LibraryDatabaseEntity {
     }
 
     public void save() {
+        save(false);
+    }
+
+    public void save(boolean updateStarred) {
         if (db != null) {
-            PlaylistItemDB.save(db, this);
+            PlaylistItemDB.save(db, this, updateStarred);
         }
     }
 
