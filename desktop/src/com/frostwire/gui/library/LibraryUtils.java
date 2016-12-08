@@ -348,6 +348,9 @@ public class LibraryUtils {
                 try {
                     Set<File> ignore = TorrentUtil.getIgnorableFiles();
                     addToPlaylist(playlist, files, playlist.isStarred(), index, ignore);
+                    if (playlist.isStarred()) {
+                        playlist.refresh();
+                    }
                     playlist.save();
                 } finally {
                     asyncAddToPlaylistFinalizer(playlist);
