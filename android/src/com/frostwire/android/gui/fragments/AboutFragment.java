@@ -18,14 +18,10 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.app.Fragment;
 import android.os.Build;
-import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -53,17 +49,17 @@ public final class AboutFragment extends AbstractFragment {
     }
 
     @Override
-    protected void initComponents(View view) {
+    protected void initComponents(View rootView) {
 
         //Title, build number and changelog setup
-        final TextView title = (TextView) view.findViewById(R.id.fragment_about_title);
+        final TextView title = findView(rootView, R.id.fragment_about_title);
         final String basicOrPlus = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "Basic" : "Plus";
         title.setText("FrostWire " + basicOrPlus + " v" + Constants.FROSTWIRE_VERSION_STRING);
 
-        final TextView buildNumber = (TextView) view.findViewById(R.id.fragment_about_build_number);
+        final TextView buildNumber = findView(rootView, R.id.fragment_about_build_number);
         buildNumber.setText("build " + BuildConfig.VERSION_CODE + ", sdk level " + Build.VERSION.SDK_INT);
 
-        final TextView changelog = (TextView) view.findViewById(R.id.fragment_about_changelog);
+        final TextView changelog = findView(rootView, R.id.fragment_about_changelog);
 
         changelog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +69,7 @@ public final class AboutFragment extends AbstractFragment {
         });
 
         //Love FrostWire button and social media icons
-        final Button loveFrostWireButton = (Button) view.findViewById(R.id.fragment_about_love_frostwire);
+        final Button loveFrostWireButton = findView(rootView, R.id.fragment_about_love_frostwire);
         loveFrostWireButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,10 +77,10 @@ public final class AboutFragment extends AbstractFragment {
             }
         });
 
-        final ImageButton facebookButton = (ImageButton) view.findViewById(R.id.fragment_about_facebook_button);
-        final ImageButton twitterButton = (ImageButton) view.findViewById(R.id.fragment_about_twitter_button);
-        final ImageButton redditButton = (ImageButton) view.findViewById(R.id.fragment_about_reddit_button);
-        final ImageButton githubButton = (ImageButton) view.findViewById(R.id.fragment_about_github_button);
+        final ImageButton facebookButton = findView(rootView, R.id.fragment_about_facebook_button);
+        final ImageButton twitterButton = findView(rootView, R.id.fragment_about_twitter_button);
+        final ImageButton redditButton = findView(rootView, R.id.fragment_about_reddit_button);
+        final ImageButton githubButton = findView(rootView, R.id.fragment_about_github_button);
 
         final String referrerParam = "?ref=android_about";
 
@@ -117,9 +113,9 @@ public final class AboutFragment extends AbstractFragment {
         });
 
         //Remaining elements including text content
-        final TextView stickersShop = (TextView) view.findViewById(R.id.fragment_about_stickers);
-        final TextView sendFeedback = (TextView) view.findViewById(R.id.fragment_about_feedback);
-        final TextView translateHelp = (TextView) view.findViewById(R.id.fragment_about_translate);
+        final TextView stickersShop = findView(rootView, R.id.fragment_about_stickers);
+        final TextView sendFeedback = findView(rootView, R.id.fragment_about_feedback);
+        final TextView translateHelp = findView(rootView, R.id.fragment_about_translate);
 
         stickersShop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,7 +138,7 @@ public final class AboutFragment extends AbstractFragment {
             }
         });
 
-        final TextView content = (TextView) view.findViewById(R.id.fragment_about_content);
+        final TextView content = findView(rootView, R.id.fragment_about_content);
         content.setText(Html.fromHtml(getAboutText()));
         content.setMovementMethod(LinkMovementMethod.getInstance());
     }
