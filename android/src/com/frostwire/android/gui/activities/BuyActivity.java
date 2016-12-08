@@ -20,7 +20,6 @@ package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,8 +43,6 @@ import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.util.Logger;
-
-import java.util.Random;
 
 /**
  * @author gubatron
@@ -112,33 +109,7 @@ public final class BuyActivity extends AbstractActivity {
 
     private String getActionBarTitle() {
         final String titlePrefix = getString(R.string.remove_ads);
-        return titlePrefix + ". " + getRandomPitch(getResources(), false) + ".";
-    }
-
-    public static String getRandomPitch(Resources resources, final boolean avoidSupportPitches) {
-        if (resources == null) {
-            return null;
-        }
-        // put "support" pitches at the beginning and modify offset2
-        final int[] pitches = {
-                R.string.support_frostwire,
-                R.string.support_free_software,
-                R.string.save_bandwidth,
-                R.string.cheaper_than_drinks,
-                R.string.cheaper_than_lattes,
-                R.string.cheaper_than_parking,
-                R.string.cheaper_than_beer,
-                R.string.cheaper_than_cigarettes,
-                R.string.cheaper_than_gas,
-                R.string.keep_the_project_alive
-        };
-        final int offset1 = 0;
-        final int offset2 = 2;
-
-        int offset = !avoidSupportPitches ? offset1 : offset2;
-        int suffixId = pitches[offset + new Random().nextInt(pitches.length - offset)];
-
-        return resources.getString(suffixId);
+        return titlePrefix + ". " + getString(UIUtils.randomPitchResId(false)) + ".";
     }
 
     private void initOfferLayer(boolean interstitialMode) {
@@ -164,7 +135,7 @@ public final class BuyActivity extends AbstractActivity {
         offerLayout.setOnClickListener(offerClickListener);
 
         final TextView randomPitch = findView(R.id.activity_buy_interstitial_random_pitch);
-        randomPitch.setText(getRandomPitch(getResources(), true));
+        randomPitch.setText(UIUtils.randomPitchResId(true));
     }
 
     @Override

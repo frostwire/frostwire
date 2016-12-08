@@ -63,6 +63,7 @@ import java.lang.reflect.Method;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 /**
  * @author gubatron
@@ -80,6 +81,20 @@ public final class UIUtils {
     private static final String[] BYTE_UNITS = new String[]{"b", "KB", "Mb", "Gb", "Tb"};
 
     private static final String GENERAL_UNIT_KBPSEC = "KB/s";
+
+    // put "support" pitches at the beginning and play with the offset
+    private static final int[] PITCHES = {
+            R.string.support_frostwire,
+            R.string.support_free_software,
+            R.string.save_bandwidth,
+            R.string.cheaper_than_drinks,
+            R.string.cheaper_than_lattes,
+            R.string.cheaper_than_parking,
+            R.string.cheaper_than_beer,
+            R.string.cheaper_than_cigarettes,
+            R.string.cheaper_than_gas,
+            R.string.keep_the_project_alive
+    };
 
     static {
         NUMBER_FORMAT0 = NumberFormat.getNumberInstance(Locale.getDefault());
@@ -174,7 +189,8 @@ public final class UIUtils {
                 if (positiveListener != null) {
                     try {
                         positiveListener.onClick(dialog, which);
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) {
+                    }
                 }
                 dialog.dismiss();
             }
@@ -209,7 +225,7 @@ public final class UIUtils {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         // show all bullets pre-checked, prepend
-        for (int i=0; i < bullets.size(); i++) {
+        for (int i = 0; i < bullets.size(); i++) {
             bullets.set(i, String.valueOf(Html.fromHtml("&#8226; " + bullets.get(i))));
         }
 
@@ -399,11 +415,10 @@ public final class UIUtils {
     }
 
     /**
-     *
-     * @param context -  containing Context.
+     * @param context                         -  containing Context.
      * @param showInstallationCompleteSection - true if you want to display "Your installation is now complete. Thank You" section
-     * @param dismissListener - what happens when the dialog is dismissed.
-     * @param referrerContextSuffix - string appended at the end of social pages click urls's ?ref=_android_ parameter.
+     * @param dismissListener                 - what happens when the dialog is dismissed.
+     * @param referrerContextSuffix           - string appended at the end of social pages click urls's ?ref=_android_ parameter.
      */
     public static void showSocialLinksDialog(final Context context,
                                              boolean showInstallationCompleteSection,
@@ -427,7 +442,7 @@ public final class UIUtils {
         ImageButton twitterButton = (ImageButton) customView.findViewById(R.id.view_social_buttons_twitter_button);
         ImageButton redditButton = (ImageButton) customView.findViewById(R.id.view_social_buttons_reddit_button);
 
-        final String referrerParam  = "?ref=android_" + ((referrerContextSuffix!=null) ? referrerContextSuffix.trim() : "");
+        final String referrerParam = "?ref=android_" + ((referrerContextSuffix != null) ? referrerContextSuffix.trim() : "");
 
         fbButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -487,16 +502,17 @@ public final class UIUtils {
     public static boolean isTablet(Activity activity) {
         DisplayMetrics metrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        float yInches= metrics.heightPixels/metrics.ydpi;
-        float xInches= metrics.widthPixels/metrics.xdpi;
-        double diagonalInches = Math.sqrt(xInches*xInches + yInches*yInches);
-        return diagonalInches>=6.5;
+        float yInches = metrics.heightPixels / metrics.ydpi;
+        float xInches = metrics.widthPixels / metrics.xdpi;
+        double diagonalInches = Math.sqrt(xInches * xInches + yInches * yInches);
+        return diagonalInches >= 6.5;
     }
 
     // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over enginner.
     public static class IntentByteExtra {
         public String name;
         public byte value;
+
         public IntentByteExtra(String name, byte value) {
             this.name = name;
             this.value = value;
@@ -518,5 +534,15 @@ public final class UIUtils {
 
     public static boolean inUIThread() {
         return Looper.myLooper() == Looper.getMainLooper();
+    }
+
+    public static int randomPitchResId(boolean avoidSupportPitches) {
+        int offset1 = 0;
+        int offset2 = 2;
+
+        int offset = !avoidSupportPitches ? offset1 : offset2;
+        int resId = PITCHES[offset + new Random().nextInt(PITCHES.length - offset)];
+
+        return resId;
     }
 }
