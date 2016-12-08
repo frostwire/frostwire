@@ -57,7 +57,6 @@ public final class ThemeMediator {
     public static final Font DIALOG_FONT = new Font(Font.DIALOG, Font.PLAIN, 12);
 
     public static final Color LIGHT_BORDER_COLOR = SkinColors.GENERAL_BORDER_COLOR;
-    public static final Color DARK_BACKGROUND_COLOR = SkinColors.DARK_BOX_BACKGROUND_COLOR;
 
     public static final Color TABLE_ALTERNATE_ROW_COLOR = SkinColors.TABLE_ALTERNATE_ROW_COLOR;
     public static final Color TABLE_SELECTED_BACKGROUND_ROW_COLOR = SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR;
@@ -66,11 +65,7 @@ public final class ThemeMediator {
 
     public static final String SKIN_PROPERTY_DARK_BOX_BACKGROUND = "skin_property_dark_box_background";
 
-    public static Color PLAYING_DATA_LINE_COLOR = new Color(7, 170, 0);
-
-    public static Color FILE_NO_EXISTS_DATA_LINE_COLOR = Color.RED;
-
-    public static Color APPLICATION_HEADER_SEPARATOR_COLOR = new Color(0x295164);
+    private static Color APPLICATION_HEADER_SEPARATOR_COLOR = new Color(0x295164);
 
     private static final int TABLE_FONT_SIZE_MIN = 10;
     private static final int TABLE_FONT_SIZE_MAX = 20;
@@ -111,7 +106,7 @@ public final class ThemeMediator {
         return fixComponentFont(label, label.getText());
     }
 
-    public static Font fixComponentFont(JComponent c, Object msg) {
+    static Font fixComponentFont(JComponent c, Object msg) {
         Font oldFont = null;
 
         if (c != null && OSUtils.isWindows()) {
@@ -129,25 +124,25 @@ public final class ThemeMediator {
         return new SkinTitledBorder(title);
     }
 
-    public static JSeparator createSeparator(int orientation, int thickness, Color color) {
+    private static JSeparator createSeparator(int orientation, Color color) {
         JSeparator sep = new JSeparator(orientation);
         UIDefaults defaults = new UIDefaults();
         defaults.put("Separator[Enabled].backgroundPainter", new SkinSeparatorBackgroundPainter(SkinSeparatorBackgroundPainter.State.Enabled, color));
-        defaults.put("Separator.thickness", thickness);
+        defaults.put("Separator.thickness", 1);
         sep.putClientProperty("Nimbus.Overrides.InheritDefaults", Boolean.TRUE);
         sep.putClientProperty("Nimbus.Overrides", defaults);
         return sep;
     }
 
-    public static JSeparator createVerticalSeparator(Color color) {
-        return createSeparator(SwingConstants.VERTICAL, 1, color);
+    private static JSeparator createVerticalSeparator(Color color) {
+        return createSeparator(SwingConstants.VERTICAL, color);
     }
 
     public static JSeparator createAppHeaderSeparator() {
         return createVerticalSeparator(APPLICATION_HEADER_SEPARATOR_COLOR);
     }
 
-    public static Font getDefaultFont() {
+    private static Font getDefaultFont() {
         UIDefaults defaults = UIManager.getLookAndFeelDefaults();
         return defaults.getFont("defaultFont");
     }
@@ -506,7 +501,7 @@ public final class ThemeMediator {
         defaults.put("ProgressBar[Disabled+Indeterminate].foregroundPainter", new SkinProgressBarPainter(SkinProgressBarPainter.State.DisabledIndeterminate, paddingDisabled));
 
         // scrollbar
-        defaults.put("ScrollBar:\"ScrollBar.button\".size", Integer.valueOf(18));
+        defaults.put("ScrollBar:\"ScrollBar.button\".size", 18);
 
         defaults.put("ScrollBar:\"ScrollBar.button\"[Disabled].foregroundPainter", new SkinScrollBarButtonPainter(SkinScrollBarButtonPainter.State.Disabled));
         defaults.put("ScrollBar:\"ScrollBar.button\"[Enabled].foregroundPainter", new SkinScrollBarButtonPainter(SkinScrollBarButtonPainter.State.Enabled));
@@ -520,7 +515,7 @@ public final class ThemeMediator {
         defaults.put("ScrollBar:ScrollBarThumb[MouseOver].backgroundPainter", new SkinScrollBarThumbPainter(SkinScrollBarThumbPainter.State.MouseOver));
         defaults.put("ScrollBar:ScrollBarThumb[Pressed].backgroundPainter", new SkinScrollBarThumbPainter(SkinScrollBarThumbPainter.State.Pressed));
 
-        // tableheader
+        // table header
         defaults.put("TableHeader.background", SkinColors.LIGHT_BACKGROUND_COLOR);
 
         defaults.put("TableHeader:\"TableHeader.renderer\"[Enabled].backgroundPainter", new SkinTableHeaderPainter(SkinTableHeaderPainter.State.Enabled));
@@ -540,7 +535,7 @@ public final class ThemeMediator {
         // splitter
         defaults.put("SplitPane:SplitPaneDivider[Enabled].backgroundPainter", new SkinSplitPaneDividerBackgroundPainter(SkinSplitPaneDividerBackgroundPainter.State.Enabled));
 
-        // tabbedpanetab
+        // tabbed pane tab
         defaults.put("TabbedPane:TabbedPaneTabArea.contentMargins", new InsetsUIResource(3, 4, 0, 4));
         defaults.put("TabbedPane:TabbedPaneTabArea[Disabled].backgroundPainter", new SkinTabbedPaneTabAreaBackgroundPainter(SkinTabbedPaneTabAreaBackgroundPainter.State.Disabled));
         defaults.put("TabbedPane:TabbedPaneTabArea[Enabled+MouseOver].backgroundPainter", new SkinTabbedPaneTabAreaBackgroundPainter(SkinTabbedPaneTabAreaBackgroundPainter.State.EnableMouseOver));

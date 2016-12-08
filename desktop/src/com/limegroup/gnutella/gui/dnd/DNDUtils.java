@@ -63,18 +63,14 @@ public class DNDUtils {
 
     /**
      * Returns array of uris extracted from transferable.
-     * @param transferable
-     * @return
-     * @throws UnsupportedFlavorException
-     * @throws IOException
      */
-    public static URI[] getURIs(Transferable transferable) throws UnsupportedFlavorException, IOException {
+    static URI[] getURIs(Transferable transferable) throws UnsupportedFlavorException, IOException {
 
         String lines = (String) (contains(transferable.getTransferDataFlavors(), FileTransferable.URIFlavor) ? transferable
                 .getTransferData(FileTransferable.URIFlavor) : transferable.getTransferData(FileTransferable.URIFlavor16));
 
         StringTokenizer st = new StringTokenizer(lines, System.getProperty("line.separator"));
-        ArrayList<URI> uris = new ArrayList<URI>();
+        ArrayList<URI> uris = new ArrayList<>();
         while (st.hasMoreTokens()) {
             String line = st.nextToken().trim();
             if (line.length() == 0) {
@@ -92,14 +88,10 @@ public class DNDUtils {
 
     /**
      * Returns true if the flavor is contained in the array.
-     * 
-     * @param array
-     * @param flavor
-     * @return
      */
     public static boolean contains(DataFlavor[] array, DataFlavor flavor) {
-        for (int i = 0; i < array.length; i++) {
-            if (flavor.equals(array[i])) {
+        for (DataFlavor anArray : array) {
+            if (flavor.equals(anArray)) {
                 return true;
             }
         }
@@ -109,24 +101,15 @@ public class DNDUtils {
     /**
      * Checks for {@link DataFlavor#javaFileListFlavor} and 
      * {@link FileTransferable#URIFlavor} for unix systems.  
-     * @param flavors
-     * @return
      */
     public static boolean containsFileFlavors(DataFlavor[] flavors) {
-        if (flavors == null) {
-            return false;
-        }
-        return contains(flavors, DataFlavor.javaFileListFlavor) || contains(flavors, FileTransferable.URIFlavor)
-                || contains(flavors, FileTransferable.URIFlavor16);
+        return flavors != null && (contains(flavors, DataFlavor.javaFileListFlavor) || contains(flavors, FileTransferable.URIFlavor) || contains(flavors, FileTransferable.URIFlavor16));
     }
 
     /**
      * Extracts the array of files from a transferable
-     * @param transferable
      * @return an empty array if the transferable does not contain any data
      * that can be interpreted as a list of files
-     * @throws UnsupportedFlavorException
-     * @throws IOException
      */
     @SuppressWarnings("unchecked")
     public static File[] getFiles(Transferable transferable) throws UnsupportedFlavorException, IOException {
@@ -141,11 +124,10 @@ public class DNDUtils {
 
     /**
      * Returns array of files for uris that denote local paths.
-     * @param uris
      * @return empty array if no uri denotes a local file
      */
     public static File[] getFiles(URI[] uris) {
-        ArrayList<File> files = new ArrayList<File>(uris.length);
+        ArrayList<File> files = new ArrayList<>(uris.length);
         for (URI uri : uris) {
             String scheme = uri.getScheme();
             if (uri.isAbsolute() && scheme != null && scheme.equalsIgnoreCase("file")) {
@@ -168,15 +150,16 @@ public class DNDUtils {
                 if (containsPlayableFile(files)) {
                     return true;
                 }
+                //noinspection SimplifiableIfStatement
                 if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {
                     return true;
                 }
-                return fallback && fallbackTransferHandler != null ? fallbackTransferHandler.canImport(support) : false;
+                return (fallback && fallbackTransferHandler != null) && fallbackTransferHandler.canImport(support);
             } catch (InvalidDnDOperationException e) {
                 // this case seems to be something special with the OS
                 return true;
             } catch (Exception e) {
-                return fallback && fallbackTransferHandler != null ? fallbackTransferHandler.canImport(support) : false;
+                return (fallback && fallbackTransferHandler != null) && fallbackTransferHandler.canImport(support);
             }
         }
         return false;

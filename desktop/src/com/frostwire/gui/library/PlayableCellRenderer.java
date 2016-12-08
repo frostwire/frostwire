@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,10 @@
 
 package com.frostwire.gui.library;
 
-import java.awt.Component;
-
-import javax.swing.JTable;
-
 import com.limegroup.gnutella.gui.tables.DefaultTableBevelledCellRenderer;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  *  Creates both a renderer and an editor for cells in the playlist table that display the name
@@ -33,28 +32,13 @@ import com.limegroup.gnutella.gui.tables.DefaultTableBevelledCellRenderer;
  */
 class PlayableCellRenderer extends DefaultTableBevelledCellRenderer {
 
-    public PlayableCellRenderer() {
+    PlayableCellRenderer() {
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         PlayableCell cell = (PlayableCell) value;
 
         super.getTableCellRendererComponent(table, cell.toString(), isSelected, hasFocus, row, column);
-        //setFontColor(cell.isPlaying(), table, row, column);
         return this;
     }
-
-    /**
-     * Check what font color to use if this song is playing.
-     * We used to color rows differently when they were playing. 
-     */
-    /*
-    private void setFontColor(boolean isPlaying, JTable table, int row, int column) {
-        if (isPlaying) {
-            setForeground(ThemeMediator.PLAYING_DATA_LINE_COLOR);
-        } else {
-            setForeground(table.getForeground());
-        }
-    }
-    */
 }
