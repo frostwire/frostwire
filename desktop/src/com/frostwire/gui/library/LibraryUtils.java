@@ -467,17 +467,17 @@ public class LibraryUtils {
     }
 
     private static int addToPlaylist(Playlist playlist, File[] files, boolean starred, Set<File> ignore) {
-        return addToPlaylist(playlist, files, starred, -1, ignore);
+        return addToPlaylist(playlist, files, starred || playlist.isStarred(), -1, ignore);
     }
 
     private static int addToPlaylist(Playlist playlist, File[] files, boolean starred, int index, Set<File> ignore) {
         int count = 0;
         for (int i = 0; i < files.length && !playlist.isDeleted(); i++) {
             if (MediaPlayer.isPlayableFile(files[i]) && !ignore.contains(files[i])) {
-                LibraryUtils.addPlaylistItem(playlist, files[i], starred, index + count);
+                LibraryUtils.addPlaylistItem(playlist, files[i], playlist.isStarred() || starred, index + count);
                 count++;
             } else if (files[i].isDirectory()) {
-                count += addToPlaylist(playlist, files[i].listFiles(), starred, index + count, ignore);
+                count += addToPlaylist(playlist, files[i].listFiles(), playlist.isStarred() || starred, index + count, ignore);
             }
         }
 

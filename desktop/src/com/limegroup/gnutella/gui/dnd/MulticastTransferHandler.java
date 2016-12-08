@@ -31,7 +31,7 @@ import java.util.Collection;
 public class MulticastTransferHandler extends LimeTransferHandler {
 	private ArrayList<LimeTransferHandler> handlers;
 	
-	private LimeTransferHandler lastTransferHandler;
+	private LimeTransferHandler lastTransferable;
 	
 	
 	@SuppressWarnings("unused")
@@ -96,11 +96,11 @@ public class MulticastTransferHandler extends LimeTransferHandler {
 		for (LimeTransferHandler handler : getHandlers()) {
 			Transferable t = handler.createTransferable(c);
 			if (t != null) {
-				lastTransferHandler = handler;
+				lastTransferable = handler;
 				return t;
 			}
 		}
-		lastTransferHandler = null;
+		lastTransferable = null;
 		return null;
 	}
 	
@@ -134,9 +134,9 @@ public class MulticastTransferHandler extends LimeTransferHandler {
 	
 	@Override
 	protected void exportDone(JComponent source, Transferable data, int action) {
-		if (lastTransferHandler != null) {
-			lastTransferHandler.exportDone(source, data, action);
-			lastTransferHandler = null;
+		if (lastTransferable != null) {
+			lastTransferable.exportDone(source, data, action);
+			lastTransferable = null;
 		}
 	}
 }

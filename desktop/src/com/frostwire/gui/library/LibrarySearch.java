@@ -108,7 +108,7 @@ public class LibrarySearch extends JPanel {
         resultsCount = 0;
     }
 
-    public void pushStatus(final String newStatus) {
+    void pushStatus(final String newStatus) {
         GUIMediator.safeInvokeLater(new Runnable() {
             public void run() {
                 statusLabel.setText(newStatus);
@@ -116,7 +116,7 @@ public class LibrarySearch extends JPanel {
         });
     }
 
-    public void revertStatus() {
+    void revertStatus() {
         GUIMediator.safeInvokeLater(new Runnable() {
             public void run() {
                 statusLabel.setText(status);
