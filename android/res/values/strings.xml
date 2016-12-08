@@ -513,6 +513,7 @@
     <string name="file_descriptor_sd_mounted">This file was deleted from the SD card, or the SD card you have inserted is a different one.</string>
     <string name="file_descriptor_sd_unmounted">This file belongs to an SD card, please insert it on your device.</string>
     <string name="help_translate_frostwire">Help translate FrostWire</string>
+    <string name="help_translate_or_proofread_frostwire">Help translate or proofread FrostWire</string>
     <string name="finishing">Finishing</string>
     <string name="scanning">Finishing - Scanning</string>
     <string name="checking_ellipsis">Checking&#8230;</string>
@@ -643,4 +644,11 @@
     <string name="all_free_downloads">All free downloads</string>
     <string name="distraction_free_search_results">Distraction Free Search (beta)</string>
     <string name="distraction_free_search_results_summary">Hide UI components to show more results. Needs app restart to take effect.</string>
+    <string name="wifi_networks_only">Wi-Fi networks only</string>
+    <string name="wifi_networks_only_summary">Save data. Download only if Wi-Fi connection is established. </string>
+    <string name="notifications_other_settings">Notifications and Other</string>
+    <string name="search_preferences">Search Preferences</string>
+    <string name="frostwire_sticker_and_more">FrostWire stickers and more</string>
+    <string name="donate_your_time">Donate your time</string>
+    <string name="changelog">Changelog</string>
 </resources>

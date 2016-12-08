@@ -32,8 +32,19 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-
     <style name="MediumText">
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
+
+    <style name="PreferencesBlueButton">
+        <item name="android:background">@drawable/blue_light_button_background_selector</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:paddingLeft">42dp</item>
+        <item name="android:paddingRight">42dp</item>
+        <item name="android:textSize">@dimen/text_x_medium</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
 </resources>
