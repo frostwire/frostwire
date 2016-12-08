@@ -15,33 +15,21 @@
 
 package com.limegroup.gnutella;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
+import com.frostwire.util.UrlUtils;
+import org.gudy.azureus2.core3.util.Constants;
+import org.gudy.azureus2.core3.util.Debug;
+import org.gudy.azureus2.core3.util.MessageText;
+import org.limewire.util.OSUtils;
+import org.limewire.util.StringUtils;
+
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
-import com.frostwire.util.UrlUtils;
-import org.gudy.azureus2.core3.util.MessageText;
-import org.gudy.azureus2.core3.util.Constants;
-import org.gudy.azureus2.core3.util.Debug;
-import org.limewire.util.OSUtils;
-import org.limewire.util.StringUtils;
-
-import com.frostwire.util.Logger;
-import com.frostwire.util.HttpClientFactory;
+import java.util.*;
 
 public class ExternalControl {
 
@@ -125,7 +113,7 @@ public class ExternalControl {
     }
 
     private boolean process(String get, BufferedReader is, OutputStream os) throws IOException {
-        Map<String, String> original_params = new HashMap<String, String>();
+        Map<String, String> original_params = new HashMap<>();
         Map<String, String> lc_params = new HashMap<String, String>();
 
         List<String> source_params = new ArrayList<String>();

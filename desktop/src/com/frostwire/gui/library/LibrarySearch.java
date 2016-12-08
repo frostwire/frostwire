@@ -326,7 +326,7 @@ public class LibrarySearch extends JPanel {
                         continue;
                     }
 
-                    if (dir.equals(LibrarySettings.USER_MUSIC_FOLDER) && directoryHolder instanceof MediaTypeSavedFilesDirectoryHolder && !((MediaTypeSavedFilesDirectoryHolder) directoryHolder).getMediaType().equals(MediaType.getAudioMediaType())) {
+                    if (dir.equals(LibrarySettings.USER_MUSIC_FOLDER.getValue()) && directoryHolder instanceof MediaTypeSavedFilesDirectoryHolder && !((MediaTypeSavedFilesDirectoryHolder) directoryHolder).getMediaType().equals(MediaType.getAudioMediaType())) {
                         continue;
                     } else {
                         search(dir, new HashSet<File>(), LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());

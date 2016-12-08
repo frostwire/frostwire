@@ -132,7 +132,7 @@ public class Version implements Comparable<Version> {
      * Equality.
      */
     public boolean equals(Object o) {
-        return compareTo((Version)o) == 0;
+        return o instanceof Version && compareTo((Version)o) == 0;
     }
     
     /**

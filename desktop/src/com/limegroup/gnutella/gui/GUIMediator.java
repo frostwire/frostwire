@@ -1305,7 +1305,7 @@ public final class GUIMediator {
             playNextSong = false;
         }
 
-        MediaPlayer.instance().asyncLoadMedia(song, true, isPreview, playNextSong);
+        MediaPlayer.instance().asyncLoadMedia(song, isPreview, playNextSong);
     }
 
     /**
@@ -1505,4 +1505,19 @@ public final class GUIMediator {
     public void startSearch(String query) {
         getMainFrame().getApplicationHeader().startSearch(query);
     }
+
+    public void playInOS(MediaSource source) {
+        if (source == null) {
+            return;
+        }
+
+        if (source.getFile() != null) {
+            GUIMediator.launchFile(source.getFile());
+        } else if (source.getPlaylistItem() != null) {
+            GUIMediator.launchFile(new File(source.getPlaylistItem().getFilePath()));
+        } else if (source.getURL() != null) {
+            GUIMediator.openURL(source.getURL());
+        }
+    }
+
 }

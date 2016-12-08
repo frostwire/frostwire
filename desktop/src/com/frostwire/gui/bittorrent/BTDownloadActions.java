@@ -446,7 +446,7 @@ final class BTDownloadActions {
             }
 
             if (file != null && MediaPlayer.isPlayableFile(file)) {
-                MediaPlayer.instance().loadMedia(new MediaSource(file), true, false, false);
+                MediaPlayer.instance().loadMedia(new MediaSource(file), false, false);
             }
         }
     }

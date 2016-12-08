@@ -208,7 +208,7 @@ public abstract class SearchEngine {
 
     @Override
     public boolean equals(Object obj) {
-        return obj !=null && _id == ((SearchEngine) obj)._id;
+        return obj instanceof SearchEngine && _id == ((SearchEngine) obj)._id;
     }
 
     @Override

@@ -786,7 +786,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
             MediaSource previousSong = mediaPlayer.getPreviousMedia(currentMedia);
 
             if (previousSong != null) {
-                mediaPlayer.asyncLoadMedia(previousSong, true, false, true);
+                mediaPlayer.asyncLoadMedia(previousSong, false, true);
             }
         }
     }

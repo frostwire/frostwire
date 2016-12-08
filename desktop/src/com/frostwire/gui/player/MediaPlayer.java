@@ -20,10 +20,11 @@ package com.frostwire.gui.player;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
-import com.frostwire.mp4.*;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.mplayer.MPlayer;
+import com.frostwire.mp4.IsoFile;
+import com.frostwire.mp4.MovieHeaderBox;
 import com.frostwire.mplayer.IcyInfoListener;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.frostwire.mplayer.PositionListener;
@@ -41,13 +42,10 @@ import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
-import javax.swing.Box;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.Math;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.List;
@@ -148,7 +146,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
             public boolean dispatchKeyEvent(KeyEvent e) {
                 if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_SPACE) {
                     Object s = e.getComponent();
-                    if (!(s instanceof JTextField) && !(s instanceof JTable && ((JTable) s).isEditing() && !(s instanceof JCheckBox))) {
+                    if (!(s instanceof JTextField) && !(s instanceof JCheckBox) && !(s instanceof JTable && ((JTable) s).isEditing())) {
                         togglePause();
                         return true;
                     }
@@ -156,7 +154,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
                 return false;
             }
         });
-
         // prepare to receive UI events
         MPlayerUIEventHandler.instance().addListener(this);
     }
@@ -187,20 +184,20 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         return playlistFilesView;
     }
 
-    public RepeatMode getRepeatMode() {
+    RepeatMode getRepeatMode() {
         return repeatMode;
     }
 
-    public void setRepeatMode(RepeatMode repeatMode) {
+    void setRepeatMode(RepeatMode repeatMode) {
         this.repeatMode = repeatMode;
         PlayerSettings.LOOP_PLAYLIST.setValue(repeatMode.getValue());
     }
 
-    public boolean isShuffle() {
+    boolean isShuffle() {
         return shuffle;
     }
 
-    public void setShuffle(boolean shuffle) {
+    void setShuffle(boolean shuffle) {
         this.shuffle = shuffle;
         PlayerSettings.SHUFFLE_PLAYLIST.setValue(shuffle);
     }
@@ -219,14 +216,14 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     /**
      * Loads a MediaSource into the player to play next
      */
-    public void loadMedia(MediaSource source, boolean play, boolean isPreview, boolean playNextSong, Playlist currentPlaylist, List<MediaSource> playlistFilesView) {
+    private void loadMedia(MediaSource source, boolean isPreview, boolean playNextSong, Playlist currentPlaylist, List<MediaSource> playlistFilesView) {
         try {
             if (source == null) {
                 return;
             }
 
             if (!isPreview && PlayerSettings.USE_OS_DEFAULT_PLAYER.getValue()) {
-                playInOS(source);
+                GUIMediator.instance().playInOS(source);
                 return;
             }
 
@@ -240,7 +237,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
                 this.playlistFilesView = null;
             }
 
-            if (play && currentMedia != null) {
+            if (currentMedia != null) {
                 durationInSeconds = -1;
 
                 if (currentMedia.getFile() != null) {
@@ -292,31 +289,34 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
 
             try {
                 MovieHeaderBox mvhd = com.frostwire.mp4.Box.findFirst(boxes, com.frostwire.mp4.Box.mvhd);
-                return mvhd.duration() / mvhd.timescale();
+                if  (mvhd != null) {
+                    return mvhd.duration() / mvhd.timescale();
+                }
             } finally {
                 IOUtils.closeQuietly(isoFile);
             }
         } catch (Throwable e) {
             return -1;
         }
+        return -1;
     }
 
-    public void asyncLoadMedia(final MediaSource source, final boolean play, final boolean isPreview, final boolean playNextSong, final Playlist currentPlaylist, final List<MediaSource> playlistFilesView) {
+    public void asyncLoadMedia(final MediaSource source, final boolean playNextSong, final Playlist currentPlaylist, final List<MediaSource> playlistFilesView) {
         playExecutor.execute(new Runnable() {
             public void run() {
-                loadMedia(source, play, isPreview, playNextSong, currentPlaylist, playlistFilesView);
+                loadMedia(source, false, playNextSong, currentPlaylist, playlistFilesView);
             }
         });
     }
 
-    public void loadMedia(MediaSource source, boolean play, boolean isPreview, boolean playNextSong) {
-        loadMedia(source, play, isPreview, playNextSong, currentPlaylist, (playlistFilesView != null) ? Arrays.asList(playlistFilesView) : null);
+    public void loadMedia(MediaSource source, boolean isPreview, boolean playNextSong) {
+        loadMedia(source, isPreview, playNextSong, currentPlaylist, (playlistFilesView != null) ? Arrays.asList(playlistFilesView) : null);
     }
 
-    public void asyncLoadMedia(final MediaSource source, final boolean play, final boolean isPreview, final boolean playNextSong) {
+    public void asyncLoadMedia(final MediaSource source, final boolean isPreview, final boolean playNextSong) {
         playExecutor.execute(new Runnable() {
             public void run() {
-                loadMedia(source, play, isPreview, playNextSong);
+                loadMedia(source, isPreview, playNextSong);
             }
         });
     }
@@ -345,7 +345,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     }
 
     /** Force showing or not the media player window */
-    public void playMedia(boolean showPlayerWindow) {
+    private void playMedia(boolean showPlayerWindow) {
         String filename = stopAndPrepareFilename();
 
         if (filename.length() > 0) {
@@ -364,7 +364,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     /**
      * Plays a file and determines whether or not to show the player window based on the MediaType of the file.
      */
-    public void playMedia() {
+    private void playMedia() {
 
         String filename = stopAndPrepareFilename();
 
@@ -385,7 +385,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     /**
      * Toggle pause the current song
      */
-    public void togglePause() {
+    void togglePause() {
         mplayer.togglePause();
         notifyState(getState());
     }
@@ -399,11 +399,11 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         notifyState(getState());
     }
 
-    public void fastForward() {
+    private void fastForward() {
         mplayer.fastForward();
     }
 
-    public void rewind() {
+    private void rewind() {
         mplayer.rewind();
     }
 
@@ -436,15 +436,15 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         return volume;
     }
 
-    public void incrementVolume() {
+    private void incrementVolume() {
         setVolume(getVolume() + 0.1);
     }
 
-    public void decrementVolume() {
+    private void decrementVolume() {
         setVolume(getVolume() - 0.1);
     }
 
-    protected void notifyVolumeChanged() {
+    private void notifyVolumeChanged() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 fireVolumeChanged(volume);
@@ -476,10 +476,8 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
 
     /**
      * Notify listeners when a new audio source has been opened.
-     * 
-     * @param mediaSource
      */
-    protected void notifyOpened(final MediaSource mediaSource) {
+    private void notifyOpened(final MediaSource mediaSource) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 fireOpened(mediaSource);
@@ -491,10 +489,8 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
      * Notify listeners about an AudioPlayerEvent. This creates general state
      * modifications to the player such as the transition from opened to playing
      * to paused to end of song.
-     * 
-     * @param state
      */
-    protected void notifyState(final MediaPlaybackState state) {
+    private void notifyState(final MediaPlaybackState state) {
 
         if (stateNotificationsEnabled) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -509,7 +505,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
      * fires a progress event off a new thread. This lets us safely fire events
      * off of the player thread while using a lock on the input stream
      */
-    protected void notifyProgress(final float currentTimeInSecs) {
+    private void notifyProgress(final float currentTimeInSecs) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 fireProgress(currentTimeInSecs);
@@ -517,7 +513,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         });
     }
 
-    protected void notifyIcyInfo(final String data) {
+    private void notifyIcyInfo(final String data) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 fireIcyInfo(data);
@@ -530,7 +526,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
      * properties map contains information about the type of song such as bit
      * rate, sample rate, media type(MPEG, Streaming,etc..), etc..
      */
-    protected void fireOpened(MediaSource mediaSource) {
+    private void fireOpened(MediaSource mediaSource) {
         for (MediaPlayerListener listener : listenerList) {
             listener.mediaOpened(this, mediaSource);
         }
@@ -542,13 +538,13 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
      * playing. This also returns a copy of the written byte[] so it can get
      * passed along to objects such as a FFT for visual feedback of the song
      */
-    protected void fireProgress(float currentTimeInSecs) {
+    private void fireProgress(float currentTimeInSecs) {
         for (MediaPlayerListener listener : listenerList) {
             listener.progressChange(this, currentTimeInSecs);
         }
     }
 
-    protected void fireVolumeChanged(double currentVolume) {
+    private void fireVolumeChanged(double currentVolume) {
         for (MediaPlayerListener listener : listenerList) {
             listener.volumeChange(this, currentVolume);
         }
@@ -559,13 +555,13 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
      * to be aware of state transitions such as from OPENED -> PLAYING ->
      * STOPPED -> EOF
      */
-    protected void fireState(MediaPlaybackState state) {
+    private void fireState(MediaPlaybackState state) {
         for (MediaPlayerListener listener : listenerList) {
             listener.stateChange(this, state);
         }
     }
 
-    protected void fireIcyInfo(String data) {
+    private void fireIcyInfo(String data) {
         for (MediaPlayerListener listener : listenerList) {
             listener.icyInfo(this, data);
         }
@@ -579,7 +575,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         notifyState(getState());
     }
 
-    public void playNextMedia() {
+    void playNextMedia() {
         if (!playNextMedia) {
             return;
         }
@@ -602,7 +598,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
 
         if (media != null) {
             //System.out.println(song.getFile());
-            asyncLoadMedia(media, true, false, true, currentPlaylist, Arrays.asList(playlistFilesView));
+            asyncLoadMedia(media, true, currentPlaylist, Arrays.asList(playlistFilesView));
         }
     }
     
@@ -661,13 +657,14 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         this.playlistFilesView = playlistFilesView.toArray(new MediaSource[playlistFilesView.size()]);
     }
 
-    public MediaSource getNextRandomSong(MediaSource currentMedia) {
+    private MediaSource getNextRandomSong(MediaSource currentMedia) {
         if (playlistFilesView == null) {
             return null;
         }
 
         MediaSource songFile;
         int count = 4;
+        //noinspection StatementWithEmptyBody
         while ((songFile = findRandomMediaFile(currentMedia)) == null && count-- > 0) {
         }
 
@@ -687,7 +684,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         return songFile;
     }
 
-    public MediaSource getNextContinuousMedia(MediaSource currentMedia) {
+    private MediaSource getNextContinuousMedia(MediaSource currentMedia) {
         if (playlistFilesView == null) {
             return null;
         }
@@ -716,7 +713,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         return null;
     }
 
-    public MediaSource getNextMedia(MediaSource currentMedia) {
+    private MediaSource getNextMedia(MediaSource currentMedia) {
         if (playlistFilesView == null) {
             return null;
         }
@@ -752,7 +749,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         return null;
     }
 
-    public MediaSource getPreviousMedia(MediaSource currentMedia) {
+    MediaSource getPreviousMedia(MediaSource currentMedia) {
         if (playlistFilesView == null) {
             return null;
         }
@@ -806,7 +803,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         return null;
     }
 
-    public boolean canSeek() {
+    boolean canSeek() {
         if (durationInSeconds != -1) {
             return durationInSeconds > 0;
         }
@@ -899,17 +896,4 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         togglePause();
     }
 
-    private void playInOS(MediaSource source) {
-        if (source == null) {
-            return;
-        }
-
-        if (source.getFile() != null) {
-            GUIMediator.launchFile(source.getFile());
-        } else if (source.getPlaylistItem() != null) {
-            GUIMediator.launchFile(new File(source.getPlaylistItem().getFilePath()));
-        } else if (source.getURL() != null) {
-            GUIMediator.openURL(source.getURL());
-        }
-    }
 }

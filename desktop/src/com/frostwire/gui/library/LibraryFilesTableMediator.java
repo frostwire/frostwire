@@ -555,7 +555,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
             return;
         }
         if (getMediaType().equals(MediaType.getAudioMediaType()) && MediaPlayer.isPlayableFile(line.getFile())) {
-            MediaPlayer.instance().asyncLoadMedia(new MediaSource(line.getFile()), true, false, true, null, getFilesView());
+            MediaPlayer.instance().asyncLoadMedia(new MediaSource(line.getFile()), true, null, getFilesView());
             UXStats.instance().log(UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
             return;
         }

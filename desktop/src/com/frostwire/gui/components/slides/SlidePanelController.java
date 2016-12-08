@@ -18,14 +18,10 @@
 
 package com.frostwire.gui.components.slides;
 
-import java.io.File;
-
-import org.limewire.util.StringUtils;
-
-import com.frostwire.gui.player.MediaSource;
 import com.frostwire.gui.player.StreamMediaSource;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
+import org.limewire.util.StringUtils;
 
 /**
  * 
@@ -77,27 +73,13 @@ class SlidePanelController {
     /**
      * Note: only for HTTP downloads
      */
-    public void installSlide() {
+    void installSlide() {
         if (slide.method == Slide.SLIDE_DOWNLOAD_METHOD_HTTP && slide.hasFlag(Slide.POST_DOWNLOAD_EXECUTE)) {
             downloadSlide();
         }
     }
 
-    private void playInOS(MediaSource source) {
-        if (source == null) {
-            return;
-        }
-
-        if (source.getFile() != null) {
-            GUIMediator.launchFile(source.getFile());
-        } else if (source.getPlaylistItem() != null) {
-            GUIMediator.launchFile(new File(source.getPlaylistItem().getFilePath()));
-        } else if (source.getURL() != null) {
-            GUIMediator.openURL(source.getURL());
-        }
-    }
-
-    public void previewVideo() {
+    void previewVideo() {
         final String mediaURL = slide.videoURL;
         if (mediaURL != null && mediaURL.contains("youtube.com")) {
             GUIMediator.openURL(slide.videoURL);
@@ -124,7 +106,7 @@ class SlidePanelController {
         }
     }
 
-    public void previewAudio() {
+    void previewAudio() {
         if (slide.hasFlag(Slide.PREVIEW_AUDIO_USING_BROWSER)) {
             GUIMediator.openURL(slide.audioURL);
         } else {
@@ -138,7 +120,7 @@ class SlidePanelController {
             if (slide.hasFlag(flagUsingFWPlayerForMediaType)) {
                 GUIMediator.instance().launchMedia(mediaSource, true);
             } else {
-                playInOS(mediaSource);
+                GUIMediator.instance().playInOS(mediaSource);
             }
         }
     }
