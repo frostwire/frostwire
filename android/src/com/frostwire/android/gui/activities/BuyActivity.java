@@ -18,15 +18,12 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
@@ -36,7 +33,6 @@ import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
@@ -68,8 +64,6 @@ public final class BuyActivity extends AbstractActivity2 {
     private ProductCardView selectedProductCard;
     private ProductPaymentOptionsView paymentOptionsView;
     private boolean offerAccepted;
-
-    protected Toolbar toolbar;
 
     public BuyActivity() {
         super(R.layout.activity_buy);
