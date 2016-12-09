@@ -651,4 +651,7 @@
     <string name="frostwire_sticker_and_more">FrostWire stickers and more</string>
     <string name="donate_your_time">Donate your time</string>
     <string name="changelog">Changelog</string>
+    <string name="general">General</string>
+    <string name="search_torrent_settings">Search/Torrent Settings</string>
+    <string name="interface_and_notifications">Interface and Notifications</string>
 </resources>
