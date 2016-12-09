@@ -29,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CompoundButton;
+import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -250,7 +251,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
             public void onFilter(View v, String str) {
                 if (adapter != null) {
-                    adapter.getFilter().filter(str);
+                    performFilter(str);
                 }
             }
 
@@ -448,7 +449,17 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             };
             restorePreviouslyChecked();
             restorePreviousFilter();
-            list.setAdapter(adapter);
+            if (StringUtils.isNullOrEmpty(previousFilter)) {
+                list.setAdapter(adapter);
+            } else {
+                performFilter(previousFilter, new Runnable() { //shows the list after filtering is done
+                    @Override
+                    public void run() {
+                        list.setAdapter(adapter);
+                        restoreListViewScrollPosition();
+                    }
+                });
+            }
 
         } catch (Throwable e) {
             LOG.error("Error updating files in list", e);
@@ -513,6 +524,24 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
+        }
+    }
+
+    private void performFilter(String filterString) {
+        performFilter(filterString, null);
+    }
+
+    private void performFilter(String filterString, final Runnable r) {
+        if (adapter != null) {
+            this.previousFilter = filterString;
+            adapter.getFilter().filter(filterString, new Filter.FilterListener() {
+                @Override
+                public void onFilterComplete(int i) {
+                    if (r != null) {
+                        r.run();
+                    }
+                }
+            });
         }
     }
 
