@@ -21,6 +21,7 @@ package com.frostwire.android.gui.activities;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +69,8 @@ public final class BuyActivity extends AbstractActivity2 {
     private ProductPaymentOptionsView paymentOptionsView;
     private boolean offerAccepted;
 
+    protected Toolbar toolbar;
+
     public BuyActivity() {
         super(R.layout.activity_buy);
     }
@@ -80,18 +83,12 @@ public final class BuyActivity extends AbstractActivity2 {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        if (isInterstitial()) {
-            hideOSTitleBar();
-        } else {
-            final ActionBar bar = getActionBar();
-            if (bar != null) {
-                bar.setDisplayHomeAsUpEnabled(true);
-                bar.setIcon(android.R.color.transparent);
-                bar.setTitle(getActionBarTitle());
-            }
+    protected void initToolbar() {
+        Toolbar toolbar = findView(R.id.toolbar_main);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            toolbar.setTitle(getActionBarTitle());
         }
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -139,6 +136,7 @@ public final class BuyActivity extends AbstractActivity2 {
         randomPitch.setText(UIUtils.randomPitchResId(true));
     }
 
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -152,13 +150,6 @@ public final class BuyActivity extends AbstractActivity2 {
         } else {
             finish();
         }
-    }
-
-    private void hideOSTitleBar() {
-        Window w = getWindow();
-        w.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        w.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-        w.requestFeature(Window.FEATURE_NO_TITLE);
     }
 
     private void onInterstitialActionBarDismiss() {
