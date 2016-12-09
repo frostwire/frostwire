@@ -18,9 +18,7 @@ package com.limegroup.gnutella;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
-import org.gudy.azureus2.core3.util.Constants;
-import org.gudy.azureus2.core3.util.Debug;
-import org.gudy.azureus2.core3.util.MessageText;
+import com.limegroup.gnutella.gui.GUIUtils;
 import org.limewire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
@@ -74,7 +72,7 @@ public class ExternalControl {
 
                                     if (address.equals(LOCALHOST_NAME) || address.equals(LOCALHOST_IP)) {
 
-                                        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), Constants.DEFAULT_ENCODING));
+                                        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), GUIUtils.DEFAULT_ENCODING));
 
                                         String line = br.readLine();
 
@@ -87,7 +85,7 @@ public class ExternalControl {
                                                 int pos = line.lastIndexOf(' ');
 
                                                 line = line.substring(0, pos);
-                                                closeSocket = process(line, br, socket.getOutputStream());
+                                                closeSocket = process(line, socket.getOutputStream());
                                             }
                                         }
                                     }
@@ -97,8 +95,7 @@ public class ExternalControl {
                                     if (closeSocket) {
                                         try {
                                             socket.close();
-                                        } catch (Exception e) {
-
+                                        } catch (Exception ignored) {
                                         }
                                     }
                                 }
@@ -112,66 +109,46 @@ public class ExternalControl {
         }).start();
     }
 
-    private boolean process(String get, BufferedReader is, OutputStream os) throws IOException {
+    private boolean process(String get, OutputStream os) throws IOException {
         Map<String, String> original_params = new HashMap<>();
-        Map<String, String> lc_params = new HashMap<String, String>();
-
-        List<String> source_params = new ArrayList<String>();
-
+        Map<String, String> lc_params = new HashMap<>();
+        List<String> source_params = new ArrayList<>();
         int pos = get.indexOf('?');
-
         String arg_str;
 
         if (pos == -1) {
-
             arg_str = "";
-
         } else {
-
             arg_str = get.substring(pos + 1);
-
             pos = arg_str.lastIndexOf(' ');
 
             if (pos >= 0) {
-
                 arg_str = arg_str.substring(0, pos).trim();
             }
 
             StringTokenizer tok = new StringTokenizer(arg_str, "&");
 
             while (tok.hasMoreTokens()) {
-
                 String arg = tok.nextToken();
-
                 pos = arg.indexOf('=');
 
                 if (pos == -1) {
-
                     String lhs = arg.trim();
-
                     original_params.put(lhs, "");
-
-                    lc_params.put(lhs.toLowerCase(MessageText.LOCALE_ENGLISH), "");
-
+                    lc_params.put(lhs.toLowerCase(GUIUtils.LOCALE_ENGLISH), "");
                 } else {
-
                     try {
                         String lhs = arg.substring(0, pos).trim();
-                        String lc_lhs = lhs.toLowerCase(MessageText.LOCALE_ENGLISH);
-
-                        String rhs = URLDecoder.decode(arg.substring(pos + 1).trim(), Constants.DEFAULT_ENCODING);
-
+                        String lc_lhs = lhs.toLowerCase(GUIUtils.LOCALE_ENGLISH);
+                        String rhs = URLDecoder.decode(arg.substring(pos + 1).trim(), GUIUtils.DEFAULT_ENCODING);
                         original_params.put(lhs, rhs);
-
                         lc_params.put(lc_lhs, rhs);
 
                         if (lc_lhs.equals("xsource")) {
-
                             source_params.add(rhs);
                         }
                     } catch (UnsupportedEncodingException e) {
-
-                        Debug.printStackTrace(e);
+                        e.printStackTrace();
                     }
                 }
             }
@@ -179,7 +156,7 @@ public class ExternalControl {
 
         if (get.startsWith("/download")) {
 
-            String info_hash = (String) lc_params.get("info_hash");
+            String info_hash = lc_params.get("info_hash");
 
             if (info_hash != null) {
                 if (activityCallback.isRemoteDownloadsAllowed()) {
@@ -192,21 +169,20 @@ public class ExternalControl {
             } else {
                 //this handles when FrostWire is already open. The second instance forwarded
                 //parameters to us via HTTP.
-                String url = UrlUtils.decode((String) lc_params.get("url"));
-                
+                String url = UrlUtils.decode(lc_params.get("url"));
                 if (!StringUtils.isNullOrEmpty(url) && activityCallback.isRemoteDownloadsAllowed()) {
                     if (url.startsWith("magnet:?")) {
                         handleTorrentMagnetRequest(url);
-                    } /** local torrent files */
-                    else if (url.startsWith("file://") || url.endsWith(".torrent")) {
+                    } else if (url.startsWith("file://") || url.endsWith(".torrent")) {
+                        // local torrent files
                         handleTorrentRequest(url);
                     }
                 } 
-                writeHTTPReply(os, "Running");
+                writeHTTPReply(os);
                 return true;
             }
         } else if (get.startsWith("/show")) {
-            writeHTTPReply(os, "Running");
+            writeHTTPReply(os);
             restoreApplication();
             return true;
         }
@@ -215,7 +191,7 @@ public class ExternalControl {
         return true;
     }
     
-    protected void writeNotFound(OutputStream os) throws IOException {
+    private void writeNotFound(OutputStream os) throws IOException {
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(os));
         pw.print("HTTP/1.0 404 Not Found" + NL + NL);
         pw.flush();
@@ -232,14 +208,14 @@ public class ExternalControl {
         pw.flush();
     }
     
-    private void writeHTTPReply(OutputStream os, String string) {
+    private void writeHTTPReply(OutputStream os) {
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(os));
         pw.print("HTTP/1.1 200 OK" + NL);
         pw.print("Cache-Control: no-cache" + NL);
         pw.print("Pragma: no-cache" + NL);
         pw.print("Content-Type: text/plain" + NL);
-        pw.print("Content-Length: " + string.length() + NL + NL);
-        pw.write(string);
+        pw.print("Content-Length: " + "Running".length() + NL + NL);
+        pw.write("Running");
         pw.flush();
     }
 
@@ -335,13 +311,7 @@ public class ExternalControl {
 
         if (options.length == 0) {
             LOG.warn("Invalid magnet, ignoring: " + arg);
-            return;
         }
-        //		
-        //		// ask callback if it wants to handle the magnets itself
-        //		if (!callback.handleMagnets(options)) {
-        //		    downloadMagnet(options);
-        //		}
     }
 
     private ActivityCallback restoreApplication() {
@@ -359,13 +329,13 @@ public class ExternalControl {
 
     /**  Check if the client is already running, and if so, pop it up.
      *   Sends the MAGNET message along the given socket. 
-     *   @returns  true if a local FrostWire responded with a true.
+     *   @return true if a local FrostWire responded with a true.
      */
     private boolean testForFrostWire(String arg) {
         try {
             //LOG.info("testForFrostWire(arg = ["+arg+"])");
             
-            String urlParameter = null;
+            String urlParameter;
             if (arg != null && (arg.startsWith("http://") || arg.startsWith("https://") || arg.startsWith("magnet:?") || arg.endsWith(".torrent"))) {
                 urlParameter = "/download?url=" + UrlUtils.encode(arg);
             }  else {
@@ -379,7 +349,7 @@ public class ExternalControl {
                 return true;
             }
             
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         return false;
