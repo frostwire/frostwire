@@ -36,6 +36,7 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
 import com.frostwire.android.offers.Offers;
@@ -48,7 +49,7 @@ import com.frostwire.util.Logger;
  * @author gubatron
  * @author aldenml
  */
-public final class BuyActivity extends AbstractActivity {
+public final class BuyActivity extends AbstractActivity2 {
 
     private static final Logger LOG = Logger.getLogger(BuyActivity.class);
 
@@ -179,8 +180,13 @@ public final class BuyActivity extends AbstractActivity {
     private void initInterstitialModeActionBar(String title) {
         View v = findView(R.id.activity_buy_actionbar_interstitial);
         v.setVisibility(View.VISIBLE);
+
+        View toolbar = findView(R.id.toolbar_main);
+        toolbar.setVisibility(View.GONE);
+
         TextView titleTextView = findView(R.id.activity_buy_actionbar_interstitial_buy_activity_title);
         titleTextView.setText(title);
+
         ImageButton closeButton = findView(R.id.activity_buy_actionbar_interstitial_buy_activity_dismiss_button);
         closeButton.setOnClickListener(new InterstitialActionBarDismissButtonClickListener());
     }

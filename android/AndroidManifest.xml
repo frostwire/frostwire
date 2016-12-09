@@ -118,7 +118,7 @@
         <activity android:name=".gui.activities.SettingsActivity"
                   android:label="@string/activity_preferences_name" android:theme="@style/Preferences"/>
         <activity android:name="com.frostwire.android.gui.activities.BuyActivity"
-                  android:label="@string/remove_ads"/>
+                  android:label="@string/remove_ads" android:theme="@style/Theme.FrostWire"/>
         <activity android:name="com.frostwire.android.gui.activities.AboutActivity"
                   android:label="@string/about" android:theme="@style/Theme.FrostWire"/>
         <activity android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
