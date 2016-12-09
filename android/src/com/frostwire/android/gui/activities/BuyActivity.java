@@ -21,6 +21,7 @@ package com.frostwire.android.gui.activities;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
 import com.frostwire.android.offers.Offers;
@@ -48,7 +50,7 @@ import com.frostwire.util.Logger;
  * @author gubatron
  * @author aldenml
  */
-public final class BuyActivity extends AbstractActivity {
+public final class BuyActivity extends AbstractActivity2 {
 
     private static final Logger LOG = Logger.getLogger(BuyActivity.class);
 
@@ -67,6 +69,8 @@ public final class BuyActivity extends AbstractActivity {
     private ProductPaymentOptionsView paymentOptionsView;
     private boolean offerAccepted;
 
+    protected Toolbar toolbar;
+
     public BuyActivity() {
         super(R.layout.activity_buy);
     }
@@ -79,18 +83,12 @@ public final class BuyActivity extends AbstractActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        if (isInterstitial()) {
-            hideOSTitleBar();
-        } else {
-            final ActionBar bar = getActionBar();
-            if (bar != null) {
-                bar.setDisplayHomeAsUpEnabled(true);
-                bar.setIcon(android.R.color.transparent);
-                bar.setTitle(getActionBarTitle());
-            }
+    protected void initToolbar() {
+        Toolbar toolbar = findView(R.id.toolbar_main);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            toolbar.setTitle(getActionBarTitle());
         }
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -138,6 +136,7 @@ public final class BuyActivity extends AbstractActivity {
         randomPitch.setText(UIUtils.randomPitchResId(true));
     }
 
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -151,13 +150,6 @@ public final class BuyActivity extends AbstractActivity {
         } else {
             finish();
         }
-    }
-
-    private void hideOSTitleBar() {
-        Window w = getWindow();
-        w.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        w.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-        w.requestFeature(Window.FEATURE_NO_TITLE);
     }
 
     private void onInterstitialActionBarDismiss() {
@@ -179,8 +171,13 @@ public final class BuyActivity extends AbstractActivity {
     private void initInterstitialModeActionBar(String title) {
         View v = findView(R.id.activity_buy_actionbar_interstitial);
         v.setVisibility(View.VISIBLE);
+
+        View toolbar = findView(R.id.toolbar_main);
+        toolbar.setVisibility(View.GONE);
+
         TextView titleTextView = findView(R.id.activity_buy_actionbar_interstitial_buy_activity_title);
         titleTextView.setText(title);
+
         ImageButton closeButton = findView(R.id.activity_buy_actionbar_interstitial_buy_activity_dismiss_button);
         closeButton.setOnClickListener(new InterstitialActionBarDismissButtonClickListener());
     }
