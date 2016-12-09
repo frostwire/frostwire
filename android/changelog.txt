@@ -1,3 +1,7 @@
+FrostWire 1.8.7 - DEC/08/2016
+ - Belarusian translation
+ - About screen make over with material design
+
 FrostWire 1.8.6 - DEC/06/2016
  - [Experimental] Distraction Free Search: Hide title bar and search box when scrolling down search results
  - Ukranian, Romanian, Hungarian translations
