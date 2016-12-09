@@ -63,7 +63,7 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
 
         setContentView(layoutResId);
         initComponents(savedInstanceState);
-        initToolbar();
+        setToolbar();
     }
 
     @Override
@@ -80,11 +80,15 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
     protected void initComponents(Bundle savedInstanceState) {
     }
 
-    protected void initToolbar() {
+    protected void initToolbar(Toolbar toolbar) {
+    }
+
+    private void setToolbar() {
         Toolbar toolbar = findView(R.id.toolbar_main);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
             toolbar.setTitle(getTitle());
+            initToolbar(toolbar);
         }
     }
 

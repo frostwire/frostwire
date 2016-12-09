@@ -77,12 +77,8 @@ public final class BuyActivity extends AbstractActivity2 {
     }
 
     @Override
-    protected void initToolbar() {
-        Toolbar toolbar = findView(R.id.toolbar_main);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            toolbar.setTitle(getActionBarTitle());
-        }
+    protected void initToolbar(Toolbar toolbar) {
+        toolbar.setTitle(getActionBarTitle());
     }
 
     @Override
