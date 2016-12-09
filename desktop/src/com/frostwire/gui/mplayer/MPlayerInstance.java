@@ -872,7 +872,7 @@ MPlayerInstance
 	}
 
 	private static void killProcesses(boolean delay) {
-		if ( Constants.isOSX ){
+		if ( OSUtils.isAnyMac() ){
 			String	process_name = BINARY_PATH.getName();
 			if (delay) {
 				try {
@@ -888,7 +888,7 @@ MPlayerInstance
 						process_name
 					});
 			
-		}else if ( Constants.isWindows ){
+		}else if ( OSUtils.isWindows() ){
 			
 			String	process_name = BINARY_PATH.getName();
 			
@@ -927,7 +927,7 @@ MPlayerInstance
 		String[]	command )
 	{
 		try{
-			if ( !Constants.isWindows ){
+			if ( !OSUtils.isWindows() ){
 			
 				command[0] = findCommand( command[0] );
 			}

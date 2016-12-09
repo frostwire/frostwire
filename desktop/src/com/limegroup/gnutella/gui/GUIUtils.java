@@ -44,6 +44,9 @@ import java.util.Locale;
  *  methods.
  */
 public final class GUIUtils {
+
+    public static final String DEFAULT_ENCODING = "UTF8";
+    public static final Locale LOCALE_ENGLISH = new Locale("en", "");
     
     private static final Logger LOG = Logger.getLogger(GUIUtils.class);
     
