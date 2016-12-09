@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,9 @@ import com.frostwire.bittorrent.*;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.util.Logger;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.settings.SharingSettings;
@@ -45,9 +45,7 @@ import java.util.Set;
  * @author aldenml
  */
 public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownload {
-
     private static final Logger LOG = Logger.getLogger(BittorrentDownload.class);
-
     private final BTDownload dl;
 
     private String displayName;
@@ -130,15 +128,11 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
         if (!partial) {
             return dl.getSavePath();
         }
-
-        for (int i = 0; i < items.size(); i++) {
-            TransferItem item = items.get(i);
-
+        for (TransferItem item : items) {
             if (item.getDisplayName().equals(getDisplayName())) {
                 return item.getFile();
             }
         }
-
         return dl.getSavePath();
     }
 
@@ -211,11 +205,9 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     public String getShareRatio() {
         long sent = dl.getTotalBytesSent();
         long received = dl.getTotalBytesReceived();
-
         if (received < 0) {
             return "0";
         }
-
         return String.valueOf((double) sent / (double) received);
     }
 
@@ -276,15 +268,11 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
     private void checkSequentialDownload() {
         BTDownloadItem item = getFirstBiggestItem();
-
         if (item != null && MediaPlayer.isPlayableFile(item.getFile())) {
             long downloaded = item.getSequentialDownloaded();
             long size = item.getSize();
-
             if (size > 0) {
-
                 long percent = (100 * downloaded) / size;
-
                 if (percent > 30 || downloaded > 10 * 1024 * 1024) {
                     if (dl.isSequentialDownload()) {
                         dl.setSequentialDownload(false);
@@ -294,8 +282,6 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                         dl.setSequentialDownload(true);
                     }
                 }
-
-                //LOG.debug("Seq: " + dl.isSequentialDownload() + " Downloaded: " + downloaded);
             }
         } else {
             if (dl.isSequentialDownload()) {
@@ -324,26 +310,23 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     }
 
     private class StatusListener implements BTDownloadListener {
-
         @Override
         public void finished(BTDownload dl) {
             if (!SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
                 dl.pause();
                 finalCleanup(dl.getIncompleteFiles());
             }
-
-            File saveLocation = new File(dl.getSavePath(), dl.getName());
-
-            if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(saveLocation)) {
-                if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                    iTunesMediator.instance().scanForSongs(saveLocation);
+            if (dl.getName() != null) {
+                File saveLocation = new File(dl.getSavePath(), dl.getName());
+                if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(saveLocation)) {
+                    if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
+                        iTunesMediator.instance().scanForSongs(saveLocation);
+                    }
+                }
+                if (!LibraryMediator.instance().isScanned(dl.hashCode())) {
+                    LibraryMediator.instance().scan(dl.hashCode(), saveLocation);
                 }
             }
-
-            if (!LibraryMediator.instance().isScanned(dl.hashCode())) {
-                LibraryMediator.instance().scan(dl.hashCode(), saveLocation);
-            }
-
             //if you have to hide seeds, do so.
             GUIMediator.safeInvokeLater(new Runnable() {
                 public void run() {
@@ -351,24 +334,23 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                 }
             });
         }
-
         @Override
         public void removed(BTDownload dl, Set<File> incompleteFiles) {
             finalCleanup(incompleteFiles);
         }
     }
 
-    public String makeMagnetUri() {
+    String makeMagnetUri() {
         return dl.magnetUri();
     }
 
-    public TorrentInfo getTorrentInfo() {
+    TorrentInfo getTorrentInfo() {
         return new TorrentInfo(dl.getTorrentFile());
     }
 
     private void setupMetadataHolder() {
         if (holder == null) {
-            File torrent = null;
+            File torrent;
             try {
                 torrent = dl.getTorrentFile();
 
@@ -408,7 +390,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
         }
     }
 
-    public static boolean deleteEmptyDirectoryRecursive(File directory) {
+    private static boolean deleteEmptyDirectoryRecursive(File directory) {
         // make sure we only delete canonical children of the parent file we
         // wish to delete. I have a hunch this might be an issue on OSX and
         // Linux under certain circumstances.
@@ -429,21 +411,21 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
         File[] files = directory.listFiles();
         if (files != null) {
-            for (int i = 0; i < files.length; i++) {
+            for (File file : files) {
                 try {
-                    if (!files[i].getCanonicalPath().startsWith(canonicalParent))
+                    if (!file.getCanonicalPath().startsWith(canonicalParent))
                         continue;
                 } catch (IOException ioe) {
                     canDelete = false;
                 }
 
-                if (!deleteEmptyDirectoryRecursive(files[i])) {
+                if (!deleteEmptyDirectoryRecursive(file)) {
                     canDelete = false;
                 }
             }
         }
 
-        return canDelete ? directory.delete() : false;
+        return canDelete && directory.delete();
     }
 
     private long calculateSize(BTDownload dl) {
@@ -469,23 +451,21 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     }
 
     private List<TransferItem> calculateItems(BTDownload dl) {
-        List<TransferItem> l = new LinkedList<TransferItem>();
-
+        List<TransferItem> l = new LinkedList<>();
         for (TransferItem item : dl.getItems()) {
             if (!item.isSkipped()) {
                 l.add(item);
             }
         }
-
         return l;
     }
 
-    public static class RendererHelper {
-        public static boolean canShareNow(com.frostwire.gui.bittorrent.BTDownload dl) {
+    static class RendererHelper {
+        static boolean canShareNow(com.frostwire.gui.bittorrent.BTDownload dl) {
             return (dl instanceof BittorrentDownload && dl.isCompleted()) || dl.isCompleted();
         }
 
-        public static void onSeedTransfer(final com.frostwire.gui.bittorrent.BTDownload dl, final boolean showShareTorrentDialog) {
+        static void onSeedTransfer(final com.frostwire.gui.bittorrent.BTDownload dl, final boolean showShareTorrentDialog) {
             boolean canShareNow = canShareNow(dl);
             if (!canShareNow) {
                 System.out.println("Not doing anything.");

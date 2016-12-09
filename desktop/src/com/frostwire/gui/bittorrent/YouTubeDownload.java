@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,6 @@
 
 package com.frostwire.gui.bittorrent;
 
-import com.frostwire.bittorrent.CopyrightLicenseBroker;
-import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.mp4.Box;
 import com.frostwire.mp4.IsoFile;
@@ -34,7 +32,6 @@ import com.frostwire.util.http.HttpClient.HttpClientListener;
 import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.iTunesSettings;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.limewire.util.OSUtils;
@@ -43,7 +40,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -53,58 +49,30 @@ import java.util.concurrent.Executors;
  * @author gubatron
  * @author aldenml
  */
-public class YouTubeDownload implements BTDownload {
-
+public class YouTubeDownload extends HttpBTDownload {
     private static final Executor YOUTUBE_THREAD_POOL = Executors.newFixedThreadPool(6);
-
-    private static final int SPEED_AVERAGE_CALCULATION_INTERVAL_MILLISECONDS = 1000;
-
     private final YouTubeCrawledSearchResult sr;
     private final DownloadType downloadType;
-
-    private final File completeFile;
     private final File tempVideo;
     private final File tempAudio;
 
-    private final HttpClient httpClient;
-    private final HttpClientListener httpClientListener;
-    private final Date dateCreated;
-
-    private final long size;
-    private long bytesReceived;
-    private TransferState state;
-    private long averageSpeed; // in bytes
-
-    // variables to keep the download rate of file transfer
-    private long speedMarkTimestamp;
-    private long totalReceivedSinceLastSpeedStamp;
-    private boolean deleteDataWhenRemoved;
-
-    public YouTubeDownload(YouTubeCrawledSearchResult sr) {
+    YouTubeDownload(YouTubeCrawledSearchResult sr) {
+        super(sr.getFilename(), sr.getSize());
         this.sr = sr;
         this.downloadType = buildDownloadType(sr);
-        this.size = sr.getSize();
-
         String filename = sr.getFilename();
-
-        completeFile = org.limewire.util.FileUtils.buildFile(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), filename);
         tempVideo = buildTempFile(FilenameUtils.getBaseName(filename), "m4v");
         tempAudio = buildTempFile(FilenameUtils.getBaseName(filename), "m4a");
-
-        bytesReceived = 0;
-        dateCreated = new Date();
-
-        httpClientListener = new HttpDownloadListenerImpl(this);
-
-        httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
-        httpClient.setListener(httpClientListener);
-
         start();
+    }
+
+    @Override
+    HttpClientListener createHttpClientListener() {
+        return new HttpDownloadListenerImpl(this);
     }
 
     private DownloadType buildDownloadType(YouTubeCrawledSearchResult sr) {
         DownloadType dt;
-
         if (sr.getVideo() != null && sr.getAudio() == null) {
             dt = DownloadType.VIDEO;
         } else if (sr.getVideo() != null && sr.getAudio() != null) {
@@ -114,13 +82,7 @@ public class YouTubeDownload implements BTDownload {
         } else {
             throw new IllegalArgumentException("Not track specified");
         }
-
         return dt;
-    }
-
-    @Override
-    public long getSize() {
-        return size;
     }
 
     @Override
@@ -134,53 +96,8 @@ public class YouTubeDownload implements BTDownload {
     }
 
     @Override
-    public boolean isResumable() {
-        return false;
-    }
-
-    @Override
     public boolean isPausable() {
         return false;
-    }
-
-    @Override
-    public boolean isCompleted() {
-        return isComplete();
-    }
-
-    @Override
-    public TransferState getState() {
-        return state;
-    }
-
-    @Override
-    public void remove() {
-        if (state != TransferState.FINISHED) {
-            state = TransferState.CANCELING;
-            httpClient.cancel();
-        }
-
-        if (deleteDataWhenRemoved) {
-            cleanup();
-        }
-    }
-
-    private void cleanup() {
-        cleanupIncomplete();
-        cleanupComplete();
-    }
-
-    @Override
-    public void pause() {
-        if (state != TransferState.FINISHED) {
-            state = TransferState.CANCELING;
-            httpClient.cancel();
-        }
-    }
-
-    @Override
-    public File getSaveLocation() {
-        return completeFile;
     }
 
     @Override
@@ -189,88 +106,8 @@ public class YouTubeDownload implements BTDownload {
     }
 
     @Override
-    public int getProgress() {
-        int progress = -1;
-
-        if (size > 0) {
-            if (isComplete()) {
-                progress = 100;
-            } else {
-                progress = (int) ((bytesReceived * 100) / size);
-                progress = Math.min(100, progress);
-            }
-        }
-
-        return progress;
-    }
-
-    @Override
-    public long getBytesReceived() {
-        return bytesReceived;
-    }
-
-    @Override
-    public long getBytesSent() {
-        return 0;
-    }
-
-    @Override
-    public double getDownloadSpeed() {
-        double result = 0;
-        if (state == TransferState.DOWNLOADING) {
-            result = averageSpeed / 1000;
-        }
-        return result;
-    }
-
-    @Override
-    public double getUploadSpeed() {
-        return 0;
-    }
-
-    @Override
-    public long getETA() {
-        if (size > 0) {
-            long speed = averageSpeed;
-            return speed > 0 ? (size - getBytesReceived()) / speed : -1;
-        } else {
-            return -1;
-        }
-    }
-
-    @Override
-    public String getPeersString() {
-        return "";
-    }
-
-    @Override
-    public String getSeedsString() {
-        return "";
-    }
-
-    @Override
     public String getHash() {
         return sr.getDownloadUrl();
-    }
-
-    @Override
-    public String getSeedToPeerRatio() {
-        return "";
-    }
-
-    @Override
-    public String getShareRatio() {
-        return "";
-    }
-
-    @Override
-    public boolean isPartialDownload() {
-        return false;
-    }
-
-    @Override
-    public Date getDateCreated() {
-        return dateCreated;
     }
 
     private void start() {
@@ -297,62 +134,16 @@ public class YouTubeDownload implements BTDownload {
         });
     }
 
-    private void cleanupFile(File f) {
-        if (f.exists()) {
-            boolean delete = f.delete();
-            if (!delete) {
-                f.deleteOnExit();
-            }
-        }
-    }
-
-    private void cleanupIncomplete() {
+    @Override
+    void cleanupIncomplete() {
         cleanupFile(tempVideo);
         cleanupFile(tempAudio);
-    }
-
-    private void cleanupComplete() {
-        cleanupFile(completeFile);
-    }
-
-    private static File getIncompleteFolder() {
-        File incompleteFolder = new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue().getParentFile(), "Incomplete");
-        if (!incompleteFolder.exists()) {
-            incompleteFolder.mkdirs();
-        }
-        return incompleteFolder;
-    }
-
-    private static File buildTempFile(String name, String ext) {
-        return new File(getIncompleteFolder(), name + "." + ext);
-    }
-
-    public boolean isComplete() {
-        if (bytesReceived > 0) {
-            return bytesReceived == size || state == TransferState.FINISHED;
-        } else {
-            return false;
-        }
-    }
-
-    private void updateAverageDownloadSpeed() {
-        long now = System.currentTimeMillis();
-
-        if (isComplete()) {
-            averageSpeed = 0;
-            speedMarkTimestamp = now;
-            totalReceivedSinceLastSpeedStamp = 0;
-        } else if (now - speedMarkTimestamp > SPEED_AVERAGE_CALCULATION_INTERVAL_MILLISECONDS) {
-            averageSpeed = ((bytesReceived - totalReceivedSinceLastSpeedStamp) * 1000) / (now - speedMarkTimestamp);
-            speedMarkTimestamp = now;
-            totalReceivedSinceLastSpeedStamp = bytesReceived;
-        }
     }
 
     private final class HttpDownloadListenerImpl implements HttpClientListener {
         private final YouTubeDownload dl;
 
-        public HttpDownloadListenerImpl(YouTubeDownload youTubeDownload) {
+        HttpDownloadListenerImpl(YouTubeDownload youTubeDownload) {
             dl = youTubeDownload;
         }
 
@@ -397,7 +188,7 @@ public class YouTubeDownload implements BTDownload {
                     if (!MediaPlayer.instance().isThisBeingPlayed(tempVideo)) {
                         state = TransferState.ERROR_MOVING_INCOMPLETE;
                     } else {
-                        boolean copiedTo = copyPlayingTemp(tempVideo, completeFile);
+                        boolean copiedTo = HttpBTDownload.copyPlayingTemp(tempVideo, completeFile);
                         if (!copiedTo) {
                             state = TransferState.ERROR_MOVING_INCOMPLETE;
                         } else {
@@ -467,21 +258,6 @@ public class YouTubeDownload implements BTDownload {
             }
         }
 
-        private boolean copyPlayingTemp(File temp, File dest) {
-            boolean r = false;
-            System.out.println(temp);
-
-            try {
-                FileUtils.copyFile(temp, dest);
-                r = true;
-            } catch (Throwable e) {
-                e.printStackTrace();
-                r = false;
-            }
-
-            return r;
-        }
-
         @Override
         public void onCancel(HttpClient client) {
             if (state.equals(TransferState.CANCELING)) {
@@ -499,16 +275,7 @@ public class YouTubeDownload implements BTDownload {
         }
     }
 
-    @Override
-    public void setDeleteTorrentWhenRemove(boolean deleteTorrentWhenRemove) {
-    }
-
-    @Override
-    public void setDeleteDataWhenRemove(boolean deleteDataWhenRemove) {
-        this.deleteDataWhenRemoved = deleteDataWhenRemove;
-    }
-
-    private static enum DownloadType {
+    private enum DownloadType {
         VIDEO, DASH, DEMUX
     }
 
@@ -537,34 +304,17 @@ public class YouTubeDownload implements BTDownload {
     }
 
     @Override
-    public PaymentOptions getPaymentOptions() {
-        return null;
-    }
-
-    @Override
-    public CopyrightLicenseBroker getCopyrightLicenseBroker() {
-        return null;
-    }
-
-    @Override
-    public boolean canPreview() {
-        return true;
-    }
-
-    @Override
     public File getPreviewFile() {
-        if (isComplete()) {
+        if (isCompleted()) {
             return completeFile;
         } else {
             if (tempVideo.exists()) {
                 return tempVideo;
             }
-
             if (tempAudio.exists()) {
                 return tempAudio;
             }
         }
-
         return null;
     }
 }
