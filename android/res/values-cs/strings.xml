@@ -594,7 +594,7 @@
     <string name="get_express_VPN">Zíscat ExpressVPN</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">Aktivovat Setí</string>
-    <string name="storage_setting_confirm_dialog_text">Chápu, že všechny soubory stažené na kartu SD podle FrostWire budou vymazány operačním systémem Android ve chvíli, kdy aplikace eMule se odinstaluje z tohoto zařízení a nebudu držet FrostWire LLC odpovědnost za jakékoli soubory ztracené.</string>
+    <string name="storage_setting_confirm_dialog_text">Chápu, že všechny soubory stažené na kartu SD podle FrostWire budou vymazány operačním systémem Android ve chvíli, kdy aplikace FrostWire se odinstaluje z tohoto zařízení a nebudu držet FrostWire LLC odpovědnost za jakékoli soubory ztracené.</string>
     <string name="cant_open_file_does_not_exist">Nemohu otevřít %1$s, soubor neexistuje.</string>
     <string name="anonymous_usage_statistics">Anonymní statistiky používání</string>
     <string name="saving_to_sd_card">Ukládání na SD kartu.</string>
