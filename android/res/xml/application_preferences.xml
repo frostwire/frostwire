@@ -29,7 +29,6 @@
             android:title="@string/bittorrent" />
         <SwitchPreference
             android:key="frostwire.prefs.network.use_mobile_data"
-            android:layout="@layout/view_preference_simple_action"
             android:summary="@string/use_mobile_data_summary"
             android:title="@string/use_mobile_data" />
         <!--Switch preference below to replace "frostwire.prefs.network.use_mobile_data" above-->
@@ -224,7 +223,7 @@
                 android:title="@string/haptic_feedback" />
             <CheckBoxPreference
                 android:key="frostwire.prefs.gui.distraction_free_search"
-                android:layout="@layout/view_preference_simple_action"
+                android:layout="@layout/view_preference_simple_action_padding"
                 android:title="@string/distraction_free_search_results"
                 android:summary="@string/distraction_free_search_results_summary"/>
             <CheckBoxPreference

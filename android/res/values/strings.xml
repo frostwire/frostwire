@@ -236,7 +236,7 @@
     <string name="mobile_data">Mobile Data</string>
     <string name="media_player_failed">Media player failed</string>
     <string name="activity_media_player_name">Media Player</string>
-    <string name="search_settings">Search Settings</string>
+    <string name="search_settings">Search</string>
     <string name="use_clearbits">Use ClearBits.net</string>
     <string name="use_tpb">Use TPB</string>
     <string name="use_tpb_summary">TPB is magnet based, works only on Wi-Fi</string>
@@ -319,7 +319,7 @@
     <string name="download_type_not_supported">Download Type not supported</string>
     <string name="im_on_it">I\'m on it…</string>
     <string name="hint_transfers">Use "menu" for bulk actions</string>
-    <string name="torrent_settings">Torrent Settings</string>
+    <string name="torrent_settings">Torrent Preferences</string>
     <string name="torrent_max_download_speed_summary">Max Download Speed (0 means unlimited)</string>
     <string name="torrent_max_download_speed">Max Download Speed</string>
     <string name="torrent_max_upload_speed_summary">Max Upload Speed (0 means unlimited)</string>
