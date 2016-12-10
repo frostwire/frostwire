@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -30,6 +29,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.*;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -98,11 +99,20 @@ public class SettingsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.application_preferences);
 
-        getListView().setPadding(20, 0, 20, 0);
+        LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent();
+        Toolbar settingsToolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.toolbar_main, root, false);
+        root.addView(settingsToolbar, 0); // insert at top
+        settingsToolbar.setTitle(R.string.settings);
+        settingsToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        getListView().setPadding(0, 0, 0, 0);
         getListView().setDivider(new ColorDrawable(this.getResources().getColor(R.color.basic_gray_dark_solid)));
         getListView().setDividerHeight(1);
-
-        hideActionBarIcon(getActionBar());
 
         setupComponents();
 
@@ -119,15 +129,6 @@ public class SettingsActivity extends PreferenceActivity {
         }
 
         updateConnectSwitch();
-    }
-
-    private void hideActionBarIcon(ActionBar bar) {
-        if (bar != null) {
-            bar.setDisplayHomeAsUpEnabled(true);
-            bar.setDisplayShowHomeEnabled(false);
-            bar.setDisplayShowTitleEnabled(true);
-            bar.setIcon(android.R.color.transparent);
-        }
     }
 
     private void setupComponents() {
@@ -657,12 +658,32 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
 
-        boolean r = super.onPreferenceTreeClick(preferenceScreen, preference);
+        // If the user has clicked on a preference screen, set up the screen
         if (preference instanceof PreferenceScreen) {
-            initializePreferenceScreen((PreferenceScreen) preference);
-            currentPreferenceKey = preference.getKey();
+            setUpNestedScreen((PreferenceScreen) preference);
         }
-        return r;
+
+        return false;
+    }
+
+    public void setUpNestedScreen(PreferenceScreen preferenceScreen) {
+        final Dialog dialog = preferenceScreen.getDialog();
+
+        Toolbar nestedSettingsToolbar;
+
+        LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
+        nestedSettingsToolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.toolbar_main, root, false);
+        // insert at top
+        root.addView(nestedSettingsToolbar, 0);
+
+        nestedSettingsToolbar.setTitle(preferenceScreen.getTitle());
+
+        nestedSettingsToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
     }
 
     /**
@@ -692,7 +713,6 @@ public class SettingsActivity extends PreferenceActivity {
                 }
             });
 
-            hideActionBarIcon(dialog.getActionBar());
             View homeButton = dialog.findViewById(android.R.id.home);
 
             if (homeButton != null) {
