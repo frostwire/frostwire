@@ -29,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CompoundButton;
+import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -94,21 +95,18 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         super(R.layout.fragment_browse_peer);
         broadcastReceiver = new LocalBroadcastReceiver();
         this.peer = new Peer();
-
         toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_RINGTONES);   //0x00 - Audio -> Ringtones
         toTheRightOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_DOCUMENTS); //0x01 - Pictures -> Documents
         toTheRightOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_PICTURES);    //0x02 - Videos -> Pictures
         toTheRightOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_TORRENTS); //0x03 - Documents -> Torrents
         toTheRightOf.put(Constants.FILE_TYPE_RINGTONES, Constants.FILE_TYPE_VIDEOS);   //0x05 - Ringtones -> Videos
         toTheRightOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_AUDIO);     //0x06 - Torrents -> Audio
-
         toTheLeftOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_TORRENTS);     //0x00 - Audio <- Torrents
         toTheLeftOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_VIDEOS);    //0x01 - Pictures <- Video
         toTheLeftOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_RINGTONES);   //0x02 - Videos <- Ringtones
         toTheLeftOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_PICTURES); //0x03 - Documents <- Pictures
         toTheLeftOf.put(Constants.FILE_TYPE_RINGTONES, Constants.FILE_TYPE_AUDIO);    //0x05 - Ringtones <- Audio
         toTheLeftOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_DOCUMENTS); //0x06 - Torrents <- Documents
-
         checkedItemsMap = new HashMap<>();
         radioButtonFileTypeMap = new HashMap<>();  // see initRadioButton(...)
     }
@@ -133,11 +131,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             LOG.warn("Something wrong, data is null");
             return;
         }
-
         if (loader.getId() == LOADER_FILES_ID) {
             updateFiles((Object[]) data);
         }
-
         updateHeader();
         if (swipeRefresh != null) {
             swipeRefresh.setRefreshing(false);
@@ -152,7 +148,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public void onResume() {
         super.onResume();
         initBroadcastReceiver();
-
         if (adapter != null) {
             restorePreviouslyChecked();
             restorePreviousFilter();
@@ -223,15 +218,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public View getHeader(Activity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
         header = inflater.inflate(R.layout.view_browse_peer_header, null);
-
         updateHeader();
-
         return header;
     }
 
     @Override
     public void onShow() {
-
     }
 
     @Override
@@ -249,9 +241,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
 
             public void onFilter(View v, String str) {
-                if (adapter != null) {
-                    adapter.getFilter().filter(str);
-                }
+                performFilter(str);
             }
 
             @Override
@@ -259,7 +249,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 clearPreviousFilter();
             }
         });
-
         swipeRefresh = findView(v, R.id.fragment_browse_peer_swipe_refresh);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -285,7 +274,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 switchToThe(false);
             }
         });
-
         initRadioButton(v, R.id.fragment_browse_peer_radio_audio, Constants.FILE_TYPE_AUDIO);
         initRadioButton(v, R.id.fragment_browse_peer_radio_ringtones, Constants.FILE_TYPE_RINGTONES);
         initRadioButton(v, R.id.fragment_browse_peer_radio_videos, Constants.FILE_TYPE_VIDEOS);
@@ -364,10 +352,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             LOG.warn("Something wrong. peer is null");
             return;
         }
-
         Librarian.instance().invalidateCountCache();
         Finger finger = peer.finger();
-
         if (header != null) {
             byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
             int numTotal = 0;
@@ -391,20 +377,15 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     numTotal = finger.numTotalVideoFiles;
                     break;
             }
-
             String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
-
             TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
             TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
-
             title.setText(fileTypeStr);
             total.setText("(" + String.valueOf(numTotal) + ")");
         }
-
         if (adapter == null) {
             browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
         }
-
         MusicUtils.stopSimplePlayer();
         updateCheckAllStatusInSearchBar();
         restoreListViewScrollPosition();
@@ -423,14 +404,11 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             LOG.warn("Something wrong, data is null");
             return;
         }
-
         try {
             byte fileType = (Byte) data[0];
-
             @SuppressWarnings("unchecked")
             List<FileDescriptor> items = (List<FileDescriptor>) data[1];
             adapter = new FileListAdapter(getActivity(), items, fileType) {
-
                 @Override
                 protected void onItemChecked(CompoundButton v, boolean isChecked) {
                     if (!isChecked) {
@@ -448,10 +426,30 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             };
             restorePreviouslyChecked();
             restorePreviousFilter();
-            list.setAdapter(adapter);
-
+            if (previousFilter != null) {
+                performFilter(previousFilter);
+            } else {
+                updateAdapter();
+            }
         } catch (Throwable e) {
             LOG.error("Error updating files in list", e);
+        }
+    }
+
+    private void updateAdapter() {
+        list.setAdapter(adapter);
+        restoreListViewScrollPosition();
+    }
+
+    private void performFilter(String filterString) {
+        this.previousFilter = filterString;
+        if (adapter != null && filterString != null) {
+            adapter.getFilter().filter(filterString, new Filter.FilterListener() {
+                @Override
+                public void onFilterComplete(int i) {
+                    updateAdapter();
+                }
+            });
         }
     }
 
@@ -516,6 +514,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         }
     }
 
+
     private final class LocalBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -531,7 +530,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     adapter.notifyDataSetChanged();
                 }
             }
-
             if (action.equals(Constants.ACTION_FILE_ADDED_OR_REMOVED)) {
                 if (intent.hasExtra(Constants.EXTRA_REFRESH_FILE_TYPE)) {
                     reloadFiles(intent.getByteExtra(Constants.EXTRA_REFRESH_FILE_TYPE, Constants.FILE_TYPE_AUDIO));
