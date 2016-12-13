@@ -1,6 +1,7 @@
-FrostWire 1.8.7 - DEC/12/2016
+FrostWire 1.8.7 - DEC/13/2016
  - New Bulgarian, Belarusian, Slovak, Thai translations
  - About screen make over with material design
+ - Fixes bug where main navigation menu wouldn't close on back pressed.
 
 FrostWire 1.8.6 - DEC/06/2016
  - [Experimental] Distraction Free Search: Hide title bar and search box when scrolling down search results
