@@ -149,7 +149,9 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     @Override
     public void onBackPressed() {
-        if (fragmentsStack.size() > 1) {
+        if (drawerLayout.isDrawerOpen(leftDrawer)) {
+            closeSlideMenu();
+        } else if (fragmentsStack.size() > 1) {
             try {
                 fragmentsStack.pop();
                 int id = fragmentsStack.peek();
