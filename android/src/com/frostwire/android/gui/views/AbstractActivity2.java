@@ -67,6 +67,15 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
     }
 
     @Override
+    protected void onTitleChanged(CharSequence title, int color) {
+        super.onTitleChanged(title, color);
+        Toolbar toolbar = findView(R.id.toolbar_main);
+        if (toolbar != null) {
+            toolbar.setTitle(title);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:

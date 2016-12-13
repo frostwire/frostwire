@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--<com.frostwire.android.gui.activities.ToggleAllSearchEnginesPreference
+        android:key="frostwire.prefs.search.preference_category.select_all"
+        android:title="@string/select_deselect_all" />-->
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_archiveorg"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_archiveorg"
+        android:title="@string/use_archiveorg" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_bitsnoop"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_bitsnoop"
+        android:title="@string/use_bitsnoop" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_btjunkie"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_btjunkie"
+        android:title="@string/use_btjunkie" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_extratorrent"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_extratorrent"
+        android:title="@string/use_extratorrent" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_eztv"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_eztv"
+        android:title="@string/use_eztv" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_frostclick"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_frostclick"
+        android:title="@string/use_frostclick" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_mininova"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_mininova"
+        android:title="@string/use_mininova" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_monova"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_monova_summary"
+        android:title="@string/use_monova" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_soundcloud"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_soundcloud"
+        android:title="@string/use_soundcloud" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_tpb"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_tpb_summary"
+        android:title="@string/use_tpb" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_torlock"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_torlock"
+        android:title="@string/use_torlock" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_torrentdownloads"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_torrentdownloads"
+        android:title="@string/use_torrentdownloads" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_limetorrents"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_limetorrents"
+        android:title="@string/use_limetorrents" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_yify"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_yify_summary"
+        android:title="@string/use_yify" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_youtube"
+        android:layout="@layout/view_preference_simple_action"
+        android:summary="@string/use_youtube"
+        android:title="@string/use_youtube" />
+
+</PreferenceScreen>
