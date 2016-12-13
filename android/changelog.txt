@@ -1,5 +1,5 @@
-FrostWire 1.8.7 - DEC/11/2016
- - New Bulgarian, Belarusian, Slovak translations
+FrostWire 1.8.7 - DEC/12/2016
+ - New Bulgarian, Belarusian, Slovak, Thai translations
  - About screen make over with material design
 
 FrostWire 1.8.6 - DEC/06/2016
