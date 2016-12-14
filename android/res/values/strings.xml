@@ -644,9 +644,16 @@
     <string name="all_free_downloads">All free downloads</string>
     <string name="distraction_free_search_results">Distraction Free Search (beta)</string>
     <string name="distraction_free_search_results_summary">Hide UI components to show more results. Needs app restart to take effect.</string>
+    <string name="general_settings">General</string>
+    <string name="search_torrent_settings">Search/Torrent Settings</string>
+    <string name="sharing_privacy_settings">Sharing and Privacy</string>
+    <string name="search_header">Search</string>
+    <string name="torrent_preferences_header">Torrent Preferences</string>
+    <string name="notification_other_header">Notifications and Other</string>
     <string name="wifi_networks_only">Wi-Fi networks only</string>
     <string name="wifi_networks_only_summary">Save data. Download only if Wi-Fi connection is established. </string>
     <string name="notifications_other_settings">Notifications and Other</string>
+    <string name="bandwidth_usage_settings">Bandwidth Usage</string>
     <string name="search_preferences">Search Preferences</string>
     <string name="frostwire_sticker_and_more">FrostWire stickers and more</string>
     <string name="donate_your_time">Donate your time</string>

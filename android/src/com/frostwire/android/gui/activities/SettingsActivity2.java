@@ -140,15 +140,6 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
     }
 
-    public static class Torrent extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-
-            //addPreferencesFromResource(R.xml.settings_torrent);
-        }
-    }
-
     public static class Search extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -158,12 +149,21 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
     }
 
+    public static class Torrent extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            addPreferencesFromResource(R.xml.settings_torrent);
+        }
+    }
+
     public static class Other extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            //addPreferencesFromResource(R.xml.settings_other);
+            addPreferencesFromResource(R.xml.settings_other);
         }
     }
 }
