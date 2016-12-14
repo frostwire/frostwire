@@ -112,15 +112,10 @@
 
     <!-- Preferences -->
 
-    <style name="Preferences" parent="android:Theme.Holo.Light">
-        <item name="android:icon">@null</item>
-        <item name="android:actionBarStyle">@style/ActionBar</item>
-        <item name="android:homeAsUpIndicator">@drawable/home_as_up_padding</item>
-        <item name="android:checkboxStyle">@style/PreferencesCheckboxStyle</item>
+    <style name="Preferences" parent="Theme.FrostWire">
         <item name="android:listSeparatorTextViewStyle">@style/PreferenceListSeparator</item>
-        <item name="android:textColorPrimary">@color/app_text_primary</item>
-        <item name="android:textColorSecondary">@color/app_text_secondary</item>
         <item name="android:windowBackground">@color/basic_white</item>
+        <item name="android:windowActionBar">false</item>
         <item name="android:listViewStyle">@style/PreferencesListView</item>
         <item name="android:listDivider">@drawable/layout_divider_1_gray</item>
         <item name="android:listSelector">@drawable/listview_item_press_background_selector</item>
@@ -143,6 +138,7 @@
 
     <style name="PreferencesListView">
         <item name="android:padding">0dp</item>
+        <item name="android:listSeparatorTextViewStyle">@style/PreferenceListSeparator</item>
     </style>
 
     <style name="PreferencesCheckboxStyle">
