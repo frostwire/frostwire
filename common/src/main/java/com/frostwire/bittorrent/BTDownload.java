@@ -358,6 +358,10 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public void pause() {
+        if (!th.isValid()) {
+            return;
+        }
+
         extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.TRUE.toString());
 
         th.setAutoManaged(false);
@@ -367,6 +371,10 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public void resume() {
+        if (!th.isValid()) {
+            return;
+        }
+
         extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.FALSE.toString());
 
         th.setAutoManaged(true);
