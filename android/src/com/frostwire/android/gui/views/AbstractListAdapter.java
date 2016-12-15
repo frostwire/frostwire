@@ -58,7 +58,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private final CheckboxOnCheckedChangeListener checkboxOnCheckedChangeListener;
     private int lastSelectedRadioButtonIndex = -1;
     private final RadioButtonOnCheckedChangeListener radioButtonCheckedChangeListener;
-    private OnItemCheckedListener onItemCheckedListener;
+    private OnItemCheckedListener<T> onItemCheckedListener;
 
     private ListAdapterFilter<T> filter;
     private boolean checkboxesVisibility;
@@ -374,7 +374,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         notifyDataSetInvalidated();
 
         if (onItemCheckedListener != null) {
-            onItemCheckedListener.onItemChecked(v, isChecked);
+            onItemCheckedListener.onItemChecked((T) v.getTag(), isChecked);
         }
     }
 
@@ -515,11 +515,11 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         return null;
     }
 
-    public interface OnItemCheckedListener {
-        void onItemChecked(CompoundButton v, boolean checked);
+    public interface OnItemCheckedListener<T> {
+        void onItemChecked(T item, boolean checked);
     }
 
-    public void setOnItemCheckedListener(OnItemCheckedListener onItemCheckedListener) {
+    public void setOnItemCheckedListener(OnItemCheckedListener<T> onItemCheckedListener) {
         this.onItemCheckedListener = onItemCheckedListener;
     }
 

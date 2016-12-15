@@ -54,7 +54,7 @@ import java.util.*;
  *
  */
 abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
-        AbstractListAdapter.OnItemCheckedListener {
+        AbstractListAdapter.OnItemCheckedListener<T> {
     static final String BUNDLE_KEY_CHECKED_OFFSETS = "checkedOffsets";
     static final String BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX = "lastSelectedRadioButtonIndex";
     private static final Logger LOG = Logger.getLogger(AbstractConfirmListDialog.class);
@@ -425,7 +425,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
     // AbstractListAdapter.OnItemCheckedListener.onItemChecked(CompoundButton v, boolean checked)
     @Override
-    public void onItemChecked(CompoundButton v, boolean checked) {
+    public void onItemChecked(T item, boolean checked) {
         if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
             updateSelectedCount();
         }
