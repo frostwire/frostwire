@@ -41,6 +41,9 @@ public class CheckBoxSeedingPreference extends android.preference.CheckBoxPrefer
 
     @Override
     protected View onCreateView(ViewGroup parent) {
+
+        //for the SettingsActivity2 we will use current
+        // View view = View.inflate(getContext(), R.layout.view_preference_checkbox_seeding_2, null);
         View view = View.inflate(getContext(), R.layout.view_preference_checkbox_seeding, null);
         title = (TextView) view.findViewById(R.id.view_preference_checkbox_seeding_title);
         summary = (TextView) view.findViewById(R.id.view_preference_checkbox_seeding_summary);
