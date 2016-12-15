@@ -80,6 +80,9 @@ public class ButtonActionPreference extends Preference {
 
     @Override
     protected View onCreateView(ViewGroup parent) {
+
+        //for the SettingsActivity2 we will use current
+        // View v = View.inflate(getContext(), R.layout.view_preference_button_action_2, null);
         View v = View.inflate(getContext(), R.layout.view_preference_button_action, null);
 
         textTitle = (TextView) v.findViewById(R.id.view_preference_button_action_title);
