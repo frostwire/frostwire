@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2013, FrostWire(R). All rights reserved.
@@ -27,48 +28,41 @@
         style="@style/WizardTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="12dp"
         android:text="@string/welcome_to_frostwire" />
 
-    <ImageView
+    <TextView
         android:id="@+id/view_general_wizard_page_title_horizontal_break"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@drawable/main_header_background"
-        android:src="@drawable/main_header_background" />
+        android:layout_height="wrap_content"
+        style="@style/WizardDivider"/>
 
     <TextView
         android:id="@+id/view_general_wizard_page_storage_path_title"
         style="@style/WizardSubTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/storage_path"
-        android:textColor="@color/white" />
+        android:text="@string/storage_path" />
 
     <TextView
         android:id="@+id/view_general_wizard_page_storage_path_textview"
-        style="@style/WizardText"
+        style="@style/WizardText.Sub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
         android:key="frostwire.prefs.storage.path_asf"
         android:text="/storage/emulated/0" />
 
     <TextView
-        style="@style/WizardSubTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/main_header_background"
-        android:paddingBottom="6dp"
-        android:paddingLeft="16dp"
-        android:paddingTop="6dp"
+        style="@style/WizardDivider.Bottom"/>
+
+    <TextView
+        style="@style/WizardText.Header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/app_dark_blue"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
         android:text="@string/seeding_settings" />
 
     <CheckBox
@@ -76,15 +70,14 @@
         style="@style/WizardSubTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
         android:text="@string/seed_finished_torrents" />
 
     <TextView
-        style="@style/WizardText"
+        style="@style/WizardText.Sub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="16dp"
         android:text="@string/seeding_settings_explanation" />
 
     <CheckBox
@@ -92,29 +85,26 @@
         style="@style/WizardSubTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="25dp"
+        android:layout_marginLeft="30dp"
         android:text="@string/seed_finished_torrents_wifi_only" />
 
     <TextView
-        style="@style/WizardText"
+        style="@style/WizardText.Sub"
         android:id="@+id/view_general_wizard_page_wifi_only_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="30dp"
-        android:text="@string/seeding_wifi_settings_explanation"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/frostwire_gray_explanation_text_dark" />
+        android:paddingLeft="35dp"
+        android:textColor="@color/frostwire_gray_explanation_text_dark"
+        android:text="@string/seeding_wifi_settings_explanation" />
 
     <TextView
-        style="@style/WizardSubTitle"
+        style="@style/WizardText.Header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/main_header_background"
-        android:paddingBottom="6dp"
-        android:paddingLeft="16dp"
-        android:paddingTop="6dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/app_dark_blue"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
         android:text="@string/other_settings" />
 
     <CheckBox
@@ -122,15 +112,14 @@
         style="@style/WizardSubTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
         android:text="@string/anonymous_usage_statistics" />
 
     <TextView
-        style="@style/WizardText"
+        style="@style/WizardText.Sub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="16dp"
         android:text="@string/anonymous_usage_statistics_summary" />
 
 </LinearLayout>
