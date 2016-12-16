@@ -374,7 +374,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         notifyDataSetInvalidated();
 
         if (onItemCheckedListener != null) {
-            onItemCheckedListener.onItemChecked((T) v.getTag(), isChecked);
+            onItemCheckedListener.onItemChecked(v, (T) v.getTag(), isChecked);
         }
     }
 
@@ -516,7 +516,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     public interface OnItemCheckedListener<T> {
-        void onItemChecked(T item, boolean checked);
+        void onItemChecked(CompoundButton v, T item, boolean checked);
     }
 
     public void setOnItemCheckedListener(OnItemCheckedListener<T> onItemCheckedListener) {

@@ -425,7 +425,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
     // AbstractListAdapter.OnItemCheckedListener.onItemChecked(CompoundButton v, boolean checked)
     @Override
-    public void onItemChecked(T item, boolean checked) {
+    public void onItemChecked(CompoundButton v, T item, boolean checked) {
         if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
             updateSelectedCount();
         }
