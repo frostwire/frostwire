@@ -29,6 +29,6 @@ public class LibTorrentMagnetDownloader implements MagnetDownloader {
     }
 
     public byte[] download(String magnet, int timeout) {
-        return BTEngine.getInstance().fetchMagnet(magnet, timeout);
+        return BTEngine.getInstance().fetchMagnet(magnet, timeout, true);
     }
 }

@@ -211,13 +211,13 @@ public final class TorrentUtil {
             create_torrent torrentCreator = new create_torrent(fs);
 
             if (!dhtTrackedOnly) {
-                torrentCreator.add_tracker(TorrentUtil.convert("udp://tracker.openbittorrent.com:80"));
-                torrentCreator.add_tracker(TorrentUtil.convert("udp://tracker.publicbt.com:80"));
-                torrentCreator.add_tracker(TorrentUtil.convert("udp://open.demonii.com:1337"));
-                torrentCreator.add_tracker(TorrentUtil.convert("udp://tracker.coppersurfer.tk:6969"));
-                torrentCreator.add_tracker(TorrentUtil.convert("udp://tracker.leechers-paradise.org:6969"));
-                torrentCreator.add_tracker(TorrentUtil.convert("udp://exodus.desync.com:6969"));
-                torrentCreator.add_tracker(TorrentUtil.convert("udp://tracker.pomf.se"));
+                torrentCreator.add_tracker("udp://tracker.openbittorrent.com:80", 0);
+                torrentCreator.add_tracker("udp://tracker.publicbt.com:80", 0);
+                torrentCreator.add_tracker("udp://open.demonii.com:1337", 0);
+                torrentCreator.add_tracker("udp://tracker.coppersurfer.tk:6969", 0);
+                torrentCreator.add_tracker("udp://tracker.leechers-paradise.org:6969", 0);
+                torrentCreator.add_tracker("udp://exodus.desync.com:6969", 0);
+                torrentCreator.add_tracker("udp://tracker.pomf.se", 0);
             }
 
             torrentCreator.set_priv(false);
@@ -274,10 +274,5 @@ public final class TorrentUtil {
                state == TransferState.DOWNLOADING_TORRENT ||
                state == TransferState.SEEDING ||
                state == TransferState.UPLOADING;
-    }
-
-    // TODO: remove this when using the java wrapper API
-    public static string_view convert(String url) {
-        return new string_view(url);
     }
 }
