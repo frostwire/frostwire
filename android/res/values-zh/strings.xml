@@ -618,4 +618,17 @@
     <string name="keep_the_project_alive">保持项目活动</string>
     <string name="remove_ads">移除广告</string>
     <string name="advertisement">廣告</string>
+    <string name="all_free_downloads">所有免費下載</string>
+    <string name="frostwire_sticker_and_more">FrostWire貼紙和更多</string>
+    <string name="wifi_networks_only_summary">保存數據。 僅在建立Wi-Fi連接時下載。 </string>
+    <string name="notifications_other_settings">通知和其他</string>
+    <string name="frostwire_features">FROSTWIRE特色</string>
+    <string name="wifi_networks_only">僅限Wi-Fi網絡</string>
+    <string name="distraction_free_search_results_summary">隱藏UI組件以顯示更多結果。 需要重新啟動應用才能生效。</string>
+    <string name="search_preferences">搜索首選項</string>
+    <string name="donate_your_time">捐贈你的時間</string>
+    <string name="distraction_free_search_results">分心免費搜索（測試版）</string>
+    <string name="help_translate_or_proofread_frostwire">幫助翻譯或校對FrostWire</string>
+    <string name="changelog">更改日誌</string>
+
 </resources>
