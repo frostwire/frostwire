@@ -40,7 +40,7 @@ public final class StoragePicker {
 
     public static final String ACTION_OPEN_DOCUMENT_TREE = "android.intent.action.OPEN_DOCUMENT_TREE";
 
-    public static final int SELECT_FOLDER_REQUEST_CODE = 1267123;
+    public static final int SELECT_FOLDER_REQUEST_CODE = 126;
 
     private static final String EXTRA_SHOW_ADVANCED = "android.content.extra.SHOW_ADVANCED";
 
