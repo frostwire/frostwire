@@ -114,7 +114,8 @@
             </intent-filter>
         </activity>
         <activity android:name="com.frostwire.android.gui.activities.WizardActivity"
-                  android:label="@string/application_label" android:screenOrientation="portrait"/>
+                  android:label="@string/application_label" android:screenOrientation="portrait"
+                  android:theme="@style/WizardActivity"/>
         <activity android:name=".gui.activities.SettingsActivity"
                   android:label="@string/activity_preferences_name" android:theme="@style/Preferences"/>
         <activity android:name="com.frostwire.android.gui.activities.SettingsActivity2"

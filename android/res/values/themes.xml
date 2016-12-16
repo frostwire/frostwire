@@ -42,5 +42,9 @@
         <item name="android:buttonStyle">@style/Widget.Button</item>
         <item name="android:textColorPrimary">@color/app_text_primary</item>
     </style>
-
+    
+    <style name="Button" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorButtonNormal">@color/basic_gray_dark</item>
+        <item name="colorAccent">@color/basic_gray_medium</item>
+    </style>
 </resources>

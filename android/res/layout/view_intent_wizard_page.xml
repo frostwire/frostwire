@@ -19,49 +19,50 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/view_intent_wizard_page_text"
+        style="@style/WizardSubTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_marginBottom="10dp"
-        android:text="@string/intent_text"
-        style="@style/WizardSubTitle" />
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/intent_text" />
 
     <CheckBox
         android:id="@+id/view_intent_wizard_page_check_accept_copyright"
-        android:layout_width="fill_parent"
+        style="@style/WizardText.Sub"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:text="@string/accept_intent"
-        android:textColor="@android:color/white"
-        style="@style/WizardText" />
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/accept_intent" />
 
     <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <CheckBox
-                android:id="@+id/view_intent_wizard_page_check_accept_tou"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="@string/i_have_read_and_agree_to_the"
-                android:textColor="@android:color/white"
-                style="@style/WizardText" />
-        <TextView android:id="@+id/view_intent_wizard_page_text_tos"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="@string/terms_of_use"
-                  android:clickable="true"
-                  style="@style/WizardText"
-                  android:layout_marginLeft="5dp"
-                  />
-    </LinearLayout>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
+        <CheckBox
+            android:id="@+id/view_intent_wizard_page_check_accept_tou"
+            style="@style/WizardText.Sub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="@string/i_have_read_and_agree_to_the" />
+
+        <TextView
+            android:id="@+id/view_intent_wizard_page_text_tos"
+            style="@style/WizardText.Terms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:clickable="true"
+            android:text="@string/terms_of_use" />
+    </LinearLayout>
 
 </LinearLayout>

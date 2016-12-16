@@ -30,7 +30,7 @@ import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.GeneralWizardPage;
 import com.frostwire.android.gui.views.WizardPageView;
 import com.frostwire.android.gui.views.WizardPageView.OnCompleteListener;
@@ -41,7 +41,7 @@ import com.frostwire.android.gui.views.preference.StoragePreference;
  * @author aldenml
  *
  */
-public class WizardActivity extends AbstractActivity {
+public class WizardActivity extends AbstractActivity2 {
     private final OnCompleteListener completeListener;
     private Button buttonPrevious;
     private Button buttonNext;
