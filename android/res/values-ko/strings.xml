@@ -618,4 +618,14 @@
     <string name="keep_the_project_alive">프로젝트를 살아있게해라</string>
     <string name="remove_ads">광고를 제거하다</string>
     <string name="use_tpb_summary">TPB는 마그넷 기반으로 Wifi에서만 작동합니다</string>
+    <string name="frostwire_sticker_and_more">FrostWire 스티커 및 기타</string>
+    <string name="wifi_networks_only_summary">데이터를 저장하십시오. Wi-Fi 연결이 설정된 경우에만 다운로드하십시오. </string>
+    <string name="notifications_other_settings">알림 및 기타</string>
+    <string name="wifi_networks_only">Wi-Fi 네트워크 만</string>
+    <string name="distraction_free_search_results_summary">더 많은 결과를 표시하려면 UI 구성 요소를 숨 깁니다. 앱을 다시 시작해야 적용됩니다.</string>
+    <string name="search_preferences">검색 환경 설정</string>
+    <string name="donate_your_time">시간을 기부하십시오.</string>
+    <string name="distraction_free_search_results">산만 무료 검색 (베타)</string>
+    <string name="help_translate_or_proofread_frostwire">FrostWire 번역 또는 교정 도움말</string>
+    <string name="changelog">변경 내역</string>
 </resources>
