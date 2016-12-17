@@ -613,4 +613,14 @@
     <string name="keep_the_project_alive">Udržujte projektu živý</string>
     <string name="remove_ads">Odstranit reklamy</string>
     <string name="use_tpb_summary">TPB je magnet na bázi funguje pouze na Wifi</string>
+    <string name="frostwire_sticker_and_more">FrostWire samolepky a další</string>
+    <string name="wifi_networks_only_summary">Uložit data. Stáhnout pouze tehdy, pokud se zjistí Wi-Fi připojení. </string>
+    <string name="notifications_other_settings">Oznámení a ostatní</string>
+    <string name="wifi_networks_only">Pouze Wi-Fi sítě</string>
+    <string name="distraction_free_search_results_summary">Skrýt UI komponenty pro zobrazení více výsledků. Potřebuje restart aplikace se projeví.</string>
+    <string name="search_preferences">Nastavení vyhledávání</string>
+    <string name="donate_your_time">Darovat svůj čas</string>
+    <string name="distraction_free_search_results">Rozptýlení Free Search (beta)</string>
+    <string name="help_translate_or_proofread_frostwire">Pomoci s překladem nebo korekturou FrostWire</string>
+    <string name="changelog">Changelog</string>
 </resources>

@@ -610,4 +610,17 @@
     <string name="keep_the_project_alive">परियोजना को जीवित रखें</string>
     <string name="remove_ads">विज्ञापन हटाएँ</string>
     <string name="use_tpb_summary">TPB चुंबक आधारित है, केवल वाईफाई पर काम करता है</string>
+    <string name="all_free_downloads">सभी मुफ्त डाउनलोड</string>
+    <string name="frostwire_sticker_and_more">FrostWire स्टिकर और अधिक</string>
+    <string name="wifi_networks_only_summary">डेटा बचाना। डाउनलोड अगर केवल वाई-फाई कनेक्शन की स्थापना की है। </string>
+    <string name="notifications_other_settings">सूचनाएं और अन्य</string>
+    <string name="frostwire_features">FrostWire फीचर्स</string>
+    <string name="wifi_networks_only">केवल वाई-फाई नेटवर्क</string>
+    <string name="distraction_free_search_results_summary">यूआई घटकों को छिपाने के लिए और अधिक परिणाम दिखाने के लिए। एप्लिकेशन को पुनः आरंभ करने की जरूरत प्रभावी करने के लिए।</string>
+    <string name="search_preferences">खोज वरीयता</string>
+    <string name="donate_your_time">अपने समय दान</string>
+    <string name="advertisement">विज्ञापन</string>
+    <string name="distraction_free_search_results">व्याकुलता मुक्त खोज (बीटा)</string>
+    <string name="help_translate_or_proofread_frostwire">अनुवाद करने में या ठीक करना FrostWire मदद</string>
+    <string name="changelog">चैंज</string>
 </resources>

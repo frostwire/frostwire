@@ -615,4 +615,14 @@
     <string name="keep_the_project_alive">Projeyi Canlı Tutun</string>
     <string name="remove_ads">Reklamları kaldırmak</string>
     <string name="use_tpb_summary">TPB mıknatıs tabanlı, yalnızca Wifi üzerinde çalışıyor</string>
+    <string name="frostwire_sticker_and_more">FrostWire çıkartmaları ve daha fazlası</string>
+    <string name="wifi_networks_only_summary">Veri kaydet. Sadece Wi-Fi bağlantısı kurulduysa indirin. </string>
+    <string name="notifications_other_settings">Bildirimler ve Diğer</string>
+    <string name="wifi_networks_only">Yalnızca kablosuz ağlar</string>
+    <string name="distraction_free_search_results_summary">Daha fazla sonuç görüntülemek için kullanıcı arabirimi bileşenlerini gizleyin. Etkinleştirmek için uygulamanın yeniden başlatılması gerekiyor.</string>
+    <string name="search_preferences">Arama Tercihleri</string>
+    <string name="donate_your_time">Zaman bağışlayın</string>
+    <string name="distraction_free_search_results">Dikkat dağıtımı Ücretsiz Arama (beta)</string>
+    <string name="help_translate_or_proofread_frostwire">FrostWire\'ı tercüme etmeye veya düzeltmeye yardımcı olun</string>
+    <string name="changelog">Değişiklikler</string>
 </resources>

@@ -611,4 +611,16 @@
     <string name="remove_ads">Anzeigen entfernen</string>
     <string name="use_tpb_summary">TPB ist Magnet basiert, funktioniert nur auf der Wifi</string>
     <string name="advertisement">werbung</string>
+    <string name="all_free_downloads">Alle kostenlosen Downloads</string>
+    <string name="frostwire_sticker_and_more">FrostWire Aufkleber und mehr</string>
+    <string name="wifi_networks_only_summary">Daten speichern. Download nur, wenn Wifi-Verbindung hergestellt ist. </string>
+    <string name="notifications_other_settings">Benachrichtigungen und Sonstiges</string>
+    <string name="frostwire_features">FROSTWIRE EIGENSCHAFTEN</string>
+    <string name="wifi_networks_only">Wifi Netzwerke nur</string>
+    <string name="distraction_free_search_results_summary">Hide UI-Komponenten, um mehr Ergebnisse zu zeigen. Neustart der App erforderlich.</string>
+    <string name="search_preferences">Sucheinstellungen</string>
+    <string name="donate_your_time">Spenden Sie Ihre Zeit</string>
+    <string name="distraction_free_search_results">Ablenkung Kostenlose Suche (Beta)</string>
+    <string name="help_translate_or_proofread_frostwire">Helfen Sie mit, FrostWire zu übersetzen oder zu korrigieren</string>
+    <string name="changelog">Änderungsprotokoll</string>
 </resources>
