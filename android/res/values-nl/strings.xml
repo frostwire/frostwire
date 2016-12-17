@@ -611,4 +611,16 @@
     <string name="remove_ads">Verwijder advertenties</string>
     <string name="use_tpb_summary">TPB is de magneet gebaseerd, werkt alleen op de website Wifi</string>
     <string name="advertisement">advertentie</string>
+    <string name="all_free_downloads">Alle gratis downloads</string>
+    <string name="frostwire_sticker_and_more">FrostWire stickers en meer</string>
+    <string name="wifi_networks_only_summary">Gegevens opslaan. Download alleen als Wi-Fi-verbinding tot stand is gebracht. </string>
+    <string name="notifications_other_settings">Kennisgevingen en andere</string>
+    <string name="frostwire_features">FROSTWIRE KENMERKEN</string>
+    <string name="wifi_networks_only">Alleen Wi-Fi-netwerken</string>
+    <string name="distraction_free_search_results_summary">Verberg componenten van de gebruikersinterface om meer resultaten te laten zien. Moet app herstart door te voeren.</string>
+    <string name="search_preferences">Zoeken voorkeuren</string>
+    <string name="donate_your_time">Doneer uw tijd</string>
+    <string name="distraction_free_search_results">Zoeken zonder afleiding (beta)</string>
+    <string name="help_translate_or_proofread_frostwire">Help vertalen of proeflezen FrostWire</string>
+    <string name="changelog">Changelog</string>
 </resources>
