@@ -613,5 +613,14 @@
     <string name="remove_ads">видалити оголошення</string>
     <string name="your_connection_has_dropped_stopping_services">Ваше підключення до Wi-Fi впав. Зупинка служб.</string>
     <string name="use_tpb_summary">TPB є магнітом на основі, працює тільки на Wi-Fi.</string>
-
+    <string name="frostwire_sticker_and_more">FrostWire наклейки і багато іншого</string>
+    <string name="wifi_networks_only_summary">Збереження даних. Завантажити тільки якщо Wi-Fi з\'єднання встановлено.</string>
+    <string name="notifications_other_settings">Відомості та інше</string>
+    <string name="wifi_networks_only">Тільки Wi-Fi мережі</string>
+    <string name="distraction_free_search_results_summary">Приховати компоненти користувальницького інтерфейсу для того щоб показати більше результатів. Потрібне перезавантаження додатки вступили в силу.</string>
+    <string name="search_preferences">налаштування пошуку</string>
+    <string name="donate_your_time">пожертвування часу</string>
+    <string name="distraction_free_search_results">Відволікання Безкоштовний пошук (бета-версія)</string>
+    <string name="help_translate_or_proofread_frostwire">Допоможіть перевести або віднімати FrostWire</string>
+    <string name="changelog">зміни</string>
 </resources>
