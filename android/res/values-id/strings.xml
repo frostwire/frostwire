@@ -613,5 +613,14 @@
     <string name="keep_the_project_alive">Menjaga proyek hidup</string>
     <string name="remove_ads">Hilangkan iklan</string>
     <string name="use_tpb_summary">TPB adalah magnet berdasarkan, bekerja hanya pada Wifi</string>
-
+    <string name="frostwire_sticker_and_more">FrostWire stiker dan banyak lagi</string>
+    <string name="wifi_networks_only_summary">Menyimpan data. Download hanya jika koneksi Wi-Fi didirikan. </string>
+    <string name="notifications_other_settings">Pemberitahuan dan lainnya</string>
+    <string name="wifi_networks_only">Jaringan wifi saja</string>
+    <string name="distraction_free_search_results_summary">Menyembunyikan komponen UI menunjukkan hasil yang lebih. Kebutuhan aplikasi Restart untuk berlaku.</string>
+    <string name="search_preferences">Cari Preferensi</string>
+    <string name="donate_your_time">Menyumbangkan waktu Anda</string>
+    <string name="distraction_free_search_results">Cari tanpa gangguan (beta)</string>
+    <string name="help_translate_or_proofread_frostwire">Membantu menerjemahkan atau mengoreksi FrostWire</string>
+    <string name="changelog">Changelog</string>
 </resources>
