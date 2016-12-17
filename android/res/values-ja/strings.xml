@@ -616,5 +616,14 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ あなたはVPNを使ってインターネットに接続しています。 <br><br> まだお持ちでない場合は、 <b>ExpressVPN</b> あなたの接続を暗号化する <b>あなたのプライバシーを守る</b>. ]]></string>
     <string name="keep_the_project_alive">プロジェクトを存続させる</string>
     <string name="remove_ads">広告を削除</string>
-
+    <string name="frostwire_sticker_and_more">FrostWireステッカーなど</string>
+    <string name="wifi_networks_only_summary">データを保存します。 Wi-Fi接続が確立されている場合にのみダウンロードします。 </string>
+    <string name="notifications_other_settings">通知およびその他</string>
+    <string name="wifi_networks_only">Wi-Fiネットワークのみ</string>
+    <string name="distraction_free_search_results_summary">より多くの結果を表示するためにユーザーインターフェイスコンポーネントを非表示にします。 アプリの再起動を有効にする必要があります。</string>
+    <string name="search_preferences">検索設定</string>
+    <string name="donate_your_time">あなたの時間を寄付する</string>
+    <string name="distraction_free_search_results">気晴らし無料検索（ベータ版）</string>
+    <string name="help_translate_or_proofread_frostwire">FrostWireを翻訳または校正するのに役立ちます</string>
+    <string name="changelog">変更ログ</string>
 </resources>
