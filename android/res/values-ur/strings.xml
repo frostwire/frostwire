@@ -111,10 +111,6 @@
     <string name="deleted_crawl_cache">کرال کا کیشے صاف کریں</string>
     <string name="clear_search_cache">سرچ کا کیشے صاف کریں</string>
     <string name="wifi_sharing_settings">وایفاے پہ تقسیم کی ترتیبات</string>
-
-
-
-
     <string name="vpn_not_found">کوئی VPN. کنکشن کو خفیہ کاری پر غور.</string>
     <string name="azureus_peer_manager_status_finished">ختم</string>
     <string name="activity_mediaplayer_name">میڈیا پلیئر</string>
