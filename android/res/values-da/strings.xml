@@ -610,8 +610,17 @@
     <string name="storage_picker_treeuri_not_directory">Den valgte sti er ikke en mappe</string>
     <string name="protect_my_privacy">Beskyt mine personlige oplysninger</string>
     <string name="your_privacy_is_a_fundamental_right_html">Dit privatliv er en grundlæggende menneskerettighed.</string>
-    <string name="keep_the_project_alive">Hold Project Alive</string>
+    <string name="keep_the_project_alive">Hold projekt i live</string>
     <string name="remove_ads">Fjern annoncer</string>
     <string name="use_tpb_summary">TPB er magnet baseret, fungerer kun på Wifi</string>
-
+    <string name="frostwire_sticker_and_more">FrostWire klistermærker og mere</string>
+    <string name="wifi_networks_only_summary">Gem data. Hent kun, hvis Wi-Fi-forbindelse er etableret. </string>
+    <string name="notifications_other_settings">Bemærkninger og andre</string>
+    <string name="wifi_networks_only">Kun Wi-Fi-netværk</string>
+    <string name="distraction_free_search_results_summary">Skjul UI komponenter for at vise flere resultater. Behov app genstart for at træde i kraft.</string>
+    <string name="search_preferences">Søg Indstillinger</string>
+    <string name="donate_your_time">Donér din tid</string>
+    <string name="distraction_free_search_results">Distraktion fri søgning (beta)</string>
+    <string name="help_translate_or_proofread_frostwire">Hjælp med at oversætte eller læse korrektur FrostWire</string>
+    <string name="changelog">Changelog</string>
 </resources>
