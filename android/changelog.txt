@@ -1,5 +1,6 @@
-FrostWire 1.8.7 - DEC/15/2016
+FrostWire 1.8.7 - DEC/17/2016
  - New Bulgarian, Belarusian, Slovak, Thai, Malaysian translations
+ - Every existing translation synced to 100%, Croatian and Urdu benefit the most
  - About screen make over with material design
  - Fixes bug where main navigation menu wouldn't close on back pressed.
 
