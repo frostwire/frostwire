@@ -615,4 +615,12 @@
     <string name="remove_ads">выдаліць аб\'явы</string>
     <string name="your_connection_has_dropped_stopping_services">Ваша падлучэнне да Wi-Fi ўпаў. Прыпынак службаў.</string>
     <string name="use_tpb_summary">СПТ з\'яўляецца магнітам на аснове, працуе толькі на Wi-Fi</string>
+    <string name="frostwire_sticker_and_more">налепкі Frostwire і многае іншае</string>
+    <string name="wifi_networks_only_summary">Захаванне дадзеных. Спампаваць толькі калі Wi-Fi злучэнне ўстаноўлена. </string>
+    <string name="notifications_other_settings">Апавяшчэнні і іншае</string>
+    <string name="wifi_networks_only">толькі Wi-Fi сеткі</string>
+    <string name="search_preferences">налады пошуку</string>
+    <string name="donate_your_time">Ахвяраванне часу</string>
+    <string name="help_translate_or_proofread_frostwire">Дапамажыце перавесці або адымаць FrostWire</string>
+    <string name="changelog">змяненняў</string>
 </resources>
