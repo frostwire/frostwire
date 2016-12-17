@@ -613,4 +613,16 @@
     <string name="keep_the_project_alive">Держите проект жив</string>
     <string name="remove_ads">Убрать рекламу</string>
     <string name="advertisement">Реклама</string>
+    <string name="all_free_downloads">Все свободные скачивания</string>
+    <string name="frostwire_sticker_and_more">наклейки Frostwire и многое другое</string>
+    <string name="wifi_networks_only_summary">Сохранить данные. Скачать только если Wi-Fi соединение установлено. </string>
+    <string name="notifications_other_settings">Уведомления и другое</string>
+    <string name="frostwire_features">FROSTWIRE ОСОБЕННОСТИ</string>
+    <string name="wifi_networks_only">Только Wi-Fi сети</string>
+    <string name="distraction_free_search_results_summary">Скрыть компоненты пользовательского интерфейса для того чтобы показать больше результатов. Требуется перезагрузка приложения вступили в силу.</string>
+    <string name="search_preferences">Настройки поиска</string>
+    <string name="donate_your_time">Пожертвование времени</string>
+    <string name="distraction_free_search_results">Отвлечение Бесплатный поиск (бета-версия)</string>
+    <string name="help_translate_or_proofread_frostwire">Помогите перевести или вычитать FrostWire</string>
+    <string name="changelog">изменений</string>
 </resources>
