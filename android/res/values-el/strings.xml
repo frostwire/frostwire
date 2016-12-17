@@ -615,4 +615,14 @@
     <string name="your_privacy_is_a_fundamental_right_html">προστασία της ιδιωτικής ζωής σας είναι ένα θεμελιώδες ανθρώπινο δικαίωμα.</string>
     <string name="keep_the_project_alive">Κρατήστε το έργο ζωντανό</string>
     <string name="remove_ads">Αφαίρεσε τις διαφημίσεις</string>
+    <string name="frostwire_sticker_and_more">FrostWire αυτοκόλλητα και πολλά άλλα</string>
+    <string name="wifi_networks_only_summary">Αποθήκευση δεδομένων. Λήψη μόνο εάν είναι εγκατεστημένος σύνδεση Wi-Fi. </string>
+    <string name="notifications_other_settings">Ειδοποιήσεις και Άλλα</string>
+    <string name="wifi_networks_only">μόνο σε δίκτυα Wi-Fi</string>
+    <string name="distraction_free_search_results_summary">Απόκρυψη UI συστατικά για να δείξει περισσότερα αποτελέσματα. Ανάγκες εφαρμογή επανεκκίνηση για να τεθεί σε ισχύ.</string>
+    <string name="search_preferences">Αναζήτηση Προτιμήσεις</string>
+    <string name="donate_your_time">Δώρισε το χρόνο σας</string>
+    <string name="distraction_free_search_results">Απόσπαση της προσοχής Δωρεάν αναζήτηση (beta)</string>
+    <string name="help_translate_or_proofread_frostwire">Βοηθήστε να μεταφράζει ή να διορθώσουν FrostWire</string>
+    <string name="changelog">Changelog</string>
 </resources>
