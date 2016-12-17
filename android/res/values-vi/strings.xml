@@ -613,5 +613,14 @@
     <string name="keep_the_project_alive">Giữ dự án sống</string>
     <string name="remove_ads">Loại bỏ các quảng cáo</string>
     <string name="use_tpb_summary">TPB là nam châm dựa, chỉ hoạt động trên Wifi</string>
-
+    <string name="frostwire_sticker_and_more">Dán FrostWire và nhiều hơn nữa</string>
+    <string name="wifi_networks_only_summary">Lưu dữ liệu. chỉ tải về nếu kết nối Wi-Fi được thiết lập. </string>
+    <string name="notifications_other_settings">Thông báo và khác</string>
+    <string name="wifi_networks_only">Mạng Wifi chỉ</string>
+    <string name="distraction_free_search_results_summary">Ẩn các thành phần giao diện người dùng để hiển thị nhiều kết quả hơn. Nhu cầu ứng dụng khởi động lại để có hiệu lực.</string>
+    <string name="search_preferences">Tuỳ chọn Tìm kiếm</string>
+    <string name="donate_your_time">Cống hiến thời gian của bạn</string>
+    <string name="distraction_free_search_results">Tìm kiếm không phân tâm (beta)</string>
+    <string name="help_translate_or_proofread_frostwire">Trợ giúp dịch hoặc hiệu đính FrostWire</string>
+    <string name="changelog">Những thay đổi gần đây</string>
 </resources>
