@@ -613,6 +613,15 @@
     <string name="remove_ads">Hirdetések eltávolítása</string>
     <string name="your_connection_has_dropped_stopping_services">A Wifi kapcsolat megszakad. Szolgáltatások leállítása.</string>
     <string name="use_tpb_summary">TPB van mágnes alapú, csak akkor működik, Wifi</string>
-
+    <string name="frostwire_sticker_and_more">FrostWire matricák és több</string>
+    <string name="wifi_networks_only_summary">Adatok tárolására. Letöltés csak akkor, ha a Wi-Fi kapcsolat jön létre. </string>
+    <string name="notifications_other_settings">Értesítések és egyéb</string>
+    <string name="wifi_networks_only">Wi-Fi hálózatok csak</string>
+    <string name="distraction_free_search_results_summary">Elrejtése felhasználói felület alkatrészek mutatni több eredményt. Needs app újraindítás után lépnek érvénybe.</string>
+    <string name="search_preferences">Keresési beállítások</string>
+    <string name="donate_your_time">Adományok az időt</string>
+    <string name="distraction_free_search_results">A figyelmetlenség Szabad keresés (béta)</string>
+    <string name="help_translate_or_proofread_frostwire">Segíts lefordítani vagy a lektorált FrostWire</string>
+    <string name="changelog">Változások</string>
 
 </resources>
