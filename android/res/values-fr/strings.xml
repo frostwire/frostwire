@@ -612,4 +612,16 @@
     <string name="keep_the_project_alive">Gardez le projet en vie</string>
     <string name="remove_ads">Supprimer les annonces</string>
     <string name="advertisement">publicité</string>
+    <string name="all_free_downloads">Tous les téléchargements gratuits</string>
+    <string name="frostwire_sticker_and_more">Autocollants FrostWire et plus</string>
+    <string name="wifi_networks_only_summary">Enregistrer des données. Téléchargement uniquement si la connexion Wi-Fi est établie. </string>
+    <string name="notifications_other_settings">Notifications et autres</string>
+    <string name="frostwire_features">FROSTWIRE PRÉSENTE</string>
+    <string name="wifi_networks_only">Réseaux Wi-Fi uniquement</string>
+    <string name="distraction_free_search_results_summary">Masquer les composants de l\'interface utilisateur pour afficher d\'autres résultats. Nécessite le redémarrage de l\'application pour prendre effet.</string>
+    <string name="search_preferences">Préférences de recherche</string>
+    <string name="donate_your_time">Donnez votre temps</string>
+    <string name="distraction_free_search_results">Distraction Recherche libre (bêta)</string>
+    <string name="help_translate_or_proofread_frostwire">Aide à traduire ou à relire FrostWire</string>
+    <string name="changelog">Changelog</string>
 </resources>
