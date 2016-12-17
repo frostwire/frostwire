@@ -613,5 +613,14 @@
     <string name="remove_ads">Elimina anunțurile</string>
     <string name="your_connection_has_dropped_stopping_services">Conexiunea Wi-Fi a scăzut. Servicii de oprire.</string>
     <string name="use_tpb_summary">TPB este pe bază de magnet, funcționează numai pe Wi-Fi</string>
-
+    <string name="frostwire_sticker_and_more">FrostWire autocolante și mai mult</string>
+    <string name="wifi_networks_only_summary">Salveaza date. Descărcați numai în cazul în care este stabilită conexiunea Wi-Fi. </string>
+    <string name="notifications_other_settings">Notificări și altele</string>
+    <string name="wifi_networks_only">Numai rețele Wi-Fi</string>
+    <string name="distraction_free_search_results_summary">Componentele se ascunde interfața cu utilizatorul pentru a afișa mai multe rezultate. Are nevoie de repornirea aplicației pentru a intra în vigoare.</string>
+    <string name="search_preferences">Preferințe de căutare</string>
+    <string name="donate_your_time">Doneaza timpul</string>
+    <string name="distraction_free_search_results">Distragerii Căutare liberă (versiune beta)</string>
+    <string name="help_translate_or_proofread_frostwire">Ajuta la traduce sau recitești FrostWire</string>
+    <string name="changelog">Changelog</string>
 </resources>
