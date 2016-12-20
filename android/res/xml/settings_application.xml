@@ -24,21 +24,17 @@
             android:summary="@string/bittorrent_network_summary"
             android:key="frostwire.prefs.internal.connect_disconnect"
             android:title="@string/bittorrent" />
-        <!--  Wi-Fi Networks Only should replace Use 3G/4G for BitTorrent -->
-        <!--<CheckBoxPreference-->
-            <!--android:key="frostwire.prefs.network.use_mobile_data"-->
-            <!--android:summary="@string/use_mobile_data_summary"-->
-            <!--android:title="@string/use_mobile_data" />-->
         <SwitchPreference
             android:summary="@string/wifi_networks_only_summary"
             android:key="frostwire.prefs.network.use_wifi_only"
             android:title="@string/wifi_networks_only" />
-        <!--<com.frostwire.android.gui.views.preference.StoragePreference
-            android:summary="@string/storage_preference_summary"
-            android:title="@string/storage_preference_title" />-->
-        <Preference
-            android:summary="@string/storage_preference_summary"
+        <com.frostwire.android.gui.views.preference.StoragePreference
             android:key="frostwire.prefs.storage.path"
+            android:summary="@string/storage_preference_summary"
+            android:title="@string/storage_preference_title" />
+        <Preference
+            android:key="frostwire.prefs.storage.path_asf"
+            android:summary="@string/storage_preference_summary"
             android:title="@string/storage_preference_title">
             <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE" />
         </Preference>

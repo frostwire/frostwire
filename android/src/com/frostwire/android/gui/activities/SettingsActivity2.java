@@ -24,11 +24,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 import android.util.Log;
 
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
@@ -157,6 +160,39 @@ public final class SettingsActivity2 extends AbstractActivity2
             super.onResume();
             setupConnectSwitch();
             setupWiFiExclusiveSwitch();
+            setupStorageOption();
+        }
+
+        private void setupStorageOption() {
+            // intentional repetition of preference value here
+            String kitkatKey = "frostwire.prefs.storage.path";
+            String lollipopKey = "frostwire.prefs.storage.path_asf";
+
+            PreferenceCategory category = (PreferenceCategory) findPreference("frostwire.prefs.general");
+            Preference activePreference;
+            if (AndroidPlatform.saf()) {
+                Preference p = findPreference(kitkatKey);
+                if (p != null) {
+                    category.removePreference(p);
+                }
+                activePreference = findPreference(lollipopKey);
+            } else {
+                Preference p = findPreference(lollipopKey);
+                if (p != null) {
+                    category.removePreference(p);
+                }
+                activePreference = findPreference(kitkatKey);
+            }
+            if (activePreference != null) {
+                activePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue.toString());
+                        return true;
+                    }
+                });
+                activePreference.setSummary(ConfigurationManager.instance().getStoragePath());
+            }
         }
 
         private void setupWiFiExclusiveSwitch() {
