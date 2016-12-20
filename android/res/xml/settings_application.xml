@@ -31,12 +31,14 @@
             <!--android:title="@string/use_mobile_data" />-->
         <SwitchPreference
             android:summary="@string/wifi_networks_only_summary"
+            android:key="frostwire.prefs.network.use_wifi_only"
             android:title="@string/wifi_networks_only" />
         <!--<com.frostwire.android.gui.views.preference.StoragePreference
             android:summary="@string/storage_preference_summary"
             android:title="@string/storage_preference_title" />-->
         <Preference
             android:summary="@string/storage_preference_summary"
+            android:key="frostwire.prefs.storage.path"
             android:title="@string/storage_preference_title">
             <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE" />
         </Preference>

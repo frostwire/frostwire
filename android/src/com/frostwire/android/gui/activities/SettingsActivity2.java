@@ -143,6 +143,7 @@ public final class SettingsActivity2 extends AbstractActivity2
     public static class Application extends PreferenceFragment {
 
         SwitchPreference connectSwitch;
+        SwitchPreference wifiOnlySwitch;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -155,6 +156,20 @@ public final class SettingsActivity2 extends AbstractActivity2
         public void onResume() {
             super.onResume();
             setupConnectSwitch();
+            setupWiFiExclusiveSwitch();
+        }
+
+        private void setupWiFiExclusiveSwitch() {
+            wifiOnlySwitch = (SwitchPreference) findPreference(Constants.PREF_KEY_INTERNAL_CONNECT_DISCONNECT);
+            if (wifiOnlySwitch != null) {
+                wifiOnlySwitch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        return false;
+                        //todo stop transfers if not on wifi
+                    }
+                });
+            }
         }
 
         private void setupConnectSwitch() {
@@ -230,6 +245,7 @@ public final class SettingsActivity2 extends AbstractActivity2
             connectSwitch.setSummaryOn(R.string.im_on_it);
             connectSwitch.setOnPreferenceChangeListener(onPreferenceChangeListener);
         }
+
     }
 
     public static class Search extends PreferenceFragment {
