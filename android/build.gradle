@@ -146,7 +146,7 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:design:25.0.1"
+    compile "com.android.support:design:25.1.0"
     compile "com.google.android.gms:play-services-ads-lite:10.0.1"
     compile "com.google.android.gms:play-services-base:10.0.1"
     compile "com.inmobi.monetization:inmobi-ads:6.0.4"
