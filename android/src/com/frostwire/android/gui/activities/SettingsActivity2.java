@@ -20,6 +20,7 @@ package com.frostwire.android.gui.activities;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -31,17 +32,21 @@ import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.preference.TwoStatePreference;
 import android.util.Log;
+import android.view.View;
 
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
+import com.frostwire.android.gui.views.preference.ButtonActionPreference;
 import com.frostwire.android.gui.views.preference.CheckBoxSeedingPreference2;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference;
 import com.frostwire.bittorrent.BTEngine;
@@ -494,6 +499,85 @@ public final class SettingsActivity2 extends AbstractActivity2
             super.onCreate(savedInstanceState);
 
             addPreferencesFromResource(R.xml.settings_other);
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+
+            setupPermanentStatusNotificationOption();
+            setupHapticFeedback();
+            setupUXStatsOption();
+            setupClearIndex();
+        }
+
+        private void setupPermanentStatusNotificationOption() {
+            final CheckBoxPreference enablePermanentStatusNotification = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION);
+            if (enablePermanentStatusNotification != null) {
+                enablePermanentStatusNotification.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        final boolean notificationEnabled = (boolean) newValue;
+                        if (!notificationEnabled) {
+                            NotificationManager notificationService = (NotificationManager) getActivity().getSystemService(NOTIFICATION_SERVICE);
+                            if (notificationService != null) {
+                                notificationService.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                            }
+                        }
+                        return true;
+                    }
+                });
+            }
+        }
+
+        private void setupHapticFeedback() {
+            final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
+            if (preference != null) {
+                preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        CheckBoxPreference cbPreference = (CheckBoxPreference) preference;
+                        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, cbPreference.isChecked());
+                        Engine.instance().getVibrator().onPreferenceChanged();
+                        return true;
+                    }
+                });
+            }
+        }
+
+        private void setupUXStatsOption() {
+            final CheckBoxPreference checkPref = (CheckBoxPreference) findPreference(Constants.PREF_KEY_UXSTATS_ENABLED);
+            if (checkPref != null) {
+                checkPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        boolean newVal = (Boolean) newValue;
+                        if (!newVal) { // not send ux stats
+                            UXStats.instance().setContext(null);
+                        }
+                        return true;
+                    }
+                });
+            }
+        }
+
+        private void setupClearIndex() {
+            final ButtonActionPreference preference = (ButtonActionPreference) findPreference("frostwire.prefs.internal.clear_index");
+
+            if (preference != null) {
+                updateIndexSummary(preference);
+                preference.setOnActionListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        LocalSearchEngine.instance().clearCache();
+                        UIUtils.showShortMessage(getActivity(), R.string.deleted_crawl_cache);
+                        updateIndexSummary(preference);
+                    }
+                });
+            }
+        }
+
+        private void updateIndexSummary(ButtonActionPreference preference) {
+            float size = (((float) LocalSearchEngine.instance().getCacheSize()) / 1024) / 1024;
+            preference.setSummary(getString(R.string.crawl_cache_size, size));
         }
     }
 }
