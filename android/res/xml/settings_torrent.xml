@@ -24,7 +24,7 @@
             android:key="frostwire.prefs.torrent.seed_finished_torrents"
             android:summary="@string/seed_finished_torrents_summary"
             android:title="@string/seed_finished_torrents" />
-        <com.frostwire.android.gui.views.preference.CheckBoxSeedingPreference
+        <com.frostwire.android.gui.views.preference.CheckBoxSeedingPreference2
             android:key="frostwire.prefs.torrent.seed_finished_torrents_wifi_only"
             android:summary="@string/seed_finished_torrents_wifi_only_summary"
             android:title="@string/seed_finished_torrents_wifi_only" />
