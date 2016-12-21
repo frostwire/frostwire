@@ -210,7 +210,7 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
 
         private void setupWiFiExclusiveSwitch() {
-            wifiOnlySwitch = (SwitchPreference) findPreference(Constants.PREF_KEY_INTERNAL_CONNECT_DISCONNECT);
+            wifiOnlySwitch = (SwitchPreference) findPreference(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
             if (wifiOnlySwitch != null) {
                 wifiOnlySwitch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
@@ -287,7 +287,6 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
 
         private void disableConnectSwitchWhileStateIsChanging() {
-            Log.w("P", "disable");
             final Preference.OnPreferenceChangeListener onPreferenceChangeListener = connectSwitch.getOnPreferenceChangeListener();
             connectSwitch.setOnPreferenceChangeListener(null);
             connectSwitch.setEnabled(false);
