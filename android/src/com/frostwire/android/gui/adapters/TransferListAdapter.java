@@ -169,7 +169,11 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     }
 
     private Transfer getGroupItem(int groupPosition) {
-        return list.get(groupPosition);
+        try {
+            return list.get(groupPosition);
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     @Override
@@ -384,7 +388,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                                      final int groupPosition) {
         final ImageView groupIndicator = findView(listItemMainLayout, R.id.view_transfer_list_item_group_indicator);
         groupIndicator.setClickable(true);
-        final int totalItems = item.getItems().size();
+        final int totalItems = item != null ? item.getItems().size() : 0;
         prepareGroupIndicatorDrawable(item, groupIndicator, totalItems > 1, expanded);
 
         if (totalItems > 1) {
