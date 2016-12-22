@@ -80,10 +80,8 @@ public final class BTDownload implements BittorrentDownload {
         TorrentInfo ti = th.torrentFile();
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
         this.parts = ti != null ? new File(savePath, "." + ti.infoHash() + ".parts") : null;
-
         this.extra = createExtra();
         this.paymentOptions = loadPaymentOptions(ti);
-
         this.innerListener = new InnerListener();
         engine.addListener(innerListener);
     }
@@ -126,24 +124,15 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isPaused() {
-        if (!th.isValid()) {
-            return false;
-        }
-        return th.status().isPaused() || engine.isPaused() || !engine.isRunning();
+        return th.isValid() && (th.status().isPaused() || engine.isPaused() || !engine.isRunning());
     }
 
     public boolean isSeeding() {
-        if (!th.isValid()) {
-            return false;
-        }
-        return th.status().isSeeding();
+        return th.isValid() && th.status().isSeeding();
     }
 
     public boolean isFinished() {
-        if (!th.isValid()) {
-            return false;
-        }
-        return th.status().isFinished();
+        return th.isValid() && th.status().isFinished();
     }
 
     public TransferState getState() {
@@ -216,7 +205,7 @@ public final class BTDownload implements BittorrentDownload {
 
     @Override
     public int getProgress() {
-        if (th == null) {
+        if (th == null || !th.isValid()) {
             return 0;
         }
 
@@ -264,27 +253,27 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public long getBytesReceived() {
-        return th.status().totalDownload();
+        return th.isValid() ? th.status().totalDownload() : 0;
     }
 
     public long getTotalBytesReceived() {
-        return th.status().allTimeDownload();
+        return th.isValid() ? th.status().allTimeDownload() : 0;
     }
 
     public long getBytesSent() {
-        return th.status().totalUpload();
+        return th.isValid() ? th.status().totalUpload() : 0;
     }
 
     public long getTotalBytesSent() {
-        return th.status().allTimeUpload();
+        return th.isValid() ? th.status().allTimeUpload() : 0;
     }
 
     public long getDownloadSpeed() {
-        return (isFinished() || isPaused() || isSeeding()) ? 0 : th.status().downloadPayloadRate();
+        return (!th.isValid() || isFinished() || isPaused() || isSeeding()) ? 0 : th.status().downloadPayloadRate();
     }
 
     public long getUploadSpeed() {
-        return ((isFinished() && !isSeeding()) || isPaused()) ? 0 : th.status().uploadPayloadRate();
+        return (!th.isValid() || (isFinished() && !isSeeding()) || isPaused()) ? 0 : th.status().uploadPayloadRate();
     }
 
     @Override
@@ -293,19 +282,19 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public int getConnectedPeers() {
-        return th.status().numPeers();
+        return th.isValid() ? th.status().numPeers() : 0;
     }
 
     public int getTotalPeers() {
-        return th.status().listPeers();
+        return th.isValid() ? th.status().listPeers() : 0;
     }
 
     public int getConnectedSeeds() {
-        return th.status().numSeeds();
+        return th.isValid() ? th.status().numSeeds() : 0;
     }
 
     public int getTotalSeeds() {
-        return th.status().listSeeds();
+        return th.isValid() ? th.status().listSeeds() : 0;
     }
 
     @Override
@@ -336,23 +325,22 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public long getETA() {
+        if (!th.isValid()) {
+            return 0;
+        }
         TorrentInfo ti = th.torrentFile();
         if (ti == null) {
             return 0;
         }
-
         TorrentStatus status = th.status();
         long left = ti.totalSize() - status.totalDone();
         long rate = status.downloadPayloadRate();
-
         if (left <= 0) {
             return 0;
         }
-
         if (rate <= 0) {
             return -1;
         }
-
         return left / rate;
     }
 
@@ -431,17 +419,14 @@ public final class BTDownload implements BittorrentDownload {
                 LOG.error("Error calling listener", e);
             }
         }
-
         doResumeData(true);
     }
 
     private void torrentRemoved() {
         engine.removeListener(innerListener);
-
         if (parts != null) {
             parts.delete();
         }
-
         fireRemoved(incompleteFilesToRemove);
     }
 
@@ -451,7 +436,6 @@ public final class BTDownload implements BittorrentDownload {
                 // trigger items calculation
                 getItems();
             }
-
         } catch (Throwable e) {
             LOG.warn("Error handling torrent checked logic", e);
         }
@@ -468,14 +452,14 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isPartial() {
-        Priority[] priorities = th.filePriorities();
-
-        for (Priority p : priorities) {
-            if (Priority.IGNORE.equals(p)) {
-                return true;
+        if (th.isValid()) {
+            Priority[] priorities = th.filePriorities();
+            for (Priority p : priorities) {
+                if (Priority.IGNORE.equals(p)) {
+                    return true;
+                }
             }
         }
-
         return false;
     }
 
@@ -509,47 +493,40 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public Set<String> trackers() {
+        if (!th.isValid()) {
+            return new HashSet<>();
+        }
         List<AnnounceEntry> trackers = th.trackers();
-
         Set<String> urls = new HashSet<>(trackers.size());
-
         for (AnnounceEntry e : trackers) {
             urls.add(e.url());
         }
-
         return urls;
     }
 
     public void trackers(Set<String> trackers) {
         List<AnnounceEntry> list = new ArrayList<>(trackers.size());
-
         for (String url : trackers) {
             list.add(new AnnounceEntry(url));
         }
-
         th.replaceTrackers(list);
-
         doResumeData(true);
     }
 
     @Override
     public List<TransferItem> getItems() {
         ArrayList<TransferItem> items = new ArrayList<>();
-
         if (th.isValid()) {
             TorrentInfo ti = th.torrentFile();
             if (ti != null && ti.isValid()) {
                 FileStorage fs = ti.files();
                 int numFiles = ti.numFiles();
-
                 for (int i = 0; i < numFiles; i++) {
                     BTDownloadItem item = new BTDownloadItem(th, i, fs.filePath(i), fs.fileSize(i), piecesTracker);
                     items.add(item);
                 }
-
                 if (piecesTracker != null) {
                     int numPieces = ti.numPieces();
-
                     // perform piece complete check
                     for (int i = 0; i < numPieces; i++) {
                         if (th.havePiece(i)) {
@@ -559,7 +536,6 @@ public final class BTDownload implements BittorrentDownload {
                 }
             }
         }
-
         return items;
     }
 
@@ -569,14 +545,11 @@ public final class BTDownload implements BittorrentDownload {
 
     public Set<File> getIncompleteFiles() {
         Set<File> s = new HashSet<>();
-
         try {
             if (!th.isValid()) {
                 return s;
             }
-
             long[] progress = th.fileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
-
             TorrentInfo ti = th.torrentFile();
             if (ti == null) {
                 // still downloading the info (from magnet)
@@ -584,21 +557,16 @@ public final class BTDownload implements BittorrentDownload {
             }
             FileStorage fs = ti.files();
             String prefix = savePath.getAbsolutePath();
-
             long createdTime = created.getTime();
-
             for (int i = 0; i < progress.length; i++) {
                 String fePath = fs.filePath(i);
                 long feSize = fs.fileSize(i);
-
                 if (progress[i] < feSize) {
                     // lets see if indeed the file is incomplete
                     File f = new File(prefix, fePath);
-
                     if (!f.exists()) {
                         continue; // nothing to do here
                     }
-
                     if (f.lastModified() >= createdTime) {
                         // we have a file modified (supposedly) by this transfer
                         s.add(f);
@@ -608,16 +576,17 @@ public final class BTDownload implements BittorrentDownload {
         } catch (Throwable e) {
             LOG.error("Error calculating the incomplete files set", e);
         }
-
         return s;
     }
 
     public boolean isSequentialDownload() {
-        return th.status().isSequentialDownload();
+        return th.isValid() && th.status().isSequentialDownload();
     }
 
     public void setSequentialDownload(boolean sequential) {
-        th.setSequentialDownload(sequential);
+        if (th.isValid()) {
+            th.setSequentialDownload(sequential);
+        }
     }
 
     public File partsFile() {
@@ -638,10 +607,8 @@ public final class BTDownload implements BittorrentDownload {
             if (th.isValid()) {
                 String infoHash = th.infoHash().toString();
                 File file = engine.resumeDataFile(infoHash);
-
                 Entry e = alert.resumeData();
                 e.swig().dict().set(EXTRA_DATA_KEY, Entry.fromMap(extra).swig());
-
                 FileUtils.writeByteArrayToFile(file, e.bencode());
             }
         } catch (Throwable e) {
@@ -668,16 +635,13 @@ public final class BTDownload implements BittorrentDownload {
 
     private Map<String, String> createExtra() {
         Map<String, String> map = new HashMap<>();
-
         try {
             String infoHash = getInfoHash();
             File file = engine.resumeDataFile(infoHash);
-
             if (file.exists()) {
                 byte[] arr = FileUtils.readFileToByteArray(file);
                 entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
                 string_entry_map d = e.dict();
-
                 if (d.has_key(EXTRA_DATA_KEY)) {
                     readExtra(d.get(EXTRA_DATA_KEY).dict(), map);
                 }
@@ -686,7 +650,6 @@ public final class BTDownload implements BittorrentDownload {
         } catch (Throwable e) {
             LOG.error("Error reading extra data from resume file", e);
         }
-
         return map;
     }
 
@@ -711,7 +674,6 @@ public final class BTDownload implements BittorrentDownload {
                 // ignore
             }
         }
-
         return flag;
     }
 
@@ -737,13 +699,10 @@ public final class BTDownload implements BittorrentDownload {
             if (!(alert instanceof TorrentAlert<?>)) {
                 return;
             }
-
             if (!((TorrentAlert<?>) alert).handle().swig().op_eq(th.swig())) {
                 return;
             }
-
             AlertType type = alert.type();
-
             switch (type) {
                 case TORRENT_FINISHED:
                     torrentFinished();
