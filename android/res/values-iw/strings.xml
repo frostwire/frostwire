@@ -22,7 +22,7 @@
     <string name="vpn_not_found">לא VPN. לשקול להצפין חיבור.</string>
     <string name="azureus_peer_manager_status_finished">גָמוּר</string>
     <string name="activity_mediaplayer_name">נגן מדיה</string>
-    <string name="sent_files_to_chat">נשלח d% קבצים לצ'אט</string>
+    <string name="sent_files_to_chat">נשלח d% קבצים לצ\'\אט</string>
     <string name="your_installation_is_complete">שההתקנה הושלמה.</string>
     <string name="error_connection_timed_out">שגיאה: חיבור הופסק/ירד. נסה שוב.</string>
     <string name="im_on_it">אני מטפל בזה…</string>
@@ -83,7 +83,7 @@
     <string name="wizard_finish">סִיוּם</string>
     <string name="peer_http_download_status_complete">לְהַשְׁלִים</string>
     <string name="rename">שינוי שם</string>
-    <string name="send_to_chat">שלח צ'אט</string>
+    <string name="send_to_chat">שלח צ\'\אט</string>
     <string name="delete_this_track">האם למחוק רצועה זו</string>
     <string name="five_dollars">$5</string>
     <string name="use_isohunt">השתמש ISOHunt.com</string>
@@ -106,7 +106,7 @@
     <string name="show_transfers_on_download_start">העברות הצג על התחל הורדה</string>
     <string name="sharing">שיתוף</string>
     <string name="send_feedback">שלח משוב</string>
-    <string name="chat_actions">פעולות צ'אט</string>
+    <string name="chat_actions">פעולות צ\'\אט</string>
     <string name="tos_refuse">מסרב</string>
     <string name="torrent_max_total_connections">חיבורים סה"כ מקסימאליים</string>
     <string name="activity_preferences_name">הגדרות</string>
@@ -429,7 +429,7 @@
     <string name="torrent_fetcher_download_status_error">שְׁגִיאָה</string>
     <string name="canceling">ביטול</string>
     <string name="get_vpn_client">קבל ExpressVPN</string>
-    <string name="sent_file_to_chat">נשלח קובץ לצ'אט</string>
+    <string name="sent_file_to_chat">נשלח קובץ לצ\'\אט</string>
     <string name="tell_others_chooser">Tweet / SMS / Email</string>
     <string name="issue_with_tip_donation_uri">יש משהו לא בסדר עם כתובת אינטרנט התרומה</string>
     <string name="frostwire_is_running">FrostWire פועל</string>
