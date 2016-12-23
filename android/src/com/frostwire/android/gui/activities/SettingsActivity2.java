@@ -189,7 +189,7 @@ public final class SettingsActivity2 extends AbstractActivity2
                             int newVal = (int) newValue;
                             executeBTEngineAction(key, e, newVal);
                             displayNumericalSummaryForPreference(preference, newVal, unlimitedValue, rate, unit);
-                            return true;
+                            return checkBTEngineActionResult(key, e, newVal);
                         }
                         return false;
                     }
@@ -219,6 +219,24 @@ public final class SettingsActivity2 extends AbstractActivity2
                     e.maxPeers(value);
                     break;
             }
+        }
+
+        private boolean checkBTEngineActionResult(final String key, final BTEngine e, final int value) {
+            switch (key) {
+                case Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED:
+                    return e.downloadRateLimit() == value;
+                case Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED:
+                    return e.uploadRateLimit() == value;
+                case Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS:
+                    return e.maxActiveDownloads() == value;
+                case Constants.PREF_KEY_TORRENT_MAX_UPLOADS:
+                    return e.maxActiveSeeds() == value;
+                case Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS:
+                    return e.maxConnections() == value;
+                case Constants.PREF_KEY_TORRENT_MAX_PEERS:
+                    return e.maxPeers() == value;
+            }
+            return false;
         }
 
         private void displayNumericalSummaryForPreference(Preference preference, long value, Long unlimitedValue, boolean rate, Unit unit) {
