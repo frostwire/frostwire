@@ -660,4 +660,12 @@
     <string name="changelog">Changelog</string>
     <string name="pro">PRO</string>
     <string name="unlimited">Unlimited</string>
+    <string name="unit_downloads_singular">download</string>
+    <string name="unit_downloads_multiple">downloads</string>
+    <string name="unit_uploads_singular">upload</string>
+    <string name="unit_uploads_multiple">uploads</string>
+    <string name="unit_connections_singular">connection</string>
+    <string name="unit_connectios_multiple">connections</string>
+    <string name="unit_peers_singular">peer</string>
+    <string name="unit_peers_multiple">peers</string>
 </resources>

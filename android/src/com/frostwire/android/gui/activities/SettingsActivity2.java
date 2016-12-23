@@ -21,7 +21,6 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
@@ -29,15 +28,10 @@ import android.preference.PreferenceFragment;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.NetworkManager;
-import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
-import com.frostwire.android.gui.views.preference.CheckBoxSeedingPreference2;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 /**
  * @author gubatron
@@ -177,16 +171,15 @@ public final class SettingsActivity2 extends AbstractActivity2
 
         private void setupTorrentOptions() {
             final BTEngine e = BTEngine.getInstance();
-            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e, 0L, true);
-            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e, 0L, true);
-            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e, -1L, false);
-            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, e, null, false);
-            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, e, null, false);
-            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e, null, false);
+            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e, 0L, true, null);
+            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e, 0L, true, null);
+            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e, -1L, false, Unit.DOWNLOADS);
+            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, e, null, false, Unit.UPLOADS);
+            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, e, null, false, Unit.CONNECTIONS);
+            setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e, null, false, Unit.PEERS);
         }
 
-        //todo think about adding units
-        private void setupNumericalPreference(final String key, final BTEngine e, final Long unlimitedValue, final boolean rate) {
+        private void setupNumericalPreference(final String key, final BTEngine e, final Long unlimitedValue, final boolean rate, final Unit unit) {
             final NumberPickerPreference pickerPreference = (NumberPickerPreference) findPreference(key);
             if (pickerPreference != null) {
                 pickerPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -195,13 +188,13 @@ public final class SettingsActivity2 extends AbstractActivity2
                         if (e != null) {
                             int newVal = (int) newValue;
                             executeBTEngineAction(key, e, newVal);
-                            displayNumericalSummaryForPreference(preference, newVal, unlimitedValue, rate);
+                            displayNumericalSummaryForPreference(preference, newVal, unlimitedValue, rate, unit);
                             return true;
                         }
                         return false;
                     }
                 });
-                displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key), unlimitedValue, rate);
+                displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key), unlimitedValue, rate, unit);
             }
         }
 
@@ -228,15 +221,46 @@ public final class SettingsActivity2 extends AbstractActivity2
             }
         }
 
-        private void displayNumericalSummaryForPreference(Preference preference, long value, Long unlimitedValue, boolean rate) {
+        private void displayNumericalSummaryForPreference(Preference preference, long value, Long unlimitedValue, boolean rate, Unit unit) {
             if (unlimitedValue != null && value == unlimitedValue) {
                 preference.setSummary(R.string.unlimited);
             } else {
                 if (rate) {
                     preference.setSummary(UIUtils.getBytesInHuman(value));
                 } else {
-                    preference.setSummary(String.valueOf(value));
+                    preference.setSummary(String.valueOf(value) + getUnit(unit, value));
                 }
+            }
+        }
+
+        @SuppressWarnings("ResourceType")
+        private String getUnit(Unit unit, long value) {
+            if (unit != null) {
+                return " " + getActivity().getResources().getString(value == 1 ? unit.getSingularResource() : unit.getMultipleResource());
+            }
+            return "";
+        }
+
+        public enum Unit {
+            DOWNLOADS(R.string.unit_downloads_singular, R.string.unit_downloads_multiple),
+            UPLOADS(R.string.unit_uploads_singular, R.string.unit_uploads_multiple),
+            CONNECTIONS(R.string.unit_connections_singular, R.string.unit_connectios_multiple),
+            PEERS(R.string.unit_peers_singular, R.string.unit_peers_multiple);
+
+            private int singularResource;
+            private int multipleResource;
+
+            Unit(int singularResource, int multipleResource) {
+                this.singularResource = singularResource;
+                this.multipleResource = multipleResource;
+            }
+
+            public int getSingularResource() {
+                return singularResource;
+            }
+
+            public int getMultipleResource() {
+                return multipleResource;
             }
         }
 
