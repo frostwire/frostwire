@@ -411,7 +411,8 @@ public final class TransferManager {
 
     public boolean isMobileAndDataSavingsOn() {
         return NetworkManager.instance().isDataMobileUp() &&
-                !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
+                (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA)
+                        && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY));
     }
 
     public boolean isBittorrentSearchResultAndMobileDataSavingsOn(SearchResult sr) {

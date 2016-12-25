@@ -18,9 +18,9 @@
  */
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--<com.frostwire.android.gui.activities.ToggleAllSearchEnginesPreference-->
-        <!--android:key="frostwire.prefs.search.preference_category.select_all"-->
-        <!--android:title="@string/select_deselect_all" />-->
+    <com.frostwire.android.gui.activities.ToggleAllSearchEnginesPreference2
+        android:key="frostwire.prefs.search.preference_category.select_all"
+        android:title="@string/select_deselect_all" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_archiveorg"
         android:title="@string/use_archiveorg" />

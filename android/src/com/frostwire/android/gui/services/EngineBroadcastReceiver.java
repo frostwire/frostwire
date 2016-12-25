@@ -122,6 +122,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         if (NetworkManager.instance().isDataUp()) {
 
             boolean useTorrentsOnMobileData = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
+            boolean bittorrentOnlyWifi = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
 
             // "Boolean Master", just for fun.
             // Let a <= "mobile up",
@@ -144,7 +145,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             //
             // mobile up means only mobile data is up and wifi is down.
 
-            if (!NetworkManager.instance().isDataMobileUp() || useTorrentsOnMobileData) {
+            if (!NetworkManager.instance().isDataMobileUp() || (useTorrentsOnMobileData && !bittorrentOnlyWifi )) {
                 LOG.info("Connected to " + networkInfo.getTypeName());
                 if (Engine.instance().isDisconnected()) {
                     // avoid ANR error inside a broadcast receiver
