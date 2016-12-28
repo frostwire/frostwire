@@ -34,7 +34,8 @@ import com.frostwire.android.R;
  * @author grzesiek
  *         <p>
  *         This is a special preference that allows the text to be greyed-out.
- *         setChecked() breakes the animation of the checkbox. Preference logic has to be rewritten not to use it.
+ *         notifyChanged() in Preference breakes the animation of the checkbox.
+ *         Preference logic has to be rewritten not to use it. (Manual manipulation of views)
  */
 public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPreference {
     private final ColorStateList titleColor;
@@ -43,12 +44,20 @@ public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPrefe
     private TextView summary;
     private CheckBox checkbox;
     private Boolean checked;
+    private final int summaryOnResId;
+    private final int summaryOffResId;
 
 
     public CheckBoxSeedingPreference2(Context context, AttributeSet attrs) {
         super(context, attrs);
         titleColor = context.getResources().getColorStateList(R.color.preference_title_text);
         summaryColor = context.getResources().getColorStateList(R.color.preference_summary_text);
+        summaryOffResId = R.string.seed_finished_torrents_wifi_only_summary_off;
+        summaryOnResId = R.string.seed_finished_torrents_wifi_only_summary;
+        checked = isChecked();
+        setSummaryOff("");
+        setSummaryOn("");
+        setSummary("");
     }
 
 
@@ -69,7 +78,7 @@ public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPrefe
                 CheckBoxSeedingPreference2.this.silentCheck(!isChecked());
             }
         });
-        checked = isChecked();
+
         return view;
     }
 
@@ -77,6 +86,18 @@ public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPrefe
         checked = newValue;
         persistBoolean(newValue);
         callChangeListener(newValue);
+        forceSummary(getCustomSummary());
+    }
+
+    private int getCustomSummary() {
+        return checked ? summaryOnResId : summaryOffResId;
+    }
+
+    private void forceSummary(int summaryResId) {
+        if (summary != null) {
+            summary.setText(summaryResId);
+            summary.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -90,9 +111,11 @@ public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPrefe
         checkbox.callOnClick();
     }
 
-    public void setChecked(Boolean checked) {
+    @Override
+    public void setChecked(boolean checked) {
         super.setChecked(checked);
         this.checked = checked;
+        forceSummary(getCustomSummary());
     }
 
     @Override
@@ -101,5 +124,11 @@ public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPrefe
         if (checkbox != null) {
             setChecked(isChecked());
         }
+    }
+
+    @Override
+    protected void onBindView(View view) {
+        super.onBindView(view);
+        setChecked(checked);
     }
 }
