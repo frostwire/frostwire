@@ -246,39 +246,32 @@ public final class SettingsActivity2 extends AbstractActivity2
                 if (rate) {
                     preference.setSummary(UIUtils.getBytesInHuman(value));
                 } else {
-                    preference.setSummary(String.valueOf(value) + getUnit(unit, value));
+                    preference.setSummary(getValueWithUnit(unit, value));
                 }
             }
         }
 
-        @SuppressWarnings("ResourceType")
-        private String getUnit(Unit unit, long value) {
+        private String getValueWithUnit(Unit unit, long value) {
             if (unit != null) {
-                return " " + getActivity().getResources().getString(value == 1 ? unit.getSingularResource() : unit.getMultipleResource());
+                return getActivity().getResources().getQuantityString(unit.getPluralResource(), (int) value, value);
             }
-            return "";
+            return String.valueOf(value);
         }
 
         public enum Unit {
-            DOWNLOADS(R.string.unit_downloads_singular, R.string.unit_downloads_multiple),
-            UPLOADS(R.string.unit_uploads_singular, R.string.unit_uploads_multiple),
-            CONNECTIONS(R.string.unit_connections_singular, R.string.unit_connectios_multiple),
-            PEERS(R.string.unit_peers_singular, R.string.unit_peers_multiple);
+            DOWNLOADS(R.plurals.unit_downloads),
+            UPLOADS(R.plurals.unit_uploads),
+            CONNECTIONS(R.plurals.unit_connections),
+            PEERS(R.plurals.unit_peers);
 
-            private int singularResource;
-            private int multipleResource;
+            private int pluralResource;
 
-            Unit(int singularResource, int multipleResource) {
-                this.singularResource = singularResource;
-                this.multipleResource = multipleResource;
+            Unit(int pluralResource) {
+                this.pluralResource = pluralResource;
             }
 
-            public int getSingularResource() {
-                return singularResource;
-            }
-
-            public int getMultipleResource() {
-                return multipleResource;
+            public int getPluralResource() {
+                return pluralResource;
             }
         }
 
