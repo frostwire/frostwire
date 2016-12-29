@@ -31,9 +31,14 @@ import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author gubatron
@@ -162,6 +167,75 @@ public final class SettingsActivity2 extends AbstractActivity2
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.settings_search);
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            setupSearchEngines();
+        }
+
+        private void setupSearchEngines() {
+            final PreferenceScreen searchEnginesScreen = (PreferenceScreen) findPreference(Constants.PREF_KEY_SEARCH_PREFERENCE_CATEGORY);
+            final Map<CheckBoxPreference, SearchEngine> inactiveSearchPreferences = new HashMap<>();
+            final Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences = new HashMap<>();
+            getSearchEnginePreferences(inactiveSearchPreferences, activeSearchEnginePreferences);
+
+            // Click listener for the search engines. Checks or unchecks the SelectAll checkbox
+            final Preference.OnPreferenceClickListener searchEngineClickListener = new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    TwoStatePreference cbPreference = (TwoStatePreference) preference;
+                    ToggleAllSearchEnginesPreference2 selectAll = (ToggleAllSearchEnginesPreference2) findPreference("frostwire.prefs.search.preference_category.select_all");
+
+                    if(!selectAll.requestChildStateChange((CheckBoxPreference) cbPreference)){
+                        cbPreference.setChecked(!cbPreference.isChecked());//reverting change we need one
+                    }
+                    return true;
+                }
+            };
+
+            // Hide inactive search engines and setup click listeners to interact with Select All.
+            if (searchEnginesScreen != null) {
+                for (CheckBoxPreference preference : inactiveSearchPreferences.keySet()) {
+                    searchEnginesScreen.removePreference(preference);
+                }
+            }
+
+            for (CheckBoxPreference preference : activeSearchEnginePreferences.keySet()) {
+                preference.setOnPreferenceClickListener(searchEngineClickListener);
+            }
+
+            ToggleAllSearchEnginesPreference2 selectAll = (ToggleAllSearchEnginesPreference2) findPreference("frostwire.prefs.search.preference_category.select_all");
+            selectAll.setSearchEnginePreferences(activeSearchEnginePreferences);
+
+        }
+
+//        private boolean areAllEnginesChecked(boolean checked, Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences) {
+//            final Collection<CheckBoxPreference> preferences = activeSearchEnginePreferences.keySet();
+//            for (CheckBoxPreference preference : preferences) {
+//                if (checked != preference.isChecked()) {
+//                    return false;
+//                }
+//            }
+//            return true;
+//        }
+
+        private void getSearchEnginePreferences(Map<CheckBoxPreference,SearchEngine> inactiveSearchEnginePreferences, Map<CheckBoxPreference,SearchEngine> activeSearchEnginePreferences) {
+            // make sure we start empty
+            inactiveSearchEnginePreferences.clear();
+            activeSearchEnginePreferences.clear();
+
+            for (SearchEngine engine : SearchEngine.getEngines()) {
+                CheckBoxPreference preference = (CheckBoxPreference) findPreference(engine.getPreferenceKey());
+                if (preference != null) { //it could already have been removed due to remote config value.
+                    if (engine.isActive()) {
+                        activeSearchEnginePreferences.put(preference, engine);
+                    } else {
+                        inactiveSearchEnginePreferences.put(preference, engine);
+                    }
+                }
+            }
         }
     }
 

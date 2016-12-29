@@ -17,10 +17,10 @@
  * limitations under the License.
  */
 -->
-<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--<com.frostwire.android.gui.activities.ToggleAllSearchEnginesPreference-->
-        <!--android:key="frostwire.prefs.search.preference_category.select_all"-->
-        <!--android:title="@string/select_deselect_all" />-->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.frostwire.android.gui.activities.ToggleAllSearchEnginesPreference2
+        android:key="frostwire.prefs.search.preference_category.select_all"
+        android:title="@string/select_deselect_all" />
     <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_archiveorg"
         android:title="@string/use_archiveorg" />
