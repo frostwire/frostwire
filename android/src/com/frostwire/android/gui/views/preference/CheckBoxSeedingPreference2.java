@@ -43,7 +43,7 @@ public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPrefe
     private TextView title;
     private TextView summary;
     private CheckBox checkbox;
-    private Boolean checked;
+    private boolean checked;
     private final int summaryOnResId;
     private final int summaryOffResId;
 
@@ -102,7 +102,7 @@ public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPrefe
 
     @Override
     public boolean isChecked() {
-        return checked != null ? checked : super.isChecked();
+        return checked;
     }
 
     @Override
