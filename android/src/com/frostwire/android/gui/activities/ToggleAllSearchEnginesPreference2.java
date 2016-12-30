@@ -22,11 +22,9 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.preference.CheckBoxPreference;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -48,6 +46,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     private CheckBox checkbox;
     private Map<CheckBoxPreference, SearchEngine> searchEnginePreferences;
     private int backgroundColor;
+    private boolean fixStateAfterNextBind = true;
 
     private View.OnClickListener checkBoxListener = new View.OnClickListener() {
         @Override
@@ -69,19 +68,14 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
         backgroundColor = context.getResources().getColor(R.color.basic_gray_dark);
     }
 
-
     @Override
     protected View onCreateView(ViewGroup parent) {
         View view = super.onCreateView(parent);
-
+        view.setBackgroundColor(backgroundColor);
         title = (TextView) view.findViewById(android.R.id.title);
         title.setTypeface(title.getTypeface(), Typeface.BOLD);
-        
-        view.setBackgroundColor(backgroundColor);
-
         checkbox = (CheckBox) view.findViewById(android.R.id.checkbox);
         checkbox.setOnClickListener(checkBoxListener);
-
         return view;
     }
 
@@ -109,6 +103,10 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     protected void onBindView(View view) {
         super.onBindView(view);
         setChecked(isChecked());
+        if (fixStateAfterNextBind) {
+            fixStateAfterNextBind = false;
+            checkbox.setChecked(isChecked());
+        }
     }
 
     private void checkAllEngines(boolean checked) {
@@ -148,6 +146,8 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
                     }
                 }
             }
+        } else {
+            fixStateAfterNextBind = true;
         }
         return true;
     }
@@ -188,14 +188,15 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
      * @return True if the child is allowed to change it's state
      */
     public boolean requestChildStateChange(CheckBoxPreference checkBoxPreference) {
-        Log.w("DBG", "req " + checkBoxPreference);
         if (isAtLeastOneOtherEngineChecked(checkBoxPreference)) {//can change the child, update state if needed
-            if(checkbox.getHandler()!=null) {// only need to animate checkbox if it is visible
+            if (checkbox.getHandler() != null) {// only need to animate checkbox if it is visible
                 if (areAllEnginesChecked()) {//turn on the checkbox
                     checkbox.getHandler().post(delayedCheckboxCheck);
                 } else if (isOneEngineNotChecked()) {//turnoff the check (just unchecked on one of the children)
                     checkbox.getHandler().post(delayedCheckboxCheck);
                 }
+            } else {
+                checkbox.setChecked(isChecked());
             }
             return true;
         } //can't change the child, don't change anything
