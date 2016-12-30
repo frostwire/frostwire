@@ -49,11 +49,12 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
         @Override
         public void onClick(View v) {
             Log.w("DBG","checkBox.onClick pref: "+isChecked() + " cb: " + checkbox.isChecked());
-            ToggleAllSearchEnginesPreference2.this.silentCheck(!isChecked());
+            ToggleAllSearchEnginesPreference2.this.onClick();
+//            ToggleAllSearchEnginesPreference2.this.silentCheck(!isChecked());
         }
     };
     private boolean notifyChildren = true;
-
+    private boolean fix = false;
 
 
     public ToggleAllSearchEnginesPreference2(Context context, AttributeSet attrs) {
@@ -94,29 +95,30 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     protected void onClickInternal() {
         Log.w("DBG", "onClickInternal");
         checkbox.setChecked(!isChecked());
-        checkbox.callOnClick();
+        ToggleAllSearchEnginesPreference2.this.silentCheck(!isChecked());
+        Log.w("DBG", "OnClickInternalEnd");
     }
 
     @Override
     protected void onClick() {
         onClickInternal();
-//        checkbox.setChecked(!isChecked());
-//        checkbox.callOnClick();
-        Log.w("DBG", "OnClickEnd");
         checkbox.getHandler().post(new Runnable() {
             @Override
             public void run() {
                 Log.w("DBG", "Runnable cb "+checkbox.isChecked() + " pref "+isChecked() );
                 //this is for syncing checkbox visual state required after recreation due to changes from other preferences - not that great todo find better way
                 if(!checkbox.isChecked() && !isChecked()) {
+                    Log.w("DBG", "special case, setting checkbox "+!isChecked() );
                     checkbox.setChecked(!isChecked());
                 }
                 if(checkbox.isChecked() && isChecked()) {
+                    Log.w("DBG", "special case, setting checkbox "+!isChecked() );
                     checkbox.setChecked(!isChecked());
                 }
                 checkbox.setChecked(isChecked());
             }
         });
+        Log.w("DBG", "OnClickEnd");
     }
 
     @Override
@@ -131,6 +133,11 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
         Log.w("DBG", "bind");
         super.onBindView(view);
         setChecked(isChecked());
+        //fix transition
+        if(fix){
+
+            fix=false;
+        }
     }
 
     private void checkAllEngines(boolean checked) {
