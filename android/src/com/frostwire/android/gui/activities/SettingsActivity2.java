@@ -1,5 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Grzesiek Rzaca (grzesiekrzaca)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +37,7 @@ import com.frostwire.bittorrent.BTEngine;
 /**
  * @author gubatron
  * @author aldenml
+ * @author grzesiekrzaca
  */
 public final class SettingsActivity2 extends AbstractActivity2
         implements PreferenceFragment.OnPreferenceStartFragmentCallback {
@@ -140,7 +142,6 @@ public final class SettingsActivity2 extends AbstractActivity2
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-
             addPreferencesFromResource(R.xml.settings_application);
         }
     }
@@ -149,7 +150,6 @@ public final class SettingsActivity2 extends AbstractActivity2
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-
             addPreferencesFromResource(R.xml.settings_search);
         }
     }
@@ -158,14 +158,12 @@ public final class SettingsActivity2 extends AbstractActivity2
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-
             addPreferencesFromResource(R.xml.settings_torrent);
         }
 
         @Override
         public void onResume() {
             super.onResume();
-
             setupTorrentOptions();
         }
 
@@ -179,62 +177,62 @@ public final class SettingsActivity2 extends AbstractActivity2
             setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e, null, false, Unit.PEERS);
         }
 
-        private void setupNumericalPreference(final String key, final BTEngine e, final Long unlimitedValue, final boolean rate, final Unit unit) {
+        private void setupNumericalPreference(final String key, final BTEngine btEngine, final Long unlimitedValue, final boolean byteRate, final Unit unit) {
             final NumberPickerPreference pickerPreference = (NumberPickerPreference) findPreference(key);
             if (pickerPreference != null) {
                 pickerPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        if (e != null) {
+                        if (btEngine != null) {
                             int newVal = (int) newValue;
-                            executeBTEngineAction(key, e, newVal);
-                            displayNumericalSummaryForPreference(preference, newVal, unlimitedValue, rate, unit);
-                            return checkBTEngineActionResult(key, e, newVal);
+                            executeBTEngineAction(key, btEngine, newVal);
+                            displayNumericalSummaryForPreference(preference, newVal, unlimitedValue, byteRate, unit);
+                            return checkBTEngineActionResult(key, btEngine, newVal);
                         }
                         return false;
                     }
                 });
-                displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key), unlimitedValue, rate, unit);
+                displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key), unlimitedValue, byteRate, unit);
             }
         }
 
-        private void executeBTEngineAction(final String key, final BTEngine e, final int value) {
+        private void executeBTEngineAction(final String key, final BTEngine btEngine, final int value) {
             switch (key) {
                 case Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED:
-                    e.downloadRateLimit(value);
+                    btEngine.downloadRateLimit(value);
                     break;
                 case Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED:
-                    e.uploadRateLimit(value);
+                    btEngine.uploadRateLimit(value);
                     break;
                 case Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS:
-                    e.maxActiveDownloads(value);
+                    btEngine.maxActiveDownloads(value);
                     break;
                 case Constants.PREF_KEY_TORRENT_MAX_UPLOADS:
-                    e.maxActiveSeeds(value);
+                    btEngine.maxActiveSeeds(value);
                     break;
                 case Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS:
-                    e.maxConnections(value);
+                    btEngine.maxConnections(value);
                     break;
                 case Constants.PREF_KEY_TORRENT_MAX_PEERS:
-                    e.maxPeers(value);
+                    btEngine.maxPeers(value);
                     break;
             }
         }
 
-        private boolean checkBTEngineActionResult(final String key, final BTEngine e, final int value) {
+        private boolean checkBTEngineActionResult(final String key, final BTEngine btEngine, final int value) {
             switch (key) {
                 case Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED:
-                    return e.downloadRateLimit() == value;
+                    return btEngine.downloadRateLimit() == value;
                 case Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED:
-                    return e.uploadRateLimit() == value;
+                    return btEngine.uploadRateLimit() == value;
                 case Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS:
-                    return e.maxActiveDownloads() == value;
+                    return btEngine.maxActiveDownloads() == value;
                 case Constants.PREF_KEY_TORRENT_MAX_UPLOADS:
-                    return e.maxActiveSeeds() == value;
+                    return btEngine.maxActiveSeeds() == value;
                 case Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS:
-                    return e.maxConnections() == value;
+                    return btEngine.maxConnections() == value;
                 case Constants.PREF_KEY_TORRENT_MAX_PEERS:
-                    return e.maxPeers() == value;
+                    return btEngine.maxPeers() == value;
             }
             return false;
         }
@@ -281,7 +279,6 @@ public final class SettingsActivity2 extends AbstractActivity2
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-
             addPreferencesFromResource(R.xml.settings_other);
         }
     }
