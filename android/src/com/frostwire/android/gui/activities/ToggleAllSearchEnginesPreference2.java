@@ -19,13 +19,17 @@
 package com.frostwire.android.gui.activities;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.preference.CheckBoxPreference;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.frostwire.android.R;
 import com.frostwire.android.gui.SearchEngine;
 
 import java.util.Map;
@@ -40,10 +44,10 @@ import java.util.Map;
  */
 public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
 
-    //    private TextView title;
-//    private TextView summary;
+    private TextView title;
     private CheckBox checkbox;
     private Map<CheckBoxPreference, SearchEngine> searchEnginePreferences;
+    private int backgroundColor;
 
     private View.OnClickListener checkBoxListener = new View.OnClickListener() {
         @Override
@@ -62,6 +66,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
 
     public ToggleAllSearchEnginesPreference2(Context context, AttributeSet attrs) {
         super(context, attrs);
+        backgroundColor = context.getResources().getColor(R.color.basic_gray_dark);
     }
 
 
@@ -69,8 +74,12 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     protected View onCreateView(ViewGroup parent) {
         View view = super.onCreateView(parent);
 
-        checkbox = (CheckBox) view.findViewById(android.R.id.checkbox);
+        title = (TextView) view.findViewById(android.R.id.title);
+        title.setTypeface(title.getTypeface(), Typeface.BOLD);
+        
+        view.setBackgroundColor(backgroundColor);
 
+        checkbox = (CheckBox) view.findViewById(android.R.id.checkbox);
         checkbox.setOnClickListener(checkBoxListener);
 
         return view;
@@ -181,10 +190,12 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     public boolean requestChildStateChange(CheckBoxPreference checkBoxPreference) {
         Log.w("DBG", "req " + checkBoxPreference);
         if (isAtLeastOneOtherEngineChecked(checkBoxPreference)) {//can change the child, update state if needed
-            if (areAllEnginesChecked()) {//turn on the checkbox
-                checkbox.getHandler().post(delayedCheckboxCheck);
-            } else if (isOneEngineNotChecked()) {//turnoff the check (just unchecked on one of the children)
-                checkbox.getHandler().post(delayedCheckboxCheck);
+            if(checkbox.getHandler()!=null) {// only need to animate checkbox if it is visible
+                if (areAllEnginesChecked()) {//turn on the checkbox
+                    checkbox.getHandler().post(delayedCheckboxCheck);
+                } else if (isOneEngineNotChecked()) {//turnoff the check (just unchecked on one of the children)
+                    checkbox.getHandler().post(delayedCheckboxCheck);
+                }
             }
             return true;
         } //can't change the child, don't change anything
