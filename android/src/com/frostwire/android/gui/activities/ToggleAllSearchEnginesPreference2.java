@@ -42,7 +42,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     //    private TextView title;
 //    private TextView summary;
     private CheckBox checkbox;
-    private Boolean checked;
+    private boolean checked;
     private Map<CheckBoxPreference, SearchEngine> searchEnginePreferences;
 
     private View.OnClickListener checkBoxListener = new View.OnClickListener() {
@@ -55,10 +55,6 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     private boolean notifyChildren = true;
 
 
-    public ToggleAllSearchEnginesPreference2(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        checked = isChecked();
-    }
 
     public ToggleAllSearchEnginesPreference2(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -71,6 +67,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     protected View onCreateView(ViewGroup parent) {
         View view = super.onCreateView(parent);
 
+        Log.w("DBG","createview");
 //        title = (TextView) view.findViewById(android.R.id.title);
 //        summary = (TextView) view.findViewById(android.R.id.summary);
         checkbox = (CheckBox) view.findViewById(android.R.id.checkbox);
@@ -84,23 +81,42 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
         Log.w("DBG","silent check "+newValue);
         checked = newValue;
         persistBoolean(newValue);
-
-
         if(notifyChildren) {
             checkAllEngines(newValue);
         }
-        callChangeListener(newValue);
     }
 
     @Override
     public boolean isChecked() {
-        return checked != null ? checked : super.isChecked();
+        return checked;
+    }
+
+    protected void onClickInternal() {
+        Log.w("DBG", "onClickInternal");
+        checkbox.setChecked(!isChecked());
+        checkbox.callOnClick();
     }
 
     @Override
     protected void onClick() {
-        checkbox.setChecked(!isChecked());
-        checkbox.callOnClick();
+        onClickInternal();
+//        checkbox.setChecked(!isChecked());
+//        checkbox.callOnClick();
+        Log.w("DBG", "OnClickEnd");
+        checkbox.getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                Log.w("DBG", "Runnable cb "+checkbox.isChecked() + " pref "+isChecked() );
+                //this is for syncing checkbox visual state required after recreation due to changes from other preferences - not that great todo find better way
+                if(!checkbox.isChecked() && !isChecked()) {
+                    checkbox.setChecked(!isChecked());
+                }
+                if(checkbox.isChecked() && isChecked()) {
+                    checkbox.setChecked(!isChecked());
+                }
+                checkbox.setChecked(isChecked());
+            }
+        });
     }
 
     @Override
@@ -122,6 +138,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
             return;
         }
 
+        Log.w("DBG","checkall");
         final OnPreferenceClickListener onPreferenceClickListener = searchEnginePreferences.keySet().iterator().next().getOnPreferenceClickListener();
         CheckBoxPreference archivePreference = null;
 
@@ -176,20 +193,6 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
      */
     public boolean requestChildStateChange(CheckBoxPreference checkBoxPreference) {
         Log.w("DBG", "req "+checkBoxPreference);
-//        if(searchEnginePreferences.get(checkBoxPreference).getName().equals("Archive.org") ) {
-//            Log.w("DBG", "child " + checkBoxPreference.isChecked());
-//            Log.w("DBG", "tasep " + ToggleAllSearchEnginesPreference2.this.isChecked());
-//            if(checkBoxPreference.isChecked() && !ToggleAllSearchEnginesPreference2.this.isChecked()) {
-//                Log.w("DBG", "firing allegedly when child = true / preference = false");
-//                checkbox.getHandler().post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        ToggleAllSearchEnginesPreference2.this.onClick();
-//                    }
-//                });
-//            }
-//        }
-
         if (isAtLeastOneOtherEngineChecked(checkBoxPreference)) {
             //can change the child
             if(areAllEnginesChecked()){//all engines checked
@@ -199,7 +202,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
                     public void run() {
                         Log.w("DBG","running onClick when all are checked [after press]");
                         notifyChildren=false;
-                        ToggleAllSearchEnginesPreference2.this.onClick();
+                        ToggleAllSearchEnginesPreference2.this.onClickInternal();
                         notifyChildren=true;
                     }
                 });
@@ -211,7 +214,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
                         public void run() {
                             Log.w("DBG","running onClick when not all are checked [after press] and this is checked");
                             notifyChildren=false;
-                            ToggleAllSearchEnginesPreference2.this.onClick();
+                            ToggleAllSearchEnginesPreference2.this.onClickInternal();
                             notifyChildren=true;
                         }
                     });
