@@ -211,16 +211,6 @@ public final class SettingsActivity2 extends AbstractActivity2
 
         }
 
-//        private boolean areAllEnginesChecked(boolean checked, Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences) {
-//            final Collection<CheckBoxPreference> preferences = activeSearchEnginePreferences.keySet();
-//            for (CheckBoxPreference preference : preferences) {
-//                if (checked != preference.isChecked()) {
-//                    return false;
-//                }
-//            }
-//            return true;
-//        }
-
         private void getSearchEnginePreferences(Map<CheckBoxPreference,SearchEngine> inactiveSearchEnginePreferences, Map<CheckBoxPreference,SearchEngine> activeSearchEnginePreferences) {
             // make sure we start empty
             inactiveSearchEnginePreferences.clear();
