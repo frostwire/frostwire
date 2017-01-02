@@ -36,7 +36,6 @@ import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -188,7 +187,7 @@ public final class SettingsActivity2 extends AbstractActivity2
                     TwoStatePreference cbPreference = (TwoStatePreference) preference;
                     ToggleAllSearchEnginesPreference2 selectAll = (ToggleAllSearchEnginesPreference2) findPreference("frostwire.prefs.search.preference_category.select_all");
 
-                    if(!selectAll.requestChildStateChange((CheckBoxPreference) cbPreference)){
+                    if (!selectAll.requestChildStateChange((CheckBoxPreference) cbPreference)) {
                         cbPreference.setChecked(!cbPreference.isChecked());//reverting change we need one
                     }
                     return true;
@@ -211,7 +210,7 @@ public final class SettingsActivity2 extends AbstractActivity2
 
         }
 
-        private void getSearchEnginePreferences(Map<CheckBoxPreference,SearchEngine> inactiveSearchEnginePreferences, Map<CheckBoxPreference,SearchEngine> activeSearchEnginePreferences) {
+        private void getSearchEnginePreferences(Map<CheckBoxPreference, SearchEngine> inactiveSearchEnginePreferences, Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences) {
             // make sure we start empty
             inactiveSearchEnginePreferences.clear();
             activeSearchEnginePreferences.clear();

@@ -43,7 +43,6 @@ import java.util.Map;
  */
 public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
 
-    private TextView title;
     private CheckBox checkbox;
     private Map<CheckBoxPreference, SearchEngine> searchEnginePreferences;
     private int backgroundColor;
@@ -73,7 +72,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     protected View onCreateView(ViewGroup parent) {
         View view = super.onCreateView(parent);
         view.setBackgroundColor(backgroundColor);
-        title = (TextView) view.findViewById(android.R.id.title);
+        TextView title = (TextView) view.findViewById(android.R.id.title);
         title.setTypeface(title.getTypeface(), Typeface.BOLD);
         checkbox = (CheckBox) view.findViewById(android.R.id.checkbox);
         checkbox.setOnClickListener(checkBoxListener);
@@ -89,7 +88,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
         return areAllEnginesChecked();
     }
 
-    protected void onClickInternal() {
+    private void onClickInternal() {
         checkbox.setChecked(!isChecked());
         ToggleAllSearchEnginesPreference2.this.silentCheck(!isChecked());
     }
