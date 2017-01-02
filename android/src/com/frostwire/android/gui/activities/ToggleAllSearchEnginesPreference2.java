@@ -28,6 +28,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SearchEngine;
 
 import java.util.Map;
@@ -123,7 +124,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
                 preference.setChecked(checked);
                 preference.setOnPreferenceClickListener(onPreferenceClickListener);
 
-                if (searchEnginePreferences.get(preference).getName().equals("Archive.org")) {
+                if (searchEnginePreferences.get(preference).getPreferenceKey().equals(Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG)) {
                     archivePreference = preference;
                 }
             }
