@@ -20,12 +20,15 @@ package com.frostwire.android.gui.activities;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v7.preference.Preference;
 
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.Constants;
@@ -34,6 +37,14 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.util.Ref;
+import com.frostwire.uxstats.UXAction;
+import com.frostwire.uxstats.UXStats;
+
+import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author gubatron
@@ -283,6 +294,89 @@ public final class SettingsActivity2 extends AbstractActivity2
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.settings_other);
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+
+            setupPermanentStatusNotificationOption();
+            setupHapticFeedback();
+            setupUXStatsOption();
+            setupClearIndex();
+        }
+
+        private void setupPermanentStatusNotificationOption() {
+            final CheckBoxPreference enablePermanentStatusNotification = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION);
+            if (enablePermanentStatusNotification != null) {
+                enablePermanentStatusNotification.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        final boolean notificationEnabled = (boolean) newValue;
+                        if (!notificationEnabled) {
+                            NotificationManager notificationService = (NotificationManager) getActivity().getSystemService(NOTIFICATION_SERVICE);
+                            if (notificationService != null) {
+                                notificationService.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                            }
+                        }
+                        return true;
+                    }
+                });
+            }
+        }
+
+        private void setupHapticFeedback() {
+            final CheckBoxPreference preference = (CheckBoxPreference) findPreference(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
+            if (preference != null) {
+                preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        CheckBoxPreference cbPreference = (CheckBoxPreference) preference;
+                        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, cbPreference.isChecked());
+                        Engine.instance().getVibrator().onPreferenceChanged();
+                        return true;
+                    }
+                });
+            }
+        }
+
+        private void setupUXStatsOption() {
+            final CheckBoxPreference checkPref = (CheckBoxPreference) findPreference(Constants.PREF_KEY_UXSTATS_ENABLED);
+            if (checkPref != null) {
+                checkPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        boolean newVal = (Boolean) newValue;
+                        if (!newVal) { // not send ux stats
+                            UXStats.instance().setContext(null);
+                        }
+                        //todo re-enable UXStats on checking that box
+                        //currently (2.I.17) after checking that box the next time the main screen will be resumed
+                        //it will check for the updates (IF there were at least 30 minutes since last update check)
+                        //and during that update it might turn on the ux stats.
+                        return true;
+                    }
+                });
+            }
+        }
+
+        private void setupClearIndex() {
+            final ButtonActionPreference preference = (ButtonActionPreference) findPreference("frostwire.prefs.internal.clear_index");
+
+            if (preference != null) {
+                updateIndexSummary(preference);
+                preference.setOnActionListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        LocalSearchEngine.instance().clearCache();
+                        UIUtils.showShortMessage(getActivity(), R.string.deleted_crawl_cache);
+                        updateIndexSummary(preference);
+                    }
+                });
+            }
+        }
+
+        private void updateIndexSummary(ButtonActionPreference preference) {
+            float size = (((float) LocalSearchEngine.instance().getCacheSize()) / 1024) / 1024;
+            preference.setSummary(getString(R.string.crawl_cache_size, size));
         }
     }
 }
