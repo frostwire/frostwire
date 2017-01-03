@@ -28,7 +28,6 @@ import android.preference.PreferenceActivity;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v7.preference.Preference;
 
-import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.Constants;
@@ -37,14 +36,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.util.Ref;
-import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
-
-import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author gubatron
