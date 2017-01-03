@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,12 @@
 
 package com.frostwire.search.extratorrent;
 
-import com.frostwire.util.Logger;
-import com.frostwire.regex.Pattern;
-import com.frostwire.search.AlbumCluster;
-import com.frostwire.search.ScrapedTorrentFileSearchResult;
-import com.frostwire.search.SearchMatcher;
+import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
-import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.JsonUtils;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -38,10 +31,6 @@ import java.util.List;
  * @author aldenml
  */
 public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<ExtratorrentItem, ExtratorrentSearchResult> {
-
-    private static final Logger LOG = Logger.getLogger(ExtratorrentSearchPerformer.class);
-    private static final String FILES_REGEX = "(?is)<tr>.*?<td.*?<img.*?<img.*?<td colspan.*?nowrap=\"nowrap\">(?<filename>[^<>]*?)&nbsp;<font.*?>\\((?<size>.*?)&nbsp;(?<unit>.*?)\\)</font>.*?</td></tr>";
-    private static final Pattern FILES_PATTERN = Pattern.compile(FILES_REGEX);
 
     public ExtratorrentSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1);
@@ -64,54 +53,8 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
 
     @Override
     protected List<? extends SearchResult> crawlResult(TorrentCrawlableSearchResult sr, byte[] data) throws Exception {
-        return crawlResult(sr, false);
+        return PerformersHelper.crawlTorrent(this, sr, data);
     }
-
-    protected List<? extends SearchResult> crawlResult(TorrentCrawlableSearchResult sr, boolean detectAlbums) throws Exception {
-        if (!(sr instanceof ExtratorrentSearchResult)) {
-            return Collections.emptyList();
-        }
-
-        LinkedList<ScrapedTorrentFileSearchResult> result = new LinkedList<>();
-
-        ExtratorrentSearchResult esr = (ExtratorrentSearchResult) sr;
-        String torrentFilesUrl = esr.getDetailsUrl().replace("/torrent/", "/torrent_files/");
-        String completePage = fetch(torrentFilesUrl);
-        String page = completePage.substring(completePage.indexOf("Torrent files list"), completePage.indexOf("Recent Searches"));
-
-        SearchMatcher matcher = SearchMatcher.from(FILES_PATTERN.matcher(page));
-
-        while (matcher.find()) {
-            try {
-                String filename = HtmlManipulator.replaceHtmlEntities(matcher.group("filename"));
-                String sizeStr = matcher.group("size");
-                String unit = matcher.group("unit");
-
-                double size = Double.parseDouble(sizeStr);
-
-                if (UNIT_TO_BYTES.containsKey(unit)) {
-                    size = size * UNIT_TO_BYTES.get(unit);
-                } else {
-                    size = -1;
-                }
-
-                result.add(new ScrapedTorrentFileSearchResult<>(esr, filename, (long) size));
-
-            } catch (Throwable e) {
-                LOG.warn("Error creating single file search result", e);
-            }
-        }
-
-        if (detectAlbums) {
-            LinkedList<SearchResult> temp = new LinkedList<>();
-            temp.addAll(result);
-            temp.addAll(new AlbumCluster().detect(sr, result));
-            return temp;
-        } else {
-            return result;
-        }
-    }
-
 
     @Override
     protected ExtratorrentSearchResult fromItem(ExtratorrentItem item) {
