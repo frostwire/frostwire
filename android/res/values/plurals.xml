@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Grzesiek Rzaca (grzesiekrzaca)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +20,6 @@
  */
 -->
 <resources>
-
     <plurals name="count_seeds_source">
         <item quantity="one">%d source</item>
         <item quantity="other">%d sources</item>
@@ -32,5 +32,20 @@
         <item quantity="one">1 file</item>
         <item quantity="other">%d files</item>
     </plurals>
-
+    <plurals name="unit_downloads">
+        <item quantity="one">%d download</item>
+        <item quantity="other">%d downloads</item>
+    </plurals>
+    <plurals name="unit_uploads">
+        <item quantity="one">%d upload</item>
+        <item quantity="other">%d uploads</item>
+    </plurals>
+    <plurals name="unit_connections">
+        <item quantity="one">%d connection</item>
+        <item quantity="other">%d connections</item>
+    </plurals>
+    <plurals name="unit_peers">
+        <item quantity="one">%d peer</item>
+        <item quantity="other">%d peers</item>
+    </plurals>
 </resources>
