@@ -1,8 +1,9 @@
 frostwire (6.4.3) stable; urgency=high
+  * Fixes issue with ExtraTorrent search.
   * Fixes issue where trackers would not be saved correctly when creating a torrent
   * New jlibtorrent 1.2.0.5
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 15 Dec 2016 15:35:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 3 Jan 2017 20:59:00 -0600
 
 frostwire (6.4.2) stable; urgency=high
   * Fixes Archive.org, SoundCloud search.
