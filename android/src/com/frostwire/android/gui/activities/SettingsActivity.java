@@ -78,7 +78,7 @@ import java.util.Map;
  */
 public class SettingsActivity extends PreferenceActivity {
     private static final Logger LOG = Logger.getLogger(SettingsActivity.class);
-    private static final boolean INTERNAL_BUILD = true;
+    private static final boolean INTERNAL_BUILD = false;
     private static String currentPreferenceKey = null;
     private boolean finishOnBack = false;
     private long removeAdsPurchaseTime = 0;
