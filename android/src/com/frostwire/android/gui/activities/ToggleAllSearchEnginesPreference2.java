@@ -48,20 +48,12 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     private int backgroundColor;
     private boolean fixStateAfterNextBind = true;
 
-    private View.OnClickListener checkBoxListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            ToggleAllSearchEnginesPreference2.this.onClick();
-        }
-    };
-
     private Runnable delayedCheckboxCheck = new Runnable() {
         @Override
         public void run() {
             checkbox.setChecked(isChecked());
         }
     };
-
 
     public ToggleAllSearchEnginesPreference2(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -75,7 +67,12 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
         TextView title = (TextView) view.findViewById(android.R.id.title);
         title.setTypeface(title.getTypeface(), Typeface.BOLD);
         checkbox = (CheckBox) view.findViewById(android.R.id.checkbox);
-        checkbox.setOnClickListener(checkBoxListener);
+        checkbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToggleAllSearchEnginesPreference2.this.onClick();
+            }
+        });
         return view;
     }
 
@@ -114,14 +111,11 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
             return;
         }
 
-        final OnPreferenceClickListener onPreferenceClickListener = searchEnginePreferences.keySet().iterator().next().getOnPreferenceClickListener();
         CheckBoxPreference archivePreference = null;
 
         for (CheckBoxPreference preference : searchEnginePreferences.keySet()) {
             if (preference != null) { //it could already have been removed due to remote config value.
-                preference.setOnPreferenceClickListener(null);
                 preference.setChecked(checked);
-                preference.setOnPreferenceClickListener(onPreferenceClickListener);
 
                 if (searchEnginePreferences.get(preference).getPreferenceKey().equals(Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG)) {
                     archivePreference = preference;
@@ -131,9 +125,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
 
         // always leave one checked.
         if (!checked && archivePreference != null) {
-            archivePreference.setOnPreferenceClickListener(null);
             archivePreference.setChecked(true);
-            archivePreference.setOnPreferenceClickListener(onPreferenceClickListener);
         }
     }
 
@@ -152,32 +144,15 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
         return true;
     }
 
-    private boolean isOneEngineNotChecked() {
-        int count = 0;
-        if (searchEnginePreferences != null) {
-            for (CheckBoxPreference preference : searchEnginePreferences.keySet()) {
-                if (preference != null) {
-                    if (!preference.isChecked()) {
-                        count++;
-                    }
-                }
-            }
-            if (count == 1) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isAtLeastOneOtherEngineChecked(CheckBoxPreference checkBoxPreference) {
+    private boolean isTheOnlyCheckedEngine(CheckBoxPreference checkBoxPreference) {
         for (CheckBoxPreference preference : searchEnginePreferences.keySet()) {
             if (preference != null && preference != checkBoxPreference) {
                 if (preference.isChecked()) {
-                    return true;
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 
     public void setSearchEnginePreferences(Map<CheckBoxPreference, SearchEngine> searchEnginePreferences) {
@@ -188,18 +163,14 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
      * @return True if the child is allowed to change it's state
      */
     public boolean requestChildStateChange(CheckBoxPreference checkBoxPreference) {
-        if (isAtLeastOneOtherEngineChecked(checkBoxPreference)) {//can change the child, update state if needed
-            if (checkbox.getHandler() != null) {// only need to animate checkbox if it is visible
-                if (areAllEnginesChecked()) {//turn on the checkbox
-                    checkbox.getHandler().post(delayedCheckboxCheck);
-                } else if (isOneEngineNotChecked()) {//turnoff the check (just unchecked on one of the children)
-                    checkbox.getHandler().post(delayedCheckboxCheck);
-                }
-            } else {
-                checkbox.setChecked(isChecked());
-            }
-            return true;
-        } //can't change the child, don't change anything
-        return false;
+        if (isTheOnlyCheckedEngine(checkBoxPreference)) {
+            return false;
+        }
+        if (checkbox.getHandler() != null) {
+            checkbox.getHandler().post(delayedCheckboxCheck);
+        } else {
+            checkbox.setChecked(isChecked());
+        }
+        return true;
     }
 }
