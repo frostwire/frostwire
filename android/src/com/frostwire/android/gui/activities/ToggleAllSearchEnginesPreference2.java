@@ -152,7 +152,7 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
                 }
             }
         }
-        return true;
+        return checkBoxPreference.isChecked();
     }
 
     public void setSearchEnginePreferences(Map<CheckBoxPreference, SearchEngine> searchEnginePreferences) {
