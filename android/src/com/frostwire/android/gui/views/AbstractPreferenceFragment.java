@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views;
 import android.os.Bundle;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v7.preference.Preference;
+import android.support.v7.preference.TwoStatePreference;
 
 /**
  * @author gubatron
@@ -52,5 +53,27 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
         if (pref == null)
             throw new NullPointerException("preference not found with key: " + key);
         return pref;
+    }
+
+    protected final void setEnabled(Preference preference, boolean enabled, boolean notifyChange) {
+        if (notifyChange) {
+            preference.setEnabled(enabled);
+        } else {
+            Preference.OnPreferenceChangeListener l = preference.getOnPreferenceChangeListener();
+            preference.setOnPreferenceChangeListener(null);
+            preference.setEnabled(enabled);
+            preference.setOnPreferenceChangeListener(l);
+        }
+    }
+
+    protected final void setChecked(TwoStatePreference preference, boolean checked, boolean notifyChange) {
+        if (notifyChange) {
+            preference.setChecked(checked);
+        } else {
+            Preference.OnPreferenceChangeListener l = preference.getOnPreferenceChangeListener();
+            preference.setOnPreferenceChangeListener(null);
+            preference.setChecked(checked);
+            preference.setOnPreferenceChangeListener(l);
+        }
     }
 }

@@ -21,6 +21,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.SwitchPreferenceCompat;
 
 import com.frostwire.android.R;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 
 /**
@@ -39,20 +40,60 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
     }
 
     private void setupConnectSwitch() {
-        SwitchPreferenceCompat preference = findPreference("frostwire.prefs.internal.connect_disconnect");
-        if (preference != null) {
-            preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                    final boolean newStatus = ((Boolean) newValue).booleanValue();
-//                    if (Engine.instance().isStarted() && !newStatus) {
-//                        disconnect();
-//                    } else if (newStatus && (Engine.instance().isStopped() || Engine.instance().isDisconnected())) {
-//                        connect();
-//                    }
-                    return true;
+        SwitchPreferenceCompat preference = getPreference("frostwire.prefs.internal.connect_disconnect");
+        preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                boolean newStatus = (boolean) newValue;
+                if (Engine.instance().isStarted() && !newStatus) {
+                    disconnect();
+                } else if (newStatus && (Engine.instance().isStopped() || Engine.instance().isDisconnected())) {
+                    connect();
                 }
-            });
+                return true;
+            }
+        });
+
+        updateConnectSwitchStatus();
+    }
+
+    private void updateConnectSwitchStatus() {
+        SwitchPreferenceCompat preference = getPreference("frostwire.prefs.internal.connect_disconnect");
+        Engine e = Engine.instance();
+
+        setEnabled(preference, true, false);
+        preference.setSummary(R.string.bittorrent_network_summary);
+
+        if (Engine.instance().isStarted()) {
+            setChecked(preference, true, false);
+        } else if (e.isStarting() || e.isStopping()) {
+            updateConnectSwitchImOnIt();
+        } else if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
+            setChecked(preference, false, false);
+        } else {
+            throw new IllegalStateException("this state is not possible");
         }
+    }
+
+    private void updateConnectSwitchImOnIt() {
+        SwitchPreferenceCompat preference = getPreference("frostwire.prefs.internal.connect_disconnect");
+        setEnabled(preference, false, false);
+        preference.setSummary(R.string.im_on_it);
+    }
+
+    private void connect() {
+        updateConnectSwitchImOnIt();
+
+        Engine.instance().startServices(); // internally this is an async call in libtorrent
+
+        updateConnectSwitchStatus();
+    }
+
+    private void disconnect() {
+        updateConnectSwitchImOnIt();
+
+        Engine.instance().stopServices(true); // internally this is an async call in libtorrent
+
+        updateConnectSwitchStatus();
     }
 }
