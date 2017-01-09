@@ -16,11 +16,9 @@
 package com.frostwire.android.gui.views.preference;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceDialogFragmentCompat;
 import android.view.View;
@@ -42,6 +40,10 @@ import com.frostwire.android.R;
 public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragmentCompat{
 
 
+    public static final String START_RANGE = "startRange";
+    public static final String END_RANGE = "endRange";
+    public static final String DEFAULT_VALUE = "defaultValue";
+
     private int mStartRange;
     private int mEndRange;
     private int mDefault;
@@ -54,9 +56,9 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mStartRange = getArguments().getInt("startRange");
-        mEndRange = getArguments().getInt("endRange");
-        mDefault = getArguments().getInt("defaultText");
+        mStartRange = getArguments().getInt(START_RANGE);
+        mEndRange = getArguments().getInt(END_RANGE);
+        mDefault = getArguments().getInt(DEFAULT_VALUE);
     }
 
     @Override
@@ -105,18 +107,13 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
 
     }
 
-    public static DialogFragment newInstance(Preference preference, Context context) {
-        TypedArray arr = context.obtainStyledAttributes(R.styleable.numberpicker);
+    public static DialogFragment newInstance(Preference preference) {
         NumberPickerPreferenceDialogFragment fragment = new NumberPickerPreferenceDialogFragment();
-        int startRange = arr.getInteger(R.styleable.numberpicker_picker_startRange, 0);
-        int endRange = arr.getInteger(R.styleable.numberpicker_picker_endRange, 200);
-        int defaultText = arr.getInteger(R.styleable.numberpicker_picker_defaultValue, 0);
-        arr.recycle();
         Bundle bundle = new Bundle(4);
         bundle.putString(ARG_KEY, preference.getKey());
-        bundle.putInt("startRange",startRange);
-        bundle.putInt("endRange",endRange);
-        bundle.putInt("defaultText",defaultText);
+        bundle.putInt(START_RANGE, ((NumberPickerPreference2) preference).getStartRange());
+        bundle.putInt(END_RANGE,  ((NumberPickerPreference2)preference).getEndRange());
+        bundle.putInt(DEFAULT_VALUE,  ((NumberPickerPreference2)preference).getDefaultValue());
         fragment.setArguments(bundle);
         return fragment;
     }

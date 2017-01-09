@@ -187,7 +187,7 @@ public final class SettingsActivity2 extends AbstractActivity2
                 public void onDisplayPreferenceDialog(Preference preference) {
                     DialogFragment fragment;
                     if (preference instanceof NumberPickerPreference2) {
-                        fragment = NumberPickerPreferenceDialogFragment.newInstance(preference,getActivity());
+                        fragment = NumberPickerPreferenceDialogFragment.newInstance(preference);
                         fragment.setTargetFragment(Torrent.this, 0);
                         fragment.show(Torrent.this.getFragmentManager(),
                                 "android.support.v7.preference.PreferenceFragment.DIALOG");
