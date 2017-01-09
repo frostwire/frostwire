@@ -21,6 +21,7 @@
     <android.support.v7.preference.PreferenceCategory android:key="frostwire.prefs.general"
         android:title="@string/general_settings">
         <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="frostwire.prefs.internal.connect_disconnect"
             android:summary="@string/bittorrent_network_summary"
             android:title="@string/bittorrent" />
         <!--  Wi-Fi Networks Only should replace Use 3G/4G for BitTorrent -->
