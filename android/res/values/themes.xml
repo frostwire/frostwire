@@ -28,6 +28,7 @@
         <item name="android:textColorSecondary">@color/app_text_secondary</item>
         <item name="toolbarNavigationButtonStyle">@style/ToolbarNavigationButtonStyle</item>
         <item name="toolbarStyle">@style/ToolbarStyle</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
     <style name="Theme.FrostWire.NoMaterial" parent="android:Theme.Holo.Light">

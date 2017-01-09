@@ -17,10 +17,10 @@
  * limitations under the License.
  */
 -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:frostwire="http://schemas.android.com/apk/res-auto">
-    <PreferenceCategory android:title="@string/sharing_privacy_settings">
-        <CheckBoxPreference
+    <android.support.v7.preference.PreferenceCategory android:title="@string/sharing_privacy_settings">
+        <android.support.v7.preference.CheckBoxPreference
             android:key="frostwire.prefs.torrent.seed_finished_torrents"
             android:summary="@string/seed_finished_torrents_summary"
             android:title="@string/seed_finished_torrents" />
@@ -28,10 +28,10 @@
             android:key="frostwire.prefs.torrent.seed_finished_torrents_wifi_only"
             android:summary="@string/seed_finished_torrents_wifi_only_summary"
             android:title="@string/seed_finished_torrents_wifi_only" />
-    </PreferenceCategory>
+    </android.support.v7.preference.PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/bandwidth_usage_settings">
-        <SwitchPreference
+    <android.support.v7.preference.PreferenceCategory android:title="@string/bandwidth_usage_settings">
+        <android.support.v7.preference.SwitchPreferenceCompat
             android:key="froswire.prefs.network.enable_dht"
             android:summary="@string/enable_dht_summary"
             android:title="@string/enable_dht" />
@@ -77,5 +77,5 @@
             frostwire:picker_defaultValue="200"
             frostwire:picker_endRange="200"
             frostwire:picker_startRange="10" />
-    </PreferenceCategory>
-</PreferenceScreen>
+    </android.support.v7.preference.PreferenceCategory>
+</android.support.v7.preference.PreferenceScreen>

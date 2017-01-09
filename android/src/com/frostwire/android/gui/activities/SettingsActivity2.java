@@ -22,9 +22,9 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.Preference;
+import android.support.v7.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
+import android.support.v14.preference.PreferenceFragment;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -82,7 +82,7 @@ public final class SettingsActivity2 extends AbstractActivity2
         Intent intent = getIntent();
         String fragmentName = intent.getStringExtra(EXTRA_SHOW_FRAGMENT);
         Bundle fragmentArgs = intent.getBundleExtra(EXTRA_SHOW_FRAGMENT_ARGUMENTS);
-        int fragmentTitle = intent.getIntExtra(EXTRA_SHOW_FRAGMENT_TITLE, 0);
+        String fragmentTitle = intent.getStringExtra(EXTRA_SHOW_FRAGMENT_TITLE);
 
         if (fragmentName == null) {
             fragmentName = SettingsActivity2.Application.class.getName();
@@ -93,23 +93,23 @@ public final class SettingsActivity2 extends AbstractActivity2
 
     @Override
     public boolean onPreferenceStartFragment(PreferenceFragment caller, Preference pref) {
-        startPreferencePanel(pref.getFragment(), pref.getExtras(), pref.getTitleRes(), null, 0);
+        startPreferencePanel(pref.getFragment(), pref.getExtras(), pref.getTitle().toString(), null, 0);
         return true;
     }
 
-    private void startPreferencePanel(String fragmentClass, Bundle args, int titleRes,
+    private void startPreferencePanel(String fragmentClass, Bundle args, String title,
                                       Fragment resultTo, int resultRequestCode) {
         if (singlePane) {
-            startWithFragment(fragmentClass, args, titleRes, resultTo, resultRequestCode);
+            startWithFragment(fragmentClass, args, title, resultTo, resultRequestCode);
         } else {
             // check singlePane comment
             throw new UnsupportedOperationException("Not implemented");
         }
     }
 
-    private void startWithFragment(String fragmentName, Bundle args, int titleRes,
+    private void startWithFragment(String fragmentName, Bundle args, String title,
                                    Fragment resultTo, int resultRequestCode) {
-        Intent intent = buildStartFragmentIntent(fragmentName, args, titleRes);
+        Intent intent = buildStartFragmentIntent(fragmentName, args, title);
         if (resultTo == null) {
             startActivity(intent);
         } else {
@@ -117,47 +117,44 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
     }
 
-    private Intent buildStartFragmentIntent(String fragmentName, Bundle args, int titleRes) {
+    private Intent buildStartFragmentIntent(String fragmentName, Bundle args, String title) {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setClass(this, getClass());
         intent.putExtra(EXTRA_SHOW_FRAGMENT, fragmentName);
         intent.putExtra(EXTRA_SHOW_FRAGMENT_ARGUMENTS, args);
-        intent.putExtra(EXTRA_SHOW_FRAGMENT_TITLE, titleRes);
+        intent.putExtra(EXTRA_SHOW_FRAGMENT_TITLE, title);
         return intent;
     }
 
-    private void switchToFragment(String fragmentName, Bundle args, int titleRes) {
+    private void switchToFragment(String fragmentName, Bundle args, String title) {
         Fragment f = Fragment.instantiate(this, fragmentName, args);
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         transaction.replace(R.id.activity_settings_content, f);
         transaction.commitAllowingStateLoss();
 
-        if (titleRes != 0) {
-            setTitle(titleRes);
+        if (title != null) {
+            setTitle(title);
         }
     }
 
     public static class Application extends PreferenceFragment {
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.settings_application);
         }
     }
 
     public static class Search extends PreferenceFragment {
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.settings_search);
         }
     }
 
     public static class Torrent extends PreferenceFragment {
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.settings_torrent);
         }
 
@@ -178,22 +175,23 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
 
         private void setupNumericalPreference(final String key, final BTEngine btEngine, final Long unlimitedValue, final boolean byteRate, final Unit unit) {
-            final NumberPickerPreference pickerPreference = (NumberPickerPreference) findPreference(key);
-            if (pickerPreference != null) {
-                pickerPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                    @Override
-                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        if (btEngine != null) {
-                            int newVal = (int) newValue;
-                            executeBTEngineAction(key, btEngine, newVal);
-                            displayNumericalSummaryForPreference(preference, newVal, unlimitedValue, byteRate, unit);
-                            return checkBTEngineActionResult(key, btEngine, newVal);
-                        }
-                        return false;
-                    }
-                });
-                displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key), unlimitedValue, byteRate, unit);
-            }
+            // TODO: restore
+//            final NumberPickerPreference pickerPreference = (NumberPickerPreference) findPreference(key);
+//            if (pickerPreference != null) {
+//                pickerPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+//                    @Override
+//                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+//                        if (btEngine != null) {
+//                            int newVal = (int) newValue;
+//                            executeBTEngineAction(key, btEngine, newVal);
+//                            displayNumericalSummaryForPreference(preference, newVal, unlimitedValue, byteRate, unit);
+//                            return checkBTEngineActionResult(key, btEngine, newVal);
+//                        }
+//                        return false;
+//                    }
+//                });
+//                displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key), unlimitedValue, byteRate, unit);
+//            }
         }
 
         private void executeBTEngineAction(final String key, final BTEngine btEngine, final int value) {
@@ -277,8 +275,7 @@ public final class SettingsActivity2 extends AbstractActivity2
 
     public static class Other extends PreferenceFragment {
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.settings_other);
         }
     }

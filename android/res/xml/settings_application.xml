@@ -17,10 +17,10 @@
  * limitations under the License.
  */
 -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:key="frostwire.prefs.general"
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <android.support.v7.preference.PreferenceCategory android:key="frostwire.prefs.general"
         android:title="@string/general_settings">
-        <SwitchPreference
+        <android.support.v7.preference.SwitchPreferenceCompat
             android:summary="@string/bittorrent_network_summary"
             android:title="@string/bittorrent" />
         <!--  Wi-Fi Networks Only should replace Use 3G/4G for BitTorrent -->
@@ -28,33 +28,33 @@
             <!--android:key="frostwire.prefs.network.use_mobile_data"-->
             <!--android:summary="@string/use_mobile_data_summary"-->
             <!--android:title="@string/use_mobile_data" />-->
-        <SwitchPreference
+        <android.support.v7.preference.SwitchPreferenceCompat
             android:summary="@string/wifi_networks_only_summary"
             android:title="@string/wifi_networks_only" />
         <!--<com.frostwire.android.gui.views.preference.StoragePreference
             android:summary="@string/storage_preference_summary"
             android:title="@string/storage_preference_title" />-->
-        <Preference
+        <android.support.v7.preference.Preference
             android:summary="@string/storage_preference_summary"
             android:title="@string/storage_preference_title">
             <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE" />
-        </Preference>
-    </PreferenceCategory>
+        </android.support.v7.preference.Preference>
+    </android.support.v7.preference.PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/search_torrent_settings">
-        <Preference
+    <android.support.v7.preference.PreferenceCategory android:title="@string/search_torrent_settings">
+        <android.support.v7.preference.Preference
             android:fragment="com.frostwire.android.gui.activities.SettingsActivity2$Search"
             android:title="@string/search_header" />
-        <Preference
+        <android.support.v7.preference.Preference
             android:fragment="com.frostwire.android.gui.activities.SettingsActivity2$Torrent"
             android:title="@string/torrent_preferences_header" />
-    </PreferenceCategory>
+    </android.support.v7.preference.PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/other_settings">
-        <Preference
+    <android.support.v7.preference.PreferenceCategory android:title="@string/other_settings">
+        <android.support.v7.preference.Preference
             android:fragment="com.frostwire.android.gui.activities.SettingsActivity2$Other"
             android:title="@string/notification_other_header" />
-        <Preference
+        <android.support.v7.preference.Preference
             android:summary="@string/remove_ads_description"
             android:title="@string/remove_ads"
             android:layout="@layout/view_preference_buy_ads_2">
@@ -62,12 +62,12 @@
                 android:action="android.intent.action.VIEW"
                 android:targetClass="com.frostwire.android.gui.activities.BuyActivity"
                 android:targetPackage="com.frostwire.android" />
-        </Preference>
-        <Preference android:title="@string/about">
+        </android.support.v7.preference.Preference>
+        <android.support.v7.preference.Preference android:title="@string/about">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:targetClass="com.frostwire.android.gui.activities.AboutActivity"
                 android:targetPackage="com.frostwire.android" />
-        </Preference>
-    </PreferenceCategory>
-</PreferenceScreen>
+        </android.support.v7.preference.Preference>
+    </android.support.v7.preference.PreferenceCategory>
+</android.support.v7.preference.PreferenceScreen>

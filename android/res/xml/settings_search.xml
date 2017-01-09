@@ -17,56 +17,56 @@
  * limitations under the License.
  */
 -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <!--<com.frostwire.android.gui.activities.ToggleAllSearchEnginesPreference-->
         <!--android:key="frostwire.prefs.search.preference_category.select_all"-->
         <!--android:title="@string/select_deselect_all" />-->
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_archiveorg"
         android:title="@string/use_archiveorg" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_bitsnoop"
         android:title="@string/use_bitsnoop" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_btjunkie"
         android:title="@string/use_btjunkie" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_extratorrent"
         android:title="@string/use_extratorrent" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_eztv"
         android:title="@string/use_eztv" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_frostclick"
         android:title="@string/use_frostclick" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_mininova"
         android:title="@string/use_mininova" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_monova"
         android:summary="@string/use_monova_summary"
         android:title="@string/use_monova" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_soundcloud"
         android:title="@string/use_soundcloud" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_tpb"
         android:summary="@string/use_tpb_summary"
         android:title="@string/use_tpb" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_torlock"
         android:title="@string/use_torlock" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_torrentdownloads"
         android:title="@string/use_torrentdownloads" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_limetorrents"
         android:title="@string/use_limetorrents" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_yify"
         android:summary="@string/use_yify_summary"
         android:title="@string/use_yify" />
-    <CheckBoxPreference
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_youtube"
         android:title="@string/use_youtube" />
-</PreferenceScreen>
+</android.support.v7.preference.PreferenceScreen>
