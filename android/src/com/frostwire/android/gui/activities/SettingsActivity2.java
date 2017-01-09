@@ -82,7 +82,7 @@ public final class SettingsActivity2 extends AbstractActivity2
         Intent intent = getIntent();
         String fragmentName = intent.getStringExtra(EXTRA_SHOW_FRAGMENT);
         Bundle fragmentArgs = intent.getBundleExtra(EXTRA_SHOW_FRAGMENT_ARGUMENTS);
-        String fragmentTitle = intent.getStringExtra(EXTRA_SHOW_FRAGMENT_TITLE);
+        CharSequence fragmentTitle = intent.getCharSequenceExtra(EXTRA_SHOW_FRAGMENT_TITLE);
 
         if (fragmentName == null) {
             fragmentName = SettingsActivity2.Application.class.getName();
@@ -93,11 +93,11 @@ public final class SettingsActivity2 extends AbstractActivity2
 
     @Override
     public boolean onPreferenceStartFragment(PreferenceFragment caller, Preference pref) {
-        startPreferencePanel(pref.getFragment(), pref.getExtras(), pref.getTitle().toString(), null, 0);
+        startPreferencePanel(pref.getFragment(), pref.getExtras(), pref.getTitle(), null, 0);
         return true;
     }
 
-    private void startPreferencePanel(String fragmentClass, Bundle args, String title,
+    private void startPreferencePanel(String fragmentClass, Bundle args, CharSequence title,
                                       Fragment resultTo, int resultRequestCode) {
         if (singlePane) {
             startWithFragment(fragmentClass, args, title, resultTo, resultRequestCode);
@@ -107,7 +107,7 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
     }
 
-    private void startWithFragment(String fragmentName, Bundle args, String title,
+    private void startWithFragment(String fragmentName, Bundle args, CharSequence title,
                                    Fragment resultTo, int resultRequestCode) {
         Intent intent = buildStartFragmentIntent(fragmentName, args, title);
         if (resultTo == null) {
@@ -117,7 +117,7 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
     }
 
-    private Intent buildStartFragmentIntent(String fragmentName, Bundle args, String title) {
+    private Intent buildStartFragmentIntent(String fragmentName, Bundle args, CharSequence title) {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setClass(this, getClass());
         intent.putExtra(EXTRA_SHOW_FRAGMENT, fragmentName);
@@ -126,7 +126,7 @@ public final class SettingsActivity2 extends AbstractActivity2
         return intent;
     }
 
-    private void switchToFragment(String fragmentName, Bundle args, String title) {
+    private void switchToFragment(String fragmentName, Bundle args, CharSequence title) {
         Fragment f = Fragment.instantiate(this, fragmentName, args);
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
