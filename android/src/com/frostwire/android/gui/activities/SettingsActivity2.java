@@ -29,6 +29,7 @@ import android.support.v14.preference.PreferenceFragment;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference;
@@ -85,7 +86,7 @@ public final class SettingsActivity2 extends AbstractActivity2
         CharSequence fragmentTitle = intent.getCharSequenceExtra(EXTRA_SHOW_FRAGMENT_TITLE);
 
         if (fragmentName == null) {
-            fragmentName = SettingsActivity2.Application.class.getName();
+            fragmentName = ApplicationFragment.class.getName();
         }
 
         switchToFragment(fragmentName, fragmentArgs, fragmentTitle);
@@ -135,13 +136,6 @@ public final class SettingsActivity2 extends AbstractActivity2
 
         if (title != null) {
             setTitle(title);
-        }
-    }
-
-    public static class Application extends PreferenceFragment {
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            addPreferencesFromResource(R.xml.settings_application);
         }
     }
 
