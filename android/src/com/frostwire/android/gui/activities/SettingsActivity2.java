@@ -18,10 +18,9 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v7.preference.Preference;
@@ -32,7 +31,8 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
-import com.frostwire.android.gui.views.preference.StoragePreference;
+import com.frostwire.android.gui.views.preference.NumberPickerPreference2;
+import com.frostwire.android.gui.views.preference.NumberPickerPreferenceDialogFragment;
 import com.frostwire.bittorrent.BTEngine;
 
 /**
@@ -41,7 +41,7 @@ import com.frostwire.bittorrent.BTEngine;
  * @author grzesiekrzaca
  */
 public final class SettingsActivity2 extends AbstractActivity2
-        implements PreferenceFragment.OnPreferenceStartFragmentCallback {
+        implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     /**
      * When starting this activity, the invoking Intent can contain this extra
@@ -129,7 +129,7 @@ public final class SettingsActivity2 extends AbstractActivity2
 
     private void switchToFragment(String fragmentName, Bundle args, CharSequence title) {
         Fragment f = Fragment.instantiate(this, fragmentName, args);
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         transaction.replace(R.id.activity_settings_content, f);
         transaction.commitAllowingStateLoss();
@@ -158,7 +158,7 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
     }
 
-    public static class Torrent extends PreferenceFragment {
+    public static class Torrent extends PreferenceFragmentCompat {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.settings_torrent);
@@ -172,6 +172,7 @@ public final class SettingsActivity2 extends AbstractActivity2
 
         private void setupTorrentOptions() {
             final BTEngine e = BTEngine.getInstance();
+            setupPreferenceManagerToDisplayDialogs();
             setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e, 0L, true, null);
             setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e, 0L, true, null);
             setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e, -1L, false, Unit.DOWNLOADS);
@@ -180,24 +181,40 @@ public final class SettingsActivity2 extends AbstractActivity2
             setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e, null, false, Unit.PEERS);
         }
 
+        private void setupPreferenceManagerToDisplayDialogs() {
+            getPreferenceManager().setOnDisplayPreferenceDialogListener(new PreferenceManager.OnDisplayPreferenceDialogListener() {
+                @Override
+                public void onDisplayPreferenceDialog(Preference preference) {
+                    DialogFragment fragment;
+                    if (preference instanceof NumberPickerPreference2) {
+                        fragment = NumberPickerPreferenceDialogFragment.newInstance(preference,getActivity());
+                        fragment.setTargetFragment(Torrent.this, 0);
+                        fragment.show(Torrent.this.getFragmentManager(),
+                                "android.support.v7.preference.PreferenceFragment.DIALOG");
+                    } else {
+                        Log.wtf("DBG","this should never happen NumberPickerPreference is not a NumberPickerPreference");
+                    }
+                }
+            });
+        }
+
         private void setupNumericalPreference(final String key, final BTEngine btEngine, final Long unlimitedValue, final boolean byteRate, final Unit unit) {
-            // TODO: restore
-//            final NumberPickerPreference pickerPreference = (NumberPickerPreference) findPreference(key);
-//            if (pickerPreference != null) {
-//                pickerPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-//                    @Override
-//                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                        if (btEngine != null) {
-//                            int newVal = (int) newValue;
-//                            executeBTEngineAction(key, btEngine, newVal);
-//                            displayNumericalSummaryForPreference(preference, newVal, unlimitedValue, byteRate, unit);
-//                            return checkBTEngineActionResult(key, btEngine, newVal);
-//                        }
-//                        return false;
-//                    }
-//                });
-//                displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key), unlimitedValue, byteRate, unit);
-//            }
+            final NumberPickerPreference2 pickerPreference = (NumberPickerPreference2) findPreference(key);
+            if (pickerPreference != null) {
+                pickerPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        if (btEngine != null) {
+                            int newVal = (int) newValue;
+                            executeBTEngineAction(key, btEngine, newVal);
+                            displayNumericalSummaryForPreference(preference, newVal, unlimitedValue, byteRate, unit);
+                            return checkBTEngineActionResult(key, btEngine, newVal);
+                        }
+                        return false;
+                    }
+                });
+                displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key), unlimitedValue, byteRate, unit);
+            }
         }
 
         private void executeBTEngineAction(final String key, final BTEngine btEngine, final int value) {
@@ -279,7 +296,7 @@ public final class SettingsActivity2 extends AbstractActivity2
 
     }
 
-    public static class Other extends PreferenceFragment {
+    public static class Other extends PreferenceFragmentCompat {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.settings_other);
