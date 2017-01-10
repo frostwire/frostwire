@@ -19,13 +19,18 @@
 
 package com.frostwire.android.gui.views;
 
-import android.app.*;
+import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
+
 import com.frostwire.android.R;
 import com.frostwire.util.Ref;
 
@@ -34,7 +39,6 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
  * @author marcelinkaaa
@@ -44,7 +48,7 @@ public abstract class AbstractDialog extends DialogFragment {
     protected static String getSuggestedTAG(Class clazz) {
         StringBuilder sb = new StringBuilder();
         char[] className = clazz.getSimpleName().toCharArray();
-        for (int i=0; i < className.length; i++) {
+        for (int i = 0; i < className.length; i++) {
             char c = className[i];
             if (i > 0 && Character.isUpperCase(c)) {
                 sb.append('_');
@@ -67,7 +71,7 @@ public abstract class AbstractDialog extends DialogFragment {
 
     public AbstractDialog(int layoutResId) {
         this.tag = getSuggestedTAG(getClass());
-        this.layoutResId =layoutResId;
+        this.layoutResId = layoutResId;
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
     }
 
@@ -110,7 +114,7 @@ public abstract class AbstractDialog extends DialogFragment {
             dispatchDialogClick(activityRef.get(), tag, which);
         }
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Dialog d = getDialog();
@@ -143,6 +147,14 @@ public abstract class AbstractDialog extends DialogFragment {
 
         if (activity instanceof AbstractActivity) {
             List<Fragment> fragments = ((AbstractActivity) activity).getVisibleFragments();
+
+            for (Fragment f : fragments) {
+                dispatchDialogClickSafe(f, tag, which);
+            }
+        }
+
+        if (activity instanceof AbstractActivity2) {
+            List<Fragment> fragments = ((AbstractActivity2) activity).getFragments();
 
             for (Fragment f : fragments) {
                 dispatchDialogClickSafe(f, tag, which);

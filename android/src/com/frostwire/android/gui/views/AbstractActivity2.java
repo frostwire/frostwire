@@ -17,6 +17,8 @@
 
 package com.frostwire.android.gui.views;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +27,10 @@ import android.view.View;
 
 import com.frostwire.android.R;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -32,13 +38,25 @@ import com.frostwire.android.R;
 public abstract class AbstractActivity2 extends AppCompatActivity {
 
     private final int layoutResId;
+    private final ArrayList<String> fragmentTags;
 
     private boolean paused;
 
     public AbstractActivity2(int layoutResId) {
         this.layoutResId = layoutResId;
+        this.fragmentTags = new ArrayList<>();
 
         this.paused = false;
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+
+        String tag = fragment.getTag();
+        if (tag != null && !fragmentTags.contains(tag)) {
+            fragmentTags.add(tag);
+        }
     }
 
     @Override
@@ -55,6 +73,20 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
 
     public boolean isPaused() {
         return paused;
+    }
+
+    List<Fragment> getFragments() {
+        List<Fragment> result = new LinkedList<>();
+
+        FragmentManager fm = getFragmentManager();
+        for (String tag : fragmentTags) {
+            Fragment f = fm.findFragmentByTag(tag);
+            if (f != null) {
+                result.add(f);
+            }
+        }
+
+        return result;
     }
 
     @Override
