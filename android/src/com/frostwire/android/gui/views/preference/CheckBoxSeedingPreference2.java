@@ -20,7 +20,10 @@ package com.frostwire.android.gui.views.preference;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.support.v7.preference.CheckBoxPreference;
+import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -34,16 +37,13 @@ import com.frostwire.android.R;
  * @author grzesiek
  *         <p>
  *         This is a special preference that allows the text to be greyed-out.
- *         notifyChanged() in Preference breakes the animation of the checkbox.
- *         Preference logic has to be rewritten not to use it. (Manual manipulation of views)
  */
-public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPreference {
+public class CheckBoxSeedingPreference2 extends CheckBoxPreference {
     private final ColorStateList titleColor;
     private final ColorStateList summaryColor;
     private TextView title;
     private TextView summary;
     private CheckBox checkbox;
-    private boolean checked;
     private final int summaryOnResId;
     private final int summaryOffResId;
 
@@ -54,43 +54,13 @@ public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPrefe
         summaryColor = context.getResources().getColorStateList(R.color.preference_summary_text);
         summaryOffResId = R.string.seed_finished_torrents_wifi_only_summary_off;
         summaryOnResId = R.string.seed_finished_torrents_wifi_only_summary;
-        checked = isChecked();
         setSummaryOff("");
         setSummaryOn("");
         setSummary("");
     }
 
-
-    @Override
-    protected View onCreateView(ViewGroup parent) {
-        View view = super.onCreateView(parent);
-
-        title = (TextView) view.findViewById(android.R.id.title);
-        summary = (TextView) view.findViewById(android.R.id.summary);
-        checkbox = (CheckBox) view.findViewById(android.R.id.checkbox);
-
-        title.setTextColor(titleColor);
-        summary.setTextColor(summaryColor);
-
-        checkbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CheckBoxSeedingPreference2.this.silentCheck(!isChecked());
-            }
-        });
-
-        return view;
-    }
-
-    private void silentCheck(boolean newValue) {
-        checked = newValue;
-        persistBoolean(newValue);
-        callChangeListener(newValue);
-        forceSummary(getCustomSummary());
-    }
-
     private int getCustomSummary() {
-        return checked ? summaryOnResId : summaryOffResId;
+        return isChecked() ? summaryOnResId : summaryOffResId;
     }
 
     private void forceSummary(int summaryResId) {
@@ -101,34 +71,21 @@ public class CheckBoxSeedingPreference2 extends android.preference.CheckBoxPrefe
     }
 
     @Override
-    public boolean isChecked() {
-        return checked;
-    }
-
-    @Override
     protected void onClick() {
         checkbox.setChecked(!isChecked());
-        checkbox.callOnClick();
     }
 
     @Override
-    public void setChecked(boolean checked) {
-        super.setChecked(checked);
-        this.checked = checked;
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        super.onBindViewHolder(holder);
+        title = (TextView) holder.findViewById(android.R.id.title);
+        summary = (TextView) holder.findViewById(android.R.id.summary);
+        checkbox = (CheckBox) holder.findViewById(android.R.id.checkbox);
+
+        title.setTextColor(titleColor);
+        summary.setTextColor(summaryColor);
+
         forceSummary(getCustomSummary());
     }
 
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        if (checkbox != null) {
-            setChecked(isChecked());
-        }
-    }
-
-    @Override
-    protected void onBindView(View view) {
-        super.onBindView(view);
-        setChecked(checked);
-    }
 }
