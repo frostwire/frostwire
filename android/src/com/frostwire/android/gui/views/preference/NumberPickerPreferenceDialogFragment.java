@@ -15,12 +15,11 @@
  */
 package com.frostwire.android.gui.views.preference;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
+import android.support.v14.preference.PreferenceDialogFragment;
 import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceDialogFragmentCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -37,7 +36,7 @@ import com.frostwire.android.R;
  * Screw encapsulation and readability of the code.
  */
 
-public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragmentCompat{
+public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragment {
 
 
     public static final String START_RANGE = "startRange";
@@ -62,7 +61,7 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
     }
 
     @Override
-    protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
+    protected void onPrepareDialogBuilder(android.app.AlertDialog.Builder builder) {
         final ViewGroup parent = (ViewGroup) mCustomTitleView.getParent();
         parent.removeView(mCustomTitleView);
         builder.setCustomTitle(mCustomTitleView);
