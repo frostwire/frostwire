@@ -27,7 +27,6 @@ import android.preference.PreferenceActivity;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceManager;
-import android.util.Log;
 
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
@@ -194,9 +193,7 @@ public final class SettingsActivity2 extends AbstractActivity2
                         fragment = NumberPickerPreferenceDialogFragment.newInstance(preference);
                         fragment.setTargetFragment(Torrent.this, 0);
                         fragment.show(Torrent.this.getFragmentManager(),
-                                "android.support.v7.preference.PreferenceFragment.DIALOG");
-                    } else {
-                        Log.wtf("DBG","this should never happen NumberPickerPreference is not a NumberPickerPreference");
+                                "android.support.v14.preference.PreferenceFragment.DIALOG");
                     }
                 }
             });

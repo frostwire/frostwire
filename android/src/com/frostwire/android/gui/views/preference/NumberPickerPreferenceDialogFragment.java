@@ -33,7 +33,6 @@ import com.frostwire.android.R;
  * Compatibility versions are even worse. To write a custom preference one needs two classes:
  * One that holds the preference, the other for the fragment that will show it.
  * And to Show that fragment we need to create a special listener. See {@link com.frostwire.android.gui.activities.SettingsActivity2.Torrent}
- * Screw encapsulation and readability of the code.
  */
 
 public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragment {
@@ -91,7 +90,7 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
         return view;
     }
 
-    private String getKey(){
+    private String getKey() {
         return getPreference().getKey();
     }
 
@@ -111,8 +110,8 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
         Bundle bundle = new Bundle(4);
         bundle.putString(ARG_KEY, preference.getKey());
         bundle.putInt(START_RANGE, ((NumberPickerPreference2) preference).getStartRange());
-        bundle.putInt(END_RANGE,  ((NumberPickerPreference2)preference).getEndRange());
-        bundle.putInt(DEFAULT_VALUE,  ((NumberPickerPreference2)preference).getDefaultValue());
+        bundle.putInt(END_RANGE, ((NumberPickerPreference2) preference).getEndRange());
+        bundle.putInt(DEFAULT_VALUE, ((NumberPickerPreference2) preference).getDefaultValue());
         fragment.setArguments(bundle);
         return fragment;
     }
