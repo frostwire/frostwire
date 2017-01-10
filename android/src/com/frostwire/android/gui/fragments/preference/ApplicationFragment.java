@@ -45,9 +45,10 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 boolean newStatus = (boolean) newValue;
-                if (Engine.instance().isStarted() && !newStatus) {
+                Engine e = Engine.instance();
+                if (e.isStarted() && !newStatus) {
                     disconnect();
-                } else if (newStatus && (Engine.instance().isStopped() || Engine.instance().isDisconnected())) {
+                } else if (newStatus && (e.isStopped() || e.isDisconnected())) {
                     connect();
                 }
                 return true;
@@ -59,10 +60,10 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
 
     private void updateConnectSwitchStatus() {
         SwitchPreferenceCompat preference = getPreference("frostwire.prefs.internal.connect_disconnect");
-
-        if (Engine.instance().isStarted()) {
+        Engine e = Engine.instance();
+        if (e.isStarted()) {
             setChecked(preference, true, false);
-        } else if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
+        } else if (e.isStopped() || e.isDisconnected()) {
             setChecked(preference, false, false);
         }
     }
