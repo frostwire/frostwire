@@ -59,41 +59,21 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
 
     private void updateConnectSwitchStatus() {
         SwitchPreferenceCompat preference = getPreference("frostwire.prefs.internal.connect_disconnect");
-        Engine e = Engine.instance();
-
-        setEnabled(preference, true, false);
-        preference.setSummary(R.string.bittorrent_network_summary);
 
         if (Engine.instance().isStarted()) {
             setChecked(preference, true, false);
-        } else if (e.isStarting() || e.isStopping()) {
-            updateConnectSwitchImOnIt();
         } else if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
             setChecked(preference, false, false);
-        } else {
-            throw new IllegalStateException("this state is not possible");
         }
     }
 
-    private void updateConnectSwitchImOnIt() {
-        SwitchPreferenceCompat preference = getPreference("frostwire.prefs.internal.connect_disconnect");
-        setEnabled(preference, false, false);
-        preference.setSummary(R.string.im_on_it);
-    }
-
     private void connect() {
-        updateConnectSwitchImOnIt();
-
         Engine.instance().startServices(); // internally this is an async call in libtorrent
-
         updateConnectSwitchStatus();
     }
 
     private void disconnect() {
-        updateConnectSwitchImOnIt();
-
         Engine.instance().stopServices(true); // internally this is an async call in libtorrent
-
         updateConnectSwitchStatus();
     }
 }
