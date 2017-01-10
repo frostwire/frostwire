@@ -40,7 +40,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
     }
 
     private void setupConnectSwitch() {
-        SwitchPreferenceCompat preference = getPreference("frostwire.prefs.internal.connect_disconnect");
+        SwitchPreferenceCompat preference = findPreference("frostwire.prefs.internal.connect_disconnect");
         preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -59,7 +59,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
     }
 
     private void updateConnectSwitchStatus() {
-        SwitchPreferenceCompat preference = getPreference("frostwire.prefs.internal.connect_disconnect");
+        SwitchPreferenceCompat preference = findPreference("frostwire.prefs.internal.connect_disconnect");
         Engine e = Engine.instance();
         if (e.isStarted()) {
             setChecked(preference, true, false);

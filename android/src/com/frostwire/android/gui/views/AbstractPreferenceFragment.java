@@ -48,13 +48,6 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
         return (T) super.findPreference(key);
     }
 
-    protected final <T extends Preference> T getPreference(String key) {
-        T pref = findPreference(key);
-        if (pref == null)
-            throw new NullPointerException("preference not found with key: " + key);
-        return pref;
-    }
-
     protected final void setEnabled(Preference preference, boolean enabled, boolean notifyChange) {
         if (notifyChange) {
             preference.setEnabled(enabled);
