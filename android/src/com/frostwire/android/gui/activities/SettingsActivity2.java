@@ -30,12 +30,14 @@ import android.support.v7.preference.PreferenceManager;
 
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference2;
 import com.frostwire.android.gui.views.preference.NumberPickerPreferenceDialogFragment;
+import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
 
 /**
@@ -175,7 +177,6 @@ public final class SettingsActivity2 extends AbstractActivity2
 
         private void setupTorrentOptions() {
             final BTEngine e = BTEngine.getInstance();
-            setupPreferenceManagerToDisplayDialogs();
             setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e, 0L, true, null);
             setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e, 0L, true, null);
             setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e, -1L, false, Unit.DOWNLOADS);
@@ -184,19 +185,17 @@ public final class SettingsActivity2 extends AbstractActivity2
             setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e, null, false, Unit.PEERS);
         }
 
-        private void setupPreferenceManagerToDisplayDialogs() {
-            getPreferenceManager().setOnDisplayPreferenceDialogListener(new PreferenceManager.OnDisplayPreferenceDialogListener() {
-                @Override
-                public void onDisplayPreferenceDialog(Preference preference) {
-                    DialogFragment fragment;
-                    if (preference instanceof NumberPickerPreference2) {
-                        fragment = NumberPickerPreferenceDialogFragment.newInstance(preference);
-                        fragment.setTargetFragment(Torrent.this, 0);
-                        fragment.show(Torrent.this.getFragmentManager(),
-                                "android.support.v14.preference.PreferenceFragment.DIALOG");
-                    }
-                }
-            });
+        @Override
+        public void onDisplayPreferenceDialog(Preference preference) {
+            if (preference instanceof NumberPickerPreference2) {
+                DialogFragment fragment;
+                fragment = NumberPickerPreferenceDialogFragment.newInstance(preference);
+                fragment.setTargetFragment(Torrent.this, 0);
+                fragment.show(Torrent.this.getFragmentManager(),
+                        "android.support.v14.preference.PreferenceFragment.DIALOG");
+            } else {
+                super.onDisplayPreferenceDialog(preference);
+            }
         }
 
         private void setupNumericalPreference(final String key, final BTEngine btEngine, final Long unlimitedValue, final boolean byteRate, final Unit unit) {
