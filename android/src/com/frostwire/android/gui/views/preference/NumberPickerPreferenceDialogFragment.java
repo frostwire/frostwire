@@ -134,7 +134,7 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
                     t.printStackTrace();
                 }
             }
-            dlgPreference.getDialog().dismiss();
+            dlgPreference.dismiss();
         }
     }
 
@@ -147,7 +147,7 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
 
         @Override
         public void onClick(View v) {
-            dlgPreference.getDialog().dismiss();
+            dlgPreference.dismiss();
         }
     }
 }
