@@ -36,7 +36,6 @@ import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference2;
-import com.frostwire.android.gui.views.preference.NumberPickerPreferenceDialogFragment;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
 
@@ -189,7 +188,7 @@ public final class SettingsActivity2 extends AbstractActivity2
         public void onDisplayPreferenceDialog(Preference preference) {
             if (preference instanceof NumberPickerPreference2) {
                 DialogFragment fragment;
-                fragment = NumberPickerPreferenceDialogFragment.newInstance(preference);
+                fragment = NumberPickerPreference2.NumberPickerPreferenceDialog.newInstance(preference);
                 fragment.setTargetFragment(Torrent.this, 0);
                 fragment.show(Torrent.this.getFragmentManager(),
                         "android.support.v14.preference.PreferenceFragment.DIALOG");

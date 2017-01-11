@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2010-2011 Mike Novak <michael.novakjr@gmail.com>
  * Copyright (C) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,22 +15,27 @@
  */
 package com.frostwire.android.gui.views.preference;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Bundle;
+import android.support.v14.preference.PreferenceDialogFragment;
 import android.support.v7.preference.DialogPreference;
+import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 
 import com.frostwire.android.R;
 
 /**
- * see {@link NumberPickerPreferenceDialogFragment} for explanation
- *
  * @author grzesiekrzaca
+ *
+ * Support version of a custom dialog preference
  */
 public class NumberPickerPreference2 extends DialogPreference {
 
@@ -91,5 +95,76 @@ public class NumberPickerPreference2 extends DialogPreference {
 
     public int getDefaultValue() {
         return defaultValue;
+    }
+
+    /**
+     * Actual dialog used to interact with the preference
+     */
+    public static class NumberPickerPreferenceDialog extends PreferenceDialogFragment {
+
+
+        public static final String START_RANGE = "startRange";
+        public static final String END_RANGE = "endRange";
+        public static final String DEFAULT_VALUE = "defaultValue";
+
+        private int mStartRange;
+        private int mEndRange;
+        private int mDefault;
+        private NumberPicker mPicker;
+
+        public NumberPickerPreferenceDialog() {
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            mStartRange = getArguments().getInt(START_RANGE);
+            mEndRange = getArguments().getInt(END_RANGE);
+            mDefault = getArguments().getInt(DEFAULT_VALUE);
+        }
+
+        @Override
+        protected void onBindDialogView(View view) {
+            super.onBindDialogView(view);
+            mPicker = (NumberPicker) view.findViewById(R.id.dialog_preference_number_picker);
+            setRange(mStartRange, mEndRange);
+            mPicker.setValue((int) getPreference().getSharedPreferences().getLong(getKey(), mDefault));
+        }
+
+        private String getKey() {
+            return getPreference().getKey();
+        }
+
+        private void setRange(int start, int end) {
+            mPicker.setMinValue(start);
+            mPicker.setMaxValue(end);
+        }
+
+
+        @Override
+        public void onDialogClosed(boolean positiveResult) {
+            if (positiveResult) {
+                ((NumberPickerPreference2) getPreference()).saveValue(mPicker.getValue());
+                final Preference.OnPreferenceChangeListener onPreferenceChangeListener = getPreference().getOnPreferenceChangeListener();
+                if (onPreferenceChangeListener != null) {
+                    try {
+                        onPreferenceChangeListener.onPreferenceChange(getPreference(), mPicker.getValue());
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        public static DialogFragment newInstance(Preference preference) {
+            NumberPickerPreferenceDialog fragment = new NumberPickerPreferenceDialog();
+            Bundle bundle = new Bundle(4);
+            bundle.putString(ARG_KEY, preference.getKey());
+            bundle.putInt(START_RANGE, ((NumberPickerPreference2) preference).getStartRange());
+            bundle.putInt(END_RANGE, ((NumberPickerPreference2) preference).getEndRange());
+            bundle.putInt(DEFAULT_VALUE, ((NumberPickerPreference2) preference).getDefaultValue());
+            fragment.setArguments(bundle);
+            return fragment;
+        }
     }
 }
