@@ -46,7 +46,6 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
     private int mEndRange;
     private int mDefault;
     private NumberPicker mPicker;
-    private TextView mCustomTitleView;
 
     public NumberPickerPreferenceDialogFragment() {
     }
@@ -60,52 +59,11 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
     }
 
     @Override
-    protected void onPrepareDialogBuilder(android.app.AlertDialog.Builder builder) {
-        final ViewGroup parent = (ViewGroup) mCustomTitleView.getParent();
-        parent.removeView(mCustomTitleView);
-        builder.setCustomTitle(mCustomTitleView);
-
-        builder.setPositiveButton(null, null);
-        builder.setNegativeButton(null, null);
-    }
-
-    @Override
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
         mPicker = (NumberPicker) view.findViewById(R.id.dialog_preference_number_picker);
         setRange(mStartRange, mEndRange);
         mPicker.setValue((int) getPreference().getSharedPreferences().getLong(getKey(), mDefault));
-
-        mCustomTitleView = (TextView) view.findViewById(R.id.dialog_preference_number_title);
-        mCustomTitleView.setText(getPreference().getDialogTitle());
-
-        // Custom buttons on our layout.
-        Button yesButton = (Button) view.findViewById(R.id.dialog_preference_number_button_yes);
-        yesButton.setText(android.R.string.ok);
-        yesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((NumberPickerPreference2) getPreference()).saveValue(mPicker.getValue());
-                final Preference.OnPreferenceChangeListener onPreferenceChangeListener = getPreference().getOnPreferenceChangeListener();
-                if (onPreferenceChangeListener != null) {
-                    try {
-                        onPreferenceChangeListener.onPreferenceChange(getPreference(), mPicker.getValue());
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
-                }
-                dismiss();
-            }
-        });
-
-        Button noButton = (Button) view.findViewById(R.id.dialog_preference_number_button_no);
-        noButton.setText(R.string.cancel);
-        noButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
     }
 
     private String getKey() {
@@ -120,7 +78,17 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
 
     @Override
     public void onDialogClosed(boolean positiveResult) {
-        //do nothing (don't save the preference - clcik outside of dialog or back button)
+        if (positiveResult) {
+            ((NumberPickerPreference2) getPreference()).saveValue(mPicker.getValue());
+            final Preference.OnPreferenceChangeListener onPreferenceChangeListener = getPreference().getOnPreferenceChangeListener();
+            if (onPreferenceChangeListener != null) {
+                try {
+                    onPreferenceChangeListener.onPreferenceChange(getPreference(), mPicker.getValue());
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        }
     }
 
     public static DialogFragment newInstance(Preference preference) {

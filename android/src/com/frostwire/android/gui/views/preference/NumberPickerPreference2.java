@@ -46,7 +46,7 @@ public class NumberPickerPreference2 extends DialogPreference {
             return;
         }
         setIcon(null);
-        setDialogLayoutResource(R.layout.dialog_preference_number_picker);
+        setDialogLayoutResource(R.layout.dialog_preference_number_picker2);
         TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.numberpicker);
         startRange = arr.getInteger(R.styleable.numberpicker_picker_startRange, 0);
         endRange = arr.getInteger(R.styleable.numberpicker_picker_endRange, 200);
