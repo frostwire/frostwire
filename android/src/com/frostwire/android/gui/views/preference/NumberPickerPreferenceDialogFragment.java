@@ -70,8 +70,8 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
     }
 
     @Override
-    protected View onCreateDialogView(Context context) {
-        View view = super.onCreateDialogView(context);
+    protected void onBindDialogView(View view) {
+        super.onBindDialogView(view);
         mPicker = (NumberPicker) view.findViewById(R.id.dialog_preference_number_picker);
         setRange(mStartRange, mEndRange);
         mPicker.setValue((int) getPreference().getSharedPreferences().getLong(getKey(), mDefault));
@@ -87,7 +87,6 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
         Button noButton = (Button) view.findViewById(R.id.dialog_preference_number_button_no);
         noButton.setText(R.string.cancel);
         noButton.setOnClickListener(new NumberPickerPreferenceDialogFragment.NegativeButtonOnClickListener(this));
-        return view;
     }
 
     private String getKey() {
