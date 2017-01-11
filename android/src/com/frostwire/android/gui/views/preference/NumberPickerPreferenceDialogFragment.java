@@ -82,11 +82,30 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
         // Custom buttons on our layout.
         Button yesButton = (Button) view.findViewById(R.id.dialog_preference_number_button_yes);
         yesButton.setText(android.R.string.ok);
-        yesButton.setOnClickListener(new NumberPickerPreferenceDialogFragment.PositiveButtonOnClickListener(this));
+        yesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((NumberPickerPreference2) getPreference()).saveValue(mPicker.getValue());
+                final Preference.OnPreferenceChangeListener onPreferenceChangeListener = getPreference().getOnPreferenceChangeListener();
+                if (onPreferenceChangeListener != null) {
+                    try {
+                        onPreferenceChangeListener.onPreferenceChange(getPreference(), mPicker.getValue());
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+                NumberPickerPreferenceDialogFragment.this.dismiss();
+            }
+        });
 
         Button noButton = (Button) view.findViewById(R.id.dialog_preference_number_button_no);
         noButton.setText(R.string.cancel);
-        noButton.setOnClickListener(new NumberPickerPreferenceDialogFragment.NegativeButtonOnClickListener(this));
+        noButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NumberPickerPreferenceDialogFragment.this.dismiss();
+            }
+        });
     }
 
     private String getKey() {
@@ -101,7 +120,7 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
 
     @Override
     public void onDialogClosed(boolean positiveResult) {
-
+        //do nothing (don't save the preference - clcik outside of dialog or back button)
     }
 
     public static DialogFragment newInstance(Preference preference) {
@@ -115,39 +134,4 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
         return fragment;
     }
 
-
-    private class PositiveButtonOnClickListener implements View.OnClickListener {
-        private final NumberPickerPreferenceDialogFragment dlgPreference;
-
-        PositiveButtonOnClickListener(NumberPickerPreferenceDialogFragment dlgPreference) {
-            this.dlgPreference = dlgPreference;
-        }
-
-        @Override
-        public void onClick(View view) {
-            ((NumberPickerPreference2) getPreference()).saveValue(mPicker.getValue());
-            final Preference.OnPreferenceChangeListener onPreferenceChangeListener = getPreference().getOnPreferenceChangeListener();
-            if (onPreferenceChangeListener != null) {
-                try {
-                    onPreferenceChangeListener.onPreferenceChange(getPreference(), mPicker.getValue());
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-            dlgPreference.dismiss();
-        }
-    }
-
-    private class NegativeButtonOnClickListener implements View.OnClickListener {
-        private final NumberPickerPreferenceDialogFragment dlgPreference;
-
-        public NegativeButtonOnClickListener(NumberPickerPreferenceDialogFragment dlgPreference) {
-            this.dlgPreference = dlgPreference;
-        }
-
-        @Override
-        public void onClick(View v) {
-            dlgPreference.dismiss();
-        }
-    }
 }
