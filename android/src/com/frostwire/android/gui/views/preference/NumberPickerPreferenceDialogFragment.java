@@ -94,7 +94,7 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
                         t.printStackTrace();
                     }
                 }
-                NumberPickerPreferenceDialogFragment.this.dismiss();
+                dismiss();
             }
         });
 
@@ -103,7 +103,7 @@ public class NumberPickerPreferenceDialogFragment extends PreferenceDialogFragme
         noButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NumberPickerPreferenceDialogFragment.this.dismiss();
+                dismiss();
             }
         });
     }
