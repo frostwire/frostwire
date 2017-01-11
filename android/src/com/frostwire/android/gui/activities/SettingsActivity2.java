@@ -23,17 +23,24 @@ import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v14.preference.PreferenceFragment;
+import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
+import android.view.View;
 
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
+import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
+import com.frostwire.android.gui.views.preference.ButtonActionPreference;
+import com.frostwire.android.gui.views.preference.ButtonActionPreference2;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.uxstats.UXStats;
@@ -352,7 +359,7 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
 
         private void setupClearIndex() {
-            final ButtonActionPreference preference = (ButtonActionPreference) findPreference("frostwire.prefs.internal.clear_index");
+            final ButtonActionPreference2 preference = (ButtonActionPreference2) findPreference("frostwire.prefs.internal.clear_index");
 
             if (preference != null) {
                 updateIndexSummary(preference);
@@ -366,7 +373,7 @@ public final class SettingsActivity2 extends AbstractActivity2
             }
         }
 
-        private void updateIndexSummary(ButtonActionPreference preference) {
+        private void updateIndexSummary(ButtonActionPreference2 preference) {
             float size = (((float) LocalSearchEngine.instance().getCacheSize()) / 1024) / 1024;
             preference.setSummary(getString(R.string.crawl_cache_size, size));
         }
