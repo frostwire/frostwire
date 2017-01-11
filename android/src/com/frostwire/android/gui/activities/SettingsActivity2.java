@@ -158,13 +158,6 @@ public final class SettingsActivity2 extends AbstractActivity2
         }
     }
 
-    public static class Search extends PreferenceFragment {
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            addPreferencesFromResource(R.xml.settings_search);
-        }
-    }
-
     public static class Torrent extends PreferenceFragment {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
