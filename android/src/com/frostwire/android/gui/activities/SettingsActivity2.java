@@ -24,14 +24,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.support.v14.preference.PreferenceFragment;
+import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceScreen;
 
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
@@ -180,17 +182,13 @@ public final class SettingsActivity2 extends AbstractActivity2
             final Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences = new HashMap<>();
             getSearchEnginePreferences(inactiveSearchPreferences, activeSearchEnginePreferences);
 
-            // Click listener for the search engines. Checks or unchecks the SelectAll checkbox
-            final Preference.OnPreferenceClickListener searchEngineClickListener = new Preference.OnPreferenceClickListener() {
+            // Change listener for the all search engines. Checks or unchecks the SelectAll checkbox
+            final Preference.OnPreferenceChangeListener onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    TwoStatePreference cbPreference = (TwoStatePreference) preference;
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
                     ToggleAllSearchEnginesPreference2 selectAll = (ToggleAllSearchEnginesPreference2) findPreference("frostwire.prefs.search.preference_category.select_all");
 
-                    if (!selectAll.requestChildStateChange((CheckBoxPreference) cbPreference)) {
-                        cbPreference.setChecked(!cbPreference.isChecked());//reverting change we need one
-                    }
-                    return true;
+                    return selectAll.requestChildStateChange((CheckBoxPreference) preference);
                 }
             };
 
@@ -202,7 +200,7 @@ public final class SettingsActivity2 extends AbstractActivity2
             }
 
             for (CheckBoxPreference preference : activeSearchEnginePreferences.keySet()) {
-                preference.setOnPreferenceClickListener(searchEngineClickListener);
+                preference.setOnPreferenceChangeListener(onPreferenceChangeListener);
             }
 
             ToggleAllSearchEnginesPreference2 selectAll = (ToggleAllSearchEnginesPreference2) findPreference("frostwire.prefs.search.preference_category.select_all");
