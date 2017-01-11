@@ -17,12 +17,18 @@
 
 package com.frostwire.android.gui.fragments.preference;
 
+import android.app.DialogFragment;
 import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.SwitchPreferenceCompat;
 
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
+import com.frostwire.android.gui.views.preference.KitKatStoragePreference;
+import com.frostwire.android.gui.views.preference.KitKatStoragePreference.KitKatStoragePreferenceDialog;
 
 /**
  * @author gubatron
@@ -37,6 +43,22 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
     @Override
     protected void initComponents() {
         setupConnectSwitch();
+        setupStorageOption();
+    }
+
+    @Override
+    public void onDisplayPreferenceDialog(Preference preference) {
+        DialogFragment dlg = null;
+        if (preference instanceof KitKatStoragePreference) {
+            dlg = KitKatStoragePreferenceDialog.newInstance(preference.getKey());
+        }
+
+        if (dlg != null) {
+            dlg.setTargetFragment(this, 0);
+            dlg.show(getFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
+        } else {
+            super.onDisplayPreferenceDialog(preference);
+        }
     }
 
     private void setupConnectSwitch() {
@@ -58,6 +80,38 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
         updateConnectSwitchStatus();
     }
 
+    private void setupStorageOption() {
+        // intentional repetition of preference value here
+        String kitkatKey = "frostwire.prefs.storage.path";
+        String lollipopKey = "frostwire.prefs.storage.path_asf";
+
+        PreferenceCategory category = findPreference("frostwire.prefs.general");
+
+        if (AndroidPlatform.saf()) {
+            // make sure this won't be saved for kitkat
+            Preference p = findPreference(kitkatKey);
+            if (p != null) {
+                category.removePreference(p);
+            }
+            p = findPreference(lollipopKey);
+            if (p != null) {
+                p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        updateStorageOptionSummary(newValue.toString());
+                        return true;
+                    }
+                });
+                updateStorageOptionSummary(ConfigurationManager.instance().getStoragePath());
+            }
+        } else {
+            Preference p = findPreference(lollipopKey);
+            if (p != null) {
+                category.removePreference(p);
+            }
+        }
+    }
+
     private void updateConnectSwitchStatus() {
         SwitchPreferenceCompat preference = findPreference("frostwire.prefs.internal.connect_disconnect");
         Engine e = Engine.instance();
@@ -76,5 +130,16 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
     private void disconnect() {
         Engine.instance().stopServices(true); // internally this is an async call in libtorrent
         updateConnectSwitchStatus();
+    }
+
+    private void updateStorageOptionSummary(String newPath) {
+        // intentional repetition of preference value here
+        String lollipopKey = "frostwire.prefs.storage.path_asf";
+        if (AndroidPlatform.saf()) {
+            Preference p = findPreference(lollipopKey);
+            if (p != null) {
+                p.setSummary(newPath);
+            }
+        }
     }
 }

@@ -22,17 +22,17 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v14.preference.PreferenceFragment;
+import android.support.v7.preference.Preference;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
-import com.frostwire.android.gui.views.preference.NumberPickerPreference;
+import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.bittorrent.BTEngine;
 
 /**
@@ -136,6 +136,25 @@ public final class SettingsActivity2 extends AbstractActivity2
 
         if (title != null) {
             setTitle(title);
+        }
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        if (intent != null && StoragePicker.ACTION_OPEN_DOCUMENT_TREE.equals(intent.getAction())) {
+            StoragePicker.show(this);
+        } else {
+            super.startActivity(intent);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
+            StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
+            // TODO: missing summary update
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
