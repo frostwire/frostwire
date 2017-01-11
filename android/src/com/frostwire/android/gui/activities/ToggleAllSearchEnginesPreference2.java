@@ -20,8 +20,10 @@ package com.frostwire.android.gui.activities;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.preference.CheckBoxPreference;
+import android.support.v7.preference.CheckBoxPreference;
+import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -46,7 +48,6 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     private CheckBox checkbox;
     private Map<CheckBoxPreference, SearchEngine> searchEnginePreferences;
     private int backgroundColor;
-    private boolean fixStateAfterNextBind = true;
 
     private Runnable delayedCheckboxCheck = new Runnable() {
         @Override
@@ -58,22 +59,6 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
     public ToggleAllSearchEnginesPreference2(Context context, AttributeSet attrs) {
         super(context, attrs);
         backgroundColor = context.getResources().getColor(R.color.basic_gray_dark);
-    }
-
-    @Override
-    protected View onCreateView(ViewGroup parent) {
-        View view = super.onCreateView(parent);
-        view.setBackgroundColor(backgroundColor);
-        TextView title = (TextView) view.findViewById(android.R.id.title);
-        title.setTypeface(title.getTypeface(), Typeface.BOLD);
-        checkbox = (CheckBox) view.findViewById(android.R.id.checkbox);
-        checkbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ToggleAllSearchEnginesPreference2.this.onClick();
-            }
-        });
-        return view;
     }
 
     private void silentCheck(boolean newValue) {
@@ -96,14 +81,29 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
         checkbox.getHandler().post(delayedCheckboxCheck);
     }
 
+
     @Override
-    protected void onBindView(View view) {
-        super.onBindView(view);
-        setChecked(isChecked());
-        if (fixStateAfterNextBind) {
-            fixStateAfterNextBind = false;
-            checkbox.setChecked(isChecked());
-        }
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        super.onBindViewHolder(holder);
+        holder.itemView.setBackgroundColor(backgroundColor);
+        TextView title = (TextView) holder.findViewById(android.R.id.title);
+        title.setTypeface(title.getTypeface(), Typeface.BOLD);
+        checkbox = (CheckBox) holder.findViewById(android.R.id.checkbox);
+        checkbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToggleAllSearchEnginesPreference2.this.onClick();
+            }
+        });
+
+        checkbox.post(new Runnable() {
+            @Override
+            public void run() {
+                if(checkbox.isChecked() != isChecked()) {
+                    checkbox.setChecked(isChecked());
+                }
+            }
+        });
     }
 
     private void checkAllEngines(boolean checked) {
@@ -138,8 +138,6 @@ public class ToggleAllSearchEnginesPreference2 extends CheckBoxPreference {
                     }
                 }
             }
-        } else {
-            fixStateAfterNextBind = true;
         }
         return true;
     }
