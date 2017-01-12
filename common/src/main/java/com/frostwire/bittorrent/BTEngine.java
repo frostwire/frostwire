@@ -18,8 +18,6 @@
 
 package com.frostwire.bittorrent;
 
-import android.util.Log;
-
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.jlibtorrent.AlertListener;
@@ -300,13 +298,7 @@ public final class BTEngine extends SessionManager {
             File torrent = saveTorrent(ti);
             saveResumeTorrent(torrent);
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES)) {
-                try {
-                    if (!torrent.delete()) {
-                        LOG.warn("Error deleting torrent file");
-                    }
-                } catch (SecurityException e) {
-                    LOG.warn("Error deleting torrent file (SecurityException) ", e);
-                }
+                deleteTorrentFile(torrent);
             }
         }
     }
@@ -342,6 +334,19 @@ public final class BTEngine extends SessionManager {
         if (!exists) {
             File torrent = saveTorrent(ti);
             saveResumeTorrent(torrent);
+            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES)) {
+                deleteTorrentFile(torrent);
+            }
+        }
+    }
+
+    public void deleteTorrentFile(File torrent) {
+        try {
+            if (!torrent.delete()) {
+                LOG.warn("Error deleting torrent file");
+            }
+        } catch (SecurityException e) {
+            LOG.warn("Error deleting torrent file (SecurityException) ", e);
         }
     }
 
@@ -358,7 +363,6 @@ public final class BTEngine extends SessionManager {
         File[] torrents = ctx.homeDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                Log.w("DBG", "restoring downloads, internal files: " + name);
                 return name != null && FilenameUtils.getExtension(name).toLowerCase().equals("torrent");
             }
         });
