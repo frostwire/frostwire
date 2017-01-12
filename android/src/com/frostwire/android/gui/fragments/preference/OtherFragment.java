@@ -35,7 +35,7 @@ import com.frostwire.uxstats.UXStats;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
-public class OtherFragment extends AbstractPreferenceFragment {
+public final class OtherFragment extends AbstractPreferenceFragment {
 
     public OtherFragment() {
         super(R.xml.settings_other);
