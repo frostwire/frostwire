@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.frostwire.android.gui.views.preference;
 
 import android.app.DialogFragment;
@@ -22,20 +23,16 @@ import android.os.Bundle;
 import android.support.v14.preference.PreferenceDialogFragment;
 import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 
 import com.frostwire.android.R;
 
 /**
- * @author grzesiekrzaca
- *
  * Support version of a custom dialog preference
+ *
+ * @author grzesiekrzaca
  */
 public final class NumberPickerPreference2 extends DialogPreference {
 
@@ -76,7 +73,6 @@ public final class NumberPickerPreference2 extends DialogPreference {
      */
     public static final class NumberPickerPreferenceDialog extends PreferenceDialogFragment {
 
-
         public static final String START_RANGE = "startRange";
         public static final String END_RANGE = "endRange";
         public static final String DEFAULT_VALUE = "defaultValue";
@@ -113,7 +109,6 @@ public final class NumberPickerPreference2 extends DialogPreference {
             mPicker.setMinValue(start);
             mPicker.setMaxValue(end);
         }
-
 
         @Override
         public void onDialogClosed(boolean positiveResult) {

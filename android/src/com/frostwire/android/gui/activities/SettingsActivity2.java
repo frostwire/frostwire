@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Grzesiek Rzaca (grzesiekrzaca)
+ *            Grzesiek Rzaca (grzesiekrzaca)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -154,7 +154,6 @@ public final class SettingsActivity2 extends AbstractActivity2
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
 
     public static class Other extends PreferenceFragment {
         @Override

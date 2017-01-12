@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Grzesiek Rzaca (grzesiekrzaca)
+ *            Grzesiek Rzaca (grzesiekrzaca)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference2;
 import com.frostwire.bittorrent.BTEngine;
-
 
 public final class TorrentFragment extends AbstractPreferenceFragment {
 
@@ -142,5 +141,4 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
         }
         return String.valueOf(value);
     }
-
 }

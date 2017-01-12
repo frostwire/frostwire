@@ -50,7 +50,7 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public class KitKatStoragePreference extends DialogPreference {
+public final class KitKatStoragePreference extends DialogPreference {
 
     private static final String CONFIRM_DIALOG_TAG = "KitKatStoragePreference.DIALOG";
 
