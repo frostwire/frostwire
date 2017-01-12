@@ -47,7 +47,7 @@
             android:fragment="com.frostwire.android.gui.fragments.preference.SearchFragment"
             android:title="@string/search_header" />
         <android.support.v7.preference.Preference
-            android:fragment="com.frostwire.android.gui.activities.SettingsActivity2$Torrent"
+            android:fragment="com.frostwire.android.gui.fragments.preference.TorrentFragment"
             android:title="@string/torrent_preferences_header" />
     </android.support.v7.preference.PreferenceCategory>
 
