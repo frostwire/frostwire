@@ -23,7 +23,6 @@ import android.content.res.ColorStateList;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
@@ -39,33 +38,13 @@ import com.frostwire.android.R;
 public class CheckBoxSeedingPreference2 extends CheckBoxPreference {
     private final ColorStateList titleColor;
     private final ColorStateList summaryColor;
-    private TextView title;
-    private TextView summary;
     private CheckBox checkbox;
-    private final int summaryOnResId;
-    private final int summaryOffResId;
 
 
     public CheckBoxSeedingPreference2(Context context, AttributeSet attrs) {
         super(context, attrs);
         titleColor = context.getResources().getColorStateList(R.color.preference_title_text);
         summaryColor = context.getResources().getColorStateList(R.color.preference_summary_text);
-        summaryOffResId = R.string.seed_finished_torrents_wifi_only_summary_off;
-        summaryOnResId = R.string.seed_finished_torrents_wifi_only_summary;
-        setSummaryOff("");
-        setSummaryOn("");
-        setSummary("");
-    }
-
-    private int getCustomSummary() {
-        return isChecked() ? summaryOnResId : summaryOffResId;
-    }
-
-    private void forceSummary(int summaryResId) {
-        if (summary != null) {
-            summary.setText(summaryResId);
-            summary.setVisibility(View.VISIBLE);
-        }
     }
 
     @Override
@@ -76,14 +55,12 @@ public class CheckBoxSeedingPreference2 extends CheckBoxPreference {
     @Override
     public void onBindViewHolder(PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
-        title = (TextView) holder.findViewById(android.R.id.title);
-        summary = (TextView) holder.findViewById(android.R.id.summary);
-        checkbox = (CheckBox) holder.findViewById(android.R.id.checkbox);
-
+        TextView title = (TextView) holder.findViewById(android.R.id.title);
+        TextView summary = (TextView) holder.findViewById(android.R.id.summary);
         title.setTextColor(titleColor);
         summary.setTextColor(summaryColor);
 
-        forceSummary(getCustomSummary());
+        checkbox = (CheckBox) holder.findViewById(android.R.id.checkbox);
     }
 
 }

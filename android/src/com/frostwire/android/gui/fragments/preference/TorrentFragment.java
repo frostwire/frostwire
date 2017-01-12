@@ -19,15 +19,21 @@
 package com.frostwire.android.gui.fragments.preference;
 
 import android.app.DialogFragment;
+import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NetworkManager;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
+import com.frostwire.android.gui.views.preference.CheckBoxSeedingPreference2;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference2;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.uxstats.UXAction;
+import com.frostwire.uxstats.UXStats;
 
 
 public final class TorrentFragment extends AbstractPreferenceFragment {
@@ -39,7 +45,51 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
     @Override
     protected void initComponents() {
         setupTorrentOptions();
+        setupSeedingOptions();
     }
+
+    private void setupSeedingOptions() {
+        final CheckBoxPreference preferenceSeeding = findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
+        final CheckBoxSeedingPreference2 preferenceSeedingWifiOnly = findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
+
+        if (preferenceSeeding != null) {
+            preferenceSeeding.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    boolean newVal = (Boolean) newValue;
+
+                    if (!newVal) { // not seeding at all
+                        TransferManager.instance().stopSeedingTorrents();
+                        UIUtils.showShortMessage(getActivity(), R.string.seeding_has_been_turned_off);
+                    }
+
+                    if (preferenceSeedingWifiOnly != null) {
+                        preferenceSeedingWifiOnly.setEnabled(newVal);
+                    }
+
+                    UXStats.instance().log(newVal ? UXAction.SHARING_SEEDING_ENABLED : UXAction.SHARING_SEEDING_DISABLED);
+                    return true;
+                }
+            });
+        }
+
+        if (preferenceSeedingWifiOnly != null) {
+            preferenceSeedingWifiOnly.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    boolean newVal = (Boolean) newValue;
+                    if (newVal && !NetworkManager.instance().isDataWIFIUp()) { // not seeding on mobile data
+                        TransferManager.instance().stopSeedingTorrents();
+                        UIUtils.showShortMessage(getActivity(), R.string.wifi_seeding_has_been_turned_off);
+                    }
+                    return true;
+                }
+            });
+        }
+
+        if (preferenceSeeding != null && preferenceSeedingWifiOnly != null) {
+            preferenceSeedingWifiOnly.setEnabled(preferenceSeeding.isChecked());
+        }
+    }
+
 
     private void setupTorrentOptions() {
         final BTEngine e = BTEngine.getInstance();
