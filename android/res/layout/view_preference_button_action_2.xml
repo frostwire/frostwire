@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,48 +20,58 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    android:orientation="horizontal"
-    android:padding="@dimen/settings_list_item_inner_padding">
+    android:background="?android:attr/selectableItemBackground"
+    android:clipToPadding="false"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+    android:paddingRight="?android:attr/listPreferredItemPaddingRight">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp">
+
+        <TextView
+            android:id="@android:id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            android:text="@string/dummy_title"
+            android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead" />
+
+        <TextView
+            android:id="@android:id/summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@android:id/title"
+            android:layout_below="@android:id/title"
+            android:maxLines="10"
+            android:text="@string/dummy_summary"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?android:attr/textColorSecondary" />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/view_preference_button_action_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxLines="2"
-            android:text="@string/dummy_title"
-            android:textColor="@color/app_text_primary"
-            android:textSize="@dimen/text_medium" />
-
-        <TextView
-            android:id="@+id/view_preference_button_action_summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxLines="3"
-            android:text="@string/dummy_summary"
-            android:textSize="@dimen/text_small" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/widget_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="right|center_vertical"
-        android:orientation="vertical">
+        android:gravity="end|center_vertical"
+        android:orientation="vertical"
+        android:paddingLeft="16dp">
 
         <Button
             android:id="@+id/view_preference_button_action_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dummy_action" />
-
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:text="@string/dummy_action"
+            android:textAlignment="center" />
     </LinearLayout>
 
 </LinearLayout>
