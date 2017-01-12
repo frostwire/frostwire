@@ -31,8 +31,9 @@
             android:title="@string/seed_finished_torrents_wifi_only" />
         <android.support.v7.preference.CheckBoxPreference
             android:key="frostwire.prefs.torrent.delete_started_torrent_files"
-            android:summary="WIP"
-            android:title="DELETE TORRENT FILES" />
+            android:summaryOn="@string/delete_started_torrents_summary_on"
+            android:summaryOff="@string/delete_started_torrents_summary_off"
+            android:title="@string/delete_started_torrents" />
     </android.support.v7.preference.PreferenceCategory>
 
     <android.support.v7.preference.PreferenceCategory android:title="@string/bandwidth_usage_settings">
