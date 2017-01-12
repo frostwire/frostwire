@@ -156,10 +156,4 @@ public final class SettingsActivity2 extends AbstractActivity2
     }
 
 
-    public static class Other extends PreferenceFragment {
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            addPreferencesFromResource(R.xml.settings_other);
-        }
-    }
 }

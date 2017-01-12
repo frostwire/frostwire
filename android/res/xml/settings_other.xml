@@ -43,7 +43,7 @@
         android:key="frostwire.prefs.uxstats.enabled"
         android:summary="@string/anonymous_usage_statistics_summary"
         android:title="@string/anonymous_usage_statistics" />
-    <com.frostwire.android.gui.views.preference.ButtonActionPreference
+    <com.frostwire.android.gui.views.preference.ButtonActionPreference2
         android:key="frostwire.prefs.internal.clear_index"
         android:summary="@string/clear_search_cache_summary"
         android:title="@string/clear_search_cache"
