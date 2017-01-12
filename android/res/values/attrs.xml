@@ -48,11 +48,6 @@
         <attr name="picker_maxValue" format="integer" />
         <attr name="picker_wrap" format="boolean" />
     </declare-styleable>
-    <declare-styleable name="NumberSpinnerPreference">
-        <attr name="spinner_startRange" format="integer" />
-        <attr name="spinner_endRange" format="integer" />
-        <attr name="spinner_defaultValue" format="integer" />
-    </declare-styleable>
     <declare-styleable name="ClearableEditTextView">
         <attr name="clearable_hint" format="string" />
     </declare-styleable>
