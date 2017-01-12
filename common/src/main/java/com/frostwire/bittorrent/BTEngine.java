@@ -18,6 +18,8 @@
 
 package com.frostwire.bittorrent;
 
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.jlibtorrent.AlertListener;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.Pair;
@@ -295,6 +297,9 @@ public final class BTEngine extends SessionManager {
         if (!torrentHandleExists) {
             File torrent = saveTorrent(ti);
             saveResumeTorrent(torrent);
+            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES)) {
+                deleteTorrentFile(torrent);
+            }
         }
     }
 
@@ -329,6 +334,19 @@ public final class BTEngine extends SessionManager {
         if (!exists) {
             File torrent = saveTorrent(ti);
             saveResumeTorrent(torrent);
+            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES)) {
+                deleteTorrentFile(torrent);
+            }
+        }
+    }
+
+    public void deleteTorrentFile(File torrent) {
+        try {
+            if (!torrent.delete()) {
+                LOG.warn("Error deleting torrent file");
+            }
+        } catch (SecurityException e) {
+            LOG.warn("Error deleting torrent file (SecurityException) ", e);
         }
     }
 
