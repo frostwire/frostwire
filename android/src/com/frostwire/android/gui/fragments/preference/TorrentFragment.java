@@ -45,10 +45,10 @@ public class TorrentFragment extends AbstractPreferenceFragment {
         final BTEngine e = BTEngine.getInstance();
         setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e, 0L, true, null);
         setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e, 0L, true, null);
-        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e, -1L, false, Unit.DOWNLOADS);
-        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, e, null, false, Unit.UPLOADS);
-        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, e, null, false, Unit.CONNECTIONS);
-        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e, null, false, Unit.PEERS);
+        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e, -1L, false, R.plurals.unit_downloads);
+        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, e, null, false, R.plurals.unit_uploads);
+        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, e, null, false, R.plurals.unit_connections);
+        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e, null, false, R.plurals.unit_peers);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class TorrentFragment extends AbstractPreferenceFragment {
         }
     }
 
-    private void setupNumericalPreference(final String key, final BTEngine btEngine, final Long unlimitedValue, final boolean byteRate, final Unit unit) {
+    private void setupNumericalPreference(final String key, final BTEngine btEngine, final Long unlimitedValue, final boolean byteRate, final Integer unit) {
         final NumberPickerPreference2 pickerPreference = findPreference(key);
         if (pickerPreference != null) {
             pickerPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -124,7 +124,7 @@ public class TorrentFragment extends AbstractPreferenceFragment {
         return false;
     }
 
-    private void displayNumericalSummaryForPreference(Preference preference, long value, Long unlimitedValue, boolean rate, Unit unit) {
+    private void displayNumericalSummaryForPreference(Preference preference, long value, Long unlimitedValue, boolean rate, Integer unit) {
         if (unlimitedValue != null && value == unlimitedValue) {
             preference.setSummary(R.string.unlimited);
         } else {
@@ -136,29 +136,11 @@ public class TorrentFragment extends AbstractPreferenceFragment {
         }
     }
 
-    private String getValueWithUnit(Unit unit, long value) {
+    private String getValueWithUnit(Integer unit, long value) {
         if (unit != null) {
-            return getActivity().getResources().getQuantityString(unit.getPluralResource(), (int) value, value);
+            return getActivity().getResources().getQuantityString(unit, (int) value, value);
         }
         return String.valueOf(value);
     }
-
-    public enum Unit {
-        DOWNLOADS(R.plurals.unit_downloads),
-        UPLOADS(R.plurals.unit_uploads),
-        CONNECTIONS(R.plurals.unit_connections),
-        PEERS(R.plurals.unit_peers);
-
-        private int pluralResource;
-
-        Unit(int pluralResource) {
-            this.pluralResource = pluralResource;
-        }
-
-        public int getPluralResource() {
-            return pluralResource;
-        }
-    }
-
 
 }
