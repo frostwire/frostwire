@@ -37,7 +37,7 @@ import com.frostwire.android.R;
  *
  * Support version of a custom dialog preference
  */
-public class NumberPickerPreference2 extends DialogPreference {
+public final class NumberPickerPreference2 extends DialogPreference {
 
     private int startRange;
     private int endRange;
@@ -46,10 +46,6 @@ public class NumberPickerPreference2 extends DialogPreference {
     public NumberPickerPreference2(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        if (attrs == null) {
-            return;
-        }
-        setIcon(null);
         setDialogLayoutResource(R.layout.dialog_preference_number_picker2);
         TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.numberpicker);
         startRange = arr.getInteger(R.styleable.numberpicker_picker_startRange, 0);
@@ -78,7 +74,7 @@ public class NumberPickerPreference2 extends DialogPreference {
     /**
      * Actual dialog used to interact with the preference
      */
-    public static class NumberPickerPreferenceDialog extends PreferenceDialogFragment {
+    public static final class NumberPickerPreferenceDialog extends PreferenceDialogFragment {
 
 
         public static final String START_RANGE = "startRange";

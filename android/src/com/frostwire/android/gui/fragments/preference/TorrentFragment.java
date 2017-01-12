@@ -30,7 +30,7 @@ import com.frostwire.android.gui.views.preference.NumberPickerPreference2;
 import com.frostwire.bittorrent.BTEngine;
 
 
-public class TorrentFragment extends AbstractPreferenceFragment {
+public final class TorrentFragment extends AbstractPreferenceFragment {
 
     public TorrentFragment() {
         super(R.xml.settings_torrent);
