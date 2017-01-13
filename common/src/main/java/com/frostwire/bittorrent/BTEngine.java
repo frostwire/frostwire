@@ -18,11 +18,8 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.android.core.ConfigurationManager;
-import com.frostwire.android.core.Constants;
 import com.frostwire.jlibtorrent.AlertListener;
 import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.Pair;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.SessionManager;
 import com.frostwire.jlibtorrent.SessionParams;
@@ -45,7 +42,6 @@ import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.jlibtorrent.swig.session_params;
 import com.frostwire.jlibtorrent.swig.settings_pack;
-import com.frostwire.jlibtorrent.swig.string_int_pair;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
@@ -297,9 +293,6 @@ public final class BTEngine extends SessionManager {
         if (!torrentHandleExists) {
             File torrent = saveTorrent(ti);
             saveResumeTorrent(torrent);
-            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES)) {
-                deleteTorrentFile(torrent);
-            }
         }
     }
 
@@ -334,19 +327,24 @@ public final class BTEngine extends SessionManager {
         if (!exists) {
             File torrent = saveTorrent(ti);
             saveResumeTorrent(torrent);
-            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES)) {
-                deleteTorrentFile(torrent);
-            }
         }
     }
 
-    public void deleteTorrentFile(File torrent) {
+    public void deleteCorrespondingTorrentFile(TorrentInfo ti) {
+        File torrentFile;
         try {
-            if (!torrent.delete()) {
+            String name = ti.name();
+            if (name == null || name.length() == 0) {
+                name = ti.infoHash().toString();
+            }
+            name = escapeFilename(name);
+
+            torrentFile = new File(ctx.torrentsDir, name + ".torrent");
+            if (!torrentFile.delete()) {
                 LOG.warn("Error deleting torrent file");
             }
-        } catch (SecurityException e) {
-            LOG.warn("Error deleting torrent file (SecurityException) ", e);
+        } catch (Exception e) {
+            LOG.warn("Error deleting torrent file ", e);
         }
     }
 

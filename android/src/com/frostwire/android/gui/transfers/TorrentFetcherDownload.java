@@ -232,7 +232,9 @@ public class TorrentFetcherDownload implements BittorrentDownload {
             }
 
             BTEngine.getInstance().download(ti, null, selection, null);
-
+            if (TransferManager.instance().isDeleteStartedTorrentEnabled()) {
+                BTEngine.getInstance().deleteCorrespondingTorrentFile(ti);
+            }
         } catch (Throwable e) {
             LOG.error("Error downloading torrent", e);
         }
