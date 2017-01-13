@@ -29,7 +29,6 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
-import com.frostwire.android.gui.views.preference.CheckBoxSeedingPreference2;
 import com.frostwire.android.gui.views.preference.NumberPickerPreference2;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.uxstats.UXAction;
@@ -50,7 +49,7 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
 
     private void setupSeedingOptions() {
         final CheckBoxPreference preferenceSeeding = findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
-        final CheckBoxSeedingPreference2 preferenceSeedingWifiOnly = findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
+        final CheckBoxPreference preferenceSeedingWifiOnly = findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
 
         if (preferenceSeeding != null) {
             preferenceSeeding.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
