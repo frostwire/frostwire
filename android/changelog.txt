@@ -1,4 +1,5 @@
-FrostWire 1.8.7 - JAN/03/2017
+FrostWire 1.8.7 - JAN/12/2017
+ - Fixes issues with YouTube search
  - Fixes issues with ExtraTorrent search
  - New Bulgarian, Belarusian, Slovak, Thai, Malaysian, Norwegian, Swedish, Finnish, Hebrew and Serbian translations
  - Every existing translation synced to 100%, Croatian and Urdu benefit the most
