@@ -257,7 +257,7 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers) {
+    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers, boolean deleteTorrentFile) {
         if (swig() == null) {
             return;
         }
@@ -293,10 +293,13 @@ public final class BTEngine extends SessionManager {
         if (!torrentHandleExists) {
             File torrent = saveTorrent(ti);
             saveResumeTorrent(torrent);
+            if (deleteTorrentFile) {
+                deleteTorrentFile(torrent);
+            }
         }
     }
 
-    public void download(TorrentCrawledSearchResult sr, File saveDir) {
+    public void download(TorrentCrawledSearchResult sr, File saveDir, boolean deleteTorrentFile) {
         if (swig() == null) {
             return;
         }
@@ -327,19 +330,14 @@ public final class BTEngine extends SessionManager {
         if (!exists) {
             File torrent = saveTorrent(ti);
             saveResumeTorrent(torrent);
+            if (deleteTorrentFile) {
+                deleteTorrentFile(torrent);
+            }
         }
     }
 
-    public void deleteCorrespondingTorrentFile(TorrentInfo ti) {
-        File torrentFile;
+    private void deleteTorrentFile(File torrentFile) {
         try {
-            String name = ti.name();
-            if (name == null || name.length() == 0) {
-                name = ti.infoHash().toString();
-            }
-            name = escapeFilename(name);
-
-            torrentFile = new File(ctx.torrentsDir, name + ".torrent");
             if (!torrentFile.delete()) {
                 LOG.warn("Error deleting torrent file");
             }

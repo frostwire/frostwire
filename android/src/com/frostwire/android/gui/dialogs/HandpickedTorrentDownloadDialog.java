@@ -317,10 +317,8 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
                         BTEngine.getInstance().download(theDialog.getTorrentInfo(),
                                 null,
                                 selection,
-                                peers);
-                        if (TransferManager.instance().isDeleteStartedTorrentEnabled()) {
-                            BTEngine.getInstance().deleteCorrespondingTorrentFile(theDialog.getTorrentInfo());
-                        }
+                                peers,
+                                TransferManager.instance().isDeleteStartedTorrentEnabled());
                         UIUtils.showTransfersOnDownloadStart(context);
                     } catch (Throwable ignored) {
                     }

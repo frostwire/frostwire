@@ -234,7 +234,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                     final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
 
                     // so the TorrentHandle object is created and added to the libtorrent session.
-                    BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
+                    BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, TransferManager.instance().isDeleteStartedTorrentEnabled());
                 } catch (Throwable e) {
                     // TODO: better handling of this error
                     LOG.error("Error creating torrent for seed", e);
