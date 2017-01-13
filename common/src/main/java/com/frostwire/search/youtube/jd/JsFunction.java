@@ -236,7 +236,7 @@ public final class JsFunction<T> {
             return (Integer) a % (Integer) b;
         }
 
-        m = Pattern.compile("^(?<func>[a-zA-Z]+)\\((?<args>[a-z0-9,]+)\\)$").matcher(expr);
+        m = Pattern.compile("^(?<func>[a-zA-Z]+)\\((?<args>[a-z0-9,]*)\\)$").matcher(expr);
         if (m.find()) {
             String fname = m.group("func");
             if (!ctx.functions.containsKey(fname) && ctx.jscode.length() > 0) {
@@ -257,7 +257,7 @@ public final class JsFunction<T> {
 
     private static JsObject extract_object(final JsContext ctx, String objname) {
         JsObject obj = new JsObject();
-        String obj_mRegex = String.format("(var"+ WS +"+)?%1$s"+ WS +"*="+ WS +"*\\{",
+        String obj_mRegex = String.format("(var"+ WS +"+)%1$s"+ WS +"*="+ WS +"*\\{",
                 escape(objname)) + WS +"*(?<fields>("+VAR + WS +"*:"+ WS +"*function\\(.*?\\)"+ WS +"*\\{.*?\\}(,"+ WS +")*)*)\\}"+ WS +"*;";
         final Matcher obj_m = Pattern.compile(obj_mRegex).matcher(ctx.jscode);
         obj_m.find();
