@@ -92,6 +92,7 @@
     <string name="search_select_filetype">Please select a file type</string>
     <string name="select_all">Select All</string>
     <string name="select_deselect_all">Select/Deselect All</string>
+    <string name="deselect_all">Deselect All</string>
     <string name="searching_for">Searching for</string>
     <string name="search_for_type_files">Search for %s files</string>
     <string name="update_title">Update time!</string>
