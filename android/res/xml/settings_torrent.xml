@@ -24,10 +24,11 @@
             android:key="frostwire.prefs.torrent.seed_finished_torrents"
             android:summary="@string/seed_finished_torrents_summary"
             android:title="@string/seed_finished_torrents" />
-        <!--<com.frostwire.android.gui.views.preference.CheckBoxSeedingPreference-->
-            <!--android:key="frostwire.prefs.torrent.seed_finished_torrents_wifi_only"-->
-            <!--android:summary="@string/seed_finished_torrents_wifi_only_summary"-->
-            <!--android:title="@string/seed_finished_torrents_wifi_only" />-->
+        <android.support.v7.preference.CheckBoxPreference
+            android:key="frostwire.prefs.torrent.seed_finished_torrents_wifi_only"
+            android:summary="@string/seed_finished_torrents_wifi_only_summary"
+            android:layout="@layout/view_preference_greyed_out_on_disable"
+            android:title="@string/seed_finished_torrents_wifi_only" />
     </android.support.v7.preference.PreferenceCategory>
 
     <android.support.v7.preference.PreferenceCategory android:title="@string/bandwidth_usage_settings">
