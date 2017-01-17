@@ -74,7 +74,8 @@
     <color name="browse_peer_listview_item_foreground">@color/app_list_item_title_text_color</color>
     <color name="browse_peer_listview_item_inactive_foreground">@color/app_dark_grey_text</color>
 
-    <color name="selected_search_background">#fff4f4f4</color>
+    <color name="selected_search_background">#fff2f2f2</color>
+    <color name="select_all_search_background">#fff9f9f9</color>
 
     <color name="tpi_unselected_text_color">@color/basic_white</color>
     <color name="warning_red">#ffff0000</color>

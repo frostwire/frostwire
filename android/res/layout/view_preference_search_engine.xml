@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Grzesiek Rząca (grzesiekrzaca)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
@@ -27,7 +28,7 @@
     android:paddingRight="?android:attr/listPreferredItemPaddingRight">
 
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground">
