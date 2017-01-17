@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Grzesiek Rząca (grzesiekrzaca)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *            Grzesiek Rząca (grzesiekrzaca)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,45 +21,48 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall"
-    android:gravity="center_vertical"
-    android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-    android:paddingRight="?android:attr/listPreferredItemPaddingRight"
     android:background="?android:attr/selectableItemBackground"
     android:clipToPadding="false"
-    android:focusable="true" >
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+    android:paddingRight="?android:attr/listPreferredItemPaddingRight">
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp">
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp">
 
-        <TextView android:id="@android:id/title"
+        <TextView
+            android:id="@android:id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead"
-            android:textColor="@color/preference_title_text"
             android:ellipsize="marquee"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead"
+            android:textColor="@color/text_primary_disabled_selector" />
 
-        <TextView android:id="@android:id/summary"
+        <TextView
+            android:id="@android:id/summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@android:id/title"
             android:layout_alignLeft="@android:id/title"
+            android:layout_below="@android:id/title"
+            android:maxLines="10"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/preference_summary_text"
-            android:maxLines="10" />
+            android:textColor="@color/text_secondary_disabled_selector" />
 
     </RelativeLayout>
 
     <!-- Preference should place its actual preference widget here. -->
-    <LinearLayout android:id="@android:id/widget_frame"
+    <LinearLayout
+        android:id="@android:id/widget_frame"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="end|center_vertical"
-        android:paddingLeft="16dp"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        android:paddingLeft="16dp" />
 </LinearLayout>

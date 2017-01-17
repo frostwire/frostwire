@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Grzesiek Rząca (grzesiekrzaca)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,6 @@
  */
 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/app_text_primary"  android:state_enabled="true"/>
-    <item android:color="@color/app_text_disabled" android:state_enabled="false"/>
+    <item android:color="@color/app_text_primary" android:state_enabled="true" />
+    <item android:color="@color/app_text_disabled" android:state_enabled="false" />
 </selector>

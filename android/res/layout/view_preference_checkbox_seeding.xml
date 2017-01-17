@@ -49,7 +49,7 @@
                 android:maxLines="2"
                 android:text="@string/dummy_title"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/disabled_text_selector" />
+                android:textColor="@color/text_primary_disabled_selector" />
 
             <TextView
                 android:id="@+id/view_preference_checkbox_seeding_summary"
@@ -59,7 +59,7 @@
                 android:maxLines="3"
                 android:text="@string/dummy_summary"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/disabled_text_selector" />
+                android:textColor="@color/text_primary_disabled_selector" />
 
         </RelativeLayout>
 

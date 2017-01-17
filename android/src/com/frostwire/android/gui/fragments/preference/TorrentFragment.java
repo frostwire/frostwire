@@ -88,7 +88,6 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
         }
     }
 
-
     private void setupTorrentOptions() {
         final BTEngine e = BTEngine.getInstance();
         setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e, 0L, true, null);
