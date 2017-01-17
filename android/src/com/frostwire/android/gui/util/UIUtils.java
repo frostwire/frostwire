@@ -32,8 +32,10 @@ import android.os.Looper;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -41,6 +43,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -109,6 +112,21 @@ public final class UIUtils {
             if (gravity != (Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM)) {
                 toast.setGravity(gravity, xOffset, yOffset);
             }
+            toast.show();
+        }
+    }
+
+    public static void showMaterialToastMessage(Context context, String message, int duration) {
+        if (context != null && message != null) {
+            LayoutInflater inflater = (LayoutInflater)
+                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View v = inflater.inflate(R.layout.toast_message, (ViewGroup) ((Activity)context).findViewById((R.id.custom_container)));
+            TextView tv = (TextView) v.findViewById(android.R.id.message);
+            tv.setText(message);
+            Toast toast = new Toast(context);
+            toast.setView(v);
+            toast.setGravity(Gravity.BOTTOM | Gravity.FILL_HORIZONTAL, 0, 0);
+            toast.setDuration(duration);
             toast.show();
         }
     }

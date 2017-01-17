@@ -22,6 +22,7 @@ import android.content.Context;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
 import android.view.View;
+import android.widget.Toast;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -110,7 +111,8 @@ public final class OtherFragment extends AbstractPreferenceFragment {
                 @Override
                 public void onClick(View v) {
                     LocalSearchEngine.instance().clearCache();
-                    UIUtils.showShortMessage(getActivity(), R.string.deleted_crawl_cache);
+//                    UIUtils.showShortMessage(getActivity(), R.string.deleted_crawl_cache);
+                    UIUtils.showMaterialToastMessage(getActivity(), getString(R.string.deleted_crawl_cache), Toast.LENGTH_SHORT);
                     updateIndexSummary(preference);
                 }
             });

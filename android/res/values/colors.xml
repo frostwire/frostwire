@@ -78,4 +78,6 @@
     <color name="warning_red">#ffff0000</color>
     <color name="approval_green">#05a751</color>
 
+    <color name="toast_background">#ff333333</color>
+
 </resources>
