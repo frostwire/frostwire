@@ -19,7 +19,6 @@ package com.frostwire.android.gui.fragments.preference;
 
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
-import android.widget.Toast;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.SearchEngine;
@@ -63,7 +62,7 @@ public final class SearchFragment extends AbstractPreferenceFragment {
                     setChecked(selectAll, false, false);
                     if (areAllEnginesChecked(activeSearchEnginePreferences, false)) {
                         cb.setChecked(true); // always keep one checked
-                        UIUtils.showMaterialToastMessage(getActivity(), getString(R.string.search_preferences_one_engine_checked_always), Toast.LENGTH_SHORT);
+                        UIUtils.showShortMaterialMessage(getActivity(), getString(R.string.search_preferences_one_engine_checked_always));
                     }
                 } else {
                     updateSelectAllCheckBox();
@@ -139,7 +138,7 @@ public final class SearchFragment extends AbstractPreferenceFragment {
         // always leave one checked.
         if (!checked && archivePreference != null) {
             setChecked(archivePreference, true, false);
-            UIUtils.showMaterialToastMessage(getActivity(), getString(R.string.search_preferences_one_engine_checked_always), Toast.LENGTH_SHORT);
+            UIUtils.showShortMaterialMessage(getActivity(), getString(R.string.search_preferences_one_engine_checked_always));
         }
     }
 }

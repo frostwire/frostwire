@@ -21,7 +21,6 @@ package com.frostwire.android.gui.fragments.preference;
 import android.app.DialogFragment;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
-import android.widget.Toast;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -58,7 +57,7 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
 
                     if (!newVal) { // not seeding at all
                         TransferManager.instance().stopSeedingTorrents();
-                        UIUtils.showMaterialToastMessage(getActivity(), getString(R.string.seeding_has_been_turned_off), Toast.LENGTH_SHORT);
+                        UIUtils.showShortMaterialMessage(getActivity(), getString(R.string.seeding_has_been_turned_off));
                     }
 
                     if (preferenceSeedingWifiOnly != null) {
@@ -77,7 +76,7 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
                     boolean newVal = (Boolean) newValue;
                     if (newVal && !NetworkManager.instance().isDataWIFIUp()) { // not seeding on mobile data
                         TransferManager.instance().stopSeedingTorrents();
-                        UIUtils.showMaterialToastMessage(getActivity(), getString(R.string.wifi_seeding_has_been_turned_off), Toast.LENGTH_SHORT);
+                        UIUtils.showShortMaterialMessage(getActivity(), getString(R.string.wifi_seeding_has_been_turned_off));
                     }
                     return true;
                 }

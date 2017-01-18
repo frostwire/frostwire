@@ -116,7 +116,11 @@ public final class UIUtils {
         }
     }
 
-    public static void showMaterialToastMessage(Context context, String message, int duration) {
+    public static void showShortMaterialMessage(Context context, String message) {
+        showMaterialMessage(context, message, Toast.LENGTH_SHORT);
+    }
+
+    public static void showMaterialMessage(Context context, String message, int duration) {
         if (context != null && message != null) {
             LayoutInflater inflater = (LayoutInflater)
                     context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
