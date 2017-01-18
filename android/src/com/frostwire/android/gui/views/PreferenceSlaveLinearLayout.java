@@ -1,5 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Grzesiek Rząca (grzesiekrzaca)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Grzesiek Rząca (grzesiekrzaca)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +28,7 @@ import android.widget.LinearLayout;
 import com.frostwire.android.R;
 
 /**
+ * Used to connect preference UI state with it's background
  * If not used in a checkbox preference will work as normal LinearLayout
  */
 public class PreferenceSlaveLinearLayout extends LinearLayout {
