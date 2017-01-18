@@ -35,7 +35,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -124,7 +123,7 @@ public final class UIUtils {
         if (context != null && message != null) {
             LayoutInflater inflater = (LayoutInflater)
                     context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.toast_message, (ViewGroup) ((Activity)context).findViewById((R.id.custom_container)));
+            View v = inflater.inflate(R.layout.toast_message, null);
             TextView tv = (TextView) v.findViewById(android.R.id.message);
             tv.setText(message);
             Toast toast = new Toast(context);
