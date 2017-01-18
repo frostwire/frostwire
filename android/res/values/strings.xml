@@ -343,8 +343,7 @@
     <string name="seed_finished_torrents_wifi_only">Seed only on Wi-Fi</string>
     <string name="seed_finished_torrents_wifi_only_summary">Seeds only when connected via Wi-Fi to save bandwidth on your data plan</string>
     <string name="delete_started_torrents">Delete .torrent files</string>
-    <string name="delete_started_torrents_summary_on">Delete .torrent files after beginning downloading</string>
-    <string name="delete_started_torrents_summary_off">Keep downloaded .torrent files in the storage location</string>
+    <string name="delete_started_torrents_summary">Delete .torrent files after beginning downloading</string>
     <string name="dummy_downloads_indicator" translatable="false">0 @ 0 KB/s</string>
     <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
     <string name="seeding_has_been_turned_off">Seeding has been turned off</string>
