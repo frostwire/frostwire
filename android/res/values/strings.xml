@@ -661,4 +661,5 @@
     <string name="changelog">Changelog</string>
     <string name="pro">PRO</string>
     <string name="unlimited">Unlimited</string>
+    <string name="search_preferences_one_engine_checked_always">By default, one search engine needs to be checked at all times</string>
 </resources>
