@@ -114,8 +114,8 @@ public final class UIUtils {
         }
     }
 
-    public static void showShortMaterialMessage(View view, String message) {
-        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
+    public static void showShortMessage(View view, int resourceId) {
+        Snackbar.make(view, resourceId, Snackbar.LENGTH_SHORT).show();
     }
 
     public static void sendShutdownIntent(Context ctx) {

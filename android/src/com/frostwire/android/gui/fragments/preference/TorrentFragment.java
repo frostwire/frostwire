@@ -57,7 +57,7 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
 
                     if (!newVal) { // not seeding at all
                         TransferManager.instance().stopSeedingTorrents();
-                        UIUtils.showShortMaterialMessage(getView(), getString(R.string.seeding_has_been_turned_off));
+                        UIUtils.showShortMessage(getView(), R.string.seeding_has_been_turned_off);
                     }
 
                     if (preferenceSeedingWifiOnly != null) {
@@ -76,7 +76,7 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
                     boolean newVal = (Boolean) newValue;
                     if (newVal && !NetworkManager.instance().isDataWIFIUp()) { // not seeding on mobile data
                         TransferManager.instance().stopSeedingTorrents();
-                        UIUtils.showShortMaterialMessage(getView(), getString(R.string.wifi_seeding_has_been_turned_off));
+                        UIUtils.showShortMessage(getView(), R.string.wifi_seeding_has_been_turned_off);
                     }
                     return true;
                 }
