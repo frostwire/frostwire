@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Looper;
+import android.support.design.widget.Snackbar;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -116,10 +117,22 @@ public final class UIUtils {
     }
 
     public static void showShortMaterialMessage(Context context, String message) {
-        showMaterialMessage(context, message, Toast.LENGTH_SHORT);
+        if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            View coordinator = activity.findViewById(R.id.coordinator);
+            if (coordinator != null) {
+                Snackbar.make(coordinator, message, Snackbar.LENGTH_SHORT).show();
+            } else {
+                //no coordinator layout -> fallback to toast
+                showMaterialToastMessage(context, message, Toast.LENGTH_SHORT);
+            }
+        } else {
+            //non-activity context -> fallback to toast
+            showMaterialToastMessage(context, message, Toast.LENGTH_SHORT);
+        }
     }
 
-    public static void showMaterialMessage(Context context, String message, int duration) {
+    private static void showMaterialToastMessage(Context context, String message, int duration) {
         if (context != null && message != null) {
             LayoutInflater inflater = (LayoutInflater)
                     context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
