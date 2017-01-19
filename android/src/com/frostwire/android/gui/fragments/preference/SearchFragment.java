@@ -62,7 +62,7 @@ public final class SearchFragment extends AbstractPreferenceFragment {
                     setChecked(selectAll, false, false);
                     if (areAllEnginesChecked(activeSearchEnginePreferences, false)) {
                         cb.setChecked(true); // always keep one checked
-                        UIUtils.showShortMaterialMessage(getActivity(), getString(R.string.search_preferences_one_engine_checked_always));
+                        UIUtils.showShortMaterialMessage(getView(), getString(R.string.search_preferences_one_engine_checked_always));
                     }
                 } else {
                     updateSelectAllCheckBox();
@@ -138,7 +138,7 @@ public final class SearchFragment extends AbstractPreferenceFragment {
         // always leave one checked.
         if (!checked && archivePreference != null) {
             setChecked(archivePreference, true, false);
-            UIUtils.showShortMaterialMessage(getActivity(), getString(R.string.search_preferences_one_engine_checked_always));
+            UIUtils.showShortMaterialMessage(getView(), getString(R.string.search_preferences_one_engine_checked_always));
         }
     }
 }

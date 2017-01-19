@@ -33,7 +33,6 @@ import android.support.design.widget.Snackbar;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -43,7 +42,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -116,35 +114,8 @@ public final class UIUtils {
         }
     }
 
-    public static void showShortMaterialMessage(Context context, String message) {
-        if (context instanceof Activity) {
-            Activity activity = (Activity) context;
-            View coordinator = activity.findViewById(R.id.coordinator);
-            if (coordinator != null) {
-                Snackbar.make(coordinator, message, Snackbar.LENGTH_SHORT).show();
-            } else {
-                //no coordinator layout -> fallback to toast
-                showMaterialToastMessage(context, message, Toast.LENGTH_SHORT);
-            }
-        } else {
-            //non-activity context -> fallback to toast
-            showMaterialToastMessage(context, message, Toast.LENGTH_SHORT);
-        }
-    }
-
-    private static void showMaterialToastMessage(Context context, String message, int duration) {
-        if (context != null && message != null) {
-            LayoutInflater inflater = (LayoutInflater)
-                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.toast_message, null);
-            TextView tv = (TextView) v.findViewById(android.R.id.message);
-            tv.setText(message);
-            Toast toast = new Toast(context);
-            toast.setView(v);
-            toast.setGravity(Gravity.BOTTOM | Gravity.FILL_HORIZONTAL, 0, 0);
-            toast.setDuration(duration);
-            toast.show();
-        }
+    public static void showShortMaterialMessage(View view, String message) {
+        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
     }
 
     public static void sendShutdownIntent(Context ctx) {
