@@ -22,6 +22,7 @@ import android.support.v7.preference.Preference;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.SearchEngine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 
 import java.util.HashMap;
@@ -61,6 +62,7 @@ public final class SearchFragment extends AbstractPreferenceFragment {
                     setChecked(selectAll, false, false);
                     if (areAllEnginesChecked(activeSearchEnginePreferences, false)) {
                         cb.setChecked(true); // always keep one checked
+                        UIUtils.showShortMessage(getView(), R.string.search_preferences_one_engine_checked_always);
                     }
                 } else {
                     updateSelectAllCheckBox();
@@ -136,6 +138,7 @@ public final class SearchFragment extends AbstractPreferenceFragment {
         // always leave one checked.
         if (!checked && archivePreference != null) {
             setChecked(archivePreference, true, false);
+            UIUtils.showShortMessage(getView(), R.string.search_preferences_one_engine_checked_always);
         }
     }
 }

@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Looper;
+import android.support.design.widget.Snackbar;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -111,6 +112,10 @@ public final class UIUtils {
             }
             toast.show();
         }
+    }
+
+    public static void showShortMessage(View view, int resourceId) {
+        Snackbar.make(view, resourceId, Snackbar.LENGTH_SHORT).show();
     }
 
     public static void sendShutdownIntent(Context ctx) {

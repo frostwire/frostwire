@@ -110,7 +110,7 @@ public final class OtherFragment extends AbstractPreferenceFragment {
                 @Override
                 public void onClick(View v) {
                     LocalSearchEngine.instance().clearCache();
-                    UIUtils.showShortMessage(getActivity(), R.string.deleted_crawl_cache);
+                    UIUtils.showShortMessage(getView(), R.string.deleted_crawl_cache);
                     updateIndexSummary(preference);
                 }
             });
