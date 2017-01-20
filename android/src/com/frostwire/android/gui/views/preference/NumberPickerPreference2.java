@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment.PreferenceDialogFragment;
+import com.frostwire.util.StringUtils;
 
 /**
  * Support version of a custom dialog preference
@@ -126,6 +127,7 @@ public final class NumberPickerPreference2 extends DialogPreference {
             super.onPrepareDialogBuilder(builder);
             // passing anything as a dialog on click listener as we want to change the
             // view on click listener later as not to dismiss the dialog on press
+            // and we need the builder to create the button
             builder.setNeutralButton(R.string.reset, this);
         }
 
@@ -189,7 +191,7 @@ public final class NumberPickerPreference2 extends DialogPreference {
             });
 
             if(hasUnlimitedValue){
-                label.setText(String.format("Choose a value form %d to %d\n (Default: %d, for unlimited %d )", startRange, endRange, defaultValue, unlimitedValue));
+                label.setText(String.format("Choose a value form %d to %d\n (%d means unlimited, default: %d)", startRange, endRange, unlimitedValue, defaultValue));
             } else {
                 label.setText(String.format("Choose a value form %d to %d\n (Default: %d)", startRange, endRange, defaultValue));
             }
@@ -206,14 +208,17 @@ public final class NumberPickerPreference2 extends DialogPreference {
         @Override
         public void onDialogClosed(boolean positiveResult) {
             if (positiveResult) {
-                int newValue = Integer.parseInt(String.valueOf(input.getText()));
-                ((NumberPickerPreference2) getPreference()).saveValue(newValue);
-                final Preference.OnPreferenceChangeListener onPreferenceChangeListener = getPreference().getOnPreferenceChangeListener();
-                if (onPreferenceChangeListener != null) {
-                    try {
-                        onPreferenceChangeListener.onPreferenceChange(getPreference(), newValue);
-                    } catch (Throwable t) {
-                        t.printStackTrace();
+                String text = String.valueOf(input.getText());
+                if(!StringUtils.isNullOrEmpty(text)) {
+                    int newValue = Integer.parseInt(text);
+                    ((NumberPickerPreference2) getPreference()).saveValue(newValue);
+                    final Preference.OnPreferenceChangeListener onPreferenceChangeListener = getPreference().getOnPreferenceChangeListener();
+                    if (onPreferenceChangeListener != null) {
+                        try {
+                            onPreferenceChangeListener.onPreferenceChange(getPreference(), newValue);
+                        } catch (Throwable t) {
+                            t.printStackTrace();
+                        }
                     }
                 }
             }

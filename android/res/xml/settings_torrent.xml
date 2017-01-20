@@ -40,7 +40,7 @@
             android:key="frostwire.prefs.torrent.max_download_speed"
             android:summary="@string/torrent_max_download_speed_summary"
             android:title="@string/torrent_max_download_speed"
-            android:positiveButtonText="@string.set"
+            android:positiveButtonText="@string/set"
             frostwire:picker_hasUnlimitedValue="true"
             frostwire:picker_unlimitedValue="0"
             frostwire:picker_defaultValue="0"
@@ -50,7 +50,7 @@
             android:key="frostwire.prefs.torrent.max_upload_speed"
             android:summary="@string/torrent_max_upload_speed_summary"
             android:title="@string/torrent_max_upload_speed"
-            android:positiveButtonText="@string.set"
+            android:positiveButtonText="@string/set"
             frostwire:picker_hasUnlimitedValue="true"
             frostwire:picker_unlimitedValue="0"
             frostwire:picker_defaultValue="0"
@@ -60,7 +60,7 @@
             android:key="frostwire.prefs.torrent.max_downloads"
             android:summary="@string/torrent_max_downloads_summary"
             android:title="@string/torrent_max_downloads"
-            android:positiveButtonText="@string.set"
+            android:positiveButtonText="@string/set"
             frostwire:picker_defaultValue="4"
             frostwire:picker_endRange="10"
             frostwire:picker_startRange="1" />
@@ -68,7 +68,7 @@
             android:key="frostwire.prefs.torrent.max_uploads"
             android:summary="@string/torrent_max_uploads_summary"
             android:title="@string/torrent_max_uploads"
-            android:positiveButtonText="@string.set"
+            android:positiveButtonText="@string/set"
             frostwire:picker_defaultValue="4"
             frostwire:picker_endRange="10"
             frostwire:picker_startRange="1" />
@@ -76,7 +76,7 @@
             android:key="frostwire.prefs.torrent.max_total_connections"
             android:summary="@string/torrent_max_total_connections_summary"
             android:title="@string/torrent_max_total_connections"
-            android:positiveButtonText="@string.set"
+            android:positiveButtonText="@string/set"
             frostwire:picker_defaultValue="200"
             frostwire:picker_endRange="200"
             frostwire:picker_startRange="10" />
@@ -84,7 +84,7 @@
             android:key="frostwire.prefs.torrent.max_peers"
             android:summary="@string/torrent_max_peers_summary"
             android:title="@string/torrent_max_peers"
-            android:positiveButtonText="@string.set"
+            android:positiveButtonText="@string/set"
             frostwire:picker_defaultValue="200"
             frostwire:picker_endRange="200"
             frostwire:picker_startRange="10" />
