@@ -40,6 +40,9 @@
             android:key="frostwire.prefs.torrent.max_download_speed"
             android:summary="@string/torrent_max_download_speed_summary"
             android:title="@string/torrent_max_download_speed"
+            android:positiveButtonText="set"
+            frostwire:picker_hasUnlimitedValue="true"
+            frostwire:picker_unlimitedValue="0"
             frostwire:picker_defaultValue="0"
             frostwire:picker_endRange="102400"
             frostwire:picker_startRange="0" />
@@ -47,6 +50,8 @@
             android:key="frostwire.prefs.torrent.max_upload_speed"
             android:summary="@string/torrent_max_upload_speed_summary"
             android:title="@string/torrent_max_upload_speed"
+            frostwire:picker_hasUnlimitedValue="true"
+            frostwire:picker_unlimitedValue="0"
             frostwire:picker_defaultValue="0"
             frostwire:picker_endRange="102400"
             frostwire:picker_startRange="0" />
