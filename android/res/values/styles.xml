@@ -719,4 +719,12 @@
         <item name="android:paddingRight">0dp</item>
     </style>
 
+
+
+    <!-- Alert style for Material theme -->
+    <style name="AppAlertTheme" parent="Theme.AppCompat.Light.Dialog">
+        <!-- Disable white background around the alert-->
+        <item name="android:windowBackground">@color/transparent</item>
+    </style>
+
 </resources>

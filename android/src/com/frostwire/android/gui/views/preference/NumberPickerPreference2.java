@@ -131,6 +131,11 @@ public final class NumberPickerPreference2 extends DialogPreference {
             builder.setNeutralButton(R.string.reset, this);
         }
 
+        @Override
+        protected boolean needInputMethod() {
+            return true;
+        }
+
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -191,9 +196,9 @@ public final class NumberPickerPreference2 extends DialogPreference {
             });
 
             if(hasUnlimitedValue){
-                label.setText(String.format("Choose a value form %d to %d\n (%d means unlimited, default: %d)", startRange, endRange, unlimitedValue, defaultValue));
+                label.setText(String.format("Choose a value form %d to %d\n(%d means unlimited, default: %d)", startRange, endRange, unlimitedValue, defaultValue));
             } else {
-                label.setText(String.format("Choose a value form %d to %d\n (Default: %d)", startRange, endRange, defaultValue));
+                label.setText(String.format("Choose a value form %d to %d\n(Default: %d)", startRange, endRange, defaultValue));
             }
         }
 

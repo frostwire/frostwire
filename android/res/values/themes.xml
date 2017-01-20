@@ -28,6 +28,7 @@
         <item name="android:textColorSecondary">@color/app_text_secondary</item>
         <item name="toolbarNavigationButtonStyle">@style/ToolbarNavigationButtonStyle</item>
         <item name="toolbarStyle">@style/ToolbarStyle</item>
+        <item name="android:alertDialogTheme">@style/AppAlertTheme</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
         <item name="android:listPreferredItemPaddingLeft">16dp</item>
         <item name="android:listPreferredItemPaddingRight">16dp</item>
