@@ -47,4 +47,9 @@
         <item name="android:elevation">2dp</item>
     </style>
 
+    <!-- This is needed so that windowBackground is not overridden as it is for lower APIs -->
+    <style name="AppAlertTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowTitleStyle">@style/DialogWindowTitle</item>
+    </style>
+
 </resources>

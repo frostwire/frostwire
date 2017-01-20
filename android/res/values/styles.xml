@@ -723,8 +723,17 @@
 
     <!-- Alert style for Material theme -->
     <style name="AppAlertTheme" parent="Theme.AppCompat.Light.Dialog">
-        <!-- Disable white background around the alert-->
+        <!-- Disable white background around the alert on old styles - on new it makes everything transparent-->
         <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:windowTitleStyle">@style/DialogWindowTitle</item>
+    </style>
+
+    <style name="DialogWindowTitle" parent="Base.DialogWindowTitle.AppCompat">
+        <item name="android:textAppearance">@style/DialogWindowTitleText</item>
+    </style>
+
+    <style name="DialogWindowTitleText" parent="@android:style/TextAppearance.DialogWindowTitle">
+        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>
