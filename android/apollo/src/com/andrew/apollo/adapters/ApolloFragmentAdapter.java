@@ -224,7 +224,15 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         if (position < 0 || (mDataList != null && position >= mDataList.size())) {
             return null;
         }
-        return (mDataList != null && !mDataList.isEmpty()) ? mDataList.get(position) : super.getItem(position);
+        if (mDataList != null && !mDataList.isEmpty()) {
+            return mDataList.get(position);
+        } else {
+            try {
+                return super.getItem(position);
+            } catch (Throwable t) {
+                return null;
+            }
+        }
     }
 
     /**
