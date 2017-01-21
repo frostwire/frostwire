@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIConstants;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.PaddedPanel;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.SearchAction;
@@ -41,11 +40,15 @@ import com.limegroup.gnutella.gui.dnd.MulticastTransferHandler;
 import com.limegroup.gnutella.gui.tables.*;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 import com.limegroup.gnutella.settings.SearchSettings;
+import com.limegroup.gnutella.util.FrostWireUtils;
 import com.limegroup.gnutella.util.QueryUtils;
 import net.miginfocom.swing.MigLayout;
+import org.limewire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -56,6 +59,8 @@ import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.limegroup.gnutella.gui.I18n.tr;
+
 public final class SearchResultMediator extends AbstractTableMediator<TableRowFilteredModel, SearchResultDataLine, UISearchResult> {
 
     private static final String SEARCH_TABLE = "SEARCH_TABLE";
@@ -64,6 +69,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * The TableSettings that all ResultPanels will use.
      */
     private static final TableSettings SEARCH_SETTINGS = new TableSettings("SEARCH_TABLE");
+    private static final java.lang.String FROSTWIRE_FEATURED_DOWNLOADS_URL = "http://www.frostwire.com/featured-downloads/?from=desktop-"+ OSUtils.getFullOS() + "-" + FrostWireUtils.getFrostWireVersion() + "b" + FrostWireUtils.getBuildNumber();
 
     /**
      * The search info of this class.
@@ -125,7 +131,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         // disable dnd for overlay panel
         TABLE.setDragEnabled(false);
         TABLE.setTransferHandler(null);
-
         SOUTH_PANEL.setVisible(false);
     }
 
@@ -273,7 +278,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
         CONFIGURE_SHARING_LISTENER = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                GUIMediator.instance().setOptionsVisible(true, I18n.tr("Options"));
+                GUIMediator.instance().setOptionsVisible(true, tr("Options"));
             }
         };
 
@@ -327,8 +332,8 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
                     break;
                 }
             }
-            PopupUtils.addMenuItem(I18n.tr("Copy Magnet"), COPY_MAGNET_ACTION_LISTENER, menu, allWithHash);
-            PopupUtils.addMenuItem(I18n.tr("Copy Hash"), COPY_HASH_ACTION_LISTENER, menu, allWithHash);
+            PopupUtils.addMenuItem(tr("Copy Magnet"), COPY_MAGNET_ACTION_LISTENER, menu, allWithHash);
+            PopupUtils.addMenuItem(tr("Copy Hash"), COPY_HASH_ACTION_LISTENER, menu, allWithHash);
 
             menu.add(createSearchAgainMenu(lines[0]));
         } else {
@@ -348,7 +353,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * Returns a menu with a 'repeat search' and 'repeat search no clear' action.
      */
     private JMenu createSearchAgainMenu(SearchResultDataLine line) {
-        JMenu menu = new SkinMenu(I18n.tr("Search More"));
+        JMenu menu = new SkinMenu(tr("Search More"));
         menu.add(new SkinMenuItem(new RepeatSearchAction()));
 
         if (line == null) {
@@ -361,7 +366,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         SearchInformation info = SearchInformation.createKeywordSearch(keywords, null, MediaType.getAnyTypeMediaType());
         if (SearchMediator.validateInfo(info) == SearchMediator.QUERY_VALID) {
             SeasonalContentSearchSuggestion.attemptToAddSeasonalContentSearchSuggestion(menu, null, searchTokens);
-            menu.add(new SkinMenuItem(new SearchAction(info, I18n.tr("Search for Keywords: {0}"))));
+            menu.add(new SkinMenuItem(new SearchAction(info, tr("Search for Keywords: {0}"))));
         }
 
         return menu;
@@ -647,8 +652,8 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
 
-        final String strShowOpts = I18n.tr("Search tools");
-        final String strHideOpts = I18n.tr("Search tools");
+        final String strShowOpts = tr("Search tools");
+        final String strHideOpts = tr("Search tools");
 
         // reusing schema box panel for more options button
         // minor optimization to keep the layout as flat as possible
@@ -737,8 +742,13 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
         JPanel overlayPanel = new JPanel();
         overlayPanel.setOpaque(false);
-        overlayPanel.setLayout(new MigLayout("fill"));
+        overlayPanel.setLayout(new MigLayout("fill, wrap"));
         overlayPanel.add(overlay, "center");
+
+        // Browse All Free Downloads Button
+        overlayPanel.add(getBrowseAllFeaturedDownloadsButton(), "center");
+
+
         JScrollPane scrollPane = new JScrollPane(overlayPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -750,8 +760,26 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         background.add(scrollPane);
         background.add(table);
 
+
         MAIN_PANEL.add(background);
         addButtonRow();
+    }
+
+    private Component getBrowseAllFeaturedDownloadsButton() {
+        Color blue = new Color(70, 179, 232);
+        JLabel browseAll = new JLabel(tr("All Free Downloads"));
+        browseAll.setBackground(blue);
+        browseAll.setForeground(Color.WHITE);
+        browseAll.setOpaque(true);
+        browseAll.setFont(new Font("Helvetica", Font.BOLD, 26));
+        browseAll.setBorder(new EmptyBorder(30,70,30,70));
+        browseAll.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                GUIMediator.openURL(FROSTWIRE_FEATURED_DOWNLOADS_URL);
+            }
+        });
+        return browseAll;
     }
 
     /**
