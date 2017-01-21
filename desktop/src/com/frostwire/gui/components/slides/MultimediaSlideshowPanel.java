@@ -18,10 +18,10 @@
 
 package com.frostwire.gui.components.slides;
 
-import com.frostwire.util.Logger;
-import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.Logger;
+import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -47,7 +47,6 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
     private static final Logger LOG = Logger.getLogger(MultimediaSlideshowPanel.class);
 
     private SlideshowListener listener;
-    private CardLayout layout;
     private List<Slide> slides;
     private List<Slide> fallbackSlides;
 
@@ -90,8 +89,8 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
 
     @Override
     public void switchToSlide(int slideIndex) {
-        if (slideIndex >= 0 && slideIndex < getNumSlides()) {
-            layout.show(this, String.valueOf(slideIndex));
+        if (slideIndex >= 0 && slideIndex < getNumSlides() && getLayout() instanceof CardLayout) {
+            ((CardLayout) getLayout()).show(this, String.valueOf(slideIndex));
         }
 
         if (timer != null) {
@@ -109,8 +108,7 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
     }
 
     private void setupUI() {
-        layout = new CardLayout();
-        setLayout(layout);
+        setLayout(new CardLayout());
     }
 
     private void setup(List<Slide> slides) {
@@ -218,7 +216,7 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
     }
 
     private List<Slide> filter(List<Slide> slides) {
-        List<Slide> result = new ArrayList<Slide>(slides.size());
+        List<Slide> result = new ArrayList<>(slides.size());
 
         for (Slide slide : slides) {
             if (isMessageEligibleForMyLang(slide.language) && isMessageEligibleForMyOs(slide.os) && isMessageEligibleForMyVersion(slide.includedVersions)) {
@@ -252,10 +250,12 @@ public class MultimediaSlideshowPanel extends JPanel implements SlideshowPanel {
             SlidePanel currentSlidePanel = getCurrentSlidePanel();
             if (currentSlidePanel == null || !currentSlidePanel.isOverlayVisible()) {
 
-                layout.next(MultimediaSlideshowPanel.this);
+                if (getLayout() instanceof CardLayout) {
+                    ((CardLayout) getLayout()).next(MultimediaSlideshowPanel.this);
 
-                if (listener != null) {
-                    listener.onSlideChanged();
+                    if (listener != null) {
+                        listener.onSlideChanged();
+                    }
                 }
 
             }
