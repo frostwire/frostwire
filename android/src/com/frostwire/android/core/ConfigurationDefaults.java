@@ -113,7 +113,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, 4L);
         defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, 200L);
         defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_PEERS, 200L);
-        defaultValues.put(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES, false);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_DELETE_TORRENT_FILE_ON_TRANSFER_START, false);
 
         defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath()); // /mnt/sdcard
 

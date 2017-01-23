@@ -347,7 +347,7 @@ public final class TransferManager {
     private static BittorrentDownload createBittorrentDownload(TransferManager manager, TorrentSearchResult sr) {
         if (sr instanceof TorrentCrawledSearchResult) {
             TorrentCrawledSearchResult torrentCrawledSearchResult = (TorrentCrawledSearchResult) sr;
-            BTEngine.getInstance().download(torrentCrawledSearchResult, null, manager.isDeleteStartedTorrentEnabled());
+            BTEngine.getInstance().download(torrentCrawledSearchResult, null, manager.isTorrentDeletedOnTransferStart());
         } else if (sr instanceof ScrapedTorrentFileSearchResult) {
             return new TorrentFetcherDownload(manager, new TorrentSearchResultInfo(sr, sr.getReferrerUrl()));
         } else if (sr.getTorrentUrl() != null) {
@@ -444,8 +444,8 @@ public final class TransferManager {
         return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
     }
 
-    public boolean isDeleteStartedTorrentEnabled() {
-        return CM.getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES);
+    public boolean isTorrentDeletedOnTransferStart() {
+        return CM.getBoolean(Constants.PREF_KEY_TORRENT_DELETE_TORRENT_FILE_ON_TRANSFER_START);
     }
 
     public void resumeResumableTransfers() {

@@ -318,7 +318,7 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
                                 null,
                                 selection,
                                 peers,
-                                TransferManager.instance().isDeleteStartedTorrentEnabled());
+                                TransferManager.instance().isTorrentDeletedOnTransferStart());
                         UIUtils.showTransfersOnDownloadStart(context);
                     } catch (Throwable ignored) {
                     }
