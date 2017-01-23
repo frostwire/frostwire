@@ -20,7 +20,6 @@ package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.AlertListener;
 import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.Pair;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.SessionManager;
 import com.frostwire.jlibtorrent.SessionParams;
@@ -43,7 +42,6 @@ import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.jlibtorrent.swig.session_params;
 import com.frostwire.jlibtorrent.swig.settings_pack;
-import com.frostwire.jlibtorrent.swig.string_int_pair;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
@@ -259,7 +257,7 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers) {
+    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers, boolean deleteTorrentFile) {
         if (swig() == null) {
             return;
         }
@@ -295,10 +293,13 @@ public final class BTEngine extends SessionManager {
         if (!torrentHandleExists) {
             File torrent = saveTorrent(ti);
             saveResumeTorrent(torrent);
+            if (deleteTorrentFile) {
+                deleteTorrentFile(torrent);
+            }
         }
     }
 
-    public void download(TorrentCrawledSearchResult sr, File saveDir) {
+    public void download(TorrentCrawledSearchResult sr, File saveDir, boolean deleteTorrentFile) {
         if (swig() == null) {
             return;
         }
@@ -329,6 +330,19 @@ public final class BTEngine extends SessionManager {
         if (!exists) {
             File torrent = saveTorrent(ti);
             saveResumeTorrent(torrent);
+            if (deleteTorrentFile) {
+                deleteTorrentFile(torrent);
+            }
+        }
+    }
+
+    private void deleteTorrentFile(File torrentFile) {
+        try {
+            if (!torrentFile.delete()) {
+                LOG.warn("Error deleting torrent file");
+            }
+        } catch (Exception e) {
+            LOG.warn("Error deleting torrent file ", e);
         }
     }
 
