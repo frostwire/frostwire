@@ -64,6 +64,7 @@ public final class SearchFragment extends AbstractPreferenceFragment {
                         cb.setChecked(true); // always keep one checked
                         UIUtils.showShortMessage(getView(), R.string.search_preferences_one_engine_checked_always);
                     }
+                    selectAll.setTitle(R.string.select_all);
                 } else {
                     updateSelectAllCheckBox();
                 }
@@ -83,7 +84,9 @@ public final class SearchFragment extends AbstractPreferenceFragment {
         selectAll.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                checkAllEngines(((CheckBoxPreference) preference).isChecked());
+                CheckBoxPreference selectAll = (CheckBoxPreference) preference;
+                checkAllEngines(selectAll.isChecked());
+                selectAll.setTitle(selectAll.isChecked() ? R.string.deselect_all : R.string.select_all);
                 return true;
             }
         });
@@ -94,6 +97,7 @@ public final class SearchFragment extends AbstractPreferenceFragment {
         CheckBoxPreference cb = findPreference("frostwire.prefs.search.preference_category.select_all");
         boolean allChecked = areAllEnginesChecked(activeSearchEnginePreferences, true);
         setChecked(cb, allChecked, false);
+        cb.setTitle(allChecked ? R.string.deselect_all : R.string.select_all);
     }
 
     private void fillSearchEnginePreferences(Map<CheckBoxPreference, SearchEngine> active, Map<CheckBoxPreference, SearchEngine> inactive) {
