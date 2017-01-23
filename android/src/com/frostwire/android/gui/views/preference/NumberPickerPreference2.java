@@ -16,7 +16,6 @@
 
 package com.frostwire.android.gui.views.preference;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -24,7 +23,7 @@ import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v14.preference.PreferenceDialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.Preference;
 import android.text.Editable;
@@ -93,7 +92,7 @@ public final class NumberPickerPreference2 extends DialogPreference {
     /**
      * Actual dialog used to interact with the preference
      */
-    public static final class NumberPickerPreferenceDialog extends PreferenceDialogFragment {
+    public static final class NumberPickerPreferenceDialog extends PreferenceDialogFragmentCompat {
 
         public static final String START_RANGE = "startRange";
         public static final String END_RANGE = "endRange";
@@ -195,7 +194,7 @@ public final class NumberPickerPreference2 extends DialogPreference {
                 }
             });
 
-            if(hasUnlimitedValue){
+            if (hasUnlimitedValue) {
                 label.setText(String.format("Choose a value form %d to %d\n(%d means unlimited, default: %d)", startRange, endRange, unlimitedValue, defaultValue));
             } else {
                 label.setText(String.format("Choose a value form %d to %d\n(Default: %d)", startRange, endRange, defaultValue));
@@ -214,7 +213,7 @@ public final class NumberPickerPreference2 extends DialogPreference {
         public void onDialogClosed(boolean positiveResult) {
             if (positiveResult) {
                 String text = String.valueOf(input.getText());
-                if(!StringUtils.isNullOrEmpty(text)) {
+                if (!StringUtils.isNullOrEmpty(text)) {
                     int newValue = Integer.parseInt(text);
                     ((NumberPickerPreference2) getPreference()).saveValue(newValue);
                     final Preference.OnPreferenceChangeListener onPreferenceChangeListener = getPreference().getOnPreferenceChangeListener();
