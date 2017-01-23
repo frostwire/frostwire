@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.AlertListener;
 import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.Pair;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.SessionManager;
 import com.frostwire.jlibtorrent.SessionParams;
@@ -43,7 +42,6 @@ import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.jlibtorrent.swig.session_params;
 import com.frostwire.jlibtorrent.swig.settings_pack;
-import com.frostwire.jlibtorrent.swig.string_int_pair;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
