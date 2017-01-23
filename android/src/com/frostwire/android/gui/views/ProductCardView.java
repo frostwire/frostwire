@@ -21,7 +21,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.offers.Product;
@@ -33,7 +33,7 @@ import com.frostwire.android.offers.Product;
  * @author marcelinkaaa
  * @author aldenml
  */
-public class ProductCardView extends LinearLayout {
+public class ProductCardView extends RelativeLayout {
 
     private final String titleBold;
     private final String titleNormal;
