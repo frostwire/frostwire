@@ -26,6 +26,7 @@ import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference.KitKatStoragePreferenceDialog;
@@ -130,6 +131,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
     private void disconnect() {
         Engine.instance().stopServices(true); // internally this is an async call in libtorrent
         updateConnectSwitchStatus();
+        UIUtils.showShortMessage(getView(), R.string.toast_on_disconnect);
     }
 
     private void updateStorageOptionSummary(String newPath) {
