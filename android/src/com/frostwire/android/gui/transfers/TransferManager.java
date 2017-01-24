@@ -347,10 +347,7 @@ public final class TransferManager {
     private static BittorrentDownload createBittorrentDownload(TransferManager manager, TorrentSearchResult sr) {
         if (sr instanceof TorrentCrawledSearchResult) {
             TorrentCrawledSearchResult torrentCrawledSearchResult = (TorrentCrawledSearchResult) sr;
-            BTEngine.getInstance().download(torrentCrawledSearchResult, null);
-            if (manager.isDeleteStartedTorrentEnabled()) {
-                BTEngine.getInstance().deleteTorrentFile(torrentCrawledSearchResult.getTorrentInfo());
-            }
+            BTEngine.getInstance().download(torrentCrawledSearchResult, null, manager.isDeleteStartedTorrentEnabled());
         } else if (sr instanceof ScrapedTorrentFileSearchResult) {
             return new TorrentFetcherDownload(manager, new TorrentSearchResultInfo(sr, sr.getReferrerUrl()));
         } else if (sr.getTorrentUrl() != null) {

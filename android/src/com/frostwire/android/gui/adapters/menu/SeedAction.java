@@ -28,7 +28,6 @@ import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
@@ -243,10 +242,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                     final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
 
                     // so the TorrentHandle object is created and added to the libtorrent session.
-                    BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null);
-                    if (TransferManager.instance().isDeleteStartedTorrentEnabled()) {
-                        BTEngine.getInstance().deleteTorrentFile(tinfo);
-                    }
+                    BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, TransferManager.instance().isDeleteStartedTorrentEnabled());
                 } catch (Throwable e) {
                     // TODO: better handling of this error
                     LOG.error("Error creating torrent for seed", e);
