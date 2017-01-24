@@ -151,6 +151,11 @@ public final class SettingsActivity2 extends AbstractActivity2
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
             // refresh the fragment
             switchToFragment(ApplicationFragment.class.getName(), null, null);
+        } else if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
+                data != null &&
+                data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
+            // We (onActivityResult) are invoked before onResume()
+            ApplicationFragment.removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
