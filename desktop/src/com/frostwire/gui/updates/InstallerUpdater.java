@@ -229,7 +229,6 @@ public class InstallerUpdater implements Runnable {
                         th = BTEngine.getInstance().find(sha1);
                         _manager = th;
                         th.resume();
-                        th.forceRecheck();
 
                         // Sleep for a bit, sometimes the added torrent is from the last session and it is finished but this is so
                         // early that we only see progress of 100% when we debug and step thru.
@@ -249,11 +248,9 @@ public class InstallerUpdater implements Runnable {
                         return;
                     }
 
-                    printDownloadManagerStatus(th);
-
                     AlertType type = alert.type();
-
-                    System.out.println(type);
+                    System.out.println("InstallerUpdater.AlertListener: " + type);
+                    printDownloadManagerStatus(th);
 
                     switch (type) {
                         case TORRENT_RESUMED:
@@ -261,7 +258,6 @@ public class InstallerUpdater implements Runnable {
                         case FILE_ERROR:
                         case PIECE_FINISHED:
                             printDownloadManagerStatus(th);
-                            th.forceRecheck();
                             onStateChanged(th, th.status().state());
                             int progress = (int) (_manager.status().progress() * 100);
                             if (progress == 100) {
@@ -314,8 +310,7 @@ public class InstallerUpdater implements Runnable {
         int index = _updateMessage.getTorrent().lastIndexOf('/');
         File torrentFileLocation = new File(appSpecialShareFolder, _updateMessage.getTorrent().substring(index + 1));
 
-        if (!appSpecialShareFolder.exists()) {
-            appSpecialShareFolder.mkdir();
+        if (!appSpecialShareFolder.exists() && appSpecialShareFolder.mkdir()) {
             appSpecialShareFolder.setWritable(true);
         }
 
@@ -391,15 +386,21 @@ public class InstallerUpdater implements Runnable {
                 return m.matches() && !m.group(1).equals(_updateMessage.getVersion());
             }
         };
-        for (File f : UpdateSettings.UPDATES_DIR.listFiles(filenameFilter)) {
-            f.delete();
+        File[] files = UpdateSettings.UPDATES_DIR.listFiles(filenameFilter);
+        if (files != null) {
+            for (File f : files) {
+                f.delete();
+            }
         }
     }
 
     private boolean checkIfDownloaded() {
         String installerFilename = UpdateMediator.getInstallerFilename(_updateMessage);
+        if (installerFilename == null) {
+            return false;
+        }
         File f = new File(UpdateSettings.UPDATES_DIR, installerFilename);
-        if (installerFilename == null || !f.exists()) {
+        if (!f.exists()) {
             return false;
         }
         _executableFile = f;
