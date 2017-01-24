@@ -28,11 +28,17 @@
         <item name="android:textColorSecondary">@color/app_text_secondary</item>
         <item name="toolbarNavigationButtonStyle">@style/ToolbarNavigationButtonStyle</item>
         <item name="toolbarStyle">@style/ToolbarStyle</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+
+    <style name="PreferenceThemeOverlay" parent="PreferenceThemeOverlay.v14.Material">
+        <item name="preferenceCategoryStyle">@style/Preference.Category.Material</item>
     </style>
 
     <style name="Preference.Category.Material">
         <item name="android:layout">@layout/view_preference_category_material</item>
+        <item name="android:textColor">@color/basic_blue_darker_highlight</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="Theme.FrostWire.NoMaterial" parent="android:Theme.Holo.Light">
