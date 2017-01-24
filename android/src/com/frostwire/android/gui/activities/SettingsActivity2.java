@@ -149,7 +149,8 @@ public final class SettingsActivity2 extends AbstractActivity2
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
-            // TODO: missing summary update
+            // refresh the fragment
+            switchToFragment(ApplicationFragment.class.getName(), null, null);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
