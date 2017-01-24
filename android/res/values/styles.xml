@@ -509,7 +509,7 @@
     </style>
 
     <style name="BuyNoAdsCardTitle.Purchase">
-        <item name="android:textStyle">bold</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
     <style name="BuyNoAdsCardPrice">
@@ -536,7 +536,7 @@
         <item name="android:paddingRight">10dp</item>
     </style>
 
-    <style name="BuyNoAdsSelectOptionBelowTitle" parent="BuyNoAdsCardTitle">
+    <style name="BuyNoAdsSelectOptionBelowTitle" parent="BuyNoAdsCardTitle.Bold">
         <item name="android:layout_marginTop">8dp</item>
     </style>
 
