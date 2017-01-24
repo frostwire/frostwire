@@ -199,13 +199,10 @@ public class InstallerUpdater implements Runnable {
             @Override
             public int[] types() {
                 return new int[]{
-                        TORRENT_PAUSED.swig(),
                         TORRENT_RESUMED.swig(),
                         TORRENT_ADDED.swig(),
-                        FILE_ERROR.swig(),
                         PIECE_FINISHED.swig(),
                         TORRENT_FINISHED.swig(),
-                        TORRENT_ERROR.swig(),
                 };
             }
 
@@ -249,7 +246,6 @@ public class InstallerUpdater implements Runnable {
                     }
 
                     if (th == null) {
-                        System.out.println("InstallerUpdater.AlertListener: skipping alert, no torrent handle yet");
                         return;
                     }
 
@@ -276,13 +272,10 @@ public class InstallerUpdater implements Runnable {
                             }
                             break;
                         case TORRENT_FINISHED:
-                            System.out.println("InstallerUpdater.AlertListener: TORRENT_FINISHED!");
                             BTEngine.getInstance().removeListener(this);
                             onStateChanged(th, th.status().state());
                             downloadComplete();
                             break;
-                        default:
-                            System.out.println("InstallerUpdater.AlertListener: other alert -> " + alert);
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();
