@@ -32,10 +32,12 @@ import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UpdateSettings;
-import org.limewire.util.CommonUtils;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
@@ -175,7 +177,6 @@ public class InstallerUpdater implements Runnable {
                 }
             }
             isDownloadingUpdate = false;
-            saveMetaData();
             cleanupOldUpdates();
 
             if (checkIfDownloaded()) {
@@ -189,50 +190,99 @@ public class InstallerUpdater implements Runnable {
 
     private void startTorrentDownload(String torrentFile, String saveDataPath) throws Exception {
 
-        AlertListener updateTorrentListener = new AlertListener() {
+        TorrentInfo tinfo = new TorrentInfo(new File(torrentFile));
+        final Sha1Hash updateInfoHash = tinfo.infoHash();
 
+        AlertListener updateTorrentListener = new AlertListener() {
             TorrentHandle th = null;
 
             @Override
             public int[] types() {
-                return new int[]{TORRENT_ADDED.swig(),
+                return new int[]{
+                        TORRENT_PAUSED.swig(),
+                        TORRENT_RESUMED.swig(),
+                        TORRENT_ADDED.swig(),
                         FILE_ERROR.swig(),
                         PIECE_FINISHED.swig(),
-                        TORRENT_FINISHED.swig()
+                        TORRENT_FINISHED.swig(),
+                        TORRENT_ERROR.swig(),
                 };
             }
 
             @Override
             public void alert(Alert<?> alert) {
                 try {
+                    if (checkIfDownloaded()) {
+                        BTEngine.getInstance().removeListener(this);
+                        showUpdateMessage();
+                    }
+
                     if (!(alert instanceof TorrentAlert<?>)) {
+                        //check manually for the md5 every time as jlibtorrent is failing to report the finished download.
+                        return;
+                    }
+                    Sha1Hash alertSha1Hash = ((TorrentAlert) alert).handle().infoHash();
+
+                    if (!alertSha1Hash.toHex().equals(updateInfoHash.toHex())) {
                         return;
                     }
 
-                    if (alert.type().equals(TORRENT_ADDED)) {
+                    if (alert.type().equals(TORRENT_ADDED) && alertSha1Hash.toHex().equals(updateInfoHash.toHex())) {
                         Sha1Hash sha1 = ((TorrentAlert<?>) alert).handle().infoHash();
                         th = BTEngine.getInstance().find(sha1);
                         _manager = th;
                         th.resume();
+                        th.forceRecheck();
+
+                        // Sleep for a bit, sometimes the added torrent is from the last session and it is finished but this is so
+                        // early that we only see progress of 100% when we debug and step thru.
+                        Thread.sleep(2000);
+
+                        // it can happen that the file is finished at this moment and no update message has been shown before.
+                        int progress = (int) (_manager.status().progress() * 100);
+                        if (progress == 100) {
+                            isDownloadingUpdate = false;
+                            BTEngine.getInstance().removeListener(this);
+                            downloadComplete();
+                            return;
+                        }
+                    }
+
+                    if (th == null) {
+                        System.out.println("InstallerUpdater.AlertListener: skipping alert, no torrent handle yet");
                         return;
                     }
 
-                    if (!((TorrentAlert<?>) alert).handle().swig().op_eq(th.swig())) {
-                        return;
-                    }
+                    printDownloadManagerStatus(th);
 
                     AlertType type = alert.type();
 
+                    System.out.println(type);
+
                     switch (type) {
+                        case TORRENT_RESUMED:
+                            printDownloadManagerStatus(th);
                         case FILE_ERROR:
                         case PIECE_FINISHED:
+                            printDownloadManagerStatus(th);
+                            th.forceRecheck();
                             onStateChanged(th, th.status().state());
+                            int progress = (int) (_manager.status().progress() * 100);
+                            if (progress == 100) {
+                                isDownloadingUpdate = false;
+                                BTEngine.getInstance().removeListener(this);
+                                downloadComplete();
+                                return;
+                            }
                             break;
                         case TORRENT_FINISHED:
+                            System.out.println("InstallerUpdater.AlertListener: TORRENT_FINISHED!");
                             BTEngine.getInstance().removeListener(this);
                             onStateChanged(th, th.status().state());
                             downloadComplete();
                             break;
+                        default:
+                            System.out.println("InstallerUpdater.AlertListener: other alert -> " + alert);
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -242,8 +292,7 @@ public class InstallerUpdater implements Runnable {
 
         try {
             BTEngine.getInstance().addListener(updateTorrentListener);
-            BTEngine.getInstance().download(new TorrentInfo(new File(torrentFile)),
-                    new File(saveDataPath), null, null, null);
+            BTEngine.getInstance().download(tinfo, new File(saveDataPath), null, null, null);
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -287,67 +336,6 @@ public class InstallerUpdater implements Runnable {
         return torrentFileLocation;
     }
 
-    private InstallerMetaData getLastInstallerMetaData() {
-        InstallerMetaData result = null;
-        try {
-            File installerDatFile = new File(getInstallerDatPath());
-
-            if (!installerDatFile.exists()) {
-                return null;
-            }
-
-            FileInputStream fis = new FileInputStream(installerDatFile);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-
-            try {
-                result = (InstallerMetaData) ois.readObject();
-
-                if (result == null) {
-                    return null;
-                }
-            } finally {
-                fis.close();
-                ois.close();
-            }
-
-            return result;
-
-        } catch (Throwable e) {
-            // processMessage will deal with us returning null
-            LOG.info("Can't read installer meta data");
-            return null;
-        }
-    }
-
-    private boolean checkIfDownloaded() {
-
-        InstallerMetaData md = getLastInstallerMetaData();
-
-        if (md == null) {
-            return false;
-        }
-
-        if (!md.frostwireVersion.equals(_updateMessage.getVersion())) {
-            return false;
-        }
-
-        String installerFilename = UpdateMediator.getInstallerFilename(_updateMessage);
-        File f = new File(UpdateSettings.UPDATES_DIR, installerFilename);
-        if (installerFilename == null || !f.exists()) {
-            return false;
-        }
-
-        _executableFile = f;
-
-        try {
-            lastMD5 = DigestUtils.getMD5(f);
-            return DigestUtils.compareMD5(lastMD5, _updateMessage.getRemoteMD5());
-        } catch (Throwable e) {
-            LOG.error("Error checking update MD5", e);
-            return false;
-        }
-    }
-
     private void onStateChanged(TorrentHandle manager, TorrentStatus.State state) {
         if (_manager == null && manager != null) {
             _manager = manager;
@@ -368,7 +356,6 @@ public class InstallerUpdater implements Runnable {
             return;
         }
 
-        //if (state == DownloadManager.STATE_ERROR) {
         ErrorCode error = manager.status().errorCode();
         if (error != null && error.value() != 0) {
             isDownloadingUpdate = false;
@@ -389,17 +376,12 @@ public class InstallerUpdater implements Runnable {
         } else if (state == TorrentStatus.State.DOWNLOADING) {
             System.out.println("stateChanged(STATE_DOWNLOADING)");
             downloadProgress = (int) (_manager.status().progress() * 100);
-        } /*else if (state == DownloadManager.STATE_READY || state == TorrentStatus.State.STATE_QUEUED) {
-            System.out.println("stateChanged(STATE_READY)");
-            manager.startDownload();
-        }*/
+        }
     }
 
     private void downloadComplete() {
         System.out.println("InstallerUpdater.downloadComplete()!!!!");
         printDownloadManagerStatus(_manager);
-
-        saveMetaData();
         cleanupOldUpdates();
 
         if (checkIfDownloaded()) {
@@ -408,49 +390,32 @@ public class InstallerUpdater implements Runnable {
     }
 
     private void cleanupOldUpdates() {
-
         final Pattern p = Pattern.compile("^frostwire-([0-9]+[0-9]?\\.[0-9]+[0-9]?\\.[0-9]+[0-9]?)(.*?)(\\.torrent)?$");
-
-        for (File f : UpdateSettings.UPDATES_DIR.listFiles(new FilenameFilter() {
-
+        FilenameFilter filenameFilter = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 Matcher m = p.matcher(name);
                 return m.matches() && !m.group(1).equals(_updateMessage.getVersion());
             }
-        })) {
-
+        };
+        for (File f : UpdateSettings.UPDATES_DIR.listFiles(filenameFilter)) {
             f.delete();
         }
     }
 
-    private String getInstallerDatPath() {
-        return CommonUtils.getUserSettingsDir().getAbsolutePath() + File.separator + "installer.dat";
-    }
-
-    private void saveMetaData() {
+    private boolean checkIfDownloaded() {
+        String installerFilename = UpdateMediator.getInstallerFilename(_updateMessage);
+        File f = new File(UpdateSettings.UPDATES_DIR, installerFilename);
+        if (installerFilename == null || !f.exists()) {
+            return false;
+        }
+        _executableFile = f;
         try {
-            String installerPath = getInstallerDatPath();
-
-            InstallerMetaData md = new InstallerMetaData();
-            md.frostwireVersion = _updateMessage.getVersion();
-
-            File f = new File(installerPath);
-
-            if (f.exists()) {
-                f.delete();
-            }
-
-            f.createNewFile();
-
-            FileOutputStream fos = new FileOutputStream(installerPath);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(md);
-
-            fos.close();
-
+            lastMD5 = DigestUtils.getMD5(f);
+            return DigestUtils.compareMD5(lastMD5, _updateMessage.getRemoteMD5());
         } catch (Throwable e) {
-            LOG.info("Can't save update meta data");
+            LOG.error("Error checking update MD5", e);
+            return false;
         }
     }
 
@@ -463,6 +428,8 @@ public class InstallerUpdater implements Runnable {
             return;
         }
         StringBuilder buf = new StringBuilder();
+        buf.append("Infohash: ");
+        buf.append(manager.infoHash().toHex());
         buf.append(" Completed:");
         TorrentStatus stats = manager.status();
         buf.append(stats.progress());
@@ -512,14 +479,4 @@ public class InstallerUpdater implements Runnable {
             fos.close();
         }
     } //downloadTorrentFile
-
-    private static class InstallerMetaData implements Serializable {
-
-        private static final long serialVersionUID = -2309399378691373445L;
-
-        /**
-         * Version coming from the update message
-         */
-        public String frostwireVersion;
-    }
 }
