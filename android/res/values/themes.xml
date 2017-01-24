@@ -31,6 +31,10 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
+    <style name="Preference.Category.Material">
+        <item name="android:layout">@layout/view_preference_category_material</item>
+    </style>
+
     <style name="Theme.FrostWire.NoMaterial" parent="android:Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/ActionBar</item>
         <item name="android:homeAsUpIndicator">@drawable/home_as_up_padding</item>

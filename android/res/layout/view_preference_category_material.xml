@@ -22,7 +22,8 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dip"
     android:textAppearance="@style/Preference_TextAppearanceMaterialBody2"
-    android:textColor="@color/preference_fallback_accent_color"
+    android:textColor="@color/basic_blue_darker_highlight"
+    android:textStyle="bold"
     android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
     android:paddingRight="?android:attr/listPreferredItemPaddingRight"
     android:paddingTop="16dip" />
