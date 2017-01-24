@@ -330,6 +330,18 @@ public final class BTEngine extends SessionManager {
         }
     }
 
+    public void deleteTorrentFile(TorrentInfo ti) {
+        entry entry = ti.toEntry().swig();
+        File torrentFile = new File(entry.dict().get(TORRENT_ORIG_PATH_KEY).string());
+        try {
+            if (!torrentFile.delete()) {
+                LOG.warn("Error deleting torrent file");
+            }
+        } catch (Exception e) {
+            LOG.warn("Error deleting torrent file ", e);
+        }
+    }
+
     public void restoreDownloads() {
         if (swig() == null) {
             return;
