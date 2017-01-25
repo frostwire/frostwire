@@ -29,8 +29,10 @@ import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference;
@@ -67,7 +69,24 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
     protected void initComponents() {
         setupConnectSwitch();
         setupStorageOption();
+        setupDataSaving();
         setupStore(removeAdsPurchaseTime);
+    }
+
+    private void setupDataSaving() {
+        SwitchPreferenceCompat preference = findPreference(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
+        preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                boolean newVal = (Boolean) newValue;
+                if (!newVal && !NetworkManager.instance().isDataWIFIUp()) {
+                    TransferManager.instance().stopHttpTransfers();
+                    TransferManager.instance().pauseTorrents();
+                    UIUtils.showShortMessage(getView(), R.string.data_saving_turn_off_transfers);
+                }
+                return true;
+            }
+        });
     }
 
     @Override
