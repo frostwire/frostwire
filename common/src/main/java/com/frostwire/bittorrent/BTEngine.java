@@ -261,7 +261,7 @@ public final class BTEngine extends SessionManager {
         download(ti, saveDir, selection, peers, false);
     }
 
-    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers, boolean deleteTorrentFile) {
+    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers, boolean dontSaveTorrentFile) {
         if (swig() == null) {
             return;
         }
@@ -295,10 +295,11 @@ public final class BTEngine extends SessionManager {
         download(ti, saveDir, priorities, null, peers);
 
         if (!torrentHandleExists) {
-            File torrent = saveTorrent(ti);
-            saveResumeTorrent(torrent);
-            if (deleteTorrentFile) {
-                deleteTorrentFile(torrent);
+            if (dontSaveTorrentFile) {
+                saveResumeTorrent(ti);
+            } else {
+                File torrent = saveTorrent(ti);
+                saveResumeTorrent(torrent);
             }
         }
     }
@@ -307,7 +308,7 @@ public final class BTEngine extends SessionManager {
         download(sr, saveDir, false);
     }
 
-    public void download(TorrentCrawledSearchResult sr, File saveDir, boolean deleteTorrentFile) {
+    public void download(TorrentCrawledSearchResult sr, File saveDir, boolean dontSaveTorrentFile) {
         if (swig() == null) {
             return;
         }
@@ -336,21 +337,12 @@ public final class BTEngine extends SessionManager {
         }
 
         if (!exists) {
-            File torrent = saveTorrent(ti);
-            saveResumeTorrent(torrent);
-            if (deleteTorrentFile) {
-                deleteTorrentFile(torrent);
+            if (dontSaveTorrentFile) {
+                saveResumeTorrent(ti);
+            } else {
+                File torrent = saveTorrent(ti);
+                saveResumeTorrent(torrent);
             }
-        }
-    }
-
-    private void deleteTorrentFile(File torrentFile) {
-        try {
-            if (!torrentFile.delete()) {
-                LOG.warn("Error deleting torrent file");
-            }
-        } catch (Exception e) {
-            LOG.warn("Error deleting torrent file ", e);
         }
     }
 
@@ -459,6 +451,28 @@ public final class BTEngine extends SessionManager {
         }
 
         return torrentFile;
+    }
+
+    private void saveResumeTorrent(TorrentInfo ti) {
+        File torrentFile;
+
+        try {
+            String name = ti.name();
+            if (name == null || name.length() == 0) {
+                name = ti.infoHash().toString();
+            }
+            name = escapeFilename(name);
+
+            torrentFile = new File(ctx.torrentsDir, name + ".torrent");
+            byte[] arr = ti.toEntry().bencode();
+
+            entry e = ti.toEntry().swig();
+            e.dict().set(TORRENT_ORIG_PATH_KEY, new entry(torrentFile.getAbsolutePath()));
+
+            FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHash().toString()), arr);
+        } catch (Throwable e) {
+            LOG.warn("Error saving resume torrent", e);
+        }
     }
 
     private void saveResumeTorrent(File torrent) {
