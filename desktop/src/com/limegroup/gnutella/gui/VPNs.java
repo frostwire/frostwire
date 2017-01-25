@@ -24,15 +24,13 @@ import org.limewire.util.OSUtils;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class VPNs {
-    public static boolean isVPNActive() {
+final class VPNs {
+    static boolean isVPNActive() {
         boolean result = false;
 
         if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
@@ -44,46 +42,43 @@ public final class VPNs {
         return result;
     }
 
+    /**
+     * <strong>VPN ON (Mac)</strong>
+     * <pre>Internet:
+     * Destination        Gateway            Flags        Refs      Use   Netif Expire
+     * 0/1                10.81.10.5         UGSc            5        0   utun1
+     * ...</pre>
+     *
+     * <strong>VPN ON (Linux)</strong>
+     * <pre>Kernel IP routing table
+     * Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+     * 0.0.0.0         10.31.10.5      128.0.0.0       UG        0 0          0 tun0
+     * ...</pre>
+     *
+     * @return true if it finds a line that starts with "0" and contains "tun" in the output of "netstat -nr"
+     */
     private static boolean isPosixVPNActive() {
         boolean result = false;
         try {
-            result = isAnyNetworkInterfaceATunnel();
-        } catch (Throwable t) {
-            result = false;
-            /**
-             try {
-             result = readProcessOutput("netstat","-nr").indexOf(" tun") != -1;
-             } catch (Throwable t2) {
-             result = false;
-             }
-             */
-        }
-
-        return result;
-    }
-
-    private static boolean isAnyNetworkInterfaceATunnel() {
-        boolean result = false;
-        try {
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (networkInterfaces.hasMoreElements()) {
-                NetworkInterface iface = networkInterfaces.nextElement();
-                if (iface.getDisplayName().contains("tun")) {
+            String netstatCmd = "netstat";
+            String[] output = readProcessOutput(netstatCmd,"-nr").split("\r\n");
+            for (String line : output) {
+                if (line.startsWith("0") && line.contains("tun")) {
                     result = true;
                     break;
                 }
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            result = false;
         }
 
         return result;
     }
 
     private static boolean isWindowsVPNActive() {
-        boolean result = false;
+        boolean result;
         try {
-            result = readProcessOutput("netstat", "-nr").indexOf("128.0.0.0") != -1;
+            result = readProcessOutput("netstat", "-nr").contains("128.0.0.0");
         } catch (Throwable t2) {
             result = false;
         }
@@ -99,12 +94,12 @@ public final class VPNs {
             Process process = pb.start();
             InputStream stdout = process.getInputStream();
             final BufferedReader brstdout = new BufferedReader(new InputStreamReader(stdout));
-            String line = null;
+            String line;
 
             try {
                 StringBuilder stringBuilder = new StringBuilder();
                 while ((line = brstdout.readLine()) != null) {
-                    stringBuilder.append(line);
+                    stringBuilder.append(line + "\r\n");
                 }
 
                 result = stringBuilder.toString();
