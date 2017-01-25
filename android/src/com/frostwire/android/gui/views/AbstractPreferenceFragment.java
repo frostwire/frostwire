@@ -17,10 +17,20 @@
 
 package com.frostwire.android.gui.views;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v14.preference.PreferenceFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.TwoStatePreference;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+
+import java.lang.reflect.Field;
 
 /**
  * @author gubatron
@@ -67,6 +77,64 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
             preference.setOnPreferenceChangeListener(null);
             preference.setChecked(checked);
             preference.setOnPreferenceChangeListener(l);
+        }
+    }
+
+    public static abstract class PreferenceDialogFragment
+            extends android.support.v14.preference.PreferenceDialogFragment {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            Context context = getActivity();
+            // initialize private super.mWhichButtonClicked
+            onClick(null, DialogInterface.BUTTON_NEGATIVE);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                    .setTitle(get("mDialogTitle"))
+                    .setIcon(this.<Drawable>getValue("mDialogIcon"))
+                    .setPositiveButton(get("mPositiveButtonText"), this)
+                    .setNegativeButton(get("mNegativeButtonText"), this);
+
+            View contentView = onCreateDialogView(context);
+            if (contentView != null) {
+                onBindDialogView(contentView);
+                builder.setView(contentView);
+            } else {
+                builder.setMessage(get("mDialogMessage"));
+            }
+
+            onPrepareDialogBuilder(builder);
+
+            Dialog dialog = builder.create();
+            if (needInputMethod()) {
+                Window window = dialog.getWindow();
+                window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            }
+
+            return dialog;
+        }
+
+        // final to effectively hide it
+        protected final void onPrepareDialogBuilder(android.app.AlertDialog.Builder builder) {
+        }
+
+        protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T> T getValue(String name) {
+            try {
+                Field f = android.support.v14.preference.PreferenceDialogFragment.class.getDeclaredField(name);
+                f.setAccessible(true);
+                return (T) f.get(this);
+            } catch (Throwable e) {
+                // ignore
+            }
+            return null;
+        }
+
+        private String get(String name) {
+            return getValue(name);
         }
     }
 }
