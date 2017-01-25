@@ -65,8 +65,7 @@ public final class MainMenuAdapter extends AbstractAdapter<MainMenuAdapter.MenuI
         add(new MenuItem(R.id.menu_main_library, R.string.my_files, R.drawable.menu_icon_library));
         add(new MenuItem(R.id.menu_main_transfers, R.string.transfers, R.drawable.menu_icon_transfers));
         add(new MenuItem(R.id.menu_main_support, R.string.help, R.drawable.menu_icon_support));
-        add(new MenuItem(R.id.menu_main_settings, R.string.settings, R.drawable.menu_icon_settings));
-        // comment this line if release is necessary
+        //add(new MenuItem(R.id.menu_main_settings, R.string.settings, R.drawable.menu_icon_settings));
         add(new MenuItem(R.id.menu_main_settings2, R.string.settings, R.drawable.menu_icon_settings));
         add(new MenuItem(R.id.menu_main_shutdown, R.string.exit, R.drawable.menu_icon_exit));
     }
