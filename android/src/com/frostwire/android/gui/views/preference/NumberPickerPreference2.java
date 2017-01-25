@@ -20,7 +20,6 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.support.v14.preference.PreferenceDialogFragment;
 import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.Preference;
 import android.util.AttributeSet;
@@ -28,6 +27,7 @@ import android.view.View;
 import android.widget.NumberPicker;
 
 import com.frostwire.android.R;
+import com.frostwire.android.gui.views.AbstractPreferenceFragment.PreferenceDialogFragment;
 
 /**
  * Support version of a custom dialog preference
