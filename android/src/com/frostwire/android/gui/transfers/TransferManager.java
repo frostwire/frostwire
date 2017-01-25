@@ -446,19 +446,21 @@ public final class TransferManager {
     public void resumeResumableTransfers() {
         List<Transfer> transfers = getTransfers();
 
-        for (Transfer t : transfers) {
-            if (t instanceof BittorrentDownload) {
-                BittorrentDownload bt = (BittorrentDownload) t;
-                if (bt.isPaused()) {
-                    bt.resume();
-                }
-            } else if (t instanceof HttpDownload) {
-                // TODO: review this feature taking care of the SD limitations
+        if (!isMobileAndDataSavingsOn()) {
+            for (Transfer t : transfers) {
+                if (t instanceof BittorrentDownload) {
+                    BittorrentDownload bt = (BittorrentDownload) t;
+                    if (bt.isPaused()) {
+                        bt.resume();
+                    }
+                } else if (t instanceof HttpDownload) {
+                    // TODO: review this feature taking care of the SD limitations
                 /*if (t.getName().contains("archive.org")) {
                     if (!t.isComplete() && !((HttpDownload) t).isDownloading()) {
                         ((HttpDownload) t).start(true);
                     }
                 }*/
+                }
             }
         }
     }
