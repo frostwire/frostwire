@@ -80,7 +80,6 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 boolean newVal = (Boolean) newValue;
                 if (!newVal && !NetworkManager.instance().isDataWIFIUp()) {
-                    TransferManager.instance().stopHttpTransfers();
                     TransferManager.instance().pauseTorrents();
                     UIUtils.showShortMessage(getView(), R.string.data_saving_turn_off_transfers);
                 }
