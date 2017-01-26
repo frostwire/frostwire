@@ -45,6 +45,7 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="12dp"
                 android:layout_marginTop="3dp"
+                android:contentDescription="@null"
                 android:scaleType="fitXY"
                 android:src="@drawable/vpn_icon_on_info" />
 
@@ -113,7 +114,8 @@
                 android:layout_height="2dp"
                 android:layout_marginBottom="22dp"
                 android:layout_marginTop="22dp"
-                android:adjustViewBounds="false" />
+                android:adjustViewBounds="false"
+                android:contentDescription="@null" />
 
 
             <!-- VPN client's feature list -->
@@ -129,7 +131,8 @@
                     style="@style/VPNTitleSecond"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingRight="5dp"
+                    android:paddingEnd="5dp"
+                    android:paddingStart="5dp"
                     android:text="@string/vpn_what_you_get_with" />
 
                 <TextView
@@ -188,6 +191,7 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="15dp"
+                android:contentDescription="@null"
                 android:src="@drawable/express_vpn" />
 
             <!-- GetVPN bottom button -->
