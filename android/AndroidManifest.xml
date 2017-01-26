@@ -128,11 +128,6 @@
                   android:label="@string/playing"
                   android:configChanges="orientation|screenSize"/>
 
-        <activity
-                android:name="com.frostwire.android.gui.activities.NoBTCWalletAvailableActivity"
-                android:label="@string/install_bitcoin_wallet">
-        </activity>
-
         <!-- Main activity -->
         <activity
                 android:name="com.andrew.apollo.ui.activities.HomeActivity"
