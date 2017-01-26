@@ -41,12 +41,23 @@
     <declare-styleable name="ButtonActionPreference">
         <attr name="button_text" format="string" />
     </declare-styleable>
-    <declare-styleable name="numberpicker">
+
+    <declare-styleable name="fwPickerPreference">
         <attr name="picker_startRange" format="integer" />
         <attr name="picker_endRange" format="integer" />
         <attr name="picker_defaultValue" format="integer" />
-        <attr name="picker_maxValue" format="integer" />
-        <attr name="picker_wrap" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="fwSeekbarPreference">
+        <attr name="seekbar_startRange" format="integer" />
+        <attr name="seekbar_endRange" format="integer" />
+        <attr name="seekbar_defaultValue" format="integer" />
+        <attr name="seekbar_maxValue" format="integer" />
+        <attr name="seekbar_wrap" format="boolean" />
+        <attr name="seekbar_isByteRate" format="boolean" />
+        <attr name="seekbar_pluralUnitResourceIdName" format="string" />
+        <attr name="seekbar_hasUnlimited" format="boolean" />
+        <attr name="seekbar_unlimitedValue" format="integer" />
     </declare-styleable>
     <declare-styleable name="ClearableEditTextView">
         <attr name="clearable_hint" format="string" />

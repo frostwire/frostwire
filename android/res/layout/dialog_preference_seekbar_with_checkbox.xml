@@ -19,17 +19,28 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="25dp"
-        android:paddingRight="25dp"
-        android:textAlignment="center"
-        android:textColor="@color/app_text_secondary"
-        android:textSize="@dimen/text_x_small"
-        android:text="@string/number_picker_tip"/>
-    <NumberPicker
-        android:id="@+id/dialog_preference_number_picker"
+    <SeekBar
+        android:id="@+id/dialog_preference_seekbar_with_checkbox_seekbar"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"/>
+    <TextView
+        android:id="@+id/dialog_preference_seekbar_with_checkbox_current_value_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:textColor="@color/app_text_secondary"
+        android:textSize="@dimen/text_x_small"
+        android:text="@string/dummy_speed"
+        />
+    <CheckBox
+        android:id="@+id/dialog_preference_seekbar_with_checkbox_unlimited_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/unlimited"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="25dp"
+        />
 </LinearLayout>

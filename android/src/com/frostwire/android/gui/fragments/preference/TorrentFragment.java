@@ -26,10 +26,11 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
+import com.frostwire.android.gui.dialogs.FWSeekbarPreferenceDialog;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
-import com.frostwire.android.gui.views.preference.NumberPickerPreference2;
+import com.frostwire.android.gui.views.preference.FWSeekbarPreference;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -90,19 +91,19 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
 
     private void setupTorrentOptions() {
         final BTEngine e = BTEngine.getInstance();
-        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e, 0L, true, null);
-        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e, 0L, true, null);
-        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e, -1L, false, R.plurals.unit_downloads);
-        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, e, null, false, R.plurals.unit_uploads);
-        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, e, null, false, R.plurals.unit_connections);
-        setupNumericalPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e, null, false, R.plurals.unit_peers);
+        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e);
+        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e);
+        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS, e);
+        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOADS, e);
+        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS, e);
+        setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_PEERS, e);
     }
 
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
-        if (preference instanceof NumberPickerPreference2) {
+        if (preference instanceof FWSeekbarPreference) {
             DialogFragment fragment;
-            fragment = NumberPickerPreference2.NumberPickerPreferenceDialog.newInstance(preference);
+            fragment = FWSeekbarPreferenceDialog.newInstance((FWSeekbarPreference) preference);
             fragment.setTargetFragment(this, 0);
             fragment.show(this.getFragmentManager(),
                     "android.support.v14.preference.PreferenceFragment.DIALOG");
@@ -111,8 +112,8 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
         }
     }
 
-    private void setupNumericalPreference(final String key, final BTEngine btEngine, final Long unlimitedValue, final boolean byteRate, final Integer unit) {
-        final NumberPickerPreference2 pickerPreference = findPreference(key);
+    private void setupFWSeekbarPreference(final String key, final BTEngine btEngine) {
+        final FWSeekbarPreference pickerPreference = findPreference(key);
         if (pickerPreference != null) {
             pickerPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
@@ -120,13 +121,26 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
                     if (btEngine != null) {
                         int newVal = (int) newValue;
                         executeBTEngineAction(key, btEngine, newVal);
-                        displayNumericalSummaryForPreference(preference, newVal, unlimitedValue, byteRate, unit);
+                        displayNumericalSummaryForPreference((FWSeekbarPreference) preference, newVal);
                         return checkBTEngineActionResult(key, btEngine, newVal);
                     }
                     return false;
                 }
             });
-            displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key), unlimitedValue, byteRate, unit);
+            displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key));
+        }
+    }
+
+    private void displayNumericalSummaryForPreference(FWSeekbarPreference preference, long value) {
+
+        if (preference.supportsUnlimitedValue() && value == preference.getUnlimitedValue()) {
+            preference.setSummary(R.string.unlimited);
+        } else {
+            if (preference.isByteRate()) {
+                preference.setSummary(UIUtils.getBytesInHuman(value));
+            } else if (preference.getPluralUnitResourceId() != -1) {
+                preference.setSummary(getValueWithUnit(preference.getPluralUnitResourceId(), value));
+            }
         }
     }
 
@@ -169,18 +183,6 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
                 return btEngine.maxPeers() == value;
         }
         return false;
-    }
-
-    private void displayNumericalSummaryForPreference(Preference preference, long value, Long unlimitedValue, boolean rate, Integer unit) {
-        if (unlimitedValue != null && value == unlimitedValue) {
-            preference.setSummary(R.string.unlimited);
-        } else {
-            if (rate) {
-                preference.setSummary(UIUtils.getBytesInHuman(value));
-            } else {
-                preference.setSummary(getValueWithUnit(unit, value));
-            }
-        }
     }
 
     private String getValueWithUnit(Integer unit, long value) {

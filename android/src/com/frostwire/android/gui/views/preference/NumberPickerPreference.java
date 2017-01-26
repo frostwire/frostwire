@@ -28,6 +28,9 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import com.frostwire.android.R;
 
+/**
+ * @deprecated Use instead {@link FWSeekbarPreference}
+ */
 public class NumberPickerPreference extends DialogPreference {
     private NumberPicker mPicker;
     private int mStartRange;
@@ -42,10 +45,10 @@ public class NumberPickerPreference extends DialogPreference {
             return;
         }
 
-        TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.numberpicker);
-        mStartRange = arr.getInteger(R.styleable.numberpicker_picker_startRange, 0);
-        mEndRange = arr.getInteger(R.styleable.numberpicker_picker_endRange, 200);
-        mDefault = arr.getInteger(R.styleable.numberpicker_picker_defaultValue, 0);
+        TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.fwPickerPreference);
+        mStartRange = arr.getInteger(R.styleable.fwPickerPreference_picker_startRange, 0);
+        mEndRange = arr.getInteger(R.styleable.fwPickerPreference_picker_endRange, 200);
+        mDefault = arr.getInteger(R.styleable.fwPickerPreference_picker_defaultValue, 0);
         arr.recycle();
         setDialogLayoutResource(R.layout.dialog_preference_number_picker);
     }
