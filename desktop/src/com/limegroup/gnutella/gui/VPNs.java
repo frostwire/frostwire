@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.limewire.util.OSUtils;
 
@@ -30,6 +31,7 @@ import java.io.InputStreamReader;
  * @author aldenml
  */
 final class VPNs {
+    private static Pattern piaKillSwitchRoutePattern = null;
     static boolean isVPNActive() {
         boolean result = false;
 
@@ -80,22 +82,17 @@ final class VPNs {
         try {
             String[] output = readProcessOutput("netstat", "-nr").split("\r\n");
             for (String line : output) {
-                // regular VPN case
-                if (line.contains("128.0.0.0") ||
-                // PIA with kill switch (Hack)
-                        (line.contains("0.0.0.0          0.0.0.0       10.") && line.endsWith("21"))) {
+                if (line.contains("128.0.0.0") || piaVPNwithKillSwitchOn(line)) {
                     result = true;
                     break;
                 }
-                // PIA with kill switch after a restart adds 0.0.0.0 0.0.0.0 10.x.x.x.x 10.x.x.x.x 21 as the first route
-                // when VPN is active
             }
         } catch (Throwable t2) {
             result = false;
+            t2.printStackTrace();
         }
         return result;
     }
-
 
     private static String readProcessOutput(String command, String arguments) {
         String result = "";
@@ -124,5 +121,18 @@ final class VPNs {
             e.printStackTrace();
         }
         return result;
+    }
+
+    private static boolean piaVPNwithKillSwitchOn(String line) {
+        compilePIAKillSwitchPattern(); // lazy-compiles the pattern only once per session
+        return piaKillSwitchRoutePattern.matcher(line).matches();
+    }
+
+    private static void compilePIAKillSwitchPattern() {
+        if (piaKillSwitchRoutePattern == null) {
+            // PIA with kill switch after a restart adds 0.0.0.0 0.0.0.0 10.x.x.x.x 10.x.x.x.x NN as the first route
+            // when VPN is active
+            piaKillSwitchRoutePattern = Pattern.compile(".*?(0\\.0\\.0\\.0).*?(0\\.0\\.0\\.0).*?(10\\.\\d*\\.\\d*\\.\\d*).*(10\\.\\d*\\.\\d*\\.\\d*).*?(\\d\\d)");
+        }
     }
 }
