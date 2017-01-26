@@ -58,7 +58,7 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
         final TextView vpnPrice = findView(R.id.view_vpn_status_vpn_price);
 
         final TextView vpnBullet = findView(R.id.view_vpn_status_bullet_textview);
-        vpnBullet.setText(fromHtml(getString(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html)));
+        vpnBullet.setText(fromHtml(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html));
 
         final TextView vpnClientFeature1 = findView(R.id.view_vpn_status_vpn_client_feature_1);
         final TextView vpnClientFeature2 = findView(R.id.view_vpn_status_vpn_client_feature_2);
@@ -83,7 +83,7 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
             vpnMoneyBack.setVisibility(View.GONE);
             vpnPrice.setVisibility(View.GONE);
             // Current Status Text
-            vpnText.setText(fromHtml(getString(R.string.protected_connections_visibility_bullet_html)));
+            vpnText.setText(fromHtml(R.string.protected_connections_visibility_bullet_html));
             // getVPNButtonTop/learnVPNButton
             getVPNButtonTop.setVisibility(View.GONE);
             learnVPNButton.setText(R.string.learn_more);
@@ -99,9 +99,7 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
             vpnMoneyBack.setText(R.string.vpn_money_back);
             vpnPrice.setText(getString(R.string.vpn_price, Constants.EXPRESSVPN_STARTING_USD_PRICE));
             // Current Status Text
-            String VPNHtmlText = getString(R.string.unprotected_connections_visibility_bullet_html);
-            Spanned VPNTextAsSpanned = fromHtml(VPNHtmlText);
-            vpnText.setText(VPNTextAsSpanned);
+            vpnText.setText(fromHtml(R.string.unprotected_connections_visibility_bullet_html));
             // getVPNButtonTop/learnVPNButton
             learnVPNButton.setVisibility(View.GONE);
             getVPNButtonTop.setText(R.string.get_express_VPN);
@@ -151,6 +149,10 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
             super.onBackPressed();
         } catch (Throwable ignored) {
         }
+    }
+
+    private Spanned fromHtml(int resId) {
+        return fromHtml(getString(resId));
     }
 
     // once we get to API 24, we can replace the method for the new one
