@@ -773,8 +773,8 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         browseAll.setBackground(blue);
         browseAll.setForeground(Color.WHITE);
         browseAll.setOpaque(true);
-        browseAll.setFont(new Font("Helvetica", Font.BOLD, 26));
-        browseAll.setBorder(new EmptyBorder(30,70,30,70));
+        browseAll.setFont(new Font("Helvetica", Font.BOLD, 24));
+        browseAll.setBorder(new EmptyBorder(20,50,20,50));
         browseAll.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
