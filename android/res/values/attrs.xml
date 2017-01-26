@@ -45,6 +45,8 @@
         <attr name="picker_startRange" format="integer" />
         <attr name="picker_endRange" format="integer" />
         <attr name="picker_defaultValue" format="integer" />
+        <attr name="picker_hasUnlimitedValue" format="boolean"/>
+        <attr name="picker_unlimitedValue" format="integer"/>
         <attr name="picker_maxValue" format="integer" />
         <attr name="picker_wrap" format="boolean" />
     </declare-styleable>

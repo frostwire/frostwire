@@ -47,4 +47,8 @@
         <item name="android:elevation">2dp</item>
     </style>
 
+    <style name="DialogWindowButton" parent="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <!--Forcing to reuse default style without the override of textStyle preset in the base .xml-->
+    </style>
+
 </resources>

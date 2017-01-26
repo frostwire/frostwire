@@ -719,4 +719,30 @@
         <item name="android:paddingRight">0dp</item>
     </style>
 
+
+
+    <!-- Alert style for Material theme -->
+    <style name="AppAlertTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowTitleStyle">@style/DialogWindowTitle</item>
+        <!-- Used for the buttons -->
+        <item name="colorAccent">@color/basic_blue_darker_highlight</item>
+        <item name="buttonBarButtonStyle">@style/DialogWindowButton</item>
+    </style>
+
+
+
+    <style name="DialogWindowTitle" parent="Base.DialogWindowTitle.AppCompat">
+        <item name="android:textAppearance">@style/DialogWindowTitleText</item>
+    </style>
+
+    <style name="DialogWindowTitleText" parent="@android:style/TextAppearance.DialogWindowTitle">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DialogWindowButton" parent="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <!-- There is no sans-serif-medium font in android < 5.0 so we make the text bold,
+        as it is closer to medium then the default typeface -->
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>
