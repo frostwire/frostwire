@@ -29,6 +29,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
@@ -36,10 +37,8 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ClickAdapter;
 
 /**
- *
  * @author gubatron
  * @author aldenml
- *
  */
 public class VPNStatusDetailActivity extends AbstractActivity {
 
@@ -58,7 +57,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
         final Intent intent = getIntent();
         final boolean isProtectedConnection = intent.getAction() != null &&
                 intent.getAction().equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED);
-        
+
         final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
         final TextView headerStatus = findView(R.id.view_vpn_status_header);
         final TextView vpnText = findView(R.id.view_vpn_status_vpn_text);
@@ -97,8 +96,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             learnVPNButton.setText(R.string.learn_more);
             // getVPNButtonBottom
             getVPNButtonBottom.setText(R.string.visit_vpn_client);
-        }
-        else {
+        } else {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_off_info);
             // Current Status Title
@@ -106,7 +104,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
             headerStatus.setTextColor(Color.RED);
             // Current Status VPN client price
             vpnMoneyBack.setText(R.string.vpn_money_back);
-            vpnPrice.setText(getString(R.string.vpn_price,Constants.EXPRESSVPN_STARTING_USD_PRICE));
+            vpnPrice.setText(getString(R.string.vpn_price, Constants.EXPRESSVPN_STARTING_USD_PRICE));
             // Current Status Text
             String VPNHtmlText = getString(R.string.unprotected_connections_visibility_bullet_html);
             Spanned VPNTextAsSpanned = Html.fromHtml(VPNHtmlText);
@@ -158,7 +156,8 @@ public class VPNStatusDetailActivity extends AbstractActivity {
         startActivity(newIntent);
         try {
             super.onBackPressed();
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
     }
 
     // Let's minimize the use of anonymous classes $1, $2 for every listener out there. DRY principle is the prime coding directive.
@@ -175,8 +174,7 @@ public class VPNStatusDetailActivity extends AbstractActivity {
         public void onClick(VPNStatusDetailActivity owner, View v) {
             if (isProtectedConnection) {
                 UIUtils.openURL(owner, Constants.VPN_LEARN_MORE_URL);
-            }
-            else {
+            } else {
                 String vpnUrl = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ?
                         Constants.EXPRESSVPN_URL_BASIC :
                         Constants.EXPRESSVPN_URL_PLUS;
