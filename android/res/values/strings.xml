@@ -664,4 +664,6 @@
     <string name="search_preferences_one_engine_checked_always">By default, one search engine needs to be checked at all times</string>
     <string name="reset">reset</string>
     <string name="set">set</string>
+    <string name="number_picker_preference_label_unlimited">Choose a value form %1$d to %2$d\n(%3$d means unlimited, default: %4$d)</string>
+    <string name="number_picker_preference_label">Choose a value form %1$d to %2$d\n(Default: %3$d)</string>
 </resources>

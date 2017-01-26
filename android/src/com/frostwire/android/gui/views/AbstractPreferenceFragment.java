@@ -80,6 +80,12 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
         }
     }
 
+    /**
+     * This class is used to get around a problem in {@link android.support.v14.preference.PreferenceDialogFragment}
+     * of using normal AlertDialog instead of the support version. This leads to problems with styling
+     * on older APIs. Due to construction of PDF one cannot just extend it. This uses reflection to
+     * alleviate that.
+     */
     public static abstract class PreferenceDialogFragment
             extends android.support.v14.preference.PreferenceDialogFragment {
 

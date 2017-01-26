@@ -92,7 +92,7 @@ public final class NumberPickerPreference2 extends DialogPreference {
     /**
      * Actual dialog used to interact with the preference
      */
-    public static final class NumberPickerPreferenceDialog extends PreferenceDialogFragmentCompat {
+    public static final class NumberPickerPreferenceDialog extends PreferenceDialogFragment {
 
         public static final String START_RANGE = "startRange";
         public static final String END_RANGE = "endRange";
@@ -195,9 +195,9 @@ public final class NumberPickerPreference2 extends DialogPreference {
             });
 
             if (hasUnlimitedValue) {
-                label.setText(String.format("Choose a value form %d to %d\n(%d means unlimited, default: %d)", startRange, endRange, unlimitedValue, defaultValue));
+                label.setText(String.format(getString(R.string.number_picker_preference_label_unlimited), startRange, endRange, unlimitedValue, defaultValue));
             } else {
-                label.setText(String.format("Choose a value form %d to %d\n(Default: %d)", startRange, endRange, defaultValue));
+                label.setText(String.format(getString(R.string.number_picker_preference_label), startRange, endRange, defaultValue));
             }
         }
 
