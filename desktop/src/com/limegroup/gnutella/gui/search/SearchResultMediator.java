@@ -27,6 +27,7 @@ import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
@@ -56,6 +57,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -69,7 +71,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * The TableSettings that all ResultPanels will use.
      */
     private static final TableSettings SEARCH_SETTINGS = new TableSettings("SEARCH_TABLE");
-    private static final java.lang.String FROSTWIRE_FEATURED_DOWNLOADS_URL = "http://www.frostwire.com/featured-downloads/?from=desktop-"+ OSUtils.getFullOS() + "-" + FrostWireUtils.getFrostWireVersion() + "b" + FrostWireUtils.getBuildNumber();
+    private static final java.lang.String FROSTWIRE_FEATURED_DOWNLOADS_URL = "http://www.frostwire.com/featured-downloads/?from=desktop-"+ UrlUtils.encode(OSUtils.getFullOS() + "-" + FrostWireUtils.getFrostWireVersion() + "b" + FrostWireUtils.getBuildNumber());
 
     /**
      * The search info of this class.
