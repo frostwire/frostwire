@@ -32,7 +32,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity2;
-import com.frostwire.android.gui.views.ClickAdapter;
 
 /**
  * @author gubatron
@@ -107,18 +106,12 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
             getVPNButtonBottom.setText(R.string.get_express_VPN);
         }
 
-        final OnGetVPNClickListener onGetVPNClickListener = new OnGetVPNClickListener(this, isProtectedConnection);
-        headerIcon.setOnClickListener(onGetVPNClickListener);
-        headerStatus.setOnClickListener(onGetVPNClickListener);
-        getVPNButtonTop.setOnClickListener(onGetVPNClickListener);
-        getVPNButtonBottom.setOnClickListener(onGetVPNClickListener);
-        learnVPNButton.setOnClickListener(onGetVPNClickListener);
-
-        headerIcon.setOnLongClickListener(onGetVPNClickListener);
-        headerStatus.setOnLongClickListener(onGetVPNClickListener);
-        getVPNButtonTop.setOnLongClickListener(onGetVPNClickListener);
-        getVPNButtonBottom.setOnLongClickListener(onGetVPNClickListener);
-        learnVPNButton.setOnLongClickListener(onGetVPNClickListener);
+        OnGetVPNClickListener l = new OnGetVPNClickListener(isProtectedConnection);
+        headerIcon.setOnClickListener(l);
+        headerStatus.setOnClickListener(l);
+        getVPNButtonTop.setOnClickListener(l);
+        getVPNButtonBottom.setOnClickListener(l);
+        learnVPNButton.setOnClickListener(l);
     }
 
     @Override
@@ -162,28 +155,25 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
         return Html.fromHtml(html);
     }
 
-    // Let's minimize the use of anonymous classes $1, $2 for every listener out there. DRY principle is the prime coding directive.
-    private static class OnGetVPNClickListener extends ClickAdapter<VPNStatusDetailActivity> {
+    private static final class OnGetVPNClickListener implements View.OnClickListener {
 
         private final boolean isProtectedConnection;
 
-        public OnGetVPNClickListener(VPNStatusDetailActivity owner, boolean isProtectedConnection) {
-            super(owner);
+        OnGetVPNClickListener(boolean isProtectedConnection) {
             this.isProtectedConnection = isProtectedConnection;
         }
 
         @Override
-        public void onClick(VPNStatusDetailActivity owner, View v) {
+        public void onClick(View v) {
             if (isProtectedConnection) {
-                UIUtils.openURL(owner, Constants.VPN_LEARN_MORE_URL);
+                UIUtils.openURL(v.getContext(), Constants.VPN_LEARN_MORE_URL);
             } else {
                 String vpnUrl = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ?
                         Constants.EXPRESSVPN_URL_BASIC :
                         Constants.EXPRESSVPN_URL_PLUS;
 
-                UIUtils.openURL(owner, vpnUrl);
+                UIUtils.openURL(v.getContext(), vpnUrl);
             }
-
         }
     }
 }
