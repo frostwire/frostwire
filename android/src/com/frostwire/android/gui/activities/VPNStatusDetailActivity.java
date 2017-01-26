@@ -58,16 +58,16 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
         final TextView vpnPrice = findView(R.id.view_vpn_status_vpn_price);
 
         final TextView vpnBullet = findView(R.id.view_vpn_status_bullet_textview);
-        vpnBullet.setText(Html.fromHtml(getString(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html)));
+        vpnBullet.setText(fromHtml(getString(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html)));
 
         final TextView vpnClientFeature1 = findView(R.id.view_vpn_status_vpn_client_feature_1);
         final TextView vpnClientFeature2 = findView(R.id.view_vpn_status_vpn_client_feature_2);
         final TextView vpnClientFeature3 = findView(R.id.view_vpn_status_vpn_client_feature_3);
         final TextView vpnClientFeature4 = findView(R.id.view_vpn_status_vpn_client_feature_4);
-        vpnClientFeature1.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature1.getText()));
-        vpnClientFeature2.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature2.getText()));
-        vpnClientFeature3.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature3.getText()));
-        vpnClientFeature4.setText(Html.fromHtml(UNICODE_BULLET + vpnClientFeature4.getText()));
+        vpnClientFeature1.setText(fromHtml(UNICODE_BULLET + vpnClientFeature1.getText()));
+        vpnClientFeature2.setText(fromHtml(UNICODE_BULLET + vpnClientFeature2.getText()));
+        vpnClientFeature3.setText(fromHtml(UNICODE_BULLET + vpnClientFeature3.getText()));
+        vpnClientFeature4.setText(fromHtml(UNICODE_BULLET + vpnClientFeature4.getText()));
 
         final Button getVPNButtonTop = findView(R.id.view_vpn_status_get_vpn_button_top);
         final Button learnVPNButton = findView(R.id.view_vpn_status_learn_more_button);
@@ -83,7 +83,7 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
             vpnMoneyBack.setVisibility(View.GONE);
             vpnPrice.setVisibility(View.GONE);
             // Current Status Text
-            vpnText.setText(Html.fromHtml(getString(R.string.protected_connections_visibility_bullet_html)));
+            vpnText.setText(fromHtml(getString(R.string.protected_connections_visibility_bullet_html)));
             // getVPNButtonTop/learnVPNButton
             getVPNButtonTop.setVisibility(View.GONE);
             learnVPNButton.setText(R.string.learn_more);
@@ -100,7 +100,7 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
             vpnPrice.setText(getString(R.string.vpn_price, Constants.EXPRESSVPN_STARTING_USD_PRICE));
             // Current Status Text
             String VPNHtmlText = getString(R.string.unprotected_connections_visibility_bullet_html);
-            Spanned VPNTextAsSpanned = Html.fromHtml(VPNHtmlText);
+            Spanned VPNTextAsSpanned = fromHtml(VPNHtmlText);
             vpnText.setText(VPNTextAsSpanned);
             // getVPNButtonTop/learnVPNButton
             learnVPNButton.setVisibility(View.GONE);
@@ -151,6 +151,13 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
             super.onBackPressed();
         } catch (Throwable ignored) {
         }
+    }
+
+    // once we get to API 24, we can replace the method for the new one
+    @SuppressWarnings("deprecated")
+    private static Spanned fromHtml(String html) {
+        //noinspection deprecation
+        return Html.fromHtml(html);
     }
 
     // Let's minimize the use of anonymous classes $1, $2 for every listener out there. DRY principle is the prime coding directive.
