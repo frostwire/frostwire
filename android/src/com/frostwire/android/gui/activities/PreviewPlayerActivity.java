@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -30,8 +29,19 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.*;
-import android.widget.*;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.Surface;
+import android.view.TextureView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -40,12 +50,12 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.util.ImageLoader;
-import com.frostwire.util.Logger;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.youtube.YouTubePackageSearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -56,7 +66,7 @@ import java.net.URL;
  * @author gubatron
  * @author aldenml
  */
-public final class PreviewPlayerActivity extends AbstractActivity implements
+public final class PreviewPlayerActivity extends AbstractActivity2 implements
         AbstractDialog.OnDialogClickListener,
         TextureView.SurfaceTextureListener,
         MediaPlayer.OnBufferingUpdateListener,
@@ -113,17 +123,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         audio = i.getBooleanExtra("audio", false);
         isFullScreen = i.getBooleanExtra("isFullScreen", false);
 
-        ActionBar ab = getActionBar();
-        if (ab != null) {
-            ab.setHomeButtonEnabled(true);
-            ab.setDisplayHomeAsUpEnabled(true);
-            int mediaTypeStrId = audio ? R.string.audio : R.string.video;
-            ab.setTitle(getString(R.string.media_preview, getString(mediaTypeStrId)) + " (buffering...)");
-            int icon = android.R.color.transparent;
-            ab.setIcon(icon);
-        } else {
-            setTitle(displayName);
-        }
+        int mediaTypeStrId = audio ? R.string.audio : R.string.video;
+        setTitle(getString(R.string.media_preview, getString(mediaTypeStrId)) + " (buffering...)");
 
         final TextureView v = findView(R.id.activity_preview_player_videoview);
         v.setSurfaceTextureListener(this);
@@ -268,7 +269,6 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         LinearLayout header = findView(R.id.activity_preview_player_header);
         ImageView thumbnail = findView(R.id.activity_preview_player_thumbnail);
         ImageButton downloadButton = findView(R.id.activity_preview_player_download_button);
-        ActionBar bar = getActionBar();
 
         // these ones only exist on landscape mode.
         LinearLayout rightSide = findView(R.id.activity_preview_player_right_side);
@@ -277,9 +277,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
         // Let's Go into full screen mode.
         if (!isFullScreen) {
-            if (bar != null) {
-                bar.hide();
-            }
+            findView(R.id.toolbar_main).setVisibility(View.GONE);
             setViewsVisibility(View.GONE, header, thumbnail, divider, downloadButton, rightSide, filler);
 
             if (isPortrait) {
@@ -292,9 +290,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             isFullScreen = true;
         } else {
             // restore components back from full screen mode.
-            if (bar != null) {
-                bar.show();
-            }
+            findView(R.id.toolbar_main).setVisibility(View.VISIBLE);
             setViewsVisibility(View.VISIBLE, header, divider, downloadButton, rightSide, filler);
             v.setRotation(0);
 
@@ -523,11 +519,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
         if (startedPlayback && !changedActionBarTitleToNonBuffering) {
             int mediaTypeStrId = audio ? R.string.audio : R.string.video;
-            ActionBar bar = getActionBar();
-            if (bar != null) {
-                bar.setTitle(getString(R.string.media_preview, getString(mediaTypeStrId)));
-                changedActionBarTitleToNonBuffering = true;
-            }
+            setTitle(getString(R.string.media_preview, getString(mediaTypeStrId)));
+            changedActionBarTitleToNonBuffering = true;
         }
 
         return false;
@@ -568,11 +561,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
             releaseMediaPlayer();
 
-            ActionBar ab = getActionBar();
-            if (ab != null) {
-                int mediaTypeStrId = audio ? R.string.audio : R.string.video;
-                ab.setTitle(getString(R.string.media_preview, getString(mediaTypeStrId)));
-            }
+            int mediaTypeStrId = audio ? R.string.audio : R.string.video;
+            setTitle(getString(R.string.media_preview, getString(mediaTypeStrId)));
         }
     }
 }

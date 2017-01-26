@@ -25,6 +25,8 @@
              android:background="@color/body_background_gray_light"
              android:orientation="vertical">
 
+    <include layout="@layout/toolbar_main" />
+
     <LinearLayout
             android:id="@+id/activity_preview_player_header"
             android:layout_width="match_parent"

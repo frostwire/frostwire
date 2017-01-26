@@ -25,6 +25,8 @@
               android:background="@color/body_background_gray_light"
               android:orientation="horizontal">
 
+    <include layout="@layout/toolbar_main" />
+
     <FrameLayout android:id="@+id/activity_preview_player_framelayout"
                  android:layout_width="0dp"
                  android:layout_height="match_parent"

@@ -125,7 +125,7 @@
         <activity android:name="com.frostwire.android.gui.activities.AboutActivity"
                   android:label="@string/about" android:theme="@style/Theme.FrostWire"/>
         <activity android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
-                  android:label="@string/playing"
+                  android:label="@string/playing" android:theme="@style/Theme.FrostWire"
                   android:configChanges="orientation|screenSize"/>
 
         <!-- Main activity -->
