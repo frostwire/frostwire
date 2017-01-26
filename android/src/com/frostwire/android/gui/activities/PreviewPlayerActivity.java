@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.*;
 import android.widget.*;
+
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
@@ -205,7 +206,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                 releaseMediaPlayer();
                 YouTubeDownloadDialog ytDownloadDlg = YouTubeDownloadDialog.newInstance(this, (YouTubePackageSearchResult) fileSearchResult);
                 ytDownloadDlg.show(getFragmentManager());
-            }  else {
+            } else {
                 NewTransferDialog dlg = NewTransferDialog.newInstance(fileSearchResult, false);
                 dlg.show(getFragmentManager());
             }
@@ -266,7 +267,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
         LinearLayout header = findView(R.id.activity_preview_player_header);
         ImageView thumbnail = findView(R.id.activity_preview_player_thumbnail);
-        ImageButton downloadButton =findView(R.id.activity_preview_player_download_button);
+        ImageButton downloadButton = findView(R.id.activity_preview_player_download_button);
         ActionBar bar = getActionBar();
 
         // these ones only exist on landscape mode.
@@ -276,7 +277,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
         // Let's Go into full screen mode.
         if (!isFullScreen) {
-            if (bar!=null) {
+            if (bar != null) {
                 bar.hide();
             }
             setViewsVisibility(View.GONE, header, thumbnail, divider, downloadButton, rightSide, filler);
@@ -372,15 +373,16 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     /**
      * Utility method: change the visibility for a bunch of views. Skips null views.
+     *
      * @param visibility
      * @param views
      */
-    private void setViewsVisibility(int visibility, View ... views) {
+    private void setViewsVisibility(int visibility, View... views) {
         if (visibility != View.INVISIBLE && visibility != View.VISIBLE && visibility != View.GONE) {
             return; //invalid visibility constant.
         }
         if (views != null) {
-            for (int i=0; i < views.length; i++) {
+            for (int i = 0; i < views.length; i++) {
                 View v = views[i];
                 if (v != null) {
                     v.setVisibility(visibility);
@@ -478,10 +480,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         am.requestAudioFocus(PreviewPlayerActivity.this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         final ImageView img = findView(R.id.activity_preview_player_thumbnail);
-       onVideoViewPrepared(img);
-       if (mp != null) {
-           changeVideoSize();
-       }
+        onVideoViewPrepared(img);
+        if (mp != null) {
+            changeVideoSize();
+        }
     }
 
     @Override
@@ -522,7 +524,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         if (startedPlayback && !changedActionBarTitleToNonBuffering) {
             int mediaTypeStrId = audio ? R.string.audio : R.string.video;
             ActionBar bar = getActionBar();
-            if (bar!=null) {
+            if (bar != null) {
                 bar.setTitle(getString(R.string.media_preview, getString(mediaTypeStrId)));
                 changedActionBarTitleToNonBuffering = true;
             }
@@ -537,7 +539,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                 mediaPlayer.stop();
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
 
         AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (mAudioManager.isMusicActive()) {
