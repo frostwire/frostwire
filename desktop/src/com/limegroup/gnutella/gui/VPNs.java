@@ -76,9 +76,20 @@ final class VPNs {
     }
 
     private static boolean isWindowsVPNActive() {
-        boolean result;
+        boolean result = false;
         try {
-            result = readProcessOutput("netstat", "-nr").contains("128.0.0.0");
+            String[] output = readProcessOutput("netstat", "-nr").split("\r\n");
+            for (String line : output) {
+                // regular VPN case
+                if (line.contains("128.0.0.0") ||
+                // PIA with kill switch (Hack)
+                        (line.contains("0.0.0.0          0.0.0.0       10.") && line.endsWith("21"))) {
+                    result = true;
+                    break;
+                }
+                // PIA with kill switch after a restart adds 0.0.0.0 0.0.0.0 10.x.x.x.x 10.x.x.x.x 21 as the first route
+                // when VPN is active
+            }
         } catch (Throwable t2) {
             result = false;
         }
