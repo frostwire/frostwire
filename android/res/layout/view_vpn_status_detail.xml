@@ -23,7 +23,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/toolbar_main"/>
+    <include layout="@layout/toolbar_main" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -62,7 +62,8 @@
                 style="@style/VPNTitle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:textColor="@color/approval_green" />
 
             <!-- VPN description text -->
             <TextView

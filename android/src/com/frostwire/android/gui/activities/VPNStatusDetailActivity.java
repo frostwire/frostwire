@@ -76,9 +76,8 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
         if (isProtectedConnection) {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_on_info);
-            // Current Status Title
+            // Current Status Title, color is set in layout
             headerStatus.setText(R.string.protected_connection);
-            headerStatus.setTextColor(getResources().getColor(R.color.approval_green));
             vpnMoneyBack.setVisibility(View.GONE);
             vpnPrice.setVisibility(View.GONE);
             // Current Status Text
@@ -132,8 +131,7 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
         // if we came from Transfers, make sure to go have the transfer fragment shown by MainActivity.
         Intent i = getIntent();
         if (i != null && i.getExtras() != null &&
-                i.getExtras().containsKey("from") &&
-                i.getExtras().get("from").equals("transfers")) {
+                i.getExtras().getString("from", "").equals("transfers")) {
             newIntent.setAction(Constants.ACTION_SHOW_TRANSFERS);
         }
 
