@@ -232,6 +232,7 @@
         <!-- VPN Status -->
         <activity android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
                   android:label="@string/activity_VPN"
+                  android:theme="@style/Theme.FrostWire"
                   android:excludeFromRecents="true"
                   android:noHistory="true"/>
         <!-- InMobi -->

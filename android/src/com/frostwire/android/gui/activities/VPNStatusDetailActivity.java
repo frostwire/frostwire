@@ -1,24 +1,22 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.activities;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -33,14 +31,14 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.ClickAdapter;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class VPNStatusDetailActivity extends AbstractActivity {
+public class VPNStatusDetailActivity extends AbstractActivity2 {
 
     public VPNStatusDetailActivity() {
         super(R.layout.view_vpn_status_detail);
@@ -49,11 +47,6 @@ public class VPNStatusDetailActivity extends AbstractActivity {
     @Override
     protected void initComponents(Bundle savedInstanceState) {
         final String UNICODE_BULLET = "&#8226; ";
-        final ActionBar bar = getActionBar();
-        if (bar != null) {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-            getActionBar().setIcon(android.R.color.transparent);
-        }
         final Intent intent = getIntent();
         final boolean isProtectedConnection = intent.getAction() != null &&
                 intent.getAction().equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED);
