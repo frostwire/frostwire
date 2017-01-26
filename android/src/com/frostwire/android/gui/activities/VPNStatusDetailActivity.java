@@ -37,7 +37,9 @@ import com.frostwire.android.gui.views.AbstractActivity2;
  * @author gubatron
  * @author aldenml
  */
-public class VPNStatusDetailActivity extends AbstractActivity2 {
+public final class VPNStatusDetailActivity extends AbstractActivity2 {
+
+    private static final String UNICODE_BULLET = "&#8226; ";
 
     public VPNStatusDetailActivity() {
         super(R.layout.view_vpn_status_detail);
@@ -45,11 +47,6 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
 
     @Override
     protected void initComponents(Bundle savedInstanceState) {
-        final String UNICODE_BULLET = "&#8226; ";
-        final Intent intent = getIntent();
-        final boolean isProtectedConnection = intent.getAction() != null &&
-                intent.getAction().equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED);
-
         final ImageView headerIcon = findView(R.id.view_vpn_status_header_icon);
         final TextView headerStatus = findView(R.id.view_vpn_status_header);
         final TextView vpnText = findView(R.id.view_vpn_status_vpn_text);
@@ -59,19 +56,16 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
         final TextView vpnBullet = findView(R.id.view_vpn_status_bullet_textview);
         vpnBullet.setText(fromHtml(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html));
 
-        final TextView vpnClientFeature1 = findView(R.id.view_vpn_status_vpn_client_feature_1);
-        final TextView vpnClientFeature2 = findView(R.id.view_vpn_status_vpn_client_feature_2);
-        final TextView vpnClientFeature3 = findView(R.id.view_vpn_status_vpn_client_feature_3);
-        final TextView vpnClientFeature4 = findView(R.id.view_vpn_status_vpn_client_feature_4);
-        vpnClientFeature1.setText(fromHtml(UNICODE_BULLET + vpnClientFeature1.getText()));
-        vpnClientFeature2.setText(fromHtml(UNICODE_BULLET + vpnClientFeature2.getText()));
-        vpnClientFeature3.setText(fromHtml(UNICODE_BULLET + vpnClientFeature3.getText()));
-        vpnClientFeature4.setText(fromHtml(UNICODE_BULLET + vpnClientFeature4.getText()));
+        appendBullet(R.id.view_vpn_status_vpn_client_feature_1);
+        appendBullet(R.id.view_vpn_status_vpn_client_feature_2);
+        appendBullet(R.id.view_vpn_status_vpn_client_feature_3);
+        appendBullet(R.id.view_vpn_status_vpn_client_feature_4);
 
         final Button getVPNButtonTop = findView(R.id.view_vpn_status_get_vpn_button_top);
         final Button learnVPNButton = findView(R.id.view_vpn_status_learn_more_button);
         final Button getVPNButtonBottom = findView(R.id.view_vpn_status_get_vpn_button_bottom);
 
+        boolean isProtectedConnection = isProtectedConnection();
         // By default the layout has icon and title set to unprotected.
         if (isProtectedConnection) {
             // Current Status Icon
@@ -140,6 +134,17 @@ public class VPNStatusDetailActivity extends AbstractActivity2 {
             super.onBackPressed();
         } catch (Throwable ignored) {
         }
+    }
+
+    private void appendBullet(int id) {
+        TextView t = findView(id);
+        t.setText(fromHtml(UNICODE_BULLET + t.getText()));
+    }
+
+    private boolean isProtectedConnection() {
+        Intent intent = getIntent();
+        String action = intent != null ? intent.getAction() : null;
+        return action != null && action.equals(Constants.ACTION_SHOW_VPN_STATUS_PROTECTED);
     }
 
     private Spanned fromHtml(int resId) {
