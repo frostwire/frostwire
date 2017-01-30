@@ -19,6 +19,7 @@ package com.frostwire.android.gui.fragments.preference;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
@@ -33,6 +34,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference;
@@ -70,9 +72,39 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
         setupConnectSwitch();
         setupVPNRequirementOption();
         setupStorageOption();
+        setupDataSaving();
         setupStore(removeAdsPurchaseTime);
     }
 
+    private void setupDataSaving() {
+        SwitchPreferenceCompat preference = findPreference(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
+        preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(final Preference preference, Object newValue) {
+                boolean newVal = (Boolean) newValue;
+                if (newVal && !NetworkManager.instance().isDataWIFIUp()) {
+                    if (TransferManager.instance().isHttpDownloadInProgress()) {
+                        UIUtils.showYesNoDialog(getActivity(), R.string.data_saving_kill_http_warning, R.string.data_saving_kill_http_warning_title, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                turnOffTransfers();
+                                setChecked((TwoStatePreference) preference, true, false);
+                            }
+                        });
+                        return false;
+                    }
+                    turnOffTransfers();
+                }
+                return true;
+            }
+        });
+    }
+
+    private void turnOffTransfers() {
+        TransferManager.instance().stopHttpTransfers();
+        TransferManager.instance().pauseTorrents();
+        UIUtils.showShortMessage(getView(), R.string.data_saving_turn_off_transfers);
+    }
 
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {

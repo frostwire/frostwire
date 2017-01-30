@@ -470,6 +470,15 @@ public final class TransferManager {
         }
     }
 
+    public boolean isHttpDownloadInProgress() {
+        for (Transfer httpDownload : httpDownloads) {
+            if(httpDownload.isDownloading()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Stops all HttpDownloads (Cloud and Wi-Fi)
      */

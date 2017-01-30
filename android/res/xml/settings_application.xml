@@ -27,10 +27,10 @@
             android:title="@string/bittorrent" />
         <!--  Wi-Fi Networks Only should replace Use 3G/4G for BitTorrent -->
         <android.support.v7.preference.SwitchPreferenceCompat
-            android:key="frostwire.prefs.network.use_mobile_data"
-            android:summary="@string/use_mobile_data_summary"
-            android:title="@string/use_mobile_data" />
-        <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="frostwire.prefs.network.use_wifi_only"
+            android:summary="@string/use_wifi_only_summary"
+            android:title="@string/use_wifi_only" />
+ 	<android.support.v7.preference.SwitchPreferenceCompat
             android:key="frostwire.prefs.network.bittorrent_on_vpn_only"
             android:summary="@string/mandatory_vpn_summary"
             android:title="@string/mandatory_vpn_title" />

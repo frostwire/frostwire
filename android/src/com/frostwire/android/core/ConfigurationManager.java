@@ -23,11 +23,14 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
+
 import com.frostwire.util.Hex;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -44,6 +47,7 @@ public class ConfigurationManager {
     private final ConfigurationDefaults defaults;
 
     private static ConfigurationManager instance;
+    private final List<Migration> migrations;
 
     public synchronized static void create(Application context) {
         if (instance != null) {
@@ -62,12 +66,33 @@ public class ConfigurationManager {
     private ConfigurationManager(Application context) {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = preferences.edit();
-
+        migrations = new ArrayList<>();
         defaults = new ConfigurationDefaults();
+        populateMigrations();
         initPreferences();
+        migratePreferences();
     }
 
+    private void populateMigrations() {
+        migrations.add(new Migration() {
+            public boolean checkPrerequisites() {
+                return !getBoolean(Constants.PREF_MIGRATION_FINISHED_KEY_NETWORK_USE_MOBILE_DATA_TO_USE_WIFI_ONLY);
+            }
 
+            public void migrate() {
+                setBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, !getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA));
+                setBoolean(Constants.PREF_MIGRATION_FINISHED_KEY_NETWORK_USE_MOBILE_DATA_TO_USE_WIFI_ONLY, true);
+            }
+        });
+    }
+
+    private void migratePreferences() {
+        for (Migration migration : migrations) {
+            if (migration.checkPrerequisites()) {
+                migration.migrate();
+            }
+        }
+    }
 
     public String getString(String key) {
         return preferences.getString(key, null);
@@ -292,5 +317,10 @@ public class ConfigurationManager {
                 setStringArray(entry.getKey(), (String[]) entry.getValue());
             }
         }
+    }
+
+    private interface Migration {
+        boolean checkPrerequisites();
+        void migrate();
     }
 }

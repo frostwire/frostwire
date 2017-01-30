@@ -187,6 +187,8 @@
     <string name="vibrate_on_finished_download">Vibrate when download finishes</string>
     <string name="use_mobile_data">Use 3G/4G for BitTorrent</string>
     <string name="use_mobile_data_summary">Use mobile network for BitTorrent downloads. Data Overage charges may apply. Use carefully.</string>
+    <string name="use_wifi_only">Wi-Fi networks only</string>
+    <string name="use_wifi_only_summary">All transfers will be performed on Wi-Fi only to save data.</string>
     <string name="connected_using_dataplan">Connected using Data Plan</string>
     <string name="send_to_chat">Send to Chat</string>
     <string name="sent_file_to_chat">Sent file to Chat</string>
@@ -480,6 +482,9 @@
     <string name="drawer_close">Close navigation drawer</string>
     <string name="please_check_connection_status_before_resuming_download">Please check the status of your internet connection before resuming.</string>
     <string name="donate_in_btc">Donate in bitcoins</string>
+    <string name="data_saving_turn_off_transfers">No Wi-fi available, all transfers have been stopped</string>
+    <string name="data_saving_kill_http_warning">This will stop all unfinished transfers in progress</string>
+    <string name="data_saving_kill_http_warning_title">Warning: Http transfers in progress</string>
     <string name="torrent_transfer_enqueued_on_mobile_data">The torrent transfer will start downloading automatically when you connect to a Wi-Fi network.(Check your Network Settings regarding 3G/4G data usage)</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Torrent transfers will not start until you connect to a Wi-Fi network.(Check your Network Settings regarding 3G/4G data usage)</string>
     <string name="torrent_transfer_consuming_mobile_data">Warning: This torrent transfer is using your 3G/4G data. (Check your Network Settings if you wish to use BitTorrent only on WiFi)</string>
