@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views.preference;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.Preference;
 import android.util.AttributeSet;
@@ -30,7 +31,7 @@ import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.AbstractPreferenceFragment;
+import com.frostwire.android.gui.views.AbstractPreferenceFragment.PreferenceDialogFragment;
 
 import java.lang.reflect.Field;
 
@@ -71,12 +72,12 @@ public final class CustomSeekBarPreference extends DialogPreference {
      * have multiple plurals.xml defined, one per each language.
      * For now, we just put the name of the plural field in the XML layout and we
      * use reflection to fetch it from the R.java file.
-     *
+     * <p>
      * See:
-     *   - plurals.xml
-     *   - attrs.xml (fwSeekbarPreference::seekbar_pluralUnitResourceIdName)
-     *   - settings_torrents.xml
-     *   - frostwire.prefs.torrent.max_downloads and others below which use units (non byte rates)
+     * - plurals.xml
+     * - attrs.xml (fwSeekbarPreference::seekbar_pluralUnitResourceIdName)
+     * - settings_torrents.xml
+     * - frostwire.prefs.torrent.max_downloads and others below which use units (non byte rates)
      */
     private int getPluralUnitResourceId(TypedArray arr) {
         String pluralUnitResourceIdName = arr.getString(R.styleable.fwSeekbarPreference_seekbar_pluralUnitResourceIdName);
@@ -92,23 +93,6 @@ public final class CustomSeekBarPreference extends DialogPreference {
             }
         }
         return pluralUnitResourceIdTemp;
-    }
-
-    public void saveValue(long val) {
-        persistLong(val);
-        notifyChanged();
-    }
-
-    public int getStartRange() {
-        return startRange;
-    }
-
-    public int getEndRange() {
-        return endRange;
-    }
-
-    public int getDefaultValue() {
-        return defaultValue;
     }
 
     public boolean isByteRate() {
@@ -127,7 +111,25 @@ public final class CustomSeekBarPreference extends DialogPreference {
         return unlimitedValue;
     }
 
-    public static final class CustomSeekBarPreferenceDialog extends AbstractPreferenceFragment.PreferenceDialogFragment {
+    private void saveValue(long val) {
+        persistLong(val);
+        notifyChanged();
+    }
+
+    private int getStartRange() {
+        return startRange;
+    }
+
+    private int getEndRange() {
+        return endRange;
+    }
+
+    private int getDefaultValue() {
+        return defaultValue;
+    }
+
+    public static final class CustomSeekBarPreferenceDialog extends PreferenceDialogFragment {
+
         private static final String START_RANGE = "startRange";
         private static final String END_RANGE = "endRange";
         private static final String DEFAULT_VALUE = "defaultValue";
@@ -184,7 +186,8 @@ public final class CustomSeekBarPreference extends DialogPreference {
 
 
         @Override
-        public void onSaveInstanceState(Bundle outState) {
+        public void onSaveInstanceState(@NonNull Bundle outState) {
+            super.onSaveInstanceState(outState);
             outState.putInt(START_RANGE, mStartRange);
             outState.putInt(END_RANGE, mEndRange);
             outState.putInt(DEFAULT_VALUE, mDefault);
@@ -194,7 +197,6 @@ public final class CustomSeekBarPreference extends DialogPreference {
             outState.putInt(UNLIMITED_VALUE, mUnlimitedValue);
             outState.putBoolean(UNLIMITED_CHECKED, mUnlimitedCheckbox.isChecked());
             outState.putInt(CURRENT_VALUE, mSeekbar.getProgress());
-            super.onSaveInstanceState(outState);
         }
 
         @Override
@@ -302,7 +304,7 @@ public final class CustomSeekBarPreference extends DialogPreference {
             if (mSupportsUnlimited && (value == mUnlimitedValue) || mUnlimitedCheckbox.isChecked()) {
                 mCurrentValueTextView.setText(getResources().getText(R.string.unlimited));
             } else if (mIsByteRate) {
-                mCurrentValueTextView.setText(UIUtils.getBytesInHuman(value) + "/s");
+                mCurrentValueTextView.setText(String.format("%s/s", UIUtils.getBytesInHuman(value)));
             } else if (mPluralUnitResourceId != -1) {
                 mCurrentValueTextView.setText(getResources().getQuantityString(mPluralUnitResourceId, value, value));
             }
