@@ -66,7 +66,7 @@
             frostwire:seekbar_defaultValue="4"
             frostwire:seekbar_startRange="1"
             frostwire:seekbar_endRange="10"
-            frostwire:seekbar_pluralUnitResourceIdName="unit_downloads"/>
+            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_downloads"/>
         <com.frostwire.android.gui.views.preference.CustomSeekBarPreference
             android:key="frostwire.prefs.torrent.max_uploads"
             android:summary="@string/torrent_max_uploads_summary"
@@ -74,7 +74,7 @@
             frostwire:seekbar_defaultValue="4"
             frostwire:seekbar_startRange="1"
             frostwire:seekbar_endRange="10"
-            frostwire:seekbar_pluralUnitResourceIdName="unit_uploads"/>
+            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_uploads"/>
         <com.frostwire.android.gui.views.preference.CustomSeekBarPreference
             android:key="frostwire.prefs.torrent.max_total_connections"
             android:summary="@string/torrent_max_total_connections_summary"
@@ -82,7 +82,7 @@
             frostwire:seekbar_defaultValue="200"
             frostwire:seekbar_startRange="10"
             frostwire:seekbar_endRange="200"
-            frostwire:seekbar_pluralUnitResourceIdName="unit_connections"/>
+            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_connections"/>
         <com.frostwire.android.gui.views.preference.CustomSeekBarPreference
             android:key="frostwire.prefs.torrent.max_peers"
             android:summary="@string/torrent_max_peers_summary"
@@ -90,6 +90,6 @@
             frostwire:seekbar_defaultValue="200"
             frostwire:seekbar_startRange="10"
             frostwire:seekbar_endRange="200"
-            frostwire:seekbar_pluralUnitResourceIdName="unit_peers"/>
+            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_peers"/>
     </android.support.v7.preference.PreferenceCategory>
 </android.support.v7.preference.PreferenceScreen>

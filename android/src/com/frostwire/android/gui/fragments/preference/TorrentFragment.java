@@ -137,7 +137,7 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
         } else {
             if (preference.isByteRate()) {
                 preference.setSummary(UIUtils.getBytesInHuman(value));
-            } else if (preference.getPluralUnitResourceId() != -1) {
+            } else if (preference.getPluralUnitResourceId() != 0) {
                 preference.setSummary(getValueWithUnit(preference.getPluralUnitResourceId(), value));
             }
         }

@@ -33,8 +33,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment.PreferenceDialogFragment;
 
-import java.lang.reflect.Field;
-
 /**
  * Support version of a custom dialog preference
  *
@@ -62,37 +60,8 @@ public final class CustomSeekBarPreference extends DialogPreference {
         isByteRate = arr.getBoolean(R.styleable.fwSeekbarPreference_seekbar_isByteRate, false);
         hasUnlimited = arr.getBoolean(R.styleable.fwSeekbarPreference_seekbar_hasUnlimited, false);
         unlimitedValue = arr.getInteger(R.styleable.fwSeekbarPreference_seekbar_unlimitedValue, 0);
-        pluralUnitResourceId = getPluralUnitResourceId(arr);
+        pluralUnitResourceId = arr.getResourceId(R.styleable.fwSeekbarPreference_seekbar_pluralUnitResourceId, 0);
         arr.recycle();
-    }
-
-    /**
-     * ANDROID API EDGE FOUND: @plurals/my_plural is not supported in XML layouts
-     * supposedly because of translation support issues, I don't see why, as you coul
-     * have multiple plurals.xml defined, one per each language.
-     * For now, we just put the name of the plural field in the XML layout and we
-     * use reflection to fetch it from the R.java file.
-     * <p>
-     * See:
-     * - plurals.xml
-     * - attrs.xml (fwSeekbarPreference::seekbar_pluralUnitResourceIdName)
-     * - settings_torrents.xml
-     * - frostwire.prefs.torrent.max_downloads and others below which use units (non byte rates)
-     */
-    private int getPluralUnitResourceId(TypedArray arr) {
-        String pluralUnitResourceIdName = arr.getString(R.styleable.fwSeekbarPreference_seekbar_pluralUnitResourceIdName);
-        int pluralUnitResourceIdTemp = -1;
-        if (pluralUnitResourceIdName != null) {
-            try {
-                Class<?> pluralsClass = Class.forName("com.frostwire.android.R$plurals");
-                Field declaredField = pluralsClass.getDeclaredField(pluralUnitResourceIdName);
-                pluralUnitResourceIdTemp = declaredField.getInt(null);
-            } catch (Throwable t) {
-                t.printStackTrace();
-                pluralUnitResourceIdTemp = -1;
-            }
-        }
-        return pluralUnitResourceIdTemp;
     }
 
     public boolean isByteRate() {

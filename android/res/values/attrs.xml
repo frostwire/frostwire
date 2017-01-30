@@ -55,7 +55,7 @@
         <attr name="seekbar_maxValue" format="integer" />
         <attr name="seekbar_wrap" format="boolean" />
         <attr name="seekbar_isByteRate" format="boolean" />
-        <attr name="seekbar_pluralUnitResourceIdName" format="string" />
+        <attr name="seekbar_pluralUnitResourceId" format="reference" />
         <attr name="seekbar_hasUnlimited" format="boolean" />
         <attr name="seekbar_unlimitedValue" format="integer" />
     </declare-styleable>
