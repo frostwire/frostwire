@@ -75,6 +75,7 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         MediaPlayer.OnVideoSizeChangedListener,
         MediaPlayer.OnInfoListener,
         AudioManager.OnAudioFocusChangeListener {
+
     private static final Logger LOG = Logger.getLogger(PreviewPlayerActivity.class);
     public static WeakReference<FileSearchResult> srRef;
 
@@ -271,7 +272,7 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         ImageButton downloadButton = findView(R.id.activity_preview_player_download_button);
 
         // these ones only exist on landscape mode.
-        LinearLayout rightSide = findView(R.id.activity_preview_player_right_side);
+        ViewGroup rightSide = findView(R.id.activity_preview_player_right_side);
         View divider = findView(R.id.activity_preview_player_divider);
 
         // Let's Go into full screen mode.
@@ -279,11 +280,16 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
             findView(R.id.toolbar_main).setVisibility(View.GONE);
             setViewsVisibility(View.GONE, header, thumbnail, divider, downloadButton, rightSide);
 
+            // TODO: refactor to properly avoid warnings
             if (isPortrait) {
+                //noinspection SuspiciousNameCombination
                 frameLayoutParams.width = metrics.heightPixels;
+                //noinspection SuspiciousNameCombination
                 frameLayoutParams.height = metrics.widthPixels;
             } else {
+                //noinspection SuspiciousNameCombination
                 frameLayoutParams.width = metrics.widthPixels;
+                //noinspection SuspiciousNameCombination
                 frameLayoutParams.height = metrics.heightPixels;
             }
             isFullScreen = true;
@@ -327,11 +333,14 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         float hRatio = (videoHeight * 1.0f) / (videoWidth * 1.0f);
         float rotation = 0;
 
+        // TODO: refactor to properly avoid warnings
         if (isPortrait) {
             if (isFullScreen) {
+                //noinspection SuspiciousNameCombination
                 params.width = metrics.heightPixels;
+                //noinspection SuspiciousNameCombination
                 params.height = metrics.widthPixels;
-                params.gravity = Gravity.TOP | Gravity.LEFT;
+                params.gravity = Gravity.TOP;
                 v.setPivotY((float) metrics.widthPixels / 2.0f);
                 rotation = 90f;
             } else {
@@ -341,7 +350,9 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
             }
         } else {
             if (isFullScreen) {
+                //noinspection SuspiciousNameCombination
                 params.width = metrics.widthPixels;
+                //noinspection SuspiciousNameCombination
                 params.height = metrics.heightPixels;
             } else {
                 params.width = Math.max(videoWidth, metrics.widthPixels / 2);
@@ -368,20 +379,17 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
 
     /**
      * Utility method: change the visibility for a bunch of views. Skips null views.
-     *
-     * @param visibility
-     * @param views
      */
     private void setViewsVisibility(int visibility, View... views) {
         if (visibility != View.INVISIBLE && visibility != View.VISIBLE && visibility != View.GONE) {
-            return; //invalid visibility constant.
+            throw new IllegalArgumentException("Invalid visibility constant");
         }
-        if (views != null) {
-            for (int i = 0; i < views.length; i++) {
-                View v = views[i];
-                if (v != null) {
-                    v.setVisibility(visibility);
-                }
+        if (views == null) {
+            throw new IllegalArgumentException("Views argument can't be null");
+        }
+        for (View v : views) {
+            if (v != null) {
+                v.setVisibility(visibility);
             }
         }
     }
