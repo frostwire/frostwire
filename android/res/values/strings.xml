@@ -605,7 +605,9 @@
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent is disconnected. Would you like me to start it for you?</string>
     <string name="seeding_is_currently_disabled">Seeding is currently disabled in your settings. Would you like me to enable seeding for you to share this file?</string>
     <string name="wifi_network_unavailable">Wifi Network Unavailable</string>
+    <string name="mobile_data_saving">Mobile Data Saving</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">According to your settings I can\'t start seeding unless you are on Wi-Fi. The file will be ready for seeding automatically when you get back to an internet enabled Wi-Fi network.</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">According to your settings I can\'t start seeding unless you are on Wi-Fi due to data savings. The file will be ready for seeding automatically when you get back to an internet enabled Wi-Fi network.</string>
     <string name="the_file_could_not_be_seeded_enable_seeding">The file could not be seeded. Enable seeding on settings.</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">The file could not be seeded. BitTorrent will remain disconnected.</string>
     <string name="fetching_torrent_ellipsis">Fetching torrent…</string>

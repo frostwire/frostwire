@@ -74,7 +74,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         this.size = calculateSize(dl);
         this.items = calculateItems(dl);
 
-        if (!dl.wasPaused()) {
+        if (!dl.wasPaused() && !manager.isMobileAndDataSavingsOn()) {
             dl.resume();
         }
 

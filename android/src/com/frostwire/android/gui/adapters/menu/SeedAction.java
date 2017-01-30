@@ -114,6 +114,8 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         // in case user seeds only on wifi and there's no wifi, we let them know what will occur.
         if (seedingOnlyOnWifiButNoWifi()) {
             showNoWifiInformationDialog();
+        } else if (TransferManager.instance().isMobileAndDataSavingsOn()) {
+            showMobileDataProtectionInformationDialog();
         }
 
         // 1. If Seeding is turned off let's ask the user if they want to
@@ -128,6 +130,10 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     private void showNoWifiInformationDialog() {
         ShowNoWifiInformationDialog.newInstance().show(((Activity) getContext()).getFragmentManager());
+    }
+
+    private void showMobileDataProtectionInformationDialog() {
+        ShowMobileDataProtectionInformationDialog.newInstance().show(((Activity) getContext()).getFragmentManager());
     }
 
     private void showBittorrentDisconnectedDialog() {
@@ -176,14 +182,16 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void seedEm() {
-        if (fd != null) {
-            seedFileDescriptor(fd);
-        } else if (btDownload != null) {
-            seedBTDownload();
-        }
+        if (!TransferManager.instance().isMobileAndDataSavingsOn()) {
+            if (fd != null) {
+                seedFileDescriptor(fd);
+            } else if (btDownload != null) {
+                seedBTDownload();
+            }
 
-        if (transferToClear != null) {
-            TransferManager.instance().remove(transferToClear);
+            if (transferToClear != null) {
+                TransferManager.instance().remove(transferToClear);
+            }
         }
     }
 
@@ -291,6 +299,31 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             title.setText(R.string.wifi_network_unavailable);
             TextView text = findView(dlg, R.id.dialog_default_info_text);
             text.setText(R.string.according_to_settings_i_cant_seed_unless_wifi);
+
+            Button okButton = findView(dlg, R.id.dialog_default_info_button_ok);
+            okButton.setText(android.R.string.ok);
+            okButton.setOnClickListener(new OkButtonOnClickListener(dlg));
+        }
+    }
+
+    public static class ShowMobileDataProtectionInformationDialog extends AbstractDialog {
+
+        public static ShowMobileDataProtectionInformationDialog newInstance() {
+            return new ShowMobileDataProtectionInformationDialog();
+        }
+
+        // Important to keep this guy 'public', even if IntelliJ thinks you shouldn't.
+        // otherwise, the app crashes when you turn the screen and the dialog can't
+        public ShowMobileDataProtectionInformationDialog() {
+            super(R.layout.dialog_default_info);
+        }
+
+        @Override
+        protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+            TextView title = findView(dlg, R.id.dialog_default_info_title);
+            title.setText(R.string.mobile_data_saving);
+            TextView text = findView(dlg, R.id.dialog_default_info_text);
+            text.setText(R.string.according_to_settings_i_cant_seed_due_to_data_savings);
 
             Button okButton = findView(dlg, R.id.dialog_default_info_button_ok);
             okButton.setText(android.R.string.ok);
