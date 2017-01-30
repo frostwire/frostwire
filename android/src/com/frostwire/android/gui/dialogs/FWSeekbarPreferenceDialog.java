@@ -16,8 +16,6 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
 import android.view.View;
@@ -89,16 +87,6 @@ public final class FWSeekbarPreferenceDialog extends AbstractPreferenceFragment.
         mUnlimitedValue = args.getInt(UNLIMITED_VALUE);
     }
 
-    /** WIP attempt to avoid crash on second layout change, probably issue is at PreferenceFragment
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Fragment f = getFragmentManager().findFragmentByTag("android.support.v14.preference.PreferenceFragment.DIALOG");
-        if (f != null) {
-            f.setTargetFragment(this, 0);
-        }
-    }
-    */
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
