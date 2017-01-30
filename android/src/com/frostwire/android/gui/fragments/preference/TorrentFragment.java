@@ -19,8 +19,6 @@
 package com.frostwire.android.gui.fragments.preference;
 
 import android.app.DialogFragment;
-import android.app.Fragment;
-import android.content.Context;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
 
@@ -47,15 +45,6 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
     protected void initComponents() {
         setupTorrentOptions();
         setupSeedingOptions();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Fragment f = getFragmentManager().findFragmentByTag("android.support.v14.preference.PreferenceFragment.DIALOG");
-        if (f != null) {
-            f.setTargetFragment(this, 0);
-        }
     }
 
     private void setupSeedingOptions() {
@@ -116,8 +105,7 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
             DialogFragment fragment;
             fragment = CustomSeekBarPreferenceDialog.newInstance((CustomSeekBarPreference) preference);
             fragment.setTargetFragment(this, 0);
-            fragment.show(this.getFragmentManager(),
-                    "android.support.v14.preference.PreferenceFragment.DIALOG");
+            fragment.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
         } else {
             super.onDisplayPreferenceDialog(preference);
         }

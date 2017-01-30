@@ -18,6 +18,7 @@
 package com.frostwire.android.gui.views;
 
 import android.app.Dialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
@@ -38,6 +39,9 @@ import java.lang.reflect.Field;
  */
 public abstract class AbstractPreferenceFragment extends PreferenceFragment {
 
+    protected static final String DIALOG_FRAGMENT_TAG =
+            "android.support.v14.preference.PreferenceFragment.DIALOG";
+
     private final int preferencesResId;
 
     public AbstractPreferenceFragment(int preferencesResId) {
@@ -48,6 +52,16 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(preferencesResId);
         initComponents();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // this is necessary to avoid a crash with double rotation of the screen
+        Fragment f = getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
+        if (f != null) {
+            f.setTargetFragment(this, 0);
+        }
     }
 
     protected void initComponents() {

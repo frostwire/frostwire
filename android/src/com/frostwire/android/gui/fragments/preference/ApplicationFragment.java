@@ -79,7 +79,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
 
         if (dlg != null) {
             dlg.setTargetFragment(this, 0);
-            dlg.show(getFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
+            dlg.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
         } else {
             super.onDisplayPreferenceDialog(preference);
         }
