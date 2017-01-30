@@ -273,12 +273,11 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         // these ones only exist on landscape mode.
         LinearLayout rightSide = findView(R.id.activity_preview_player_right_side);
         View divider = findView(R.id.activity_preview_player_divider);
-        View filler = findView(R.id.activity_preview_player_filler);
 
         // Let's Go into full screen mode.
         if (!isFullScreen) {
             findView(R.id.toolbar_main).setVisibility(View.GONE);
-            setViewsVisibility(View.GONE, header, thumbnail, divider, downloadButton, rightSide, filler);
+            setViewsVisibility(View.GONE, header, thumbnail, divider, downloadButton, rightSide);
 
             if (isPortrait) {
                 frameLayoutParams.width = metrics.heightPixels;
@@ -291,7 +290,7 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         } else {
             // restore components back from full screen mode.
             findView(R.id.toolbar_main).setVisibility(View.VISIBLE);
-            setViewsVisibility(View.VISIBLE, header, divider, downloadButton, rightSide, filler);
+            setViewsVisibility(View.VISIBLE, header, divider, downloadButton, rightSide);
             v.setRotation(0);
 
             // restore the thumbnail on the way back only if doing audio preview.
