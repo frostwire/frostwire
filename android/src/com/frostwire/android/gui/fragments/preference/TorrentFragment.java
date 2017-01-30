@@ -31,8 +31,8 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
-import com.frostwire.android.gui.views.preference.FWSeekbarPreference;
-import com.frostwire.android.gui.views.preference.FWSeekbarPreference.FWSeekbarPreferenceDialog;
+import com.frostwire.android.gui.views.preference.CustomSeekBarPreference;
+import com.frostwire.android.gui.views.preference.CustomSeekBarPreference.CustomSeekBarPreferenceDialog;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -112,9 +112,9 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
 
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
-        if (preference instanceof FWSeekbarPreference) {
+        if (preference instanceof CustomSeekBarPreference) {
             DialogFragment fragment;
-            fragment = FWSeekbarPreferenceDialog.newInstance((FWSeekbarPreference) preference);
+            fragment = CustomSeekBarPreferenceDialog.newInstance((CustomSeekBarPreference) preference);
             fragment.setTargetFragment(this, 0);
             fragment.show(this.getFragmentManager(),
                     "android.support.v14.preference.PreferenceFragment.DIALOG");
@@ -124,7 +124,7 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
     }
 
     private void setupFWSeekbarPreference(final String key, final BTEngine btEngine) {
-        final FWSeekbarPreference pickerPreference = findPreference(key);
+        final CustomSeekBarPreference pickerPreference = findPreference(key);
         if (pickerPreference != null) {
             pickerPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
@@ -132,7 +132,7 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
                     if (btEngine != null) {
                         int newVal = (int) newValue;
                         executeBTEngineAction(key, btEngine, newVal);
-                        displayNumericalSummaryForPreference((FWSeekbarPreference) preference, newVal);
+                        displayNumericalSummaryForPreference((CustomSeekBarPreference) preference, newVal);
                         return checkBTEngineActionResult(key, btEngine, newVal);
                     }
                     return false;
@@ -142,7 +142,7 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
         }
     }
 
-    private void displayNumericalSummaryForPreference(FWSeekbarPreference preference, long value) {
+    private void displayNumericalSummaryForPreference(CustomSeekBarPreference preference, long value) {
 
         if (preference.supportsUnlimitedValue() && value == preference.getUnlimitedValue()) {
             preference.setSummary(R.string.unlimited);

@@ -1,4 +1,5 @@
 /*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (C) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +40,7 @@ import java.lang.reflect.Field;
  * @author grzesiekrzaca
  * @author gubatron
  */
-public final class FWSeekbarPreference extends DialogPreference {
+public final class CustomSeekBarPreference extends DialogPreference {
 
     private final int startRange;
     private final int endRange;
@@ -49,7 +50,7 @@ public final class FWSeekbarPreference extends DialogPreference {
     private final boolean hasUnlimited;
     private final int unlimitedValue;
 
-    public FWSeekbarPreference(Context context, AttributeSet attrs) {
+    public CustomSeekBarPreference(Context context, AttributeSet attrs) {
 
         super(context, attrs);
         setDialogLayoutResource(R.layout.dialog_preference_seekbar_with_checkbox);
@@ -126,7 +127,7 @@ public final class FWSeekbarPreference extends DialogPreference {
         return unlimitedValue;
     }
 
-    public static final class FWSeekbarPreferenceDialog extends AbstractPreferenceFragment.PreferenceDialogFragment {
+    public static final class CustomSeekBarPreferenceDialog extends AbstractPreferenceFragment.PreferenceDialogFragment {
         private static final String START_RANGE = "startRange";
         private static final String END_RANGE = "endRange";
         private static final String DEFAULT_VALUE = "defaultValue";
@@ -149,8 +150,8 @@ public final class FWSeekbarPreference extends DialogPreference {
         private CheckBox mUnlimitedCheckbox;
         private TextView mCurrentValueTextView;
 
-        public static FWSeekbarPreferenceDialog newInstance(final FWSeekbarPreference preference) {
-            FWSeekbarPreferenceDialog fragment = new FWSeekbarPreferenceDialog();
+        public static CustomSeekBarPreferenceDialog newInstance(final CustomSeekBarPreference preference) {
+            CustomSeekBarPreferenceDialog fragment = new CustomSeekBarPreferenceDialog();
             Bundle bundle = new Bundle();
             bundle.putString(ARG_KEY, preference.getKey());
             bundle.putInt(START_RANGE, preference.getStartRange());
@@ -165,7 +166,7 @@ public final class FWSeekbarPreference extends DialogPreference {
             return fragment;
         }
 
-        public FWSeekbarPreferenceDialog() {
+        public CustomSeekBarPreferenceDialog() {
         }
 
         @Override
@@ -318,7 +319,7 @@ public final class FWSeekbarPreference extends DialogPreference {
                 int value = (mSupportsUnlimited && mUnlimitedCheckbox.isChecked()) ?
                         mUnlimitedValue :
                         mSeekbar.getProgress();
-                ((FWSeekbarPreference) getPreference()).saveValue(value);
+                ((CustomSeekBarPreference) getPreference()).saveValue(value);
                 final Preference.OnPreferenceChangeListener onPreferenceChangeListener = getPreference().getOnPreferenceChangeListener();
                 if (onPreferenceChangeListener != null) {
                     try {
