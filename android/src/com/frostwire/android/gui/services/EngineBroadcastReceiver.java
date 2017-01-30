@@ -26,6 +26,7 @@ import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
+
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.Librarian;
@@ -34,8 +35,8 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.util.Logger;
 import com.frostwire.platform.Platforms;
+import com.frostwire.util.Logger;
 
 import java.io.File;
 
@@ -62,12 +63,17 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 handleMediaMounted(context, intent);
 
                 if (Engine.instance().isDisconnected()) {
-                    Engine.instance().getThreadPool().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            Engine.instance().startServices();
-                        }
-                    });
+                    if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
+                            !NetworkManager.instance().isTunnelUp()) {
+                        //don't start
+                    } else {
+                        Engine.instance().getThreadPool().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                Engine.instance().startServices();
+                            }
+                        });
+                    }
                 }
             } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
                 handleMediaUnmounted(intent);
@@ -148,16 +154,23 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 LOG.info("Connected to " + networkInfo.getTypeName());
                 if (Engine.instance().isDisconnected()) {
                     // avoid ANR error inside a broadcast receiver
-                    Engine.instance().getThreadPool().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            Engine.instance().startServices();
 
-                            if (shouldStopSeeding()) {
-                                TransferManager.instance().stopSeedingTorrents();
+                    if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
+                            !NetworkManager.instance().isTunnelUp()) {
+                        //don't start
+                    } else {
+                        Engine.instance().getThreadPool().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                Engine.instance().startServices();
+
+                                if (shouldStopSeeding()) {
+                                    TransferManager.instance().stopSeedingTorrents();
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+
                 } else if (shouldStopSeeding()) {
                     TransferManager.instance().stopSeedingTorrents();
                 }

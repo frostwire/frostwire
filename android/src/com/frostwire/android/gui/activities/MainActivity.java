@@ -17,8 +17,17 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.*;
-import android.content.*;
+import android.app.ActionBar;
+import android.app.Dialog;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -38,6 +47,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
@@ -47,6 +57,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
@@ -65,8 +76,13 @@ import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.*;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
+import com.frostwire.android.gui.views.AdMenuItemView;
+import com.frostwire.android.gui.views.PlayerMenuItemView;
+import com.frostwire.android.gui.views.PlayerNotifierView;
+import com.frostwire.android.gui.views.TimerService;
+import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
@@ -76,6 +92,7 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -369,7 +386,7 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
             Offers.initAdNetworks(this);
-        } else if (!isShutdown()){
+        } else if (!isShutdown()) {
             controller.startWizardActivity();
         }
         checkLastSeenVersion();
@@ -516,8 +533,14 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
 
         syncSlideMenu();
         if (firstTime) {
-            firstTime = false;
-            Engine.instance().startServices(); // it's necessary for the first time after wizard
+            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
+                    !NetworkManager.instance().isTunnelUp()) {
+                // todo change to snackbar when view is compatible
+                UIUtils.showShortMessage(this, R.string.cannot_start_engine_without_vpn);
+            } else {
+                firstTime = false;
+                Engine.instance().startServices(); // it's necessary for the first time after wizard
+            }
         }
         SoftwareUpdater.instance().checkForUpdate(this);
     }
@@ -684,7 +707,7 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
             // if they haven't paid for ads
             if (!Offers.disabledAds() &&
-                (playerItem == null || playerItem.getVisibility() == View.GONE)) {
+                    (playerItem == null || playerItem.getVisibility() == View.GONE)) {
                 visibility = View.VISIBLE;
             }
         }
