@@ -42,6 +42,8 @@ public final class FWSeekbarPreferenceDialog extends AbstractPreferenceFragment.
     private static final String PLURAL_UNIT_RESOURCE_ID = "pluralUnitResourceId";
     private static final String SUPPORTS_UNLIMITED = "supportsUnlimited";
     private static final String UNLIMITED_VALUE = "unlimitedValue";
+    private static final String UNLIMITED_CHECKED = "unlimitedChecked";
+    private static final String CURRENT_VALUE = "currentValue";
 
     private int mStartRange;
     private int mEndRange;
@@ -66,7 +68,7 @@ public final class FWSeekbarPreferenceDialog extends AbstractPreferenceFragment.
         bundle.putInt(PLURAL_UNIT_RESOURCE_ID, preference.getPluralUnitResourceId());
         bundle.putBoolean(SUPPORTS_UNLIMITED, preference.supportsUnlimitedValue());
         bundle.putInt(UNLIMITED_VALUE, preference.getUnlimitedValue());
-
+        bundle.putInt(CURRENT_VALUE, -1);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -97,15 +99,25 @@ public final class FWSeekbarPreferenceDialog extends AbstractPreferenceFragment.
         outState.putInt(PLURAL_UNIT_RESOURCE_ID, mPluralUnitResourceId);
         outState.putBoolean(SUPPORTS_UNLIMITED, mSupportsUnlimited);
         outState.putInt(UNLIMITED_VALUE, mUnlimitedValue);
+        outState.putBoolean(UNLIMITED_CHECKED, mUnlimitedCheckbox.isChecked());
+        outState.putInt(CURRENT_VALUE, mSeekbar.getProgress());
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
-        int previousValue = (int) getPreference().getSharedPreferences().getLong(getKey(), mDefault);
         mSeekbar = (SeekBar) view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_seekbar);
         mSeekbar.setMax(mEndRange);
+
+        int previousValue = (int) getPreference().getSharedPreferences().getLong(getKey(), mDefault);
+        if (getArguments() != null) {
+            int curVal = getArguments().getInt(CURRENT_VALUE);
+            if (curVal != -1) {
+                previousValue = curVal;
+            }
+        }
+        mSeekbar.setProgress(previousValue);
         mSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -122,6 +134,8 @@ public final class FWSeekbarPreferenceDialog extends AbstractPreferenceFragment.
         });
         mCurrentValueTextView = (TextView) view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_current_value_textview);
         mUnlimitedCheckbox = (CheckBox) view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_unlimited_checkbox);
+        Bundle arguments = getArguments();
+        mUnlimitedCheckbox.setChecked((arguments != null && arguments.getBoolean(UNLIMITED_CHECKED)));
         mUnlimitedCheckbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,17 +148,24 @@ public final class FWSeekbarPreferenceDialog extends AbstractPreferenceFragment.
 
     private void updateComponents(int currentValue) {
         mSkipListeners = true;
-        mSeekbar.setProgress(currentValue);
         if (!mSupportsUnlimited) {
             mUnlimitedCheckbox.setVisibility(View.GONE);
             mSeekbar.setEnabled(true);
+            mSeekbar.setProgress(currentValue);
         } else {
             mUnlimitedCheckbox.setVisibility(View.VISIBLE);
-            if (currentValue == mUnlimitedValue) {
+            mSeekbar.setEnabled(true);
+            if (mUnlimitedCheckbox.isChecked()) {
                 mSeekbar.setProgress(mSeekbar.getMax());
-                mUnlimitedCheckbox.setChecked(true);
+                mSeekbar.setEnabled(false);
+            } else {
+                boolean isUnlimited = currentValue == mUnlimitedValue;
+                if (isUnlimited) {
+                    mSeekbar.setProgress(mSeekbar.getMax());
+                    mUnlimitedCheckbox.setChecked(true);
+                    mSeekbar.setEnabled(false);
+                }
             }
-            mSeekbar.setEnabled(currentValue != mUnlimitedValue);
         }
         mSkipListeners = false;
     }
@@ -154,10 +175,12 @@ public final class FWSeekbarPreferenceDialog extends AbstractPreferenceFragment.
             return;
         }
         value = seekbarMinValueCheck(seekBar, value);
+        Bundle arguments = getArguments();
+        arguments.putInt(CURRENT_VALUE, value);
         updateCurrentValueTextView(value);
     }
 
-    // SeekBar does not support a minimum value, have to override behaviour
+    // SeekBar does not support a minimum value .setMinimum(int), have to override behaviour
     private int seekbarMinValueCheck(SeekBar seekBar, int value) {
         if (value < mStartRange) {
             mSkipListeners = true;
@@ -169,19 +192,21 @@ public final class FWSeekbarPreferenceDialog extends AbstractPreferenceFragment.
     }
 
     private void onUnlimitedCheckboxClicked() {
+        Bundle arguments = getArguments();
+        arguments.putBoolean(UNLIMITED_CHECKED, mUnlimitedCheckbox.isChecked());
         if (mSkipListeners) {
             return;
         }
         mSkipListeners = true;
-        mSeekbar.setEnabled(!mUnlimitedCheckbox.isChecked());
         int seekbarValue = mSeekbar.getProgress();
-        updateComponents(seekbarValue);
-        updateCurrentValueTextView(seekbarValue);
+        int currentValue = mUnlimitedCheckbox.isChecked() ? mUnlimitedValue : seekbarValue;
+        updateComponents(currentValue);
+        updateCurrentValueTextView(currentValue);
         mSkipListeners = false;
     }
 
     private void updateCurrentValueTextView(int value) {
-        if (mSupportsUnlimited && value == mUnlimitedValue) {
+        if (mSupportsUnlimited && (value == mUnlimitedValue) || mUnlimitedCheckbox.isChecked()) {
             mCurrentValueTextView.setText(getResources().getText(R.string.unlimited));
         } else if (mIsByteRate) {
             mCurrentValueTextView.setText(UIUtils.getBytesInHuman(value) + "/s");
