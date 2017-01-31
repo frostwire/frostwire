@@ -25,17 +25,18 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:gravity="center_horizontal"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="12dp"
         android:textColor="@color/app_text_secondary"
         android:textSize="@dimen/text_x_medium"
         android:text="@string/dummy_speed"
         />
     <SeekBar
         android:id="@+id/dialog_preference_seekbar_with_checkbox_seekbar"
-        android:layout_marginTop="25dp"
-        android:layout_marginBottom="12dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
+        />
     <CheckBox
         android:id="@+id/dialog_preference_seekbar_with_checkbox_unlimited_checkbox"
         android:layout_width="match_parent"
