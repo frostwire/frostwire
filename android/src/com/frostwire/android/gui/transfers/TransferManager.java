@@ -142,7 +142,6 @@ public final class TransferManager {
             return new InvalidDownload(R.string.cloud_download_aborted_on_mobile_data);
         }
 
-
         if (alreadyDownloading(sr.getDetailsUrl())) {
             transfer = new ExistingDownload();
         }

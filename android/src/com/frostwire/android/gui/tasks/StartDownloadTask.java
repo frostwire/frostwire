@@ -21,6 +21,7 @@ package com.frostwire.android.gui.tasks;
 import android.app.Activity;
 import android.content.Context;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.transfers.InvalidDownload;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
@@ -75,8 +76,10 @@ public class StartDownloadTask extends ContextTask<Transfer> {
                 ytDownloadDlg.show(((Activity) getContext()).getFragmentManager());
             }
             else {
-                UIUtils.showTransfersOnDownloadStart(getContext());
                 transfer = TransferManager.instance().download(sr);
+                if(!(transfer instanceof InvalidDownload)) {
+                    UIUtils.showTransfersOnDownloadStart(getContext());
+                }
             }
         } catch (Throwable e) {
             LOG.warn("Error adding new download from result: " + sr, e);
