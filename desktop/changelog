@@ -1,11 +1,12 @@
 frostwire (6.4.4) stable; urgency=high
   * New "All Free Downloads" button on welcome screen lets users explore all previous
     FrostWire free and legal promoted downloads.
+  * Fixes issue with YouTube search
   * Fixes issue with VPN detection for Mac/Linux after PIA/Express VPN updates.
   * Fixes issue with PIA VPN detection in Windows when advanced connection kill-switch enabled.
   * Fixes issue where the FrostWire update message wouldn't be shown until the next session.
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 26 Jan 2017 11:25:46 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 31 Jan 2017 09:51:09 -0600
 
 frostwire (6.4.3) stable; urgency=high
   * Fixes issue with YouTube search
