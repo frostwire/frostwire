@@ -19,12 +19,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-    <SeekBar
-        android:id="@+id/dialog_preference_seekbar_with_checkbox_seekbar"
-        android:layout_marginTop="25dp"
-        android:layout_marginBottom="12dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
     <TextView
         android:id="@+id/dialog_preference_seekbar_with_checkbox_current_value_textview"
         android:layout_width="match_parent"
@@ -36,6 +30,12 @@
         android:textSize="@dimen/text_x_medium"
         android:text="@string/dummy_speed"
         />
+    <SeekBar
+        android:id="@+id/dialog_preference_seekbar_with_checkbox_seekbar"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
     <CheckBox
         android:id="@+id/dialog_preference_seekbar_with_checkbox_unlimited_checkbox"
         android:layout_width="match_parent"
