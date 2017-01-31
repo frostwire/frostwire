@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CheckBox;
@@ -50,7 +51,6 @@ public final class CustomSeekBarPreference extends DialogPreference {
     private final int unlimitedValue;
 
     public CustomSeekBarPreference(Context context, AttributeSet attrs) {
-
         super(context, attrs);
         setDialogLayoutResource(R.layout.dialog_preference_seekbar_with_checkbox);
         TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.fwSeekbarPreference);
@@ -64,19 +64,29 @@ public final class CustomSeekBarPreference extends DialogPreference {
         arr.recycle();
     }
 
-    public boolean isByteRate() {
+    @Override
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        super.onBindViewHolder(holder);
+
+        TextView summaryView = (TextView) holder.findViewById(android.R.id.summary);
+        if (summaryView != null) {
+            setNumericalSummary(summaryView, getPersistedLong(defaultValue));
+        }
+    }
+
+    private boolean isByteRate() {
         return isByteRate;
     }
 
-    public int getPluralUnitResourceId() {
+    private int getPluralUnitResourceId() {
         return pluralUnitResourceId;
     }
 
-    public boolean supportsUnlimitedValue() {
+    private boolean supportsUnlimitedValue() {
         return hasUnlimited;
     }
 
-    public int getUnlimitedValue() {
+    private int getUnlimitedValue() {
         return unlimitedValue;
     }
 
@@ -95,6 +105,20 @@ public final class CustomSeekBarPreference extends DialogPreference {
 
     private int getDefaultValue() {
         return defaultValue;
+    }
+
+    private void setNumericalSummary(TextView summaryView, long value) {
+        if (supportsUnlimitedValue() && value == getUnlimitedValue()) {
+            summaryView.setText(R.string.unlimited);
+        } else {
+            if (isByteRate()) {
+                summaryView.setText(UIUtils.getBytesInHuman(value));
+            } else if (getPluralUnitResourceId() != 0) {
+                String text = getContext().getResources().
+                        getQuantityString(getPluralUnitResourceId(), (int) value, value);
+                summaryView.setText(text);
+            }
+        }
     }
 
     public static final class CustomSeekBarPreferenceDialog extends PreferenceDialogFragment {
@@ -152,7 +176,6 @@ public final class CustomSeekBarPreference extends DialogPreference {
             mSupportsUnlimited = args.getBoolean(SUPPORTS_UNLIMITED);
             mUnlimitedValue = args.getInt(UNLIMITED_VALUE);
         }
-
 
         @Override
         public void onSaveInstanceState(@NonNull Bundle outState) {

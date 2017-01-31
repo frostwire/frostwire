@@ -23,7 +23,6 @@ import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -120,26 +119,11 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
                     if (btEngine != null) {
                         int newVal = (int) newValue;
                         executeBTEngineAction(key, btEngine, newVal);
-                        displayNumericalSummaryForPreference((CustomSeekBarPreference) preference, newVal);
                         return checkBTEngineActionResult(key, btEngine, newVal);
                     }
                     return false;
                 }
             });
-            displayNumericalSummaryForPreference(pickerPreference, ConfigurationManager.instance().getLong(key));
-        }
-    }
-
-    private void displayNumericalSummaryForPreference(CustomSeekBarPreference preference, long value) {
-
-        if (preference.supportsUnlimitedValue() && value == preference.getUnlimitedValue()) {
-            preference.setSummary(R.string.unlimited);
-        } else {
-            if (preference.isByteRate()) {
-                preference.setSummary(UIUtils.getBytesInHuman(value));
-            } else if (preference.getPluralUnitResourceId() != 0) {
-                preference.setSummary(getValueWithUnit(preference.getPluralUnitResourceId(), value));
-            }
         }
     }
 
@@ -182,12 +166,5 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
                 return btEngine.maxPeers() == value;
         }
         return false;
-    }
-
-    private String getValueWithUnit(Integer unit, long value) {
-        if (unit != null) {
-            return getActivity().getResources().getQuantityString(unit, (int) value, value);
-        }
-        return String.valueOf(value);
     }
 }
