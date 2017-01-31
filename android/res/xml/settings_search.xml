@@ -45,14 +45,14 @@
         android:title="@string/use_mininova" />
     <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_monova"
-        android:summary="@string/use_monova_summary"
+        android:summary="@string/use_magnet_summary"
         android:title="@string/use_monova" />
     <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_soundcloud"
         android:title="@string/use_soundcloud" />
     <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_tpb"
-        android:summary="@string/use_tpb_summary"
+        android:summary="@string/use_magnet_summary"
         android:title="@string/use_tpb" />
     <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_torlock"
@@ -65,7 +65,7 @@
         android:title="@string/use_limetorrents" />
     <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_yify"
-        android:summary="@string/use_yify_summary"
+        android:summary="@string/use_magnet_summary"
         android:title="@string/use_yify" />
     <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_youtube"
