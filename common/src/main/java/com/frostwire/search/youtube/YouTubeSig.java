@@ -41,7 +41,7 @@ final class YouTubeSig {
          }
          >> Output: gr
          */
-        Matcher m = Pattern.compile("\\.sig\\|\\|([$a-zA-Z0-9]+)\\(").matcher(jscode);
+        Matcher m = Pattern.compile("\"signature\"," + JsFunction.WS + "?([$a-zA-Z0-9]+)\\(").matcher(jscode);
         m.find();
         String funcname = m.group(1);
         this.fn = new JsFunction<>(jscode, funcname);

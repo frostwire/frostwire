@@ -267,8 +267,8 @@ public final class YouTubeExtractor {
             fileNameFound = true;
         }
 
-        String playerId = br.getRegex("<script src=\"//s.ytimg.com/yts/jsbin/player-([\\w_\\-]+)/base.js\" name=\"player/base\"></script>").getMatch(0);
-        YouTubeSig ytSig = getYouTubeSig("http://s.ytimg.com/yts/jsbin/player-" + playerId + "/base.js");
+        String playerId = br.getRegex("<script src=\"/yts/jsbin/player-([\\w_\\-]+)/base.js\" name=\"player/base\"></script>").getMatch(0);
+        YouTubeSig ytSig = getYouTubeSig("http://www.youtube.com/yts/jsbin/player-" + playerId + "/base.js");
         currentYTSig = ytSig;
 
         /* html5_fmt_map */

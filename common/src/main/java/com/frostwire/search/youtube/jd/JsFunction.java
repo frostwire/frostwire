@@ -47,7 +47,8 @@ public final class JsFunction<T> {
     private final JsContext ctx;
     private final LambdaN initial_function;
 
-    private final static String WS = "[ \\t\\n\\x0B\\f\\r]"; //whitespaces, line feeds, aka \s.
+    // TODO: refactor visibility here
+    public final static String WS = "[ \\t\\n\\x0B\\f\\r]"; //whitespaces, line feeds, aka \s.
     private final static String VAR = "[a-zA-Z$0-9_]+";
     private final static String CODE = "{(?<code>[^\\}]+)\\}";
 
