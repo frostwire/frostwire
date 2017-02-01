@@ -1,3 +1,7 @@
+FrostWire 1.8.9 - FEB/01/2017
+ - Applovin update (6.4.2)
+ - Android support library update to 25.1.1
+
 FrostWire 1.8.8 - JAN/31/2017
  - Initial makeover of Settings screens with material design
  - Fixes issues with YouTube search
