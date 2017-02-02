@@ -258,6 +258,7 @@
     <string name="search">Search</string>
     <string name="transfers">Transfers</string>
     <string name="dummy_title" translatable="false">[Title]</string>
+    <string name="dummy_subtitle" translatable="false">[Subtitle]</string>
     <string name="dummy_status" translatable="false">[Status]</string>
     <string name="dummy_speed" translatable="false">[Speed]</string>
     <string name="dummy_size" translatable="false">[Size]</string>

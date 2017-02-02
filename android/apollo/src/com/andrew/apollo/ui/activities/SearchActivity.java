@@ -1,22 +1,33 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.ui.activities;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
-import android.content.*;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Intent;
+import android.content.Loader;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -24,17 +35,26 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
+import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CursorAdapter;
+import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView.ScaleType;
-import android.widget.SearchView.OnQueryTextListener;
+import android.widget.TextView;
+
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.format.PrefixHighlighter;
@@ -46,6 +66,7 @@ import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.ThemeUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.views.AbstractActivity;
 
 import java.util.Locale;
 
@@ -53,10 +74,10 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * Provides the search interface for Apollo.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
+public class SearchActivity extends AbstractActivity implements LoaderCallbacks<Cursor>,
         OnScrollListener, OnQueryTextListener, OnItemClickListener, ServiceConnection {
     /**
      * Grid view column count. ONE - list, TWO - normal grid
@@ -91,6 +112,20 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
      */
     private ThemeUtils mResources;
 
+    public SearchActivity() {
+        super(R.layout.apollo_activity_search);
+    }
+
+    @Override
+    protected void initToolbar(Toolbar toolbar) {
+        View v = LayoutInflater.from(this).inflate(R.layout.view_toolbar_title_subtitle_header, null);
+        setToolbarView(v);
+
+        TextView title = findView(R.id.view_toolbar_header_title);
+        // R.string.app_name is actually "My Music" (from original apollo code)
+        title.setText(R.string.app_name);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -113,34 +148,19 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
         // Bind Apollo's service
         mToken = MusicUtils.bindToService(this, this);
 
-        // Theme the action bar
-        final ActionBar actionBar = getActionBar();
-        mResources.themeActionBar(actionBar, getString(R.string.app_name));
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setIcon(R.color.transparent);
-        }
-
-        // Set the layout
-        setContentView(R.layout.grid_base);
-
-        // Give the background a little UI
-        final FrameLayout background = (FrameLayout)findViewById(R.id.grid_base_container);
-        background.setBackgroundDrawable(getResources().getDrawable(R.drawable.pager_background));
-
         // Get the query
         final String query = getIntent().getStringExtra(SearchManager.QUERY);
         mFilterString = !TextUtils.isEmpty(query) ? query : null;
 
         // Action bar subtitle
-        mResources.setSubtitle("\"" + mFilterString + "\"");
+        setSubtitle(mFilterString);
 
         // Initialize the adapter
         mAdapter = new SearchAdapter(this);
         // Set the prefix
         mAdapter.setPrefix(mFilterString);
         // Initialize the list
-        mGridView = (GridView)findViewById(R.id.grid_base);
+        mGridView = findView(R.id.apollo_activity_search_grid_base);
         // Bind the data
         mGridView.setAdapter(mAdapter);
         // Recycle the data
@@ -177,12 +197,10 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
-        getMenuInflater().inflate(R.menu.search, menu);
-        // Theme the search icon
-        mResources.setSearchIcon(menu);
+        getMenuInflater().inflate(R.menu.apollo_menu_search, menu);
 
         // Filter the list the user is looking it via SearchView
-        mSearchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
+        mSearchView = (SearchView)menu.findItem(R.id.apollo_menu_item_search).getActionView();
         mSearchView.setOnQueryTextListener(this);
 
         // Add voice search
@@ -259,8 +277,8 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
         if (data == null || data.isClosed() || data.getCount() <= 0) {
             // Set the empty text
-            final TextView empty = (TextView)findViewById(R.id.empty);
-            empty.setText(getString(R.string.empty_search));
+            TextView empty = findView(R.id.apollo_activity_search_text_empty);
+            empty.setText(R.string.empty_search);
             mGridView.setEmptyView(empty);
             return;
         }
@@ -314,7 +332,7 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
             mSearchView.clearFocus();
         }
         // Action bar subtitle
-        mResources.setSubtitle("\"" + mFilterString + "\"");
+        setSubtitle(mFilterString);
         return true;
     }
 
@@ -420,7 +438,7 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
 
         /**
          * Constructor for <code>SearchAdapter</code>
-         * 
+         *
          * @param context The {@link Context} to use.
          */
         public SearchAdapter(final Activity context) {
@@ -575,4 +593,8 @@ public class SearchActivity extends Activity implements LoaderCallbacks<Cursor>,
         // Nothing to do
     }
 
+    private void setSubtitle(String s) {
+        TextView subtitle = findView(R.id.view_toolbar_header_subtitle);
+        subtitle.setText("\"" + s + "\"");
+    }
 }

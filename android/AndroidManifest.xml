@@ -213,6 +213,7 @@
         <!-- Search interface -->
         <activity
                 android:name="com.andrew.apollo.ui.activities.SearchActivity"
+                android:theme="@style/Theme.FrostWire"
                 android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
