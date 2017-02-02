@@ -44,6 +44,7 @@ import android.widget.TextView;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
@@ -51,15 +52,19 @@ import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.AbstractDialog;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.youtube.YouTubePackageSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.mopub.mobileads.MoPubErrorCode;
+import com.mopub.mobileads.MoPubView;
 
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Random;
 
 /**
  * @author gubatron
@@ -160,6 +165,74 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         if (isFullScreen) {
             isFullScreen = false; //so it will make it full screen on what was an orientation change.
             toggleFullScreen(v);
+        }
+
+        initMopubView();
+    }
+
+    private void initMopubView() {
+        if (Offers.disabledAds()) {
+            return;
+        }
+
+        final int mopubAlbumArtBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD);
+        final int r = new Random().nextInt(100)+1;
+        //LOG.info("moPubOnPreviewThreshold: " + mopubAlbumArtBannerThreshold + " - dice roll: " + r + " - skip moPubOnPreview? " + (r > mopubAlbumArtBannerThreshold));
+        if (r > mopubAlbumArtBannerThreshold) {
+            return;
+        }
+
+        final MoPubView mopubView = (MoPubView) findViewById(R.id.activity_preview_player_mopubview);
+        final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.activity_preview_advertisement_header_layout);
+        final ImageButton dismissButton = (ImageButton) findViewById(R.id.audio_player_dismiss_mopubview_button);
+
+        if (mopubView == null || linearLayout == null || dismissButton == null) {
+            return;
+        }
+
+        dismissButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mopubView.setVisibility(View.GONE);
+                linearLayout.setVisibility(View.GONE);
+            }
+        });
+        mopubView.setTesting(true);
+        mopubView.setAutorefreshEnabled(true);
+        boolean isVertical = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        mopubView.setAdUnitId(isVertical ? "a8be0cad4ad0419dbb19601aef3a18d2" : "2fd0fafe3d3c4d668385a620caaa694e");
+        mopubView.setKeywords("music,audio,ringtone,video,music video");
+
+        mopubView.setBannerAdListener(new MoPubView.BannerAdListener() {
+            @Override
+            public void onBannerLoaded(MoPubView banner) {
+                linearLayout.setVisibility(View.VISIBLE);
+                mopubView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
+                linearLayout.setVisibility(View.GONE);
+                mopubView.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onBannerClicked(MoPubView banner) {
+            }
+
+            @Override
+            public void onBannerExpanded(MoPubView banner) {
+            }
+
+            @Override
+            public void onBannerCollapsed(MoPubView banner) {
+            }
+        });
+
+        try {
+            mopubView.loadAd();
+        } catch (Throwable e) {
+            LOG.warn("AudioPlayer Mopub banner could not be loaded", e);
         }
     }
 

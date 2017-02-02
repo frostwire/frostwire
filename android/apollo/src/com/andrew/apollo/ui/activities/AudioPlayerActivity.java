@@ -726,7 +726,11 @@ public class AudioPlayerActivity extends FragmentActivity implements
                     setAlbumArtAdVisibility(false);
                 }
             });
-            mAlbumArtAd.loadAd();
+            try {
+                mAlbumArtAd.loadAd();
+            } catch (Throwable e) {
+                LOG.warn("AudioPlayer Mopub banner could not be loaded", e);
+            }
         }
     }
 
