@@ -115,7 +115,11 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
                 MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(MoPubAdNetwork.this, placement);
                 moPubInterstitial.setInterstitialAdListener(moPubListener);
                 interstitials.put(placement, moPubInterstitial);
-                moPubInterstitial.load();
+                try {
+                    moPubInterstitial.load();
+                } catch (Throwable e) {
+                    LOG.warn("Mopub Interstitial couldn't be loaded", e);
+                }
             }
         });
     }
