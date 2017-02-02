@@ -20,6 +20,7 @@
 -->
 <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/toolbar_main"
     android:layout_width="match_parent"
     android:layout_height="48dp"
@@ -28,8 +29,10 @@
     app:navigationContentDescription="@string/abc_action_bar_up_description"
     app:navigationIcon="?attr/homeAsUpIndicator"
     app:title="@string/application_label"
-    app:titleTextColor="@color/action_bar_title">
+    app:titleTextColor="@color/action_bar_title"
+    tools:ignore="PrivateResource">
 
+    <!--suppress CheckTagEmptyBody -->
     <RelativeLayout
         android:id="@+id/toolbar_main_placeholder"
         android:layout_width="match_parent"
