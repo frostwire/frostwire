@@ -238,7 +238,6 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
         if (isShutdown()) {
             return;
         }
-        initDrawerListener();
         leftDrawer = findView(R.id.activity_main_left_drawer);
         listMenu = findView(R.id.left_drawer);
         initPlayerItemListener();
@@ -271,31 +270,6 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, BuyActivity.class);
                 startActivity(intent);
-            }
-        });
-    }
-
-    private void initDrawerListener() {
-        drawerLayout = findView(R.id.drawer_layout);
-        drawerLayout.setDrawerListener(new SimpleDrawerListener() {
-            @Override
-            public void onDrawerStateChanged(int newState) {
-                refreshPlayerItem();
-                refreshMenuRemoveAdsItem();
-            }
-
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                syncSlideMenu();
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-
             }
         });
     }
@@ -387,7 +361,6 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
     @Override
     protected void onResume() {
         super.onResume();
-        initDrawerListener();
         setupDrawer();
         initPlayerItemListener();
         initAdMenuItemListener();
@@ -907,6 +880,7 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
     }
 
     private void setupDrawer() {
+        drawerLayout = findView(R.id.drawer_layout);
         Toolbar toolbar = findView(R.id.toolbar_main);
         drawerToggle = new MenuDrawerToggle(this, drawerLayout, toolbar);
         drawerLayout.setDrawerListener(drawerToggle);
