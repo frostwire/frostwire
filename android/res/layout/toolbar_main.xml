@@ -30,4 +30,10 @@
     app:title="@string/application_label"
     app:titleTextColor="@color/action_bar_title">
 
+    <RelativeLayout
+        android:id="@+id/toolbar_main_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"></RelativeLayout>
+
 </android.support.v7.widget.Toolbar>

@@ -62,6 +62,7 @@
 
         <activity android:name="com.frostwire.android.gui.activities.MainActivity"
                   android:label="@string/application_label"
+                  android:theme="@style/Theme.FrostWire"
                   android:launchMode="singleTask"
                   android:protectionLevel="dangerous">
             <intent-filter>

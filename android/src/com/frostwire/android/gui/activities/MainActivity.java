@@ -27,10 +27,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.SimpleDrawerListener;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -95,7 +96,7 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
  * @author gubatron
  * @author aldenml
  */
-public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
+public class MainActivity extends AbstractActivity2 implements ConfigurationUpdateListener,
         OnDialogClickListener,
         ServiceConnection,
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -799,12 +800,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void updateHeader(Fragment fragment) {
         try {
-            ActionBar actionBar = getActionBar();
-            if (actionBar == null) {
+            Toolbar toolbar = findView(R.id.toolbar_main);
+            if (toolbar == null) {
                 LOG.warn("updateHeader(): Check your logic, no actionBar available");
                 return;
             }
-            RelativeLayout placeholder = (RelativeLayout) actionBar.getCustomView();
+            RelativeLayout placeholder = (RelativeLayout) toolbar.findViewById(R.id.toolbar_main_placeholder);
             if (placeholder != null && placeholder.getChildCount() > 0) {
                 placeholder.removeAllViews();
             }
@@ -908,7 +909,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void setupDrawer() {
-        drawerToggle = new MenuDrawerToggle(this, drawerLayout);
+        Toolbar toolbar = findView(R.id.toolbar_main);
+        drawerToggle = new MenuDrawerToggle(this, drawerLayout, toolbar);
         drawerLayout.setDrawerListener(drawerToggle);
     }
 
@@ -935,8 +937,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private static final class MenuDrawerToggle extends ActionBarDrawerToggle {
         private final WeakReference<MainActivity> activityRef;
 
-        MenuDrawerToggle(MainActivity activity, DrawerLayout drawerLayout) {
-            super(activity, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
+        MenuDrawerToggle(MainActivity activity, DrawerLayout drawerLayout, Toolbar toolbar) {
+            super(activity, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
 
             // aldenml: even if the parent class holds a strong reference, I decided to keep a weak one
             this.activityRef = Ref.weak(activity);
