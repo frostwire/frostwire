@@ -618,13 +618,19 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         super.onDestroy();
         stopAnyOtherPlayers();
         releaseMediaPlayer();
+    }
+
+
+    @Override
+    protected void onPause() {
         destroyMopubView();
+        super.onPause();
     }
 
     private void destroyMopubView() {
         try {
             if (mopubView != null) {
-                mopubView.destroy();
+                mopubView.destroy(); // -> mopubView.unregisterScreenStateBroadcastReceiver() private method call
             }
         } catch (Throwable ignored) {
             LOG.error(ignored.getMessage(), ignored);
