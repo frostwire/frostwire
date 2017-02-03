@@ -95,6 +95,7 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
     private boolean isFullScreen = false;
     private boolean videoSizeSetupDone = false;
     private boolean changedActionBarTitleToNonBuffering = false;
+    private MoPubView mopubView;
 
     public PreviewPlayerActivity() {
         super(R.layout.activity_preview_player);
@@ -175,14 +176,14 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
             return;
         }
 
-        final int mopubAlbumArtBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD);
+        final int mopubPreviewBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD);
         final int r = new Random().nextInt(100)+1;
-        //LOG.info("moPubOnPreviewThreshold: " + mopubAlbumArtBannerThreshold + " - dice roll: " + r + " - skip moPubOnPreview? " + (r > mopubAlbumArtBannerThreshold));
-        if (r > mopubAlbumArtBannerThreshold) {
+        //LOG.info("moPubOnPreviewThreshold: " + mopubPreviewBannerThreshold + " - dice roll: " + r + " - skip moPubOnPreview? " + (r > mopubPreviewBannerThreshold));
+        if (r > mopubPreviewBannerThreshold) {
             return;
         }
 
-        final MoPubView mopubView = (MoPubView) findViewById(R.id.activity_preview_player_mopubview);
+        mopubView = (MoPubView) findViewById(R.id.activity_preview_player_mopubview);
         final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.activity_preview_advertisement_header_layout);
         final ImageButton dismissButton = (ImageButton) findViewById(R.id.audio_player_dismiss_mopubview_button);
 
@@ -617,6 +618,17 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         super.onDestroy();
         stopAnyOtherPlayers();
         releaseMediaPlayer();
+        destroyMopubView();
+    }
+
+    private void destroyMopubView() {
+        try {
+            if (mopubView != null) {
+                mopubView.destroy();
+            }
+        } catch (Throwable ignored) {
+            LOG.error(ignored.getMessage(), ignored);
+        }
     }
 
     @Override
