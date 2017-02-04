@@ -177,6 +177,13 @@ public final class SearchFragment extends AbstractFragment implements
         } else {
             setupPromoSlides();
         }
+
+        if (list != null && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH)) {
+            list.setOnScrollListener(
+                    DirectionDetectorScrollListener.createOnScrollListener(
+                            createScrollDirectionListener(),
+                            Engine.instance().getThreadPool()));
+        }
     }
 
     @Override
@@ -306,13 +313,6 @@ public final class SearchFragment extends AbstractFragment implements
             });
         }
         list.setAdapter(adapter);
-
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH)) {
-            list.setOnScrollListener(
-                    DirectionDetectorScrollListener.createOnScrollListener(
-                            createScrollDirectionListener(),
-                            Engine.instance().getThreadPool()));
-        }
     }
 
     private ScrollDirectionListener createScrollDirectionListener() {
