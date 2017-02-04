@@ -19,7 +19,6 @@
 package com.frostwire.android.gui.fragments;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -329,24 +328,11 @@ public final class SearchFragment extends AbstractFragment implements
         };
     }
 
-    private void actionBarShow(boolean show) {
-        ActionBar actionBar = getActivity().getActionBar();
-        if (actionBar != null) {
-            if (show) {
-                actionBar.show();
-            } else {
-                actionBar.hide();
-            }
-        }
-    }
-
     private void onSearchScrollDown() {
-        actionBarShow(false);
         hideSearchBox();
     }
 
     private void onSearchScrollUp() {
-        actionBarShow(true);
         showSearchBox();
     }
 
