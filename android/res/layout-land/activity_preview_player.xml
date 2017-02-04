@@ -53,19 +53,34 @@
                 android:contentDescription="@null"
                 android:scaleType="fitCenter" />
 
-            <ImageButton
-                android:id="@+id/activity_preview_player_download_button"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
+            <LinearLayout
+                android:id="@+id/activity_preview_player_buttons_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
                 android:layout_gravity="center_horizontal|bottom"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@null"
-                android:contentDescription="@null"
-                android:scaleType="fitCenter"
-                android:src="@drawable/download_icon" />
+                android:layout_marginBottom="10dp">
+                <ImageButton
+                    android:id="@+id/activity_preview_player_download_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:contentDescription="@null"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/download_icon"
+                    android:layout_marginRight="10dp"/>
+                <ImageButton
+                    android:id="@+id/activity_preview_player_fullscreen_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:contentDescription="@null"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/fullscreen"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="2.5dp"/>
+            </LinearLayout>
         </FrameLayout>
 
         <View
@@ -80,47 +95,34 @@
             android:layout_height="match_parent"
             android:layout_weight="0.5"
             android:orientation="vertical">
-
             <LinearLayout
-                android:id="@+id/activity_preview_player_header"
+                android:id="@+id/activity_preview_player_metadata_header"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/audio_player_header_height"
+                android:layout_height="50dp"
+                android:padding="5dp"
+                android:paddingBottom="0dp"
                 android:background="@color/basic_white"
                 android:baselineAligned="false"
                 android:orientation="vertical">
-
-                <LinearLayout
+                <TextView
+                    android:id="@+id/activity_preview_player_track_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top"
-                    android:orientation="vertical"
-                    android:paddingEnd="@dimen/audio_player_header_padding_right"
-                    android:paddingLeft="@dimen/audio_player_header_padding_left"
-                    android:paddingRight="@dimen/audio_player_header_padding_right"
-                    android:paddingStart="@dimen/audio_player_header_padding_left"
-                    android:paddingTop="10.0dip">
-
-                    <TextView
-                        android:id="@+id/activity_preview_player_track_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="@string/dummy_title"
-                        android:textColor="@android:color/black"
-                        android:textSize="@dimen/text_size_medium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/activity_preview_player_artist_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="@string/dummy_author"
-                        android:textColor="@android:color/black"
-                        android:textSize="@dimen/text_size_small" />
-                </LinearLayout>
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="@string/dummy_title"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_medium"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:id="@+id/activity_preview_player_artist_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="@string/dummy_author"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_small"/>
             </LinearLayout>
 
             <LinearLayout
@@ -134,8 +136,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal|right"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="7dp"
+                    android:layout_marginTop="2dp"
                     android:background="@null"
                     android:src="@drawable/ad_cancel"
                     android:visibility="invisible" />

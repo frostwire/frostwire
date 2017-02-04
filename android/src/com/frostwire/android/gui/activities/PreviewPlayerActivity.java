@@ -96,6 +96,7 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
     private boolean videoSizeSetupDone = false;
     private boolean changedActionBarTitleToNonBuffering = false;
     private MoPubView mopubView;
+    private boolean mopubLoaded = false;
 
     public PreviewPlayerActivity() {
         super(R.layout.activity_preview_player);
@@ -122,16 +123,19 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         int mediaTypeStrId = audio ? R.string.audio : R.string.video;
         setTitle(getString(R.string.media_preview, getString(mediaTypeStrId)) + " (buffering...)");
 
-        final TextureView v = findView(R.id.activity_preview_player_videoview);
-        v.setSurfaceTextureListener(this);
+        final TextureView videoTexture = findView(R.id.activity_preview_player_videoview);
+        videoTexture.setSurfaceTextureListener(this);
+
+        final ImageButton toggleFullscreenButton = findView(R.id.activity_preview_player_fullscreen_button);
+        toggleFullscreenButton.setVisibility(audio ? View.GONE : View.VISIBLE);
 
         // when previewing audio, we make the video view really tiny.
         // hiding it will cause the player not to play.
         if (audio) {
-            final ViewGroup.LayoutParams layoutParams = v.getLayoutParams();
+            final ViewGroup.LayoutParams layoutParams = videoTexture.getLayoutParams();
             layoutParams.width = 1;
             layoutParams.height = 1;
-            v.setLayoutParams(layoutParams);
+            videoTexture.setLayoutParams(layoutParams);
         }
 
         final ImageView img = findView(R.id.activity_preview_player_thumbnail);
@@ -142,11 +146,17 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         artistName.setText(source);
 
         if (!audio) {
-            v.setOnTouchListener(new View.OnTouchListener() {
+            videoTexture.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public boolean onTouch(View view, MotionEvent event) {
-                    toggleFullScreen(v);
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    toggleFullScreen(videoTexture);
                     return false;
+                }
+            });
+            toggleFullscreenButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    toggleFullScreen(videoTexture);
                 }
             });
         }
@@ -165,7 +175,7 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
 
         if (isFullScreen) {
             isFullScreen = false; //so it will make it full screen on what was an orientation change.
-            toggleFullScreen(v);
+            toggleFullScreen(videoTexture);
         }
 
         initMopubView();
@@ -175,27 +185,25 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         if (Offers.disabledAds()) {
             return;
         }
-
         final int mopubPreviewBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD);
         final int r = new Random().nextInt(100)+1;
         //LOG.info("moPubOnPreviewThreshold: " + mopubPreviewBannerThreshold + " - dice roll: " + r + " - skip moPubOnPreview? " + (r > mopubPreviewBannerThreshold));
         if (r > mopubPreviewBannerThreshold) {
             return;
         }
-
         mopubView = (MoPubView) findViewById(R.id.activity_preview_player_mopubview);
-        final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.activity_preview_advertisement_header_layout);
+        final LinearLayout advertisementHeaderLayout = (LinearLayout) findViewById(R.id.activity_preview_advertisement_header_layout);
         final ImageButton dismissButton = (ImageButton) findViewById(R.id.audio_player_dismiss_mopubview_button);
-
-        if (mopubView == null || linearLayout == null || dismissButton == null) {
+        if (mopubView == null || advertisementHeaderLayout == null || dismissButton == null) {
             return;
         }
-
         dismissButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mopubLoaded = false;
+                advertisementHeaderLayout.setVisibility(View.GONE);
                 mopubView.setVisibility(View.GONE);
-                linearLayout.setVisibility(View.GONE);
+
             }
         });
         mopubView.setTesting(true);
@@ -203,18 +211,19 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         boolean isVertical = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         mopubView.setAdUnitId(isVertical ? "a8be0cad4ad0419dbb19601aef3a18d2" : "2fd0fafe3d3c4d668385a620caaa694e");
         mopubView.setKeywords("music,audio,ringtone,video,music video");
-
         mopubView.setBannerAdListener(new MoPubView.BannerAdListener() {
             @Override
             public void onBannerLoaded(MoPubView banner) {
-                linearLayout.setVisibility(View.VISIBLE);
+                mopubLoaded = true;
+                advertisementHeaderLayout.setVisibility(View.VISIBLE);
                 mopubView.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
-                linearLayout.setVisibility(View.GONE);
+                advertisementHeaderLayout.setVisibility(View.GONE);
                 mopubView.setVisibility(View.GONE);
+                mopubLoaded = false;
             }
 
             @Override
@@ -229,14 +238,12 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
             public void onBannerCollapsed(MoPubView banner) {
             }
         });
-
         try {
             mopubView.loadAd();
         } catch (Throwable e) {
             LOG.warn("AudioPlayer Mopub banner could not be loaded", e);
         }
     }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -291,7 +298,6 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
             if (location != null) {
                 return location;
             }
-
         } catch (Throwable e) {
             LOG.error("Unable to detect final url", e);
         } finally {
@@ -330,18 +336,23 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         final FrameLayout frameLayout = findView(R.id.activity_preview_player_framelayout);
         LinearLayout.LayoutParams frameLayoutParams = (LinearLayout.LayoutParams) frameLayout.getLayoutParams();
 
-        LinearLayout header = findView(R.id.activity_preview_player_header);
+        LinearLayout playerMetadataHeader = findView(R.id.activity_preview_player_metadata_header);
         ImageView thumbnail = findView(R.id.activity_preview_player_thumbnail);
-        ImageButton downloadButton = findView(R.id.activity_preview_player_download_button);
+        LinearLayout buttonsContainer = findView(R.id.activity_preview_player_buttons_container);
 
         // these ones only exist on landscape mode.
         ViewGroup rightSide = findView(R.id.activity_preview_player_right_side);
         View divider = findView(R.id.activity_preview_player_divider);
 
+        // these might not even be there
+        LinearLayout advertisementHeaderLayout = findView(R.id.activity_preview_advertisement_header_layout);
+        MoPubView moPubView = findView(R.id.activity_preview_player_mopubview);
+
         // Let's Go into full screen mode.
         if (!isFullScreen) {
             findView(R.id.toolbar_main).setVisibility(View.GONE);
-            setViewsVisibility(View.GONE, header, thumbnail, divider, downloadButton, rightSide);
+            setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, divider, buttonsContainer, rightSide);
+            setViewsVisibility(View.GONE, advertisementHeaderLayout, moPubView);
 
             // TODO: refactor to properly avoid warnings
             if (isPortrait) {
@@ -359,7 +370,10 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
         } else {
             // restore components back from full screen mode.
             findView(R.id.toolbar_main).setVisibility(View.VISIBLE);
-            setViewsVisibility(View.VISIBLE, header, divider, downloadButton, rightSide);
+            setViewsVisibility(View.VISIBLE, playerMetadataHeader, divider, buttonsContainer, rightSide);
+            if (mopubLoaded) {
+                setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, moPubView);
+            }
             v.setRotation(0);
 
             // restore the thumbnail on the way back only if doing audio preview.
@@ -630,6 +644,8 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
     private void destroyMopubView() {
         try {
             if (mopubView != null) {
+                LinearLayout advertisementHeaderLayout = findView(R.id.activity_preview_advertisement_header_layout);
+                advertisementHeaderLayout.setVisibility(View.GONE);
                 mopubView.destroy(); // -> mopubView.unregisterScreenStateBroadcastReceiver() private method call
             }
         } catch (Throwable ignored) {

@@ -24,15 +24,12 @@
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_main" />
-
     <LinearLayout
-        android:id="@+id/activity_preview_player_header"
+        android:id="@+id/activity_preview_player_metadata_header"
         android:layout_width="match_parent"
         android:layout_height="@dimen/audio_player_header_height"
         android:background="@color/basic_white"
-        android:baselineAligned="false"
         android:orientation="horizontal">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,7 +39,6 @@
             android:paddingLeft="@dimen/audio_player_header_padding_left"
             android:paddingRight="@dimen/audio_player_header_padding_right"
             android:paddingStart="@dimen/audio_player_header_padding_left">
-
             <TextView
                 android:id="@+id/activity_preview_player_track_name"
                 android:layout_width="match_parent"
@@ -53,7 +49,6 @@
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/text_size_medium"
                 android:textStyle="bold" />
-
             <TextView
                 android:id="@+id/activity_preview_player_artist_name"
                 android:layout_width="match_parent"
@@ -81,7 +76,6 @@
             android:layout_marginTop="10dp"
             android:background="@null"
             android:src="@drawable/ad_cancel"
-            android:layout_alignRight="@+id/activity_preview_player_advertisement_text"
             android:visibility="invisible" />
         <TextView
             android:id="@+id/activity_preview_player_advertisement_text"
@@ -93,7 +87,6 @@
             android:text="@string/advertisement"
             android:textColor="@color/app_text_disabled"
             android:visibility="visible" />
-
         <ImageButton
             android:id="@+id/audio_player_dismiss_mopubview_button"
             android:layout_width="wrap_content"
@@ -102,7 +95,6 @@
             android:layout_marginRight="10dp"
             android:background="@null"
             android:src="@drawable/ad_cancel"
-            android:layout_alignRight="@+id/activity_preview_player_advertisement_text"
             android:visibility="visible" />
     </LinearLayout>
 
@@ -126,13 +118,11 @@
         android:layout_margin="0dp"
         android:layout_weight="1.0"
         android:padding="0dp">
-
         <TextureView
             android:id="@+id/activity_preview_player_videoview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal|center_vertical" />
-
         <ImageView
             android:id="@+id/activity_preview_player_thumbnail"
             android:layout_width="match_parent"
@@ -142,16 +132,32 @@
             android:contentDescription="@null" />
     </FrameLayout>
 
-    <ImageButton
-        android:id="@+id/activity_preview_player_download_button"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
-        android:background="@null"
-        android:contentDescription="@null"
-        android:scaleType="fitCenter"
-        android:src="@drawable/download_icon" />
-
+    <LinearLayout
+        android:id="@+id/activity_preview_player_buttons_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+        <ImageButton
+            android:id="@+id/activity_preview_player_download_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/download_icon"
+            android:layout_marginRight="10dp"/>
+        <ImageButton
+            android:id="@+id/activity_preview_player_fullscreen_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/fullscreen"
+            android:layout_marginLeft="10dp"/>
+    </LinearLayout>
 </LinearLayout>
