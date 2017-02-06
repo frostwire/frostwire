@@ -534,8 +534,7 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
                     !NetworkManager.instance().isTunnelUp()) {
-                // todo change to snackbar when view is compatible
-                UIUtils.showShortMessage(this, R.string.cannot_start_engine_without_vpn);
+                UIUtils.showShortMessage(getWindow().getDecorView().getRootView(), R.string.cannot_start_engine_without_vpn);
             } else {
                 firstTime = false;
                 Engine.instance().startServices(); // it's necessary for the first time after wizard
