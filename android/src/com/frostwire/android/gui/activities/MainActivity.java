@@ -17,18 +17,26 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.*;
-import android.content.*;
+import android.app.ActionBar;
+import android.app.Dialog;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.DrawerLayout.SimpleDrawerListener;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -38,6 +46,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
@@ -65,8 +74,13 @@ import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.*;
+import com.frostwire.android.gui.views.AbstractActivity2;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
+import com.frostwire.android.gui.views.AdMenuItemView;
+import com.frostwire.android.gui.views.PlayerMenuItemView;
+import com.frostwire.android.gui.views.PlayerNotifierView;
+import com.frostwire.android.gui.views.TimerService;
+import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
@@ -76,6 +90,7 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -369,7 +384,7 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
             Offers.initAdNetworks(this);
-        } else if (!isShutdown()){
+        } else if (!isShutdown()) {
             controller.startWizardActivity();
         }
         checkLastSeenVersion();
@@ -684,7 +699,7 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
             // if they haven't paid for ads
             if (!Offers.disabledAds() &&
-                (playerItem == null || playerItem.getVisibility() == View.GONE)) {
+                    (playerItem == null || playerItem.getVisibility() == View.GONE)) {
                 visibility = View.VISIBLE;
             }
         }
