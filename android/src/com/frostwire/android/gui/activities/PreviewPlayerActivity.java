@@ -350,7 +350,7 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
 
         // Let's Go into full screen mode.
         if (!isFullScreen) {
-            findView(R.id.toolbar_main).setVisibility(View.GONE);
+            findToolbar().setVisibility(View.GONE);
             setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, divider, buttonsContainer, rightSide);
             setViewsVisibility(View.GONE, advertisementHeaderLayout, moPubView);
 
@@ -369,7 +369,7 @@ public final class PreviewPlayerActivity extends AbstractActivity2 implements
             isFullScreen = true;
         } else {
             // restore components back from full screen mode.
-            findView(R.id.toolbar_main).setVisibility(View.VISIBLE);
+            findToolbar().setVisibility(View.VISIBLE);
             setViewsVisibility(View.VISIBLE, playerMetadataHeader, divider, buttonsContainer, rightSide);
             if (mopubLoaded) {
                 setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, moPubView);

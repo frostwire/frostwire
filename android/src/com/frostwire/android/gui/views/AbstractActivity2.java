@@ -101,7 +101,7 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
     @Override
     protected void onTitleChanged(CharSequence title, int color) {
         super.onTitleChanged(title, color);
-        Toolbar toolbar = findView(R.id.toolbar_main);
+        Toolbar toolbar = findToolbar();
         if (toolbar != null) {
             toolbar.setTitle(title);
         }
@@ -125,7 +125,7 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
     }
 
     private void setToolbar() {
-        Toolbar toolbar = findView(R.id.toolbar_main);
+        Toolbar toolbar = findToolbar();
         if (toolbar != null) {
             setSupportActionBar(toolbar);
             toolbar.setTitle(getTitle());
@@ -136,5 +136,9 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
     @SuppressWarnings("unchecked")
     protected final <T extends View> T findView(int id) {
         return (T) super.findViewById(id);
+    }
+
+    protected final Toolbar findToolbar() {
+        return findView(R.id.toolbar_main);
     }
 }

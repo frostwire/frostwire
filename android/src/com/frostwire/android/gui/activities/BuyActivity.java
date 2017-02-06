@@ -162,7 +162,7 @@ public final class BuyActivity extends AbstractActivity2 {
         View v = findView(R.id.activity_buy_actionbar_interstitial);
         v.setVisibility(View.VISIBLE);
 
-        View toolbar = findView(R.id.toolbar_main);
+        View toolbar = findToolbar();
         toolbar.setVisibility(View.GONE);
 
         TextView titleTextView = findView(R.id.activity_buy_actionbar_interstitial_buy_activity_title);

@@ -771,7 +771,7 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
 
     private void updateHeader(Fragment fragment) {
         try {
-            Toolbar toolbar = findView(R.id.toolbar_main);
+            Toolbar toolbar = findToolbar();
             if (toolbar == null) {
                 LOG.warn("updateHeader(): Check your logic, no actionBar available");
                 return;
@@ -881,7 +881,7 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
 
     private void setupDrawer() {
         drawerLayout = findView(R.id.drawer_layout);
-        Toolbar toolbar = findView(R.id.toolbar_main);
+        Toolbar toolbar = findToolbar();
         drawerToggle = new MenuDrawerToggle(this, drawerLayout, toolbar);
         drawerLayout.setDrawerListener(drawerToggle);
     }
