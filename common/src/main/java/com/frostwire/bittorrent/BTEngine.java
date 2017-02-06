@@ -452,10 +452,9 @@ public final class BTEngine extends SessionManager {
         try {
             String name = getEscapedFilename(ti);
 
-            byte[] arr = ti.toEntry().bencode();
-
             entry e = ti.toEntry().swig();
             e.dict().set(TORRENT_ORIG_PATH_KEY, new entry(torrentFile(name).getAbsolutePath()));
+            byte[] arr = Vectors.byte_vector2bytes(e.bencode());
 
             FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHash().toString()), arr);
         } catch (Throwable e) {
