@@ -158,18 +158,18 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                     if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
                             !NetworkManager.instance().isTunnelUp()) {
                         //don't start
-                    } else {
-                        Engine.instance().getThreadPool().execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                Engine.instance().startServices();
-
-                                if (shouldStopSeeding()) {
-                                    TransferManager.instance().stopSeedingTorrents();
-                                }
-                            }
-                        });
+                        return;
                     }
+
+                    Engine.instance().getThreadPool().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            Engine.instance().startServices();
+                            if (shouldStopSeeding()) {
+                                TransferManager.instance().stopSeedingTorrents();
+                            }
+                        }
+                    });
 
                 } else if (shouldStopSeeding()) {
                     TransferManager.instance().stopSeedingTorrents();
