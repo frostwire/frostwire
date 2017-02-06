@@ -269,8 +269,11 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
                 !NetworkManager.instance().isTunnelUp()) {
-            // todo change to snackbar when activities are compatible
-            UIUtils.showShortMessage(getContext(), R.string.cannot_start_engine_without_vpn);
+            if (getContext() instanceof Activity) {
+                UIUtils.showShortMessage(((Activity) getContext()).getWindow().getDecorView().getRootView(), R.string.cannot_start_engine_without_vpn);
+            } else {
+                UIUtils.showShortMessage(getContext(), R.string.cannot_start_engine_without_vpn);
+            }
         } else {
             Engine.instance().getThreadPool().execute(new Runnable() {
                 @Override
