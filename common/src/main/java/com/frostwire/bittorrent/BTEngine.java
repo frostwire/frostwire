@@ -253,11 +253,15 @@ public final class BTEngine extends SessionManager {
         download(ti, saveDir, priorities, null, null);
 
         if (!exists) {
-            saveResumeTorrent(torrent);
+            saveResumeTorrent(ti);
         }
     }
 
     public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers) {
+        download(ti, saveDir, selection, peers, false);
+    }
+
+    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers, boolean dontSaveTorrentFile) {
         if (swig() == null) {
             return;
         }
@@ -291,12 +295,18 @@ public final class BTEngine extends SessionManager {
         download(ti, saveDir, priorities, null, peers);
 
         if (!torrentHandleExists) {
-            File torrent = saveTorrent(ti);
-            saveResumeTorrent(torrent);
+            saveResumeTorrent(ti);
+            if (!dontSaveTorrentFile) {
+                saveTorrent(ti);
+            }
         }
     }
 
     public void download(TorrentCrawledSearchResult sr, File saveDir) {
+        download(sr, saveDir, false);
+    }
+
+    public void download(TorrentCrawledSearchResult sr, File saveDir, boolean dontSaveTorrentFile) {
         if (swig() == null) {
             return;
         }
@@ -325,8 +335,10 @@ public final class BTEngine extends SessionManager {
         }
 
         if (!exists) {
-            File torrent = saveTorrent(ti);
-            saveResumeTorrent(torrent);
+            saveResumeTorrent(ti);
+            if (!dontSaveTorrentFile) {
+                saveTorrent(ti);
+            }
         }
     }
 
@@ -381,6 +393,10 @@ public final class BTEngine extends SessionManager {
         return new File(ctx.homeDir, infoHash + ".torrent");
     }
 
+    File torrentFile(String name) {
+        return new File(ctx.torrentsDir, name + ".torrent");
+    }
+
     File resumeDataFile(String infoHash) {
         return new File(ctx.homeDir, infoHash + ".resume");
     }
@@ -413,40 +429,45 @@ public final class BTEngine extends SessionManager {
         return savePath;
     }
 
-    private File saveTorrent(TorrentInfo ti) {
+    private void saveTorrent(TorrentInfo ti) {
         File torrentFile;
 
         try {
-            String name = ti.name();
-            if (name == null || name.length() == 0) {
-                name = ti.infoHash().toString();
-            }
-            name = escapeFilename(name);
+            String name = getEscapedFilename(ti);
 
-            torrentFile = new File(ctx.torrentsDir, name + ".torrent");
+            torrentFile = torrentFile(name);
             byte[] arr = ti.toEntry().bencode();
 
             FileSystem fs = Platforms.get().fileSystem();
             fs.write(torrentFile, arr);
             fs.scan(torrentFile);
         } catch (Throwable e) {
-            torrentFile = null;
             LOG.warn("Error saving torrent info to file", e);
         }
 
-        return torrentFile;
     }
 
-    private void saveResumeTorrent(File torrent) {
+    private void saveResumeTorrent(TorrentInfo ti) {
+
         try {
-            TorrentInfo ti = new TorrentInfo(torrent);
+            String name = getEscapedFilename(ti);
+
             entry e = ti.toEntry().swig();
-            e.dict().set(TORRENT_ORIG_PATH_KEY, new entry(torrent.getAbsolutePath()));
+            e.dict().set(TORRENT_ORIG_PATH_KEY, new entry(torrentFile(name).getAbsolutePath()));
             byte[] arr = Vectors.byte_vector2bytes(e.bencode());
+
             FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHash().toString()), arr);
         } catch (Throwable e) {
             LOG.warn("Error saving resume torrent", e);
         }
+    }
+
+    private String getEscapedFilename(TorrentInfo ti) {
+        String name = ti.name();
+        if (name == null || name.length() == 0) {
+            name = ti.infoHash().toString();
+        }
+        return escapeFilename(name);
     }
 
     private void fireStarted() {
@@ -528,7 +549,7 @@ public final class BTEngine extends SessionManager {
                         if (torrent.exists() && saveDir.exists()) {
                             LOG.info("Restored old vuze download: " + torrent);
                             restoreDownloadsQueue.add(new RestoreDownloadTask(torrent, saveDir, priorities, null));
-                            saveResumeTorrent(torrent);
+                            saveResumeTorrent(new TorrentInfo(torrent));
                         }
                     } catch (Throwable e) {
                         LOG.error("Error restoring vuze torrent download", e);

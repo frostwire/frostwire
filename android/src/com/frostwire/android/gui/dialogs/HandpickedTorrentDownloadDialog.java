@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.bittorrent.BTEngine;
@@ -313,11 +314,11 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
                     try {
                         String magnet = theDialog.getMagnetUri();
                         List<TcpEndpoint> peers = parsePeers(magnet);
-
                         BTEngine.getInstance().download(theDialog.getTorrentInfo(),
                                 null,
                                 selection,
-                                peers);
+                                peers,
+                                TransferManager.instance().isDeleteStartedTorrentEnabled());
                         UIUtils.showTransfersOnDownloadStart(context);
                     } catch (Throwable ignored) {
                     }
