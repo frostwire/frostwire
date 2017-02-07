@@ -57,7 +57,6 @@ public final class Constants {
      */
     @Deprecated
     public static final String PREF_KEY_NETWORK_USE_MOBILE_DATA = "frostwire.prefs.network.use_mobile_data";
-    public static final String PREF_MIGRATION_FINISHED_KEY_NETWORK_USE_MOBILE_DATA_TO_USE_WIFI_ONLY = "frostwire.prefs.migration.use_mobile_data.use_wifi_only";
     public static final String PREF_KEY_NETWORK_USE_WIFI_ONLY = "frostwire.prefs.network.use_wifi_only";
     public static final String PREF_KEY_NETWORK_MAX_CONCURRENT_UPLOADS = "frostwire.prefs.network.max_concurrent_uploads";
     public static final String PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY = "frostwire.prefs.network.bittorrent_on_vpn_only";
