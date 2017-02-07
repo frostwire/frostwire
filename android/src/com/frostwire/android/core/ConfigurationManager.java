@@ -71,16 +71,22 @@ public class ConfigurationManager {
     }
 
     /**
-     * This method migrates the deprecated {@link Constants#PREF_KEY_NETWORK_USE_MOBILE_DATA}
-     * to the new {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY}
-     * it will be run only once
+     * If the deprecated {@link Constants#PREF_KEY_NETWORK_USE_MOBILE_DATA} is found
+     * it gets migrated to the new {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY and then deleted.
      */
     private void migrateWifiOnlyPreference() {
-        final String MIGRATION_MARKER = "frostwire.prefs.migration.use_mobile_data.use_wifi_only";
-        if(!getBoolean(MIGRATION_MARKER)) {
-            setBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, !getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA));
-            setBoolean(MIGRATION_MARKER, true);
+        if (!preferences.contains(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA)) {
+            return;
         }
+        setBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, !getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA));
+        removePreference(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
+    }
+
+    private void removePreference(String key) {
+        try {
+            editor.remove(key);
+            editor.commit();
+        } catch (Throwable ignore) {}
     }
 
     public String getString(String key) {
