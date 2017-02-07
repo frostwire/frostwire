@@ -17,7 +17,6 @@
 
 package com.frostwire.android.gui.fragments.preference;
 
-import android.app.Activity;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceGroup;
@@ -30,9 +29,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -158,17 +155,15 @@ public final class SearchFragment extends AbstractPreferenceFragment {
 
     @Override
     protected RecyclerView.Adapter onCreateAdapter(PreferenceScreen preferenceScreen) {
-        return new CheckedAwarePreferenceGroupAdapter(getActivity(), preferenceScreen, R.color.selected_search_background, R.color.basic_white);
+        return new CheckedAwarePreferenceGroupAdapter(preferenceScreen, R.color.selected_search_background, R.color.basic_white);
     }
 
     private static class CheckedAwarePreferenceGroupAdapter extends PreferenceGroupAdapter {
         final int checkedDrawableId;
         final int unCheckedDrawableId;
-        final WeakReference<Activity> activityRef;
 
-        CheckedAwarePreferenceGroupAdapter(Activity activity, PreferenceGroup preferenceGroup, int checkedDrawableId, int unCheckedDrawableId) {
+        CheckedAwarePreferenceGroupAdapter(PreferenceGroup preferenceGroup, int checkedDrawableId, int unCheckedDrawableId) {
             super(preferenceGroup);
-            activityRef = Ref.weak(activity);
             this.checkedDrawableId = checkedDrawableId;
             this.unCheckedDrawableId = unCheckedDrawableId;
         }
@@ -177,9 +172,9 @@ public final class SearchFragment extends AbstractPreferenceFragment {
         public void onBindViewHolder(PreferenceViewHolder holder, int position) {
             final CheckBoxPreference preference = (CheckBoxPreference) getItem(position);
             preference.onBindViewHolder(holder);
-            if (!preference.getKey().equals(PREF_KEY_SEARCH_SELECT_ALL) && Ref.alive(activityRef)) {
+            if (!preference.getKey().equals(PREF_KEY_SEARCH_SELECT_ALL)) {
                 int drawableId = preference.isChecked() ? checkedDrawableId : unCheckedDrawableId;
-                holder.itemView.setBackground(activityRef.get().getResources().getDrawable(drawableId));
+                holder.itemView.setBackgroundResource(drawableId);
             }
         }
     }
