@@ -35,6 +35,7 @@
     <FrameLayout
         android:id="@+id/toolbar_main_placeholder"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
 </android.support.v7.widget.Toolbar>

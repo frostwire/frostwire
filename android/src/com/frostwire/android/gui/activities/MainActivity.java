@@ -38,6 +38,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -793,7 +794,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             if (fragment instanceof MainFragment) {
                 View header = ((MainFragment) fragment).getHeader(this);
                 if (header != null) {
-                    setToolbarView(header);
+                    setToolbarView(header, Gravity.CENTER);
                 }
             }
         } catch (Throwable e) {

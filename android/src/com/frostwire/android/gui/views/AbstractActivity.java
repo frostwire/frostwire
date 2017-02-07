@@ -146,7 +146,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
         return findView(R.id.toolbar_main);
     }
 
-    protected final void setToolbarView(View view) {
+    protected final void setToolbarView(View view, int gravity) {
         FrameLayout placeholder = findView(R.id.toolbar_main_placeholder);
         if (toolbarView != null && placeholder != null) {
             placeholder.removeView(toolbarView);
@@ -156,8 +156,13 @@ public abstract class AbstractActivity extends AppCompatActivity {
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.gravity = Gravity.CENTER;
+            params.gravity = gravity;
             placeholder.addView(toolbarView, params);
+            placeholder.setVisibility(View.VISIBLE);
         }
+    }
+
+    protected final void setToolbarView(View view) {
+        setToolbarView(view, Gravity.LEFT | Gravity.CENTER_VERTICAL);
     }
 }
