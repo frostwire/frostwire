@@ -110,7 +110,8 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
 
     @Override
     protected void initToolbar(Toolbar toolbar) {
-        View v = LayoutInflater.from(this).inflate(R.layout.view_toolbar_title_subtitle_header, null);
+        View v = LayoutInflater.from(this).
+                inflate(R.layout.view_toolbar_title_subtitle_header, toolbar, false);
         setToolbarView(v);
 
         TextView title = findView(R.id.view_toolbar_header_title);
@@ -121,9 +122,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Fade it in
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
