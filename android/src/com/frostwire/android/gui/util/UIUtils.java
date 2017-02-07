@@ -118,6 +118,20 @@ public final class UIUtils {
         Snackbar.make(view, resourceId, Snackbar.LENGTH_SHORT).show();
     }
 
+    public static void showLongMessage(View view, int resourceId) {
+        Snackbar.make(view, resourceId, Snackbar.LENGTH_LONG).show();
+    }
+
+    public static void showDismissableMessage(View view, int resourceId) {
+        final Snackbar snackbar = Snackbar.make(view, resourceId, Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAction(R.string.dismiss, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snackbar.dismiss();
+            }
+        }).show();
+    }
+
     public static void sendShutdownIntent(Context ctx) {
         Intent i = new Intent(ctx, MainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
