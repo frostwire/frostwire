@@ -137,6 +137,8 @@
         <!-- Now playing -->
         <activity
                 android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
+                android:label="@string/frostwire_player"
+                android:theme="@style/Theme.FrostWire"
                 android:clearTaskOnLaunch="true"
                 android:launchMode="singleTask"
                 android:windowSoftInputMode="adjustPan">

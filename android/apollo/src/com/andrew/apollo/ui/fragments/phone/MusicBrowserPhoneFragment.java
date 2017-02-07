@@ -135,7 +135,7 @@ public class MusicBrowserPhoneFragment extends Fragment implements
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        mResources.setFavoriteIcon(menu);
+        ThemeUtils.setFavoriteIcon(menu);
     }
 
     /**

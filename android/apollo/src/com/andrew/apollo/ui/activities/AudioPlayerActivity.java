@@ -47,8 +47,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -75,6 +75,7 @@ import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
@@ -95,7 +96,7 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class AudioPlayerActivity extends FragmentActivity implements
+public class AudioPlayerActivity extends AbstractActivity implements
         ServiceConnection,
         OnSeekBarChangeListener,
         DeleteDialog.DeleteDialogCallback,
@@ -169,9 +170,6 @@ public class AudioPlayerActivity extends FragmentActivity implements
     // Image cache
     private ImageFetcher mImageFetcher;
 
-    // Theme resources
-    private ThemeUtils mResources;
-
     private long mPosOverride = -1;
 
     private long mStartSeekPos = 0;
@@ -189,19 +187,16 @@ public class AudioPlayerActivity extends FragmentActivity implements
     // for removeAds display
     private long removeAdsPurchaseTime = 0;
 
+    public AudioPlayerActivity() {
+        super(R.layout.activity_player_base);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Initialize the theme resources
-        mResources = new ThemeUtils(this);
-        // Set the overflow style
-        mResources.setOverflowStyle(this);
-
-        // Fade it in
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -217,25 +212,6 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         // Initialize the broadcast receiver
         mPlaybackStatus = new PlaybackStatus(this);
-
-        // Theme the action bar
-        final ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            mResources.themeActionBar(actionBar, getString(R.string.frostwire_player));
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setIcon(R.color.transparent);
-        }
-
-        TextView actionBarTitleTextView = (TextView) findViewById(R.id.action_bar_title);
-        actionBarTitleTextView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        // Set the layout
-        setContentView(R.layout.activity_player_base);
 
         // Cache all the items
         initPlaybackControls();
@@ -256,8 +232,6 @@ public class AudioPlayerActivity extends FragmentActivity implements
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
     }
-
-
 
     private void initRemoveAds() {
         TextView removeAdsTextView = (TextView) findViewById(R.id.audio_player_remove_ads_text_link);
@@ -371,7 +345,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
             final MenuItem effects = menu.findItem(R.id.menu_audio_player_equalizer);
             effects.setVisible(false);
         }
-        mResources.setFavoriteIcon(menu);
+        ThemeUtils.setFavoriteIcon(menu);
         return true;
     }
 
@@ -381,11 +355,9 @@ public class AudioPlayerActivity extends FragmentActivity implements
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
-        getMenuInflater().inflate(R.menu.search, menu);
-        // Theme the search icon
-        mResources.setSearchIcon(menu);
+        getMenuInflater().inflate(R.menu.apollo_menu_search, menu);
 
-        final SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        final SearchView searchView = (SearchView) menu.findItem(R.id.apollo_menu_item_search).getActionView();
         // Add voice search
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
@@ -408,7 +380,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         });
 
         // Favorite action
-        getMenuInflater().inflate(R.menu.favorite, menu);
+        getMenuInflater().inflate(R.menu.apollo_menu_favorite, menu);
         // Shuffle all
         getMenuInflater().inflate(R.menu.shuffle, menu);
         // Share, ringtone, and equalizer
@@ -424,9 +396,6 @@ public class AudioPlayerActivity extends FragmentActivity implements
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
             case R.id.menu_shuffle:
                 // Shuffle all the songs
                 MusicUtils.shuffleAll(this);
@@ -591,13 +560,12 @@ public class AudioPlayerActivity extends FragmentActivity implements
     /**
      * Initializes the items in the now playing screen
      */
-    @SuppressWarnings("deprecation")
     private void initPlaybackControls() {
         // ViewPager container
         mPageContainer = (FrameLayout) findViewById(R.id.audio_player_pager_container);
         // Theme the pager container background
         mPageContainer
-                .setBackgroundDrawable(mResources.getDrawable("audio_player_pager_container"));
+                .setBackgroundResource(R.drawable.audio_player_pager_container);
 
         // Now playing header
         mAudioPlayerHeader = (LinearLayout) findViewById(R.id.audio_player_header);
@@ -644,7 +612,7 @@ public class AudioPlayerActivity extends FragmentActivity implements
         // Used to show and hide the queue fragment
         mQueueSwitch = (ImageView) findViewById(R.id.audio_player_switch_queue);
         // Theme the queue switch icon
-        mQueueSwitch.setImageDrawable(mResources.getDrawable("btn_switch_queue"));
+        mQueueSwitch.setImageResource(R.drawable.btn_switch_queue);
         // Progress
         mProgress = (SeekBar) findViewById(android.R.id.progress);
 

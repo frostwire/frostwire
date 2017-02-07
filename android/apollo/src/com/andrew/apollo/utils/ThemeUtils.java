@@ -161,14 +161,10 @@ public class ThemeUtils {
      * @param context  The {@link Context} to use.
      * @param favorite The favorites action.
      */
-    public void setFavoriteIcon(final Menu favorite) {
-        final MenuItem favoriteAction = favorite.findItem(R.id.menu_favorite);
-        final String favoriteIconId = "ic_action_favorite";
-        if (MusicUtils.isFavorite()) {
-            setMenuItemColor(favoriteAction, "favorite_selected", favoriteIconId);
-        } else {
-            setMenuItemColor(favoriteAction, "favorite_normal", favoriteIconId);
-        }
+    public static void setFavoriteIcon(final Menu favorite) {
+        final MenuItem item = favorite.findItem(R.id.menu_favorite);
+        item.setIcon(MusicUtils.isFavorite() ?
+                R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
     }
 
     /**
