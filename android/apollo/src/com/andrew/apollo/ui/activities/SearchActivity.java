@@ -41,7 +41,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -50,7 +49,6 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CursorAdapter;
-import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
@@ -64,7 +62,6 @@ import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
-import com.andrew.apollo.utils.ThemeUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity;
 
@@ -107,11 +104,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
     // Used the filter the user's music
     private SearchView mSearchView;
 
-    /**
-     * Theme resources
-     */
-    private ThemeUtils mResources;
-
     public SearchActivity() {
         super(R.layout.apollo_activity_search);
     }
@@ -126,18 +118,9 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         title.setText(R.string.app_name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Initialize the theme resources
-        mResources = new ThemeUtils(this);
-        // Set the overflow style
-        mResources.setOverflowStyle(this);
 
         // Fade it in
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -239,21 +222,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
             MusicUtils.unbindFromService(mToken);
             mToken = null;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     /**
