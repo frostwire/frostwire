@@ -41,7 +41,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -791,16 +790,10 @@ public class MainActivity extends AbstractActivity2 implements ConfigurationUpda
                 LOG.warn("updateHeader(): Check your logic, no actionBar available");
                 return;
             }
-            RelativeLayout placeholder = (RelativeLayout) toolbar.findViewById(R.id.toolbar_main_placeholder);
-            if (placeholder != null && placeholder.getChildCount() > 0) {
-                placeholder.removeAllViews();
-            }
             if (fragment instanceof MainFragment) {
                 View header = ((MainFragment) fragment).getHeader(this);
-                if (placeholder != null && header != null) {
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-                    params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-                    placeholder.addView(header, params);
+                if (header != null) {
+                    setToolbarView(header);
                 }
             }
         } catch (Throwable e) {

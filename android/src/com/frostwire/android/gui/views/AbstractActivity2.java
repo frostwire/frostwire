@@ -22,8 +22,11 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.frostwire.android.R;
 
@@ -41,6 +44,7 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
     private final ArrayList<String> fragmentTags;
 
     private boolean paused;
+    private View toolbarView;
 
     public AbstractActivity2(int layoutResId) {
         this.layoutResId = layoutResId;
@@ -140,5 +144,24 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
 
     protected final Toolbar findToolbar() {
         return findView(R.id.toolbar_main);
+    }
+
+    protected final View getToolbarView() {
+        return toolbarView;
+    }
+
+    protected final void setToolbarView(View view) {
+        FrameLayout placeholder = findView(R.id.toolbar_main_placeholder);
+        if (toolbarView != null && placeholder != null) {
+            placeholder.removeView(toolbarView);
+        }
+        toolbarView = view;
+        if (toolbarView != null && placeholder != null) {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.gravity = Gravity.CENTER;
+            placeholder.addView(toolbarView, params);
+        }
     }
 }
