@@ -183,11 +183,11 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         getMenuInflater().inflate(R.menu.apollo_menu_search, menu);
 
         // Filter the list the user is looking it via SearchView
-        mSearchView = (SearchView)menu.findItem(R.id.apollo_menu_item_search).getActionView();
+        mSearchView = (SearchView) menu.findItem(R.id.apollo_menu_item_search).getActionView();
         mSearchView.setOnQueryTextListener(this);
 
         // Add voice search
-        final SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
         mSearchView.setSearchableInfo(searchableInfo);
         return super.onCreateOptionsMenu(menu);
@@ -231,7 +231,7 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
         final Uri uri = Uri.parse("content://media/external/audio/search/fancy/"
                 + Uri.encode(mFilterString));
-        final String[] projection = new String[] {
+        final String[] projection = new String[]{
                 BaseColumns._ID, MediaStore.Audio.Media.MIME_TYPE, MediaStore.Audio.Artists.ARTIST,
                 MediaStore.Audio.Albums.ALBUM, MediaStore.Audio.Media.TITLE, "data1", "data2"
         };
@@ -293,7 +293,7 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         // the user can
         // more easily browse the list of results.
         if (mSearchView != null) {
-            final InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) {
                 imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
             }
@@ -327,7 +327,7 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
      */
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
-            final long id) {
+                            final long id) {
         Cursor cursor = mAdapter.getCursor();
         cursor.moveToPosition(position);
         if (cursor.isBeforeFirst() || cursor.isAfterLast()) {
@@ -340,7 +340,7 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         // If it's an artist, open the artist profile
         if ("artist".equals(mimeType)) {
             NavUtils.openArtistProfile(this,
-                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST)),null);
+                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST)), null);
         } else if ("album".equals(mimeType)) {
             // If it's an album, open the album profile
             int albumId = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums._ID);
@@ -351,8 +351,8 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
                     MusicUtils.getSongListForAlbum(this, albumId));
         } else if (position >= 0 && id >= 0) {
             // If it's a song, play it and leave
-            final long[] list = new long[] {
-                id
+            final long[] list = new long[]{
+                    id
             };
             MusicUtils.playAll(list, 0, false);
         }
@@ -409,7 +409,7 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
          *
          * @param context The {@link Context} to use.
          */
-        public SearchAdapter(final Activity context) {
+        SearchAdapter(final Activity context) {
             super(context, null, false);
             // Initialize the cache & image fetcher
             mImageFetcher = ApolloUtils.getImageFetcher(context);
@@ -510,7 +510,7 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
          */
         @Override
         public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
-            return ((Activity)context).getLayoutInflater().inflate(
+            return ((Activity) context).getLayoutInflater().inflate(
                     R.layout.list_item_detailed_no_background, parent, false);
         }
 
@@ -532,9 +532,9 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
 
         /**
          * @param pause True to temporarily pause the disk cache, false
-         *            otherwise.
+         *              otherwise.
          */
-        public void setPauseDiskCache(final boolean pause) {
+        void setPauseDiskCache(final boolean pause) {
             if (mImageFetcher != null) {
                 mImageFetcher.setPauseDiskCache(pause);
             }
@@ -557,7 +557,7 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
      */
     @Override
     public void onScroll(final AbsListView view, final int firstVisibleItem,
-            final int visibleItemCount, final int totalItemCount) {
+                         final int visibleItemCount, final int totalItemCount) {
         // Nothing to do
     }
 
