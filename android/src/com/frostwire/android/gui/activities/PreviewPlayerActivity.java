@@ -50,7 +50,7 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.views.AbstractActivity2;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.ImageLoader;
@@ -70,7 +70,7 @@ import java.util.Random;
  * @author gubatron
  * @author aldenml
  */
-public final class PreviewPlayerActivity extends AbstractActivity2 implements
+public final class PreviewPlayerActivity extends AbstractActivity implements
         AbstractDialog.OnDialogClickListener,
         TextureView.SurfaceTextureListener,
         MediaPlayer.OnBufferingUpdateListener,

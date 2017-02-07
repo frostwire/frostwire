@@ -29,7 +29,7 @@ import android.support.v7.preference.Preference;
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
-import com.frostwire.android.gui.views.AbstractActivity2;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.preference.StoragePreference;
 
 /**
@@ -37,7 +37,7 @@ import com.frostwire.android.gui.views.preference.StoragePreference;
  * @author aldenml
  * @author grzesiekrzaca
  */
-public final class SettingsActivity2 extends AbstractActivity2
+public final class SettingsActivity2 extends AbstractActivity
         implements PreferenceFragment.OnPreferenceStartFragmentCallback {
 
     /**

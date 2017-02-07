@@ -73,7 +73,7 @@ import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.AbstractActivity2;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.gui.views.PlayerMenuItemView;
@@ -108,7 +108,7 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
  * @author gubatron
  * @author aldenml
  */
-public class MainActivity extends AbstractActivity2 implements ConfigurationUpdateListener,
+public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
         OnDialogClickListener,
         ServiceConnection,
         ActivityCompat.OnRequestPermissionsResultCallback {

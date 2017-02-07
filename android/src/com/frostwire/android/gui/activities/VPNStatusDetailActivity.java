@@ -31,13 +31,13 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.AbstractActivity2;
+import com.frostwire.android.gui.views.AbstractActivity;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class VPNStatusDetailActivity extends AbstractActivity2 {
+public final class VPNStatusDetailActivity extends AbstractActivity {
 
     private static final String UNICODE_BULLET = "&#8226; ";
 

@@ -38,7 +38,7 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public abstract class AbstractActivity2 extends AppCompatActivity {
+public abstract class AbstractActivity extends AppCompatActivity {
 
     private final int layoutResId;
     private final ArrayList<String> fragmentTags;
@@ -46,7 +46,7 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
     private boolean paused;
     private View toolbarView;
 
-    public AbstractActivity2(int layoutResId) {
+    public AbstractActivity(int layoutResId) {
         this.layoutResId = layoutResId;
         this.fragmentTags = new ArrayList<>();
 
@@ -138,19 +138,15 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
     }
 
     @SuppressWarnings("unchecked")
-    public final <T extends View> T findView(int id) {
+    protected final <T extends View> T findView(int id) {
         return (T) super.findViewById(id);
     }
 
-    public final Toolbar findToolbar() {
+    protected final Toolbar findToolbar() {
         return findView(R.id.toolbar_main);
     }
 
-    public final View getToolbarView() {
-        return toolbarView;
-    }
-
-    public final void setToolbarView(View view) {
+    protected final void setToolbarView(View view) {
         FrameLayout placeholder = findView(R.id.toolbar_main_placeholder);
         if (toolbarView != null && placeholder != null) {
             placeholder.removeView(toolbarView);
