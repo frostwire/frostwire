@@ -79,8 +79,8 @@ public final class TimerSubscription {
                 call = !((AbstractFragment) observer).isPaused();
             }
         }
-        if (observer instanceof AbstractActivity) {
-            call = !((AbstractActivity) observer).isPaused();
+        if (observer instanceof AbstractActivity2) {
+            call = !((AbstractActivity2) observer).isPaused();
         }
         if (call) {
             observer.onTime();

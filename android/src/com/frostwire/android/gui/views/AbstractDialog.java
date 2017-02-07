@@ -145,14 +145,6 @@ public abstract class AbstractDialog extends DialogFragment {
 
         dispatchDialogClickSafe(activity, tag, which);
 
-        if (activity instanceof AbstractActivity) {
-            List<Fragment> fragments = ((AbstractActivity) activity).getVisibleFragments();
-
-            for (Fragment f : fragments) {
-                dispatchDialogClickSafe(f, tag, which);
-            }
-        }
-
         if (activity instanceof AbstractActivity2) {
             List<Fragment> fragments = ((AbstractActivity2) activity).getFragments();
 
