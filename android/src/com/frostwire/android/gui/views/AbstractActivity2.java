@@ -138,19 +138,19 @@ public abstract class AbstractActivity2 extends AppCompatActivity {
     }
 
     @SuppressWarnings("unchecked")
-    protected final <T extends View> T findView(int id) {
+    public final <T extends View> T findView(int id) {
         return (T) super.findViewById(id);
     }
 
-    protected final Toolbar findToolbar() {
+    public final Toolbar findToolbar() {
         return findView(R.id.toolbar_main);
     }
 
-    protected final View getToolbarView() {
+    public final View getToolbarView() {
         return toolbarView;
     }
 
-    protected final void setToolbarView(View view) {
+    public final void setToolbarView(View view) {
         FrameLayout placeholder = findView(R.id.toolbar_main_placeholder);
         if (toolbarView != null && placeholder != null) {
             placeholder.removeView(toolbarView);
