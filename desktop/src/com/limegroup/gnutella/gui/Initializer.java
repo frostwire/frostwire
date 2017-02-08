@@ -483,8 +483,6 @@ public final class Initializer {
 
         if (canStartBitTorrentWithCurrentVPNSettingsAndStatus()) {
             BTEngine.getInstance().start();
-        } else {
-            //prepare to inform the user?
         }
 
         if (!SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue()) {
