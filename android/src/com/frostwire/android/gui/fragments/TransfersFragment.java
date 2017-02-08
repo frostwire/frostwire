@@ -25,13 +25,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceActivity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
+
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
+import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
@@ -42,6 +46,7 @@ import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.MenuDialog;
 import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
+import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -49,6 +54,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
+import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.transfers.*;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -390,7 +396,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
             if (inPrivateFolder) {
                 sdCardNotification.setVisibility(View.VISIBLE);
-                sdCardNotification.setOnClickListener(new SDCardNotificationListener(this));
+                sdCardNotification.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showStoragePreference();
+                    }
+                });
             }
         }
 
@@ -404,7 +415,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             String internalMemoryNotificationDescription = getString(R.string.saving_to_internal_memory_description, bytesAvailableInHuman);
             internalMemoryNotification.setDescription(internalMemoryNotificationDescription);
             internalMemoryNotification.setVisibility(View.VISIBLE);
-            internalMemoryNotification.setOnClickListener(new SDCardNotificationListener(this));
+            internalMemoryNotification.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showStoragePreference();
+                }
+            });
         }
     }
 
@@ -808,17 +824,18 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    private static final class SDCardNotificationListener extends ClickAdapter<TransfersFragment> {
-
-        SDCardNotificationListener(TransfersFragment owner) {
-            super(owner);
+    private void showStoragePreference() {
+        Activity activity = getActivity();
+        if (activity == null) {
+            return; // quick return
         }
 
-        @Override
-        public void onClick(TransfersFragment owner, View v) {
-            Intent i = new Intent(owner.getActivity(), SettingsActivity.class);
-            i.setAction(Constants.ACTION_SETTINGS_SELECT_STORAGE);
-            owner.getActivity().startActivity(i);
+        if (AndroidPlatform.saf()) {
+            StoragePicker.show(activity);
+        } else {
+            Intent i = new Intent(activity, SettingsActivity.class);
+            i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, ApplicationFragment.class.getName());
+            activity.startActivity(i);
         }
     }
 }
