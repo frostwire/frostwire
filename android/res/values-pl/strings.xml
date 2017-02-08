@@ -320,7 +320,7 @@
     <string name="wizard_previous">Poprzedni</string>
     <string name="wizard_next">Następny</string>
     <string name="wizard_finish">Zakończ</string>
-    <string name="welcome_to_frostwire">Witamy w FrostWire</string>
+    <string name="welcome_to_frostwire">Witamy w FrostWire %s</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">Skonfigurujmy Twoje ustawienia zanim zaczniemy.</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Jak inni widzą Cię w sieci lokalnej (Wi-Fi)</string>
     <string name="seeding_settings">Ustawienia Seedowania</string>

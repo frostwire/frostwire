@@ -317,7 +317,7 @@
     <string name="wizard_previous">पिछला</string>
     <string name="wizard_next">अगला</string>
     <string name="wizard_finish">समाप्त</string>
-    <string name="welcome_to_frostwire">फ्रॉस्टवाइर करने के लिए आपका स्वागत है</string>
+    <string name="welcome_to_frostwire">FrostWire %s करने के लिए आपका स्वागत है</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">इससे पहले कि हम शुरू करें आप को सेट करें .</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">दूसरे आपको स्थानीय नेटवर्क (वाईफाई) पर कैसे देखते हैं</string>
     <string name="seeding_settings">सीडिंग सेट्टिंग्स</string>

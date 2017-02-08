@@ -317,7 +317,7 @@
     <string name="wizard_previous">Вернуться</string>
     <string name="wizard_next">Продолжить</string>
     <string name="wizard_finish">Завершить</string>
-    <string name="welcome_to_frostwire">Добро пожаловать в FrostWire</string>
+    <string name="welcome_to_frostwire">Добро пожаловать в FrostWire %s</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">Давайте сделаем настройку прежде, чем начнем.</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Как другие видят Вас в локальной сети (Wi-Fi)</string>
     <string name="seeding_settings">Настройки раздачи</string>

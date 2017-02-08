@@ -317,7 +317,7 @@
     <string name="wizard_previous">Předchozí</string>
     <string name="wizard_next">Další</string>
     <string name="wizard_finish">Konec</string>
-    <string name="welcome_to_frostwire">Vítejte na FrostWire</string>
+    <string name="welcome_to_frostwire">Vítejte na FrostWire %s</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">Pojďme si nastavit si předtím, než začneme.</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Jak vás vidí ostatní na lokální síti (WiFi)</string>
     <string name="seeding_settings">Seeding Nastavení</string>

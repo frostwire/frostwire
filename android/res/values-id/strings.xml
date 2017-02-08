@@ -316,7 +316,7 @@
     <string name="wizard_previous">Sebelum</string>
     <string name="wizard_next">Selanjutnya</string>
     <string name="wizard_finish">Selesai</string>
-    <string name="welcome_to_frostwire">Selamat Datang di FrostWire</string>
+    <string name="welcome_to_frostwire">Selamat Datang di FrostWire %s</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">Mari mempersiapkan Anda sebelum kita mulai</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Bagaimana orang lain melihat Anda di dalam jaringan lokal (WiFi)</string>
     <string name="seeding_settings">Pengaturan Seeding</string>

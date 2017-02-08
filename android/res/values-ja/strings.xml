@@ -328,7 +328,7 @@
     <string name="wizard_previous">前へ</string>
     <string name="wizard_next">次へ</string>
     <string name="wizard_finish">終了</string>
-    <string name="welcome_to_frostwire">FrostWireへようこそ</string>
+    <string name="welcome_to_frostwire">FrostWire %s へようこそ</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">はじめる前に設定をしましょう。</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">ローカルネットワーク(WiFi)でのあなたの他の人からの見え方</string>
     <string name="seeding_settings">シード処理設定</string>

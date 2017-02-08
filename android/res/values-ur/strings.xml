@@ -437,7 +437,7 @@
     <string name="alpha_tests_team">الفا ٹیسٹ ٹیم</string>
     <string name="peer_http_upload_status_cancelled">منسوخ</string>
     <string name="send_bitcoin_tip">ویکیپیڈیا عطیہ حساب</string>
-    <string name="welcome_to_frostwire">FrostWire خوش آمدید %s</string>
+    <string name="welcome_to_frostwire">FrostWire %s خوش آمدید</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent off (Data Saver On)"</string>
     <string name="ad_free">کوئی اشتہارات</string>
     <string name="current_plan">موجودہ پلان</string>

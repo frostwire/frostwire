@@ -320,7 +320,7 @@
     <string name="wizard_previous">이전</string>
     <string name="wizard_next">다음</string>
     <string name="wizard_finish">완료</string>
-    <string name="welcome_to_frostwire">FrostWire에 오신 것을 환영합니다.</string>
+    <string name="welcome_to_frostwire">FrostWire %s 에 오신 것을 환영합니다.</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">일단 시작 전에 당신의 취향에 맞게 어플리케이션을 설정해보겠습니다.</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">다른 사람들이 어떻게 무선인터넷 네트워크를 통해 당신을 찾나요?</string>
     <string name="seeding_settings">시드 설정</string>

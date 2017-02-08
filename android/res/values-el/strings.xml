@@ -322,7 +322,7 @@
     <string name="wizard_previous">Προηγούμενο</string>
     <string name="wizard_next">Επόμενο</string>
     <string name="wizard_finish">Ολοκλήρωση</string>
-    <string name="welcome_to_frostwire">Καλώς ήρθες στο FrostWire</string>
+    <string name="welcome_to_frostwire">Καλώς ήρθες στο FrostWire %s</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">Ας σε βοηθήσουμε με τις ρυθμίσεις πριν ξεκινήσουμε.</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Πώς σε βλέπουν οι άλλοι στο τοπικό ασύρματο δίκτυο</string>
     <string name="seeding_settings">Ρυθμίσεις Μοιράσματος</string>

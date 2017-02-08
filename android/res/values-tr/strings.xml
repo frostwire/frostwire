@@ -317,7 +317,7 @@
     <string name="wizard_previous">Önceki</string>
     <string name="wizard_next">Sonraki</string>
     <string name="wizard_finish">Bitir</string>
-    <string name="welcome_to_frostwire">FrostWire\'e Hoşgeldiniz</string>
+    <string name="welcome_to_frostwire">FrostWire %s\'e Hoşgeldiniz</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">Başlamadan önce sizi ayarlayalım.</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Diğerleri sizi yerel ağda nasıl görecek (WiFi)</string>
     <string name="seeding_settings">Tohumlama Ayarları</string>

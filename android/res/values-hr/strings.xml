@@ -411,7 +411,7 @@
     <string name="mobile_data">Mobilni podatci</string>
     <string name="cant_resume_torrent_transfers"> "Veza"</string>
     <string name="seed_finished_torrents">Dijeli završene torrente</string>
-    <string name="welcome_to_frostwire">Dobrodošli u FrostWire</string>
+    <string name="welcome_to_frostwire">Dobrodošli u FrostWire %s</string>
     <string name="wanna_download_question">Želite li preuzeti?</string>
     <string name="storage_setting_warning">UPOZORENJE: Sve datoteke koje FrostWire preuzme na SD karticu će ANDROID obrisati ako deinstalirate FrostWire.</string>
     <string name="cancel_menu_action">Zaustavi prijenose</string>

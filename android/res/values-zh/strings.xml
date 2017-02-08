@@ -316,7 +316,7 @@
     <string name="wizard_previous">先前</string>
     <string name="wizard_next">其次</string>
     <string name="wizard_finish">完成</string>
-    <string name="welcome_to_frostwire">欢迎来到FrostWire</string>
+    <string name="welcome_to_frostwire">欢迎来到FrostWire %s</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">开始之前先认识一下.</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">在本地无线网络中，其他人如何看到你</string>
     <string name="seeding_settings">播种设置</string>

@@ -316,7 +316,7 @@
     <string name="wizard_previous">Trở lại</string>
     <string name="wizard_next">Tiếp tục</string>
     <string name="wizard_finish">Hoàn thành</string>
-    <string name="welcome_to_frostwire">Chào mừng bạn đến với FrostWire</string>
+    <string name="welcome_to_frostwire">Chào mừng bạn đến với FrostWire %s</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">Hãy để tôi giúp bạn thiết đặt trước khi chúng ta bắt đầu. Let\'s set you up before we begin.</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Làm thế nào để người khác thấy bạn trên mạng cục bộ (WiFi)</string>
     <string name="seeding_settings">Thiết lập Seeding</string>
