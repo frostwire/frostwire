@@ -388,8 +388,8 @@ public final class StatusLine {
     private void createVPNDisconnectLabel() {
         _bittorrent_vpn = new JLabel();
         _bittorrent_vpn.setMinimumSize(new Dimension(34, 20));
-        _bittorrent_vpn.setText("BitTorrent is disabled!");//todo translation
-        _bittorrent_vpn.setToolTipText("Due to current settings with no VPN connection BitTorrent will not start. Click to see the settings screen");//todo translation
+        _bittorrent_vpn.setText(I18n.tr("BitTorrent is disabled!"));
+        _bittorrent_vpn.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
         _bittorrent_vpn.addMouseListener(STATUS_BAR_LISTENER);
     }
 
