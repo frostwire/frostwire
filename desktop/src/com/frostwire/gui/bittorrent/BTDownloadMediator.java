@@ -38,20 +38,14 @@ import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.http.HttpClient;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.PaddedPanel;
+import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.actions.LimeAction;
-import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.gui.search.GenericCellEditor;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.TableSettings;
-import com.limegroup.gnutella.settings.BittorrentSettings;
-import com.limegroup.gnutella.settings.QuestionsHandler;
-import com.limegroup.gnutella.settings.TablesHandlerSettings;
-import com.limegroup.gnutella.settings.iTunesSettings;
+import com.limegroup.gnutella.settings.*;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
@@ -613,7 +607,11 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         GUIMediator.safeInvokeLater(new Runnable() {
             public void run() {
                 try {
-                    BTEngine.getInstance().download(torrentFile, saveDir, null);
+                    if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !VPNs.isVPNActive()) {
+                        GUIMediator.showWarning(I18n.tr("VPN is inactive. Current settings require active VPN connection before starting BitTorrent engine. Setup a VPN connection or check advanced settings."));
+                    } else {
+                        BTEngine.getInstance().download(torrentFile, saveDir, null);
+                    }
                 } catch (Throwable e) {
                     e.printStackTrace();
                     if (!e.toString().contains("No files selected by user")) {
@@ -674,7 +672,11 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     }
 
                     if (saveDir == null) {
-                        BTEngine.getInstance().download(torrentFile, null, filesSelection);
+                        if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !VPNs.isVPNActive()) {
+                            GUIMediator.showWarning(I18n.tr("VPN is inactive. Current settings require active VPN connection before starting BitTorrent engine. Setup a VPN connection or check advanced settings."));
+                        } else {
+                            BTEngine.getInstance().download(torrentFile, null, filesSelection);
+                        }
                     } else {
                         GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
                     }
