@@ -28,7 +28,9 @@ import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
@@ -39,11 +41,17 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.*;
-import com.frostwire.jlibtorrent.swig.*;
-import com.frostwire.util.Logger;
+import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.jlibtorrent.Sha1Hash;
+import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.swig.create_torrent;
+import com.frostwire.jlibtorrent.swig.error_code;
+import com.frostwire.jlibtorrent.swig.file_storage;
+import com.frostwire.jlibtorrent.swig.libtorrent;
+import com.frostwire.jlibtorrent.swig.set_piece_hashes_listener;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
+import com.frostwire.util.Logger;
 
 import java.io.File;
 
@@ -258,25 +266,33 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void onBittorrentConnect() {
-        Engine.instance().getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                Engine.instance().startServices();
-                while (!Engine.instance().isStarted()) {
-                    SystemClock.sleep(1000);
-                }
-                final Looper mainLooper = getContext().getMainLooper();
-                Handler h = new Handler(mainLooper);
-                h.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        onClick(getContext());
-                    }
-                });
+
+        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
+                !NetworkManager.instance().isTunnelUp()) {
+            if (getContext() instanceof Activity) {
+                UIUtils.showShortMessage(((Activity) getContext()).getWindow().getDecorView().getRootView(), R.string.cannot_start_engine_without_vpn);
+            } else {
+                UIUtils.showShortMessage(getContext(), R.string.cannot_start_engine_without_vpn);
             }
-        });
-
-
+        } else {
+            Engine.instance().getThreadPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    Engine.instance().startServices();
+                    while (!Engine.instance().isStarted()) {
+                        SystemClock.sleep(1000);
+                    }
+                    final Looper mainLooper = getContext().getMainLooper();
+                    Handler h = new Handler(mainLooper);
+                    h.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onClick(getContext());
+                        }
+                    });
+                }
+            });
+        }
     }
 
     // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.

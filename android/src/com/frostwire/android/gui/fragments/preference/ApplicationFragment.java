@@ -23,12 +23,14 @@ import android.content.Intent;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.SwitchPreferenceCompat;
+import android.support.v7.preference.TwoStatePreference;
 import android.widget.Toast;
 
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
@@ -66,9 +68,11 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
     @Override
     protected void initComponents() {
         setupConnectSwitch();
+        setupVPNRequirementOption();
         setupStorageOption();
         setupStore(removeAdsPurchaseTime);
     }
+
 
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
@@ -85,6 +89,22 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
         }
     }
 
+    private void setupVPNRequirementOption() {
+        SwitchPreferenceCompat preference = findPreference(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
+        preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                boolean newVal = (boolean) newValue;
+                if (newVal && !NetworkManager.instance().isTunnelUp()) {
+                    disconnect();
+                    setChecked((TwoStatePreference) findPreference("frostwire.prefs.internal.connect_disconnect"), false, false);
+                    UIUtils.showShortMessage(getView(), R.string.switch_off_engine_without_vpn);
+                }
+                return true;
+            }
+        });
+    }
+
     private void setupConnectSwitch() {
         SwitchPreferenceCompat preference = findPreference("frostwire.prefs.internal.connect_disconnect");
         preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -95,7 +115,13 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
                 if (e.isStarted() && !newStatus) {
                     disconnect();
                 } else if (newStatus && (e.isStopped() || e.isDisconnected())) {
-                    connect();
+                    if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY, false) &&
+                            !NetworkManager.instance().isTunnelUp()) {
+                        UIUtils.showShortMessage(getView(), R.string.cannot_start_engine_without_vpn);
+                        return false;
+                    } else {
+                        connect();
+                    }
                 }
                 return true;
             }

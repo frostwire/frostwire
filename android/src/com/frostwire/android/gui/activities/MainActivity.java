@@ -56,6 +56,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
@@ -531,8 +532,13 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
         syncSlideMenu();
         if (firstTime) {
-            firstTime = false;
-            Engine.instance().startServices(); // it's necessary for the first time after wizard
+            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
+                    !NetworkManager.instance().isTunnelUp()) {
+                UIUtils.showDismissableMessage(getWindow().getDecorView().getRootView(), R.string.cannot_start_engine_without_vpn);
+            } else {
+                firstTime = false;
+                Engine.instance().startServices(); // it's necessary for the first time after wizard
+            }
         }
         SoftwareUpdater.instance().checkForUpdate(this);
     }
