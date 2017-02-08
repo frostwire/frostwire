@@ -1,18 +1,24 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.ui.activities;
 
 import android.animation.ObjectAnimator;
-import android.app.ActionBar;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.BroadcastReceiver;
@@ -34,8 +40,9 @@ import android.provider.MediaStore.Audio.Albums;
 import android.provider.MediaStore.Audio.Artists;
 import android.provider.MediaStore.Audio.Playlists;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,8 +54,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -102,7 +107,7 @@ public class AudioPlayerActivity extends AbstractActivity implements
         DeleteDialog.DeleteDialogCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private static Logger LOG = Logger.getLogger(AudioPlayerActivity.class);
+    private static final Logger LOG = Logger.getLogger(AudioPlayerActivity.class);
 
     // Message to refresh the time
     private static final int REFRESH_TIME = 1;
@@ -191,9 +196,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         super(R.layout.activity_player_base);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -217,9 +219,9 @@ public class AudioPlayerActivity extends AbstractActivity implements
         initPlaybackControls();
 
         // Album Art Ad Controls
-        mAlbumArtAd = (MoPubView) findViewById(R.id.audio_player_mopubview);
-        mDismissAlbumArtAdButton = (ImageButton) findViewById(R.id.audio_player_dismiss_mopubview_button);
-        mAdvertisementText = (TextView) findViewById(R.id.audio_player_advertisement_text);
+        mAlbumArtAd = findView(R.id.audio_player_mopubview);
+        mDismissAlbumArtAdButton = findView(R.id.audio_player_dismiss_mopubview_button);
+        mAdvertisementText = findView(R.id.audio_player_advertisement_text);
         initAlbumArtBanner();
         initRemoveAds();
 
@@ -228,15 +230,15 @@ public class AudioPlayerActivity extends AbstractActivity implements
         PlayerGestureListener gestureListener = new PlayerGestureListener();
         gestureDetector = new GestureDetector(this, gestureListener);
         gestureDetector.setOnDoubleTapListener(gestureListener);
-        findViewById(R.id.audio_player_album_art).setOnTouchListener(gestureListener);
+        findView(R.id.audio_player_album_art).setOnTouchListener(gestureListener);
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
     }
 
     private void initRemoveAds() {
-        TextView removeAdsTextView = (TextView) findViewById(R.id.audio_player_remove_ads_text_link);
+        TextView removeAdsTextView = findView(R.id.audio_player_remove_ads_text_link);
 
-        if (!Offers.removeAdsOffersEnabled() || (removeAdsPurchaseTime > 0)    ) {
+        if (!Offers.removeAdsOffersEnabled() || (removeAdsPurchaseTime > 0)) {
             removeAdsTextView.setVisibility(View.GONE);
             removeAdsTextView.setOnClickListener(null);
         } else {
@@ -254,18 +256,12 @@ public class AudioPlayerActivity extends AbstractActivity implements
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onNewIntent(Intent intent) {
         setIntent(intent);
         startPlayback();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
         musicPlaybackService = IApolloService.Stub.asInterface(service);
@@ -279,17 +275,11 @@ public class AudioPlayerActivity extends AbstractActivity implements
         invalidateOptionsMenu();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onServiceDisconnected(final ComponentName name) {
         musicPlaybackService = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onProgressChanged(final SeekBar bar, final int progress, final boolean fromuser) {
         if (!fromuser || musicPlaybackService == null) {
@@ -312,9 +302,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onStartTrackingTouch(final SeekBar bar) {
         mLastSeekEventTime = 0;
@@ -322,9 +309,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         mCurrentTime.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onStopTrackingTouch(final SeekBar bar) {
         if (mPosOverride != -1) {
@@ -334,9 +318,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         mFromTouch = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         // Hide the EQ option if it can't be opened
@@ -349,9 +330,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
@@ -390,9 +368,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
@@ -460,15 +435,12 @@ public class AudioPlayerActivity extends AbstractActivity implements
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()
             removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
-            LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime="+removeAdsPurchaseTime);
+            LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime=" + removeAdsPurchaseTime);
         } else if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onBackPressed() {
         Engine.instance().getVibrator().hapticFeedback();
@@ -476,9 +448,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         finish();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -491,9 +460,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         initRemoveAds();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -514,9 +480,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         MusicUtils.notifyForegroundStateChanged(this, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -524,9 +487,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         mImageFetcher.flush();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -562,18 +522,17 @@ public class AudioPlayerActivity extends AbstractActivity implements
      */
     private void initPlaybackControls() {
         // ViewPager container
-        mPageContainer = (FrameLayout) findViewById(R.id.audio_player_pager_container);
+        mPageContainer = findView(R.id.audio_player_pager_container);
         // Theme the pager container background
-        mPageContainer
-                .setBackgroundResource(R.drawable.audio_player_pager_container);
+        mPageContainer.setBackgroundResource(R.drawable.audio_player_pager_container);
 
         // Now playing header
-        mAudioPlayerHeader = (LinearLayout) findViewById(R.id.audio_player_header);
+        mAudioPlayerHeader = findView(R.id.audio_player_header);
         // Opens the currently playing album profile
         mAudioPlayerHeader.setOnClickListener(mOpenAlbumProfile);
 
         // Used to hide the artwork and show the queue
-        final FrameLayout mSwitch = (FrameLayout) findViewById(R.id.audio_player_switch);
+        final FrameLayout mSwitch = findView(R.id.audio_player_switch);
         mSwitch.setOnClickListener(mToggleHiddenPanel);
 
         // Initialize the pager adapter
@@ -582,39 +541,39 @@ public class AudioPlayerActivity extends AbstractActivity implements
         mPagerAdapter.add(QueueFragment.class, null);
 
         // Initialize the ViewPager
-        ViewPager mViewPager = (ViewPager) findViewById(R.id.audio_player_pager);
+        ViewPager mViewPager = findView(R.id.audio_player_pager);
         // Attach the adapter
         mViewPager.setAdapter(mPagerAdapter);
         // Offscreen pager loading limit
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
         // Play and pause button
-        mPlayPauseButton = (PlayPauseButton) findViewById(R.id.action_button_play);
+        mPlayPauseButton = findView(R.id.action_button_play);
         // Shuffle button
-        mShuffleButton = (ShuffleButton) findViewById(R.id.action_button_shuffle);
+        mShuffleButton = findView(R.id.action_button_shuffle);
         // Repeat button
-        mRepeatButton = (RepeatButton) findViewById(R.id.action_button_repeat);
+        mRepeatButton = findView(R.id.action_button_repeat);
         // Previous button
-        RepeatingImageButton mPreviousButton = (RepeatingImageButton) findViewById(R.id.action_button_previous);
+        RepeatingImageButton mPreviousButton = findView(R.id.action_button_previous);
         // Next button
-        RepeatingImageButton mNextButton = (RepeatingImageButton) findViewById(R.id.action_button_next);
+        RepeatingImageButton mNextButton = findView(R.id.action_button_next);
         // Track name
-        mTrackName = (TextView) findViewById(R.id.audio_player_track_name);
+        mTrackName = findView(R.id.audio_player_track_name);
         // Artist name
-        mArtistName = (TextView) findViewById(R.id.audio_player_artist_name);
+        mArtistName = findView(R.id.audio_player_artist_name);
         // Album art
-        mAlbumArt = (ImageView) findViewById(R.id.audio_player_album_art);
+        mAlbumArt = findView(R.id.audio_player_album_art);
         // Small album art
-        mAlbumArtSmall = (ImageView) findViewById(R.id.audio_player_switch_album_art);
+        mAlbumArtSmall = findView(R.id.audio_player_switch_album_art);
         // Current time
-        mCurrentTime = (TextView) findViewById(R.id.audio_player_current_time);
+        mCurrentTime = findView(R.id.audio_player_current_time);
         // Total time
-        mTotalTime = (TextView) findViewById(R.id.audio_player_total_time);
+        mTotalTime = findView(R.id.audio_player_total_time);
         // Used to show and hide the queue fragment
-        mQueueSwitch = (ImageView) findViewById(R.id.audio_player_switch_queue);
+        mQueueSwitch = findView(R.id.audio_player_switch_queue);
         // Theme the queue switch icon
         mQueueSwitch.setImageResource(R.drawable.btn_switch_queue);
         // Progress
-        mProgress = (SeekBar) findViewById(android.R.id.progress);
+        mProgress = findView(android.R.id.progress);
 
         // Set the repeat listener for the previous button
         mPreviousButton.setRepeatListener(mRewindListener);
@@ -634,7 +593,7 @@ public class AudioPlayerActivity extends AbstractActivity implements
         }
 
         final int mopubAlbumArtBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD);
-        final int r = new Random().nextInt(100)+1;
+        final int r = new Random().nextInt(100) + 1;
         LOG.info("mopubAlbumArtBannerThreshold: " + mopubAlbumArtBannerThreshold + " - dice roll: " + r + " - skip initAlbumArt? " + (r > mopubAlbumArtBannerThreshold));
         if (r > mopubAlbumArtBannerThreshold) {
             return;
@@ -711,7 +670,7 @@ public class AudioPlayerActivity extends AbstractActivity implements
             mAdvertisementText.setVisibility(adVisibility);
             mAlbumArt.setVisibility(albumArtVisibility);
 
-            TextView removeAdsTextView = (TextView) findViewById(R.id.audio_player_remove_ads_text_link);
+            TextView removeAdsTextView = findView(R.id.audio_player_remove_ads_text_link);
             if (removeAdsTextView != null) {
                 removeAdsTextView.setVisibility(Offers.removeAdsOffersEnabled() && visible ?
                         View.VISIBLE : View.GONE);
