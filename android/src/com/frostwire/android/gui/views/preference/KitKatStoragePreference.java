@@ -57,7 +57,7 @@ public final class KitKatStoragePreference extends DialogPreference {
     public KitKatStoragePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        setDialogLayoutResource(R.layout.dialog_preference_storage);
+        setDialogLayoutResource(R.layout.dialog_preference_kitkat_storage);
         setPositiveButtonText(null);
     }
 
@@ -79,7 +79,7 @@ public final class KitKatStoragePreference extends DialogPreference {
         protected void onBindDialogView(View view) {
             super.onBindDialogView(view);
 
-            ListView list = (ListView) view.findViewById(R.id.dialog_preference_storage_list);
+            ListView list = (ListView) view.findViewById(R.id.dialog_preference_kitkat_storage_list);
 
             list.setAdapter(new StoragesAdapter(getActivity()));
             list.setOnItemClickListener(new OnItemClickAdapter<StorageMount>() {
@@ -106,7 +106,7 @@ public final class KitKatStoragePreference extends DialogPreference {
             });
 
 
-            TextView warningText = (TextView) view.findViewById(R.id.dialog_preference_storage_warning);
+            TextView warningText = (TextView) view.findViewById(R.id.dialog_preference_kitkat_storage_warning);
             warningText.setVisibility(list.getCount() == 1 ? View.GONE : View.VISIBLE);
         }
 

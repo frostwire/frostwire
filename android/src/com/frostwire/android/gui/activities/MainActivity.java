@@ -82,7 +82,6 @@ import com.frostwire.android.gui.views.PlayerMenuItemView;
 import com.frostwire.android.gui.views.PlayerNotifierView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
-import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;

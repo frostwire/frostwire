@@ -54,7 +54,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
-import com.frostwire.android.gui.views.preference.StoragePreference;
 import com.frostwire.transfers.*;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
