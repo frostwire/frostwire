@@ -32,7 +32,6 @@
     <item name="menu_main_transfers" type="id"/>
     <item name="menu_main_support" type="id"/>
     <item name="menu_main_settings" type="id"/>
-    <item name="menu_main_settings2" type="id"/>
     <item name="menu_main_shutdown" type="id"/>
 
 </resources>

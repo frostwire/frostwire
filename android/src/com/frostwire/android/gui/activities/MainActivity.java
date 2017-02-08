@@ -725,8 +725,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 try {
                     if (id == R.id.menu_main_settings) {
                         controller.showPreferences();
-                    } else if (id == R.id.menu_main_settings2) {
-                        controller.showPreferences2();
                     } else if (id == R.id.menu_main_shutdown) {
                         showShutdownDialog();
                     } else if (id == R.id.menu_main_my_music) {
