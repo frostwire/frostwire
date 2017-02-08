@@ -36,7 +36,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.activities.SettingsActivity2;
+import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
@@ -336,7 +336,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             @Override
             public void onClick(View v) {
                 Context ctx = v.getContext();
-                Intent i = new Intent(ctx, SettingsActivity2.class);
+                Intent i = new Intent(ctx, SettingsActivity.class);
                 if (showTorrentSettingsOnClick) {
                     i.setAction(Constants.ACTION_SETTINGS_OPEN_TORRENT_SETTINGS);
                 }
@@ -816,7 +816,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
         @Override
         public void onClick(TransfersFragment owner, View v) {
-            Intent i = new Intent(owner.getActivity(), SettingsActivity2.class);
+            Intent i = new Intent(owner.getActivity(), SettingsActivity.class);
             i.setAction(Constants.ACTION_SETTINGS_SELECT_STORAGE);
             owner.getActivity().startActivity(i);
         }

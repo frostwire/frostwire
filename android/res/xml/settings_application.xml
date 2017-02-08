@@ -63,7 +63,7 @@
             android:title="@string/notification_other_header" />
         <android.support.v7.preference.Preference
             android:key="frostwire.prefs.offers.buy_no_ads"
-            android:layout="@layout/view_preference_buy_ads_2"
+            android:layout="@layout/view_preference_buy_ads"
             android:summary="@string/remove_ads_description"
             android:title="@string/remove_ads">
             <intent

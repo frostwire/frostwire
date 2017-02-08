@@ -37,7 +37,7 @@ import com.frostwire.android.gui.views.preference.StoragePreference;
  * @author aldenml
  * @author grzesiekrzaca
  */
-public final class SettingsActivity2 extends AbstractActivity
+public final class SettingsActivity extends AbstractActivity
         implements PreferenceFragment.OnPreferenceStartFragmentCallback {
 
     /**
@@ -68,7 +68,7 @@ public final class SettingsActivity2 extends AbstractActivity
     // see PreferenceFragment source code
     private final boolean singlePane;
 
-    public SettingsActivity2() {
+    public SettingsActivity() {
         super(R.layout.activity_settings);
         singlePane = true;
     }

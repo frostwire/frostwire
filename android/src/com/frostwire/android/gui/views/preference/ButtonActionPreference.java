@@ -31,7 +31,7 @@ import com.frostwire.android.R;
  * @author gubatron
  * @author aldenml
  */
-public final class ButtonActionPreference2 extends Preference {
+public final class ButtonActionPreference extends Preference {
 
     private CharSequence buttonText;
 
@@ -39,10 +39,10 @@ public final class ButtonActionPreference2 extends Preference {
 
     private OnClickListener listener;
 
-    public ButtonActionPreference2(Context context, AttributeSet attrs) {
+    public ButtonActionPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        setLayoutResource(R.layout.view_preference_button_action_2);
+        setLayoutResource(R.layout.view_preference_button_action);
 
         TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ButtonActionPreference);
         buttonText = attributes.getString(R.styleable.ButtonActionPreference_button_text);

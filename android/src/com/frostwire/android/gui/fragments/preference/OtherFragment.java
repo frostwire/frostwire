@@ -31,7 +31,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
-import com.frostwire.android.gui.views.preference.ButtonActionPreference2;
+import com.frostwire.android.gui.views.preference.ButtonActionPreference;
 import com.frostwire.uxstats.UXStats;
 
 /**
@@ -102,7 +102,7 @@ public final class OtherFragment extends AbstractPreferenceFragment {
     }
 
     private void setupClearIndex() {
-        final ButtonActionPreference2 preference = findPreference("frostwire.prefs.internal.clear_index");
+        final ButtonActionPreference preference = findPreference("frostwire.prefs.internal.clear_index");
 
         if (preference != null) {
             updateIndexSummary(preference);

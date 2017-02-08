@@ -23,7 +23,7 @@ import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.activities.SettingsActivity2;
+import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.WizardActivity;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
@@ -57,7 +57,7 @@ public final class MainController {
     }
 
     public void showPreferences() {
-        Intent i = new Intent(activity, SettingsActivity2.class);
+        Intent i = new Intent(activity, SettingsActivity.class);
         activity.startActivity(i);
     }
 
