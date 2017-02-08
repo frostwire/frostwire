@@ -156,8 +156,17 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
 
     private void applyVPNOption(BTEngine btEngine) {
         boolean newVal = MANDATORY_VPN_CHECKBOX_FIELD.isSelected();
-        //do stuff
-
+        if (newVal) {
+            if (!VPNs.isVPNActive()) {
+                btEngine.stop();
+                GUIMediator.instance().getStatusLine().refresh();
+            }
+        } else {
+            if (!btEngine.isRunning()) {
+                btEngine.start();
+                GUIMediator.instance().getStatusLine().refresh();
+            }
+        }
         ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.setValue(newVal);
     }
 }

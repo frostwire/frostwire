@@ -30,9 +30,9 @@ import java.io.InputStreamReader;
  * @author gubatron
  * @author aldenml
  */
-final class VPNs {
+public final class VPNs {
     private static Pattern piaKillSwitchRoutePattern = null;
-    static boolean isVPNActive() {
+    public static boolean isVPNActive() {
         boolean result = false;
 
         if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
