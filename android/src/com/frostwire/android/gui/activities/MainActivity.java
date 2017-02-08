@@ -577,7 +577,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
-            StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
+            StoragePicker.handle(this, requestCode, resultCode, data);
         } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
             Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, false, false);
         }

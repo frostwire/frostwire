@@ -25,6 +25,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ViewFlipper;
+
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
@@ -34,7 +35,6 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.GeneralWizardPage;
 import com.frostwire.android.gui.views.WizardPageView;
 import com.frostwire.android.gui.views.WizardPageView.OnCompleteListener;
-import com.frostwire.android.gui.views.preference.StoragePreference;
 
 /**
  * @author gubatron
@@ -105,7 +105,7 @@ public class WizardActivity extends AbstractActivity {
     private void onStoragePathChanged(int requestCode, int resultCode, Intent data) {
         View view = viewFlipper.getCurrentView();
         if (view instanceof GeneralWizardPage) {
-            String newPath = StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
+            String newPath = StoragePicker.handle(this, requestCode, resultCode, data);
             if (newPath != null) {
                 ((GeneralWizardPage) view).updateStoragePathTextView(newPath);
             }

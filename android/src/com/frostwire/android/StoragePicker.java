@@ -24,7 +24,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.provider.DocumentFile;
+
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.util.Logger;
 import com.frostwire.platform.Platforms;
 
@@ -96,6 +99,12 @@ public final class StoragePicker {
             UIUtils.showShortMessage(context, R.string.storage_picker_treeuri_error);
             LOG.error("Error handling folder selection", e);
             result = null;
+        }
+
+        if (result != null) {
+            ConfigurationManager.instance().setStoragePath(result);
+            BTEngine.ctx.dataDir = Platforms.data();
+            BTEngine.ctx.torrentsDir = Platforms.torrents();
         }
 
         return result;

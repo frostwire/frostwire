@@ -148,7 +148,7 @@ public final class SettingsActivity extends AbstractActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
-            StoragePreference.onDocumentTreeActivityResult(this, requestCode, resultCode, data);
+            StoragePicker.handle(this, requestCode, resultCode, data);
             // refresh the fragment
             switchToFragment(ApplicationFragment.class.getName(), null, null);
         } else if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&

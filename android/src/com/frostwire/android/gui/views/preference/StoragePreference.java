@@ -160,19 +160,6 @@ public class StoragePreference extends DialogPreference {
         }
     }
 
-    /**
-     * Add this on your activity's onActivityResult() method to obtain the selected path.
-     */
-    public static String onDocumentTreeActivityResult(Context context, int requestCode, int resultCode, Intent data) {
-        final String selectedPath = StoragePicker.handle(context, requestCode, resultCode, data);
-        if (selectedPath != null) {
-            ConfigurationManager.instance().setStoragePath(selectedPath);
-            BTEngine.ctx.dataDir = Platforms.data();
-            BTEngine.ctx.torrentsDir = Platforms.torrents();
-        }
-        return selectedPath;
-    }
-
     private void uxLogSelection() {
         try {
             File file = new File(selectedPath);
