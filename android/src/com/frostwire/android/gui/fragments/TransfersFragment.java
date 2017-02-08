@@ -47,6 +47,7 @@ import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.MenuDialog;
 import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
+import com.frostwire.android.gui.fragments.preference.TorrentFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -54,6 +55,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.*;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.transfers.*;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -165,6 +167,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         int downloads = TransferManager.instance().getActiveDownloads();
         int uploads = TransferManager.instance().getActiveUploads();
 
+        onCheckDHT();
         updateStatusBar(sDown, sUp, downloads, uploads);
         updateButtonMenuVisibility();
     }
@@ -189,7 +192,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    private void onCheckDHT(final boolean dhtEnabled, final int dhtPeers) {
+    private void onCheckDHT() {
         if (textDHTPeers == null || !TransfersFragment.this.isAdded()) {
             return;
         }
@@ -216,6 +219,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             textDHTPeers.setText(R.string.bittorrent_off);
             return;
         }
+
+        boolean dhtEnabled = BTEngine.getInstance().isDhtRunning();
+        long dhtPeers = BTEngine.getInstance().stats().dhtNodes();
 
         // No DHT
         if (!dhtEnabled) {
@@ -343,7 +349,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 Context ctx = v.getContext();
                 Intent i = new Intent(ctx, SettingsActivity.class);
                 if (showTorrentSettingsOnClick) {
-                    i.setAction(Constants.ACTION_SETTINGS_OPEN_TORRENT_SETTINGS);
+                    i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, TorrentFragment.class.getName());
+                    i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT_TITLE, getString(R.string.torrent_preferences_header));
                 }
                 ctx.startActivity(i);
             }
