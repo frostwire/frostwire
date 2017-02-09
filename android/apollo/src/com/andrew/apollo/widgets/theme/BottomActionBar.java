@@ -51,6 +51,6 @@ public class BottomActionBar extends RelativeLayout {
         super.onFinishInflate();
         // Theme the selector
         final LinearLayout bottomActionBar = (LinearLayout) findViewById(R.id.bottom_action_bar);
-        bottomActionBar.setBackground(new HoloSelector(getContext()));
+        bottomActionBar.setBackgroundResource(R.drawable.holo_background_selector);
     }
 }

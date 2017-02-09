@@ -24,7 +24,6 @@ import com.frostwire.android.R;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.ThemeUtils;
-import com.andrew.apollo.widgets.theme.HoloSelector;
 
 /**
  * A custom {@link ImageButton} that represents the "repeat" button.
@@ -57,13 +56,11 @@ public class RepeatButton extends ImageButton implements OnClickListener, OnLong
      * @param context The {@link Context} to use
      * @param attrs The attributes of the XML tag that is inflating the view.
      */
-    @SuppressWarnings("deprecation")
     public RepeatButton(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         // Initialze the theme resources
         mResources = new ThemeUtils(context);
-        // Set the selector
-        setBackgroundDrawable(new HoloSelector(context));
+        setBackgroundResource(R.drawable.holo_background_selector);
         // Control playback (cycle repeat modes)
         setOnClickListener(this);
         // Show the cheat sheet

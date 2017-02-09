@@ -23,7 +23,6 @@ import android.widget.ImageButton;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.ThemeUtils;
-import com.andrew.apollo.widgets.theme.HoloSelector;
 import com.frostwire.android.R;
 
 /**
@@ -63,13 +62,11 @@ public class RepeatingImageButton extends ImageButton implements OnClickListener
      * @param context The {@link Context} to use
      * @param attrs The attributes of the XML tag that is inflating the view.
      */
-    @SuppressWarnings("deprecation")
     public RepeatingImageButton(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         // Initialize the theme resources
         mResources = new ThemeUtils(context);
-        // Theme the selector
-        setBackgroundDrawable(new HoloSelector(context));
+        setBackgroundResource(R.drawable.holo_background_selector);
         setFocusable(true);
         setLongClickable(true);
         setOnClickListener(this);
