@@ -75,7 +75,7 @@ public final class StatusLine {
     /**
      * Shows when bittorrent is disabled due to VPN settings
      */
-    private JLabel _bittorrent_vpn;
+    private VPNBitTorrentDisabledWarningLabel _bittorrent_vpn;
 
     private IconButton _twitterButton;
     private IconButton _facebookButton;
@@ -272,8 +272,7 @@ public final class StatusLine {
                 remainingWidth = addStatusIndicator(_connectionQualityMeter, sepWidth, remainingWidth, gbc);
             }
 
-            if (!BTEngine.getInstance().isRunning() && ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() &&
-                    !VPNs.isVPNActive()) {
+            if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && _bittorrent_vpn.shouldBeShown()) {
                 remainingWidth = addStatusIndicator(_bittorrent_vpn, sepWidth, remainingWidth, gbc);
             }
 
@@ -386,7 +385,7 @@ public final class StatusLine {
      * Sets up the bittorrent connection disabled due to vpn settings info
      */
     private void createVPNDisconnectLabel() {
-        _bittorrent_vpn = new JLabel();
+        _bittorrent_vpn = new VPNBitTorrentDisabledWarningLabel();
         _bittorrent_vpn.setText("<html><b>"+I18n.tr("BitTorrent is disabled!")+"</b></html>");
         _bittorrent_vpn.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
         _bittorrent_vpn.addMouseListener(STATUS_BAR_LISTENER);
