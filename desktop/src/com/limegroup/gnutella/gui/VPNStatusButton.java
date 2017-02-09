@@ -28,19 +28,16 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author gubatron
  * @author aldenml
  */
-public final class VPNStatusButton extends IconButton {
+public final class VPNStatusButton extends IconButton implements VPNStatusRefresher.VPNStatusListener {
 
     private final String VPN_URL = "http://www.frostwire.com/vpn";
-    private final long REFRESH_INTERVAL_IN_MILLIS = 20000;
-    private long lastRefresh = 0;
-
-    private static final ThreadPool pool = new ThreadPool("VPNStatusButton", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<Runnable>(), true);
 
     public VPNStatusButton() {
         super("vpn_off");
         setBorder(null);
         initActionListener();
-        refresh();
+        VPNStatusRefresher.getInstance().register(this);
+        VPNStatusRefresher.getInstance().refresh();
     }
 
     private void initActionListener() {
@@ -52,7 +49,7 @@ public final class VPNStatusButton extends IconButton {
         });
     }
 
-    public void updateVPNIcon(boolean vpnIsOn) {
+    private void updateVPNIcon(boolean vpnIsOn) {
         if (vpnIsOn) {
             setIcon(GUIMediator.getThemeImage("vpn_on"));
             setToolTipText("<html><p width=\"260\">" +
@@ -67,23 +64,11 @@ public final class VPNStatusButton extends IconButton {
     }
 
     public void refresh() {
-        long now = System.currentTimeMillis();
-        if (lastRefresh == 0 || (now - lastRefresh >= REFRESH_INTERVAL_IN_MILLIS)) {
-            lastRefresh = now;
-            Thread vpnStatusCheckerThread = new Thread("VPNStatus-checker") {
-                @Override
-                public void run() {
-                    //possibly blocking code
-                    final boolean isVPNActive = VPNs.isVPNActive();
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateVPNIcon(isVPNActive);
-                        }
-                    });
-                }
-            };
-            pool.execute(vpnStatusCheckerThread);
-        }
+        VPNStatusRefresher.getInstance().refresh();
+    }
+
+    @Override
+    public void onStatusUpdated(boolean vpnIsOn) {
+        updateVPNIcon(vpnIsOn);
     }
 }
