@@ -321,7 +321,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 items.add(new PauseDownloadMenuAction(context.get(), download));
             } else {
                 boolean wifiIsUp = NetworkManager.instance().isDataWIFIUp();
-                boolean bittorrentOnMobileData = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
+                boolean bittorrentOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
                 boolean bittorrentOff = Engine.instance().isStopped() || Engine.instance().isDisconnected();
 
                 if (wifiIsUp || bittorrentOnMobileData) {
