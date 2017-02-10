@@ -75,7 +75,7 @@ public final class StatusLine {
     /**
      * Shows when bittorrent is disabled due to VPN settings
      */
-    private VPNBitTorrentDisabledWarningLabel _bittorrent_vpn;
+    private VPNBitTorrentDisabledWarningLabel bitTorrentDisabledWarningLabel;
 
     private IconButton _twitterButton;
     private IconButton _facebookButton;
@@ -272,8 +272,8 @@ public final class StatusLine {
                 remainingWidth = addStatusIndicator(_connectionQualityMeter, sepWidth, remainingWidth, gbc);
             }
 
-            if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && _bittorrent_vpn.shouldBeShown()) {
-                remainingWidth = addStatusIndicator(_bittorrent_vpn, sepWidth, remainingWidth, gbc);
+            if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && bitTorrentDisabledWarningLabel.shouldBeShown()) {
+                remainingWidth = addStatusIndicator(bitTorrentDisabledWarningLabel, sepWidth, remainingWidth, gbc);
             }
 
             if (StatusBarSettings.VPN_DISPLAY_ENABLED.getValue()) {
@@ -385,10 +385,10 @@ public final class StatusLine {
      * Sets up the bittorrent connection disabled due to vpn settings info
      */
     private void createVPNDisconnectLabel() {
-        _bittorrent_vpn = new VPNBitTorrentDisabledWarningLabel();
-        _bittorrent_vpn.setText("<html><b>"+I18n.tr("BitTorrent is disabled!")+"</b></html>");
-        _bittorrent_vpn.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
-        _bittorrent_vpn.addMouseListener(STATUS_BAR_LISTENER);
+        bitTorrentDisabledWarningLabel = new VPNBitTorrentDisabledWarningLabel();
+        bitTorrentDisabledWarningLabel.setText("<html><b>"+I18n.tr("BitTorrent is disabled!")+"</b></html>");
+        bitTorrentDisabledWarningLabel.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
+        bitTorrentDisabledWarningLabel.addMouseListener(STATUS_BAR_LISTENER);
     }
 
     /**
@@ -480,7 +480,7 @@ public final class StatusLine {
 
     private void updateSeedingStatus() {
         boolean seedingStatus = SharingSettings.SEED_FINISHED_TORRENTS.getValue();
-        seedingStatusButton.setText("<html>" + (seedingStatus ? I18n.tr("<b>Seeding</b>") : I18n.tr("<b>Not Seeding</b>")) + "</html>");
+        seedingStatusButton.setText("<html><b>" + (seedingStatus ? I18n.tr("Seeding") : I18n.tr("Not Seeding")) + "</b></html>");
         seedingStatusButton.setIcon(seedingStatus ? GUIMediator.getThemeImage("seeding_small") : GUIMediator.getThemeImage("not_seeding_small"));
     }
 
@@ -685,7 +685,7 @@ public final class StatusLine {
                             GUIMediator.Tabs.TRANSFERS : GUIMediator.Tabs.SEARCH_TRANSFERS;
                     GUIMediator.instance().setWindow(transfersTab);
                 }
-                if (clickedComponent == _bittorrent_vpn) {
+                if (clickedComponent == bitTorrentDisabledWarningLabel) {
                     GUIMediator.instance().setOptionsVisible(true, OptionsConstructor.BITTORRENT_ADVANCED_KEY);
                 }
             }
