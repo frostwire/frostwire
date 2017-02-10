@@ -23,9 +23,11 @@ import com.limegroup.gnutella.settings.ConnectionSettings;
 public class VPNBitTorrentGuard {
 
     public static boolean canUseBitTorrent(boolean silent) {
-        if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !VPNs.isVPNActive()) {
+        if (ConnectionSettings.VPN_BITTORRENT_GUARD_ON.getValue() && !VPNs.isVPNActive()) {
             if (!silent) {
-                GUIMediator.showWarning(I18n.tr("VPN is inactive. Current settings require active VPN connection before starting BitTorrent engine. Setup a VPN connection or check advanced settings."));
+
+                GUIMediator.showWarning(I18n.tr("BitTorrent is off because your VPN is disconnected.") + "\r\n" +
+                                        I18n.tr("To re-enable BitTorrent transfers start a VPN connection Go to Settings > Setup a VPN connection or check advanced settings."));
             }
             return false;
         }

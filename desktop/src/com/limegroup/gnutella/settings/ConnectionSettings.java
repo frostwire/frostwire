@@ -104,7 +104,7 @@ public final class ConnectionSettings extends LimeProps {
     /**
      * setting that governs if BitTorrent engine can start if there is no VPN (if true it can only start with VPN active)
      */
-    public static final BooleanSetting MANDATORY_VPN_FOR_BITTORRENT = FACTORY.createBooleanSetting("MANDATORY_VPN_FOR_BITTORRENT", false);
+    public static final BooleanSetting VPN_BITTORRENT_GUARD_ON = FACTORY.createBooleanSetting("VPN_BITTORRENT_GUARD_ON", false);
 
 }
 

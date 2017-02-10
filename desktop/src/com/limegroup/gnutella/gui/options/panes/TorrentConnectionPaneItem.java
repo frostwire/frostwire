@@ -111,7 +111,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         final BTEngine btEngine = BTEngine.getInstance();
 
         return (btEngine.isDhtRunning() == ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected() ||
-                ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() != MANDATORY_VPN_CHECKBOX_FIELD.isSelected() ||
+                ConnectionSettings.VPN_BITTORRENT_GUARD_ON.getValue() != MANDATORY_VPN_CHECKBOX_FIELD.isSelected() ||
                 btEngine.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()) ||
                 (btEngine.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()) ||
                 (btEngine.maxPeers() != MAX_PEERS_FIELD.getValue()) ||
@@ -122,7 +122,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     public void initOptions() {
         final BTEngine btEngine = BTEngine.getInstance();
         ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(btEngine.isDhtRunning());
-        MANDATORY_VPN_CHECKBOX_FIELD.setSelected(ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue());
+        MANDATORY_VPN_CHECKBOX_FIELD.setSelected(ConnectionSettings.VPN_BITTORRENT_GUARD_ON.getValue());
         MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.maxConnections());
         MAX_PEERS_FIELD.setValue(btEngine.maxPeers());
         MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.maxActiveDownloads());
@@ -167,6 +167,6 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
                 GUIMediator.instance().getStatusLine().refresh();
             }
         }
-        ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.setValue(newVal);
+        ConnectionSettings.VPN_BITTORRENT_GUARD_ON.setValue(newVal);
     }
 }

@@ -26,7 +26,7 @@ public class VPNBitTorrentDisabledWarningLabel extends JLabel implements VPNStat
     private boolean vpnIsOn;
 
     boolean shouldBeShown() {
-        return ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !vpnIsOn;
+        return ConnectionSettings.VPN_BITTORRENT_GUARD_ON.getValue() && !vpnIsOn;
     }
 
     @Override
