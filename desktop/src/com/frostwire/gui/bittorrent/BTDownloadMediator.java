@@ -29,7 +29,6 @@ import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
-import com.frostwire.util.Logger;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentItemSearchResult;
@@ -37,12 +36,10 @@ import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.PaddedPanel;
+import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.actions.LimeAction;
-import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.gui.search.GenericCellEditor;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
@@ -610,22 +607,24 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openTorrentFileForSeed(final File torrentFile, final File saveDir) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                try {
-                    BTEngine.getInstance().download(torrentFile, saveDir, null);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    if (!e.toString().contains("No files selected by user")) {
-                        // could not read torrent file or bad torrent file.
-                        GUIMediator.showError(
-                                I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
-                                        torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
+        if (VPNBitTorrentGuard.canUseBitTorrent()) {
+            GUIMediator.safeInvokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        BTEngine.getInstance().download(torrentFile, saveDir, null);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        if (!e.toString().contains("No files selected by user")) {
+                            // could not read torrent file or bad torrent file.
+                            GUIMediator.showError(
+                                    I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
+                                            torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
+                        }
                     }
-                }
 
-            }
-        });
+                }
+            });
+        }
     }
 
     @Override
@@ -644,52 +643,54 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openTorrentFile(final File torrentFile, final boolean partialDownload, final Runnable onOpenRunnableForUIThread) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    boolean[] filesSelection = null;
+        if (VPNBitTorrentGuard.canUseBitTorrent()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        boolean[] filesSelection = null;
 
-                    if (partialDownload) {
-                        PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), torrentFile);
-                        dlg.setVisible(true);
-                        filesSelection = dlg.getFilesSelection();
-                        if (filesSelection == null) {
-                            return;
+                        if (partialDownload) {
+                            PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), torrentFile);
+                            dlg.setVisible(true);
+                            filesSelection = dlg.getFilesSelection();
+                            if (filesSelection == null) {
+                                return;
+                            }
+                        }
+
+                        if (onOpenRunnableForUIThread != null) {
+                            onOpenRunnableForUIThread.run();
+                        }
+
+                        File saveDir = null;
+
+                        // Check if there's a file named like the torrent in the same folder
+                        // then that means the user wants to seed
+                        String seedDataFilename = FilenameUtils.removeExtension(torrentFile.getName());
+
+                        File seedDataFile = new File(torrentFile.getParentFile(), seedDataFilename);
+                        if (seedDataFile.exists()) {
+                            saveDir = torrentFile.getParentFile();
+                        }
+
+                        if (saveDir == null) {
+                            BTEngine.getInstance().download(torrentFile, null, filesSelection);
+                        } else {
+                            GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (!e.toString().contains("No files selected by user")) {
+                            // could not read torrent file or bad torrent file.
+                            GUIMediator.showError(
+                                    I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
+                                            torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
                         }
                     }
-
-                    if (onOpenRunnableForUIThread != null) {
-                        onOpenRunnableForUIThread.run();
-                    }
-
-                    File saveDir = null;
-
-                    // Check if there's a file named like the torrent in the same folder
-                    // then that means the user wants to seed
-                    String seedDataFilename = FilenameUtils.removeExtension(torrentFile.getName());
-
-                    File seedDataFile = new File(torrentFile.getParentFile(), seedDataFilename);
-                    if (seedDataFile.exists()) {
-                        saveDir = torrentFile.getParentFile();
-                    }
-
-                    if (saveDir == null) {
-                        BTEngine.getInstance().download(torrentFile, null, filesSelection);
-                    } else {
-                        GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    if (!e.toString().contains("No files selected by user")) {
-                        // could not read torrent file or bad torrent file.
-                        GUIMediator.showError(
-                                I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
-                                        torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
-                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public void openTorrentSearchResult(final TorrentSearchResult sr, final boolean partialDownload) {

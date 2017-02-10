@@ -75,7 +75,7 @@ public final class OptionsConstructor {
     static final String SHARED_BASIC_KEY = "OPTIONS_SHARED_BASIC_TITLE";
     static final String BITTORRENT_KEY = "OPTIONS_BITTORRENT_MAIN_TITLE";
     public static final String BITTORRENT_BASIC_KEY = "OPTIONS_BITTORRENT_BASIC_TITLE";
-    static final String BITTORRENT_ADVANCED_KEY = "OPTIONS_BITTORRENT_ADVANCED_TITLE";
+    public static final String BITTORRENT_ADVANCED_KEY = "OPTIONS_BITTORRENT_ADVANCED_TITLE";
     static final String SHUTDOWN_KEY = "OPTIONS_SHUTDOWN_MAIN_TITLE";
     public static final String LIBRARY_KEY = "OPTIONS_LIBRARY_MAIN_TITLE";
     static final String PLAYER_KEY = "OPTIONS_PLAYER_MAIN_TITLE";

@@ -17,6 +17,7 @@ package com.limegroup.gnutella.gui.options.panes;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.limegroup.gnutella.gui.*;
+import com.limegroup.gnutella.settings.ConnectionSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 
 import javax.swing.*;
@@ -38,6 +39,8 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
 
     private final static String ENABLE_DISTRIBUTED_HASH_TABLE = I18n.tr("Enable Distributed Hash Table (DHT)");
 
+    private final static String MANDATORY_VPN = I18n.tr("Require VPN connection for BitTorrent");
+
     private WholeNumberField MAX_ACTIVE_DOWNLOADS_FIELD = new SizedWholeNumberField(4);
 
     private WholeNumberField MAX_GLOBAL_NUM_CONNECTIONS_FIELD = new SizedWholeNumberField(4);
@@ -48,6 +51,8 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
 
     private final JCheckBox ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD = new JCheckBox();
 
+    private final JCheckBox MANDATORY_VPN_CHECKBOX_FIELD = new JCheckBox();
+
     public TorrentConnectionPaneItem() {
         super(TITLE, TEXT);
 
@@ -55,6 +60,14 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
 
         LabeledComponent comp = new LabeledComponent(ENABLE_DISTRIBUTED_HASH_TABLE,
                 ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD,
+                LabeledComponent.LEFT_GLUE,
+                LabeledComponent.LEFT);
+
+        panel.add(comp.getComponent());
+        panel.addVerticalComponentGap();
+
+        comp = new LabeledComponent(MANDATORY_VPN,
+                MANDATORY_VPN_CHECKBOX_FIELD,
                 LabeledComponent.LEFT_GLUE,
                 LabeledComponent.LEFT);
 
@@ -98,6 +111,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         final BTEngine btEngine = BTEngine.getInstance();
 
         return (btEngine.isDhtRunning() == ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected() ||
+                ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() != MANDATORY_VPN_CHECKBOX_FIELD.isSelected() ||
                 btEngine.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()) ||
                 (btEngine.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()) ||
                 (btEngine.maxPeers() != MAX_PEERS_FIELD.getValue()) ||
@@ -108,6 +122,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     public void initOptions() {
         final BTEngine btEngine = BTEngine.getInstance();
         ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(btEngine.isDhtRunning());
+        MANDATORY_VPN_CHECKBOX_FIELD.setSelected(ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue());
         MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.maxConnections());
         MAX_PEERS_FIELD.setValue(btEngine.maxPeers());
         MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.maxActiveDownloads());
@@ -118,6 +133,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     public boolean applyOptions() throws IOException {
         BTEngine btEngine = BTEngine.getInstance();
         applyDHTOptions(btEngine);
+        applyVPNOption(btEngine);
         btEngine.maxConnections(MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue());
         btEngine.maxPeers(MAX_PEERS_FIELD.getValue());
         btEngine.maxActiveDownloads(MAX_ACTIVE_DOWNLOADS_FIELD.getValue());
@@ -136,5 +152,21 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
             btEngine.startDht();
             SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.setValue(true);
         }
+    }
+
+    private void applyVPNOption(BTEngine btEngine) {
+        boolean newVal = MANDATORY_VPN_CHECKBOX_FIELD.isSelected();
+        if (newVal) {
+            if (!VPNs.isVPNActive()) {
+                btEngine.stop();
+                GUIMediator.instance().getStatusLine().refresh();
+            }
+        } else {
+            if (!btEngine.isRunning()) {
+                btEngine.start();
+                GUIMediator.instance().getStatusLine().refresh();
+            }
+        }
+        ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.setValue(newVal);
     }
 }

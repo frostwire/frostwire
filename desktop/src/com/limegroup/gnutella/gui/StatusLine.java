@@ -21,6 +21,7 @@ import com.frostwire.gui.theme.SkinCheckBoxMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.settings.ApplicationSettings;
+import com.limegroup.gnutella.settings.ConnectionSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.StatusBarSettings;
 import org.limewire.setting.BooleanSetting;
@@ -70,6 +71,11 @@ public final class StatusLine {
      */
     private JLabel _bandwidthUsageDown;
     private JLabel _bandwidthUsageUp;
+
+    /**
+     * Shows when bittorrent is disabled due to VPN settings
+     */
+    private VPNBitTorrentDisabledWarningLabel bitTorrentDisabledWarningLabel;
 
     private IconButton _twitterButton;
     private IconButton _facebookButton;
@@ -121,6 +127,8 @@ public final class StatusLine {
         //  make icons and panels for connection quality
         GUIMediator.setSplashScreenString(I18n.tr("Creating Connection Quality Indicator..."));
         createConnectionQualityPanel();
+
+        createVPNDisconnectLabel();
 
         //  make the 'Language' button
         GUIMediator.setSplashScreenString(I18n.tr("Adding flags here and there..."));
@@ -208,7 +216,7 @@ public final class StatusLine {
             public String getToolTipText() {
                 boolean seedingStatus = SharingSettings.SEED_FINISHED_TORRENTS.getValue();
 
-                return "<html>"+(seedingStatus ? I18n.tr("<b>Seeding</b><p>completed torrent downloads.</p>") : I18n.tr("<b>Not Seeding</b><p>File chunks might be shared only during a torrent download.</p>")+"</html>");
+                return "<html>" + (seedingStatus ? I18n.tr("<b>Seeding</b><p>completed torrent downloads.</p>") : I18n.tr("<b>Not Seeding</b><p>File chunks might be shared only during a torrent download.</p>") + "</html>");
             }
         };
 
@@ -262,6 +270,10 @@ public final class StatusLine {
             //  add connection quality indicator if there's room
             if (StatusBarSettings.CONNECTION_QUALITY_DISPLAY_ENABLED.getValue()) {
                 remainingWidth = addStatusIndicator(_connectionQualityMeter, sepWidth, remainingWidth, gbc);
+            }
+
+            if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && bitTorrentDisabledWarningLabel.shouldBeShown()) {
+                remainingWidth = addStatusIndicator(bitTorrentDisabledWarningLabel, sepWidth, remainingWidth, gbc);
             }
 
             if (StatusBarSettings.VPN_DISPLAY_ENABLED.getValue()) {
@@ -325,8 +337,9 @@ public final class StatusLine {
                 //some macosx versions are throwing a deep NPE when this is invoked all the way down at 
                 //sun.lwawt.macosx.LWCToolkit.getScreenResolution(Unknown Source)
                 BAR.validate();
-            } catch (Throwable ignored) {}
-            
+            } catch (Throwable ignored) {
+            }
+
             BAR.repaint();
         }
     }
@@ -345,7 +358,7 @@ public final class StatusLine {
     }
 
     /**
-     * Creates a vertical separator for visually separating status bar elements 
+     * Creates a vertical separator for visually separating status bar elements
      */
     private Component createSeparator() {
         JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
@@ -366,6 +379,16 @@ public final class StatusLine {
         _connectionQualityMeter.setMaximumSize(new Dimension(90, 30));
         //   add right-click listener
         _connectionQualityMeter.addMouseListener(STATUS_BAR_LISTENER);
+    }
+
+    /**
+     * Sets up the bittorrent connection disabled due to vpn settings info
+     */
+    private void createVPNDisconnectLabel() {
+        bitTorrentDisabledWarningLabel = new VPNBitTorrentDisabledWarningLabel();
+        bitTorrentDisabledWarningLabel.setText("<html><b>"+I18n.tr("BitTorrent is disabled!")+"</b></html>");
+        bitTorrentDisabledWarningLabel.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
+        bitTorrentDisabledWarningLabel.addMouseListener(STATUS_BAR_LISTENER);
     }
 
     /**
@@ -392,7 +415,7 @@ public final class StatusLine {
     }
 
     /**
-        _lwsStatus = new JLabel();
+     * _lwsStatus = new JLabel();
      * Sets up the 'Bandwidth Usage' label.
      */
     private void createBandwidthLabel() {
@@ -433,7 +456,7 @@ public final class StatusLine {
 
     /**
      * Updates the center panel if non-PRO.  Periodically rotates between
-     * the update panel and the status link handler. 
+     * the update panel and the status link handler.
      */
     private void updateCenterPanel() {
         long now = System.currentTimeMillis();
@@ -457,7 +480,7 @@ public final class StatusLine {
 
     private void updateSeedingStatus() {
         boolean seedingStatus = SharingSettings.SEED_FINISHED_TORRENTS.getValue();
-        seedingStatusButton.setText("<html>"+(seedingStatus ? I18n.tr("<b>Seeding</b>") : I18n.tr("<b>Not Seeding</b>"))+"</html>");
+        seedingStatusButton.setText("<html><b>" + (seedingStatus ? I18n.tr("Seeding") : I18n.tr("Not Seeding")) + "</b></html>");
         seedingStatusButton.setIcon(seedingStatus ? GUIMediator.getThemeImage("seeding_small") : GUIMediator.getThemeImage("not_seeding_small"));
     }
 
@@ -475,7 +498,7 @@ public final class StatusLine {
     }
 
     /**
-     * Updates the firewall text. 
+     * Updates the firewall text.
      */
     public void updateFirewallLabel(boolean notFirewalled) {
         if (notFirewalled) {
@@ -495,7 +518,7 @@ public final class StatusLine {
     }
 
     /**
-     * Updates the firewall text. 
+     * Updates the firewall text.
      */
     public void updateFirewall() {
         try {
@@ -526,7 +549,7 @@ public final class StatusLine {
 
     /**
      * Notification that loading has finished.
-     *
+     * <p>
      * The loading label is removed and the update notification
      * component is added.  If necessary, the center panel will
      * rotate back and forth between displaying the update
@@ -561,14 +584,14 @@ public final class StatusLine {
         String status = null;
         String tip = null;
         switch (quality) {
-        case STATUS_DISCONNECTED:
-            status = I18n.tr("Disconnected");
-            tip = I18n.tr("Check your internet connection, FrostWire can't connect.");
-            break;
-        case STATUS_TURBOCHARGED:
-            status = I18n.tr("Turbo-Charged");
-            tip = I18n.tr("Your connection to the network is extremely strong");
-            break;
+            case STATUS_DISCONNECTED:
+                status = I18n.tr("Disconnected");
+                tip = I18n.tr("Check your internet connection, FrostWire can't connect.");
+                break;
+            case STATUS_TURBOCHARGED:
+                status = I18n.tr("Turbo-Charged");
+                tip = I18n.tr("Your connection to the network is extremely strong");
+                break;
         }
 
         long dhtNodes = BTEngine.getInstance().dhtNodes();
@@ -582,12 +605,12 @@ public final class StatusLine {
     }
 
     /**
-      * Accessor for the <tt>JComponent</tt> instance that contains all
-      * of the panels for the status line.
-      *
-      * @return the <tt>JComponent</tt> instance that contains all
-      *  of the panels for the status line
-      */
+     * Accessor for the <tt>JComponent</tt> instance that contains all
+     * of the panels for the status line.
+     *
+     * @return the <tt>JComponent</tt> instance that contains all
+     * of the panels for the status line
+     */
     public JComponent getComponent() {
         if (BAR == null) {
             BAR = new JPanel(new GridBagLayout());
@@ -662,6 +685,9 @@ public final class StatusLine {
                             GUIMediator.Tabs.TRANSFERS : GUIMediator.Tabs.SEARCH_TRANSFERS;
                     GUIMediator.instance().setWindow(transfersTab);
                 }
+                if (clickedComponent == bitTorrentDisabledWarningLabel) {
+                    GUIMediator.instance().setOptionsVisible(true, OptionsConstructor.BITTORRENT_ADVANCED_KEY);
+                }
             }
         }
     };
@@ -697,7 +723,7 @@ public final class StatusLine {
     }
 
     /**
-     * Action for the 'Show Firewall Status' menu item. 
+     * Action for the 'Show Firewall Status' menu item.
      */
     private class ShowLanguageStatusAction extends AbstractAction {
 
@@ -716,7 +742,7 @@ public final class StatusLine {
     }
 
     /**
-     * Action for the 'Show Firewall Status' menu item. 
+     * Action for the 'Show Firewall Status' menu item.
      */
     private class ShowFirewallStatusAction extends AbstractAction {
 
@@ -731,7 +757,7 @@ public final class StatusLine {
     }
 
     /**
-     * Action for the 'Show Bandwidth Consumption' menu item. 
+     * Action for the 'Show Bandwidth Consumption' menu item.
      */
     private class ShowBandwidthConsumptionAction extends AbstractAction {
 

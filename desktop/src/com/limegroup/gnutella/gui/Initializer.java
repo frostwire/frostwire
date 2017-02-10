@@ -135,6 +135,13 @@ public final class Initializer {
         postinit();
     }
 
+    private boolean canStartBitTorrentWithCurrentVPNSettingsAndStatus() {
+        if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue()) {
+            return VPNs.isVPNActive();
+        }
+        return true;
+    }
+
     /**
      * Initializes the very early things.
      */
@@ -473,7 +480,10 @@ public final class Initializer {
         ctx.retries = port1 - port0;
 
         BTEngine.ctx = ctx;
-        BTEngine.getInstance().start();
+
+        if (canStartBitTorrentWithCurrentVPNSettingsAndStatus()) {
+            BTEngine.getInstance().start();
+        }
 
         if (!SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue()) {
             BTEngine.getInstance().stopDht();
