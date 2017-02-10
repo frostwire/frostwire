@@ -86,9 +86,9 @@ public class FileTypeAssociation implements ShellAssociation {
 			SERVICE.registerUserAssociation(association);
             SystemUtils.flushIconCache();
         } catch (AssociationAlreadyRegisteredException ignore){
-            LOG.error("can't register", ignore);
+            LOG.error("can't addRefreshListener", ignore);
 		} catch (RegisterFailedException ignore){
-            LOG.error("can't register", ignore);
+            LOG.error("can't addRefreshListener", ignore);
 		}
         
 	}

@@ -18,31 +18,19 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.limegroup.gnutella.settings.ConnectionSettings;
+
 import javax.swing.*;
 
 public class VPNBitTorrentDisabledWarningLabel extends JLabel implements VPNStatusRefresher.VPNStatusListener {
+    private boolean vpnIsOn;
 
-
-    private boolean showWarning;
-
-    public VPNBitTorrentDisabledWarningLabel() {
-        VPNStatusRefresher.getInstance().register(this);
-        VPNStatusRefresher.getInstance().refresh();
-    }
-
-    public boolean shouldBeShown() {
-        return showWarning;
+    boolean shouldBeShown() {
+        return ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !vpnIsOn;
     }
 
     @Override
     public void onStatusUpdated(boolean vpnIsOn) {
-        if(vpnIsOn) {
-            if (getParent()!= null) {
-                getParent().remove(this);
-            }
-            showWarning = false;
-        } else {
-            showWarning = true;
-        }
+        this.vpnIsOn = vpnIsOn;
     }
 }

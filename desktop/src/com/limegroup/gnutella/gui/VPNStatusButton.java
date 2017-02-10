@@ -32,12 +32,10 @@ public final class VPNStatusButton extends IconButton implements VPNStatusRefres
 
     private final String VPN_URL = "http://www.frostwire.com/vpn";
 
-    public VPNStatusButton() {
+    VPNStatusButton() {
         super("vpn_off");
         setBorder(null);
         initActionListener();
-        VPNStatusRefresher.getInstance().register(this);
-        VPNStatusRefresher.getInstance().refresh();
     }
 
     private void initActionListener() {
@@ -61,10 +59,6 @@ public final class VPNStatusButton extends IconButton implements VPNStatusRefres
                     I18n.tr("FrostWire can't detect an encrypted VPN connection, your privacy is at risk. Click icon to set up an encrypted VPN connection.") +
                     "</p></html>");
         }
-    }
-
-    public void refresh() {
-        VPNStatusRefresher.getInstance().refresh();
     }
 
     @Override

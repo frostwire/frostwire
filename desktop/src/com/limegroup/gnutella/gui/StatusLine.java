@@ -21,7 +21,6 @@ import com.frostwire.gui.theme.SkinCheckBoxMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.settings.ApplicationSettings;
-import com.limegroup.gnutella.settings.ConnectionSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.StatusBarSettings;
 import org.limewire.setting.BooleanSetting;
@@ -34,13 +33,13 @@ import java.awt.event.*;
  * The component for the space at the bottom of the main application
  * window, including the connected status and the media player.
  */
-public final class StatusLine {
+public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
     /**
      * The different connection status possibilities.
      */
-    public static final int STATUS_DISCONNECTED = 0;
-    public static final int STATUS_TURBOCHARGED = 1;
+    static final int STATUS_DISCONNECTED = 0;
+    static final int STATUS_TURBOCHARGED = 1;
 
     /**
      * The main container for the status line component.
@@ -51,39 +50,41 @@ public final class StatusLine {
      * The left most panel containing the connection quality.
      * The switcher changes the actual ImageIcons on this panel.
      */
-    private JLabel _connectionQualityMeter;
+    private JLabel connectionQualityMeter;
     private final ImageIcon[] _connectionQualityMeterIcons = new ImageIcon[7];
 
-    private final VPNStatusButton _vpnStatus = new VPNStatusButton();
+    private final VPNStatusRefresher vpnStatusRefresher;
 
-    /**
-     * The button for the current language flag to allow language switching
-     */
-    private LanguageButton _languageButton;
-
-    /**
-     * The label with the firewall status.
-     */
-    private JLabel _firewallStatus;
-
-    /**
-     * The labels for displaying the bandwidth usage.
-     */
-    private JLabel _bandwidthUsageDown;
-    private JLabel _bandwidthUsageUp;
+    private final VPNStatusButton vpnStatusButton;
 
     /**
      * Shows when bittorrent is disabled due to VPN settings
      */
-    private VPNBitTorrentDisabledWarningLabel bitTorrentDisabledWarningLabel;
+    private final VPNBitTorrentDisabledWarningLabel noVpnNoBittorrentWarningLabel;
 
-    private IconButton _twitterButton;
-    private IconButton _facebookButton;
-    private IconButton _googlePlusButton;
+    /**
+     * The button for the current language flag to allow language switching
+     */
+    private LanguageButton languageButton;
+
+    /**
+     * The label with the firewall status.
+     */
+    private JLabel firewallStatus;
+
+    /**
+     * The labels for displaying the bandwidth usage.
+     */
+    private JLabel bandwidthUsageDown;
+    private JLabel bandwidthUsageUp;
+
+    private IconButton twitterButton;
+    private IconButton facebookButton;
+    private IconButton googlePlusButton;
 
     private IconButton seedingStatusButton;
 
-    private DonationButtons _donationButtons;
+    private DonationButtons donationButtons;
 
     /**
      * Variables for the center portion of the status bar, which can display
@@ -92,8 +93,8 @@ public final class StatusLine {
      * StatusLinkHandler (ads for going PRO).
      */
     private StatusComponent STATUS_COMPONENT;
-    private JPanel _centerPanel;
-    private Component _centerComponent;
+    private JPanel centerPanel;
+    private Component centerComponent;
 
     ///////////////////////////////////////////////////////////////////////////
     //  Construction
@@ -102,7 +103,7 @@ public final class StatusLine {
     /**
      * Creates a new status line in the disconnected state.
      */
-    public StatusLine() {
+    StatusLine() {
         GUIMediator.setSplashScreenString(I18n.tr("Loading Status Window..."));
 
         getComponent().addMouseListener(STATUS_BAR_LISTENER);
@@ -128,7 +129,13 @@ public final class StatusLine {
         GUIMediator.setSplashScreenString(I18n.tr("Creating Connection Quality Indicator..."));
         createConnectionQualityPanel();
 
-        createVPNDisconnectLabel();
+        // VPN status
+        vpnStatusButton = new VPNStatusButton();
+        noVpnNoBittorrentWarningLabel = createVPNDisconnectLabel();
+        vpnStatusRefresher = VPNStatusRefresher.getInstance();
+        vpnStatusRefresher.addRefreshListener(vpnStatusButton);
+        vpnStatusRefresher.addRefreshListener(noVpnNoBittorrentWarningLabel);
+        vpnStatusRefresher.addRefreshListener(this);
 
         //  make the 'Language' button
         GUIMediator.setSplashScreenString(I18n.tr("Adding flags here and there..."));
@@ -163,37 +170,36 @@ public final class StatusLine {
         /*
          The refresh listener for updating the bandwidth usage every second.
         */
-        RefreshListener REFRESH_LISTENER = new RefreshListener() {
+        GUIMediator.addRefreshListener(new RefreshListener() {
             public void refresh() {
                 if (StatusBarSettings.BANDWIDTH_DISPLAY_ENABLED.getValue()) {
                     updateBandwidth();
                 }
                 updateCenterPanel();
             }
-        };
-        GUIMediator.addRefreshListener(REFRESH_LISTENER);
+        });
 
         refresh();
     }
 
     private void createDonationButtonsComponent() {
-        _donationButtons = new DonationButtons();
+        donationButtons = new DonationButtons();
     }
 
     private void createTwitterButton() {
-        _twitterButton = new IconButton("TWITTER");
-        initSocialButton(_twitterButton, I18n.tr("Follow us @frostwire"), GUIConstants.TWITTER_FROSTWIRE_URL);
+        twitterButton = new IconButton("TWITTER");
+        initSocialButton(twitterButton, I18n.tr("Follow us @frostwire"), GUIConstants.TWITTER_FROSTWIRE_URL);
     }
 
     private void createFacebookButton() {
-        _facebookButton = new IconButton("FACEBOOK");
-        initSocialButton(_facebookButton, I18n.tr("Like FrostWire on Facebook and stay in touch with the community. Get Help and Help Others."), GUIConstants.FACEBOOK_FROSTWIRE_URL);
+        facebookButton = new IconButton("FACEBOOK");
+        initSocialButton(facebookButton, I18n.tr("Like FrostWire on Facebook and stay in touch with the community. Get Help and Help Others."), GUIConstants.FACEBOOK_FROSTWIRE_URL);
     }
 
     private void createGooglePlusButton() {
-        _googlePlusButton = new IconButton("GOOGLEPLUS");
-        _googlePlusButton.setPreferredSize(new Dimension(19, 16));
-        initSocialButton(_googlePlusButton, I18n.tr("Circle FrostWire on G+"), GUIConstants.GPLUS_FROSTWIRE_URL);
+        googlePlusButton = new IconButton("GOOGLEPLUS");
+        googlePlusButton.setPreferredSize(new Dimension(19, 16));
+        initSocialButton(googlePlusButton, I18n.tr("Circle FrostWire on G+"), GUIConstants.GPLUS_FROSTWIRE_URL);
     }
 
     private void initSocialButton(IconButton socialButton, String toolTipText, final String url) {
@@ -208,7 +214,6 @@ public final class StatusLine {
     }
 
     private void createSeedingStatusLabel() {
-
         seedingStatusButton = new IconButton("", "SEEDING", true) {
             private static final long serialVersionUID = -8985154093868645203L;
 
@@ -249,14 +254,14 @@ public final class StatusLine {
             remainingWidth -= sepWidth;
             remainingWidth -= GUIConstants.SEPARATOR / 2;
 
-            // substract donation buttons as needed2
-            if (_donationButtons != null) {
-                remainingWidth -= _donationButtons.getWidth();
+            // subtract donation buttons as needed2
+            if (donationButtons != null) {
+                remainingWidth -= donationButtons.getWidth();
                 remainingWidth -= GUIConstants.SEPARATOR;
             }
 
             //  subtract center component
-            int indicatorWidth = _centerComponent.getWidth();
+            int indicatorWidth = centerComponent.getWidth();
             remainingWidth -= indicatorWidth;
 
             //  add components to panel, if room
@@ -269,37 +274,38 @@ public final class StatusLine {
 
             //  add connection quality indicator if there's room
             if (StatusBarSettings.CONNECTION_QUALITY_DISPLAY_ENABLED.getValue()) {
-                remainingWidth = addStatusIndicator(_connectionQualityMeter, sepWidth, remainingWidth, gbc);
+                remainingWidth = addStatusIndicator(connectionQualityMeter, sepWidth, remainingWidth, gbc);
             }
 
-            if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && bitTorrentDisabledWarningLabel.shouldBeShown()) {
-                remainingWidth = addStatusIndicator(bitTorrentDisabledWarningLabel, sepWidth, remainingWidth, gbc);
+            vpnStatusRefresher.refresh(); // async call
+
+            if (noVpnNoBittorrentWarningLabel.shouldBeShown()) {
+                remainingWidth = addStatusIndicator(noVpnNoBittorrentWarningLabel, sepWidth, remainingWidth, gbc);
             }
 
             if (StatusBarSettings.VPN_DISPLAY_ENABLED.getValue()) {
-                _vpnStatus.refresh();
-                remainingWidth = addStatusIndicator(_vpnStatus, sepWidth, remainingWidth, gbc);
+                remainingWidth = addStatusIndicator(vpnStatusButton, sepWidth, remainingWidth, gbc);
             }
 
             //  add the language button if there's room
             if (getLanguageSetting().getValue() && remainingWidth > indicatorWidth) {
-                remainingWidth = addStatusIndicator(_languageButton, sepWidth, remainingWidth, gbc);
+                remainingWidth = addStatusIndicator(languageButton, sepWidth, remainingWidth, gbc);
             }
 
             //  then add firewall display if there's room
             if (StatusBarSettings.FIREWALL_DISPLAY_ENABLED.getValue()) {
-                remainingWidth = addStatusIndicator(_firewallStatus, sepWidth, remainingWidth, gbc);
+                remainingWidth = addStatusIndicator(firewallStatus, sepWidth, remainingWidth, gbc);
                 updateFirewall();
             }
 
             //  add bandwidth display if there's room
-            indicatorWidth = GUIConstants.SEPARATOR + GUIConstants.SEPARATOR / 2 + sepWidth + Math.max((int) _bandwidthUsageDown.getMinimumSize().getWidth(), _bandwidthUsageDown.getWidth())
-                    + Math.max((int) _bandwidthUsageUp.getMinimumSize().getWidth(), _bandwidthUsageUp.getWidth());
+            indicatorWidth = GUIConstants.SEPARATOR + GUIConstants.SEPARATOR / 2 + sepWidth + Math.max((int) bandwidthUsageDown.getMinimumSize().getWidth(), bandwidthUsageDown.getWidth())
+                    + Math.max((int) bandwidthUsageUp.getMinimumSize().getWidth(), bandwidthUsageUp.getWidth());
             if (StatusBarSettings.BANDWIDTH_DISPLAY_ENABLED.getValue() && remainingWidth > indicatorWidth) {
                 BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
-                BAR.add(_bandwidthUsageDown, gbc);
+                BAR.add(bandwidthUsageDown, gbc);
                 BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
-                BAR.add(_bandwidthUsageUp, gbc);
+                BAR.add(bandwidthUsageUp, gbc);
                 BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
                 BAR.add(createSeparator(), gbc);
                 //remainingWidth -= indicatorWidth;
@@ -314,21 +320,21 @@ public final class StatusLine {
 
             gbc = new GridBagConstraints();
             gbc.gridx = GridBagConstraints.RELATIVE;
-            BAR.add(_facebookButton, gbc);
-            BAR.add(_twitterButton, gbc);
-            BAR.add(_googlePlusButton, gbc);
+            BAR.add(facebookButton, gbc);
+            BAR.add(twitterButton, gbc);
+            BAR.add(googlePlusButton, gbc);
 
             BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
             //  make center panel stretchy
             gbc.weightx = 1;
-            BAR.add(_centerPanel, gbc);
+            BAR.add(centerPanel, gbc);
             gbc.weightx = 0;
             BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
 
             // donation buttons
-            if (_donationButtons != null && StatusBarSettings.DONATION_BUTTONS_DISPLAY_ENABLED.getValue()) {
+            if (donationButtons != null && StatusBarSettings.DONATION_BUTTONS_DISPLAY_ENABLED.getValue()) {
                 BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
-                BAR.add(_donationButtons, gbc);
+                BAR.add(donationButtons, gbc);
                 BAR.add(Box.createHorizontalStrut(10));
                 BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
             }
@@ -369,34 +375,35 @@ public final class StatusLine {
     }
 
     /**
-     * Sets up _connectionQualityMeter's icons.
+     * Sets up connectionQualityMeter's icons.
      */
     private void createConnectionQualityPanel() {
         updateTheme(); // loads images
-        _connectionQualityMeter = new JLabel();
-        _connectionQualityMeter.setOpaque(false);
-        _connectionQualityMeter.setMinimumSize(new Dimension(34, 20));
-        _connectionQualityMeter.setMaximumSize(new Dimension(90, 30));
+        connectionQualityMeter = new JLabel();
+        connectionQualityMeter.setOpaque(false);
+        connectionQualityMeter.setMinimumSize(new Dimension(34, 20));
+        connectionQualityMeter.setMaximumSize(new Dimension(90, 30));
         //   add right-click listener
-        _connectionQualityMeter.addMouseListener(STATUS_BAR_LISTENER);
+        connectionQualityMeter.addMouseListener(STATUS_BAR_LISTENER);
     }
 
     /**
      * Sets up the bittorrent connection disabled due to vpn settings info
      */
-    private void createVPNDisconnectLabel() {
-        bitTorrentDisabledWarningLabel = new VPNBitTorrentDisabledWarningLabel();
-        bitTorrentDisabledWarningLabel.setText("<html><b>"+I18n.tr("BitTorrent is disabled!")+"</b></html>");
-        bitTorrentDisabledWarningLabel.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
-        bitTorrentDisabledWarningLabel.addMouseListener(STATUS_BAR_LISTENER);
+    private VPNBitTorrentDisabledWarningLabel createVPNDisconnectLabel() {
+        VPNBitTorrentDisabledWarningLabel bitTorrentDisabledWarning = new VPNBitTorrentDisabledWarningLabel();
+        bitTorrentDisabledWarning.setText("<html><b>"+I18n.tr("VPN Off: BitTorrent disabled")+"</b></html>");
+        bitTorrentDisabledWarning.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
+        bitTorrentDisabledWarning.addMouseListener(STATUS_BAR_LISTENER);
+        return bitTorrentDisabledWarning;
     }
 
     /**
      * Sets up the 'Language' button
      */
     private void createLanguageButton() {
-        _languageButton = new LanguageButton();
-        _languageButton.addMouseListener(STATUS_BAR_LISTENER);
+        languageButton = new LanguageButton();
+        languageButton.addMouseListener(STATUS_BAR_LISTENER);
         updateLanguage();
     }
 
@@ -404,14 +411,14 @@ public final class StatusLine {
      * Sets up the 'Firewall Status' label.
      */
     private void createFirewallLabel() {
-        _firewallStatus = new JLabel();
+        firewallStatus = new JLabel();
 
         updateFirewall();
 
         // don't allow easy clipping
-        _firewallStatus.setMinimumSize(new Dimension(20, 20));
+        firewallStatus.setMinimumSize(new Dimension(20, 20));
         // add right-click listener
-        _firewallStatus.addMouseListener(STATUS_BAR_LISTENER);
+        firewallStatus.addMouseListener(STATUS_BAR_LISTENER);
     }
 
     /**
@@ -419,15 +426,15 @@ public final class StatusLine {
      * Sets up the 'Bandwidth Usage' label.
      */
     private void createBandwidthLabel() {
-        _bandwidthUsageDown = new LazyTooltip(GUIMediator.getThemeImage("downloading_small"));
-        _bandwidthUsageUp = new LazyTooltip(GUIMediator.getThemeImage("uploading_small"));
+        bandwidthUsageDown = new LazyTooltip(GUIMediator.getThemeImage("downloading_small"));
+        bandwidthUsageUp = new LazyTooltip(GUIMediator.getThemeImage("uploading_small"));
         //updateBandwidth();
         // don't allow easy clipping
-        _bandwidthUsageDown.setMinimumSize(new Dimension(60, 20));
-        _bandwidthUsageUp.setMinimumSize(new Dimension(60, 20));
+        bandwidthUsageDown.setMinimumSize(new Dimension(60, 20));
+        bandwidthUsageUp.setMinimumSize(new Dimension(60, 20));
         // add right-click listeners
-        _bandwidthUsageDown.addMouseListener(STATUS_BAR_LISTENER);
-        _bandwidthUsageUp.addMouseListener(STATUS_BAR_LISTENER);
+        bandwidthUsageDown.addMouseListener(STATUS_BAR_LISTENER);
+        bandwidthUsageUp.addMouseListener(STATUS_BAR_LISTENER);
     }
 
     /**
@@ -435,10 +442,10 @@ public final class StatusLine {
      */
     private void createCenterPanel() {
         STATUS_COMPONENT = new StatusComponent();
-        _centerComponent = new JLabel();
-        _centerPanel = new JPanel(new GridBagLayout());
+        centerComponent = new JLabel();
+        centerPanel = new JPanel(new GridBagLayout());
 
-        _centerPanel.setOpaque(false);
+        centerPanel.setOpaque(false);
         STATUS_COMPONENT.setProgressPreferredSize(new Dimension(250, 20));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -447,10 +454,10 @@ public final class StatusLine {
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
-        _centerPanel.add(STATUS_COMPONENT, gbc);
+        centerPanel.add(STATUS_COMPONENT, gbc);
 
         //  add right-click listeners
-        _centerPanel.addMouseListener(STATUS_BAR_LISTENER);
+        centerPanel.addMouseListener(STATUS_BAR_LISTENER);
         STATUS_COMPONENT.addMouseListener(STATUS_BAR_LISTENER);
     }
 
@@ -464,8 +471,8 @@ public final class StatusLine {
             return;
 
         _nextUpdateTime = now + 1000 * 5; // update every minute
-        _centerPanel.removeAll();
-        _centerComponent = new JLabel();
+        centerPanel.removeAll();
+        centerComponent = new JLabel();
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -473,7 +480,7 @@ public final class StatusLine {
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
-        _centerPanel.add(_centerComponent, gbc);
+        centerPanel.add(centerComponent, gbc);
 
         refresh();
     }
@@ -489,7 +496,7 @@ public final class StatusLine {
     /**
      * Updates the status text.
      */
-    public void setStatusText(final String text) {
+    void setStatusText(final String text) {
         GUIMediator.safeInvokeAndWait(new Runnable() {
             public void run() {
                 STATUS_COMPONENT.setText(text);
@@ -500,27 +507,27 @@ public final class StatusLine {
     /**
      * Updates the firewall text.
      */
-    public void updateFirewallLabel(boolean notFirewalled) {
+    private void updateFirewallLabel(boolean notFirewalled) {
         if (notFirewalled) {
-            _firewallStatus.setIcon(GUIMediator.getThemeImage("firewall_no"));
-            _firewallStatus.setToolTipText(I18n.tr("FrostWire has not detected a firewall"));
+            firewallStatus.setIcon(GUIMediator.getThemeImage("firewall_no"));
+            firewallStatus.setToolTipText(I18n.tr("FrostWire has not detected a firewall"));
         } else {
-            _firewallStatus.setIcon(GUIMediator.getThemeImage("firewall"));
-            _firewallStatus.setToolTipText(I18n.tr("FrostWire has detected a firewall"));
+            firewallStatus.setIcon(GUIMediator.getThemeImage("firewall"));
+            firewallStatus.setToolTipText(I18n.tr("FrostWire has detected a firewall"));
         }
     }
 
     /**
      * Updates the image on the flag
      */
-    public void updateLanguage() {
-        _languageButton.updateLanguageFlag();
+    void updateLanguage() {
+        languageButton.updateLanguageFlag();
     }
 
     /**
      * Updates the firewall text.
      */
-    public void updateFirewall() {
+    private void updateFirewall() {
         try {
             BTEngine engine = BTEngine.getInstance();
             updateFirewallLabel(!engine.isFirewalled());
@@ -531,7 +538,7 @@ public final class StatusLine {
     /**
      * Updates the bandwidth statistics.
      */
-    public void updateBandwidth() {
+    private void updateBandwidth() {
         try {
             //  format strings
             String sDown = GUIUtils.rate2speed(GUIMediator.instance().getBTDownloadMediator().getDownloadsBandwidth());
@@ -541,8 +548,8 @@ public final class StatusLine {
             int downloads = GUIMediator.instance().getCurrentDownloads();
             int uploads = GUIMediator.instance().getCurrentUploads();
 
-            _bandwidthUsageDown.setText(downloads + " @ " + sDown);
-            _bandwidthUsageUp.setText(uploads + " @ " + sUp);
+            bandwidthUsageDown.setText(downloads + " @ " + sDown);
+            bandwidthUsageUp.setText(uploads + " @ " + sUp);
         } catch (Throwable ignored) {
         }
     }
@@ -557,15 +564,15 @@ public final class StatusLine {
      */
     void loadFinished() {
         updateCenterPanel();
-        _centerPanel.revalidate();
-        _centerPanel.repaint();
+        centerPanel.revalidate();
+        centerPanel.repaint();
         refresh();
     }
 
     /**
      * Load connection quality theme icons
      */
-    public void updateTheme() {
+    private void updateTheme() {
         _connectionQualityMeterIcons[StatusLine.STATUS_DISCONNECTED] = GUIMediator.getThemeImage("connect_small_0");
         _connectionQualityMeterIcons[StatusLine.STATUS_TURBOCHARGED] = GUIMediator.getThemeImage("connect_small_6");
     }
@@ -573,13 +580,13 @@ public final class StatusLine {
     /**
      * Alters the displayed connection quality.
      */
-    public void setConnectionQuality(int quality) {
+    void setConnectionQuality(int quality) {
         // make sure we don't go over our bounds.
         if (quality >= _connectionQualityMeterIcons.length) {
             quality = _connectionQualityMeterIcons.length - 1;
         }
 
-        _connectionQualityMeter.setIcon(_connectionQualityMeterIcons[quality]);
+        connectionQualityMeter.setIcon(_connectionQualityMeterIcons[quality]);
 
         String status = null;
         String tip = null;
@@ -597,11 +604,11 @@ public final class StatusLine {
         long dhtNodes = BTEngine.getInstance().dhtNodes();
         if (dhtNodes > 0) {
             String updatedToolTip = tip + ". (DHT: " + dhtNodes + " " + I18n.tr("nodes") + ")";
-            _connectionQualityMeter.setToolTipText(updatedToolTip);
+            connectionQualityMeter.setToolTipText(updatedToolTip);
         } else {
-            _connectionQualityMeter.setToolTipText(tip);
+            connectionQualityMeter.setToolTipText(tip);
         }
-        _connectionQualityMeter.setText(status);
+        connectionQualityMeter.setText(status);
     }
 
     /**
@@ -680,24 +687,29 @@ public final class StatusLine {
                 jpm.show(clickedComponent, me.getX(), me.getY());
             } else {
                 // if they click on the speed indicators show them the active transfers.
-                if (clickedComponent == _bandwidthUsageUp || clickedComponent == _bandwidthUsageDown) {
+                if (clickedComponent == bandwidthUsageUp || clickedComponent == bandwidthUsageDown) {
                     final GUIMediator.Tabs transfersTab = GUIMediator.Tabs.TRANSFERS.isEnabled() ?
                             GUIMediator.Tabs.TRANSFERS : GUIMediator.Tabs.SEARCH_TRANSFERS;
                     GUIMediator.instance().setWindow(transfersTab);
                 }
-                if (clickedComponent == bitTorrentDisabledWarningLabel) {
+                if (clickedComponent == noVpnNoBittorrentWarningLabel) {
                     GUIMediator.instance().setOptionsVisible(true, OptionsConstructor.BITTORRENT_ADVANCED_KEY);
                 }
             }
         }
     };
 
+    @Override
+    public void onStatusUpdated(boolean vpnIsOn) {
+        refresh();
+    }
+
     /**
      * Action for the 'Show Connection Quality' menu item.
      */
     private class ShowConnectionQualityAction extends AbstractAction {
 
-        public ShowConnectionQualityAction() {
+        ShowConnectionQualityAction() {
             putValue(Action.NAME, I18n.tr("Show Connection Quality"));
         }
 
@@ -712,7 +724,7 @@ public final class StatusLine {
      */
     private class ShowVPNAction extends AbstractAction {
 
-        public ShowVPNAction() {
+        ShowVPNAction() {
             putValue(Action.NAME, I18n.tr("Show Connection Privacy Status"));
         }
 
@@ -727,7 +739,7 @@ public final class StatusLine {
      */
     private class ShowLanguageStatusAction extends AbstractAction {
 
-        public ShowLanguageStatusAction() {
+        ShowLanguageStatusAction() {
             putValue(Action.NAME, I18n.tr("Show Language Status"));
         }
 
@@ -746,7 +758,7 @@ public final class StatusLine {
      */
     private class ShowFirewallStatusAction extends AbstractAction {
 
-        public ShowFirewallStatusAction() {
+        ShowFirewallStatusAction() {
             putValue(Action.NAME, I18n.tr("Show Firewall Status"));
         }
 
@@ -761,7 +773,7 @@ public final class StatusLine {
      */
     private class ShowBandwidthConsumptionAction extends AbstractAction {
 
-        public ShowBandwidthConsumptionAction() {
+        ShowBandwidthConsumptionAction() {
             putValue(Action.NAME, I18n.tr("Show Bandwidth Consumption"));
         }
 
@@ -773,7 +785,7 @@ public final class StatusLine {
 
     private class ShowDonationButtonsAction extends AbstractAction {
 
-        public ShowDonationButtonsAction() {
+        ShowDonationButtonsAction() {
             putValue(Action.NAME, I18n.tr("Show Donation Buttons"));
         }
 

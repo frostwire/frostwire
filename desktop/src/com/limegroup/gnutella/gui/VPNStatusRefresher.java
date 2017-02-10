@@ -26,12 +26,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class VPNStatusRefresher {
 
-    private final long REFRESH_INTERVAL_IN_MILLIS = 20000;
     private long lastRefresh = 0;
 
     private Set<VPNStatusListener> clients = new HashSet<>();
 
-    private static final ThreadPool pool = new ThreadPool("VPNStatusRefresher", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<Runnable>(), true);
+    private static final ThreadPool pool = new ThreadPool("VPNStatusRefresher", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<>(), true);
 
     private VPNStatusRefresher() {
     }
@@ -45,12 +44,13 @@ public class VPNStatusRefresher {
         return instance;
     }
 
-    public void register(VPNStatusListener registrant){
-        clients.add(registrant);
+    public void addRefreshListener(VPNStatusListener listener){
+        clients.add(listener);
     }
 
     public void refresh() {
         long now = System.currentTimeMillis();
+        long REFRESH_INTERVAL_IN_MILLIS = 20000;
         if (lastRefresh == 0 || (now - lastRefresh >= REFRESH_INTERVAL_IN_MILLIS)) {
             lastRefresh = now;
             Thread vpnStatusCheckerThread = new Thread("VPNStatus-checker") {
@@ -64,7 +64,7 @@ public class VPNStatusRefresher {
                             for (VPNStatusListener client : clients) {
                                 try {
                                     client.onStatusUpdated(isVPNActive);
-                                } catch (Exception e) {//client messed up in some way, but we go on.
+                                } catch (Exception e) { //client messed up in some way, but we go on.
                                     e.printStackTrace();
                                 }
                             }
