@@ -42,19 +42,6 @@
         <item name="android:textColor">@color/basic_blue_darker_highlight</item>
         <item name="android:textStyle">bold</item>
     </style>
-
-    <style name="Theme.FrostWire.NoMaterial" parent="android:Theme.Holo.Light">
-        <item name="android:actionBarStyle">@style/ActionBar</item>
-        <item name="android:homeAsUpIndicator">@drawable/home_as_up_padding</item>
-        <item name="android:actionOverflowButtonStyle">@style/ActionButton.Overflow</item>
-        <item name="android:windowBackground">@color/app_background</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:listViewStyle">@style/TransparentListView</item>
-        <item name="android:expandableListViewStyle">@style/TransparentExpandableListView</item>
-        <item name="android:checkboxStyle">@style/Widget.CompoundButton.CheckBox</item>
-        <item name="android:buttonStyle">@style/Widget.Button</item>
-        <item name="android:textColorPrimary">@color/app_text_primary</item>
-    </style>
     
     <style name="Button" parent="ThemeOverlay.AppCompat.Dark">
         <item name="colorButtonNormal">@color/basic_gray_dark</item>

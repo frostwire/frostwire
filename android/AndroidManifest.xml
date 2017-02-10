@@ -52,7 +52,7 @@
 
     <application android:name="com.frostwire.android.gui.MainApplication"
                  android:allowBackup="true" android:icon="@mipmap/ic_launcher"
-                 android:label="@string/application_label" android:theme="@style/Theme.FrostWire.NoMaterial">
+                 android:label="@string/application_label" android:theme="@style/Theme.FrostWire">
 
         <meta-data android:name="com.google.android.gms.version"
                    android:value="@integer/google_play_services_version"/>
@@ -61,7 +61,6 @@
 
         <activity android:name="com.frostwire.android.gui.activities.MainActivity"
                   android:label="@string/application_label"
-                  android:theme="@style/Theme.FrostWire"
                   android:launchMode="singleTask"
                   android:protectionLevel="dangerous">
             <intent-filter>
@@ -117,26 +116,22 @@
                   android:label="@string/application_label" android:screenOrientation="portrait"
                   android:theme="@style/WizardActivity"/>
         <activity android:name="com.frostwire.android.gui.activities.SettingsActivity"
-                  android:label="@string/activity_preferences_name" android:theme="@style/Theme.FrostWire"/>
+                  android:label="@string/activity_preferences_name" />
         <activity android:name="com.frostwire.android.gui.activities.BuyActivity"
-                  android:label="@string/remove_ads" android:theme="@style/Theme.FrostWire"/>
+                  android:label="@string/remove_ads" />
         <activity android:name="com.frostwire.android.gui.activities.AboutActivity"
-                  android:label="@string/about" android:theme="@style/Theme.FrostWire"/>
+                  android:label="@string/about" />
         <activity android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
-                  android:label="@string/playing" android:theme="@style/Theme.FrostWire"
+                  android:label="@string/playing"
                   android:configChanges="orientation|screenSize"/>
 
         <!-- Main activity -->
-        <activity
-                android:name="com.andrew.apollo.ui.activities.HomeActivity"
-                android:theme="@style/Theme.FrostWire"
+        <activity android:name="com.andrew.apollo.ui.activities.HomeActivity"
                 android:windowSoftInputMode="adjustPan">
         </activity>
         <!-- Now playing -->
-        <activity
-                android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
+        <activity android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
                 android:label="@string/frostwire_player"
-                android:theme="@style/Theme.FrostWire"
                 android:clearTaskOnLaunch="true"
                 android:launchMode="singleTask"
                 android:windowSoftInputMode="adjustPan">
@@ -196,13 +191,10 @@
             </intent-filter>
         </activity>
         <!-- Profile phone Activity -->
-        <activity
-                android:name="com.andrew.apollo.ui.activities.ProfileActivity"
-                android:theme="@style/Theme.FrostWire"
+        <activity android:name="com.andrew.apollo.ui.activities.ProfileActivity"
                 android:excludeFromRecents="true"/>
         <!-- Shortcut launcher Activity -->
-        <activity
-                android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
+        <activity android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
                 android:excludeFromRecents="true"
                 android:theme="@style/Theme.Transparent">
             <intent-filter>
@@ -212,9 +204,7 @@
             </intent-filter>
         </activity>
         <!-- Search interface -->
-        <activity
-                android:name="com.andrew.apollo.ui.activities.SearchActivity"
-                android:theme="@style/Theme.FrostWire"
+        <activity android:name="com.andrew.apollo.ui.activities.SearchActivity"
                 android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
@@ -230,7 +220,6 @@
         <!-- VPN Status -->
         <activity android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
                   android:label="@string/activity_VPN"
-                  android:theme="@style/Theme.FrostWire"
                   android:excludeFromRecents="true"
                   android:noHistory="true"/>
         <!-- InMobi -->
