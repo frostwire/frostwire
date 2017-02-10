@@ -3,6 +3,7 @@ FrostWire 1.8.9 - FEB/10/2017
    connection is not present
  - New privacy enhancing setting to not keep .torrent files when starting torrent transfers
  - Use 3G/4G for Bittorrent setting renamed to "Wi-Fi Only"
+ - Do not show Applovin video ads on exit
  - Applovin update (6.4.2)
  - Android support library update to 25.1.1
  - Upgrades to video preview screen
