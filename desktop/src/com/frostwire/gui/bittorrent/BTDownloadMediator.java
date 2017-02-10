@@ -604,7 +604,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openTorrentFileForSeed(final File torrentFile, final File saveDir) {
-        if(canUseBitTorrent()) {
+        if (VPNBitTorrentGuard.canUseBitTorrent()) {
             GUIMediator.safeInvokeLater(new Runnable() {
                 public void run() {
                     try {
@@ -639,16 +639,8 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         BTDownloadDataLine.SEEDING_COLUMN.setCellEditor(new GenericCellEditor(getSeedingRenderer()));
     }
 
-    private boolean canUseBitTorrent(){
-        if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !VPNs.isVPNActive()) {
-            GUIMediator.showWarning(I18n.tr("VPN is inactive. Current settings require active VPN connection before starting BitTorrent engine. Setup a VPN connection or check advanced settings."));
-            return false;
-        }
-        return true;
-    }
-
     public void openTorrentFile(final File torrentFile, final boolean partialDownload, final Runnable onOpenRunnableForUIThread) {
-        if(canUseBitTorrent()) {
+        if (VPNBitTorrentGuard.canUseBitTorrent()) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     try {
