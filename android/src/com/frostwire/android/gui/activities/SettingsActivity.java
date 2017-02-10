@@ -127,7 +127,7 @@ public final class SettingsActivity extends AbstractActivity
         Fragment f = Fragment.instantiate(this, fragmentName, args);
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        transaction.replace(R.id.activity_settings_content, f);
+        transaction.replace(R.id.activity_settings_content, f, fragmentName);
         transaction.commitAllowingStateLoss();
 
         if (title != null) {

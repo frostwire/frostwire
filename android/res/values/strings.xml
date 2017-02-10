@@ -480,8 +480,12 @@
     <string name="drawer_close">Close navigation drawer</string>
     <string name="please_check_connection_status_before_resuming_download">Please check the status of your internet connection before resuming.</string>
     <string name="donate_in_btc">Donate in bitcoins</string>
+    <string name="data_saving_turn_off_transfers">No Wi-fi available, all transfers have been stopped</string>
+    <string name="data_saving_kill_http_warning">This will stop all unfinished transfers in progress</string>
+    <string name="data_saving_kill_http_warning_title">Warning: Http transfers in progress</string>
     <string name="torrent_transfer_enqueued_on_mobile_data">The torrent transfer will start downloading automatically when you connect to a Wi-Fi network.(Check your Network Settings regarding 3G/4G data usage)</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Torrent transfers will not start until you connect to a Wi-Fi network.(Check your Network Settings regarding 3G/4G data usage)</string>
+    <string name="cloud_download_aborted_on_mobile_data">Current setting prevents downloading when not on Wi-Fi network</string>
     <string name="torrent_transfer_consuming_mobile_data">Warning: This torrent transfer is using your 3G/4G data. (Check your Network Settings if you wish to use BitTorrent only on WiFi)</string>
     <string name="add_transfer_label">Paste a magnet or torrent URL</string>
     <string name="please_enter_valid_url">Please enter a valid URL</string>

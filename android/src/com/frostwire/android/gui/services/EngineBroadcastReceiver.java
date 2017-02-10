@@ -127,7 +127,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
 
         if (NetworkManager.instance().isDataUp()) {
 
-            boolean useTorrentsOnMobileData = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
+            boolean useTorrentsOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
 
             // "Boolean Master", just for fun.
             // Let a <= "mobile up",

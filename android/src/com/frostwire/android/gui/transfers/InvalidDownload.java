@@ -34,6 +34,16 @@ import com.frostwire.transfers.TransferState;
  */
 public class InvalidDownload implements Transfer, InvalidTransfer {
 
+    private final int reasonResId;
+
+    public InvalidDownload(int reasonResId) {
+        this.reasonResId = reasonResId;
+    }
+
+    public InvalidDownload(){
+        this.reasonResId = R.string.download_type_not_supported;
+    }
+
     @Override
     public String getDisplayName() {
         return null;
@@ -101,7 +111,7 @@ public class InvalidDownload implements Transfer, InvalidTransfer {
 
     @Override
     public int getReasonResId() {
-        return R.string.download_type_not_supported;
+        return reasonResId;
     }
 
     @Override

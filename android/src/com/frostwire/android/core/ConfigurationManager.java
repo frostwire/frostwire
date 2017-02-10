@@ -23,11 +23,14 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
+
 import com.frostwire.util.Hex;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -38,6 +41,12 @@ import java.util.Map.Entry;
  * @author aldenml
  */
 public class ConfigurationManager {
+    /**
+     * @deprecated left for migration purposes, see {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY }
+     */
+    @Deprecated
+    private static final String PREF_KEY_NETWORK_USE_MOBILE_DATA = "frostwire.prefs.network.use_mobile_data";
+
     private final SharedPreferences preferences;
     private final Editor editor;
 
@@ -62,12 +71,29 @@ public class ConfigurationManager {
     private ConfigurationManager(Application context) {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = preferences.edit();
-
         defaults = new ConfigurationDefaults();
         initPreferences();
+        migrateWifiOnlyPreference();
     }
 
+    /**
+     * If the deprecated {@link #PREF_KEY_NETWORK_USE_MOBILE_DATA} is found
+     * it gets migrated to the new {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY and then deleted.
+     */
+    private void migrateWifiOnlyPreference() {
+        if (!preferences.contains(PREF_KEY_NETWORK_USE_MOBILE_DATA)) {
+            return;
+        }
+        setBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, !getBoolean(PREF_KEY_NETWORK_USE_MOBILE_DATA));
+        removePreference(PREF_KEY_NETWORK_USE_MOBILE_DATA);
+    }
 
+    private void removePreference(String key) {
+        try {
+            editor.remove(key);
+            editor.commit();
+        } catch (Throwable ignore) {}
+    }
 
     public String getString(String key) {
         return preferences.getString(key, null);
@@ -293,4 +319,5 @@ public class ConfigurationManager {
             }
         }
     }
+
 }
