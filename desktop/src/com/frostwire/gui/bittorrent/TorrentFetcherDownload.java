@@ -241,15 +241,13 @@ public class TorrentFetcherDownload implements BTDownload {
     }
 
     private void downloadTorrent(final byte[] data, final List<TcpEndpoint> peers) {
-        if (relativePath != null) {
+        if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !VPNs.isVPNActive()) {
+            GUIMediator.showWarning(I18n.tr("VPN is inactive. Current settings require active VPN connection before starting BitTorrent engine. Setup a VPN connection or check advanced settings."));
+        } else if (relativePath != null) {
             try {
                 TorrentInfo ti = TorrentInfo.bdecode(data);
                 boolean[] selection = calculateSelection(ti, relativePath);
-                if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !VPNs.isVPNActive()) {
-                    GUIMediator.showWarning(I18n.tr("VPN is inactive. Current settings require active VPN connection before starting BitTorrent engine. Setup a VPN connection or check advanced settings."));
-                } else {
-                    BTEngine.getInstance().download(ti, null, selection, peers);
-                }
+                BTEngine.getInstance().download(ti, null, selection, peers);
             } catch (Throwable e) {
                 LOG.error("Error downloading torrent", e);
             }
@@ -269,11 +267,7 @@ public class TorrentFetcherDownload implements BTDownload {
                             }
                         }
                         TorrentInfo ti = TorrentInfo.bdecode(data);
-                        if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !VPNs.isVPNActive()) {
-                            GUIMediator.showWarning(I18n.tr("VPN is inactive. Current settings require active VPN connection before starting BitTorrent engine. Setup a VPN connection or check advanced settings."));
-                        } else {
-                            BTEngine.getInstance().download(ti, null, selection, peers);
-                        }
+                        BTEngine.getInstance().download(ti, null, selection, peers);
                         GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
                     } catch (Throwable e) {
                         LOG.error("Error downloading torrent", e);

@@ -62,7 +62,11 @@ public class VPNStatusRefresher {
                         @Override
                         public void run() {
                             for (VPNStatusListener client : clients) {
-                                client.onStatusUpdated(isVPNActive);
+                                try {
+                                    client.onStatusUpdated(isVPNActive);
+                                } catch (Exception e) {//client messed up in some way, but we go on.
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     });

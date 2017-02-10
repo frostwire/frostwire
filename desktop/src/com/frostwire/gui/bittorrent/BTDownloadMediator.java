@@ -604,26 +604,24 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openTorrentFileForSeed(final File torrentFile, final File saveDir) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                try {
-                    if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !VPNs.isVPNActive()) {
-                        GUIMediator.showWarning(I18n.tr("VPN is inactive. Current settings require active VPN connection before starting BitTorrent engine. Setup a VPN connection or check advanced settings."));
-                    } else {
+        if(canUseBitTorrent()) {
+            GUIMediator.safeInvokeLater(new Runnable() {
+                public void run() {
+                    try {
                         BTEngine.getInstance().download(torrentFile, saveDir, null);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        if (!e.toString().contains("No files selected by user")) {
+                            // could not read torrent file or bad torrent file.
+                            GUIMediator.showError(
+                                    I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
+                                            torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
+                        }
                     }
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    if (!e.toString().contains("No files selected by user")) {
-                        // could not read torrent file or bad torrent file.
-                        GUIMediator.showError(
-                                I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
-                                        torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
-                    }
-                }
 
-            }
-        });
+                }
+            });
+        }
     }
 
     @Override
@@ -641,57 +639,63 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         BTDownloadDataLine.SEEDING_COLUMN.setCellEditor(new GenericCellEditor(getSeedingRenderer()));
     }
 
+    private boolean canUseBitTorrent(){
+        if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !VPNs.isVPNActive()) {
+            GUIMediator.showWarning(I18n.tr("VPN is inactive. Current settings require active VPN connection before starting BitTorrent engine. Setup a VPN connection or check advanced settings."));
+            return false;
+        }
+        return true;
+    }
+
     public void openTorrentFile(final File torrentFile, final boolean partialDownload, final Runnable onOpenRunnableForUIThread) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    boolean[] filesSelection = null;
+        if(canUseBitTorrent()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        boolean[] filesSelection = null;
 
-                    if (partialDownload) {
-                        PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), torrentFile);
-                        dlg.setVisible(true);
-                        filesSelection = dlg.getFilesSelection();
-                        if (filesSelection == null) {
-                            return;
+                        if (partialDownload) {
+                            PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), torrentFile);
+                            dlg.setVisible(true);
+                            filesSelection = dlg.getFilesSelection();
+                            if (filesSelection == null) {
+                                return;
+                            }
                         }
-                    }
 
-                    if (onOpenRunnableForUIThread != null) {
-                        onOpenRunnableForUIThread.run();
-                    }
+                        if (onOpenRunnableForUIThread != null) {
+                            onOpenRunnableForUIThread.run();
+                        }
 
-                    File saveDir = null;
+                        File saveDir = null;
 
-                    // Check if there's a file named like the torrent in the same folder
-                    // then that means the user wants to seed
-                    String seedDataFilename = FilenameUtils.removeExtension(torrentFile.getName());
+                        // Check if there's a file named like the torrent in the same folder
+                        // then that means the user wants to seed
+                        String seedDataFilename = FilenameUtils.removeExtension(torrentFile.getName());
 
-                    File seedDataFile = new File(torrentFile.getParentFile(), seedDataFilename);
-                    if (seedDataFile.exists()) {
-                        saveDir = torrentFile.getParentFile();
-                    }
+                        File seedDataFile = new File(torrentFile.getParentFile(), seedDataFilename);
+                        if (seedDataFile.exists()) {
+                            saveDir = torrentFile.getParentFile();
+                        }
 
-                    if (saveDir == null) {
-                        if (ConnectionSettings.MANDATORY_VPN_FOR_BITTORRENT.getValue() && !VPNs.isVPNActive()) {
-                            GUIMediator.showWarning(I18n.tr("VPN is inactive. Current settings require active VPN connection before starting BitTorrent engine. Setup a VPN connection or check advanced settings."));
-                        } else {
+                        if (saveDir == null) {
                             BTEngine.getInstance().download(torrentFile, null, filesSelection);
+                        } else {
+                            GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
                         }
-                    } else {
-                        GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
-                    }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    if (!e.toString().contains("No files selected by user")) {
-                        // could not read torrent file or bad torrent file.
-                        GUIMediator.showError(
-                                I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
-                                        torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (!e.toString().contains("No files selected by user")) {
+                            // could not read torrent file or bad torrent file.
+                            GUIMediator.showError(
+                                    I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
+                                            torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     }
 
     public void openTorrentSearchResult(final TorrentSearchResult sr, final boolean partialDownload) {
