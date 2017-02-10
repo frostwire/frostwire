@@ -182,54 +182,44 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             // Action bar title
             setTitle(mArtistName);
 
-        } else
-            // Set up the album profile
-            if (isAlbum()) {
-                // Add the carousel images
-                mTabCarousel.setAlbumProfileHeader(this, mProfileName, mArtistName);
-                // Album profile fragments
-                mPagerAdapter.add(AlbumSongFragment.class, mArguments);
-                // Action bar title = album name
-                setTitle(mProfileName);
-                // Action bar subtitle = year released
-                setSubtitle(mArguments.getString(Config.ALBUM_YEAR));
-            } else
-                // Set up the favorites profile
-                if (isFavorites()) {
-                    // Add the carousel images
-                    mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
-                    // Favorite fragment
-                    mPagerAdapter.add(FavoriteFragment.class, null);
-                    // Action bar title = Favorites
-                    setTitle(mProfileName);
-                } else
-                    // Set up the last added profile
-                    if (isLastAdded()) {
-                        // Add the carousel images
-                        mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
-                        // Last added fragment
-                        mPagerAdapter.add(LastAddedFragment.class, null);
-                        // Action bar title = Last added
-                        setTitle(mProfileName);
-                    } else
-                        // Set up the user playlist profile
-                        if (isPlaylist()) {
-                            // Add the carousel images
-                            mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
-                            // Playlist profile fragments
-                            mPagerAdapter.add(PlaylistSongFragment.class, mArguments);
-                            // Action bar title = playlist name
-                            setTitle(mProfileName);
-                        } else
-                            // Set up the genre profile
-                            if (isGenre()) {
-                                // Add the carousel images
-                                mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
-                                // Genre profile fragments
-                                mPagerAdapter.add(GenreSongFragment.class, mArguments);
-                                // Action bar title = playlist name
-                                setTitle(mProfileName);
-                            }
+        } else if (isAlbum()) { // Set up the album profile
+            // Add the carousel images
+            mTabCarousel.setAlbumProfileHeader(this, mProfileName, mArtistName);
+            // Album profile fragments
+            mPagerAdapter.add(AlbumSongFragment.class, mArguments);
+            // Action bar title = album name
+            setTitle(mProfileName);
+            // Action bar subtitle = year released
+            setSubtitle(mArguments.getString(Config.ALBUM_YEAR));
+        } else if (isFavorites()) { // Set up the favorites profile
+            // Add the carousel images
+            mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
+            // Favorite fragment
+            mPagerAdapter.add(FavoriteFragment.class, null);
+            // Action bar title = Favorites
+            setTitle(mProfileName);
+        } else if (isLastAdded()) { // Set up the last added profile
+            // Add the carousel images
+            mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
+            // Last added fragment
+            mPagerAdapter.add(LastAddedFragment.class, null);
+            // Action bar title = Last added
+            setTitle(mProfileName);
+        } else if (isPlaylist()) { // Set up the user playlist profile
+            // Add the carousel images
+            mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
+            // Playlist profile fragments
+            mPagerAdapter.add(PlaylistSongFragment.class, mArguments);
+            // Action bar title = playlist name
+            setTitle(mProfileName);
+        } else if (isGenre()) { // Set up the genre profile
+            // Add the carousel images
+            mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
+            // Genre profile fragments
+            mPagerAdapter.add(GenreSongFragment.class, mArguments);
+            // Action bar title = playlist name
+            setTitle(mProfileName);
+        }
 
         // Initialize the ViewPager
         mViewPager = (ViewPager) findViewById(R.id.activity_profile_base_pager);
