@@ -560,7 +560,10 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
     }
 
     private void setSubtitle(String s) {
-        TextView subtitle = findView(R.id.view_toolbar_header_subtitle);
-        subtitle.setText("\"" + s + "\"");
+        if (!TextUtils.isEmpty(s)) {
+            TextView subtitle = findView(R.id.view_toolbar_header_subtitle);
+            subtitle.setVisibility(View.VISIBLE);
+            subtitle.setText("\"" + s + "\"");
+        }
     }
 }

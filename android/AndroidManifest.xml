@@ -130,6 +130,7 @@
         <!-- Main activity -->
         <activity
                 android:name="com.andrew.apollo.ui.activities.HomeActivity"
+                android:theme="@style/Theme.FrostWire"
                 android:windowSoftInputMode="adjustPan">
         </activity>
         <!-- Now playing -->
@@ -198,6 +199,7 @@
         <!-- Profile phone Activity -->
         <activity
                 android:name="com.andrew.apollo.ui.activities.ProfileActivity"
+                android:theme="@style/Theme.FrostWire"
                 android:excludeFromRecents="true"/>
         <!-- Shortcut launcher Activity -->
         <activity

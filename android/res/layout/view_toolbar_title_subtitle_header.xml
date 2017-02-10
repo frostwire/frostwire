@@ -42,5 +42,6 @@
         android:maxLines="1"
         android:text="@string/dummy_subtitle"
         android:textColor="@color/basic_white"
-        android:textSize="@dimen/text_size_small" />
+        android:textSize="@dimen/text_size_small"
+        android:visibility="gone" />
 </LinearLayout>

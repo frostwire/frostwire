@@ -168,18 +168,6 @@ public class ThemeUtils {
     }
 
     /**
-     * Sets the {@link MenuItem} icon for the search action.
-     *
-     * @param context The {@link Context} to use.
-     * @param search  The Menu used to find the "menu_search" action.
-     */
-    public void setSearchIcon(final Menu search) {
-        final MenuItem searchAction = search.findItem(R.id.menu_search);
-        final String searchIconId = "ic_action_search";
-        setMenuItemColor(searchAction, "search_action", searchIconId);
-    }
-
-    /**
      * Sets the {@link MenuItem} icon for the add to Home screen action.
      *
      * @param context The {@link Context} to use.

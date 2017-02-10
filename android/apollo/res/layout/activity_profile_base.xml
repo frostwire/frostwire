@@ -14,9 +14,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<com.andrew.apollo.widgets.theme.ThemeableFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="@drawable/pager_background"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_main" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -51,4 +55,4 @@
         <include layout="@layout/bottom_action_bar" />
     </LinearLayout>
 
-</com.andrew.apollo.widgets.theme.ThemeableFrameLayout>
+</LinearLayout>

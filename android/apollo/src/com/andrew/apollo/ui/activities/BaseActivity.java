@@ -20,13 +20,15 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.IApolloService;
@@ -44,6 +46,7 @@ import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
+import com.frostwire.android.gui.views.AbstractActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -58,7 +61,7 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public abstract class BaseActivity extends FragmentActivity
+public abstract class BaseActivity extends AbstractActivity
         implements ServiceConnection {
     /**
      * Play state and meta change listener
@@ -105,10 +108,21 @@ public abstract class BaseActivity extends FragmentActivity
      */
     private PlaybackStatus mPlaybackStatus;
 
-    /**
-     * Theme resources
-     */
-    protected ThemeUtils mResources;
+
+    public BaseActivity(int layoutResId) {
+        super(layoutResId);
+    }
+
+    @Override
+    protected void initToolbar(Toolbar toolbar) {
+        View v = LayoutInflater.from(this).
+                inflate(R.layout.view_toolbar_title_subtitle_header, toolbar, false);
+        setToolbarView(v);
+
+        TextView title = findView(R.id.view_toolbar_header_title);
+        // R.string.app_name is actually "My Music" (from original apollo code)
+        title.setText(R.string.app_name);
+    }
 
     /**
      * {@inheritDoc}
@@ -116,21 +130,12 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Initialize the theme resources
-        mResources = new ThemeUtils(this);
-        // Set the overflow style
-        mResources.setOverflowStyle(this);
-        // Fade it in
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         // Bind Apollo's service
         mToken = MusicUtils.bindToService(this, this);
         // Initialize the broadcast receiver
         mPlaybackStatus = new PlaybackStatus(this);
-        prepareActionBar();
-        // Set the layout
-        setContentView(setContentView());
         // Initialize the bottom action bar
         initBottomActionBar();
     }
@@ -145,26 +150,6 @@ public abstract class BaseActivity extends FragmentActivity
         }
 
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void prepareActionBar() {
-        final ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            mResources.themeActionBar(actionBar, getString(R.string.app_name));
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setIcon(R.color.transparent);
-            actionBar.setDisplayShowTitleEnabled(false);
-        }
-
-        TextView actionBarTitleTextView = (TextView) findViewById(R.id.action_bar_title);
-        actionBarTitleTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getBackHome();
-            }
-        });
     }
 
     /**
@@ -195,13 +180,9 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
-        getMenuInflater().inflate(R.menu.search, menu);
-        // Settings
-        getMenuInflater().inflate(R.menu.activity_base, menu);
-        // Theme the search icon
-        mResources.setSearchIcon(menu);
+        getMenuInflater().inflate(R.menu.apollo_menu_search, menu);
 
-        final SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        final SearchView searchView = (SearchView) menu.findItem(R.id.apollo_menu_item_search).getActionView();
         // Add voice search
         final SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
         final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
@@ -510,11 +491,6 @@ public abstract class BaseActivity extends FragmentActivity
             finish();
         }
     }
-
-    /**
-     * @return The resource ID to be inflated.
-     */
-    public abstract int setContentView();
 
     private class StopAndHideBottomActionBarListener extends StopListener {
 

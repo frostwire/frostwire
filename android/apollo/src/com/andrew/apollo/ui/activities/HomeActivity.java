@@ -24,6 +24,11 @@ import com.frostwire.android.R;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class HomeActivity extends BaseActivity {
+
+    public HomeActivity() {
+        super(R.layout.activity_base);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -36,13 +41,5 @@ public class HomeActivity extends BaseActivity {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.activity_base_content, new MusicBrowserPhoneFragment()).commit();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int setContentView() {
-        return R.layout.activity_base;
     }
 }

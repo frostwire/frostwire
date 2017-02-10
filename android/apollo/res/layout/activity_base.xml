@@ -19,11 +19,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <com.andrew.apollo.widgets.theme.ThemeableFrameLayout
+    <include layout="@layout/toolbar_main" />
+
+    <FrameLayout
         android:id="@+id/activity_base_content"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:background="@drawable/pager_background" />
 
     <include layout="@layout/bottom_action_bar"/>
 

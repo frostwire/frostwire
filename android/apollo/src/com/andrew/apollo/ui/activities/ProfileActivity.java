@@ -25,10 +25,13 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.TextView;
+
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
@@ -99,6 +102,10 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
 
     private PreferenceUtils mPreferences;
 
+    public ProfileActivity() {
+        super(R.layout.activity_profile_base);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -163,7 +170,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
             mPagerAdapter.add(ArtistSongFragment.class, mArguments);
             mPagerAdapter.add(ArtistAlbumFragment.class, mArguments);
             // Action bar title
-            mResources.setTitle(mArtistName);
+            setTitle(mArtistName);
 
         } else
         // Set up the album profile
@@ -173,9 +180,9 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
             // Album profile fragments
             mPagerAdapter.add(AlbumSongFragment.class, mArguments);
             // Action bar title = album name
-            mResources.setTitle(mProfileName);
+            setTitle(mProfileName);
             // Action bar subtitle = year released
-            mResources.setSubtitle(mArguments.getString(Config.ALBUM_YEAR));
+            setSubtitle(mArguments.getString(Config.ALBUM_YEAR));
         } else
         // Set up the favorites profile
         if (isFavorites()) {
@@ -184,7 +191,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
             // Favorite fragment
             mPagerAdapter.add(FavoriteFragment.class, null);
             // Action bar title = Favorites
-            mResources.setTitle(mProfileName);
+            setTitle(mProfileName);
         } else
         // Set up the last added profile
         if (isLastAdded()) {
@@ -193,7 +200,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
             // Last added fragment
             mPagerAdapter.add(LastAddedFragment.class, null);
             // Action bar title = Last added
-            mResources.setTitle(mProfileName);
+            setTitle(mProfileName);
         } else
         // Set up the user playlist profile
         if (isPlaylist()) {
@@ -202,7 +209,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
             // Playlist profile fragments
             mPagerAdapter.add(PlaylistSongFragment.class, mArguments);
             // Action bar title = playlist name
-            mResources.setTitle(mProfileName);
+            setTitle(mProfileName);
         } else
         // Set up the genre profile
         if (isGenre()) {
@@ -211,7 +218,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
             // Genre profile fragments
             mPagerAdapter.add(GenreSongFragment.class, mArguments);
             // Action bar title = playlist name
-            mResources.setTitle(mProfileName);
+            setTitle(mProfileName);
         }
 
         // Initialize the ViewPager
@@ -239,18 +246,7 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
      * {@inheritDoc}
      */
     @Override
-    public int setContentView() {
-        return R.layout.activity_profile_base;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        // Theme the add to home screen icon
-        mResources.setAddToHomeScreenIcon(menu);
-
         if (isEmptyPlaylist()) {
             menu.removeItem(R.id.menu_shuffle);
         } else {
@@ -757,5 +753,20 @@ public class ProfileActivity extends BaseActivity implements OnPageChangeListene
 
     private AlbumSongFragment getAlbumSongFragment() {
         return (AlbumSongFragment) mPagerAdapter.getFragment(0);
+    }
+
+    private void setTitle(String s) {
+        if (!TextUtils.isEmpty(s)) {
+            TextView subtitle = findView(R.id.view_toolbar_header_subtitle);
+            subtitle.setText(s);
+        }
+    }
+
+    private void setSubtitle(String s) {
+        if (!TextUtils.isEmpty(s)) {
+            TextView subtitle = findView(R.id.view_toolbar_header_subtitle);
+            subtitle.setVisibility(View.VISIBLE);
+            subtitle.setText(s);
+        }
     }
 }

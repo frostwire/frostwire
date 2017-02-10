@@ -363,8 +363,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
         getMenuInflater().inflate(R.menu.shuffle, menu);
         // Share, ringtone, and equalizer
         getMenuInflater().inflate(R.menu.audio_player, menu);
-        // Settings
-        getMenuInflater().inflate(R.menu.activity_base, menu);
         return true;
     }
 
