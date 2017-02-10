@@ -1,7 +1,8 @@
-FrostWire 1.8.9 - FEB/08/2017
+FrostWire 1.8.9 - FEB/10/2017
  - New privacy enhancing setting to automatically disable all bittorrent activity if a VPN
    connection is not present
  - New privacy enhancing setting to not keep .torrent files when starting torrent transfers
+ - Use 3G/4G for Bittorrent setting renamed to "Wi-Fi Only"
  - Applovin update (6.4.2)
  - Android support library update to 25.1.1
  - Upgrades to video preview screen
