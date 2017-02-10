@@ -95,13 +95,17 @@ class AppLovinAdNetwork extends AbstractAdNetwork {
             interstitialAdapter.shutdownAppAfter(shutdownAfterwards);
             interstitialAdapter.dismissActivityAfterwards(dismissAfterward);
             try {
-                result = interstitialAdapter.isAdReadyToDisplay() && interstitialAdapter.show(activity, placement);
+                result = interstitialAdapter.isAdReadyToDisplay() &&
+
+                        // do not show applovin interstitials on exit
+                        (!shutdownAfterwards || !interstitialAdapter.isVideoAd())  &&
+
+                        interstitialAdapter.show(activity, placement);
             } catch (Throwable e) {
                 e.printStackTrace();
                 result = false;
             }
         }
-
         return result;
     }
 }
