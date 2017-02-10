@@ -125,6 +125,7 @@
         <item name="android:indeterminateDrawable">
             @drawable/progress_indeterminate_horizontal_holo
         </item>
+        <item name="android:background">@color/basic_blue</item>
         <item name="android:minHeight">16dip</item>
         <item name="android:maxHeight">16dip</item>
     </style>
