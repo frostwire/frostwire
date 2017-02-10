@@ -18,8 +18,8 @@
 package com.frostwire.android.gui.fragments.preference;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
@@ -33,9 +33,11 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.activities.BuyActivity;
+import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference.KitKatStoragePreferenceDialog;
@@ -52,12 +54,13 @@ import java.util.Collection;
  * @author gubatron
  * @author aldenml
  */
-public final class ApplicationFragment extends AbstractPreferenceFragment {
+public final class ApplicationFragment extends AbstractPreferenceFragment implements AbstractDialog.OnDialogClickListener {
 
     private static final Logger LOG = Logger.getLogger(ApplicationFragment.class);
 
     private static final boolean INTERNAL_BUILD = false;
     private static final int MILLISECONDS_IN_A_DAY = 86400000;
+    private static final String CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG = "ApplicationFragment.DIALOG.stop.http";
 
     // TODO: refactor this
     // due to the separation of fragments and activities
@@ -84,13 +87,15 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
                 boolean newVal = (Boolean) newValue;
                 if (newVal && !NetworkManager.instance().isDataWIFIUp()) {
                     if (TransferManager.instance().isHttpDownloadInProgress()) {
-                        UIUtils.showYesNoDialog(getActivity(), R.string.data_saving_kill_http_warning, R.string.data_saving_kill_http_warning_title, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                turnOffTransfers();
-                                setChecked((TwoStatePreference) preference, true, false);
-                            }
-                        });
+                        YesNoDialog dlg = YesNoDialog.newInstance(
+                                CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG,
+                                R.string.data_saving_kill_http_warning_title,
+                                R.string.data_saving_kill_http_warning,
+                                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK
+                        );
+                        dlg.setTargetFragment(ApplicationFragment.this, 0);
+                        dlg.show(getFragmentManager(), CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG);
+
                         return false;
                     }
                     turnOffTransfers();
@@ -98,6 +103,15 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
                 return true;
             }
         });
+    }
+
+
+    @Override
+    public void onDialogClick(String tag, int which) {
+        if (CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG.equals(tag) && Dialog.BUTTON_POSITIVE == which) {
+            turnOffTransfers();
+            setChecked((TwoStatePreference) findPreference(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY), true, false);
+        }
     }
 
     private void turnOffTransfers() {
@@ -274,6 +288,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment {
         p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
         p.setOnPreferenceClickListener(new RemoveAdsOnPreferenceClickListener(getActivity(), purchasedProducts));
     }
+
 
     private static final class RemoveAdsOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
 
