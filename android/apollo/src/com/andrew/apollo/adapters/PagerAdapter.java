@@ -13,9 +13,8 @@ package com.andrew.apollo.adapters;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.app.Fragment;
+import android.support.v13.app.FragmentPagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 import com.andrew.apollo.ui.fragments.*;
@@ -36,7 +35,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     private final List<Holder> mHolderList = Lists.newArrayList();
 
-    private final FragmentActivity mFragmentActivity;
+    private final Activity mFragmentActivity;
 
     /**
      * Constructor of <code>PagerAdapter<code>
@@ -44,8 +43,8 @@ public class PagerAdapter extends FragmentPagerAdapter {
      * @param fragmentActivity The {@link Activity} of the
      *                         {@link Fragment}.
      */
-    public PagerAdapter(final FragmentActivity fragmentActivity) {
-        super(fragmentActivity.getSupportFragmentManager());
+    public PagerAdapter(final Activity fragmentActivity) {
+        super(fragmentActivity.getFragmentManager());
         mFragmentActivity = fragmentActivity;
     }
 

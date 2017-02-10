@@ -16,13 +16,14 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.util.Logger;
 
 import java.util.List;
@@ -138,8 +139,7 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
      * This way we can invoke that fragment's refresh() method when we need it, keeping
      * all the on Ok logic here and not forcing ApolloFragment to implement OnDialogClick
      * and having to handle each possible's dialog click with a bunch of conditions. */
-    private void lookForPlaylistFragment() {
-        final List<Fragment> fragments = getFragmentManager().getFragments();
+    private void lookForPlaylistFragment(List<Fragment> fragments) {
         if (fragments != null && !fragments.isEmpty()) {
             for (Fragment f : fragments) {
                 if (f instanceof PlaylistFragment) {
@@ -153,6 +153,8 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        lookForPlaylistFragment();
+        if (activity instanceof AbstractActivity) {
+            lookForPlaylistFragment(((AbstractActivity) activity).getFragments());
+        }
     }
 }

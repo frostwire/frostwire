@@ -17,8 +17,8 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.Loader;
+import android.app.Activity;
+import android.content.Loader;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -193,7 +193,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
     }
 
     private void deleteSelectedPlaylist(long playlistId) {
-        FragmentActivity activity = getActivity();
+        Activity activity = getActivity();
         if (activity != null && activity.getContentResolver() != null) {
             int deleted = MusicUtils.deletePlaylist(activity, playlistId);
             if (deleted > 0) {

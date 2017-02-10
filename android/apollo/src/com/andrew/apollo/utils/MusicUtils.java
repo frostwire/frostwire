@@ -149,7 +149,7 @@ public final class MusicUtils {
         }
     }
 
-    public static int deletePlaylist(FragmentActivity activity, long playlistId) {
+    public static int deletePlaylist(Activity activity, long playlistId) {
         if (activity.getContentResolver() == null) {
             return 0;
         }

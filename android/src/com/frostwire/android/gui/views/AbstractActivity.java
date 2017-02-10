@@ -79,7 +79,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
         return paused;
     }
 
-    List<Fragment> getFragments() {
+    public final List<Fragment> getFragments() {
         List<Fragment> result = new LinkedList<>();
 
         FragmentManager fm = getFragmentManager();

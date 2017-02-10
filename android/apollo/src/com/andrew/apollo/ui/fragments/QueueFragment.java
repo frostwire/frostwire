@@ -12,7 +12,7 @@
 package com.andrew.apollo.ui.fragments;
 
 import android.os.Bundle;
-import android.support.v4.content.Loader;
+import android.content.Loader;
 import android.view.*;
 import android.widget.AdapterView;
 import com.andrew.apollo.adapters.SongAdapter;

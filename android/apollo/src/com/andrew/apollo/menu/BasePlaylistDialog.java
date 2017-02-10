@@ -16,7 +16,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -66,7 +66,7 @@ abstract class BasePlaylistDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         mPlaylistDialog = new AlertDialog.Builder(getActivity()).create();
-        LayoutInflater inflater = LayoutInflater.from(getContext());
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
         View view = inflater.inflate(R.layout.dialog_default_input, null);
         mPlaylistDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         mPlaylistDialog.setView(view);

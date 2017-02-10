@@ -12,7 +12,7 @@
 package com.andrew.apollo.ui.fragments.profile;
 
 import android.os.Bundle;
-import android.support.v4.content.Loader;
+import android.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

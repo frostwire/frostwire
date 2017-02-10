@@ -13,8 +13,8 @@ package com.andrew.apollo.ui.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.Loader;
+import android.app.Fragment;
+import android.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 import com.andrew.apollo.adapters.ArtistAdapter;

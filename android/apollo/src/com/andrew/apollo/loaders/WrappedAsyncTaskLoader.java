@@ -2,7 +2,7 @@
 package com.andrew.apollo.loaders;
 
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
+import android.content.AsyncTaskLoader;
 
 /**
  * <a href="http://code.google.com/p/android/issues/detail?id=14944">Issue

@@ -14,7 +14,7 @@ package com.andrew.apollo.menu;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -90,7 +90,7 @@ public class DeleteDialog extends DialogFragment {
         mFetcher = ApolloUtils.getImageFetcher(getActivity());
 
         final AlertDialog.Builder apolloDeleteFilesDialog = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = LayoutInflater.from(getContext());
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
         final View inflator = inflater.inflate(R.layout.dialog_default, null);
         apolloDeleteFilesDialog.setView(inflator);
 

@@ -21,9 +21,9 @@ package com.andrew.apollo.ui.fragments.profile;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
+import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.Loader;
 import android.view.*;
 import android.widget.*;
 import com.andrew.apollo.MusicStateListener;
@@ -284,7 +284,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 case FragmentMenuItems.DELETE:
                     return onDelete(songList);
                 case FragmentMenuItems.MORE_BY_ARTIST:
-                    long artistId = MusicUtils.getIdForArtist(getContext(), mArtistName);
+                    long artistId = MusicUtils.getIdForArtist(getActivity(), mArtistName);
                     long[] tracks = MusicUtils.getSongListForArtist(getActivity(), artistId);
                     NavUtils.openArtistProfile(getActivity(), mArtistName, tracks);
                     return true;

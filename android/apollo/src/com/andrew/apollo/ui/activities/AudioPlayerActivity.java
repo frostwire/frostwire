@@ -404,7 +404,7 @@ public class AudioPlayerActivity extends AbstractActivity implements
                 // Delete current song
                 DeleteDialog.newInstance(MusicUtils.getTrackName(), new long[]{
                         MusicUtils.getCurrentAudioId()
-                }, null).show(getSupportFragmentManager(), "DeleteDialog");
+                }, null).show(getFragmentManager(), "DeleteDialog");
                 return true;
             case R.id.menu_audio_player_add_to_playlist:
                 AddToPlaylistMenuAction menuAction = new AddToPlaylistMenuAction(this, new long[]{

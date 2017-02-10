@@ -14,7 +14,7 @@ package com.andrew.apollo.ui.fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
+import android.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 import com.andrew.apollo.adapters.AlbumAdapter;
