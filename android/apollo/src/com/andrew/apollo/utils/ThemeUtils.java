@@ -1,29 +1,29 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.utils;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.*;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
+
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 
@@ -45,11 +45,6 @@ public class ThemeUtils {
     private final int mCurrentThemeColor;
 
     /**
-     * Custom action bar layout
-     */
-    private final View mActionBarLayout;
-
-    /**
      * The theme resources.
      */
     private Resources mResources;
@@ -64,8 +59,6 @@ public class ThemeUtils {
         mResources = context.getResources();
         // Get the current theme color
         mCurrentThemeColor = PreferenceUtils.getInstance(context).getDefaultThemeColor(context);
-        // Inflate the custom layout
-        mActionBarLayout = LayoutInflater.from(context).inflate(R.layout.action_bar, null);
     }
 
     /**
@@ -111,128 +104,13 @@ public class ThemeUtils {
     }
 
     /**
-     * Sets the correct overflow icon in the action bar depending on whether or
-     * not the current action bar color is dark or light.
-     *
-     * @param app The {@link Activity} used to set the theme.
-     */
-    public void setOverflowStyle(final Activity app) {
-        app.setTheme(R.style.Apollo_Theme_Dark);
-    }
-
-    /**
-     * This is used to set the color of a {@link MenuItem}. For instance, when
-     * the current song is a favorite, the favorite icon will use the current
-     * theme color.
-     *
-     * @param menuItem             The {@link MenuItem} to set.
-     * @param resourceColorName    The color theme resource key.
-     * @param resourceDrawableName The drawable theme resource key.
-     */
-    public void setMenuItemColor(final MenuItem menuItem, final String resourceColorName,
-                                 final String resourceDrawableName) {
-
-        final Drawable maskDrawable = getDrawable(resourceDrawableName);
-        if (!(maskDrawable instanceof BitmapDrawable)) {
-            return;
-        }
-
-        final Bitmap maskBitmap = ((BitmapDrawable) maskDrawable).getBitmap();
-        final int width = maskBitmap.getWidth();
-        final int height = maskBitmap.getHeight();
-
-        final Bitmap outBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        final Canvas canvas = new Canvas(outBitmap);
-        canvas.drawBitmap(maskBitmap, 0, 0, null);
-
-        final Paint maskedPaint = new Paint();
-        maskedPaint.setColor(getColor(resourceColorName));
-        maskedPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-
-        canvas.drawRect(0, 0, width, height, maskedPaint);
-
-        final BitmapDrawable outDrawable = new BitmapDrawable(mResources, outBitmap);
-        menuItem.setIcon(outDrawable);
-    }
-
-    /**
      * Sets the {@link MenuItem} icon for the favorites action.
      *
-     * @param context  The {@link Context} to use.
      * @param favorite The favorites action.
      */
     public static void setFavoriteIcon(final Menu favorite) {
         final MenuItem item = favorite.findItem(R.id.menu_favorite);
         item.setIcon(MusicUtils.isFavorite() ?
                 R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
-    }
-
-    /**
-     * Sets the {@link MenuItem} icon for the add to Home screen action.
-     *
-     * @param context The {@link Context} to use.
-     * @param search  The Menu used to find the "add_to_homescreen" item.
-     */
-    public void setAddToHomeScreenIcon(final Menu search) {
-        final MenuItem pinnAction = search.findItem(R.id.menu_add_to_homescreen);
-        final String pinnIconId = "ic_action_pinn_to_home";
-        setMenuItemColor(pinnAction, "pinn_to_action", pinnIconId);
-    }
-
-    /**
-     * Builds a custom layout and applies it to the action bar, then themes the
-     * background, title, and subtitle.
-     *
-     * @param actionBar The {@link ActionBar} to use.
-     * @param resources The {@link ThemeUtils} used to theme the background,
-     *                  title, and subtitle.
-     * @param title     The title for the action bar
-     * @param subtitle  The subtitle for the action bar.
-     */
-    public void themeActionBar(final ActionBar actionBar, final String title) {
-        // Set the custom layout
-        actionBar.setCustomView(mActionBarLayout);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
-
-        // Theme the action bar background
-        actionBar.setBackgroundDrawable(getDrawable("action_bar"));
-
-        // Theme the title
-        setTitle(title);
-    }
-
-    /**
-     * Themes the action bar subtitle
-     *
-     * @param subtitle The subtitle to use
-     */
-    public void setTitle(final String title) {
-        if (!TextUtils.isEmpty(title)) {
-            // Get the title text view
-            final TextView actionBarTitle = (TextView) mActionBarLayout
-                    .findViewById(R.id.action_bar_title);
-            // Theme the title
-            actionBarTitle.setTextColor(getColor("action_bar_title"));
-            // Set the title
-            actionBarTitle.setText(title);
-        }
-    }
-
-    /**
-     * Themes the action bar subtitle
-     *
-     * @param subtitle The subtitle to use
-     */
-    public void setSubtitle(final String subtitle) {
-        if (!TextUtils.isEmpty(subtitle)) {
-            final TextView actionBarSubtitle = (TextView) mActionBarLayout
-                    .findViewById(R.id.action_bar_subtitle);
-            actionBarSubtitle.setVisibility(View.VISIBLE);
-            // Theme the subtitle
-            actionBarSubtitle.setTextColor(getColor("action_bar_subtitle"));
-            // Set the subtitle
-            actionBarSubtitle.setText(subtitle);
-        }
     }
 }

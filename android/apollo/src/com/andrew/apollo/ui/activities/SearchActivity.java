@@ -74,7 +74,7 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class SearchActivity extends AbstractActivity implements LoaderCallbacks<Cursor>,
+public final class SearchActivity extends AbstractActivity implements LoaderCallbacks<Cursor>,
         OnScrollListener, OnQueryTextListener, OnItemClickListener, ServiceConnection {
     /**
      * Grid view column count. ONE - list, TWO - normal grid
@@ -159,9 +159,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         getLoaderManager().initLoader(0, null, this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
@@ -172,9 +169,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         getLoaderManager().restartLoader(0, null, this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
@@ -191,27 +185,18 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         return super.onCreateOptionsMenu(menu);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onStart() {
         super.onStart();
         MusicUtils.notifyForegroundStateChanged(this, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onStop() {
         super.onStop();
         MusicUtils.notifyForegroundStateChanged(this, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -222,9 +207,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
         final Uri uri = Uri.parse("content://media/external/audio/search/fancy/"
@@ -236,9 +218,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         return new CursorLoader(this, uri, projection, null, null, null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
         if (data == null || data.isClosed() || data.getCount() <= 0) {
@@ -253,9 +232,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         mAdapter.swapCursor(data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onLoaderReset(final Loader<Cursor> loader) {
         // This is called when the last Cursor provided to onLoadFinished()
@@ -264,9 +240,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         mAdapter.swapCursor(null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onScrollStateChanged(final AbsListView view, final int scrollState) {
         // Pause disk cache access to ensure smoother scrolling
@@ -279,9 +252,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean onQueryTextSubmit(final String query) {
         if (TextUtils.isEmpty(query)) {
@@ -302,9 +272,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean onQueryTextChange(final String newText) {
         if (TextUtils.isEmpty(newText)) {
@@ -320,9 +287,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
                             final long id) {
@@ -361,17 +325,11 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         finish();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
         musicPlaybackService = IApolloService.Stub.asInterface(service);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onServiceDisconnected(final ComponentName name) {
         musicPlaybackService = null;
@@ -415,9 +373,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
             mHighlighter = new PrefixHighlighter(context);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void bindView(final View convertView, final Context context, final Cursor cursor) {
             /* Recycle ViewHolder's items */
@@ -503,26 +458,17 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
             return ((Activity) context).getLayoutInflater().inflate(
                     R.layout.list_item_detailed_no_background, parent, false);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean hasStableIds() {
             return true;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public int getViewTypeCount() {
             return VIEW_TYPE_COUNT;
@@ -550,9 +496,6 @@ public class SearchActivity extends AbstractActivity implements LoaderCallbacks<
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onScroll(final AbsListView view, final int firstVisibleItem,
                          final int visibleItemCount, final int totalItemCount) {
