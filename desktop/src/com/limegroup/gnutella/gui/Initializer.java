@@ -136,10 +136,7 @@ public final class Initializer {
     }
 
     private boolean canStartBitTorrentWithCurrentVPNSettingsAndStatus() {
-        if (ConnectionSettings.VPN_BITTORRENT_GUARD_ON.getValue()) {
-            return VPNs.isVPNActive();
-        }
-        return true;
+        return !ConnectionSettings.VPN_BITTORRENT_GUARD_ON.getValue() || VPNs.isVPNActive();
     }
 
     /**
