@@ -17,9 +17,12 @@
  * limitations under the License.
  */
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
-          package="com.frostwire.android" android:installLocation="auto"
-          android:versionCode="340" android:versionName="1.8.9">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.frostwire.android"
+    android:installLocation="auto"
+    android:versionCode="340"
+    android:versionName="1.8.9">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9050xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9010xyz" (don't commit like this) -->
@@ -27,255 +30,298 @@
     <!-- Basic version example for 1.7.2 build 242  -> 9010242 -->
     <!-- Don't go nuts, max version number will be: 2,147,483,647 -->
 
-    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="25"/>
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="25" />
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
-    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
-    <uses-permission android:name="android.permission.GET_TASKS"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
-    <uses-permission android:name="com.android.vending.BILLING"/>
-    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="com.android.vending.BILLING" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
-    <application android:name="com.frostwire.android.gui.MainApplication"
-                 android:allowBackup="true" android:icon="@mipmap/ic_launcher"
-                 android:label="@string/application_label" android:theme="@style/Theme.FrostWire">
+    <application
+        android:name="com.frostwire.android.gui.MainApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/application_label"
+        android:theme="@style/Theme.FrostWire">
 
-        <meta-data android:name="com.google.android.gms.version"
-                   android:value="@integer/google_play_services_version"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <!-- activities -->
 
-        <activity android:name="com.frostwire.android.gui.activities.MainActivity"
-                  android:label="@string/application_label"
-                  android:launchMode="singleTask"
-                  android:protectionLevel="dangerous">
+        <activity
+            android:name="com.frostwire.android.gui.activities.MainActivity"
+            android:label="@string/application_label"
+            android:launchMode="singleTask"
+            android:protectionLevel="dangerous">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <action android:name="android.intent.action.MUSIC_PLAYER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MUSIC_PLAYER" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-                <category android:name="android.intent.category.APP_MUSIC"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_MUSIC" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
             <!-- handle .torrent urls, files and magnets -->
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="magnet"/>
-                <data android:host="*"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="magnet" />
+                <data android:host="*" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:mimeType="application/x-bittorrent"/>
-                <data android:scheme="http"/>
-                <data android:scheme="https"/>
-                <data android:scheme="file"/>
-                <data android:scheme="content"/>
-                <data android:host="*"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:mimeType="application/x-bittorrent" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:host="*" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:mimeType="*/*"/>
-                <data android:scheme="http"/>
-                <data android:scheme="https"/>
-                <data android:scheme="file"/>
-                <data android:scheme="content"/>
-                <data android:host="*"/>
-                <data android:pathPattern=".*\\.torrent"/>
-                <data android:pathPattern=".*\\..*\\.torrent"/>
-                <data android:pathPattern=".*\\..*\\..*\\.torrent"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.torrent"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.torrent"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:mimeType="*/*" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.torrent" />
+                <data android:pathPattern=".*\\..*\\.torrent" />
+                <data android:pathPattern=".*\\..*\\..*\\.torrent" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.torrent" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.torrent" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
             </intent-filter>
         </activity>
-        <activity android:name="com.frostwire.android.gui.activities.WizardActivity"
-                  android:label="@string/application_label" android:screenOrientation="portrait"
-                  android:theme="@style/WizardActivity"/>
-        <activity android:name="com.frostwire.android.gui.activities.SettingsActivity"
-                  android:label="@string/activity_preferences_name" />
-        <activity android:name="com.frostwire.android.gui.activities.BuyActivity"
-                  android:label="@string/remove_ads" />
-        <activity android:name="com.frostwire.android.gui.activities.AboutActivity"
-                  android:label="@string/about" />
-        <activity android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
-                  android:label="@string/playing"
-                  android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name="com.frostwire.android.gui.activities.WizardActivity"
+            android:label="@string/application_label"
+            android:screenOrientation="portrait"
+            android:theme="@style/WizardActivity" />
+        <activity
+            android:name="com.frostwire.android.gui.activities.SettingsActivity"
+            android:label="@string/activity_preferences_name" />
+        <activity
+            android:name="com.frostwire.android.gui.activities.BuyActivity"
+            android:label="@string/remove_ads" />
+        <activity
+            android:name="com.frostwire.android.gui.activities.AboutActivity"
+            android:label="@string/about" />
+        <activity
+            android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/playing" />
 
         <!-- Main activity -->
-        <activity android:name="com.andrew.apollo.ui.activities.HomeActivity"
-                android:windowSoftInputMode="adjustPan">
-        </activity>
+        <activity
+            android:name="com.andrew.apollo.ui.activities.HomeActivity"
+            android:windowSoftInputMode="adjustPan"></activity>
         <!-- Now playing -->
-        <activity android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
-                android:label="@string/frostwire_player"
-                android:clearTaskOnLaunch="true"
-                android:launchMode="singleTask"
-                android:windowSoftInputMode="adjustPan">
+        <activity
+            android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
+            android:clearTaskOnLaunch="true"
+            android:label="@string/frostwire_player"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="content"/>
-                <data android:mimeType="audio/*"/>
-                <data android:mimeType="application/ogg"/>
-                <data android:mimeType="application/x-ogg"/>
-                <data android:mimeType="application/itunes"/>
+                <data android:scheme="content" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="application/ogg" />
+                <data android:mimeType="application/x-ogg" />
+                <data android:mimeType="application/itunes" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="file"/>
-                <data android:mimeType="audio/*"/>
-                <data android:mimeType="application/ogg"/>
-                <data android:mimeType="application/x-ogg"/>
-                <data android:mimeType="application/itunes"/>
+                <data android:scheme="file" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="application/ogg" />
+                <data android:mimeType="application/x-ogg" />
+                <data android:mimeType="application/itunes" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="http"/>
-                <data android:mimeType="audio/*"/>
-                <data android:mimeType="application/ogg"/>
-                <data android:mimeType="application/x-ogg"/>
-                <data android:mimeType="application/itunes"/>
+                <data android:scheme="http" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="application/ogg" />
+                <data android:mimeType="application/x-ogg" />
+                <data android:mimeType="application/itunes" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:mimeType="vnd.android.cursor.dir/playlist"/>
-                <data android:mimeType="vnd.android.cursor.dir/albums"/>
-                <data android:mimeType="vnd.android.cursor.dir/artists"/>
+                <data android:mimeType="vnd.android.cursor.dir/playlist" />
+                <data android:mimeType="vnd.android.cursor.dir/albums" />
+                <data android:mimeType="vnd.android.cursor.dir/artists" />
             </intent-filter>
             <intent-filter>
-                <action android:name="com.frostwire.android.AUDIO_PLAYER"/>
+                <action android:name="com.frostwire.android.AUDIO_PLAYER" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.PICK"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.OPENABLE"/>
-                <data android:mimeType="vnd.android.cursor.dir/audio"/>
+                <action android:name="android.intent.action.PICK" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="vnd.android.cursor.dir/audio" />
             </intent-filter>
         </activity>
         <!-- Profile phone Activity -->
-        <activity android:name="com.andrew.apollo.ui.activities.ProfileActivity"
-                android:excludeFromRecents="true"/>
+        <activity
+            android:name="com.andrew.apollo.ui.activities.ProfileActivity"
+            android:excludeFromRecents="true" />
         <!-- Shortcut launcher Activity -->
-        <activity android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
-                android:excludeFromRecents="true"
-                android:theme="@style/Theme.Transparent">
+        <activity
+            android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.Transparent">
             <intent-filter>
-                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH"/>
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <!-- Search interface -->
-        <activity android:name="com.andrew.apollo.ui.activities.SearchActivity"
-                android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity">
+        <activity
+            android:name="com.andrew.apollo.ui.activities.SearchActivity"
+            android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity">
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-                <action android:name="android.intent.action.MEDIA_SEARCH"/>
+                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.MEDIA_SEARCH" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
             <meta-data
-                    android:name="android.app.searchable"
-                    android:resource="@xml/searchable"/>
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
         <!-- VPN Status -->
-        <activity android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
-                  android:label="@string/activity_VPN"
-                  android:excludeFromRecents="true"
-                  android:noHistory="true"/>
+        <activity
+            android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
+            android:excludeFromRecents="true"
+            android:label="@string/activity_VPN"
+            android:noHistory="true" />
         <!-- InMobi -->
-        <activity android:name="com.inmobi.rendering.InMobiAdActivity"
-                  android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
-                  android:theme="@android:style/Theme.Translucent.NoTitleBar"
-                  android:hardwareAccelerated="true"
-                  tools:ignore="UnusedAttribute"/>
+        <activity
+            android:name="com.inmobi.rendering.InMobiAdActivity"
+            android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            tools:ignore="UnusedAttribute" />
         <!-- when we get to Android N (API level 24) add -> android:resizeableActivity="false" -->
 
         <receiver
-                android:name="com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver"
-                android:enabled="true"
-                android:exported="true">
+            android:name="com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER"/>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-                <action android:name="com.inmobi.share.id"/>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="com.inmobi.share.id" />
             </intent-filter>
         </receiver>
 
         <!-- end of InMobi -->
 
         <!-- AppLovin -->
-        <meta-data android:name="applovin.sdk.key"
-                   android:value="PDAf5nX3UvzDFSGe52hI1kez_GTHC4GcIQGOCpRghOuyr9axCGDD_sB-6kFJpWw5yBU8_wphJhd8rD32UHGT8R"/>
+        <meta-data
+            android:name="applovin.sdk.key"
+            android:value="PDAf5nX3UvzDFSGe52hI1kez_GTHC4GcIQGOCpRghOuyr9axCGDD_sB-6kFJpWw5yBU8_wphJhd8rD32UHGT8R" />
 
-        <activity android:name="com.applovin.adview.AppLovinInterstitialActivity" android:configChanges="orientation|screenSize"/>
-        <activity android:name="com.applovin.adview.AppLovinConfirmationActivity"/>
-        <meta-data android:name="applovin.sdk.verbose_logging" android:value="false"/>
+        <activity
+            android:name="com.applovin.adview.AppLovinInterstitialActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity android:name="com.applovin.adview.AppLovinConfirmationActivity" />
+
+        <meta-data
+            android:name="applovin.sdk.verbose_logging"
+            android:value="false" />
         <!-- end of AppLovin -->
 
         <!-- Mopub -->
-        <activity android:name="com.mopub.mobileads.MoPubActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
-        <activity android:name="com.mopub.mobileads.MraidActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
-        <activity android:name="com.mopub.common.MoPubBrowser" android:configChanges="keyboardHidden|orientation|screenSize"/>
-        <activity android:name="com.mopub.mobileads.MraidVideoPlayerActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <activity
+            android:name="com.mopub.mobileads.MoPubActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="com.mopub.mobileads.MraidActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="com.mopub.common.MoPubBrowser"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
         <!-- EOMopub -->
 
         <!-- services -->
 
-        <service android:name="com.frostwire.android.gui.services.EngineService"
-                 android:exported="false"/>
-        <service android:name="com.andrew.apollo.MusicPlaybackService"
-                 android:protectionLevel="dangerous"/>
+        <service
+            android:name="com.frostwire.android.gui.services.EngineService"
+            android:exported="false" />
+        <service
+            android:name="com.andrew.apollo.MusicPlaybackService"
+            android:protectionLevel="dangerous" />
 
         <receiver android:name="com.frostwire.android.gui.services.EngineBroadcastReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
         <receiver android:name="com.andrew.apollo.MediaButtonIntentReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON"/>
-                <action android:name="android.media.AUDIO_BECOMING_NOISY"/>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
             </intent-filter>
         </receiver>
     </application>
