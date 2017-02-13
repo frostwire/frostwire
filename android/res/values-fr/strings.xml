@@ -505,7 +505,7 @@
     <string name="error_wrong_signature">Erreur: signature erroné</string>
     <string name="vpn_found">VPN trouvé. Connexion cryptée.</string>
     <string name="error_no_space_left_on_device">Erreur: Pas d\'espace laissé pour enregistrer le fichier</string>
-    <string name="are_you_sure_delete_playlist">Etes-vous sûr de vouloir supprimer la liste d\'écoute %s </string>
+    <string name="are_you_sure_delete_playlist">Etes-vous sûr de vouloir supprimer la liste d\'écoute %s</string>
     <string name="storage_picker_treeuri_null">Aucun chemin de stockage a été sélectionné</string>
     <string name="help_translate_frostwire">Aide traduire FrostWire</string>
     <string name="best_value">Meilleure valeur</string>

@@ -438,7 +438,7 @@
     <string name="error_wrong_signature">त्रुटि: गलत हस्ताक्षर</string>
     <string name="vpn_found">वीपीएन पाया। कनेक्शन एन्क्रिप्ट।</string>
     <string name="error_no_space_left_on_device">त्रुटि: कोई स्थान नहीं फाइल को बचाने के लिए छोड़ दिया</string>
-    <string name="are_you_sure_delete_playlist">क्या आप वाकई प्लेलिस्ट को मिटाना चाहते हैं %s </string>
+    <string name="are_you_sure_delete_playlist">क्या आप वाकई प्लेलिस्ट को मिटाना चाहते हैं %s</string>
     <string name="storage_picker_treeuri_null">कोई भंडारण पथ चुना गया था</string>
     <string name="now_playing">अभी खेल रहे है</string>
     <string name="use_soundcloud">उपयोग Soundcloud.com</string>

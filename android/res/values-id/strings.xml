@@ -441,7 +441,7 @@
     <string name="error_wrong_signature">Kesalahan: Salah tanda tangan</string>
     <string name="vpn_found">VPN ditemukan. Koneksi terenkripsi.</string>
     <string name="error_no_space_left_on_device">Kesalahan: Tidak ada ruang yang tersisa untuk menyimpan file</string>
-    <string name="are_you_sure_delete_playlist">Apakah Anda yakin ingin menghapus daftar main  %s</string>
+    <string name="are_you_sure_delete_playlist">Apakah Anda yakin ingin menghapus daftar main %s</string>
     <string name="storage_picker_treeuri_null">Tidak ada jalan penyimpanan terpilih</string>
     <string name="now_playing">Sedang dimainkan</string>
     <string name="use_soundcloud">Gunakan Soundcloud.com</string>

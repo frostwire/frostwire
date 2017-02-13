@@ -475,7 +475,7 @@
     <string name="error_wrong_signature">خطأ: توقيع خاطئة</string>
     <string name="vpn_found">VPN تم العثور عليها. تشفير الاتصال.</string>
     <string name="error_no_space_left_on_device">خطأ: لا توجد مساحة متبقية لحفظ الملف</string>
-    <string name="are_you_sure_delete_playlist">هل أنت متأكد أنك تريد حذف قائمة التشغيل s% الصورة</string>
+    <string name="are_you_sure_delete_playlist">هل أنت متأكد أنك تريد حذف قائمة التشغيل %s الصورة</string>
     <string name="storage_picker_treeuri_null">لم يتم اختيار مسار التخزين</string>
     <string name="now_playing">الآن اللعب</string>
     <string name="help_translate_frostwire">المساعدة في ترجمة برنامج FrostWire</string>

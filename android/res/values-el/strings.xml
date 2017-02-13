@@ -509,7 +509,7 @@
     <string name="error_wrong_signature">Σφάλμα: Λάθος υπογραφή</string>
     <string name="vpn_found">VPN που βρέθηκαν. Σύνδεση κρυπτογραφημένα.</string>
     <string name="error_no_space_left_on_device">Σφάλμα: Δεν υπάρχει χώρος για να αποθηκεύσετε το αρχείο</string>
-    <string name="are_you_sure_delete_playlist">Είστε σίγουροι ότι θέλετε να διαγράψετε τη λίστα αναπαραγωγής %s </string>
+    <string name="are_you_sure_delete_playlist">Είστε σίγουροι ότι θέλετε να διαγράψετε τη λίστα αναπαραγωγής %s</string>
     <string name="storage_picker_treeuri_null">Δεν έχει επιλεγεί διαδρομή αποθήκευσης</string>
     <string name="best_value">Η καλύτερη αξία</string>
     <string name="enable_dht_summary">Χρησιμοποιήστε το Distributed Hash Πίνακας θέση να ανακοινώσει/αναζήτηση συνομηλίκους torrent</string>

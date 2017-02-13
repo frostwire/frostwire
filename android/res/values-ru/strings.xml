@@ -544,7 +544,7 @@
     <string name="i_have_read_and_agree_to_the">Я прочитал и согласен с</string>
     <string name="scanning">Отделка - Сканирование</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">В соответствии с вашими настройками я не могу начать раздачу, если вы не на Wi-Fi. Файл будет готов к высева автоматически, когда вы вернетесь к Интернету включен сеть Wi-Fi.</string>
-    <string name="are_you_sure_delete_playlist">Вы уверены, что хотите удалить список воспроизведения %s </string>
+    <string name="are_you_sure_delete_playlist">Вы уверены, что хотите удалить список воспроизведения %s</string>
     <string name="storage_picker_treeuri_null">Ни один путь хранения не был выбран</string>
     <string name="best_value">Лучшее значение</string>
     <string name="btc">BTC</string>

@@ -559,7 +559,7 @@
     <string name="i_have_read_and_agree_to_the">私は読んで同意する</string>
     <string name="scanning">仕上げ - スキャン</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">あなたの設定によると、Wi-Fiを使用していない限り、私は播種を開始できません。 このファイルは、インターネット対応のWi-Fiネットワークに戻ったときに自動的にシードできる状態になります。</string>
-    <string name="are_you_sure_delete_playlist"> %s プレイリストを削除してもよろしいですか？</string>
+    <string name="are_you_sure_delete_playlist">%s プレイリストを削除してもよろしいですか？</string>
     <string name="best_value">お買い得</string>
     <string name="vpn_client_feature_2">無制限のダウンロード速度</string>
     <string name="delete_files">ファイルを削除する</string>

@@ -317,7 +317,7 @@
     <string name="vpn_found">VPN پایا. کنکشن مرموز کردہ.</string>
     <string name="error_no_space_left_on_device">خرابی: کوئی خلا فائل کو بچانے کے لئے چھوڑ دیا</string>
     <string name="sharing_preferences">ترتیبات کا اشتراک</string>
-    <string name="are_you_sure_delete_playlist">کیا آپ واقعی s% پلے لسٹ حذف کرنا چاہتے ہیں</string>
+    <string name="are_you_sure_delete_playlist">کیا آپ واقعی %s پلے لسٹ حذف کرنا چاہتے ہیں</string>
     <string name="storage_picker_treeuri_null">کوئی سٹوریج پاتھ منتخب کیا گیا</string>
     <string name="now_playing">ابھی چل رہا ہے</string>
     <string name="use_soundcloud">استعمال Soundcloud.com</string>

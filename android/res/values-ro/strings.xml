@@ -262,7 +262,7 @@
     <string name="vpn_found">VPN găsite. Conexiune criptate.</string>
     <string name="error_no_space_left_on_device">Eroare: Nu există spațiu la stânga pentru a salva fișierul</string>
     <string name="sharing_preferences">Setări de partajare</string>
-    <string name="are_you_sure_delete_playlist">Sunteți sigur că doriți să ștergeți lista de redare Shakira %s</string>
+    <string name="are_you_sure_delete_playlist">Sunteți sigur că doriți să ștergeți lista de redare %s</string>
     <string name="storage_picker_treeuri_null">Nici o cale de stocare a fost selectat</string>
     <string name="peer_http_download_status_waiting">Aşteptare</string>
     <string name="now_playing">Acum redarea</string>

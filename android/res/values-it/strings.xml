@@ -448,7 +448,7 @@
     <string name="error_wrong_signature">Errore: firma errata</string>
     <string name="vpn_found">VPN trovato. Connessione crittografata.</string>
     <string name="error_no_space_left_on_device">Errore: Nessuno spazio a sinistra per salvare il file</string>
-    <string name="are_you_sure_delete_playlist">Sei sicuro di voler eliminare il elenco di riproduzione %s </string>
+    <string name="are_you_sure_delete_playlist">Sei sicuro di voler eliminare il elenco di riproduzione %s</string>
     <string name="storage_picker_treeuri_null">Nessun percorso di archiviazione è stato selezionato</string>
     <string name="now_playing">Ora sta giocando</string>
     <string name="use_soundcloud">Utilizzare Soundcloud.com</string>

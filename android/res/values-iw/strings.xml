@@ -269,7 +269,7 @@
     <string name="vpn_found">VPN נמצא. חיבור מוצפן.</string>
     <string name="error_no_space_left_on_device">שגיאה: לא נשאר מקום כדי לשמור את הקובץ</string>
     <string name="sharing_preferences">הגדרות שיתוף</string>
-    <string name="are_you_sure_delete_playlist">האם אתה בטוח שאתה רוצה למחוק את רשימת ההשמעה s%</string>
+    <string name="are_you_sure_delete_playlist">האם אתה בטוח שאתה רוצה למחוק את רשימת ההשמעה %s</string>
     <string name="storage_picker_treeuri_null">לא קיים נתיב אחסון נבחרה</string>
     <string name="peer_http_download_status_waiting">הַמתָנָה</string>
     <string name="now_playing">עכשיו משחק</string>
