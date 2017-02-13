@@ -58,11 +58,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private final VPNStatusButton vpnStatusButton;
 
     /**
-     * Shows when bittorrent is disabled due to VPN settings
-     */
-    private final VPNBitTorrentDisabledWarningLabel noVpnNoBittorrentWarningLabel;
-
-    /**
      * The button for the current language flag to allow language switching
      */
     private LanguageButton languageButton;
@@ -130,11 +125,9 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         createConnectionQualityPanel();
 
         // VPN status
-        vpnStatusButton = new VPNStatusButton();
-        noVpnNoBittorrentWarningLabel = createVPNDisconnectLabel();
+        vpnStatusButton = new VPNStatusButton(this);
         vpnStatusRefresher = VPNStatusRefresher.getInstance();
         vpnStatusRefresher.addRefreshListener(vpnStatusButton);
-        vpnStatusRefresher.addRefreshListener(noVpnNoBittorrentWarningLabel);
         vpnStatusRefresher.addRefreshListener(this);
 
         //  make the 'Language' button
@@ -279,10 +272,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
             vpnStatusRefresher.refresh(); // async call
 
-            if (noVpnNoBittorrentWarningLabel.shouldBeShown()) {
-                remainingWidth = addStatusIndicator(noVpnNoBittorrentWarningLabel, sepWidth, remainingWidth, gbc);
-            }
-
             if (StatusBarSettings.VPN_DISPLAY_ENABLED.getValue()) {
                 remainingWidth = addStatusIndicator(vpnStatusButton, sepWidth, remainingWidth, gbc);
             }
@@ -385,17 +374,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         connectionQualityMeter.setMaximumSize(new Dimension(90, 30));
         //   add right-click listener
         connectionQualityMeter.addMouseListener(STATUS_BAR_LISTENER);
-    }
-
-    /**
-     * Sets up the bittorrent connection disabled due to vpn settings info
-     */
-    private VPNBitTorrentDisabledWarningLabel createVPNDisconnectLabel() {
-        VPNBitTorrentDisabledWarningLabel bitTorrentDisabledWarning = new VPNBitTorrentDisabledWarningLabel();
-        bitTorrentDisabledWarning.setText("<html><b>"+I18n.tr("VPN Off: BitTorrent disabled")+"</b></html>");
-        bitTorrentDisabledWarning.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
-        bitTorrentDisabledWarning.addMouseListener(STATUS_BAR_LISTENER);
-        return bitTorrentDisabledWarning;
     }
 
     /**
@@ -691,9 +669,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
                     final GUIMediator.Tabs transfersTab = GUIMediator.Tabs.TRANSFERS.isEnabled() ?
                             GUIMediator.Tabs.TRANSFERS : GUIMediator.Tabs.SEARCH_TRANSFERS;
                     GUIMediator.instance().setWindow(transfersTab);
-                }
-                if (clickedComponent == noVpnNoBittorrentWarningLabel) {
-                    VPNDropGuard.canUseBitTorrent(true);
                 }
             }
         }

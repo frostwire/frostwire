@@ -35,16 +35,20 @@ import static com.limegroup.gnutella.gui.I18n.tr;
 public class VPNDropGuard {
 
     public static boolean canUseBitTorrent(boolean showExplanationDialog) {
+        return canUseBitTorrent(showExplanationDialog, null);
+    }
+
+    public static boolean canUseBitTorrent(boolean showExplanationDialog, Runnable uiCallback) {
         if (ConnectionSettings.VPN_DROP_PROTECTION.getValue() && !VPNs.isVPNActive()) {
             if (showExplanationDialog) {
-                showExplanationDialog();
+                showExplanationDialog(uiCallback);
             }
             return false;
         }
         return true;
     }
 
-    private static void showExplanationDialog() {
+    private static void showExplanationDialog(final Runnable uiCallback) {
         GUIMediator.safeInvokeLater(new Runnable() {
             @Override
             public void run() {
@@ -88,6 +92,12 @@ public class VPNDropGuard {
                         dialog.dispose();
                         ConnectionSettings.VPN_DROP_PROTECTION.setValue(false);
                         MessageService.instance().showMessage(tr("VPN-Drop protection disabled. Restarting BitTorrent engine."));
+                        if (uiCallback != null) {
+                            try {
+                                uiCallback.run();
+                            } catch (Throwable ignored) {
+                            }
+                        }
                         BackgroundExecutorService.schedule(new Runnable() {
                             @Override
                             public void run() {
