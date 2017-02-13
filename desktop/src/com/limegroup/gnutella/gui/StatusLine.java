@@ -693,7 +693,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
                     GUIMediator.instance().setWindow(transfersTab);
                 }
                 if (clickedComponent == noVpnNoBittorrentWarningLabel) {
-                    GUIMediator.instance().setOptionsVisible(true, OptionsConstructor.BITTORRENT_ADVANCED_KEY);
+                    VPNDropGuard.canUseBitTorrent(true);
                 }
             }
         }

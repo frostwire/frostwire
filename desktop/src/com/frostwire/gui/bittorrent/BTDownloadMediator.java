@@ -607,7 +607,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openTorrentFileForSeed(final File torrentFile, final File saveDir) {
-        if (VPNBitTorrentGuard.canUseBitTorrent()) {
+        if (VPNDropGuard.canUseBitTorrent()) {
             GUIMediator.safeInvokeLater(new Runnable() {
                 public void run() {
                     try {
@@ -643,7 +643,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openTorrentFile(final File torrentFile, final boolean partialDownload, final Runnable onOpenRunnableForUIThread) {
-        if (VPNBitTorrentGuard.canUseBitTorrent()) {
+        if (VPNDropGuard.canUseBitTorrent()) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     try {

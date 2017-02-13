@@ -35,7 +35,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.UserAgentGenerator;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.VPNBitTorrentGuard;
+import com.limegroup.gnutella.gui.VPNDropGuard;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -239,7 +239,7 @@ public class TorrentFetcherDownload implements BTDownload {
     }
 
     private void downloadTorrent(final byte[] data, final List<TcpEndpoint> peers) {
-        if (VPNBitTorrentGuard.canUseBitTorrent()) {
+        if (VPNDropGuard.canUseBitTorrent()) {
             if (relativePath != null) {
                 try {
                     TorrentInfo ti = TorrentInfo.bdecode(data);

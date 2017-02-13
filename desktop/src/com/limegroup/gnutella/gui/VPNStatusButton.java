@@ -30,7 +30,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public final class VPNStatusButton extends IconButton implements VPNStatusRefresher.VPNStatusListener {
 
-    private final String VPN_URL = "http://www.frostwire.com/vpn";
+    static final String VPN_URL = "http://www.frostwire.com/vpn";
 
     VPNStatusButton() {
         super("vpn_off");

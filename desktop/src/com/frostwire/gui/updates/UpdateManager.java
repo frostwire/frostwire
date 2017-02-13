@@ -17,9 +17,7 @@ package com.frostwire.gui.updates;
 
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.VPNBitTorrentGuard;
-import com.limegroup.gnutella.gui.VPNs;
-import com.limegroup.gnutella.settings.ConnectionSettings;
+import com.limegroup.gnutella.gui.VPNDropGuard;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.OSUtils;
@@ -213,16 +211,16 @@ public final class UpdateManager implements Serializable {
 
             // Logic for Windows or Mac Update
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
-                if ((hasUrl && !hasTorrent && !hasInstallerUrl) || hasUrl && !VPNBitTorrentGuard.canUseBitTorrent(true)) {
+                if ((hasUrl && !hasTorrent && !hasInstallerUrl) || hasUrl && !VPNDropGuard.canUseBitTorrent(false)) {
                     showUpdateMessage(updateMessage);
-                } else if ((hasTorrent || hasInstallerUrl) && VPNBitTorrentGuard.canUseBitTorrent(true)) {
+                } else if ((hasTorrent || hasInstallerUrl) && VPNDropGuard.canUseBitTorrent(false)) {
                     new InstallerUpdater(updateMessage, force).start();
                 }
             }
             // Logic for Linux
             else if (OSUtils.isLinux()) {
                 if (OSUtils.isUbuntu()) {
-                    if ((hasTorrent || hasInstallerUrl) && VPNBitTorrentGuard.canUseBitTorrent(true)) {
+                    if ((hasTorrent || hasInstallerUrl) && VPNDropGuard.canUseBitTorrent(false)) {
                         new InstallerUpdater(updateMessage, force).start();
                     } else {
                         showUpdateMessage(updateMessage);
@@ -251,7 +249,7 @@ public final class UpdateManager implements Serializable {
 
         String[] options = new String[3];
 
-        if (msg.getTorrent() != null && VPNBitTorrentGuard.canUseBitTorrent(true)) {
+        if (msg.getTorrent() != null && VPNDropGuard.canUseBitTorrent(false)) {
             options[OPTION_DOWNLOAD_TORRENT] = I18n.tr("Download Torrent");
         } else {
             options = new String[2];

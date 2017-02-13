@@ -27,19 +27,19 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
 
     public final static String TITLE = I18n.tr("BitTorrent Connection Settings");
 
-    public final static String TEXT = I18n.tr("Adjust connection settings to make better use of your internet connection");
+    private final static String TEXT = I18n.tr("Adjust connection settings to make better use of your internet connection");
 
-    public final static String MAX_ACTIVE_DOWNLOADS = I18n.tr("Maximum active downloads");
+    private final static String MAX_ACTIVE_DOWNLOADS = I18n.tr("Maximum active downloads");
 
-    public final static String MAX_GLOBAL_NUM_CONNECTIONS = I18n.tr("Global maximum number of connections");
+    private final static String MAX_GLOBAL_NUM_CONNECTIONS = I18n.tr("Global maximum number of connections");
 
-    public final static String MAX_PEERS = I18n.tr("Maximum number of peers");
+    private final static String MAX_PEERS = I18n.tr("Maximum number of peers");
 
-    public final static String MAX_ACTIVE_SEEDS = I18n.tr("Maximum active seeds");
+    private final static String MAX_ACTIVE_SEEDS = I18n.tr("Maximum active seeds");
 
     private final static String ENABLE_DISTRIBUTED_HASH_TABLE = I18n.tr("Enable Distributed Hash Table (DHT)");
 
-    private final static String MANDATORY_VPN = I18n.tr("Require VPN connection for BitTorrent");
+    private final static String VPN_DROP_PROTECTION = I18n.tr("VPN-Drop Protection. Require VPN connection for BitTorrent");
 
     private WholeNumberField MAX_ACTIVE_DOWNLOADS_FIELD = new SizedWholeNumberField(4);
 
@@ -66,7 +66,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         panel.add(comp.getComponent());
         panel.addVerticalComponentGap();
 
-        comp = new LabeledComponent(MANDATORY_VPN,
+        comp = new LabeledComponent(VPN_DROP_PROTECTION,
                 MANDATORY_VPN_CHECKBOX_FIELD,
                 LabeledComponent.LEFT_GLUE,
                 LabeledComponent.LEFT);
@@ -111,7 +111,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         final BTEngine btEngine = BTEngine.getInstance();
 
         return (btEngine.isDhtRunning() == ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected() ||
-                ConnectionSettings.VPN_BITTORRENT_GUARD_ON.getValue() != MANDATORY_VPN_CHECKBOX_FIELD.isSelected() ||
+                ConnectionSettings.VPN_DROP_PROTECTION.getValue() != MANDATORY_VPN_CHECKBOX_FIELD.isSelected() ||
                 btEngine.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()) ||
                 (btEngine.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()) ||
                 (btEngine.maxPeers() != MAX_PEERS_FIELD.getValue()) ||
@@ -122,7 +122,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     public void initOptions() {
         final BTEngine btEngine = BTEngine.getInstance();
         ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(btEngine.isDhtRunning());
-        MANDATORY_VPN_CHECKBOX_FIELD.setSelected(ConnectionSettings.VPN_BITTORRENT_GUARD_ON.getValue());
+        MANDATORY_VPN_CHECKBOX_FIELD.setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
         MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.maxConnections());
         MAX_PEERS_FIELD.setValue(btEngine.maxPeers());
         MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.maxActiveDownloads());
@@ -167,6 +167,6 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
                 GUIMediator.instance().getStatusLine().refresh();
             }
         }
-        ConnectionSettings.VPN_BITTORRENT_GUARD_ON.setValue(newVal);
+        ConnectionSettings.VPN_DROP_PROTECTION.setValue(newVal);
     }
 }

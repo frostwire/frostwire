@@ -55,7 +55,7 @@ import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.VPNBitTorrentGuard;
+import com.limegroup.gnutella.gui.VPNDropGuard;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
@@ -154,7 +154,7 @@ public final class TorrentUtil {
         boolean allowedToResume = true;
         boolean oneIsCompleted = false;
 
-        if (!VPNBitTorrentGuard.canUseBitTorrent()) {
+        if (!VPNDropGuard.canUseBitTorrent()) {
             return false;
         }
 
