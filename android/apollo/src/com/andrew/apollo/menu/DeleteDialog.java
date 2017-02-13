@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.menu;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.os.Bundle;
 import android.app.DialogFragment;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -33,7 +40,7 @@ import com.frostwire.android.R;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class DeleteDialog extends DialogFragment {
+public final class DeleteDialog extends DialogFragment {
 
     public interface DeleteDialogCallback {
         void onDelete(long[] id);
@@ -75,15 +82,10 @@ public class DeleteDialog extends DialogFragment {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
 
         final Bundle arguments = getArguments();
-        // Get the image cache key
-        final String key = arguments.getString("cachekey");
         // Get the track(s) to delete
         mItemList = arguments.getLongArray("items");
         //   Initialize the image cache
@@ -106,21 +108,13 @@ public class DeleteDialog extends DialogFragment {
         Button yesButton = (Button) inflator.findViewById(R.id.dialog_default_button_yes);
         yesButton.setText(R.string.delete);
 
-        noButton.setOnClickListener(new NegativeButtonOnClickListener(this, apolloDeleteFilesDialog));
-        yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, apolloDeleteFilesDialog));
+        noButton.setOnClickListener(new NegativeButtonOnClickListener());
+        yesButton.setOnClickListener(new PositiveButtonOnClickListener());
 
         return apolloDeleteFilesDialog.create();
     }
 
     private class NegativeButtonOnClickListener implements View.OnClickListener {
-        private final DeleteDialog deleteDialog;
-        private final AlertDialog.Builder apolloDeleteFilesDialog;
-
-        public NegativeButtonOnClickListener(DeleteDialog deleteDialog, AlertDialog.Builder apolloDeleteFilesDialog) {
-            this.deleteDialog = deleteDialog;
-            this.apolloDeleteFilesDialog = apolloDeleteFilesDialog;
-        }
-
         @Override
         public void onClick(View view) {
             dismiss();
@@ -128,14 +122,13 @@ public class DeleteDialog extends DialogFragment {
     }
 
     private class PositiveButtonOnClickListener implements View.OnClickListener {
-        private final DeleteDialog deleteDialog;
-        private final AlertDialog.Builder apolloDeleteFilesDialog;
-        final Bundle arguments = getArguments();
-        final String key = arguments.getString("cachekey");
 
-        public PositiveButtonOnClickListener(DeleteDialog deleteDialog, AlertDialog.Builder apolloDeleteFilesDialog) {
-            this.deleteDialog = deleteDialog;
-            this.apolloDeleteFilesDialog = apolloDeleteFilesDialog;
+        private final Bundle arguments;
+        private final String key;
+
+        PositiveButtonOnClickListener() {
+            arguments = getArguments();
+            key = arguments.getString("cachekey");
         }
 
         @Override
@@ -157,4 +150,3 @@ public class DeleteDialog extends DialogFragment {
         }
     }
 }
-

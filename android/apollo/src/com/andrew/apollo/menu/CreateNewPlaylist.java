@@ -1,22 +1,30 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.menu;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.app.Fragment;
+
 import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
@@ -24,7 +32,6 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity;
-import com.frostwire.util.Logger;
 
 import java.util.List;
 
@@ -34,13 +41,10 @@ import java.util.List;
  *         actions, but it really needs to work either way. As in, capitalized
  *         or not.
  */
-public class CreateNewPlaylist extends BasePlaylistDialog {
-
-    @SuppressWarnings("unused")
-    private Logger LOGGER = Logger.getLogger(CreateNewPlaylist.class);
+public final class CreateNewPlaylist extends BasePlaylistDialog {
 
     // The playlist list
-    private long[] mPlaylistList = new long[] {};
+    private long[] mPlaylistList = new long[]{};
 
     /**
      * @param list The list of tracks to add to the playlist
@@ -54,17 +58,11 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
         return frag;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onSaveInstanceState(final Bundle bundle) {
         bundle.putString("defaultname", mPlaylist.getText().toString());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void initObjects(final Bundle savedInstanceState) {
         mPlaylistList = getArguments().getLongArray("playlist_list");
@@ -82,7 +80,7 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
         }
         final String playlistName = mPlaylist.getText().toString();
         if (playlistName.length() > 0) {
-            final int playlistId = (int)MusicUtils.getIdForPlaylist(getActivity(),
+            final int playlistId = (int) MusicUtils.getIdForPlaylist(getActivity(),
                     playlistName);
             if (playlistId >= 0) {
                 MusicUtils.clearPlaylist(getActivity(), playlistId);
@@ -93,7 +91,7 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
                 MusicUtils.addToPlaylist(getActivity(), mPlaylistList, newId);
             }
             int added;
-            if (mPlaylistList != null && (added=mPlaylistList.length) > 0) {
+            if (mPlaylistList != null && (added = mPlaylistList.length) > 0) {
                 final String message = getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, added, added);
                 AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
             }
@@ -105,8 +103,8 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
     private String makePlaylistName() {
         final String template = getString(R.string.new_playlist_name_template);
         int num = 1;
-        final String[] projection = new String[] {
-            MediaStore.Audio.Playlists.NAME
+        final String[] projection = new String[]{
+                MediaStore.Audio.Playlists.NAME
         };
         final ContentResolver resolver = getActivity().getContentResolver();
         final String selection = MediaStore.Audio.Playlists.NAME + " != ''";
@@ -135,10 +133,12 @@ public class CreateNewPlaylist extends BasePlaylistDialog {
         return suggestedName;
     }
 
-    /** Looks for the PlaylistFragment and keeps it as a weak reference in case its found.
+    /**
+     * Looks for the PlaylistFragment and keeps it as a weak reference in case its found.
      * This way we can invoke that fragment's refresh() method when we need it, keeping
      * all the on Ok logic here and not forcing ApolloFragment to implement OnDialogClick
-     * and having to handle each possible's dialog click with a bunch of conditions. */
+     * and having to handle each possible's dialog click with a bunch of conditions.
+     */
     private void lookForPlaylistFragment(List<Fragment> fragments) {
         if (fragments != null && !fragments.isEmpty()) {
             for (Fragment f : fragments) {
