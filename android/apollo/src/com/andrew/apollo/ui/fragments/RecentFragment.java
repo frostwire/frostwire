@@ -11,26 +11,20 @@
 
 package com.andrew.apollo.ui.fragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.content.Loader;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
 import com.andrew.apollo.adapters.AlbumAdapter;
 import com.andrew.apollo.loaders.RecentLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Album;
-import com.andrew.apollo.ui.activities.BaseActivity;
-import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 
 import java.util.List;
-
-import static com.andrew.apollo.utils.PreferenceUtils.RECENT_LAYOUT;
 
 /**
  * This class is used to display all of the recently listened to albums by the
@@ -42,16 +36,6 @@ public class RecentFragment extends AlbumFragment {
 
     public RecentFragment() {
         super(Fragments.RECENT_FRAGMENT_GROUP_ID, Fragments.RECENT_FRAGMENT_LOADER_ID);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
-        // Register the music status listener
-        ((BaseActivity)activity).setMusicStateListenerListener(this);
     }
 
     /**
@@ -95,13 +79,5 @@ public class RecentFragment extends AlbumFragment {
         if (mAdapter != null) {
             mAdapter.setTouchPlay(true);
         }
-    }
-
-    protected boolean isSimpleLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(RECENT_LAYOUT);
-    }
-
-    protected boolean isDetailedLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isDetailedLayout(RECENT_LAYOUT);
     }
 }
