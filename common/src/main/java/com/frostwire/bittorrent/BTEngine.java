@@ -119,13 +119,13 @@ public final class BTEngine extends SessionManager {
 
     @Override
     public void start() {
-        settings_pack sp = new settings_pack();
+        SessionParams params = loadSettings();
 
+        settings_pack sp = params.settings().swig();
         sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
         sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
         sp.set_str(settings_pack.string_types.dht_bootstrap_nodes.swigValue(), dhtBootstrapNodes());
 
-        SessionParams params = loadSettings();
         super.start(params);
     }
 
