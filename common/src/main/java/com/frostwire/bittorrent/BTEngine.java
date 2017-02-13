@@ -18,35 +18,14 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.AlertListener;
-import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.Priority;
-import com.frostwire.jlibtorrent.SessionManager;
-import com.frostwire.jlibtorrent.SessionParams;
-import com.frostwire.jlibtorrent.SettingsPack;
-import com.frostwire.jlibtorrent.TcpEndpoint;
-import com.frostwire.jlibtorrent.TorrentHandle;
-import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.Vectors;
-import com.frostwire.jlibtorrent.alerts.Alert;
+import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.alerts.ExternalIpAlert;
-import com.frostwire.jlibtorrent.alerts.FastresumeRejectedAlert;
-import com.frostwire.jlibtorrent.alerts.ListenFailedAlert;
-import com.frostwire.jlibtorrent.alerts.ListenSucceededAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentAlert;
-import com.frostwire.jlibtorrent.swig.bdecode_node;
-import com.frostwire.jlibtorrent.swig.byte_vector;
-import com.frostwire.jlibtorrent.swig.entry;
-import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.libtorrent;
-import com.frostwire.jlibtorrent.swig.session_params;
-import com.frostwire.jlibtorrent.swig.settings_pack;
+import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -57,13 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import static com.frostwire.jlibtorrent.alerts.AlertType.EXTERNAL_IP;
-import static com.frostwire.jlibtorrent.alerts.AlertType.FASTRESUME_REJECTED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_FAILED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_SUCCEEDED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.PEER_LOG;
-import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_ADDED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_LOG;
+import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 
 /**
  * @author gubatron
@@ -85,6 +58,8 @@ public final class BTEngine extends SessionManager {
     };
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
+    private static final String STATE_VERSION_KEY = "state_version";
+    private static final String STATE_VERSION_VALUE = "1.2.0.6-RC4";
     public static BTContext ctx;
 
     private final InnerListener innerListener;
@@ -172,28 +147,48 @@ public final class BTEngine extends SessionManager {
                 int ret = bdecode_node.bdecode(buffer, n, ec);
 
                 if (ret == 0) {
+                    String stateVersion = n.dict_find_string_value_s(STATE_VERSION_KEY);
+                    if (!STATE_VERSION_VALUE.equals(stateVersion)) {
+                        return defaultParams();
+                    }
+
                     session_params params = libtorrent.read_session_params(n);
                     buffer.clear(); // prevents GC
                     return new SessionParams(params);
                 } else {
-                    throw new IllegalArgumentException("Can't decode data: " + ec.message());
+                    LOG.error("Can't decode session state data: " + ec.message());
+                    return defaultParams();
                 }
             } else {
-                SettingsPack sp = defaultSettings();
-                SessionParams params = new SessionParams(sp);
-                return params;
+                return defaultParams();
             }
         } catch (Throwable e) {
             LOG.error("Error loading session state", e);
-            SettingsPack sp = defaultSettings();
-            SessionParams params = new SessionParams(sp);
-            return params;
+            return defaultParams();
         }
+    }
+
+    private SessionParams defaultParams() {
+        SettingsPack sp = defaultSettings();
+        SessionParams params = new SessionParams(sp);
+        return params;
     }
 
     @Override
     protected void onApplySettings(SettingsPack sp) {
         saveSettings();
+    }
+
+    @Override
+    public byte[] saveState() {
+        if (swig() == null) {
+            return null;
+        }
+
+        entry e = new entry();
+        swig().save_state(e);
+        e.set(STATE_VERSION_KEY, STATE_VERSION_VALUE);
+        return Vectors.byte_vector2bytes(e.bencode());
     }
 
     private void saveSettings() {
