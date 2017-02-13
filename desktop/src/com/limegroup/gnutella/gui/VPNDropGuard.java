@@ -27,6 +27,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 
 import static com.limegroup.gnutella.gui.I18n.tr;
 
@@ -50,11 +52,28 @@ public class VPNDropGuard {
                 dialog.setTitle(tr("VPN-Drop Protection Active"));
                 dialog.setLayout(new FlowLayout()); // gets rid of that default border layout
                 dialog.setModal(true);
-                dialog.setResizable(false);
-                JPanel panel = new JPanel(new MigLayout());
-                panel.add(new JLabel("<html><h1>" + tr("BitTorrent is off because your VPN is disconnected") + "</h1></html>"), "wrap");
-                panel.add(new JLabel("<html><h2>" + tr("Check the status of your VPN connection or disable the VPN-Drop Protection") + ".</h2></html>"), "wrap");
-                JButton whatIsAVPN = new JButton("<html><h3>" + tr("What is a VPN?"));
+                dialog.setResizable(true);
+                dialog.addWindowStateListener(new WindowStateListener() {
+                    @Override
+                    public void windowStateChanged(WindowEvent e) {
+                        System.out.println(dialog.getSize());
+                    }
+                });
+
+                // Icon and labels
+                JLabel icon = new JLabel(GUIMediator.getThemeImage("warn-triangle"));
+                icon.setPreferredSize(new Dimension(64,64));
+
+                JPanel labelPanel = new JPanel(new MigLayout());
+                labelPanel.add(new JLabel("<html><p><strong>" + tr("BitTorrent is off because your VPN is disconnected") + "</strong></p></html>"), "wrap");
+                labelPanel.add(new JLabel("<html><p>" + tr("Check the status of your VPN connection or disable the VPN-Drop Protection") + ".</p></html>"), "wrap");
+
+                JPanel upperPanel = new JPanel(new MigLayout());
+                upperPanel.add(icon);
+                upperPanel.add(labelPanel);
+
+                // Buttons
+                JButton whatIsAVPN = new JButton(tr("What is a VPN?"));
                 whatIsAVPN.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -62,7 +81,7 @@ public class VPNDropGuard {
                         GUIMediator.openURL(VPNStatusButton.VPN_URL);
                     }
                 });
-                JButton disableVPNDrop = new JButton("<html><h3>" + tr("Disable VPN-Drop protection"));
+                JButton disableVPNDrop = new JButton(tr("Disable VPN-Drop protection"));
                 disableVPNDrop.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -77,23 +96,28 @@ public class VPNDropGuard {
                         });
                     }
                 });
-                JButton ok = new JButton("<html><h3>" + tr("Ok"));
+                JButton ok = new JButton(tr("Ok"));
                 ok.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         dialog.dispose();
                     }
                 });
-                JPanel panelButtons = new JPanel(new MigLayout("","[][][grow]"));
-                panelButtons.add(whatIsAVPN);
-                panelButtons.add(disableVPNDrop);
-                panelButtons.add(ok,"growx, shrink 0");
-                panel.add(panelButtons, "growx");
-                dialog.add(panel);
+                JPanel buttonsPanel = new JPanel(new MigLayout("insets 10px 0 0 0, align right",""));
+                buttonsPanel.add(whatIsAVPN);
+                buttonsPanel.add(disableVPNDrop);
+                buttonsPanel.add(ok,"growx, shrink 0");
 
-                dialog.setPreferredSize(new Dimension(752, 214));
+                // Put it all together
+                JPanel panel = new JPanel(new MigLayout());
+                panel.add(upperPanel, "wrap");
+                panel.add(buttonsPanel, "growx");
+
+                // Add it to the dialog
+                dialog.add(panel);
+                dialog.setPreferredSize(new Dimension(630, 210));
                 dialog.pack();
-                dialog.setLocationRelativeTo(GUIMediator.getAppFrame());
+                dialog.setLocationRelativeTo(GUIMediator.getAppFrame()); // centers dialog with respect to parent frame
                 dialog.setVisible(true);
             }
         });
