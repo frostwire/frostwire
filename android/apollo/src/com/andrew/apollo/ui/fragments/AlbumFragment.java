@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
+
 import com.andrew.apollo.adapters.AlbumAdapter;
 import com.andrew.apollo.loaders.AlbumLoader;
 import com.andrew.apollo.model.Album;
@@ -31,11 +32,10 @@ import java.util.List;
 
 /**
  * This class is used to display all of the albums on a user's device.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
- *  * @author Angel Leon (@gubatron)
+ * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
-
  */
 public class AlbumFragment extends ApolloFragment<AlbumAdapter, Album> {
 
@@ -52,7 +52,7 @@ public class AlbumFragment extends ApolloFragment<AlbumAdapter, Album> {
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         // Register the music status listener
-        ((BaseActivity)activity).setMusicStateListenerListener(this);
+        ((BaseActivity) activity).setMusicStateListenerListener(this);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class AlbumFragment extends ApolloFragment<AlbumAdapter, Album> {
 
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
-            final long id) {
+                            final long id) {
         mItem = mAdapter.getItem(position);
         NavUtils.openAlbumProfile(getActivity(),
                 mItem.mAlbumName,

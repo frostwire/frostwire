@@ -101,7 +101,7 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class AudioPlayerActivity extends AbstractActivity implements
+public final class AudioPlayerActivity extends AbstractActivity implements
         ServiceConnection,
         OnSeekBarChangeListener,
         DeleteDialog.DeleteDialogCallback,
@@ -1006,9 +1006,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
      * Used to scan backwards through the track
      */
     private final RepeatingImageButton.RepeatListener mRewindListener = new RepeatingImageButton.RepeatListener() {
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void onRepeat(final View v, final long howlong, final int repcnt) {
             scanBackward(repcnt, howlong);
@@ -1019,9 +1016,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
      * Used to scan ahead through the track
      */
     private final RepeatingImageButton.RepeatListener mFastForwardListener = new RepeatingImageButton.RepeatListener() {
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void onRepeat(final View v, final long howlong, final int repcnt) {
             scanForward(repcnt, howlong);
@@ -1033,10 +1027,6 @@ public class AudioPlayerActivity extends AbstractActivity implements
      * fragments, then back again
      */
     private final OnClickListener mToggleHiddenPanel = new OnClickListener() {
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void onClick(final View v) {
             if (mPageContainer.getVisibility() == View.VISIBLE) {
@@ -1121,12 +1111,9 @@ public class AudioPlayerActivity extends AbstractActivity implements
          * Constructor of <code>PlaybackStatus</code>
          */
         public PlaybackStatus(final AudioPlayerActivity activity) {
-            mReference = new WeakReference<>(activity);
+            mReference = Ref.weak(activity);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void onReceive(final Context context, final Intent intent) {
             if (!Ref.alive(mReference)) {
