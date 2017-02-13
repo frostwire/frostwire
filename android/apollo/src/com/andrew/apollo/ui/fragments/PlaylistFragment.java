@@ -1,24 +1,29 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.ui.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.Loader;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.app.Activity;
-import android.content.Loader;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -27,6 +32,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.TextView;
+
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.PlaylistAdapter;
 import com.andrew.apollo.loaders.PlaylistLoader;
@@ -51,9 +57,8 @@ import java.util.List;
  * @author Alden Torres (@aldenml)
  * @author Marcelina Knitter (@marcelinkaaa)
  */
-@SuppressLint("ValidFragment")
 public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> {
-    //private static Logger LOG = Logger.getLogger(PlaylistFragment.class);
+
     public PlaylistFragment() {
         super(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, Fragments.PLAYLIST_FRAGMENT_LOADER_ID);
     }
@@ -132,15 +137,12 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         return PreferenceUtils.SIMPLE_LAYOUT;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
                             final long id) {
         final Bundle bundle = new Bundle();
         mItem = mAdapter.getItem(position);
-        String playlistName;
+        String playlistName = "<no name>";
         // Favorites list
         if (position == 0) {
             playlistName = getString(R.string.playlist_favorites);
@@ -151,9 +153,11 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
             bundle.putString(Config.MIME_TYPE, getString(R.string.playlist_last_added));
         } else {
             // User created
-            playlistName = mItem.mPlaylistName;
-            bundle.putString(Config.MIME_TYPE, MediaStore.Audio.Playlists.CONTENT_TYPE);
-            bundle.putLong(Config.ID, mItem.mPlaylistId);
+            if (mItem != null) {
+                playlistName = mItem.mPlaylistName;
+                bundle.putString(Config.MIME_TYPE, MediaStore.Audio.Playlists.CONTENT_TYPE);
+                bundle.putLong(Config.ID, mItem.mPlaylistId);
+            }
         }
 
         bundle.putString(Config.NAME, playlistName);
@@ -204,7 +208,6 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
     public static class PlaylistFragmentDeleteDialog extends AbstractDialog {
         private String playlistName;
         private long playlistId;
@@ -216,7 +219,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         }
 
         public PlaylistFragmentDeleteDialog() {
-             super(R.layout.dialog_default);
+            super(R.layout.dialog_default);
         }
 
         private PlaylistFragmentDeleteDialog(String playlistName, long playlistId) {
@@ -237,7 +240,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
             TextView dialogTitle = findView(dlg, R.id.dialog_default_title);
             dialogTitle.setText(getString(R.string.delete_dialog_title, playlistName));
             TextView text = findView(dlg, R.id.dialog_default_text);
-            text.setText(getResources().getString(R.string.are_you_sure_delete_playlist, playlistName));
+            text.setText(getString(R.string.are_you_sure_delete_playlist, playlistName));
             Button buttonYes = findView(dlg, R.id.dialog_default_button_yes);
             buttonYes.setText(R.string.delete);
             buttonYes.setOnClickListener(new ButtonOnClickListener(this, true));
@@ -264,12 +267,12 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         }
     }
 
+    private static class ButtonOnClickListener implements View.OnClickListener {
 
-    @SuppressWarnings("WeakerAccess")
-    public static class ButtonOnClickListener implements View.OnClickListener {
         private final boolean delete;
         private final PlaylistFragmentDeleteDialog dialog;
-        public ButtonOnClickListener(PlaylistFragmentDeleteDialog dlg, boolean delete) {
+
+        ButtonOnClickListener(PlaylistFragmentDeleteDialog dlg, boolean delete) {
             this.delete = delete;
             this.dialog = dlg;
         }
