@@ -1,44 +1,36 @@
-
 package com.andrew.apollo.loaders;
 
-import android.content.Context;
 import android.content.AsyncTaskLoader;
+import android.content.Context;
 
 /**
  * <a href="http://code.google.com/p/android/issues/detail?id=14944">Issue
  * 14944</a>
- * 
+ *
  * @author Alexander Blom
  */
-public abstract class WrappedAsyncTaskLoader<D> extends AsyncTaskLoader<D> {
+abstract class WrappedAsyncTaskLoader<D> extends AsyncTaskLoader<D> {
 
     private D mData;
 
     /**
      * Constructor of <code>WrappedAsyncTaskLoader</code>
-     * 
+     *
      * @param context The {@link Context} to use.
      */
-    public WrappedAsyncTaskLoader(Context context) {
+    WrappedAsyncTaskLoader(Context context) {
         super(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void deliverResult(D data) {
         if (!isReset()) {
             this.mData = data;
             super.deliverResult(data);
-        } else {
-            // An asynchronous query came in while the loader is stopped
         }
+        //else { An asynchronous query came in while the loader is stopped }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onStartLoading() {
         if (this.mData != null) {
@@ -48,18 +40,12 @@ public abstract class WrappedAsyncTaskLoader<D> extends AsyncTaskLoader<D> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onStopLoading() {
         // Attempt to cancel the current load task if possible
         cancelLoad();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void onReset() {
         super.onReset();

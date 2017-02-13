@@ -1,23 +1,36 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.adapters;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
-import com.andrew.apollo.ui.fragments.*;
+
+import com.andrew.apollo.ui.fragments.AlbumFragment;
+import com.andrew.apollo.ui.fragments.ArtistFragment;
+import com.andrew.apollo.ui.fragments.LastAddedFragment;
+import com.andrew.apollo.ui.fragments.PlaylistFragment;
+import com.andrew.apollo.ui.fragments.RecentFragment;
+import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.utils.Lists;
 import com.frostwire.android.R;
 
@@ -55,7 +68,6 @@ public class PagerAdapter extends FragmentPagerAdapter {
      * @param className The full qualified name of fragment class.
      * @param params    The instantiate params.
      */
-    @SuppressWarnings("synthetic-access")
     public void add(final Class<? extends Fragment> className, final Bundle params) {
         final Holder mHolder = new Holder();
         mHolder.mClassName = className.getName();
@@ -81,9 +93,6 @@ public class PagerAdapter extends FragmentPagerAdapter {
         return getItem(position);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object instantiateItem(final ViewGroup container, final int position) {
         final Fragment mFragment = (Fragment) super.instantiateItem(container, position);
@@ -95,9 +104,6 @@ public class PagerAdapter extends FragmentPagerAdapter {
         return mFragment;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Fragment getItem(final int position) {
         final Holder mCurrentHolder = mHolderList.get(position);
@@ -105,9 +111,6 @@ public class PagerAdapter extends FragmentPagerAdapter {
                 mCurrentHolder.mClassName, mCurrentHolder.mParams);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void destroyItem(final ViewGroup container, final int position, final Object object) {
         super.destroyItem(container, position, object);
@@ -117,17 +120,11 @@ public class PagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getCount() {
         return mHolderList.size();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public CharSequence getPageTitle(final int position) {
         return mFragmentActivity.getResources().getStringArray(R.array.page_titles)[position]
@@ -177,7 +174,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
         /**
          * Method that returns the fragment class.
          *
-         * @return Class<? extends Fragment> The fragment class.
+         * @return the fragment class.
          */
         public Class<? extends Fragment> getFragmentClass() {
             return mFragmentClass;
