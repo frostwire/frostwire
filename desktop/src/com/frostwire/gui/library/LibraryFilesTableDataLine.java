@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,54 +38,48 @@ import java.util.Date;
 /**
  * This class acts as a single line containing all
  * the necessary Library info.
- * 
+ *
  * @author gubatron
  * @author aldenml
- * 
  */
 public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLine<File> {
 
     static final int ACTIONS_IDX = 0;
 
     /**
-     * Constant for the column with the wi-fi shared state.
-     */
-    //static final int SHARE_IDX = 1;
-
-    /**
      * Constant for the column with the icon of the file.
      */
-    static final int ICON_IDX = 1;
+    private static final int ICON_IDX = 1;
 
     /**
      * Constant for the column with the name of the file.
      */
-    static final int NAME_IDX = 2;
+    private static final int NAME_IDX = 2;
 
     /**
      * Constant for the column storing the size of the file.
      */
-    static final int SIZE_IDX = 3;
+    private static final int SIZE_IDX = 3;
 
     /**
      * Constant for the column storing the file type (extension or more
      * more general type) of the file.
      */
-    static final int TYPE_IDX = 4;
+    private static final int TYPE_IDX = 4;
 
     /**
      * Constant for the column storing the file's path
      */
-    static final int PATH_IDX = 5;
+    private static final int PATH_IDX = 5;
 
     /**
      * Constant for the column indicating the mod time of a file.
      */
     static final int MODIFICATION_TIME_IDX = 6;
-    
+
     static final int PAYMENT_OPTIONS_IDX = 7;
-    
-    static final int LICENSE_IDX = 8;
+
+    private static final int LICENSE_IDX = 8;
 
     private static final SizeHolder ZERO_SIZED_HOLDER = new SizeHolder(0);
 
@@ -96,19 +90,19 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
      */
     private static LimeTableColumn[] ltColumns;
 
-    /** Variable for the name */
-    private String _name;
-
-    /** Variable for the type */
+    /**
+     * Variable for the type
+     */
     private String _type;
 
-    /** Variable for the size */
-    private long _size;
-
-    /** Cached SizeHolder */
+    /**
+     * Cached SizeHolder
+     */
     private SizeHolder _sizeHolder;
 
-    /** Variable for the path */
+    /**
+     * Variable for the path
+     */
     private String _path;
 
     /**
@@ -155,7 +149,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         } catch (IOException ignored) {
         }
 
-        _name = initializer.getName();
+        String _name = initializer.getName();
         _type = "";
 
         if (!file.isDirectory()) {
@@ -175,7 +169,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         // only load file sizes, do nothing for directories
         // directories implicitly set SizeHolder to null and display nothing
         if (initializer.isFile()) {
-            _size = initializer.length();
+            long _size = initializer.length();
             _sizeHolder = new SizeHolder(_size);
         } else {
             _sizeHolder = ZERO_SIZED_HOLDER;
@@ -186,31 +180,31 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         this.actionsHolder = new LibraryActionsHolder(this, false);
 
         this.nameCell = new NameHolder(_name);
-        
-        if (initializer != null && 
-            initializer.isFile() && 
-            FilenameUtils.getExtension(initializer.getName()) != null &&
-            FilenameUtils.getExtension(initializer.getName()).toLowerCase().endsWith("torrent")) {
+
+        if (initializer != null &&
+                initializer.isFile() &&
+                FilenameUtils.getExtension(initializer.getName()) != null &&
+                FilenameUtils.getExtension(initializer.getName()).toLowerCase().endsWith("torrent")) {
 
             BTInfoAdditionalMetadataHolder additionalMetadataHolder = null;
 
             try {
                 additionalMetadataHolder = new BTInfoAdditionalMetadataHolder(initializer, initializer.getName());
             } catch (Throwable t) {
-                System.err.println("[InvalidTorrent] Can't create BTInfoAdditionalMetadataholder out of " + initializer.getAbsolutePath() );
+                System.err.println("[InvalidTorrent] Can't create BTInfoAdditionalMetadataholder out of " + initializer.getAbsolutePath());
                 t.printStackTrace();
             }
 
-            boolean hasLicense = additionalMetadataHolder!=null && additionalMetadataHolder.getLicenseBroker() != null;
+            boolean hasLicense = additionalMetadataHolder != null && additionalMetadataHolder.getLicenseBroker() != null;
             boolean hasPaymentOptions = additionalMetadataHolder != null && additionalMetadataHolder.getPaymentOptions() != null;
-            
+
             if (hasLicense) {
-                 System.out.println(initializer);
-                 license = additionalMetadataHolder.getLicenseBroker().getLicenseName();
+                System.out.println(initializer);
+                license = additionalMetadataHolder.getLicenseBroker().getLicenseName();
             } else {
                 license = "";
             }
-            
+
             if (hasPaymentOptions) {
                 paymentOptions = additionalMetadataHolder.getPaymentOptions();
             } else {
@@ -233,36 +227,35 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
     /**
      * Returns the object stored in the specified cell in the table.
      *
-     * @param idx  The column of the cell to access
-     *
-     * @return  The <code>Object</code> stored at the specified "cell" in
-     *          the list
+     * @param idx The column of the cell to access
+     * @return The <code>Object</code> stored at the specified "cell" in
+     * the list
      */
     public Object getValueAt(int idx) {
         try {
             boolean isPlaying = isPlaying();
             switch (idx) {
-            case ACTIONS_IDX:
-                actionsHolder.setPlaying(isPlaying);
-                return actionsHolder;
-            case ICON_IDX:
-                return new PlayableIconCell(getIcon(), isPlaying);
-            case NAME_IDX:
-                return nameCell;
-            case SIZE_IDX:
-                return new PlayableCell(this, _sizeHolder, _sizeHolder.toString(), isPlaying, idx);
-            case TYPE_IDX:
-                return new PlayableCell(this, _type, isPlaying, idx);
-            case PATH_IDX:
-                return new PlayableCell(this, _path, isPlaying, idx);
-            case MODIFICATION_TIME_IDX:
-                return new PlayableCell(this, lastModified, lastModified.toString(), isPlaying, idx);
+                case ACTIONS_IDX:
+                    actionsHolder.setPlaying(isPlaying);
+                    return actionsHolder;
+                case ICON_IDX:
+                    return new PlayableIconCell(getIcon(), isPlaying);
+                case NAME_IDX:
+                    return nameCell;
+                case SIZE_IDX:
+                    return new PlayableCell(this, _sizeHolder, _sizeHolder.toString(), isPlaying, idx);
+                case TYPE_IDX:
+                    return new PlayableCell(this, _type, isPlaying, idx);
+                case PATH_IDX:
+                    return new PlayableCell(this, _path, isPlaying, idx);
+                case MODIFICATION_TIME_IDX:
+                    return new PlayableCell(this, lastModified, lastModified.toString(), isPlaying, idx);
 //            case SHARE_IDX:
 //                return new FileShareCell(this, initializer.getAbsolutePath(), shared);
-            case PAYMENT_OPTIONS_IDX:
-                return paymentOptions;
-            case LICENSE_IDX:
-                return license;
+                case PAYMENT_OPTIONS_IDX:
+                    return paymentOptions;
+                case LICENSE_IDX:
+                    return license;
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -280,10 +273,10 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
 
     public boolean isClippable(int idx) {
         switch (idx) {
-        case ICON_IDX:
-            return false;
-        default:
-            return true;
+            case ICON_IDX:
+                return false;
+            default:
+                return true;
         }
     }
 
@@ -296,30 +289,30 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
     }
 
     public String[] getToolTipArray(int col) {
-        return new String[] { getInitializeObject().getAbsolutePath() };
+        return new String[]{getInitializeObject().getAbsolutePath()};
     }
 
     private LimeTableColumn[] getLimeTableColumns() {
         if (ltColumns == null) {
-            LimeTableColumn[] temp = { new LimeTableColumn(ACTIONS_IDX, "LIBRARY_TABLE_ACTIONS", I18n.tr("Actions"), 18, true, LibraryActionsHolder.class),
+            LimeTableColumn[] temp = {new LimeTableColumn(ACTIONS_IDX, "LIBRARY_TABLE_ACTIONS", I18n.tr("Actions"), 18, true, LibraryActionsHolder.class),
 
-            //new LimeTableColumn(SHARE_IDX, "LIBRARY_TABLE_SHARE", I18n.tr("Wi-Fi Shared"), 18, true, FileShareCell.class),
+                    //new LimeTableColumn(SHARE_IDX, "LIBRARY_TABLE_SHARE", I18n.tr("Wi-Fi Shared"), 18, true, FileShareCell.class),
 
-            new LimeTableColumn(ICON_IDX, "LIBRARY_TABLE_ICON", I18n.tr("Icon"), GUIMediator.getThemeImage("question_mark"), 18, true, PlayableIconCell.class),
+                    new LimeTableColumn(ICON_IDX, "LIBRARY_TABLE_ICON", I18n.tr("Icon"), GUIMediator.getThemeImage("question_mark"), 18, true, PlayableIconCell.class),
 
-            new LimeTableColumn(NAME_IDX, "LIBRARY_TABLE_NAME", I18n.tr("Name"), 239, true, NameHolder.class),
+                    new LimeTableColumn(NAME_IDX, "LIBRARY_TABLE_NAME", I18n.tr("Name"), 239, true, NameHolder.class),
 
-            new LimeTableColumn(SIZE_IDX, "LIBRARY_TABLE_SIZE", I18n.tr("Size"), 62, true, PlayableCell.class),
+                    new LimeTableColumn(SIZE_IDX, "LIBRARY_TABLE_SIZE", I18n.tr("Size"), 62, true, PlayableCell.class),
 
-            new LimeTableColumn(TYPE_IDX, "LIBRARY_TABLE_TYPE", I18n.tr("Type"), 48, true, PlayableCell.class),
+                    new LimeTableColumn(TYPE_IDX, "LIBRARY_TABLE_TYPE", I18n.tr("Type"), 48, true, PlayableCell.class),
 
-            new LimeTableColumn(PATH_IDX, "LIBRARY_TABLE_PATH", I18n.tr("Path"), 108, true, PlayableCell.class),
+                    new LimeTableColumn(PATH_IDX, "LIBRARY_TABLE_PATH", I18n.tr("Path"), 108, true, PlayableCell.class),
 
-            new LimeTableColumn(MODIFICATION_TIME_IDX, "LIBRARY_TABLE_MODIFICATION_TIME", I18n.tr("Last Modified"), 20, true, PlayableCell.class),
-            
-            new LimeTableColumn(PAYMENT_OPTIONS_IDX, "LIBRARY_TABLE_PAYMENT_OPTIONS", I18n.tr("Tips/Donations"), 20, false, PaymentOptions.class),
-            
-            new LimeTableColumn(LICENSE_IDX, "LIBRARY_TABLE_LICENSE", I18n.tr("License"), 100, true, String.class),
+                    new LimeTableColumn(MODIFICATION_TIME_IDX, "LIBRARY_TABLE_MODIFICATION_TIME", I18n.tr("Last Modified"), 20, true, PlayableCell.class),
+
+                    new LimeTableColumn(PAYMENT_OPTIONS_IDX, "LIBRARY_TABLE_PAYMENT_OPTIONS", I18n.tr("Tips/Donations"), 20, false, PaymentOptions.class),
+
+                    new LimeTableColumn(LICENSE_IDX, "LIBRARY_TABLE_LICENSE", I18n.tr("License"), 100, true, String.class),
             };
             ltColumns = temp;
         }
