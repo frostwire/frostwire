@@ -81,11 +81,11 @@ public class VPNDropGuard {
                 dialog.dispose();
             }
         });
-        JPanel panelButtons = new JPanel(new MigLayout());
+        JPanel panelButtons = new JPanel(new MigLayout("","[][][grow]"));
         panelButtons.add(whatIsAVPN);
         panelButtons.add(disableVPNDrop);
-        panelButtons.add(ok,"align right, wrap");
-        panel.add(panelButtons);
+        panelButtons.add(ok,"growx, shrink 0");
+        panel.add(panelButtons, "growx");
         dialog.add(panel);
 
         dialog.setPreferredSize(new Dimension(752, 214));
