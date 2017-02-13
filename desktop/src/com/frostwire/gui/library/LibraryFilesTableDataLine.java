@@ -199,7 +199,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
             boolean hasPaymentOptions = additionalMetadataHolder != null && additionalMetadataHolder.getPaymentOptions() != null;
 
             if (hasLicense) {
-                System.out.println(initializer);
                 license = additionalMetadataHolder.getLicenseBroker().getLicenseName();
             } else {
                 license = "";
