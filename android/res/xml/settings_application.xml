@@ -31,8 +31,8 @@
             android:title="@string/wifi_networks_only" />
  	<android.support.v7.preference.SwitchPreferenceCompat
             android:key="frostwire.prefs.network.bittorrent_on_vpn_only"
-            android:summary="@string/mandatory_vpn_summary"
-            android:title="@string/mandatory_vpn_title" />
+            android:summary="@string/vpn_drop_protection_summary"
+            android:title="@string/vpn_drop_protection_title" />
         <com.frostwire.android.gui.views.preference.KitKatStoragePreference
             android:key="frostwire.prefs.storage.path"
             android:summary="@string/storage_preference_summary"

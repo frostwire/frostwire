@@ -676,7 +676,7 @@
     <string name="number_picker_tip">Tip: touch selected number to use keyboard</string>
     <string name="cannot_start_engine_without_vpn">BitTorrent can\'t start unless a VPN is available. (Check your settings)</string>
     <string name="switch_off_engine_without_vpn">VPN is inactive, stopping the BitTorrent engine.</string>
-    <string name="mandatory_vpn_title">Use BitTorrent only with VPN</string>
-    <string name="mandatory_vpn_summary">Protect your privacy. Automatically disable BitTorrent transfers unless an encrypted VPN connection is active</string>
+    <string name="vpn_drop_protection_title">VPN-Drop Protection</string>
+    <string name="vpn_drop_protection_summary">Protect your privacy. Automatically disable BitTorrent transfers unless an encrypted VPN connection is active</string>
     <string name="dismiss">Dismiss</string>
 </resources>
