@@ -27,8 +27,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
 
 import static com.limegroup.gnutella.gui.I18n.tr;
 
@@ -56,17 +54,11 @@ public class VPNDropGuard {
                 dialog.setTitle(tr("VPN-Drop Protection Active"));
                 dialog.setLayout(new FlowLayout()); // gets rid of that default border layout
                 dialog.setModal(true);
-                dialog.setResizable(true);
-                dialog.addWindowStateListener(new WindowStateListener() {
-                    @Override
-                    public void windowStateChanged(WindowEvent e) {
-                        System.out.println(dialog.getSize());
-                    }
-                });
+                dialog.setResizable(false);
 
                 // Icon and labels
-                JLabel icon = new JLabel(GUIMediator.getThemeImage("warn-triangle"));
-                icon.setPreferredSize(new Dimension(64,64));
+                JLabel icon = new JLabel(GUIMediator.getThemeImage("vpn_drop_guard_dialog_icon"));
+                icon.setPreferredSize(new Dimension(115,96));
 
                 JPanel labelPanel = new JPanel(new MigLayout());
                 labelPanel.add(new JLabel("<html><p><strong>" + tr("BitTorrent is off because your VPN is disconnected") + "</strong></p></html>"), "wrap");
@@ -125,7 +117,7 @@ public class VPNDropGuard {
 
                 // Add it to the dialog
                 dialog.add(panel);
-                dialog.setPreferredSize(new Dimension(630, 210));
+                dialog.setPreferredSize(new Dimension(700, 225));
                 dialog.pack();
                 dialog.setLocationRelativeTo(GUIMediator.getAppFrame()); // centers dialog with respect to parent frame
                 dialog.setVisible(true);
