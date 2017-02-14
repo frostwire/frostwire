@@ -200,7 +200,9 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
 
             if (hasLicense) {
                 license = additionalMetadataHolder.getLicenseBroker().getLicenseName();
-            } else {
+            }
+
+            if (license == null) {
                 license = "";
             }
 
