@@ -94,6 +94,11 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
     }
 
     private void updateVPNIcon(boolean vpnIsOn) {
+        if (lastVPNStatus == vpnIsOn) {
+            // quick return
+            return;
+        }
+
         lastVPNStatus = vpnIsOn;
         if (vpnIsOn) {
             iconButton.setIcon(GUIMediator.getThemeImage("vpn_on"));
