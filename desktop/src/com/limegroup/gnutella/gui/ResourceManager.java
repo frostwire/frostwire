@@ -76,16 +76,6 @@ public final class ResourceManager {
     private static Locale _locale;
 
     /**
-     * Boolean for whether or not the font-size has been reduced.
-     */
-    //private static boolean _fontReduced = false;
-
-    /**
-     * The default MetalTheme.
-     */
-    //private static MetalTheme _defaultTheme = null;
-
-    /**
      * Whether or not LimeWire was started in the 'brushed metal' look.
      */
     private final boolean BRUSHED_METAL;

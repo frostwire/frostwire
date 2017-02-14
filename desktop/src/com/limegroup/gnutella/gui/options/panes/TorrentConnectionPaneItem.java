@@ -51,7 +51,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
 
     private final JCheckBox ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD = new JCheckBox();
 
-    private final JCheckBox MANDATORY_VPN_CHECKBOX_FIELD = new JCheckBox();
+    private final JCheckBox VPN_DROP_PROTECTION_CHECKBOX = new JCheckBox();
 
     public TorrentConnectionPaneItem() {
         super(TITLE, TEXT);
@@ -67,7 +67,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         panel.addVerticalComponentGap();
 
         comp = new LabeledComponent(VPN_DROP_PROTECTION,
-                MANDATORY_VPN_CHECKBOX_FIELD,
+                VPN_DROP_PROTECTION_CHECKBOX,
                 LabeledComponent.LEFT_GLUE,
                 LabeledComponent.LEFT);
 
@@ -111,7 +111,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         final BTEngine btEngine = BTEngine.getInstance();
 
         return (btEngine.isDhtRunning() == ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.isSelected() ||
-                ConnectionSettings.VPN_DROP_PROTECTION.getValue() != MANDATORY_VPN_CHECKBOX_FIELD.isSelected() ||
+                ConnectionSettings.VPN_DROP_PROTECTION.getValue() != VPN_DROP_PROTECTION_CHECKBOX.isSelected() ||
                 btEngine.maxActiveDownloads() != MAX_ACTIVE_DOWNLOADS_FIELD.getValue()) ||
                 (btEngine.maxConnections() != MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue()) ||
                 (btEngine.maxPeers() != MAX_PEERS_FIELD.getValue()) ||
@@ -121,8 +121,8 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     @Override
     public void initOptions() {
         final BTEngine btEngine = BTEngine.getInstance();
-        ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(btEngine.isDhtRunning());
-        MANDATORY_VPN_CHECKBOX_FIELD.setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
+        ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD.setSelected(SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue());
+        VPN_DROP_PROTECTION_CHECKBOX.setSelected(ConnectionSettings.VPN_DROP_PROTECTION.getValue());
         MAX_GLOBAL_NUM_CONNECTIONS_FIELD.setValue(btEngine.maxConnections());
         MAX_PEERS_FIELD.setValue(btEngine.maxPeers());
         MAX_ACTIVE_DOWNLOADS_FIELD.setValue(btEngine.maxActiveDownloads());
@@ -133,7 +133,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     public boolean applyOptions() throws IOException {
         BTEngine btEngine = BTEngine.getInstance();
         applyDHTOptions(btEngine);
-        applyVPNOption(btEngine);
+        applyVPNDropProtectionOption(btEngine);
         btEngine.maxConnections(MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue());
         btEngine.maxPeers(MAX_PEERS_FIELD.getValue());
         btEngine.maxActiveDownloads(MAX_ACTIVE_DOWNLOADS_FIELD.getValue());
@@ -154,19 +154,15 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         }
     }
 
-    private void applyVPNOption(BTEngine btEngine) {
-        boolean newVal = MANDATORY_VPN_CHECKBOX_FIELD.isSelected();
-        if (newVal) {
-            if (!VPNs.isVPNActive()) {
-                btEngine.stop();
-                GUIMediator.instance().getStatusLine().refresh();
-            }
-        } else {
-            if (!btEngine.isRunning()) {
-                btEngine.start();
-                GUIMediator.instance().getStatusLine().refresh();
-            }
+    private void applyVPNDropProtectionOption(BTEngine btEngine) {
+        boolean vpnDropProtectionSelected = VPN_DROP_PROTECTION_CHECKBOX.isSelected();
+        if (vpnDropProtectionSelected && !VPNs.isVPNActive()) {
+            btEngine.stop();
+        } else if (!btEngine.isRunning()) {
+            btEngine.start();
         }
-        ConnectionSettings.VPN_DROP_PROTECTION.setValue(newVal);
+        ConnectionSettings.VPN_DROP_PROTECTION.setValue(vpnDropProtectionSelected);
+        GUIMediator.instance().getStatusLine().updateVPNDropProtectionLabelState();
+        GUIMediator.instance().getStatusLine().refresh();
     }
 }

@@ -125,7 +125,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         createConnectionQualityPanel();
 
         // VPN status
-        vpnStatusButton = new VPNStatusButton(this);
+        vpnStatusButton = new VPNStatusButton();
         vpnStatusRefresher = VPNStatusRefresher.getInstance();
         vpnStatusRefresher.addRefreshListener(vpnStatusButton);
         vpnStatusRefresher.addRefreshListener(this);
@@ -174,6 +174,13 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
         refresh();
     }
+
+    public void updateVPNDropProtectionLabelState() {
+        if (vpnStatusButton != null) {
+            vpnStatusButton.onStatusUpdated(vpnStatusButton.getLastVPNStatus());
+        }
+    }
+
 
     private void createDonationButtonsComponent() {
         donationButtons = new DonationButtons();

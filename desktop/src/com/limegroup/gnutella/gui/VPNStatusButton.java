@@ -32,11 +32,11 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
 
     private final IconButton iconButton;
     private final ThreadLocal<VPNBitTorrentDisabledWarningLabel> vpnDropGuardLabel;
-    private final StatusLine statusLine;
+    private boolean lastVPNStatus;
+
     static final String VPN_URL = "http://www.frostwire.com/vpn";
 
-    VPNStatusButton(StatusLine statusLine) {
-        this.statusLine = statusLine;
+    VPNStatusButton() {
         iconButton = new IconButton("vpn_off");
         iconButton.setBorder(null);
         vpnDropGuardLabel = new ThreadLocal<VPNBitTorrentDisabledWarningLabel>() {
@@ -88,11 +88,13 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
             @Override
             public void run() {
                 updateVPNIcon(false);
+                GUIMediator.instance().getStatusLine().refresh();
             }
         });
     }
 
     private void updateVPNIcon(boolean vpnIsOn) {
+        lastVPNStatus = vpnIsOn;
         if (vpnIsOn) {
             iconButton.setIcon(GUIMediator.getThemeImage("vpn_on"));
             iconButton.setToolTipText("<html><p width=\"260\">" +
@@ -108,7 +110,7 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
         removeAll();
         add(iconButton);
 
-        if (vpnDropGuardLabel.get().shouldBeShown()) {
+        if (!vpnIsOn && vpnDropGuardLabel.get().shouldBeShown()) {
             add(vpnDropGuardLabel.get());
         }
     }
@@ -116,5 +118,9 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
     @Override
     public void onStatusUpdated(boolean vpnIsOn) {
         updateVPNIcon(vpnIsOn);
+    }
+
+    public boolean getLastVPNStatus() {
+        return lastVPNStatus;
     }
 }

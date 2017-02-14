@@ -38,7 +38,7 @@ public class VPNDropGuard {
         return canUseBitTorrent(showExplanationDialog, null);
     }
 
-    public static boolean canUseBitTorrent(boolean showExplanationDialog, Runnable uiCallback) {
+    static boolean canUseBitTorrent(boolean showExplanationDialog, Runnable uiCallback) {
         if (ConnectionSettings.VPN_DROP_PROTECTION.getValue() && !VPNs.isVPNActive()) {
             if (showExplanationDialog) {
                 showExplanationDialog(uiCallback);
@@ -91,13 +91,13 @@ public class VPNDropGuard {
                     public void actionPerformed(ActionEvent e) {
                         dialog.dispose();
                         ConnectionSettings.VPN_DROP_PROTECTION.setValue(false);
-                        MessageService.instance().showMessage(tr("VPN-Drop protection disabled. Restarting BitTorrent engine."));
                         if (uiCallback != null) {
                             try {
                                 uiCallback.run();
                             } catch (Throwable ignored) {
                             }
                         }
+                        MessageService.instance().showMessage(tr("VPN-Drop protection disabled. Restarting BitTorrent engine."));
                         BackgroundExecutorService.schedule(new Runnable() {
                             @Override
                             public void run() {
