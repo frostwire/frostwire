@@ -477,9 +477,10 @@ public final class Initializer {
         ctx.retries = port1 - port0;
 
         BTEngine.ctx = ctx;
-
-        if (canStartBitTorrentWithCurrentVPNSettingsAndStatus()) {
-            BTEngine.getInstance().start();
+        BTEngine btEngine = BTEngine.getInstance();
+        btEngine.start();
+        if (!canStartBitTorrentWithCurrentVPNSettingsAndStatus()) {
+            btEngine.pause();
         }
 
         if (!SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue()) {

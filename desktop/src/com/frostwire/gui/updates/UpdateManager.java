@@ -211,16 +211,16 @@ public final class UpdateManager implements Serializable {
 
             // Logic for Windows or Mac Update
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
-                if ((hasUrl && !hasTorrent && !hasInstallerUrl) || hasUrl && !VPNDropGuard.canUseBitTorrent(false)) {
+                if ((hasUrl && !hasTorrent && !hasInstallerUrl) || hasUrl) {
                     showUpdateMessage(updateMessage);
-                } else if ((hasTorrent || hasInstallerUrl) && VPNDropGuard.canUseBitTorrent(false)) {
+                } else if ((hasTorrent || hasInstallerUrl)) {
                     new InstallerUpdater(updateMessage, force).start();
                 }
             }
             // Logic for Linux
             else if (OSUtils.isLinux()) {
                 if (OSUtils.isUbuntu()) {
-                    if ((hasTorrent || hasInstallerUrl) && VPNDropGuard.canUseBitTorrent(false)) {
+                    if ((hasTorrent || hasInstallerUrl)) {
                         new InstallerUpdater(updateMessage, force).start();
                     } else {
                         showUpdateMessage(updateMessage);
