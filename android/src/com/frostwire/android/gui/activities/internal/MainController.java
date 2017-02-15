@@ -50,10 +50,10 @@ public final class MainController {
     }
 
     public void switchFragment(int itemId) {
-        Fragment fragment = activity.getFragmentByMenuId(itemId);
-        if (fragment != null) {
-            activity.switchContent(fragment);
-        }
+//        Fragment fragment = activity.getFragmentByMenuId(itemId);
+//        if (fragment != null) {
+//            activity.switchContent(fragment);
+//        }
     }
 
     public void showPreferences() {

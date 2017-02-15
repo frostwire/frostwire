@@ -21,6 +21,9 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
     <style name="Widget.Holo.Light.ActionMode" parent="android:Widget.Holo.ActionMode">
         <item name="android:titleTextStyle">
             @android:style/TextAppearance.Holo.Widget.ActionMode.Title

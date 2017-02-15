@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_main_search"
+            android:icon="@drawable/menu_icon_search"
+            android:title="Search" />
+        <item
+            android:id="@+id/menu_main_my_music"
+            android:icon="@drawable/menu_icon_my_music"
+            android:title="My Music" />
+        <item
+            android:id="@+id/menu_main_library"
+            android:icon="@drawable/menu_icon_library"
+            android:title="My Files" />
+        <item
+            android:id="@+id/menu_main_transfers"
+            android:icon="@drawable/menu_icon_transfers"
+            android:title="Transfers" />
+        <item
+            android:id="@+id/menu_main_support"
+            android:icon="@drawable/menu_icon_support"
+            android:title="Help" />
+        <item
+            android:id="@+id/menu_main_settings"
+            android:icon="@drawable/menu_icon_settings"
+            android:title="Settings" />
+        <item
+            android:id="@+id/menu_main_shutdown"
+            android:icon="@drawable/menu_icon_exit"
+            android:title="Exit" />
+    </group>
+</menu>
