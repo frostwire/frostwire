@@ -211,7 +211,7 @@ public final class UpdateManager implements Serializable {
 
             // Logic for Windows or Mac Update
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
-                if ((hasUrl && !hasTorrent && !hasInstallerUrl) || hasUrl) {
+                if (hasUrl && !hasTorrent && !hasInstallerUrl) {
                     showUpdateMessage(updateMessage);
                 } else if ((hasTorrent || hasInstallerUrl)) {
                     new InstallerUpdater(updateMessage, force).start();
@@ -220,7 +220,7 @@ public final class UpdateManager implements Serializable {
             // Logic for Linux
             else if (OSUtils.isLinux()) {
                 if (OSUtils.isUbuntu()) {
-                    if ((hasTorrent || hasInstallerUrl)) {
+                    if (hasTorrent || hasInstallerUrl) {
                         new InstallerUpdater(updateMessage, force).start();
                     } else {
                         showUpdateMessage(updateMessage);
