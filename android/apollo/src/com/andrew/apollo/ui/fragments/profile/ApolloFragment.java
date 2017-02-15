@@ -1,38 +1,51 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.ui.fragments.profile;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
-import android.view.*;
-import android.widget.*;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.SubMenu;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.ListView;
+import android.widget.TextView;
+
 import com.andrew.apollo.MusicStateListener;
 import com.andrew.apollo.adapters.ApolloFragmentAdapter;
 import com.andrew.apollo.loaders.PlaylistLoader;
 import com.andrew.apollo.menu.CreateNewPlaylist;
 import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.menu.FragmentMenuItems;
-import com.andrew.apollo.model.*;
+import com.andrew.apollo.model.Album;
+import com.andrew.apollo.model.Artist;
+import com.andrew.apollo.model.Genre;
+import com.andrew.apollo.model.Playlist;
+import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.recycler.RecycleHolder;
@@ -251,7 +264,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         if (item.getGroupId() == GROUP_ID) {
             final long[] songList = mSongList != null ?
                     mSongList :
-                    new long[] { mSelectedId };
+                    new long[]{mSelectedId};
 
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
@@ -314,7 +327,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         return true;
     }
 
-    private boolean onRemoveFromRecent()  {
+    private boolean onRemoveFromRecent() {
         RecentStore.getInstance(getActivity()).removeItem(mSelectedId);
         MusicUtils.refresh();
         restartLoader(true);
@@ -377,7 +390,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                         R.plurals.NNNtrackstoplaylist, added, added);
                 AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
             }
-        } else if (mSelectedId != -1){
+        } else if (mSelectedId != -1) {
             FavoritesStore.getInstance(getActivity()).addSongId(
                     mSelectedId, mSongName, mAlbumName, mArtistName);
         }
@@ -437,7 +450,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             } else {
                 mGridView.setAdapter(mAdapter);
             }
-        }  else {
+        } else {
             mAdapter.unload();
         }
 
@@ -628,14 +641,14 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             }
             mAdapter.setPauseDiskCache(
                     scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING ||
-                    scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
+                            scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
 
         }
     };
 
     /**
      * @return The position of an item in the list or grid based on the id of
-     *         the currently playing album.
+     * the currently playing album.
      */
     private int getItemPositionByAlbum() {
         final long albumId = MusicUtils.getCurrentAlbumId();
@@ -678,7 +691,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     /**
      * @return The position of an item in the list based on the name of the
-     *         currently playing song.
+     * currently playing song.
      */
     private int getItemPositionBySong() {
         final long trackId = MusicUtils.getCurrentAudioId();

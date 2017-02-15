@@ -1,20 +1,33 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.ui.fragments;
 
-import android.os.Bundle;
 import android.content.Loader;
-import android.view.*;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+
 import com.andrew.apollo.adapters.SongAdapter;
 import com.andrew.apollo.dragdrop.DragSortListView;
 import com.andrew.apollo.dragdrop.DragSortListView.DragScrollProfile;
@@ -34,24 +47,22 @@ import java.util.List;
 
 /**
  * This class is used to display all of the songs in the queue.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
  */
-public class QueueFragment extends ApolloFragment<SongAdapter, Song> implements DropListener, RemoveListener, DragScrollProfile {
+public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
+        implements DropListener, RemoveListener, DragScrollProfile {
 
     public QueueFragment() {
         super(Fragments.QUEUE_FRAGMENT_GROUP_ID, Fragments.QUEUE_FRAGMENT_LOADER_ID);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
-        super.onCreateView(inflater,container, savedInstanceState);
+                             final Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         DragSortListView dsListView = (DragSortListView) mListView;
         dsListView.setDropListener(this);
         // Set the swipe to remove listener
@@ -61,9 +72,6 @@ public class QueueFragment extends ApolloFragment<SongAdapter, Song> implements 
         return mRootView;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         if (inflater != null) {
@@ -72,14 +80,11 @@ public class QueueFragment extends ApolloFragment<SongAdapter, Song> implements 
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_save_queue:
-                NowPlayingCursor queue = (NowPlayingCursor)QueueLoader
+                NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
                         .makeQueueCursor(getActivity());
                 CreateNewPlaylist.getInstance(MusicUtils.getSongListForCursor(queue)).show(
                         getFragmentManager(), "CreatePlaylist");
@@ -112,7 +117,7 @@ public class QueueFragment extends ApolloFragment<SongAdapter, Song> implements 
 
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
-            final long id) {
+                            final long id) {
         // When selecting a track from the queue, just jump there instead of
         // reloading the queue. This is both faster, and prevents accidentally
         // dropping out of party shuffle.
