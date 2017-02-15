@@ -717,16 +717,20 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
 
     private void setTitle(String s) {
         if (!TextUtils.isEmpty(s)) {
-            TextView subtitle = findView(R.id.view_toolbar_header_subtitle);
-            subtitle.setText(s);
+            TextView title = findView(R.id.view_toolbar_header_title);
+            if (title != null) {
+                title.setText(s);
+            }
         }
     }
 
     private void setSubtitle(String s) {
         if (!TextUtils.isEmpty(s)) {
             TextView subtitle = findView(R.id.view_toolbar_header_subtitle);
-            subtitle.setVisibility(View.VISIBLE);
-            subtitle.setText(s);
+            if (subtitle != null) {
+                subtitle.setVisibility(View.VISIBLE);
+                subtitle.setText(s);
+            }
         }
     }
 }

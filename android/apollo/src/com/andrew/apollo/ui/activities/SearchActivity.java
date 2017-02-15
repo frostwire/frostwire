@@ -505,8 +505,10 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
     private void setSubtitle(String s) {
         if (!TextUtils.isEmpty(s)) {
             TextView subtitle = findView(R.id.view_toolbar_header_subtitle);
-            subtitle.setVisibility(View.VISIBLE);
-            subtitle.setText("\"" + s + "\"");
+            if (subtitle != null) {
+                subtitle.setVisibility(View.VISIBLE);
+                subtitle.setText("\"" + s + "\"");
+            }
         }
     }
 }
