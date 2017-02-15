@@ -1,22 +1,30 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.ui.fragments.profile;
 
-import android.os.Bundle;
 import android.content.Loader;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.ArtistAlbumAdapter;
 import com.andrew.apollo.loaders.ArtistAlbumLoader;
@@ -32,15 +40,15 @@ import java.util.List;
 
 /**
  * This class is used to display all of the albums from a particular artist.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
  */
-public class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Album> {
+public final class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Album> {
 
     public ArtistAlbumFragment() {
-        super(Fragments.ARTIST_ALBUM_PROFILE_FRAGMENT_GROUP_ID,Fragments.ARTIST_ALBUM_PROFILE_FRAGMENT_LOADER_ID);
+        super(Fragments.ARTIST_ALBUM_PROFILE_FRAGMENT_GROUP_ID, Fragments.ARTIST_ALBUM_PROFILE_FRAGMENT_LOADER_ID);
     }
 
     /**
@@ -49,7 +57,7 @@ public class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Albu
      */
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
 
         if (mListView != null && mProfileTabCarousel != null) {
@@ -76,9 +84,6 @@ public class ArtistAlbumFragment extends ApolloFragment<ArtistAlbumAdapter, Albu
         return new ArtistAlbumLoader(getActivity(), args.getLong(Config.ID));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onItemClick(final AdapterView<?> parent,
                             final View view,
