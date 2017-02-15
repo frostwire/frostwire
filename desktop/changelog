@@ -1,6 +1,10 @@
-frostwire (6.4.5) stable; urgency=high
+frostwire (6.4.6) stable; urgency=high
   * New VPN-Drop protection setting. Automatically stop all BitTorrent traffic
     if no VPN connection is available
+	
+ -- FrostWire Team <contact@frostwire.com>  Wed, 15 Feb 2017 10:18:02 -0600
+	
+frostwire (6.4.5) stable; urgency=high
   * New jlibtorrent 1.2.0.6 fixes BitTorrent connectivity issues
 
  -- FrostWire Team <contact@frostwire.com>  Mon, 13 Feb 2017 10:18:02 -0600
