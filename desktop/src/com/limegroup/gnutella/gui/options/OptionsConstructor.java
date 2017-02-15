@@ -195,7 +195,6 @@ public final class OptionsConstructor {
         DIALOG.getContentPane().add(mainPanel);
 
         OptionsTreeNode node = initializePanels();
-        System.out.println("Show node: " + node.getTitleKey());
         PANE_MANAGER.show(node);
     }
 
