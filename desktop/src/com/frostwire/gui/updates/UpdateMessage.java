@@ -35,7 +35,7 @@ final class UpdateMessage implements Serializable {
     private String build = null;
     private Date _expiration = null; //only needed for messageType == "announcement"
     private String _torrent = null; //optional torrent url
-    private String installerUrl; // optional installer url
+    private String installerUrl = null; // optional installer url
     private String _os = null; //optional OS string. If this exists and this machine
     //is not that OS, then the reader should discard this message
     private String _showOnce = "false"; //if this message is to be shown once or not

@@ -211,16 +211,16 @@ public final class UpdateManager implements Serializable {
 
             // Logic for Windows or Mac Update
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
-                if ((hasUrl && !hasTorrent && !hasInstallerUrl) || hasUrl) {
+                if (hasUrl && !hasTorrent && !hasInstallerUrl) {
                     showUpdateMessage(updateMessage);
-                } else if ((hasTorrent || hasInstallerUrl)) {
+                } else if (hasTorrent || hasInstallerUrl) {
                     new InstallerUpdater(updateMessage, force).start();
                 }
             }
             // Logic for Linux
             else if (OSUtils.isLinux()) {
                 if (OSUtils.isUbuntu()) {
-                    if ((hasTorrent || hasInstallerUrl)) {
+                    if (hasTorrent || hasInstallerUrl) {
                         new InstallerUpdater(updateMessage, force).start();
                     } else {
                         showUpdateMessage(updateMessage);
@@ -249,7 +249,7 @@ public final class UpdateManager implements Serializable {
 
         String[] options = new String[3];
 
-        if (msg.getTorrent() != null && VPNDropGuard.canUseBitTorrent(false)) {
+        if (msg.getTorrent() != null) {
             options[OPTION_DOWNLOAD_TORRENT] = I18n.tr("Download Torrent");
         } else {
             options = new String[2];
