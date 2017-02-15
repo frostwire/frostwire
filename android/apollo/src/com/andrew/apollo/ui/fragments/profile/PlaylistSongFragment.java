@@ -1,25 +1,36 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.ui.fragments.profile;
 
 import android.content.ContentResolver;
+import android.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.app.Fragment;
-import android.content.Loader;
-import android.view.*;
+import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.ProfileSongAdapter;
 import com.andrew.apollo.dragdrop.DragSortListView;
@@ -43,11 +54,8 @@ import java.util.List;
  * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
  */
-public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Song> implements DropListener, RemoveListener, DragScrollProfile {
+public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Song> implements DropListener, RemoveListener, DragScrollProfile {
 
-    /**
-     * Empty constructor as per the {@link Fragment} documentation
-     */
     public PlaylistSongFragment() {
         super(Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_GROUP_ID, Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_LOADER_ID);
     }
@@ -61,9 +69,6 @@ public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Son
         super.onActivityCreated(savedInstanceState);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v,
                                     final ContextMenuInfo menuInfo) {
@@ -96,18 +101,12 @@ public class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Son
         return new ProfileSongAdapter(getActivity(), R.layout.edit_track_list_item, ProfileSongAdapter.DISPLAY_PLAYLIST_SETTING);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
                             final long id) {
         MusicUtils.playAllFromUserItemClick(mAdapter, position);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
         return new PlaylistSongLoader(getActivity(), mPlaylistId);
