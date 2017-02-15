@@ -71,10 +71,9 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
                 VPN_DROP_PROTECTION_CHECKBOX,
                 LabeledComponent.LEFT_GLUE,
                 LabeledComponent.LEFT);
-         */
-
         panel.add(comp.getComponent());
         panel.addVerticalComponentGap();
+         */
 
         comp = new LabeledComponent(
                 MAX_ACTIVE_DOWNLOADS,
