@@ -66,10 +66,12 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         panel.add(comp.getComponent());
         panel.addVerticalComponentGap();
 
+        /**
         comp = new LabeledComponent(VPN_DROP_PROTECTION,
                 VPN_DROP_PROTECTION_CHECKBOX,
                 LabeledComponent.LEFT_GLUE,
                 LabeledComponent.LEFT);
+         */
 
         panel.add(comp.getComponent());
         panel.addVerticalComponentGap();
@@ -133,7 +135,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     public boolean applyOptions() throws IOException {
         BTEngine btEngine = BTEngine.getInstance();
         applyDHTOptions(btEngine);
-        applyVPNDropProtectionOption(btEngine);
+        //applyVPNDropProtectionOption(btEngine);
         btEngine.maxConnections(MAX_GLOBAL_NUM_CONNECTIONS_FIELD.getValue());
         btEngine.maxPeers(MAX_PEERS_FIELD.getValue());
         btEngine.maxActiveDownloads(MAX_ACTIVE_DOWNLOADS_FIELD.getValue());

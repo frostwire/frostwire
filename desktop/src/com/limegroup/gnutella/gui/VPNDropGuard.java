@@ -33,7 +33,7 @@ import static com.limegroup.gnutella.gui.I18n.tr;
 public class VPNDropGuard {
 
     public static boolean canUseBitTorrent(boolean showExplanationDialog) {
-        return canUseBitTorrent(showExplanationDialog, null);
+        return true;//canUseBitTorrent(showExplanationDialog, null);
     }
 
     static boolean canUseBitTorrent(boolean showExplanationDialog, Runnable uiCallback) {

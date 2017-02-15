@@ -479,9 +479,9 @@ public final class Initializer {
         BTEngine.ctx = ctx;
         BTEngine btEngine = BTEngine.getInstance();
         btEngine.start();
-        if (!canStartBitTorrentWithCurrentVPNSettingsAndStatus()) {
-            btEngine.pause();
-        }
+        //if (!canStartBitTorrentWithCurrentVPNSettingsAndStatus()) {
+        //    btEngine.pause();
+        //}
 
         if (!SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue()) {
             BTEngine.getInstance().stopDht();
