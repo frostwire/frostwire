@@ -30,7 +30,7 @@ import java.awt.event.ActionListener;
 
 import static com.limegroup.gnutella.gui.I18n.tr;
 
-public class VPNDropGuard {
+public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
 
     public static boolean canUseBitTorrent(boolean showExplanationDialog) {
         return canUseBitTorrent(showExplanationDialog, null);
@@ -130,4 +130,20 @@ public class VPNDropGuard {
         return canUseBitTorrent(true);
     }
 
+    @Override
+    public void onStatusUpdated(boolean vpnIsOn) {
+        boolean vpnDropProtectionOn = ConnectionSettings.VPN_DROP_PROTECTION.getValue();
+        BTEngine instance = BTEngine.getInstance();
+
+        if (vpnDropProtectionOn) {
+            if (vpnIsOn && instance.isPaused()) {
+                instance.resume();
+            }
+            if (!vpnIsOn && !instance.isPaused()) {
+                instance.pause();
+            }
+        } else if (!vpnDropProtectionOn && instance.isPaused()) {
+            instance.resume();
+        }
+    }
 }

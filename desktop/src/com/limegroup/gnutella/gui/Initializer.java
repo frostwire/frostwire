@@ -135,10 +135,6 @@ public final class Initializer {
         postinit();
     }
 
-    private boolean canStartBitTorrentWithCurrentVPNSettingsAndStatus() {
-        return !ConnectionSettings.VPN_DROP_PROTECTION.getValue() || VPNs.isVPNActive();
-    }
-
     /**
      * Initializes the very early things.
      */
@@ -479,13 +475,12 @@ public final class Initializer {
         BTEngine.ctx = ctx;
         BTEngine btEngine = BTEngine.getInstance();
         btEngine.start();
-        if (!canStartBitTorrentWithCurrentVPNSettingsAndStatus()) {
-            btEngine.pause();
-        }
 
         if (!SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue()) {
             BTEngine.getInstance().stopDht();
         }
+
+        VPNStatusRefresher.getInstance().addRefreshListener(new VPNDropGuard());
     }
 
     /**

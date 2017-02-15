@@ -38,12 +38,12 @@ public final class FrostWireUtils {
     /**
      * Constant for the current version of FrostWire.
      */
-    private static final String FROSTWIRE_VERSION = "6.4.5";
+    private static final String FROSTWIRE_VERSION = "6.4.6";
 
     /**
      * Build number for the current version, gets reset to 1 on every version bump
      */
-    private static final int BUILD_NUMBER = 220;
+    private static final int BUILD_NUMBER = 222;
 
     /**
      * Make sure the constructor can never be called.
