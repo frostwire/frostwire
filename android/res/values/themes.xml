@@ -32,6 +32,7 @@
         <item name="android:listPreferredItemPaddingLeft">16dp</item>
         <item name="android:listPreferredItemPaddingRight">16dp</item>
         <item name="vpiTitlePageIndicatorStyle">@style/TitlePageIndicatorStyle</item>
+        <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
     <style name="SplashScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">

@@ -50,7 +50,7 @@ public final class MainController {
     }
 
     public void switchFragment(int itemId) {
-        Fragment fragment = activity.getFragmentByMenuId(itemId);
+        Fragment fragment = activity.getFragmentByNavMenuId(itemId);
         if (fragment != null) {
             activity.switchContent(fragment);
         }
@@ -69,7 +69,7 @@ public final class MainController {
 
     public void showTransfers(TransferStatus status) {
         if (!(activity.getCurrentFragment() instanceof TransfersFragment)) {
-            TransfersFragment fragment = (TransfersFragment) activity.getFragmentByMenuId(R.id.menu_main_transfers);
+            TransfersFragment fragment = (TransfersFragment) activity.getFragmentByNavMenuId(R.id.menu_main_transfers);
             fragment.selectStatusTab(status);
             switchFragment(R.id.menu_main_transfers);
         }

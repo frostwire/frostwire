@@ -18,6 +18,7 @@
 package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -34,6 +35,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -42,16 +44,16 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.AndroidPlatform;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
@@ -60,7 +62,6 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
-import com.frostwire.android.gui.activities.internal.MainMenuAdapter;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.SDPermissionDialog;
@@ -78,7 +79,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.AdMenuItemView;
-import com.frostwire.android.gui.views.PlayerMenuItemView;
 import com.frostwire.android.gui.views.PlayerNotifierView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
@@ -126,18 +126,17 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private DrawerLayout drawerLayout;
 
     private ActionBarDrawerToggle drawerToggle;
-    private View leftDrawer;
-    private ListView listMenu;
+    private NavigationView navView;
     private SearchFragment search;
     private BrowsePeerFragment library;
     private TransfersFragment transfers;
     private Fragment currentFragment;
     private final Stack<Integer> fragmentsStack;
-    private PlayerMenuItemView playerItem;
     private AdMenuItemView menuRemoveAdsItem;
     private TimerSubscription playerSubscription;
     private BroadcastReceiver mainBroadcastReceiver;
     private boolean externalStoragePermissionsRequested = false;
+    private int checkedNavViewMenuItemId = -1;
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -163,7 +162,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(leftDrawer)) {
+        if (drawerLayout.isDrawerOpen(navView)) {
             closeSlideMenu();
         } else if (fragmentsStack.size() > 1) {
             try {
@@ -183,8 +182,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         updateHeader(getCurrentFragment());
     }
 
-    public void onConfigurationUpdate() {
-        setupMenuItems();
+    public void onConfigurationUpdate(boolean frostWireUpdateAvailable) {
+        updateNavigationView(frostWireUpdateAvailable);
     }
 
     public void shutdown() {
@@ -253,12 +252,9 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (isShutdown()) {
             return;
         }
-        leftDrawer = findView(R.id.activity_main_left_drawer);
-        listMenu = findView(R.id.left_drawer);
-        initPlayerItemListener();
+        initNavigationView(this);
         initAdMenuItemListener();
         setupFragments();
-        setupMenuItems();
         setupInitialFragment(savedInstanceState);
         playerSubscription = TimerService.subscribe(((PlayerNotifierView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
         onNewIntent(getIntent());
@@ -267,14 +263,81 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         setupDrawer();
     }
 
-    private void initPlayerItemListener() {
-        playerItem = findView(R.id.slidemenu_player_menuitem);
-        playerItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.launchPlayerActivity();
+    private void initNavigationView(final Activity activity) {
+        if (navView == null) {
+            navView = findView(R.id.activity_main_nav_view);
+            navView.setNavigationItemSelectedListener(
+                    new NavigationView.OnNavigationItemSelectedListener() {
+                        @Override
+                        public boolean onNavigationItemSelected(MenuItem menuItem) {
+                            onNavigationViewMenuItemSelected(menuItem);
+                            return true;
+                        }
+                    });
+            View navViewHeader = navView.getHeaderView(0);
+            // Prep title and version
+            TextView title = (TextView) navViewHeader.findViewById(R.id.nav_view_header_main_title);
+            String basicOrPlus = (String) activity.getText(Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? R.string.basic : R.string.plus);
+            title.setText(activity.getText(R.string.application_label) + " " + basicOrPlus + " v" + Constants.FROSTWIRE_VERSION_STRING);
+            TextView build = (TextView) navViewHeader.findViewById(R.id.nav_view_header_main_build);
+            build.setText(activity.getText(R.string.build) + " " + BuildConfig.VERSION_CODE);
+            // Prep update button
+            ImageView updateButton = (ImageView) navViewHeader.findViewById(R.id.nav_view_header_main_update);
+            updateButton.setVisibility(View.GONE);
+            updateButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onNavigationViewUpdateButtonClicked(activity);
+                }
+            });
+        }
+    }
+
+    private void onNavigationViewUpdateButtonClicked(Context context) {
+        drawerLayout.closeDrawer(navView);
+        SoftwareUpdater.instance().notifyUserAboutUpdate(context);
+    }
+
+    private void updateNavigationView(boolean updateAvailable) {
+        if (navView == null) {
+            initNavigationView(this);
+        }
+        if (updateAvailable) {
+            View navViewHeader = navView.getHeaderView(0);
+            ImageView updateButton = (ImageView) navViewHeader.findViewById(R.id.nav_view_header_main_update);
+            updateButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void onNavigationViewMenuItemSelected(MenuItem menuItem) {
+        checkedNavViewMenuItemId = menuItem.getItemId();
+        Engine.instance().getVibrator().hapticFeedback();
+        syncSlideMenu();
+        menuItem.setChecked(true);
+        setTitle(menuItem.getTitle());
+
+        Fragment fragment = getFragmentByNavMenuId(menuItem.getItemId());
+        if (fragment != null) {
+            switchContent(fragment);
+        } else {
+            switch (menuItem.getItemId()) {
+                case R.id.menu_main_my_music:
+                    controller.launchMyMusic();
+                    break;
+                case R.id.menu_main_support:
+                    UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
+                    break;
+                case R.id.menu_main_settings:
+                    controller.showPreferences();
+                    break;
+                case R.id.menu_main_shutdown:
+                    showShutdownDialog();
+                    break;
+                default:
+                    break;
             }
-        });
+        }
+        drawerLayout.closeDrawer(navView);
     }
 
     private void initAdMenuItemListener() {
@@ -377,9 +440,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     protected void onResume() {
         super.onResume();
         setupDrawer();
-        initPlayerItemListener();
+        initNavigationView(this);
         initAdMenuItemListener();
-        refreshPlayerItem();
         refreshMenuRemoveAdsItem();
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
@@ -446,6 +508,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (outState != null) {
+            // MIGHT DO: save checkedNavViewMenuItemId in bundle.
             super.onSaveInstanceState(outState);
             saveLastFragment(outState);
             saveFragmentsStack(outState);
@@ -507,10 +570,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         //avoid memory leaks when the device is tilted and the menu gets recreated.
         SoftwareUpdater.instance().removeConfigurationUpdateListener(this);
 
-        if (playerItem != null) {
-            playerItem.unbindDrawables();
-        }
-
         if (mToken != null) {
             MusicUtils.unbindFromService(mToken);
             mToken = null;
@@ -569,8 +628,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void handleSDPermissionDialogClick(int which) {
         if (which == Dialog.BUTTON_POSITIVE) {
             StoragePicker.show(this);
-        } else {
-            // TODO:
         }
     }
 
@@ -600,10 +657,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void toggleDrawer() {
-        if (drawerLayout.isDrawerOpen(leftDrawer)) {
-            drawerLayout.closeDrawer(leftDrawer);
+        if (drawerLayout.isDrawerOpen(navView)) {
+            drawerLayout.closeDrawer(navView);
         } else {
-            drawerLayout.openDrawer(leftDrawer);
+            drawerLayout.openDrawer(navView);
             syncSlideMenu();
         }
 
@@ -648,97 +705,16 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void syncSlideMenu() {
-        listMenu.clearChoices();
         invalidateOptionsMenu();
-
-        Fragment fragment = getCurrentFragment();
-        int menuId = R.id.menu_main_search;
-        if (fragment instanceof SearchFragment) {
-            menuId = R.id.menu_main_search;
-        } else if (fragment instanceof BrowsePeerFragment) {
-            menuId = R.id.menu_main_library;
-        } else if (fragment instanceof TransfersFragment) {
-            menuId = R.id.menu_main_transfers;
-        }
-        setCheckedItem(menuId);
-    }
-
-    private void setCheckedItem(int id) {
-        try {
-            listMenu.clearChoices();
-            ((MainMenuAdapter) listMenu.getAdapter()).notifyDataSetChanged();
-
-            int position = 0;
-            MainMenuAdapter adapter = (MainMenuAdapter) listMenu.getAdapter();
-            for (int i = 0; i < adapter.getCount(); i++) {
-                listMenu.setItemChecked(i, false);
-                if (adapter.getItemId(i) == id) {
-                    position = i;
-                    break;
-                }
-            }
-
-            if (id != -1) {
-                listMenu.setItemChecked(position, true);
-            }
-
-            invalidateOptionsMenu();
-
-            if (drawerToggle != null) {
-                drawerToggle.syncState();
-            }
-        } catch (Throwable e) { // protecting from weird android UI engine issues
-            LOG.warn("Error setting slide menu item selected", e);
-        }
-    }
-
-    private void refreshPlayerItem() {
-        if (playerItem != null) {
-            playerItem.refresh();
-        }
+        navView.setCheckedItem(getNavMenuIdByFragment(getCurrentFragment()));
     }
 
     private void refreshMenuRemoveAdsItem() {
-        // only visible for basic or debug build
-        int visibility = View.GONE;
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
-            // if they haven't paid for ads
-            if (!Offers.disabledAds() &&
-                    (playerItem == null || playerItem.getVisibility() == View.GONE)) {
-                visibility = View.VISIBLE;
-            }
-        }
+        // only visible for basic or debug build and if ads have not been disabled.
+        int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) && !Offers.disabledAds()) ?
+                View.VISIBLE :
+                View.GONE;
         menuRemoveAdsItem.setVisibility(visibility);
-    }
-
-    private void setupMenuItems() {
-        listMenu.setAdapter(new MainMenuAdapter(this));
-        listMenu.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-        listMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //onItemClick(AdapterView<?> parent, View view, int position, long id)
-                syncSlideMenu();
-                Engine.instance().getVibrator().hapticFeedback();
-                controller.closeSlideMenu();
-                try {
-                    if (id == R.id.menu_main_settings) {
-                        controller.showPreferences();
-                    } else if (id == R.id.menu_main_shutdown) {
-                        showShutdownDialog();
-                    } else if (id == R.id.menu_main_my_music) {
-                        controller.launchMyMusic();
-                    } else if (id == R.id.menu_main_support) {
-                        UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
-                    } else {
-                        listMenu.setItemChecked(position, true);
-                        controller.switchFragment((int) id);
-                    }
-                } catch (Throwable e) { // protecting from weird android UI engine issues
-                    LOG.error("Error clicking slide menu item", e);
-                }
-            }
-        });
     }
 
     private void setupFragments() {
@@ -765,6 +741,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         switchContent(fragment);
+    }
+
+    private void setCheckedItem(int navMenuItemId) {
+        if (navView != null) {
+            navView.setCheckedItem(navMenuItemId);
+        }
     }
 
     private void saveFragmentsStack(Bundle outState) {
@@ -797,8 +779,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             if (fragment instanceof MainFragment) {
                 View header = ((MainFragment) fragment).getHeader(this);
                 if (header != null) {
-                    setToolbarView(header, Gravity.CENTER);
+                    setToolbarView(header, Gravity.LEFT);
                 }
+            }
+            if (navView != null && checkedNavViewMenuItemId != -1) {
+                MenuItem item = navView.getMenu().findItem(checkedNavViewMenuItemId);
+                setTitle(item.getTitle());
             }
         } catch (Throwable e) {
             LOG.error("Error updating main header", e);
@@ -822,7 +808,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
      * The following methods are only public to be able to use them from another package(internal).
      */
 
-    public Fragment getFragmentByMenuId(int id) {
+    public Fragment getFragmentByNavMenuId(int id) {
         switch (id) {
             case R.id.menu_main_search:
                 return search;
@@ -835,6 +821,18 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
+    private int getNavMenuIdByFragment(Fragment fragment) {
+        int menuId = -1;
+        if (fragment == search) {
+            menuId = R.id.menu_main_search;
+        } else if (fragment == library) {
+            menuId = R.id.menu_main_library;
+        } else if (fragment == transfers) {
+            menuId = R.id.menu_main_transfers;
+        }
+        return menuId;
+    }
+
     public void switchContent(Fragment fragment) {
         switchContent(fragment, true);
     }
@@ -844,7 +842,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     public void closeSlideMenu() {
-        drawerLayout.closeDrawer(leftDrawer);
+        drawerLayout.closeDrawer(navView);
     }
 
     @Override
@@ -931,7 +929,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         @Override
         public void onDrawerClosed(View view) {
             if (Ref.alive(activityRef)) {
-                activityRef.get().invalidateOptionsMenu();
                 activityRef.get().syncSlideMenu();
             }
         }
@@ -940,7 +937,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         public void onDrawerOpened(View drawerView) {
             if (Ref.alive(activityRef)) {
                 UIUtils.hideKeyboardFromActivity(activityRef.get());
-                activityRef.get().invalidateOptionsMenu();
                 activityRef.get().syncSlideMenu();
             }
         }
@@ -949,7 +945,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         public void onDrawerStateChanged(int newState) {
             if (Ref.alive(activityRef)) {
                 MainActivity activity = activityRef.get();
-                activity.refreshPlayerItem();
                 activity.refreshMenuRemoveAdsItem();
                 activity.syncSlideMenu();
             }
@@ -957,7 +952,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     public void performYTSearch(String ytUrl) {
-        SearchFragment searchFragment = (SearchFragment) getFragmentByMenuId(R.id.menu_main_search);
+        SearchFragment searchFragment = (SearchFragment) getFragmentByNavMenuId(R.id.menu_main_search);
         searchFragment.performYTSearch(ytUrl);
         switchContent(searchFragment);
     }
