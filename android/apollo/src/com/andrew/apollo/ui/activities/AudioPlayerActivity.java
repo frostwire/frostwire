@@ -333,9 +333,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
-        getMenuInflater().inflate(R.menu.apollo_menu_search, menu);
+        getMenuInflater().inflate(R.menu.player_search, menu);
 
-        final SearchView searchView = (SearchView) menu.findItem(R.id.apollo_menu_item_search).getActionView();
+        final SearchView searchView = (SearchView) menu.findItem(R.id.menu_player_search).getActionView();
         // Add voice search
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
@@ -358,7 +358,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         });
 
         // Favorite action
-        getMenuInflater().inflate(R.menu.apollo_menu_favorite, menu);
+        getMenuInflater().inflate(R.menu.player_favorite, menu);
         // Shuffle all
         getMenuInflater().inflate(R.menu.shuffle, menu);
         // Share, ringtone, and equalizer
@@ -375,7 +375,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 // Refresh the queue
                 ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
                 return true;
-            case R.id.menu_favorite:
+            case R.id.menu_player_favorite:
                 // Toggle the current track as a favorite and update the menu
                 // item
                 toggleFavorite();

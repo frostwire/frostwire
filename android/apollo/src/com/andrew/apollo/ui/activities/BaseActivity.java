@@ -183,9 +183,9 @@ public abstract class BaseActivity extends AbstractActivity
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
-        getMenuInflater().inflate(R.menu.apollo_menu_search, menu);
+        getMenuInflater().inflate(R.menu.player_search, menu);
 
-        final SearchView searchView = (SearchView) menu.findItem(R.id.apollo_menu_item_search).getActionView();
+        final SearchView searchView = (SearchView) menu.findItem(R.id.menu_player_search).getActionView();
         // Add voice search
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());

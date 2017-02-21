@@ -21,7 +21,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_favorite"
+        android:id="@+id/menu_player_favorite"
         android:icon="@drawable/ic_action_favorite"
         android:orderInCategory="2"
         android:title="@string/add_to_favorites"

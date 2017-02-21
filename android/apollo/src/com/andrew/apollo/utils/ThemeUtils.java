@@ -109,7 +109,7 @@ public class ThemeUtils {
      * @param favorite The favorites action.
      */
     public static void setFavoriteIcon(final Menu favorite) {
-        final MenuItem item = favorite.findItem(R.id.menu_favorite);
+        final MenuItem item = favorite.findItem(R.id.menu_player_favorite);
         item.setIcon(MusicUtils.isFavorite() ?
                 R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
     }

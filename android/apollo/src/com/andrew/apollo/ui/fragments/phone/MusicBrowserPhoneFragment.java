@@ -149,7 +149,7 @@ public class MusicBrowserPhoneFragment extends Fragment implements
         }
 
         // Favorite action
-        inflater.inflate(R.menu.favorite, menu);
+        inflater.inflate(R.menu.player_favorite, menu);
         // Shuffle all
         inflater.inflate(R.menu.shuffle, menu);
         // Sort orders
@@ -176,7 +176,7 @@ public class MusicBrowserPhoneFragment extends Fragment implements
                 // Shuffle all the songs
                 MusicUtils.shuffleAll(getActivity());
                 return true;
-            case R.id.menu_favorite:
+            case R.id.menu_player_favorite:
                 // Toggle the current track as a favorite and update the menu
                 // item
                 MusicUtils.toggleFavorite();

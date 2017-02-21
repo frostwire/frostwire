@@ -21,11 +21,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/apollo_menu_item_search"
-        android:icon="@drawable/ic_action_search"
-        android:orderInCategory="1"
-        android:title="@string/menu_search"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="ifRoom|collapseActionView" />
+        android:id="@+id/menu_player_add_to_homescreen"
+        android:icon="@drawable/ic_action_pinn_to_home"
+        android:orderInCategory="2"
+        android:title="@string/menu_add_to_homescreen"
+        app:showAsAction="ifRoom" />
 
 </menu>

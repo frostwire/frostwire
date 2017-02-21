@@ -172,10 +172,10 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
-        getMenuInflater().inflate(R.menu.apollo_menu_search, menu);
+        getMenuInflater().inflate(R.menu.player_search, menu);
 
         // Filter the list the user is looking it via SearchView
-        mSearchView = (SearchView) menu.findItem(R.id.apollo_menu_item_search).getActionView();
+        mSearchView = (SearchView) menu.findItem(R.id.menu_player_search).getActionView();
         mSearchView.setOnQueryTextListener(this);
 
         // Add voice search

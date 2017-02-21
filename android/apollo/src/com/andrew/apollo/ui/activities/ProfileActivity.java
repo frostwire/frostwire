@@ -265,7 +265,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Pin to Home screen
-        getMenuInflater().inflate(R.menu.apollo_menu_add_to_homescreen, menu);
+        getMenuInflater().inflate(R.menu.player_add_to_homescreen, menu);
         // Shuffle
         getMenuInflater().inflate(R.menu.shuffle, menu);
         // Sort orders
@@ -319,7 +319,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             case android.R.id.home:
                 goBack();
                 return true;
-            case R.id.menu_add_to_homescreen: {
+            case R.id.menu_player_add_to_homescreen: {
                 // Place the artist, album, genre, or playlist onto the Home
                 // screen. Definitely one of my favorite features.
                 final String name = isArtist() ? mArtistName : mProfileName;
