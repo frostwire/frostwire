@@ -133,48 +133,52 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-                        <ImageButton
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal|right"
-                            android:layout_marginRight="10dp"
-                            android:layout_marginTop="10dp"
-                            android:background="@null"
-                            android:src="@drawable/ad_cancel"
-                            android:layout_alignRight="@+id/audio_player_advertisement_text"
-                            android:visibility="invisible" />
-                        <TextView
-                            android:id="@+id/audio_player_advertisement_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_weight="1.0"
-                            android:gravity="center"
-                            android:text="@string/advertisement"
-                            android:textColor="@color/app_text_disabled"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignRight="@+id/audio_player_advertisement_text"
+                                android:layout_gravity="center_horizontal|right"
+                                android:layout_marginRight="10dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@null"
+                                android:src="@drawable/ad_cancel"
+                                android:visibility="invisible" />
+
+                            <TextView
+                                android:id="@+id/audio_player_advertisement_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="1.0"
+                                android:gravity="center"
+                                android:text="@string/advertisement"
+                                android:textColor="@color/app_text_disabled"
+                                android:visibility="gone" />
+
+                            <ImageButton
+                                android:id="@+id/audio_player_dismiss_mopubview_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignRight="@+id/audio_player_advertisement_text"
+                                android:layout_gravity="center_vertical|right"
+                                android:layout_marginRight="10dp"
+                                android:background="@null"
+                                android:src="@drawable/ad_cancel"
+                                android:visibility="gone" />
+                        </LinearLayout>
+
+                        <com.mopub.mobileads.MoPubView
+                            android:id="@+id/audio_player_mopubview"
+                            android:layout_width="match_parent"
+                            android:layout_height="250dp"
                             android:visibility="gone" />
 
-                        <ImageButton
-                            android:id="@+id/audio_player_dismiss_mopubview_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical|right"
-                            android:layout_marginRight="10dp"
-                            android:background="@null"
-                            android:src="@drawable/ad_cancel"
-                            android:layout_alignRight="@+id/audio_player_advertisement_text"
-                            android:visibility="gone" />
-                    </LinearLayout>
-                    <com.mopub.mobileads.MoPubView
-                        android:id="@+id/audio_player_mopubview"
-                        android:layout_width="match_parent"
-                        android:layout_height="250dp"
-                        android:visibility="gone" />
                         <TextView
                             android:id="@+id/audio_player_remove_ads_text_link"
                             android:layout_width="match_parent"
@@ -245,7 +249,7 @@
             android:textSize="@dimen/text_size_medium"
             app:themeResource="audio_player_total_time" />
 
-        <com.andrew.apollo.widgets.theme.ThemeableSeekBar
+        <SeekBar
             android:id="@android:id/progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -253,7 +257,8 @@
             android:layout_marginBottom="@dimen/audio_player_seek_bar_margin_bottom"
             android:layout_toLeftOf="@+id/audio_player_total_time"
             android:layout_toRightOf="@+id/audio_player_current_time"
-            android:max="1000" />
+            android:max="1000"
+            android:progressDrawable="@drawable/audio_player_seekbar" />
 
         <LinearLayout
             android:id="@+id/audio_player_controlss"
