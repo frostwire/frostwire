@@ -31,6 +31,7 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
         <item name="android:listPreferredItemPaddingLeft">16dp</item>
         <item name="android:listPreferredItemPaddingRight">16dp</item>
+        <item name="vpiTitlePageIndicatorStyle">@style/TitlePageIndicatorStyle</item>
     </style>
 
     <style name="PreferenceThemeOverlay" parent="PreferenceThemeOverlay.v14.Material">
@@ -47,4 +48,6 @@
         <item name="colorButtonNormal">@color/basic_gray_dark</item>
         <item name="colorAccent">@color/basic_gray_medium</item>
     </style>
+
+    <style name="TitlePageIndicatorStyle" />
 </resources>
