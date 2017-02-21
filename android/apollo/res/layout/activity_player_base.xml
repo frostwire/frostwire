@@ -257,6 +257,7 @@
             android:layout_marginBottom="@dimen/audio_player_seek_bar_margin_bottom"
             android:layout_toLeftOf="@+id/audio_player_total_time"
             android:layout_toRightOf="@+id/audio_player_current_time"
+            android:background="@null"
             android:max="1000"
             android:progressDrawable="@drawable/audio_player_seekbar" />
 
