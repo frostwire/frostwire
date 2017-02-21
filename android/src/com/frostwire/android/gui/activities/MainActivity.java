@@ -17,7 +17,6 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -34,24 +33,30 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.AndroidPlatform;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
@@ -109,7 +114,7 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
  * @author gubatron
  * @author aldenml
  */
-public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
+public class MainActivity extends AbstractActivity implements
         OnDialogClickListener,
         ServiceConnection,
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -123,10 +128,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
     private final Map<Integer, DangerousPermissionsChecker> permissionsCheckers;
     private MainController controller;
-    private DrawerLayout drawerLayout;
 
-    private ActionBarDrawerToggle drawerToggle;
-    private View leftDrawer;
     private ListView listMenu;
     private SearchFragment search;
     private BrowsePeerFragment library;
@@ -139,53 +141,132 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private BroadcastReceiver mainBroadcastReceiver;
     private boolean externalStoragePermissionsRequested = false;
 
-    public MainActivity() {
-        super(R.layout.activity_main);
-        this.controller = new MainController(this);
-        this.fragmentsStack = new Stack<>();
-        this.permissionsCheckers = initPermissionsCheckers();
-    }
-
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_SEARCH) {
-            if (!(getCurrentFragment() instanceof SearchFragment)) {
-                controller.switchFragment(R.id.menu_main_search);
-            }
-        } else if (keyCode == KeyEvent.KEYCODE_MENU) {
-            toggleDrawer();
-        } else {
-            return super.onKeyDown(keyCode, event);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        this.controller = new MainController(this);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View navHeaderView =  navigationView.getHeaderView(0);
+        TextView title = (TextView)navHeaderView.findViewById(R.id.nav_header_main_title);
+        String basicOrPlus = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "Basic" : "Plus";
+        title.setText("FrostWire " + basicOrPlus + " v" + Constants.FROSTWIRE_VERSION_STRING);
+        TextView buildNumber = (TextView)navHeaderView.findViewById(R.id.nav_header_main_build);
+        buildNumber.setText("build " + BuildConfig.VERSION_CODE);
+
+        setupDrawerContent(navigationView);
+
+        if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
+            // we are still in the wizard.
+            return;
         }
 
-        return true;
+        if (isShutdown()) {
+            return;
+        }
+
+        checkExternalStoragePermissionsOrBindMusicService();
+        checkAccessCoarseLocationPermissions();
+    }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+    }
+
+    public void selectDrawerItem(MenuItem menuItem) {
+        // Insert the fragment by replacing any existing fragment
+        Fragment fragment;
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+
+        switch(menuItem.getItemId()) {
+            case R.id.menu_main_search:
+                fragment = new SearchFragment();
+            ft.replace(R.id.content_frame, fragment).commit();
+                break;
+            case R.id.menu_main_my_music:
+                controller.launchMyMusic();
+                break;
+            case R.id.menu_main_library:
+                fragment = new BrowsePeerFragment();
+            ft.replace(R.id.content_frame, fragment).commit();
+                break;
+            case R.id.menu_main_transfers:
+                fragment = new TransfersFragment();
+            ft.replace(R.id.content_frame, fragment).commit();
+                break;
+            case R.id.menu_main_support:
+                UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
+                break;
+            case R.id.menu_main_settings:
+                controller.showPreferences();
+                break;
+            case R.id.menu_main_shutdown:
+                showShutdownDialog();
+                break;
+            default:
+                fragment = new SearchFragment();
+                ft.replace(R.id.content_frame, fragment).commit();
+        }
+
+        // Highlight the selected item
+        menuItem.setChecked(true);
+        // Set action bar title on changed fragment
+        setTitle(menuItem.getTitle());
+        // Close the navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
     }
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(leftDrawer)) {
-            closeSlideMenu();
-        } else if (fragmentsStack.size() > 1) {
-            try {
-                fragmentsStack.pop();
-                int id = fragmentsStack.peek();
-                Fragment fragment = getFragmentManager().findFragmentById(id);
-                switchContent(fragment, false);
-            } catch (Throwable e) {
-                // don't break the app
-                showLastBackDialog();
-            }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
         } else {
-            showLastBackDialog();
+            super.onBackPressed();
         }
-
-        syncSlideMenu();
-        updateHeader(getCurrentFragment());
     }
 
-    public void onConfigurationUpdate() {
-        setupMenuItems();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
     public void shutdown() {
         Offers.stopAdNetworks(this);
@@ -203,6 +284,48 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             }
         }.start();
     }
+
+    private boolean isShutdown() {
+        return isShutdown(null);
+    }
+
+    private boolean isShutdown(Intent intent) {
+        if (intent == null) {
+            intent = getIntent();
+        }
+        boolean result = intent != null && intent.getBooleanExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), false);
+        if (result) {
+            shutdown();
+        }
+        return result;
+    }
+
+
+    public MainActivity() {
+        super(R.layout.activity_main);
+//        this.controller = new MainController(this);
+        this.fragmentsStack = new Stack<>();
+        this.permissionsCheckers = initPermissionsCheckers();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+            if (!(getCurrentFragment() instanceof SearchFragment)) {
+                controller.switchFragment(R.id.menu_main_search);
+            }
+        } else if (keyCode == KeyEvent.KEYCODE_MENU) {
+//            toggleDrawer();
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
+
+        return true;
+    }
+
+//    public void onConfigurationUpdate() {
+//        setupMenuItems();
+//    }
 
     @Override
     public void finish() {
@@ -226,21 +349,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
-    private boolean isShutdown() {
-        return isShutdown(null);
-    }
-
-    private boolean isShutdown(Intent intent) {
-        if (intent == null) {
-            intent = getIntent();
-        }
-        boolean result = intent != null && intent.getBooleanExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), false);
-        if (result) {
-            shutdown();
-        }
-        return result;
-    }
-
     private boolean isGoHome(Intent intent) {
         if (intent == null) {
             intent = getIntent();
@@ -248,46 +356,46 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         return intent != null && intent.getBooleanExtra("gohome-" + ConfigurationManager.instance().getUUIDString(), false);
     }
 
-    @Override
-    protected void initComponents(Bundle savedInstanceState) {
-        if (isShutdown()) {
-            return;
-        }
-        leftDrawer = findView(R.id.activity_main_left_drawer);
-        listMenu = findView(R.id.left_drawer);
-        initPlayerItemListener();
-        initAdMenuItemListener();
-        setupFragments();
-        setupMenuItems();
-        setupInitialFragment(savedInstanceState);
-        playerSubscription = TimerService.subscribe(((PlayerNotifierView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
-        onNewIntent(getIntent());
-        SoftwareUpdater.instance().addConfigurationUpdateListener(this);
-        setupActionBar();
-        setupDrawer();
-    }
+//    @Override
+//    protected void initComponents(Bundle savedInstanceState) {
+//        if (isShutdown()) {
+//            return;
+//        }
+//        leftDrawer = findView(R.id.activity_main_left_drawer);
+//        listMenu = findView(R.id.left_drawer);
+//        initPlayerItemListener();
+//        initAdMenuItemListener();
+//        setupFragments();
+//        setupMenuItems();
+//        setupInitialFragment(savedInstanceState);
+//        playerSubscription = TimerService.subscribe(((PlayerNotifierView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
+//        onNewIntent(getIntent());
+//        SoftwareUpdater.instance().addConfigurationUpdateListener(this);
+//        setupActionBar();
+//        setupDrawer();
+//    }
 
-    private void initPlayerItemListener() {
-        playerItem = findView(R.id.slidemenu_player_menuitem);
-        playerItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.launchPlayerActivity();
-            }
-        });
-    }
+//    private void initPlayerItemListener() {
+//        playerItem = findView(R.id.slidemenu_player_menuitem);
+//        playerItem.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                controller.launchPlayerActivity();
+//            }
+//        });
+//    }
 
-    private void initAdMenuItemListener() {
-        menuRemoveAdsItem = findView(R.id.slidermenu_ad_menuitem);
-        RelativeLayout menuAd = findView(R.id.view_ad_menu_item_ad);
-        menuAd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, BuyActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
+//    private void initAdMenuItemListener() {
+//        menuRemoveAdsItem = findView(R.id.slidermenu_ad_menuitem);
+//        RelativeLayout menuAd = findView(R.id.view_ad_menu_item_ad);
+//        menuAd.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(MainActivity.this, BuyActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -373,42 +481,42 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setupDrawer();
-        initPlayerItemListener();
-        initAdMenuItemListener();
-        refreshPlayerItem();
-        refreshMenuRemoveAdsItem();
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
-            mainResume();
-            Offers.initAdNetworks(this);
-        } else if (!isShutdown()) {
-            controller.startWizardActivity();
-        }
-        checkLastSeenVersion();
-        registerMainBroadcastReceiver();
-        syncSlideMenu();
-        //uncomment to test social links dialog
-        //UIUtils.showSocialLinksDialog(this, true, null, "");
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
-            checkExternalStoragePermissionsOrBindMusicService();
-        }
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+////        setupDrawer();
+////        initPlayerItemListener();
+////        initAdMenuItemListener();
+//        refreshPlayerItem();
+////        refreshMenuRemoveAdsItem();
+//        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
+//            mainResume();
+//            Offers.initAdNetworks(this);
+//        } else if (!isShutdown()) {
+//            controller.startWizardActivity();
+//        }
+//        checkLastSeenVersion();
+//        registerMainBroadcastReceiver();
+////        syncSlideMenu();
+//        //uncomment to test social links dialog
+//        //UIUtils.showSocialLinksDialog(this, true, null, "");
+//        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
+//            checkExternalStoragePermissionsOrBindMusicService();
+//        }
+//    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mainBroadcastReceiver != null) {
-            try {
-                unregisterReceiver(mainBroadcastReceiver);
-            } catch (Throwable ignored) {
-                //oh well (the api doesn't provide a way to know if it's been registered before,
-                //seems like overkill keeping track of these ourselves.)
-            }
-        }
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        if (mainBroadcastReceiver != null) {
+//            try {
+//                unregisterReceiver(mainBroadcastReceiver);
+//            } catch (Throwable ignored) {
+//                //oh well (the api doesn't provide a way to know if it's been registered before,
+//                //seems like overkill keeping track of these ourselves.)
+//            }
+//        }
+//    }
 
     private Map<Integer, DangerousPermissionsChecker> initPermissionsCheckers() {
         Map<Integer, DangerousPermissionsChecker> checkers = new HashMap<>();
@@ -454,22 +562,22 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private ServiceToken mToken;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
-            // we are still in the wizard.
-            return;
-        }
-
-        if (isShutdown()) {
-            return;
-        }
-
-        checkExternalStoragePermissionsOrBindMusicService();
-        checkAccessCoarseLocationPermissions();
-    }
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//
+//        if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
+//            // we are still in the wizard.
+//            return;
+//        }
+//
+//        if (isShutdown()) {
+//            return;
+//        }
+//
+//        checkExternalStoragePermissionsOrBindMusicService();
+//        checkAccessCoarseLocationPermissions();
+//    }
 
     private void checkAccessCoarseLocationPermissions() {
         DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE);
@@ -529,7 +637,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void mainResume() {
         checkSDPermission();
 
-        syncSlideMenu();
+//        syncSlideMenu();
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
                     !NetworkManager.instance().isTunnelUp()) {
@@ -598,17 +706,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
-    private void toggleDrawer() {
-        if (drawerLayout.isDrawerOpen(leftDrawer)) {
-            drawerLayout.closeDrawer(leftDrawer);
-        } else {
-            drawerLayout.openDrawer(leftDrawer);
-            syncSlideMenu();
-        }
-
-        updateHeader(getCurrentFragment());
-    }
-
     private void showLastBackDialog() {
         YesNoDialog dlg = YesNoDialog.newInstance(
                 LAST_BACK_DIALOG_ID,
@@ -646,52 +743,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, true, false);
     }
 
-    private void syncSlideMenu() {
-        listMenu.clearChoices();
-        invalidateOptionsMenu();
-
-        Fragment fragment = getCurrentFragment();
-        int menuId = R.id.menu_main_search;
-        if (fragment instanceof SearchFragment) {
-            menuId = R.id.menu_main_search;
-        } else if (fragment instanceof BrowsePeerFragment) {
-            menuId = R.id.menu_main_library;
-        } else if (fragment instanceof TransfersFragment) {
-            menuId = R.id.menu_main_transfers;
-        }
-        setCheckedItem(menuId);
-        updateHeader(getCurrentFragment());
-    }
-
-    private void setCheckedItem(int id) {
-        try {
-            listMenu.clearChoices();
-            ((MainMenuAdapter) listMenu.getAdapter()).notifyDataSetChanged();
-
-            int position = 0;
-            MainMenuAdapter adapter = (MainMenuAdapter) listMenu.getAdapter();
-            for (int i = 0; i < adapter.getCount(); i++) {
-                listMenu.setItemChecked(i, false);
-                if (adapter.getItemId(i) == id) {
-                    position = i;
-                    break;
-                }
-            }
-
-            if (id != -1) {
-                listMenu.setItemChecked(position, true);
-            }
-
-            invalidateOptionsMenu();
-
-            if (drawerToggle != null) {
-                drawerToggle.syncState();
-            }
-        } catch (Throwable e) { // protecting from weird android UI engine issues
-            LOG.warn("Error setting slide menu item selected", e);
-        }
-    }
-
     private void refreshPlayerItem() {
         if (playerItem != null) {
             playerItem.refresh();
@@ -708,64 +759,35 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 visibility = View.VISIBLE;
             }
         }
-        menuRemoveAdsItem.setVisibility(visibility);
+//        menuRemoveAdsItem.setVisibility(visibility);
     }
 
-    private void setupMenuItems() {
-        listMenu.setAdapter(new MainMenuAdapter(this));
-        listMenu.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-        listMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //onItemClick(AdapterView<?> parent, View view, int position, long id)
-                syncSlideMenu();
-                Engine.instance().getVibrator().hapticFeedback();
-                controller.closeSlideMenu();
-                try {
-                    if (id == R.id.menu_main_settings) {
-                        controller.showPreferences();
-                    } else if (id == R.id.menu_main_shutdown) {
-                        showShutdownDialog();
-                    } else if (id == R.id.menu_main_my_music) {
-                        controller.launchMyMusic();
-                    } else if (id == R.id.menu_main_support) {
-                        UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
-                    } else {
-                        listMenu.setItemChecked(position, true);
-                        controller.switchFragment((int) id);
-                    }
-                } catch (Throwable e) { // protecting from weird android UI engine issues
-                    LOG.error("Error clicking slide menu item", e);
-                }
-            }
-        });
-    }
 
-    private void setupFragments() {
-        search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
-        library = (BrowsePeerFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_browse_peer);
-        transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
-        hideFragments(getFragmentManager().beginTransaction()).commit();
-    }
+//    private void setupFragments() {
+//        search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
+//        library = (BrowsePeerFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_browse_peer);
+//        transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
+//        hideFragments(getFragmentManager().beginTransaction()).commit();
+//    }
 
     private FragmentTransaction hideFragments(FragmentTransaction ts) {
         return ts.hide(search).hide(library).hide(transfers);
     }
 
-    private void setupInitialFragment(Bundle savedInstanceState) {
-        Fragment fragment = null;
-
-        if (savedInstanceState != null) {
-            fragment = getFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
-            restoreFragmentsStack(savedInstanceState);
-        }
-        if (fragment == null) {
-            fragment = search;
-            setCheckedItem(R.id.menu_main_search);
-        }
-
-        switchContent(fragment);
-    }
+//    private void setupInitialFragment(Bundle savedInstanceState) {
+//        Fragment fragment = null;
+//
+//        if (savedInstanceState != null) {
+//            fragment = getFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
+//            restoreFragmentsStack(savedInstanceState);
+//        }
+//        if (fragment == null) {
+//            fragment = search;
+//            setCheckedItem(R.id.menu_main_search);
+//        }
+//
+//        switchContent(fragment);
+//    }
 
     private void saveFragmentsStack(Bundle outState) {
         int[] stack = new int[fragmentsStack.size()];
@@ -843,60 +865,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         return currentFragment;
     }
 
-    public void closeSlideMenu() {
-        drawerLayout.closeDrawer(leftDrawer);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle != null) {
-            try {
-                drawerToggle.onOptionsItemSelected(item);
-            } catch (Throwable t) {
-                // usually java.lang.IllegalArgumentException: No drawer view found with gravity LEFT
-                return false;
-            }
-            return true;
-        }
-
-        if (item == null) {
-            return false;
-        }
-
-        switch (item.getItemId()) {
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
-    }
-
-    private void setupActionBar() {
-        ActionBar bar = getActionBar();
-        if (bar != null) {
-            bar.setCustomView(R.layout.view_custom_actionbar);
-            bar.setDisplayShowCustomEnabled(true);
-            bar.setDisplayHomeAsUpEnabled(true);
-            bar.setHomeButtonEnabled(true);
-        }
-    }
-
-    private void setupDrawer() {
-        drawerLayout = findView(R.id.drawer_layout);
-        Toolbar toolbar = findToolbar();
-        drawerToggle = new MenuDrawerToggle(this, drawerLayout, toolbar);
-        drawerLayout.setDrawerListener(drawerToggle);
-    }
 
     public void onServiceConnected(final ComponentName name, final IBinder service) {
         musicPlaybackService = IApolloService.Stub.asInterface(service);
@@ -918,48 +886,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         Offers.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private static final class MenuDrawerToggle extends ActionBarDrawerToggle {
-        private final WeakReference<MainActivity> activityRef;
-
-        MenuDrawerToggle(MainActivity activity, DrawerLayout drawerLayout, Toolbar toolbar) {
-            super(activity, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
-
-            // aldenml: even if the parent class holds a strong reference, I decided to keep a weak one
-            this.activityRef = Ref.weak(activity);
-        }
-
-        @Override
-        public void onDrawerClosed(View view) {
-            if (Ref.alive(activityRef)) {
-                activityRef.get().invalidateOptionsMenu();
-                activityRef.get().syncSlideMenu();
-            }
-        }
-
-        @Override
-        public void onDrawerOpened(View drawerView) {
-            if (Ref.alive(activityRef)) {
-                UIUtils.hideKeyboardFromActivity(activityRef.get());
-                activityRef.get().invalidateOptionsMenu();
-                activityRef.get().syncSlideMenu();
-            }
-        }
-
-        @Override
-        public void onDrawerStateChanged(int newState) {
-            if (Ref.alive(activityRef)) {
-                MainActivity activity = activityRef.get();
-                activity.refreshPlayerItem();
-                activity.refreshMenuRemoveAdsItem();
-                activity.syncSlideMenu();
-            }
-        }
-    }
 
     public void performYTSearch(String ytUrl) {
         SearchFragment searchFragment = (SearchFragment) getFragmentByMenuId(R.id.menu_main_search);
         searchFragment.performYTSearch(ytUrl);
-        switchContent(searchFragment);
+//        switchContent(searchFragment);
     }
 
     // TODO: refactor and move this method for a common place when needed

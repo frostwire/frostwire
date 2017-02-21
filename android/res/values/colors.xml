@@ -31,6 +31,8 @@
     <color name="basic_gray_medium">#d1dddddd</color>
     <color name="basic_gray_dark">#76dddddd</color>
     <color name="basic_gray_dark_solid">#c9c9c9</color>
+    <color name="basic_gray_selector">#e9e9e9</color>
+    <color name="basic_green">#0FC486</color>
 
     <!-- General app colors -->
     <color name="app_background">@color/basic_blue</color>

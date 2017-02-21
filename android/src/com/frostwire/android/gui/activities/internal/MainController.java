@@ -45,15 +45,15 @@ public final class MainController {
         return activity;
     }
 
-    public void closeSlideMenu() {
-        activity.closeSlideMenu();
-    }
+//    public void closeSlideMenu() {
+//        activity.closeSlideMenu();
+//    }
 
     public void switchFragment(int itemId) {
-        Fragment fragment = activity.getFragmentByMenuId(itemId);
-        if (fragment != null) {
-            activity.switchContent(fragment);
-        }
+//        Fragment fragment = activity.getFragmentByMenuId(itemId);
+//        if (fragment != null) {
+//            activity.switchContent(fragment);
+//        }
     }
 
     public void showPreferences() {
