@@ -323,7 +323,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Hide the EQ option if it can't be opened
         final Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         if (getPackageManager().resolveActivity(intent, 0) == null) {
-            final MenuItem effects = menu.findItem(R.id.menu_audio_player_equalizer);
+            final MenuItem effects = menu.findItem(R.id.menu_player_audio_player_equalizer);
             effects.setVisible(false);
         }
         ThemeUtils.setFavoriteIcon(menu);
@@ -360,16 +360,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Favorite action
         getMenuInflater().inflate(R.menu.player_favorite, menu);
         // Shuffle all
-        getMenuInflater().inflate(R.menu.shuffle, menu);
+        getMenuInflater().inflate(R.menu.player_shuffle, menu);
         // Share, ringtone, and equalizer
-        getMenuInflater().inflate(R.menu.audio_player, menu);
+        getMenuInflater().inflate(R.menu.player_audio_player, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_shuffle:
+            case R.id.menu_player_shuffle:
                 // Shuffle all the songs
                 MusicUtils.shuffleAll(this);
                 // Refresh the queue
@@ -380,19 +380,19 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 // item
                 toggleFavorite();
                 return true;
-            case R.id.menu_audio_player_ringtone:
+            case R.id.menu_player_audio_player_ringtone:
                 // Set the current track as a ringtone
                 writeSettingsHelper.onSetRingtoneOption(this, MusicUtils.getCurrentAudioId(), Constants.FILE_TYPE_AUDIO);
                 return true;
-            case R.id.menu_audio_player_share:
+            case R.id.menu_player_audio_player_share:
                 // Share the current meta data
                 shareCurrentTrack();
                 return true;
-            case R.id.menu_audio_player_equalizer:
+            case R.id.menu_player_audio_player_equalizer:
                 // Sound effects
                 NavUtils.openEffectsPanel(this);
                 return true;
-            case R.id.menu_audio_player_stop:
+            case R.id.menu_player_audio_player_stop:
                 try {
                     MusicUtils.musicPlaybackService.stop();
                 } catch (Throwable e) {
@@ -400,13 +400,13 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 }
                 finish();
                 return true;
-            case R.id.menu_audio_player_delete:
+            case R.id.menu_player_audio_player_delete:
                 // Delete current song
                 DeleteDialog.newInstance(MusicUtils.getTrackName(), new long[]{
                         MusicUtils.getCurrentAudioId()
                 }, null).show(getFragmentManager(), "DeleteDialog");
                 return true;
-            case R.id.menu_audio_player_add_to_playlist:
+            case R.id.menu_player_audio_player_add_to_playlist:
                 AddToPlaylistMenuAction menuAction = new AddToPlaylistMenuAction(this, new long[]{
                         MusicUtils.getCurrentAudioId()
                 });

@@ -215,7 +215,7 @@ public abstract class BaseActivity extends AbstractActivity
             case android.R.id.home:
                 getBackHome();
                 return true;
-            case R.id.menu_new_playlist:
+            case R.id.menu_player_new_playlist:
                 onOptionsItemNewPlaylistSelected();
                 return true;
             default:

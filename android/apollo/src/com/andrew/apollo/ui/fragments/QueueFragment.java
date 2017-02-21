@@ -75,7 +75,7 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         if (inflater != null) {
-            inflater.inflate(R.menu.queue, menu);
+            inflater.inflate(R.menu.player_queue, menu);
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -83,14 +83,14 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_save_queue:
+            case R.id.menu_player_save_queue:
                 NowPlayingCursor queue = (NowPlayingCursor) QueueLoader
                         .makeQueueCursor(getActivity());
                 CreateNewPlaylist.getInstance(MusicUtils.getSongListForCursor(queue)).show(
                         getFragmentManager(), "CreatePlaylist");
                 queue.close();
                 return true;
-            case R.id.menu_clear_queue:
+            case R.id.menu_player_clear_queue:
                 MusicUtils.clearQueue();
                 NavUtils.goHome(getActivity());
                 return true;

@@ -242,10 +242,10 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         if (isEmptyPlaylist()) {
-            menu.removeItem(R.id.menu_shuffle);
+            menu.removeItem(R.id.menu_player_shuffle);
         } else {
             // Set the shuffle all title to "play all" if a playlist.
-            final MenuItem shuffle = menu.findItem(R.id.menu_shuffle);
+            final MenuItem shuffle = menu.findItem(R.id.menu_player_shuffle);
             String title;
             if (isFavorites() || isLastAdded() || isPlaylist()) {
                 title = getString(R.string.menu_play_all);
@@ -267,14 +267,14 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         // Pin to Home screen
         getMenuInflater().inflate(R.menu.player_add_to_homescreen, menu);
         // Shuffle
-        getMenuInflater().inflate(R.menu.shuffle, menu);
+        getMenuInflater().inflate(R.menu.player_shuffle, menu);
         // Sort orders
         if (isArtistSongPage()) {
-            getMenuInflater().inflate(R.menu.artist_song_sort_by, menu);
+            getMenuInflater().inflate(R.menu.player_artist_song_sort_by, menu);
         } else if (isArtistAlbumPage()) {
-            getMenuInflater().inflate(R.menu.artist_album_sort_by, menu);
+            getMenuInflater().inflate(R.menu.player_artist_album_sort_by, menu);
         } else if (isAlbum()) {
-            getMenuInflater().inflate(R.menu.album_song_sort_by, menu);
+            getMenuInflater().inflate(R.menu.player_album_song_sort_by, menu);
         }
         // Add to playlist
         if (isArtist() || isAlbum()) {
@@ -294,7 +294,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             // Create Empty New Playlist
             // Add to playlist
             case FragmentMenuItems.NEW_PLAYLIST:
-            case R.id.menu_new_playlist:
+            case R.id.menu_player_new_playlist:
                 onOptionsItemNewPlaylistSelected();
                 return true;
 
@@ -327,7 +327,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                 ApolloUtils.createShortcutIntentAsync(name, mArtistName, id, mType, Ref.weak((Activity) this));
                 return true;
             }
-            case R.id.menu_shuffle: {
+            case R.id.menu_player_shuffle: {
                 final long id = mArguments.getLong(Config.ID);
                 long[] list = null;
                 if (isArtist()) {
@@ -350,7 +350,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                 }
                 return true;
             }
-            case R.id.menu_sort_by_az:
+            case R.id.menu_player_sort_by_az:
                 if (isArtistSongPage()) {
                     mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_A_Z);
                     getArtistSongFragment().refresh();
@@ -362,7 +362,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                     getAlbumSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_za:
+            case R.id.menu_player_sort_by_za:
                 if (isArtistSongPage()) {
                     mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_Z_A);
                     getArtistSongFragment().refresh();
@@ -374,13 +374,13 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                     getAlbumSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_album:
+            case R.id.menu_player_sort_by_album:
                 if (isArtistSongPage()) {
                     mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_ALBUM);
                     getArtistSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_year:
+            case R.id.menu_player_sort_by_year:
                 if (isArtistSongPage()) {
                     mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_YEAR);
                     getArtistSongFragment().refresh();
@@ -389,7 +389,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                     getArtistAlbumFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_duration:
+            case R.id.menu_player_sort_by_duration:
                 if (isArtistSongPage()) {
                     mPreferences
                             .setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_DURATION);
@@ -399,17 +399,17 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                     getAlbumSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_date_added:
+            case R.id.menu_player_sort_by_date_added:
                 if (isArtistSongPage()) {
                     mPreferences.setArtistSongSortOrder(SortOrder.ArtistSongSortOrder.SONG_DATE);
                     getArtistSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_track_list:
+            case R.id.menu_player_sort_by_track_list:
                 mPreferences.setAlbumSongSortOrder(SortOrder.AlbumSongSortOrder.SONG_TRACK_LIST);
                 getAlbumSongFragment().refresh();
                 return true;
-            case R.id.menu_sort_by_filename:
+            case R.id.menu_player_sort_by_filename:
                 if (isArtistSongPage()) {
                     mPreferences.setArtistSongSortOrder(
                             SortOrder.ArtistSongSortOrder.SONG_FILENAME);

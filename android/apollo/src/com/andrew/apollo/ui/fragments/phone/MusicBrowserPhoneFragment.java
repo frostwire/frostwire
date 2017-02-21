@@ -142,31 +142,31 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         if (isPlaylistPage()) {
-            inflater.inflate(R.menu.new_playlist, menu);
+            inflater.inflate(R.menu.player_new_playlist, menu);
         }
 
         // Favorite action
         inflater.inflate(R.menu.player_favorite, menu);
         // Shuffle all
-        inflater.inflate(R.menu.shuffle, menu);
+        inflater.inflate(R.menu.player_shuffle, menu);
         // Sort orders
         if (isRecentPage()) {
-            inflater.inflate(R.menu.view_as, menu);
+            inflater.inflate(R.menu.player_view_as, menu);
         } else if (isArtistPage()) {
-            inflater.inflate(R.menu.artist_sort_by, menu);
-            inflater.inflate(R.menu.view_as, menu);
+            inflater.inflate(R.menu.player_artist_sort_by, menu);
+            inflater.inflate(R.menu.player_view_as, menu);
         } else if (isAlbumPage()) {
-            inflater.inflate(R.menu.album_sort_by, menu);
-            inflater.inflate(R.menu.view_as, menu);
+            inflater.inflate(R.menu.player_album_sort_by, menu);
+            inflater.inflate(R.menu.player_view_as, menu);
         } else if (isSongPage()) {
-            inflater.inflate(R.menu.song_sort_by, menu);
+            inflater.inflate(R.menu.player_song_sort_by, menu);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_shuffle:
+            case R.id.menu_player_shuffle:
                 // Shuffle all the songs
                 MusicUtils.shuffleAll(getActivity());
                 return true;
@@ -176,7 +176,7 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
                 MusicUtils.toggleFavorite();
                 getActivity().invalidateOptionsMenu();
                 return true;
-            case R.id.menu_sort_by_az:
+            case R.id.menu_player_sort_by_az:
                 if (isArtistPage()) {
                     mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_A_Z);
                     getArtistFragment().refresh();
@@ -188,7 +188,7 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
                     getSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_za:
+            case R.id.menu_player_sort_by_za:
                 if (isArtistPage()) {
                     mPreferences.setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_Z_A);
                     getArtistFragment().refresh();
@@ -200,7 +200,7 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
                     getSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_artist:
+            case R.id.menu_player_sort_by_artist:
                 if (isAlbumPage()) {
                     mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_ARTIST);
                     getAlbumFragment().refresh();
@@ -209,13 +209,13 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
                     getSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_album:
+            case R.id.menu_player_sort_by_album:
                 if (isSongPage()) {
                     mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_ALBUM);
                     getSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_year:
+            case R.id.menu_player_sort_by_year:
                 if (isAlbumPage()) {
                     mPreferences.setAlbumSortOrder(SortOrder.AlbumSortOrder.ALBUM_YEAR);
                     getAlbumFragment().refresh();
@@ -224,13 +224,13 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
                     getSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_duration:
+            case R.id.menu_player_sort_by_duration:
                 if (isSongPage()) {
                     mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_DURATION);
                     getSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_number_of_songs:
+            case R.id.menu_player_sort_by_number_of_songs:
                 if (isArtistPage()) {
                     mPreferences
                             .setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_NUMBER_OF_SONGS);
@@ -240,20 +240,20 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
                     getAlbumFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_number_of_albums:
+            case R.id.menu_player_sort_by_number_of_albums:
                 if (isArtistPage()) {
                     mPreferences
                             .setArtistSortOrder(SortOrder.ArtistSortOrder.ARTIST_NUMBER_OF_ALBUMS);
                     getArtistFragment().refresh();
                 }
                 return true;
-            case R.id.menu_sort_by_filename:
+            case R.id.menu_player_sort_by_filename:
                 if (isSongPage()) {
                     mPreferences.setSongSortOrder(SortOrder.SongSortOrder.SONG_FILENAME);
                     getSongFragment().refresh();
                 }
                 return true;
-            case R.id.menu_view_as_simple:
+            case R.id.menu_player_view_as_simple:
                 if (isRecentPage()) {
                     mPreferences.setRecentLayout("simple");
                 } else if (isArtistPage()) {
@@ -263,7 +263,7 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
                 }
                 NavUtils.goHome(getActivity());
                 return true;
-            case R.id.menu_view_as_detailed:
+            case R.id.menu_player_view_as_detailed:
                 if (isRecentPage()) {
                     mPreferences.setRecentLayout("detailed");
                 } else if (isArtistPage()) {
@@ -273,7 +273,7 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
                 }
                 NavUtils.goHome(getActivity());
                 return true;
-            case R.id.menu_view_as_grid:
+            case R.id.menu_player_view_as_grid:
                 if (isRecentPage()) {
                     mPreferences.setRecentLayout("grid");
                 } else if (isArtistPage()) {
