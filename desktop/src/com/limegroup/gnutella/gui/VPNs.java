@@ -35,20 +35,6 @@ public final class VPNs {
     private static Pattern piaKillSwitchRoutePattern = null;
     private static String netstatCmd = null;
 
-    private static String getNetstatPath() {
-        if (netstatCmd != null) {
-            return netstatCmd;
-        }
-
-        String candidate = "netstat";
-        if (OSUtils.isMacOSX() && new File("/usr/sbin/netstat").exists()) {
-            candidate = "/usr/sbin/netstat";
-        }
-        netstatCmd = candidate;
-        return netstatCmd;
-    }
-
-
     public static boolean isVPNActive() {
         boolean result = false;
 
@@ -152,4 +138,17 @@ public final class VPNs {
             piaKillSwitchRoutePattern = Pattern.compile(".*?(0\\.0\\.0\\.0).*?(0\\.0\\.0\\.0).*?(10\\.\\d*\\.\\d*\\.\\d*).*(10\\.\\d*\\.\\d*\\.\\d*).*?(\\d\\d)");
         }
     }
+
+    private static String getNetstatPath() {
+        if (netstatCmd != null) {
+            return netstatCmd;
+        }
+        String candidate = "netstat";
+        if (OSUtils.isMacOSX() && new File("/usr/sbin/netstat").exists()) {
+            candidate = "/usr/sbin/netstat";
+        }
+        netstatCmd = candidate;
+        return netstatCmd;
+    }
+
 }
