@@ -26,7 +26,6 @@ import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -145,10 +144,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         setCheckboxesVisibility(fileType != Constants.FILE_TYPE_RINGTONES && checkState);
     }
 
-    public void showMenuForSelectedItems() {
-        if (checked.size() > 0) {
-            trackDialog(new MenuBuilder(getMenuAdapter(checked.iterator().next().fd, false)).show());
-        }
+    public void showMenuForSelectedItems(int x, int y) {
+        showMenuForSelectedItems(null, x, y);
     }
 
     public MenuAdapter getMenuForSelectedItems() {
@@ -583,17 +580,19 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return result;
     }
 
-    public void showMenuForSelectedItems(MenuAction mask) {
+    public void showMenuForSelectedItems(MenuAction mask, int x, int y) {
         if (checked.size() > 0) {
             MenuAdapter adapter = getMenuAdapter(checked.iterator().next().fd, false);
             if (adapter != null) {
-                for (int i = 0; i < adapter.getCount(); i++) {
-                    MenuAction item = adapter.getItem(i);
-                    if (item.getText().equals(mask.getText())) {
-                        adapter.removeItem(item);
+                if (mask != null) {
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        MenuAction item = adapter.getItem(i);
+                        if (item.getText().equals(mask.getText())) {
+                            adapter.removeItem(item);
+                        }
                     }
                 }
-                trackDialog(new MenuBuilder(adapter).show());
+                trackDialog(new MenuBuilder(adapter).show(x, y));
             }
         }
     }

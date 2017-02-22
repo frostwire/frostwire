@@ -20,6 +20,9 @@ package com.frostwire.android.gui.views;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Point;
+import android.view.Gravity;
+import android.view.WindowManager;
 
 /**
  * @author gubatron
@@ -37,6 +40,31 @@ public class MenuBuilder implements DialogInterface.OnClickListener, DialogInter
 
     public AlertDialog show() {
         createDialog().show();
+        return dialog;
+    }
+
+    /**
+     * Show the dialog with offset
+     *
+     * @param x x value of the view that spawned the menu
+     * @param y y value of the view that spawned the menu
+     * @return the shown Dialog
+     */
+    //x,y is the center of the view that spawned the menu
+    public AlertDialog show(int x, int y) {
+        createDialog();
+        WindowManager.LayoutParams windowLayoutParams = dialog.getWindow().getAttributes();
+        Point size = new Point();
+        dialog.getWindow().getWindowManager().getDefaultDisplay().getSize(size);
+        windowLayoutParams.gravity = Gravity.TOP | Gravity.LEFT;
+        windowLayoutParams.y = y;
+        windowLayoutParams.x = x;
+        if (x > size.x / 2) {
+            windowLayoutParams.gravity = Gravity.TOP | Gravity.RIGHT;
+            windowLayoutParams.x = size.x - x;
+        }
+        dialog.getWindow().setAttributes(windowLayoutParams);
+        dialog.show();
         return dialog;
     }
 

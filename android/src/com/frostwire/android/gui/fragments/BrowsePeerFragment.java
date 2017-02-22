@@ -383,11 +383,15 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         menuButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                int[] pos = new int[2];
+                menuButton.getLocationOnScreen(pos);
+                pos[0] += menuButton.getWidth();
+                pos[1] -= menuButton.getHeight();
                 if (adapter.getMenuForSelectedItems().getCount() > 2) {
                     MenuAction mask = adapter.getMenuForSelectedItems().getItem(adapter.getMenuForSelectedItems().getCount() - 1);
-                    adapter.showMenuForSelectedItems(mask);
+                    adapter.showMenuForSelectedItems(mask, pos[0], pos[1]);
                 } else {
-                    adapter.showMenuForSelectedItems();
+                    adapter.showMenuForSelectedItems(pos[0], pos[1]);
                 }
             }
         });
@@ -634,8 +638,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     private Drawable getMutableDrawable(int id) {
-        Drawable base =  getResources().getDrawable(id).mutate();
-        if(base.getConstantState() != null){
+        Drawable base = getResources().getDrawable(id).mutate();
+        if (base.getConstantState() != null) {
             return base.getConstantState().newDrawable(getResources());
         }
         return base;
