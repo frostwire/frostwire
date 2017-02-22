@@ -91,26 +91,6 @@
     <dimen name="audio_player_controls_main_button_width">58.0dip</dimen>
     <dimen name="audio_player_controls_main_button_height">58.0dip</dimen>
 
-    <!-- App Widgets -->
-    <dimen name="app_widget_large_min_width">250.0dip</dimen>
-    <dimen name="app_widget_large_min_height">128.0dip</dimen>
-    <dimen name="app_widget_scrollable_min_height">180.0dip</dimen>
-    <dimen name="app_widget_scrollable_min_resize_height">110.0dip</dimen>
-    <dimen name="app_widget_large_alternate_artwork_size">80.0dip</dimen>
-    <dimen name="app_widget_small_min_width">250.0dip</dimen>
-    <dimen name="app_widget_small_min_height">40.0dip</dimen>
-    <dimen name="app_widget_small_info_container_padding_left">8.0dip</dimen>
-    <dimen name="app_widget_small_info_container_padding_right">8.0dip</dimen>
-    <dimen name="app_widget_small_artwork_size">48.0dip</dimen>
-    <dimen name="app_widget_small_button_padding">8.0dip</dimen>
-    <dimen name="app_widget_small_button_height">48.0dip</dimen>
-    <dimen name="app_widget_recents_action_bar_height">48.0dip</dimen>
-    <dimen name="app_widget_recents_action_bar_item_padding">8.0dip</dimen>
-    <dimen name="app_widget_tiny_height">70.0dip</dimen>
-    <dimen name="app_widget_tiny_width">70.0dip</dimen>
-    <dimen name="app_widget_padding">0.0dip</dimen>
-    <dimen name="app_widget_bottom_margin">4.0dip</dimen>
-
     <!-- Shadow height -->
     <dimen name="shadow_height">0dip</dimen>
 

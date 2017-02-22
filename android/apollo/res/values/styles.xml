@@ -15,17 +15,6 @@
  -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Main Holo -->
-    <style name="Apollo.Theme.Dark" parent="@android:style/Theme.Holo.Light.DarkActionBar">
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:actionOverflowButtonStyle">@style/customOverFlow</item>
-        <item name="android:homeAsUpIndicator">@drawable/home_as_up_padding</item>
-    </style>
-
-    <style name="customOverFlow">
-        <item name="android:src">@drawable/ic_menu_moreoverflow</item>
-    </style>
-
     <!-- Shortcut Activity theme -->
     <style name="Theme.Transparent" parent="@android:style/Theme.Holo.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
