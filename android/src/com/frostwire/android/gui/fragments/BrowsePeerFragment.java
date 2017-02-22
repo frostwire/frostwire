@@ -340,7 +340,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public View getHeader(Activity activity) {
 
         // old searchBar muting
-        if(searchBar != null) {
+        if (searchBar != null) {
             //need to mute this in case of drawer changes requesting recreation of header
             searchBar.setOnFocusChangeListener(null);
         }
@@ -388,7 +388,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         });
 
         updateHeader();
-        if(fragmentState == ViewState.FILTERING) {
+        if (fragmentState == ViewState.FILTERING) {
             enableSearchBar(true);
         }
 
@@ -590,10 +590,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             } else if (fragmentState == ViewState.CHECK) {
                 searchButton.setVisibility(View.GONE);
                 searchBar.setVisibility(View.GONE);
-                if (adapter.getCheckedCount() > 0) {
-                    menuButton.setVisibility(View.VISIBLE);
-                } else {
-                    menuButton.setVisibility(View.GONE);
+                if (adapter != null) {
+                    menuButton.setVisibility(adapter.getCheckedCount() > 0 ? View.VISIBLE : View.GONE);
                 }
                 selectAllContainer.setVisibility(View.VISIBLE);
                 fileTypeButtons.setVisibility(View.GONE);
