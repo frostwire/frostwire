@@ -660,7 +660,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             menuId = R.id.menu_main_transfers;
         }
         setCheckedItem(menuId);
-        updateHeader(getCurrentFragment());
     }
 
     private void setCheckedItem(int id) {
