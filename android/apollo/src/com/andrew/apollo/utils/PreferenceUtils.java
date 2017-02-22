@@ -1,12 +1,19 @@
 /*
- * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright (C) 2012 Andrew Neal
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.andrew.apollo.utils;
@@ -15,6 +22,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+
 import com.andrew.apollo.ui.fragments.AlbumFragment;
 import com.andrew.apollo.ui.fragments.ArtistFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
@@ -22,7 +30,6 @@ import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
-import com.frostwire.android.R;
 
 /**
  * A collection of helpers designed to get and set various preferences across
@@ -66,9 +73,6 @@ public final class PreferenceUtils {
     public static final String RECENT_LAYOUT = "recent_layout";
 
     public static final String SIMPLE_LAYOUT = "simple";
-
-    // Key used to set the overall theme color
-    public static final String DEFAULT_THEME_COLOR = "default_theme_color";
 
     private static PreferenceUtils sInstance;
 
@@ -120,17 +124,6 @@ public final class PreferenceUtils {
      */
     public final int getStartPage() {
         return mPreferences.getInt(START_PAGE, DEFAULT_PAGE);
-    }
-
-    /**
-     * Returns the current theme color.
-     *
-     * @param context The {@link Context} to use.
-     * @return The default theme color.
-     */
-    public final int getDefaultThemeColor(final Context context) {
-        return mPreferences.getInt(DEFAULT_THEME_COLOR,
-                context.getResources().getColor(R.color.holo_blue_light));
     }
 
     /**

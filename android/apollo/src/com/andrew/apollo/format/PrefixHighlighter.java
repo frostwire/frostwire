@@ -18,6 +18,7 @@ import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
 
 import com.andrew.apollo.utils.PreferenceUtils;
+import com.frostwire.android.R;
 
 /**
  * Highlights the text in a text field.
@@ -33,7 +34,7 @@ public class PrefixHighlighter {
      * @param prefixHighlightColor The color used to highlight the prefixes.
      */
     public PrefixHighlighter(final Context context) {
-        mPrefixHighlightColor = PreferenceUtils.getInstance(context).getDefaultThemeColor(context);
+        mPrefixHighlightColor = context.getResources().getColor(R.color.holo_blue_light);
     }
 
     /**
