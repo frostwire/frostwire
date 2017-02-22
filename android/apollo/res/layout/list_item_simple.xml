@@ -26,7 +26,7 @@
 	android:paddingBottom="@dimen/list_simple_vertical_padding"
     android:background="@drawable/listview_item_background_selector">
 
-    <com.andrew.apollo.widgets.theme.ThemeableTextView
+    <TextView
         android:id="@+id/line_one"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,9 +37,9 @@
         android:textSize="@dimen/text_size_medium"
         android:textStyle="bold"
 		android:paddingRight="@dimen/list_simple_horizontal_padding"
-        app:themeResource="line_one"/>
+		android:textColor="@color/line_one"/>
 
-    <com.andrew.apollo.widgets.theme.ThemeableTextView
+    <TextView
         android:id="@+id/line_one_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -47,9 +47,9 @@
 		android:gravity="center_vertical"
         android:singleLine="true"
         android:textSize="@dimen/text_size_medium"
-        app:themeResource="line_one" />
+		android:textColor="@color/line_one" />
 
-    <com.andrew.apollo.widgets.theme.ThemeableTextView
+    <TextView
         android:id="@+id/line_two"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,9 +58,9 @@
         android:singleLine="true"
         android:textSize="@dimen/text_size_small"
 		android:paddingRight="@dimen/list_simple_horizontal_padding"
-        app:themeResource="line_two" />
+		android:textColor="@color/line_two" />
 
-    <com.andrew.apollo.widgets.theme.ThemeableTextView
+    <TextView
         android:id="@+id/line_three"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -68,6 +68,6 @@
         android:singleLine="true"
         android:textSize="@dimen/text_size_small"
 		android:paddingRight="@dimen/list_simple_horizontal_padding"
-        app:themeResource="line_three" />
+		android:textColor="@color/line_three" />
 
 </RelativeLayout>

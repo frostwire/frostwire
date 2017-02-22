@@ -50,16 +50,16 @@
             android:layout_weight="1"
             android:paddingLeft="@dimen/bottom_action_bar_info_padding_left" >
 
-            <com.andrew.apollo.widgets.theme.ThemeableTextView
+            <TextView
                 android:id="@+id/bottom_action_bar_line_one"
                 style="@style/BottomActionBarLineOne"
-                app:themeResource="bab_line_one" />
+                android:textColor="@color/bab_line_one" />
 
-            <com.andrew.apollo.widgets.theme.ThemeableTextView
+            <TextView
                 android:id="@+id/bottom_action_bar_line_two"
                 style="@style/BottomActionBarLineTwo"
                 android:layout_below="@+id/bottom_action_bar_line_one"
-                app:themeResource="bab_line_two" />
+                android:textColor="@color/bab_line_two" />
         </RelativeLayout>
 
         <HorizontalScrollView

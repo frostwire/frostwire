@@ -46,37 +46,34 @@
 		android:paddingTop="@dimen/list_simple_vertical_padding"
 		android:paddingBottom="@dimen/list_simple_vertical_padding">
 
-        <com.andrew.apollo.widgets.theme.ThemeableTextView
+        <TextView
             android:id="@+id/line_one"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:maxLines="2"
-            android:textColor="@color/white"
             android:textSize="@dimen/text_size_medium"
             android:textStyle="bold"
-            app:themeResource="line_one" />
+            android:textColor="@color/line_one" />
 
-        <com.andrew.apollo.widgets.theme.ThemeableTextView
+        <TextView
             android:id="@+id/line_two"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/line_one"
             android:layout_marginTop="@dimen/list_item_line_two_margin_top"
             android:maxLines="2"
-            android:textColor="@color/transparent_white"
             android:textSize="@dimen/text_size_small"
-            app:themeResource="line_two" />
+            android:textColor="@color/line_two" />
 
-        <com.andrew.apollo.widgets.theme.ThemeableTextView
+        <TextView
             android:id="@+id/line_three"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:singleLine="true"
-            android:textColor="@color/transparent_white"
             android:textSize="@dimen/text_size_small"
-            app:themeResource="line_three" />
+            android:textColor="@color/line_three" />
     </RelativeLayout>
 
 </RelativeLayout>
