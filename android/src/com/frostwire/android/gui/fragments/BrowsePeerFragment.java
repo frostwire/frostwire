@@ -339,10 +339,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     @Override
     public View getHeader(Activity activity) {
 
+        // old searchBar muting
         if(searchBar != null) {
             //need to mute this in case of drawer changes requesting recreation of header
             searchBar.setOnFocusChangeListener(null);
         }
+
         LayoutInflater inflater = LayoutInflater.from(activity);
         header = inflater.inflate(R.layout.view_browse_peer_header, null);
         checkButton = findView(header, R.id.view_browse_peer_header_check_mode_button);
@@ -857,8 +859,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private void enableSearchBar(boolean enabled) {
         if (enabled) {
             searchBar.setText(filterString);
-
             searchBar.requestFocus();
+
             searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View view, boolean hasFocus) {
