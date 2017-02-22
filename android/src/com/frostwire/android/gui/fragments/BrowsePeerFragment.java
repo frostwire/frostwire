@@ -383,7 +383,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         menuButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                adapter.showMenuForSelectedItems();
+                if (adapter.getMenuForSelectedItems().getCount() > 2) {
+                    MenuAction mask = adapter.getMenuForSelectedItems().getItem(adapter.getMenuForSelectedItems().getCount() - 1);
+                    adapter.showMenuForSelectedItems(mask);
+                } else {
+                    adapter.showMenuForSelectedItems();
+                }
             }
         });
 
@@ -628,11 +633,19 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         }
     }
 
+    private Drawable getMutableDrawable(int id) {
+        Drawable base =  getResources().getDrawable(id).mutate();
+        if(base.getConstantState() != null){
+            return base.getConstantState().newDrawable(getResources());
+        }
+        return base;
+    }
+
     private void getSelectedItemsOptions() {
         MenuAdapter menu = adapter.getMenuForSelectedItems();
         if (menu != null) {
             final MenuAction lastMenuItem = menu.getItem(menu.getCount() - 1);
-            Drawable icon = lastMenuItem.getImage();
+            Drawable icon = getMutableDrawable(lastMenuItem.getImageId());
             icon.setColorFilter(new PorterDuffColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP));
             firstActionButton.setImageDrawable(icon);
             firstActionButton.setVisibility(View.VISIBLE);
@@ -642,11 +655,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     lastMenuItem.onClick();
                 }
             });
+            secondActionButton.setVisibility(View.GONE);
             if (menu.getCount() <= 2) {// just show the actions don't show the menu
                 menuButton.setVisibility(View.GONE);
                 if (menu.getCount() == 2) {
                     final MenuAction secondToLastMenuItem = menu.getItem(0);
-                    icon = secondToLastMenuItem.getImage();
+                    icon = getMutableDrawable(secondToLastMenuItem.getImageId());
                     icon.setColorFilter(new PorterDuffColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP));
                     secondActionButton.setImageDrawable(icon);
                     secondActionButton.setVisibility(View.VISIBLE);

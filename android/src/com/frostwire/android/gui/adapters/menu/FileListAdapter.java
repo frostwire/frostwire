@@ -583,6 +583,21 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return result;
     }
 
+    public void showMenuForSelectedItems(MenuAction mask) {
+        if (checked.size() > 0) {
+            MenuAdapter adapter = getMenuAdapter(checked.iterator().next().fd, false);
+            if (adapter != null) {
+                for (int i = 0; i < adapter.getCount(); i++) {
+                    MenuAction item = adapter.getItem(i);
+                    if (item.getText().equals(mask.getText())) {
+                        adapter.removeItem(item);
+                    }
+                }
+                trackDialog(new MenuBuilder(adapter).show());
+            }
+        }
+    }
+
     private static class FileListFilter implements ListAdapterFilter<FileDescriptorItem> {
         public boolean accept(FileDescriptorItem obj, CharSequence constraint) {
             String keywords = constraint.toString();

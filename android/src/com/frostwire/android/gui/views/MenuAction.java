@@ -32,20 +32,22 @@ public abstract class MenuAction {
 
     private final WeakReference<Context> contextRef;
     private final Drawable image;
+    private final int imageId;
     private final String text;
 
-    public MenuAction(Context context, Drawable image, String text) {
+    private MenuAction(Context context, Drawable image, String text, int imageId) {
         this.contextRef = new WeakReference<Context>(context);
         this.image = image;
         this.text = text;
+        this.imageId = imageId;
     }
 
     public MenuAction(Context context, int imageId, String text) {
-        this(context, context.getResources().getDrawable(imageId), text);
+        this(context, context.getResources().getDrawable(imageId), text, imageId);
     }
 
     public MenuAction(Context context, int imageId, int textId) {
-        this(context, context.getResources().getDrawable(imageId), context.getResources().getString(textId));
+        this(context, context.getResources().getDrawable(imageId), context.getResources().getString(textId), imageId);
     }
 
     public MenuAction(Context context, int imageId, int textId, Object... formatArgs) {
@@ -58,6 +60,10 @@ public abstract class MenuAction {
 
     public Drawable getImage() {
         return image;
+    }
+
+    public int getImageId() {
+        return imageId;
     }
 
     public final void onClick() {
