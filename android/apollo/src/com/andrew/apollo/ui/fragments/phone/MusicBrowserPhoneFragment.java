@@ -39,7 +39,6 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.andrew.apollo.utils.SortOrder;
-import com.andrew.apollo.utils.ThemeUtils;
 import com.frostwire.android.R;
 import com.viewpagerindicator.TitlePageIndicator;
 import com.viewpagerindicator.TitlePageIndicator.OnCenterItemClickListener;
@@ -135,7 +134,8 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        ThemeUtils.setFavoriteIcon(menu);
+        menu.findItem(R.id.menu_player_favorite).setIcon(MusicUtils.isFavorite() ?
+                R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
     }
 
     @Override

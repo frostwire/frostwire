@@ -68,7 +68,6 @@ import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
-import com.andrew.apollo.utils.ThemeUtils;
 import com.andrew.apollo.widgets.PlayPauseButton;
 import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
@@ -326,7 +325,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             final MenuItem effects = menu.findItem(R.id.menu_player_audio_player_equalizer);
             effects.setVisible(false);
         }
-        ThemeUtils.setFavoriteIcon(menu);
+        menu.findItem(R.id.menu_player_favorite).setIcon(MusicUtils.isFavorite() ?
+                R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
         return true;
     }
 
