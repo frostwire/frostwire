@@ -35,7 +35,7 @@
     </style>
 
     <style name="SplashScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@drawable/frostwire_splash</item>
+        <item name="android:windowBackground">@drawable/frostwire_splash_screen</item>
         <item name="colorPrimaryDark">@color/basic_blue_darker_highlight</item>
     </style>
 
