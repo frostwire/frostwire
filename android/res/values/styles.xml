@@ -557,7 +557,7 @@
 
     <!-- Wizard Activity -->
 
-    <style name="WizardActivity" parent="ThemeFrostWire">
+    <style name="WizardActivity" parent="Theme.FrostWire">
         <item name="android:textColorSecondary">@color/frostwire_gray_explanation_text</item>
         <item name="android:windowBackground">@color/app_background</item>
     </style>
