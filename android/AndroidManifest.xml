@@ -75,7 +75,8 @@
             android:name="com.frostwire.android.gui.activities.MainActivity"
             android:label="@string/application_label"
             android:launchMode="singleTask"
-            android:protectionLevel="dangerous">
+            android:protectionLevel="dangerous"
+            android:theme="@style/SplashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.MUSIC_PLAYER" />

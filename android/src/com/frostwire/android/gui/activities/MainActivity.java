@@ -456,6 +456,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.Theme_FrostWire);
         super.onCreate(savedInstanceState);
 
         if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
