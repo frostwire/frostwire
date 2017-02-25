@@ -73,7 +73,7 @@ import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
-import com.frostwire.android.gui.views.NavigationMenu;
+import com.frostwire.android.gui.activities.internal.NavigationMenu;
 import com.frostwire.android.gui.views.PlayerNotifierView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
@@ -105,6 +105,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         OnDialogClickListener,
         ServiceConnection,
         ActivityCompat.OnRequestPermissionsResultCallback {
+    public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
 
     private static final Logger LOG = Logger.getLogger(MainActivity.class);
     private static final String FRAGMENTS_STACK_KEY = "fragments_stack";
@@ -112,9 +113,9 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private static final String LAST_BACK_DIALOG_ID = "last_back_dialog";
     private static final String SHUTDOWN_DIALOG_ID = "shutdown_dialog";
     private static boolean firstTime = true;
-    public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
+
     private final SparseArray<DangerousPermissionsChecker> permissionsCheckers;
-    private MainController controller;
+    private final MainController controller;
 
     private NavigationMenu navigationMenu;
     private SearchFragment search;

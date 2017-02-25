@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package com.frostwire.android.gui.views;
+package com.frostwire.android.gui.activities.internal;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -38,9 +39,9 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
 
 /**
@@ -55,18 +56,18 @@ public class NavigationMenu {
     private final MainController controller;
     private final NavigationView navView;
     private final DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle drawerToggle;
-    private AdMenuItemView menuRemoveAdsItem;
+    private final ActionBarDrawerToggle drawerToggle;
+    private final AdMenuItemView menuRemoveAdsItem;
     private int checkedNavViewMenuItemId = -1;
 
     public NavigationMenu(MainController controller, DrawerLayout drawerLayout, Toolbar toolbar) {
         this.controller = controller;
         this.drawerLayout = drawerLayout;
         MainActivity mainActivity = controller.getActivity();
-        drawerToggle = new MenuDrawerToggle(this, controller, drawerLayout, toolbar);
+        drawerToggle = new MenuDrawerToggle(controller, drawerLayout, toolbar);
         this.drawerLayout.addDrawerListener(drawerToggle);
         navView = initNavigationView(mainActivity);
-        initAdMenuItemListener(mainActivity);
+        menuRemoveAdsItem = initAdMenuItemListener(mainActivity);
         refreshMenuRemoveAdsItem();
     }
 
@@ -94,10 +95,10 @@ public class NavigationMenu {
         navView.setCheckedItem(menuItemId);
     }
 
-    private NavigationView initNavigationView(final MainActivity activity) {
+    private NavigationView initNavigationView(final Activity activity) {
         NavigationView resultNavView = navView;
         if (navView == null) {
-            resultNavView = activity.findView(R.id.activity_main_nav_view);
+            resultNavView = (NavigationView) activity.findViewById(R.id.activity_main_nav_view);
             resultNavView.setNavigationItemSelectedListener(
                     new NavigationView.OnNavigationItemSelectedListener() {
                         @Override
@@ -165,16 +166,17 @@ public class NavigationMenu {
         SoftwareUpdater.instance().notifyUserAboutUpdate(context);
     }
 
-    private void initAdMenuItemListener(final MainActivity mainActivity) {
-        menuRemoveAdsItem = mainActivity.findView(R.id.slidermenu_ad_menuitem);
-        RelativeLayout menuAd = mainActivity.findView(R.id.view_ad_menu_item_ad);
+    private AdMenuItemView initAdMenuItemListener(final Activity activity) {
+        AdMenuItemView adMenuItemView = (AdMenuItemView) activity.findViewById(R.id.slidermenu_ad_menuitem);
+        RelativeLayout menuAd = (RelativeLayout) activity.findViewById(R.id.view_ad_menu_item_ad);
         menuAd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mainActivity, BuyActivity.class);
-                mainActivity.startActivity(intent);
+                Intent intent = new Intent(activity, BuyActivity.class);
+                activity.startActivity(intent);
             }
         });
+        return adMenuItemView;
     }
 
     private void refreshMenuRemoveAdsItem() {
@@ -202,13 +204,11 @@ public class NavigationMenu {
         drawerToggle.onOptionsItemSelected(item);
     }
 
-    private static final class MenuDrawerToggle extends ActionBarDrawerToggle {
-        private final NavigationMenu navigationMenu;
+    private final class MenuDrawerToggle extends ActionBarDrawerToggle {
         private final MainController controller;
 
-        MenuDrawerToggle(NavigationMenu navigationMenu, MainController controller, DrawerLayout drawerLayout, Toolbar toolbar) {
+        MenuDrawerToggle(MainController controller, DrawerLayout drawerLayout, Toolbar toolbar) {
             super(controller.getActivity(), drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
-            this.navigationMenu = navigationMenu;
             this.controller = controller;
         }
 
@@ -227,7 +227,7 @@ public class NavigationMenu {
 
         @Override
         public void onDrawerStateChanged(int newState) {
-            navigationMenu.refreshMenuRemoveAdsItem();
+            NavigationMenu.this.refreshMenuRemoveAdsItem();
             controller.syncNavigationMenu();
         }
     }
