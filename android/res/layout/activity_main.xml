@@ -2,6 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +19,10 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <include layout="@layout/toolbar_main" />
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -34,6 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
+            <include layout="@layout/toolbar_main" />
 
             <FrameLayout
                 android:id="@+id/content_frame"
@@ -69,36 +71,24 @@
                 android:visibility="gone" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/activity_main_left_drawer"
-            android:layout_width="@dimen/mainmenu_width"
+        <android.support.design.widget.NavigationView
+            android:id="@+id/activity_main_nav_view"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:orientation="vertical">
-
-            <ListView
-                android:id="@+id/left_drawer"
-                style="@style/SlideMenu.List"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@color/app_dark_blue"
-                android:choiceMode="singleChoice"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="0dp" />
-
-            <com.frostwire.android.gui.views.PlayerMenuItemView
-                android:id="@+id/slidemenu_player_menuitem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
+            android:fitsSystemWindows="true"
+            app:headerLayout="@layout/nav_view_header"
+            app:itemBackground="@drawable/nav_view_background_color_selector"
+            app:itemIconTint="@color/nav_view_icon_color_selector"
+            app:itemTextColor="@color/app_text_primary"
+            app:menu="@menu/nav_view_menu">
 
             <com.frostwire.android.gui.views.AdMenuItemView
                 android:id="@+id/slidermenu_ad_menuitem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:visibility="gone" />
-        </LinearLayout>
+        </android.support.design.widget.NavigationView>
     </android.support.v4.widget.DrawerLayout>
-
 </LinearLayout>

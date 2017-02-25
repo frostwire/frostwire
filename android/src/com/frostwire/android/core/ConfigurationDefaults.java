@@ -58,7 +58,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_TRANSFERS_ON_DOWNLOAD_START, true);
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG, true);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false);
-        defaultValues.put(Constants.PREF_KEY_GUI_USE_INMOBI, false);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_MOPUB, true);
         defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
@@ -67,7 +66,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
                 new String[]{
                         Constants.AD_NETWORK_SHORTCODE_APPLOVIN,
-                        Constants.AD_NETWORK_SHORTCODE_INMOBI,
                         Constants.AD_NETWORK_SHORTCODE_REMOVEADS
                 });
         defaultValues.put(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, true);

@@ -19,48 +19,46 @@
  */
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:baselineAligned="false" >
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false">
 
-	<LinearLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginRight="8dp"
-		android:layout_alignParentRight="true">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dp">
 
-		<ImageButton
-			android:id="@+id/view_transfers_header_button_add_transfer"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:background="@null"
-			android:contentDescription="@null"
-			android:src="@drawable/add_transfer" />
+        <ImageButton
+            android:id="@+id/view_transfers_header_button_add_transfer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@null"
+            android:src="@drawable/add_transfer"/>
 
-		<ImageButton
-			android:id="@+id/view_transfers_header_button_menu"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="5dp"
-			android:background="@null"
-			android:contentDescription="@null"
-			android:src="@drawable/ic_menu_moreoverflow"
-			android:visibility="visible" />
-
-
+        <ImageButton
+            android:id="@+id/view_transfers_header_button_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:background="@null"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_menu_moreoverflow"
+            android:visibility="visible"/>
 
 
-	</LinearLayout>
+    </LinearLayout>
 
 
-	<TextView
+    <TextView
         android:id="@+id/view_transfers_header_text_title"
         style="@style/MainFragmentSimpleHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
         android:layout_centerVertical="true"
         android:paddingRight="40dp"
-        android:layout_centerInParent="true"
-        android:text="@null" />
+        android:text="@null"/>
 </RelativeLayout>
