@@ -201,7 +201,6 @@ public final class Constants {
     public static final String CHANGELOG_URL = "https://github.com/frostwire/frostwire/blob/master/android/changelog.txt";
 
     public static final String AD_NETWORK_SHORTCODE_APPLOVIN = "AL";
-    public static final String AD_NETWORK_SHORTCODE_INMOBI = "IM";
     public static final String AD_NETWORK_SHORTCODE_REMOVEADS = "RA";
     public static final String AD_NETWORK_SHORTCODE_MOPUB = "MP";
 }
