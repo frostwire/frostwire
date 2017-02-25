@@ -52,7 +52,7 @@ import com.frostwire.android.offers.Offers;
  * Created on 02/23/2017
  */
 
-public class NavigationMenu {
+public final class NavigationMenu {
     private final MainController controller;
     private final NavigationView navView;
     private final DrawerLayout drawerLayout;
