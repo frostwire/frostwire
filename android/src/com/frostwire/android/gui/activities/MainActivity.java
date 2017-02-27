@@ -496,7 +496,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
                     !NetworkManager.instance().isTunnelUp()) {
-                UIUtils.showDismissableMessage(getWindow().getDecorView().getRootView(), R.string.cannot_start_engine_without_vpn);
+                UIUtils.showDismissableMessage(getWindow().getDecorView().findViewById(R.id.activity_main_navigation), R.string.cannot_start_engine_without_vpn);
             } else {
                 firstTime = false;
                 Engine.instance().startServices(); // it's necessary for the first time after wizard
