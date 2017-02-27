@@ -737,10 +737,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         return currentFragment;
     }
 
-    public void closeSlideMenu() {
-        navigationMenu.hide();
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (navigationMenu != null) {
@@ -795,9 +791,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         musicPlaybackService = IApolloService.Stub.asInterface(service);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void onServiceDisconnected(final ComponentName name) {
         musicPlaybackService = null;
     }

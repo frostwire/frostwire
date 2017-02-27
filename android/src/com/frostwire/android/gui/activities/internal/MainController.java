@@ -78,18 +78,6 @@ public final class MainController {
         activity.startActivity(i);
     }
 
-    public void launchPlayerActivity() {
-        if (!Ref.alive(activityRef)) {
-            return;
-        }
-        MainActivity activity = activityRef.get();
-        if (Engine.instance().getMediaPlayer().getCurrentFD() != null) {
-            Intent i = new Intent(activity, AudioPlayerActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            activity.startActivity(i);
-        }
-    }
-
     public void showTransfers(TransferStatus status) {
         if (!Ref.alive(activityRef)) {
             return;
