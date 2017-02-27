@@ -674,7 +674,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             if (fragment instanceof MainFragment) {
                 View header = ((MainFragment) fragment).getHeader(this);
                 if (header != null) {
-                    setToolbarView(header, Gravity.START);
+                    setToolbarView(header);
                 }
             }
             if (navigationMenu != null) {
