@@ -636,6 +636,24 @@
     <string name="donate_your_time">Донате време</string>
     <string name="changelog">Changelog</string>
     <string name="pro">PRO</string>
-
+    <string name="cloud_download_aborted_on_mobile_data">Актуелна поставка спречава преузимање када није на Ви-Фи мрежи</string>
+    <string name="delete_started_torrents_summary">Обриши .торрент фајлове након почетка преузимања</string>
+    <string name="dismiss">одбацити</string>
+    <string name="search_preferences_one_engine_checked_always">По дефаулту, један претраживач треба да се провери у сваком тренутку</string>
+    <string name="switch_off_engine_without_vpn">ВПН је неактиван, заустављање БитТоррент мотор.</string>
+    <string name="number_picker_tip">Савет: додир изабран број да користе тастатуру</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Без Ви-Фи доступан, сви трансфери су престали</string>
+    <string name="vpn_drop_protection_title">ВПН Заштита је неактиван</string>
+    <string name="deselect_all">Поништите све</string>
+    <string name="data_saving_kill_http_warning">То ће зауставити све недовршене трансфере у току</string>
+    <string name="delete_started_torrents">Делете .торрент филес</string>
+    <string name="unlimited">неограничен</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">Према поставкама не могу почети сетву, осим ако сте на Ви-Фи због уштеда података. Фајл ће бити спреман за сијање аутоматски када се вратиш на интернет омогућен Ви-Фи мрежу.</string>
+    <string name="vpn_drop_protection_summary">Заштитили своју приватност. Аутоматски искључити БитТоррент трансфера, осим ако кодиран ВПН веза активна</string>
+    <string name="cannot_start_engine_without_vpn">Додато неће почети осим ВПН је доступан. (Проверите подешавања)</string>
+    <string name="use_magnet_summary">На основу магнетних линкова, ради само на Вифи</string>
+    <string name="mobile_data_saving">Мобиле података Уштеда</string>
+    <string name="data_saving_kill_http_warning_title">Упозорење: хттп трансфери у току</string>
 
 </resources>

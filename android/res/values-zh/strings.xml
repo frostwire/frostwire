@@ -630,5 +630,32 @@
     <string name="distraction_free_search_results">分心免費搜索（測試版）</string>
     <string name="help_translate_or_proofread_frostwire">幫助翻譯或校對FrostWire</string>
     <string name="changelog">更改日誌</string>
+    <string name="cloud_download_aborted_on_mobile_data">当前设置阻止不在Wifi网络上下载</string>
+    <string name="sharing_privacy_settings">分享和隐私</string>
+    <string name="delete_started_torrents_summary">删除.torrent文件开始下载后</string>
+    <string name="dismiss">解雇</string>
+    <string name="torrent_preferences_header">Torrent偏好</string>
+    <string name="search_preferences_one_engine_checked_always">默认情况下，需要始终检查一个搜索引擎</string>
+    <string name="switch_off_engine_without_vpn">VPN不活动，停止BitTorrent引擎。</string>
+    <string name="notification_other_header">通知和其他</string>
+    <string name="number_picker_tip">提示：触摸所选的号码以使用键盘</string>
+    <string name="search_torrent_settings">搜索和洪流设置</string>
+    <string name="general_settings">一般</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">没有可用的Wifi，所有传输都已停止</string>
+    <string name="vpn_drop_protection_title">VPN保护无效</string>
+    <string name="deselect_all">取消选择全部</string>
+    <string name="data_saving_kill_http_warning">这将停止所有未完成的转移</string>
+    <string name="delete_started_torrents">删除.torrent文件</string>
+    <string name="search_header">搜索</string>
+    <string name="bandwidth_usage_settings">带宽使用</string>
+    <string name="unlimited">无限</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">根据您的设置，我无法开始播种，除非您在Wi-Fi由于数据节省。 当您返回启用互联网的Wi-Fi网络时，该文件将可以自动播种。</string>
+    <string name="vpn_drop_protection_summary">保护您的隐私。 自动禁用BitTorrent传输，除非加密VPN连接处于活动状态</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent将不会启动，除非VPN可用。 （检查您的设置）</string>
+    <string name="use_magnet_summary">基于磁铁链接，只能在Wifi上工作</string>
+    <string name="mobile_data_saving">移动数据保存</string>
+    <string name="data_saving_kill_http_warning_title">警告：Http正在进行传输</string>
 
 </resources>

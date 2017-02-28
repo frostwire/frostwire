@@ -631,4 +631,23 @@
     <string name="remove_ads">Poista mainokset</string>
     <string name="your_connection_has_dropped_stopping_services">WiFi-yhteys on laskenut. Pysäyttäminen palvelut.</string>
     <string name="use_tpb_summary">TPB on magneetti pohjainen, toimii vain Wifi</string>
+    <string name="cloud_download_aborted_on_mobile_data">Nykyinen asetus estää lataaminen kun ei WiFi-verkossa</string>
+    <string name="delete_started_torrents_summary">Poista .torrent-tiedostoja jälkeen alkaa lataamisen</string>
+    <string name="dismiss">Hylkää</string>
+    <string name="search_preferences_one_engine_checked_always">Oletuksena yksi hakukone on tarkistettava aina</string>
+    <string name="switch_off_engine_without_vpn">VPN on aktiivinen, pysäytetään BitTorrent moottori.</string>
+    <string name="number_picker_tip">Vihje: touch valittu numero käyttää näppäimistöä</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Ei WiFi, kaikki siirrot on lopetettu</string>
+    <string name="vpn_drop_protection_title">VPN Valvontatoiminto ei ole käytössä</string>
+    <string name="deselect_all">Poista kaikki valinnat</string>
+    <string name="data_saving_kill_http_warning">Tämä pysäyttää kaikki keskeneräiset siirrot käynnissä</string>
+    <string name="delete_started_torrents">Poista .torrent-tiedostoja</string>
+    <string name="unlimited">Rajoittamaton</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">Mukaan asetukset En voi aloittaa kylvö ellet ovat Wi-Fi vuoksi tietojen säästöjä. Tiedosto on valmis kylvö automaattisesti kun saat takaisin internet käytössä Wi-Fi-verkkoon.</string>
+    <string name="vpn_drop_protection_summary">Yksityisyyden suojaamiseksi. Automaattisesti poistaa BitTorrent siirtoja ellei salatun VPN-yhteys on aktiivinen</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent ei käynnisty, ellei VPN on saatavilla. (Tarkista asetukset)</string>
+    <string name="use_magnet_summary">Magnet pohjainen, toimii vain Wifi</string>
+    <string name="mobile_data_saving">Mobiilitiedonsiirto säästö</string>
+    <string name="data_saving_kill_http_warning_title">Varoitus: Http siirrot käynnissä</string>
 </resources>
