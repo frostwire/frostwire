@@ -623,4 +623,32 @@
     <string name="distraction_free_search_results">Ablenkung Kostenlose Suche (Beta)</string>
     <string name="help_translate_or_proofread_frostwire">Helfen Sie mit, FrostWire zu übersetzen oder zu korrigieren</string>
     <string name="changelog">Änderungsprotokoll</string>
+    <string name="cloud_download_aborted_on_mobile_data">Aktuelle Einstellung verhindert das Herunterladen, wenn nicht auf Wifi-Netzwerk</string>
+    <string name="sharing_privacy_settings">Teilen und Datenschutz</string>
+    <string name="delete_started_torrents_summary">Löschen Sie .torrent-Dateien nach dem Download</string>
+    <string name="dismiss">Entlassen</string>
+    <string name="torrent_preferences_header">Torrent-Einstellungen</string>
+    <string name="search_preferences_one_engine_checked_always">Standardmäßig muss eine Suchmaschine jederzeit überprüft werden</string>
+    <string name="switch_off_engine_without_vpn">VPN ist inaktiv und stoppt den BitTorrent-Motor.</string>
+    <string name="notification_other_header">Benachrichtigungen und andere</string>
+    <string name="number_picker_tip">Tipp: Tippen Sie auf die gewählte Nummer, um die Tastatur zu benutzen</string>
+    <string name="search_torrent_settings">Suchen/Torrent-Einstellungen</string>
+    <string name="general_settings">General</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Kein Wifi verfügbar, alle Transfers wurden gestoppt</string>
+    <string name="vpn_drop_protection_title">VPN-Schutz ist inaktiv</string>
+    <string name="deselect_all">Alle abwählen</string>
+    <string name="data_saving_kill_http_warning">Damit werden alle unfertigen Transfers im Gange sein</string>
+    <string name="delete_started_torrents">Löschen von .torrent-Dateien</string>
+    <string name="search_header">Suche</string>
+    <string name="bandwidth_usage_settings">Bandbreitennutzung</string>
+    <string name="unlimited">Unbegrenzt</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">Nach Ihren Einstellungen kann ich nicht anfangen zu seeding, es sei denn, Sie sind auf Wi-Fi aufgrund von Daten sparen. Die Datei ist bereit für die Seeding automatisch, wenn Sie wieder zu einem Internet-fähigen Wi-Fi-Netzwerk.</string>
+    <string name="vpn_drop_protection_summary">Beschütze deine Privatsphäre. Automatische Deaktivierung von BitTorrent-Transfers, sofern keine verschlüsselte VPN-Verbindung aktiv ist</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent startet nicht, es sei denn, ein VPN ist verfügbar. (Überprüfen Sie Ihre Einstellungen)</string>
+    <string name="use_magnet_summary">Magnet basiert, funktioniert nur auf Wifi</string>
+    <string name="mobile_data_saving">Mobile Daten sparen</string>
+    <string name="data_saving_kill_http_warning_title">Warnung: Http geht weiter</string>
+
 </resources>

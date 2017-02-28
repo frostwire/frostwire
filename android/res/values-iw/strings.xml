@@ -631,5 +631,23 @@
     <string name="remove_ads">הסר פרסומות</string>
     <string name="your_connection_has_dropped_stopping_services">חיבור Wifi שלך ירד. עוצר שירותים.</string>
     <string name="use_tpb_summary">TPB הוא מבוסס מגנט, עובד רק על Wifi</string>
-
+    <string name="cloud_download_aborted_on_mobile_data">הגדרה נוכחית מונעת הורדה כשאינה ברשת Wifi</string>
+    <string name="delete_started_torrents_summary">מחיקת קבצים .torrent לאחר תחילת ההורדה</string>
+    <string name="dismiss">לשחרר</string>
+    <string name="search_preferences_one_engine_checked_always">כברירת מחדל, מנוע חיפוש אחד צריך להיבדק בכל עת</string>
+    <string name="switch_off_engine_without_vpn">VPN אינו פעיל, עצירת המנוע ביטורנט.</string>
+    <string name="number_picker_tip">טיפ: מגע נבחר מספר להשתמש במקלדת</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">אין Wi-Fi זמין, כל העברות הופסקו</string>
+    <string name="vpn_drop_protection_title">VPN להגנה אינה פעילה</string>
+    <string name="deselect_all">הסר סימון מהכל</string>
+    <string name="data_saving_kill_http_warning">פעולה זו תעצור את כל ההעברות הגמורות בהתקדמות</string>
+    <string name="delete_started_torrents">מחיקת קבצים .torrent</string>
+    <string name="unlimited">ללא הגבלה</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">על פי ההגדרות שלך אני לא יכול להתחיל זריעה אלא אם אתה מחובר ל- Wi-Fi בשל חיסכון נתונים. הקובץ יהיה מוכן זריעה אוטומטית כשתחזור אל אינטרנט אפשרת רשת Wi-Fi.</string>
+    <string name="vpn_drop_protection_summary">להגן על הפרטיות שלך. באופן אוטומטי להשבית העברות ביטורנט אלא חיבור VPN מוצפן פעיל</string>
+    <string name="cannot_start_engine_without_vpn">ביטורנט יתחיל רק אם ב- VPN זמין. (בדוק את ההגדרות שלך)</string>
+    <string name="use_magnet_summary">בהתבסס על קישורי מגנט, עובד רק על Wifi</string>
+    <string name="mobile_data_saving">שמירת נתונים ניידת</string>
+    <string name="data_saving_kill_http_warning_title">העברות Http בביצוע: אזהרה</string>
 </resources>

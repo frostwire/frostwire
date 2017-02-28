@@ -623,4 +623,32 @@
     <string name="distraction_free_search_results">Distragerii Căutare liberă (versiune beta)</string>
     <string name="help_translate_or_proofread_frostwire">Ajuta la traduce sau recitești FrostWire</string>
     <string name="changelog">Changelog</string>
+    <string name="cloud_download_aborted_on_mobile_data">Setarea curentă previne descărcarea atunci când nu este pe rețea Wi-Fi</string>
+    <string name="sharing_privacy_settings">Distribuirea și confidențialitatea</string>
+    <string name="delete_started_torrents_summary">Șterge fișierele .torrent după care începe descărcarea</string>
+    <string name="dismiss">Demită</string>
+    <string name="torrent_preferences_header">Preferințe Torrent</string>
+    <string name="search_preferences_one_engine_checked_always">În mod implicit, un motor de căutare trebuie să fie verificate în orice moment</string>
+    <string name="switch_off_engine_without_vpn">VPN este inactiv, oprirea motorului BitTorrent.</string>
+    <string name="notification_other_header">Notificări și altele</string>
+    <string name="number_picker_tip">Sfat: atingeți selectat număr pentru a utiliza tastatura</string>
+    <string name="search_torrent_settings">Căutați și Setări Torrent</string>
+    <string name="general_settings">General</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Wi-Fi nu este disponibil, toate transferurile au fost oprite</string>
+    <string name="vpn_drop_protection_title">Protecție VPN este inactivă</string>
+    <string name="deselect_all">Deselecteaza toate</string>
+    <string name="data_saving_kill_http_warning">Acest lucru se va opri toate transferurile neterminate în curs de desfășurare</string>
+    <string name="delete_started_torrents">Șterge fișierele .torrent</string>
+    <string name="search_header">Căutare</string>
+    <string name="bandwidth_usage_settings">Utilizarea lățimii de bandă</string>
+    <string name="unlimited">Nelimitat</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">În conformitate cu setările Nu pot începe seed decât dacă sunteți pe Wi-Fi, datorită economiilor de date. Fișierul va fi gata pentru însămânțarea în mod automat atunci când ajunge înapoi la un Internet activat rețea Wi-Fi.</string>
+    <string name="vpn_drop_protection_summary">Proteja confidențialitatea. dezactiva automat transferurile BitTorrent excepția cazului în care o conexiune VPN criptat este activă</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent nu va începe decât dacă un VPN este disponibil. (Verificați setările)</string>
+    <string name="use_magnet_summary">Bazat pe link-uri cu magneți, funcționează numai pe Wi-Fi</string>
+    <string name="mobile_data_saving">Salvarea datelor mobile</string>
+    <string name="data_saving_kill_http_warning_title">Atenție: Http transferurile în curs de desfășurare</string>
+
 </resources>

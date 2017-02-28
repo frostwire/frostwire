@@ -624,5 +624,31 @@
     <string name="your_privacy_is_a_fundamental_right_html">Vaša privatnost je temeljno ljudsko pravo.</string>
     <string name="keep_the_project_alive">Držite projekta živ</string>
     <string name="remove_ads">Makni reklame</string>
-
+    <string name="cloud_download_aborted_on_mobile_data">Trenutna postavka onemogućuje preuzimanje kada niste na mreži Wifi</string>
+    <string name="sharing_privacy_settings">Dijeljenje i privatnost</string>
+    <string name="delete_started_torrents_summary">Brisanje .torrent datoteke nakon početka preuzimanja</string>
+    <string name="dismiss">Odbaciti</string>
+    <string name="torrent_preferences_header">Torrent preferencije</string>
+    <string name="search_preferences_one_engine_checked_always">Po defaultu, jedan tražilice treba provjeriti u svakom trenutku</string>
+    <string name="switch_off_engine_without_vpn">VPN je neaktivan, zaustavljanje BitTorrent motor.</string>
+    <string name="notification_other_header">Obavijesti i ostale</string>
+    <string name="number_picker_tip">Savjet: dodir odabrani broj za korištenje tipkovnice</string>
+    <string name="search_torrent_settings">Traži i Torrent Postavke</string>
+    <string name="general_settings">General</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Ne WiFi priključak, svi transferi su prestali</string>
+    <string name="vpn_drop_protection_title">VPN zaštita nije aktivan</string>
+    <string name="deselect_all">Odznači sve</string>
+    <string name="data_saving_kill_http_warning">To će zaustaviti sve započete transfere u tijeku</string>
+    <string name="delete_started_torrents">Brisanje .torrent datoteka</string>
+    <string name="search_header">Pretraživanje</string>
+    <string name="bandwidth_usage_settings">Korištenje propusne moći</string>
+    <string name="unlimited">Neograničen</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">Prema postavkama ne mogu početi zasijavanja, osim ako ste na Wi-Fi, zbog uštede podataka. Datoteka će biti spreman za automatski zasijavanje kad se vratiš na internetu omogućena Wi-Fi mreže.</string>
+    <string name="vpn_drop_protection_summary">Zaštitite svoju privatnost. Automatski onemogućiti BitTorrent transfere, osim ako je aktivan kodiran VPN veza</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent neće započeti ukoliko VPN dostupna. (Provjerite postavke)</string>
+    <string name="use_magnet_summary">Na temelju magnet linkove, radi samo na Wifi</string>
+    <string name="mobile_data_saving">Mobitel Spremanje podataka</string>
+    <string name="data_saving_kill_http_warning_title">Upozorenje: http transferi u tijeku</string>
 </resources>

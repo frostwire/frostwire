@@ -631,5 +631,24 @@
     <string name="remove_ads">Ta bort annonser</string>
     <string name="your_connection_has_dropped_stopping_services">Din WiFi-anslutning har minskat. Stoppa tjänster.</string>
     <string name="use_tpb_summary">TPB är magnet baserad, fungerar endast på Wifi</string>
+    <string name="cloud_download_aborted_on_mobile_data">Nuvarande inställning förhindrar nedladdning när inte på WiFi-nätverk</string>
+    <string name="delete_started_torrents_summary">Radera .torrent filer efter att ha påbörjat ladda ner</string>
+    <string name="dismiss">Avfärda</string>
+    <string name="search_preferences_one_engine_checked_always">Som standard behöver en sökmotor som ska kontrolleras vid alla tidpunkter</string>
+    <string name="switch_off_engine_without_vpn">VPN är inaktiv, stoppa BitTorrent motor.</string>
+    <string name="number_picker_tip">Tips: tryck valt nummer för att använda tangentbordet</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Ingen Wifi tillgängliga, har alla överföringar stoppats</string>
+    <string name="vpn_drop_protection_title">VPN Protection är inaktiv</string>
+    <string name="deselect_all">Avmarkera alla</string>
+    <string name="data_saving_kill_http_warning">Detta kommer att stoppa alla oavslutade överföringar pågående</string>
+    <string name="delete_started_torrents">Radera .torrent filer</string>
+    <string name="unlimited">Obegränsat</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">Enligt dina inställningar jag kan inte börja sådd om du inte är på Wi-Fi på grund av uppgifter besparingar. Filen kommer att vara redo för sådd automatiskt när du kommer tillbaka till en Internet-ansluten Wi-Fi-nätverk.</string>
+    <string name="vpn_drop_protection_summary">Skydda din integritet. inaktivera BitTorrent överföringar automatiskt om en krypterad VPN-anslutning är aktiv</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent startar inte en VPN är tillgänglig. (Kontrollera inställningarna)</string>
+    <string name="use_magnet_summary">Baserat på magnetlänkar, fungerar endast på Wifi</string>
+    <string name="mobile_data_saving">Den mobila data Besparing</string>
+    <string name="data_saving_kill_http_warning_title">Varning: Http överföringar pågår</string>
 
 </resources>
