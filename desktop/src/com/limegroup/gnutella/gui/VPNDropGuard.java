@@ -93,7 +93,9 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
                         BackgroundExecutorService.schedule(new Runnable() {
                             @Override
                             public void run() {
-                                BTEngine.getInstance().restart(); // has a sleep call, don't do this on UI thread.
+                                if(BTEngine.getInstance().isPaused()) {
+                                    BTEngine.getInstance().resume();
+                                }
                             }
                         });
                     }
