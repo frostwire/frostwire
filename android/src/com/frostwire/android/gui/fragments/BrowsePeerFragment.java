@@ -889,12 +889,10 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 @Override
                 public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        //do stuff
                         String filter = textView.getText().toString();
                         if (!StringUtils.isNullOrEmpty(filter)) {
                             enterFilteredState();
                             performFilter(filter);
-                            //mute change
                             searchBar.setOnFocusChangeListener(null);
                         }
                         searchBar.clearFocus();

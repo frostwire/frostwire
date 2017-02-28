@@ -231,4 +231,21 @@ public final class NavigationMenu {
             controller.syncNavigationMenu();
         }
     }
+
+    /**
+     * @param drawerForBack - if true, swaps drawer for back, otherwise back for drawer
+     */
+    public void swapDrawerForBack(boolean drawerForBack) {
+        drawerToggle.setHomeAsUpIndicator(R.drawable.ic_ab_back_material);
+        drawerToggle.setDrawerIndicatorEnabled(!drawerForBack);
+        if (drawerForBack) {
+            drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    controller.getActivity().onBackPressed();
+                }
+            });
+        }
+        drawerLayout.setDrawerLockMode(drawerForBack ? DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED);
+    }
 }

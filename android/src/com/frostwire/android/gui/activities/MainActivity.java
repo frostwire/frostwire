@@ -39,7 +39,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,6 +56,7 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
+import com.frostwire.android.gui.activities.internal.NavigationMenu;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.SDPermissionDialog;
@@ -73,7 +73,6 @@ import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
-import com.frostwire.android.gui.activities.internal.NavigationMenu;
 import com.frostwire.android.gui.views.PlayerNotifierView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
@@ -170,7 +169,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         syncNavigationMenu();
-        updateHeader(getCurrentFragment());
     }
 
     public void onConfigurationUpdate(boolean frostWireUpdateAvailable) {
@@ -850,17 +848,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
      * @param drawerForBack - if true, swaps drawer for back, otherwise back for drawer
      */
     public void swapDrawerForBack(boolean drawerForBack) {
-        drawerToggle.setHomeAsUpIndicator(R.drawable.ic_ab_back_material);
-        drawerToggle.setDrawerIndicatorEnabled(!drawerForBack);
-        if (drawerForBack) {
-            drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onBackPressed();
-                }
-            });
-        }
-        drawerLayout.setDrawerLockMode(drawerForBack ? DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED);
+        navigationMenu.swapDrawerForBack(drawerForBack);
     }
 
 }
