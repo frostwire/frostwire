@@ -102,13 +102,20 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private ListView list;
     private FileListAdapter adapter;
     private Peer peer;
-    private ViewState fragmentState = ViewState.NORMAL;
-    private ViewState beforeCheckState = ViewState.NORMAL;
+    private Finger oldFinger;
     private View header;
     private long lastAdapterRefresh;
     private String filterString;
     private HashMap<Byte, Set<FileListAdapter.FileDescriptorItem>> checkedItemsMap;
     private SwipeLayout swipe;
+
+    private BrowserPeerFragmentState currentFragmentState;
+    private BrowserPeerFragmentState beforeCheckedFragmentState;
+
+    private BrowserPeerFragmentState normalState = new NormalState();
+    private BrowserPeerFragmentState checkState = new CheckState();
+    private BrowserPeerFragmentState filteringState = new FilteringState();
+    private BrowserPeerFragmentState filteredState = new FilteredState();
 
     //-----header
     private ImageView checkButton;
@@ -189,6 +196,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public BrowsePeerFragment() {
         super(R.layout.fragment_browse_peer);
         broadcastReceiver = new LocalBroadcastReceiver();
+        currentFragmentState = normalState;
         this.peer = new Peer();
         toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_RINGTONES);   //0x00 - Audio -> Ringtones
         toTheRightOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_DOCUMENTS); //0x01 - Pictures -> Documents
@@ -252,12 +260,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             browseFilesButtonClick(adapter.getFileType());
         }
 
-        if (fragmentState == ViewState.CHECK) {
-            enterCheckState();
-        } else if (fragmentState == ViewState.FILTERING) {
-            enterFilteringState();
-        } else if (fragmentState == ViewState.FILTERED) {
-            enterFilteredState();
+        if (currentFragmentState != null) {
+            currentFragmentState.enterState();
         }
 
         updateHeader();
@@ -360,11 +364,11 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         checkButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (fragmentState == ViewState.CHECK) {
+                if (currentFragmentState == checkState) {
                     getActivity().onBackPressed();
                 } else {
                     if (adapter.getFileType() != Constants.FILE_TYPE_RINGTONES) {
-                        enterCheckState();
+                        checkState.enterState();
                         randomlyShowUIHint();
                     }
                 }
@@ -374,10 +378,11 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         searchButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (fragmentState.equals(ViewState.FILTERING)) {
+                if (currentFragmentState == filteringState) {
                     getActivity().onBackPressed();
                 } else {
-                    enterFilteringState();
+                    filteringState.enterState();
+//                    enterFilteringState();
                 }
             }
         });
@@ -399,7 +404,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         });
 
         updateHeader();
-        if (fragmentState == ViewState.FILTERING) {
+        if (currentFragmentState == filteringState) {
             enableSearchBar(true);
         }
 
@@ -528,126 +533,92 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         loader.forceLoad();
         return loader;
     }
-
+    
     private void updateHeader() {
+        updateHeader(true);
+    }
+
+    private void updateHeader(boolean updateFinger) {
         if (peer == null) {
             LOG.warn("Something wrong. peer is null");
             return;
         }
-        Runnable fingerTask = new Runnable() {
-            @Override
-            public void run() {
-                Librarian.instance().invalidateCountCache();
-                Finger finger = peer.finger();
-                if (header != null) {
-                    final byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
-                    int numTotal = 0;
-                    switch (fileType) {
-                        case Constants.FILE_TYPE_TORRENTS:
-                            numTotal = finger.numTotalTorrentFiles;
-                            break;
-                        case Constants.FILE_TYPE_AUDIO:
-                            numTotal = finger.numTotalAudioFiles;
-                            break;
-                        case Constants.FILE_TYPE_DOCUMENTS:
-                            numTotal = finger.numTotalDocumentFiles;
-                            break;
-                        case Constants.FILE_TYPE_PICTURES:
-                            numTotal = finger.numTotalPictureFiles;
-                            break;
-                        case Constants.FILE_TYPE_RINGTONES:
-                            numTotal = finger.numTotalRingtoneFiles;
-                            break;
-                        case Constants.FILE_TYPE_VIDEOS:
-                            numTotal = finger.numTotalVideoFiles;
-                            break;
+        if(updateFinger || oldFinger == null) {
+            Runnable fingerTask = new Runnable() {
+                @Override
+                public void run() {
+                    Librarian.instance().invalidateCountCache();
+                    Finger finger = peer.finger();
+                    oldFinger = finger;
+                    if (header != null) {
+                        final byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
+                        final int numTotalFinal = getTotalFromFinger(finger, fileType);
+                        Runnable postExecute = new Runnable() {
+                            @Override
+                            public void run() {
+                                updateHeaderText(fileType, numTotalFinal);
+                            }
+                        };
+                        Handler handler = new Handler(getActivity().getMainLooper());
+                        handler.post(postExecute);
                     }
-
-                    final int numTotalFinal = numTotal;
-
-                    Runnable postExecute = new Runnable() {
-                        @Override
-                        public void run() {
-                            String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
-                            int filterNumTotal = adapter.getCount();
-                            TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
-                            TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
-                            if (fragmentState == ViewState.CHECK) {
-                                title.setText(adapter.getCheckedCount() + " " + getResources().getString(R.string.selected));
-                                total.setText("");
-                            } else {
-                                if (StringUtils.isNullOrEmpty(filterString)) {
-                                    title.setText(fileTypeStr);
-                                    total.setText("(" + String.valueOf(numTotalFinal) + ")");
-                                } else {
-                                    title.setText(filterString);
-                                    total.setText("(" + filterNumTotal + "/" + String.valueOf(numTotalFinal) + ")");
-                                }
-                            }
-                            if (adapter == null) {
-                                browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
-                            }
-                            MusicUtils.stopSimplePlayer();
-                            updateViewsToState();
-                        }
-                    };
-                    Handler handler = new Handler(getActivity().getMainLooper());
-                    handler.post(postExecute);
                 }
+            };
+            Engine.instance().getThreadPool().submit(fingerTask);
+        } else {
+            byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
+            int numTotalFinal = getTotalFromFinger(oldFinger, fileType);
+            updateHeaderText(fileType, numTotalFinal);
+        }
+        
+    }
+    
+    private int getTotalFromFinger(Finger finger, byte fileType) {
+        switch (fileType) {
+            case Constants.FILE_TYPE_TORRENTS:
+                return finger.numTotalTorrentFiles;
+            case Constants.FILE_TYPE_AUDIO:
+                return finger.numTotalAudioFiles;
+            case Constants.FILE_TYPE_DOCUMENTS:
+                return finger.numTotalDocumentFiles;
+            case Constants.FILE_TYPE_PICTURES:
+                return finger.numTotalPictureFiles;
+            case Constants.FILE_TYPE_RINGTONES:
+                return finger.numTotalRingtoneFiles;
+            case Constants.FILE_TYPE_VIDEOS:
+                return finger.numTotalVideoFiles;
+        }
+        return 0;
+    }
+    
+    private void updateHeaderText(byte fileType, int numTotalFinal) {
+        String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
+        int filterNumTotal = adapter.getCount();
+        TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
+        TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
+        if (currentFragmentState == checkState) {
+            title.setText(adapter.getCheckedCount() + " " + getResources().getString(R.string.selected));
+            total.setText("");
+        } else {
+            if (StringUtils.isNullOrEmpty(filterString)) {
+                title.setText(fileTypeStr);
+                total.setText("(" + String.valueOf(numTotalFinal) + ")");
+            } else {
+                title.setText(filterString);
+                total.setText("(" + filterNumTotal + "/" + String.valueOf(numTotalFinal) + ")");
             }
-        };
-        Engine.instance().getThreadPool().submit(fingerTask);
+        }
+        if (adapter == null) {
+            browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
+        }
+        MusicUtils.stopSimplePlayer();
+        updateViewsToState();
     }
 
     private void updateViewsToState() {
         if (header != null) {
-            if (fragmentState == ViewState.FILTERING) {
-                searchBar.setVisibility(View.VISIBLE);
-                searchButton.setVisibility(View.GONE);
-                firstActionButton.setVisibility(View.GONE);
-                secondActionButton.setVisibility(View.GONE);
-                menuButton.setVisibility(View.GONE);
-                checkButton.setVisibility(View.GONE);
-                textContainer.setVisibility(View.GONE);
-                selectAllContainer.setVisibility(View.GONE);
-                overlay.setVisibility(View.VISIBLE);
-            } else if (fragmentState == ViewState.CHECK) {
-                searchButton.setVisibility(View.GONE);
-                searchBar.setVisibility(View.GONE);
-                if (adapter != null) {
-                    menuButton.setVisibility(adapter.getCheckedCount() > 0 ? View.VISIBLE : View.GONE);
-                }
-                selectAllContainer.setVisibility(View.VISIBLE);
-                fileTypeButtons.setVisibility(View.GONE);
-                checkButton.setVisibility(View.GONE);
-                overlay.setVisibility(View.GONE);
-                getSelectedItemsOptions();
-            } else if (fragmentState == ViewState.FILTERED) {
-                searchBar.setVisibility(View.GONE);
-                searchButton.setVisibility(View.VISIBLE);
-                firstActionButton.setVisibility(View.GONE);
-                secondActionButton.setVisibility(View.GONE);
-                menuButton.setVisibility(View.GONE);
-                if (adapter != null) {
-                    checkButton.setVisibility(adapter.getFileType() != Constants.FILE_TYPE_RINGTONES ? View.VISIBLE : View.GONE);
-                }
-                textContainer.setVisibility(View.VISIBLE);
-                selectAllContainer.setVisibility(View.GONE);
-                fileTypeButtons.setVisibility(View.VISIBLE);
-                overlay.setVisibility(View.GONE);
-            } else { // NORMAL
-                searchBar.setVisibility(View.GONE);
-                searchButton.setVisibility(View.VISIBLE);
-                firstActionButton.setVisibility(View.GONE);
-                secondActionButton.setVisibility(View.GONE);
-                menuButton.setVisibility(View.GONE);
-                if (adapter != null) {
-                    checkButton.setVisibility(adapter.getFileType() != Constants.FILE_TYPE_RINGTONES ? View.VISIBLE : View.GONE);
-                }
-                textContainer.setVisibility(View.VISIBLE);
-                selectAllContainer.setVisibility(View.GONE);
-                fileTypeButtons.setVisibility(View.VISIBLE);
-                overlay.setVisibility(View.GONE);
+            if(currentFragmentState!=null) {
+                currentFragmentState.updateViews();
             }
         }
     }
@@ -730,15 +701,16 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 protected boolean onItemLongClicked(View v) {
                     if (adapter.getFileType() == Constants.FILE_TYPE_RINGTONES) {
                         UIUtils.showShortMessage(getActivity(), R.string.checkmode_invalid_type_message);
-                    } else if (fragmentState != ViewState.CHECK) {
-                        enterCheckState();
+                    } else if (currentFragmentState != checkState) {
+                        checkState.enterState();
+//                        onItemClicked(v); // select the one used to enter state
                     } else {
                         onItemClicked(v);
                     }
                     return true;
                 }
             };
-            adapter.setCheckState(fragmentState == ViewState.CHECK);
+            adapter.setCheckState(currentFragmentState == checkState);
             adapter.setOnItemCheckedListener(new AbstractListAdapter.OnItemCheckedListener<FileListAdapter.FileDescriptorItem>() {
                 @Override
                 public void onItemChecked(CompoundButton v, FileListAdapter.FileDescriptorItem item, boolean checked) {
@@ -817,70 +789,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     public boolean inSpecialState() {
-        return fragmentState != ViewState.NORMAL;
+        return currentFragmentState != normalState;
     }
 
     public void endSpecialState() {
-        if (fragmentState == ViewState.CHECK) {
-            endCheckState();
-        } else if (fragmentState == ViewState.FILTERING) {
-            endFilteringState();
-        } else if (fragmentState == ViewState.FILTERED) {
-            endFilteredState();
+        if (currentFragmentState != null) {
+            currentFragmentState.leaveState();
         }
-    }
-
-    public void enterCheckState() {
-        if (fragmentState != ViewState.CHECK) {
-            beforeCheckState = fragmentState; //might get called multiple times when in/out of background
-        }
-        fragmentState = ViewState.CHECK;
-        ((MainActivity) getActivity()).swapDrawerForBack(true);
-        enableSwipe(false);
-        adapter.setCheckState(true);
-        updateHeader();
-    }
-
-    public void endCheckState() {
-        fragmentState = beforeCheckState;
-        if (beforeCheckState == ViewState.FILTERED) {
-            ((MainActivity) getActivity()).swapDrawerForBack(true);
-        }
-        enableSwipe(true);
-        adapter.setCheckState(false);
-        adapter.clearChecked();
-        changeSelectAllCheckBoxSilently(false);
-        updateHeader();
-    }
-
-    public void enterFilteringState() {
-        fragmentState = ViewState.FILTERING;
-        ((MainActivity) getActivity()).swapDrawerForBack(true);
-        updateHeader();
-        enableSearchBar(true);
-    }
-
-    public void endFilteringState() {
-        fragmentState = ViewState.NORMAL;
-        enableSearchBar(false);
-        filterString = null;
-        reloadFiles(adapter.getFileType());
-        updateHeader();
-    }
-
-    public void enterFilteredState() {
-        fragmentState = ViewState.FILTERED;
-        enableSearchBar(false);
-        ((MainActivity) getActivity()).swapDrawerForBack(true);
-        updateHeader();
-    }
-
-    public void endFilteredState() {
-        fragmentState = ViewState.NORMAL;
-        enableSearchBar(false);
-        filterString = null;
-        reloadFiles(adapter.getFileType());
-        updateHeader();
     }
 
     private void enableSwipe(boolean enabled) {
@@ -906,7 +821,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
                         String filter = textView.getText().toString();
                         if (!StringUtils.isNullOrEmpty(filter)) {
-                            enterFilteredState();
+                            filteredState.enterState();
                             performFilter(filter);
                             searchBar.setOnFocusChangeListener(null);
                         }
@@ -995,7 +910,180 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         }
     }
 
-    private enum ViewState {
-        NORMAL, CHECK, FILTERING, FILTERED
+    private abstract class BrowserPeerFragmentState {
+        abstract void enterState();
+        abstract void leaveState();
+        protected void showRequiredViews() {}
+        protected void hideOtherViews() {}
+        public void updateViews() {
+            hideOtherViews();
+            showRequiredViews();
+        }
+
     }
+
+    private class NormalState extends BrowserPeerFragmentState {
+
+        @Override
+        public void enterState() {
+
+        }
+
+        @Override
+        public void leaveState() {
+
+        }
+
+        @Override
+        protected void showRequiredViews() {
+            searchButton.setVisibility(View.VISIBLE);
+            fileTypeButtons.setVisibility(View.VISIBLE);
+            if (adapter != null) {
+                checkButton.setVisibility(adapter.getFileType() != Constants.FILE_TYPE_RINGTONES ? View.VISIBLE : View.GONE);
+            }
+            textContainer.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void hideOtherViews() {
+            searchBar.setVisibility(View.GONE);
+            firstActionButton.setVisibility(View.GONE);
+            secondActionButton.setVisibility(View.GONE);
+            menuButton.setVisibility(View.GONE);
+            selectAllContainer.setVisibility(View.GONE);
+            overlay.setVisibility(View.GONE);
+        }
+    }
+
+    private class CheckState extends BrowserPeerFragmentState {
+
+        @Override
+        public void enterState() {
+            if(currentFragmentState != this) {
+                beforeCheckedFragmentState = currentFragmentState;
+            }
+            currentFragmentState = this;
+            ((MainActivity) getActivity()).swapDrawerForBack(true);
+            enableSwipe(false);
+            adapter.setCheckState(true);
+            updateHeader();
+        }
+
+        @Override
+        public void leaveState() {
+            currentFragmentState = beforeCheckedFragmentState;
+            if(beforeCheckedFragmentState == filteredState) {
+                ((MainActivity) getActivity()).swapDrawerForBack(true);
+            }
+            enableSwipe(true);
+            adapter.setCheckState(false);
+            adapter.clearChecked();
+            changeSelectAllCheckBoxSilently(false);
+            updateHeader();
+        }
+
+        @Override
+        protected void showRequiredViews() {
+            if (adapter != null) {
+                menuButton.setVisibility(adapter.getCheckedCount() > 0 ? View.VISIBLE : View.GONE);
+            }
+            selectAllContainer.setVisibility(View.VISIBLE);
+            getSelectedItemsOptions();
+        }
+
+        @Override
+        protected void hideOtherViews() {
+            searchButton.setVisibility(View.GONE);
+            searchBar.setVisibility(View.GONE);
+            fileTypeButtons.setVisibility(View.GONE);
+            checkButton.setVisibility(View.GONE);
+            overlay.setVisibility(View.GONE);
+        }
+    }
+
+    private class FilteringState extends BrowserPeerFragmentState {
+
+        @Override
+        public void enterState() {
+            currentFragmentState = this;
+            ((MainActivity) getActivity()).swapDrawerForBack(true);
+            updateHeader();
+            enableSearchBar(true);
+        }
+
+        @Override
+        public void leaveState() {
+            currentFragmentState = normalState;
+            enableSearchBar(false);
+            filterString = null;
+            reloadFiles(adapter.getFileType());
+            updateHeader();
+        }
+
+        @Override
+        protected void showRequiredViews() {
+            searchBar.setVisibility(View.VISIBLE);
+            overlay.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void hideOtherViews() {
+            searchButton.setVisibility(View.GONE);
+            firstActionButton.setVisibility(View.GONE);
+            secondActionButton.setVisibility(View.GONE);
+            menuButton.setVisibility(View.GONE);
+            checkButton.setVisibility(View.GONE);
+            textContainer.setVisibility(View.GONE);
+            selectAllContainer.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void updateViews() {
+            super.updateViews();
+            searchBar.requestFocus();
+            final InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.showSoftInput(searchBar, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
+
+    private class FilteredState extends BrowserPeerFragmentState {
+
+        @Override
+        public void enterState() {
+            currentFragmentState = this;
+            enableSearchBar(false);
+            ((MainActivity) getActivity()).swapDrawerForBack(true);
+            updateHeader();
+        }
+
+        @Override
+        public void leaveState() {
+            currentFragmentState = normalState;
+            enableSearchBar(false);
+            filterString = null;
+            reloadFiles(adapter.getFileType());
+            updateHeader();
+        }
+
+        @Override
+        protected void showRequiredViews() {
+            if (adapter != null) {
+                checkButton.setVisibility(adapter.getFileType() != Constants.FILE_TYPE_RINGTONES ? View.VISIBLE : View.GONE);
+            }
+            searchButton.setVisibility(View.VISIBLE);
+            fileTypeButtons.setVisibility(View.VISIBLE);
+            textContainer.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void hideOtherViews() {
+            searchBar.setVisibility(View.GONE);
+            firstActionButton.setVisibility(View.GONE);
+            secondActionButton.setVisibility(View.GONE);
+            menuButton.setVisibility(View.GONE);
+            selectAllContainer.setVisibility(View.GONE);
+            overlay.setVisibility(View.GONE);
+        }
+    }
+
 }
