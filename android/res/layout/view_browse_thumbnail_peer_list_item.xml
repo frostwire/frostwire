@@ -89,7 +89,7 @@
 
     <ImageView
         android:id="@+id/view_browse_peer_list_item_menu_icon"
-        android:layout_gravity="right"
+        android:layout_gravity="center_vertical"
         android:paddingTop="5dp"
         android:layout_weight="0"
         android:adjustViewBounds="true"
