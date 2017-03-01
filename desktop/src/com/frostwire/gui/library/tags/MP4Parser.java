@@ -67,8 +67,9 @@ class MP4Parser extends AbstractTagParser {
                 String genre = getGenre(ilst);
                 String track = ""; //getTrackNumberValue(ilst);
                 String year = "";// getBoxValue(ilst, AppleRecordingYear2Box.class);
+                String lyrics = "";
 
-                data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year);
+                data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year, lyrics);
 
             } finally {
                 IOUtils.closeQuietly(iso);

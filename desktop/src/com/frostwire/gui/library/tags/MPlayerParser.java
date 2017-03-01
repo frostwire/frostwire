@@ -57,8 +57,8 @@ class MPlayerParser extends AbstractTagParser {
                 String genre = properties.get("Genre");
                 String track = properties.get("Track");
                 String year = properties.get("Year");
-
-                data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year);
+                String lyrics = properties.get("Lyrics");
+                data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year, lyrics);
 
             } finally {
                 mplayer.dispose();

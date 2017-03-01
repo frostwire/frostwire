@@ -43,7 +43,7 @@ abstract class AbstractTagParser implements TagsParser {
         this.file = file;
     }
 
-    protected TagsData sanitize(int duration, String bitrate, String title, String artist, String album, String comment, String genre, String track, String year) {
+    protected TagsData sanitize(int duration, String bitrate, String title, String artist, String album, String comment, String genre, String track, String year, String lyrics) {
         if (title == null || title.length() == 0) {
             title = FilenameUtils.getBaseName(file.getAbsolutePath());
         }
@@ -84,7 +84,11 @@ abstract class AbstractTagParser implements TagsParser {
             year = "";
         }
 
-        return new TagsData(duration, bitrate, title, artist, album, comment, genre, track, year);
+        if (lyrics == null) {
+            lyrics = "";
+        }
+
+        return new TagsData(duration, bitrate, title, artist, album, comment, genre, track, year, lyrics);
     }
 
     protected static BufferedImage imageFromData(byte[] data) {

@@ -69,8 +69,9 @@ class JaudiotaggerParser extends AbstractTagParser {
             String genre = getGenre(audioFile);
             String track = getTrack(audioFile);
             String year = getYear(audioFile);
+            String lyrics = getLyrics(audioFile);
 
-            data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year);
+            data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year, lyrics);
 
         } catch (Exception e) {
             LOG.warn("Unable to parse file using Jaudiotagger: " + file);
@@ -126,6 +127,10 @@ class JaudiotaggerParser extends AbstractTagParser {
 
     protected String getYear(AudioFile audioFile) {
         return getValueSafe(audioFile.getTag(), FieldKey.YEAR);
+    }
+
+    protected String getLyrics(AudioFile audioFile) {
+        return getValueSafe(audioFile.getTag(), FieldKey.LYRICS);
     }
 
     private String getValueSafe(Tag tag, FieldKey id) {

@@ -33,8 +33,9 @@ public class TagsData {
     private final String genre;
     private final String track;
     private final String year;
+    private final String lyrics;
 
-    TagsData(int duration, String bitrate, String title, String artist, String album, String comment, String genre, String track, String year) {
+    TagsData(int duration, String bitrate, String title, String artist, String album, String comment, String genre, String track, String year, String lyrics) {
         this.duration = duration;
         this.bitrate = bitrate;
         this.title = title;
@@ -44,6 +45,7 @@ public class TagsData {
         this.genre = genre;
         this.track = track;
         this.year = year;
+        this.lyrics = lyrics;
     }
 
     public int getDuration() {
@@ -80,5 +82,9 @@ public class TagsData {
 
     public String getYear() {
         return year;
+    }
+
+    public String getLyrics() {
+        return lyrics;
     }
 }
