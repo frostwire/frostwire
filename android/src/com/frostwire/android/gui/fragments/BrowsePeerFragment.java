@@ -143,7 +143,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 } else {
                     menuButton.setVisibility(View.GONE);
                 }
-                updateHeader();
+                updateHeader(false);
             }
         }
     };
@@ -263,8 +263,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         if (currentFragmentState != null) {
             currentFragmentState.enterState();
         }
-
-        updateHeader();
+        
         restoreListViewScrollPosition();
     }
 
@@ -719,7 +718,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     } else {
                         menuButton.setVisibility(View.GONE);
                     }
-                    updateHeader();
+                    updateHeader(false);
                 }
             });
             restorePreviouslyChecked();
@@ -925,7 +924,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
         @Override
         public void enterState() {
-
+            updateHeader();
         }
 
         @Override
