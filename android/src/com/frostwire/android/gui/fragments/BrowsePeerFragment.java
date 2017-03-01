@@ -30,6 +30,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
@@ -63,6 +64,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.AbstractListAdapter;
@@ -532,56 +534,69 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             LOG.warn("Something wrong. peer is null");
             return;
         }
-        Librarian.instance().invalidateCountCache();
-        Finger finger = peer.finger();
-        if (header != null) {
-            byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
-            int numTotal = 0;
-            switch (fileType) {
-                case Constants.FILE_TYPE_TORRENTS:
-                    numTotal = finger.numTotalTorrentFiles;
-                    break;
-                case Constants.FILE_TYPE_AUDIO:
-                    numTotal = finger.numTotalAudioFiles;
-                    break;
-                case Constants.FILE_TYPE_DOCUMENTS:
-                    numTotal = finger.numTotalDocumentFiles;
-                    break;
-                case Constants.FILE_TYPE_PICTURES:
-                    numTotal = finger.numTotalPictureFiles;
-                    break;
-                case Constants.FILE_TYPE_RINGTONES:
-                    numTotal = finger.numTotalRingtoneFiles;
-                    break;
-                case Constants.FILE_TYPE_VIDEOS:
-                    numTotal = finger.numTotalVideoFiles;
-                    break;
-            }
-            String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
+        Runnable fingerTask = new Runnable() {
+            @Override
+            public void run() {
+                Librarian.instance().invalidateCountCache();
+                Finger finger = peer.finger();
+                if (header != null) {
+                    final byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
+                    int numTotal = 0;
+                    switch (fileType) {
+                        case Constants.FILE_TYPE_TORRENTS:
+                            numTotal = finger.numTotalTorrentFiles;
+                            break;
+                        case Constants.FILE_TYPE_AUDIO:
+                            numTotal = finger.numTotalAudioFiles;
+                            break;
+                        case Constants.FILE_TYPE_DOCUMENTS:
+                            numTotal = finger.numTotalDocumentFiles;
+                            break;
+                        case Constants.FILE_TYPE_PICTURES:
+                            numTotal = finger.numTotalPictureFiles;
+                            break;
+                        case Constants.FILE_TYPE_RINGTONES:
+                            numTotal = finger.numTotalRingtoneFiles;
+                            break;
+                        case Constants.FILE_TYPE_VIDEOS:
+                            numTotal = finger.numTotalVideoFiles;
+                            break;
+                    }
 
-            int filterNumTotal = adapter.getCount();
+                    final int numTotalFinal = numTotal;
 
-            TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
-            TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
-
-            if (fragmentState == ViewState.CHECK) {
-                title.setText(adapter.getCheckedCount() + " " + getResources().getString(R.string.selected));
-                total.setText("");
-            } else {
-                if (StringUtils.isNullOrEmpty(filterString)) {
-                    title.setText(fileTypeStr);
-                    total.setText("(" + String.valueOf(numTotal) + ")");
-                } else {
-                    title.setText(filterString);
-                    total.setText("(" + filterNumTotal + "/" + String.valueOf(numTotal) + ")");
+                    Runnable postExecute = new Runnable() {
+                        @Override
+                        public void run() {
+                            String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
+                            int filterNumTotal = adapter.getCount();
+                            TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
+                            TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
+                            if (fragmentState == ViewState.CHECK) {
+                                title.setText(adapter.getCheckedCount() + " " + getResources().getString(R.string.selected));
+                                total.setText("");
+                            } else {
+                                if (StringUtils.isNullOrEmpty(filterString)) {
+                                    title.setText(fileTypeStr);
+                                    total.setText("(" + String.valueOf(numTotalFinal) + ")");
+                                } else {
+                                    title.setText(filterString);
+                                    total.setText("(" + filterNumTotal + "/" + String.valueOf(numTotalFinal) + ")");
+                                }
+                            }
+                            if (adapter == null) {
+                                browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
+                            }
+                            MusicUtils.stopSimplePlayer();
+                            updateViewsToState();
+                        }
+                    };
+                    Handler handler = new Handler(getActivity().getMainLooper());
+                    handler.post(postExecute);
                 }
             }
-        }
-        if (adapter == null) {
-            browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
-        }
-        MusicUtils.stopSimplePlayer();
-        updateViewsToState();
+        };
+        Engine.instance().getThreadPool().submit(fingerTask);
     }
 
     private void updateViewsToState() {
@@ -983,5 +998,4 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private enum ViewState {
         NORMAL, CHECK, FILTERING, FILTERED
     }
-
 }
