@@ -382,7 +382,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     getActivity().onBackPressed();
                 } else {
                     filteringState.enterState();
-//                    enterFilteringState();
                 }
             }
         });
@@ -703,7 +702,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                         UIUtils.showShortMessage(getActivity(), R.string.checkmode_invalid_type_message);
                     } else if (currentFragmentState != checkState) {
                         checkState.enterState();
-//                        onItemClicked(v); // select the one used to enter state
+                        onItemClicked(v); // select the one used to enter state
                     } else {
                         onItemClicked(v);
                     }
