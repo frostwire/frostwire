@@ -93,6 +93,10 @@ class MP3Parser extends JaudiotaggerParser {
         return getValueSafe(super.getYear(audioFile), audioFile, ID3v24Frames.FRAME_ID_YEAR);
     }
 
+    protected String getLyrics(AudioFile audioFile) {
+        return getValueSafe(getValueSafe(super.getLyrics(audioFile), audioFile, ID3v24Frames.FRAME_ID_SYNC_LYRIC), audioFile, ID3v24Frames.FRAME_ID_UNSYNC_LYRICS);
+    }
+
     private String getValueSafe(String currentValue, AudioFile audioFile, String identifier) {
         String value = currentValue;
 

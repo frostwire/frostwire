@@ -133,15 +133,6 @@ class MP4Parser extends AbstractTagParser {
         return b != null ? b.value() : "";
     }
 
-//    private String getTrackNumberValue(AppleItemListBox ilst) {
-//        String value = "";
-//        List<AppleTrackNumberBox> boxes = ilst.find(AppleTrackNumberBox.class);
-//        if (boxes != null && !boxes.isEmpty()) {
-//            value = String.valueOf(boxes.get(0).getA());
-//        }
-//        return value;
-//    }
-
     private <T extends AppleIntegerBox> long getBoxLongValue(AppleItemListBox ilst, int type) {
         AppleIntegerBox b = ilst.findFirst(type);
         return b != null ? b.value() : -1;
