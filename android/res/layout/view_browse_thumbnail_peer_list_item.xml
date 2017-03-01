@@ -90,10 +90,9 @@
     <ImageView
         android:id="@+id/view_browse_peer_list_item_menu_icon"
         android:layout_gravity="center_vertical"
-        android:paddingTop="5dp"
-        android:layout_weight="0"
+        android:padding="10dp"
         android:adjustViewBounds="true"
         android:src="@drawable/single_file_option"
         android:layout_height="wrap_content"
-        android:layout_width="28dp" />
+        android:layout_width="wrap_content" />
 </LinearLayout>
