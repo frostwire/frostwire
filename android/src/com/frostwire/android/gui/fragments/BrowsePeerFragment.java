@@ -838,7 +838,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         ((MainActivity) getActivity()).swapDrawerForBack(true);
         enableSwipe(false);
         adapter.setCheckState(true);
-        updateViewsToState();
+        updateHeader();
     }
 
     public void endCheckState() {
@@ -850,13 +850,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         adapter.setCheckState(false);
         adapter.clearChecked();
         changeSelectAllCheckBoxSilently(false);
-        updateViewsToState();
+        updateHeader();
     }
 
     public void enterFilteringState() {
         fragmentState = ViewState.FILTERING;
         ((MainActivity) getActivity()).swapDrawerForBack(true);
-        updateViewsToState();
+        updateHeader();
         enableSearchBar(true);
     }
 
@@ -865,14 +865,14 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         enableSearchBar(false);
         filterString = null;
         reloadFiles(adapter.getFileType());
-        updateViewsToState();
+        updateHeader();
     }
 
     public void enterFilteredState() {
         fragmentState = ViewState.FILTERED;
         enableSearchBar(false);
         ((MainActivity) getActivity()).swapDrawerForBack(true);
-        updateViewsToState();
+        updateHeader();
     }
 
     public void endFilteredState() {
@@ -880,7 +880,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         enableSearchBar(false);
         filterString = null;
         reloadFiles(adapter.getFileType());
-        updateViewsToState();
+        updateHeader();
     }
 
     private void enableSwipe(boolean enabled) {
