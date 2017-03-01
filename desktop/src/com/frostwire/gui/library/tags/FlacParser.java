@@ -17,17 +17,16 @@
 
 package com.frostwire.gui.library.tags;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.List;
-
+import com.frostwire.util.Logger;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.flac.FlacFileReader;
 import org.jaudiotagger.audio.flac.metadatablock.MetadataBlockDataPicture;
 import org.jaudiotagger.tag.flac.FlacTag;
 
-import com.frostwire.util.Logger;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.List;
 
 /**
  * 

@@ -504,9 +504,24 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
             OPEN_IN_FOLDER_ACTION.setEnabled(false);
         }
 
+        System.out.println("LibraryPlaylistsTableMediator::handleSelection() - sel.length == " + sel.length);
         if (sel.length == 1) {
             LibraryMediator.instance().getLibraryCoverArt().setFile(getSelectedLibraryLines()[0].getFile());
+            LibraryUtils.asyncParseLyrics(selectedFile, new LibraryUtils.OnLyricsParsedUICallback() {
+                @Override
+                public void run() {
+                    onLyricsParsed(getLyrics());
+                }
+            });
         }
+    }
+
+    private void onLyricsParsed(String lyrics) {
+        System.out.println("====================================================================================================");
+        System.out.println("LibraryPlaylistsTableMediator.onLyricsParsed() <" + lyrics.length() + " bytes> (thread -> " + Thread.currentThread().getName() + ")");
+        System.out.println(lyrics);
+        System.out.println("====================================================================================================");
+        // TODO: Update UI and show or hide lyrics depending on what we get.
     }
 
     /**

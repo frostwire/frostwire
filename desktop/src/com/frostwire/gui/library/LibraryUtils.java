@@ -737,4 +737,35 @@ public class LibraryUtils {
             }
         });
     }
+
+    static void asyncParseLyrics(final File audioFile, final OnLyricsParsedUICallback uiCallback) {
+        if (audioFile == null || !audioFile.isFile() || !audioFile.canRead() || uiCallback == null) {
+            if (uiCallback != null) {
+                uiCallback.setLyrics("");
+                GUIMediator.safeInvokeLater(uiCallback);
+            }
+            return;
+        }
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                TagsData tagsData = new TagsReader(audioFile).parse();
+                if (tagsData != null) {
+                    uiCallback.setLyrics(tagsData.getLyrics()); // can't be null, only ""
+                    GUIMediator.safeInvokeLater(uiCallback);
+                }
+            }
+        });
+    }
+
+    public abstract static class OnLyricsParsedUICallback implements Runnable {
+        private String lyrics;
+        void setLyrics(String lyrics) {
+            this.lyrics = lyrics;
+        }
+        String getLyrics() {
+            return lyrics;
+        }
+        public abstract void run();
+    }
 }
