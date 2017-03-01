@@ -623,5 +623,32 @@
     <string name="remove_ads">Mengeluarkan iklan</string>
     <string name="your_connection_has_dropped_stopping_services">Sambungan Wifi anda telah digugurkan. perkhidmatan henti.</string>
     <string name="use_tpb_summary">TPB adalah berasaskan magnet, hanya berfungsi pada Wifi</string>
+    <string name="cloud_download_aborted_on_mobile_data">tetapan semasa menghalang dimuat turun apabila tidak pada rangkaian Wifi</string>
+    <string name="sharing_privacy_settings">Perkongsian dan Privasi</string>
+    <string name="delete_started_torrents_summary">Padam fail Torrent selepas mula memuat turun</string>
+    <string name="dismiss">Abaikan</string>
+    <string name="torrent_preferences_header">Keutamaan torrent</string>
+    <string name="search_preferences_one_engine_checked_always">Secara lalai, satu enjin carian perlu diperiksa pada setiap masa</string>
+    <string name="switch_off_engine_without_vpn">VPN tidak aktif, berhenti enjin BitTorrent.</string>
+    <string name="notification_other_header">Pemberitahuan dan Lain-lain</string>
+    <string name="number_picker_tip">Petua: sentuhan nombor untuk menggunakan papan kekunci dipilih</string>
+    <string name="search_torrent_settings">Cari dan Tetapan Torrent</string>
+    <string name="general_settings">Jeneral</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Tiada Wifi ada, semua pemindahan telah berhenti</string>
+    <string name="vpn_drop_protection_title">Perlindungan VPN tidak aktif</string>
+    <string name="deselect_all">Nyahpilih Semua</string>
+    <string name="data_saving_kill_http_warning">Ini akan menghentikan semua pemindahan belum selesai dijalankan</string>
+    <string name="delete_started_torrents">Padam fail Torrent</string>
+    <string name="search_header">Cari</string>
+    <string name="bandwidth_usage_settings">Penggunaan jalur lebar</string>
+    <string name="unlimited">Tidak terhad</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">Mengikut tetapan anda saya tidak boleh memulakan pembenihan melainkan jika anda berada di Wi-Fi kerana simpanan data. Fail akan bersedia untuk pembenihan secara automatik apabila anda kembali ke internet yang dihidupkan rangkaian Wi-Fi.</string>
+    <string name="vpn_drop_protection_summary">Melindungi privasi anda. melumpuhkan pemindahan BitTorrent secara automatik melainkan sambungan VPN disulitkan aktif</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent tidak akan bermula melainkan jika VPN yang boleh didapati. (Semak tetapan anda)</string>
+    <string name="use_magnet_summary">Berdasarkan pautan magnet, hanya berfungsi pada Wifi</string>
+    <string name="mobile_data_saving">Data Mudah Alih Penjimatan</string>
+    <string name="data_saving_kill_http_warning_title">Amaran: Http pemindahan dalam kemajuan</string>
 
 </resources>

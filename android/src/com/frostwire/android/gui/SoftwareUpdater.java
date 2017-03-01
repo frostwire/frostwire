@@ -65,7 +65,7 @@ public final class SoftwareUpdater {
     private final boolean ALWAYS_SHOW_UPDATE_DIALOG = false; // debug flag.
 
     public interface ConfigurationUpdateListener {
-        void onConfigurationUpdate();
+        void onConfigurationUpdate(boolean updateAvailable);
     }
 
     private static final String TAG = "FW.SoftwareUpdater";
@@ -96,14 +96,6 @@ public final class SoftwareUpdater {
         this.latestVersion = Constants.FROSTWIRE_VERSION_STRING;
         this.configurationUpdateListeners = new HashSet<>();
     }
-
-//    public boolean isOldVersion() {
-//        return oldVersion;
-//    }
-//
-//    public String getLatestVersion() {
-//        return latestVersion;
-//    }
 
     public void checkForUpdate(final Context context) {
         long now = System.currentTimeMillis();
@@ -166,7 +158,7 @@ public final class SoftwareUpdater {
             protected void onPostExecute(Boolean result) {
 
                 if (ALWAYS_SHOW_UPDATE_DIALOG || (result && !isCancelled())) {
-                    notifyUpdate(context);
+                    notifyUserAboutUpdate(context);
                 }
 
                 // Even if we're offline, we need to disable these for the Google Play Distro.
@@ -178,8 +170,8 @@ public final class SoftwareUpdater {
                     scSE.setActive(false);
                 }
 
-                //nav menu always needs to be updated after we read the config.
-                notifyConfigurationUpdateListeners();
+                //nav menu or other components always needs to be updated after we read the config.
+                notifyConfigurationUpdateListeners(result);
             }
         };
 
@@ -192,7 +184,7 @@ public final class SoftwareUpdater {
      * @throws IOException
      */
     private boolean handleOTAUpdate() throws IOException {
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
             LOG.info("handleOTAUpdate(): it's Google Play, aborting -> false");
             return false;
         }
@@ -242,7 +234,7 @@ public final class SoftwareUpdater {
         return Platforms.get().systemPaths().update();
     }
 
-    private void notifyUpdate(final Context context) {
+    public void notifyUserAboutUpdate(final Context context) {
         try {
             if (update.a == null) {
                 update.a = UPDATE_ACTION_OTA; // make it the old behavior
@@ -250,11 +242,11 @@ public final class SoftwareUpdater {
 
             if (update.a.equals(UPDATE_ACTION_OTA)) {
                 if (!ALWAYS_SHOW_UPDATE_DIALOG && !getUpdateApk().exists()) {
-                    LOG.info("notifyUpdate(): " + getUpdateApk().getAbsolutePath() + " not found. Aborting.");
+                    LOG.info("notifyUserAboutUpdate(): " + getUpdateApk().getAbsolutePath() + " not found. Aborting.");
                     return;
                 }
 
-                LOG.info("notifyUpdate(): showing update dialog.");
+                LOG.info("notifyUserAboutUpdate(): showing update dialog.");
                 SoftwareUpdaterDialog.newInstance(update).show(((Activity) context).getFragmentManager());
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
 
@@ -298,7 +290,6 @@ public final class SoftwareUpdater {
         if (Constants.IS_BASIC_AND_DEBUG) {
             myBuild += 40000;
         }
-        LOG.info("isFrostWireOld(myBuild=" + myBuild + ", latestBuild=" + latestBuild + ")");
         boolean result;
         try {
             int latestBuildNum = Integer.parseInt(latestBuild);
@@ -307,6 +298,7 @@ public final class SoftwareUpdater {
             LOG.error("isFrostWireOld() can't parse latestBuild number.", ignored);
             result = false;
         }
+        LOG.info("isFrostWireOld(myBuild=" + myBuild + ", latestBuild=" + latestBuild + ") => " + result);
         return result;
     }
 
@@ -399,10 +391,10 @@ public final class SoftwareUpdater {
         }
     }
 
-    private void notifyConfigurationUpdateListeners() {
+    private void notifyConfigurationUpdateListeners(boolean result) {
         for (ConfigurationUpdateListener listener : configurationUpdateListeners) {
             try {
-                listener.onConfigurationUpdate();
+                listener.onConfigurationUpdate(result);
             } catch (Throwable ignored) {
             }
         }

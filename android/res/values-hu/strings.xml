@@ -623,5 +623,31 @@
     <string name="distraction_free_search_results">A figyelmetlenség Szabad keresés (béta)</string>
     <string name="help_translate_or_proofread_frostwire">Segíts lefordítani vagy a lektorált FrostWire</string>
     <string name="changelog">Változások</string>
-
+    <string name="cloud_download_aborted_on_mobile_data">Aktuális beállítás megakadályozza a letöltést, ha nincs WiFi hálózat</string>
+    <string name="sharing_privacy_settings">Megosztás és adatvédelem</string>
+    <string name="delete_started_torrents_summary">Törlés .torrent fájlokat megkezdése után a letöltés</string>
+    <string name="dismiss">Elvetése</string>
+    <string name="torrent_preferences_header">Torrent preferenciák</string>
+    <string name="search_preferences_one_engine_checked_always">Alapértelmezésben egy kereső ellenőrizni kell minden alkalommal</string>
+    <string name="switch_off_engine_without_vpn">VPN inaktív, megállás a BitTorrent motort.</string>
+    <string name="notification_other_header">Értesítések és egyéb</string>
+    <string name="number_picker_tip">Tipp: touch kiválasztott számot használni billentyűzet</string>
+    <string name="search_torrent_settings">Keresés és Torrent Beállítások</string>
+    <string name="general_settings">Tábornok</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Nincs wifi minden transzfer volna állítani</string>
+    <string name="vpn_drop_protection_title">VPN védelem inaktív</string>
+    <string name="deselect_all">Összes kijelölés törlése</string>
+    <string name="data_saving_kill_http_warning">Ez leállítja az összes befejezetlen transzfer folyamatban</string>
+    <string name="delete_started_torrents">Törlés .torrent fájlokat</string>
+    <string name="search_header">Keresés</string>
+    <string name="bandwidth_usage_settings">sávszélesség-használat</string>
+    <string name="unlimited">Korlátlan</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">Szerint a beállításokat nem tudom elindítani vetés hacsak nem a Wi-Fi miatt adatmegtakarítás. A fájl lesz kész vetés automatikusan visszaálljon egy internet képes Wi-Fi hálózathoz.</string>
+    <string name="vpn_drop_protection_summary">Adatainak védelme érdekében. Automatikusan letiltja BitTorrent átutalások, kivéve, ha titkosított VPN-kapcsolat aktív</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent nem indul, kivéve, ha a VPN elérhető. (Ellenőrizze a beállításokat)</string>
+    <string name="use_magnet_summary">Alapján mágnes linkek, csak akkor működik, Wifi</string>
+    <string name="mobile_data_saving">Mobil adatok mentése</string>
+    <string name="data_saving_kill_http_warning_title">Figyelmeztetés: Http transzferek folyamatban</string>
 </resources>

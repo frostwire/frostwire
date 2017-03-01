@@ -567,7 +567,7 @@
     <string name="torrent_max_uploads_summary">แม็กซ์อัปโหลด</string>
     <string name="activity_about">เกี่ยวกับ</string>
     <string name="try_other_keywords">ลองใช้คำหลักน้อยลง/ที่แตกต่างกัน</string>
-    <string name="use_upnp_port_mapping_summary">ลองกดที่นี่เพื่อตั้งหมายเลขพอร์ตคู่มือการใช้งาน...</string>
+    <string name="use_upnp_port_mapping_summary">ลองกดที่นี่เพื่อตั้งหมายเลขพอร์ตคู่มือการใช้งาน…</string>
     <string name="activity_media_player_image_description">ภาพสื่อ</string>
     <string name="donate_1">บริจาค $1</string>
     <string name="donate_5">บริจาค $5</string>
@@ -623,6 +623,33 @@
     <string name="remove_ads">ลบโฆษณา</string>
     <string name="your_connection_has_dropped_stopping_services">การเชื่อมต่อไร้สายของคุณได้ลดลง หยุดให้บริการ</string>
     <string name="use_tpb_summary">TPB เป็นแม่เหล็กที่ใช้งานได้เฉพาะใน WiFi</string>
+    <string name="cloud_download_aborted_on_mobile_data">การตั้งค่าปัจจุบันจะช่วยป้องกันการดาวน์โหลดเมื่อไม่ได้อยู่บนเครือข่ายไร้สาย</string>
+    <string name="sharing_privacy_settings">ร่วมกันและความเป็นส่วนตัว</string>
+    <string name="delete_started_torrents_summary">ลบไฟล์ .torrent หลังจากที่เริ่มต้นการดาวน์โหลด</string>
+    <string name="dismiss">ยกเลิก</string>
+    <string name="torrent_preferences_header">การตั้งค่า Torrent</string>
+    <string name="search_preferences_one_engine_checked_always">โดยค่าเริ่มต้นเครื่องมือค้นหาหนึ่งจะต้องมีการตรวจสอบทุกครั้ง</string>
+    <string name="switch_off_engine_without_vpn">VPN ไม่ได้ใช้งานหยุดเครื่องยนต์ BitTorrent</string>
+    <string name="notification_other_header">การแจ้งเตือนและอื่น ๆ</string>
+    <string name="number_picker_tip">เคล็ดลับ: สัมผัสหมายเลขที่เลือกใช้แป้นพิมพ์</string>
+    <string name="search_torrent_settings">การค้นหาและการตั้งค่า Torrent</string>
+    <string name="general_settings">ทั่วไป</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">ไม่มี WiFi ใช้ได้การถ่ายโอนทั้งหมดได้ถูกหยุด</string>
+    <string name="vpn_drop_protection_title">คุ้มครอง VPN ไม่ได้ใช้งาน</string>
+    <string name="deselect_all">ยกเลิกการเลือกทั้งหมด</string>
+    <string name="data_saving_kill_http_warning">นี้จะหยุดการถ่ายโอนยังไม่เสร็จทั้งหมดในความคืบหน้า</string>
+    <string name="delete_started_torrents">ลบไฟล์ .torrent</string>
+    <string name="search_header">ค้นหา</string>
+    <string name="bandwidth_usage_settings">การใช้แบนด์วิธ</string>
+    <string name="unlimited">ไม่ จำกัด</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">ตามการตั้งค่าของคุณฉันไม่สามารถเริ่มต้นการเพาะถ้าคุณเป็น Wi-Fi เนื่องจากเงินฝากออมทรัพย์ข้อมูล ไฟล์ที่จะพร้อมสำหรับการเพาะโดยอัตโนมัติเมื่อคุณได้รับกลับไปอินเทอร์เน็ตเปิดการใช้งานเครือข่าย Wi-Fi</string>
+    <string name="vpn_drop_protection_summary">ปกป้องความเป็นส่วนตัวของคุณ ปิดการใช้งานการถ่ายโอน BitTorrent โดยอัตโนมัติเว้นแต่จะมีการเชื่อมต่อ VPN เข้ารหัสการใช้งาน</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent จะไม่เริ่มต้นเว้นแต่ VPN สามารถใช้ได้ (ตรวจสอบการตั้งค่าของคุณ)</string>
+    <string name="use_magnet_summary">ขึ้นอยู่กับการเชื่อมโยงแม่เหล็กทำงานเฉพาะใน Wifi</string>
+    <string name="mobile_data_saving">การบันทึกข้อมูลมือถือ</string>
+    <string name="data_saving_kill_http_warning_title">คำเตือน: http โอนในความคืบหน้า</string>
 
 
 </resources>

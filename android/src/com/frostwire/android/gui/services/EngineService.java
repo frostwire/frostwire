@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
+
 import com.andrew.apollo.MediaButtonIntentReceiver;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -43,7 +44,6 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
-import com.inmobi.commons.core.utilities.uid.ImIdShareBroadCastReceiver;
 import com.squareup.okhttp.ConnectionPool;
 
 import java.io.File;
@@ -129,7 +129,6 @@ public class EngineService extends Service implements IEngineService {
 
     private void enableReceivers(boolean enable) {
         PackageManager pm = getPackageManager();
-        enableReceiver(pm, ImIdShareBroadCastReceiver.class, enable);
         enableReceiver(pm, EngineBroadcastReceiver.class, enable);
         enableReceiver(pm, MediaButtonIntentReceiver.class, enable);
     }

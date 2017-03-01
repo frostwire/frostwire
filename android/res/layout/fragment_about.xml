@@ -43,7 +43,8 @@
                 android:gravity="center_horizontal"
                 android:text="@string/dummy_title"
                 android:textSize="21sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/app_text_primary"/>
 
             <TextView
                 android:id="@+id/fragment_about_build_number"
@@ -148,6 +149,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:layout_marginTop="25dp"
+            android:textColor="@color/app_text_primary"
             android:text="@string/dummy_title" />
 
         <ImageView

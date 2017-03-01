@@ -628,4 +628,32 @@
     <string name="distraction_free_search_results">산만 무료 검색 (베타)</string>
     <string name="help_translate_or_proofread_frostwire">FrostWire 번역 또는 교정 도움말</string>
     <string name="changelog">변경 내역</string>
+    <string name="cloud_download_aborted_on_mobile_data">Wi-Fi 네트워크가 아닌 경우 현재 설정으로 다운로드하지 못함</string>
+    <string name="sharing_privacy_settings">공유 및 개인 정보</string>
+    <string name="delete_started_torrents_summary">다운로드를 시작한 후 .torrent 파일을 삭제하십시오.</string>
+    <string name="dismiss">버리다</string>
+    <string name="torrent_preferences_header">Torrent 환경 설정</string>
+    <string name="search_preferences_one_engine_checked_always">기본적으로 한 검색 엔진을 항상 확인해야합니다.</string>
+    <string name="switch_off_engine_without_vpn">VPN이 비활성화되어 BitTorrent 엔진이 중지됩니다.</string>
+    <string name="notification_other_header">알림 및 기타</string>
+    <string name="number_picker_tip">도움말 : 키보드를 사용하려면 선택한 번호를 터치하십시오.</string>
+    <string name="search_torrent_settings">검색 및 토런트 설정</string>
+    <string name="general_settings">일반</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Wi-Fi를 사용할 수 없으며 모든 전송이 중지되었습니다.</string>
+    <string name="vpn_drop_protection_title">VPN 보호가 비활성화 됨</string>
+    <string name="deselect_all">모두 선택 취소</string>
+    <string name="data_saving_kill_http_warning">진행중인 모든 미완료 전송을 중지합니다.</string>
+    <string name="delete_started_torrents">.torrent 파일 삭제</string>
+    <string name="search_header">수색</string>
+    <string name="bandwidth_usage_settings">대역폭 사용량</string>
+    <string name="unlimited">제한 없는</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">귀하의 설정에 따르면 데이터 저장으로 인해 Wi-Fi를 사용하지 않는 이상 시드를 시작할 수 없습니다. 이 파일은 인터넷 가능 Wi-Fi 네트워크로 돌아 가면 자동으로 시드 할 준비가됩니다.</string>
+    <string name="vpn_drop_protection_summary">개인 정보를 보호하십시오. 암호화 된 VPN 연결이 활성화되어 있지 않으면 BitTorrent 전송을 자동으로 사용하지 않도록 설정</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent는 VPN이 사용 가능하지 않으면 시작되지 않습니다. (설정 확인)</string>
+    <string name="use_magnet_summary">자석 링크를 기반으로 Wi-Fi에서만 작동합니다.</string>
+    <string name="mobile_data_saving">모바일 데이터 저장</string>
+    <string name="data_saving_kill_http_warning_title">경고 : HTTP 전송 진행 중 </string>
+
 </resources>

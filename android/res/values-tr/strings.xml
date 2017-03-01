@@ -625,4 +625,32 @@
     <string name="distraction_free_search_results">Dikkat dağıtımı Ücretsiz Arama (beta)</string>
     <string name="help_translate_or_proofread_frostwire">FrostWire\'ı tercüme etmeye veya düzeltmeye yardımcı olun</string>
     <string name="changelog">Değişiklikler</string>
+    <string name="cloud_download_aborted_on_mobile_data">Geçerli ayar, Wifi şebekesinde değilken indirmeyi engeller</string>
+    <string name="sharing_privacy_settings">Paylaşım ve Gizlilik</string>
+    <string name="delete_started_torrents_summary">İndirilmeye başlandıktan sonra .torrent dosyalarını silin.</string>
+    <string name="dismiss">Reddet</string>
+    <string name="torrent_preferences_header">Torrent Tercihleri</string>
+    <string name="search_preferences_one_engine_checked_always">Varsayılan olarak, bir arama motorunun her zaman kontrol edilmesi gerekiyor</string>
+    <string name="switch_off_engine_without_vpn">VPN devre dışı, BitTorrent motorunu durduruyor.</string>
+    <string name="notification_other_header">Bildirimler ve Diğer</string>
+    <string name="number_picker_tip">İpucu: klavyeyi kullanmak için seçili numaraya dokunun</string>
+    <string name="search_torrent_settings">Arama ve Torrent Ayarları</string>
+    <string name="general_settings">Genel</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Wifi yok, tüm aktarmalar durduruldu</string>
+    <string name="vpn_drop_protection_title">VPN Koruması devre dışı</string>
+    <string name="deselect_all">Hiçbirini seçme</string>
+    <string name="data_saving_kill_http_warning">Bu işlem tamamlanmamış tüm transferleri durduracaktır</string>
+    <string name="delete_started_torrents">Torrent dosyalarını sil</string>
+    <string name="search_header">Arama</string>
+    <string name="bandwidth_usage_settings">Bant Genişliği Kullanımı</string>
+    <string name="unlimited">Sınırsız</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">Ayarlarınıza göre, veri tasarrufu yüzünden Wi-Fi kullanmadıysanız tohum ekmeye başlayamam. İnternet üzerinden bir Wi-Fi ağına geri döndüğünüzde, dosya otomatik olarak ekim için hazır olacaktır.</string>
+    <string name="vpn_drop_protection_summary">Gizliliğinizi koruyun. Şifreli bir VPN bağlantısı etkin olmadığı sürece BitTorrent aktarımlarını otomatik olarak devre dışı bırak</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent, VPN yoksa başlamayacaktır. (Ayarlarınızı kontrol edin)</string>
+    <string name="use_magnet_summary">Mıknatıs bağlantılarına dayanarak, yalnızca Wifi\'de çalışır</string>
+    <string name="mobile_data_saving">Mobil Veri Tasarrufu</string>
+    <string name="data_saving_kill_http_warning_title">Uyarı: Http aktarımı devam ediyor</string>
+
 </resources>

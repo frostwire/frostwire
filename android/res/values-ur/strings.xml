@@ -623,5 +623,32 @@
     <string name="show_love">FrostWire پسند ہے؟</string>
     <string name="remove_ads">اشتھارات ہٹا</string>
     <string name="use_tpb_summary">TPB مقناطیس کی بنیاد پر ہے، صرف وائی فائی پر کام کرتا ہے</string>
+    <string name="cloud_download_aborted_on_mobile_data">موجودہ ترتیب وائی فائی نیٹ ورک پر جب نہیں ڈاؤن لوڈ کرنے سے روکتا ہے</string>
+    <string name="sharing_privacy_settings">شیئرنگ اور پرائیویسی</string>
+    <string name="delete_started_torrents_summary">ڈاؤن لوڈ کرنے کے آغاز کے بعد .torrent فائلوں کو خارج کر</string>
+    <string name="dismiss">برخاست</string>
+    <string name="torrent_preferences_header">اوپر کی ترجیحات</string>
+    <string name="search_preferences_one_engine_checked_always">ڈیفالٹ کی طرف سے، ایک کی تلاش کے انجن کو ہر وقت کی جانچ پڑتال کی جائے کی ضرورت ہے</string>
+    <string name="switch_off_engine_without_vpn">VPN غیر فعال ہے. BitTorrent کے انجن روکنا.</string>
+    <string name="notification_other_header">نوٹیفیکیشن اور دیگر</string>
+    <string name="number_picker_tip">ترکیب: رابطے کے منتخب کی بورڈ کا استعمال کرنے کے لئے نمبر</string>
+    <string name="search_torrent_settings">تلاش اور نامہ ترتیبات</string>
+    <string name="general_settings">جنرل</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">آپ کوئی وائی فائی، تمام کی منتقلی کو روکا جا چکے ہیں</string>
+    <string name="vpn_drop_protection_title">VPN تحفظ غیر فعال ہے</string>
+    <string name="deselect_all">تمام غیر منتخب کریں</string>
+    <string name="data_saving_kill_http_warning">یہ ترقی میں تمام نامکمل ٹرانسفر بند ہو جائیں گے</string>
+    <string name="delete_started_torrents">.torrent فائلوں کو خارج کر</string>
+    <string name="search_header">تلاش کریں</string>
+    <string name="bandwidth_usage_settings">بینڈوڈتھ کے استعمال</string>
+    <string name="unlimited">لا محدود</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">آپ کی ترتیبات کے مطابق میں بوائ شروع نہیں کر سکتا جب تک کہ آپ کی وجہ سے اعداد و شمار کی بچت کرنے کے لئے وائی فائی پر ہیں. جب آپ کو وائی فائی نیٹ ورک چالو حالت میں ایک انٹرنیٹ کو واپس مل فائل خود کار طریقے کی بوائ کے لئے تیار ہو جائے گا.</string>
+    <string name="vpn_drop_protection_summary">آپ کی پرائیویسی کی حفاظت کرو. ایک مرموز ویپیین کنکشن فعال ہے جب تک کہ خود کار طریقے سے BitTorrent کے ٹرانسفرز کو غیر فعال</string>
+    <string name="cannot_start_engine_without_vpn"> ایک VPN دستیاب ہے جب تک کہ BitTorrent کے شروع نہیں کرے گا. (آپ کی ترتیبات چیک کریں)</string>
+    <string name="use_magnet_summary">مقناطیس لنکس بنا پر، صرف وائی فائی پر کام کرتا ہے</string>
+    <string name="mobile_data_saving">موبائل ڈیٹا کی بچت</string>
+    <string name="data_saving_kill_http_warning_title">Wانتباہ: پیش رفت میں HTTP ٹرانسفر</string>
 
 </resources>

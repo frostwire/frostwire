@@ -1,3 +1,10 @@
+FrostWire 1.9.0 - FEB/28/2017
+ - New material-design navigation menu
+ - Fixes bug where equalizer window would not open
+ - Music player cleanup
+ - InMobi network removed
+ - All translations up to date
+
 FrostWire 1.8.9 - FEB/13/2017
  - New privacy enhancing setting to automatically disable all bittorrent activity if a VPN
    connection is not present

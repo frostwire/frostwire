@@ -648,6 +648,7 @@
 
     <style name="DefaultDialogTheme.MainText">
         <item name="android:textSize">@dimen/text_large</item>
+        <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
     <style name="DefaultDialogTheme.SmallText">

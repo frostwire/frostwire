@@ -553,6 +553,7 @@
     <string name="dummy_build" translatable="false">[build number]</string>
     <string name="basic">Basic</string>
     <string name="plus">Plus</string>
+    <string name="build">build</string>
     <string name="try_other_keywords">Try fewer/different keywords</string>
     <string name="try_frostwire_plus_for_more_results">Try FrostWire Plus for more results</string>
     <string name="action_menu_overflow_description">More options</string>

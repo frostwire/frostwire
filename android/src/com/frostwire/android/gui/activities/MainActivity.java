@@ -1,5 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,16 +37,12 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
@@ -60,7 +57,6 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
-import com.frostwire.android.gui.activities.internal.MainMenuAdapter;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.SDPermissionDialog;
@@ -77,8 +73,7 @@ import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
-import com.frostwire.android.gui.views.AdMenuItemView;
-import com.frostwire.android.gui.views.PlayerMenuItemView;
+import com.frostwire.android.gui.activities.internal.NavigationMenu;
 import com.frostwire.android.gui.views.PlayerNotifierView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
@@ -97,10 +92,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
@@ -113,6 +105,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         OnDialogClickListener,
         ServiceConnection,
         ActivityCompat.OnRequestPermissionsResultCallback {
+    public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
 
     private static final Logger LOG = Logger.getLogger(MainActivity.class);
     private static final String FRAGMENTS_STACK_KEY = "fragments_stack";
@@ -120,21 +113,16 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private static final String LAST_BACK_DIALOG_ID = "last_back_dialog";
     private static final String SHUTDOWN_DIALOG_ID = "shutdown_dialog";
     private static boolean firstTime = true;
-    public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
-    private final Map<Integer, DangerousPermissionsChecker> permissionsCheckers;
-    private MainController controller;
-    private DrawerLayout drawerLayout;
 
-    private ActionBarDrawerToggle drawerToggle;
-    private View leftDrawer;
-    private ListView listMenu;
+    private final SparseArray<DangerousPermissionsChecker> permissionsCheckers;
+    private final MainController controller;
+
+    private NavigationMenu navigationMenu;
     private SearchFragment search;
     private BrowsePeerFragment library;
     private TransfersFragment transfers;
     private Fragment currentFragment;
     private final Stack<Integer> fragmentsStack;
-    private PlayerMenuItemView playerItem;
-    private AdMenuItemView menuRemoveAdsItem;
     private TimerSubscription playerSubscription;
     private BroadcastReceiver mainBroadcastReceiver;
     private boolean externalStoragePermissionsRequested = false;
@@ -157,14 +145,13 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         } else {
             return super.onKeyDown(keyCode, event);
         }
-
         return true;
     }
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(leftDrawer)) {
-            closeSlideMenu();
+        if (navigationMenu.isOpen()) {
+            navigationMenu.hide();
         } else if (fragmentsStack.size() > 1) {
             try {
                 fragmentsStack.pop();
@@ -179,12 +166,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             showLastBackDialog();
         }
 
-        syncSlideMenu();
+        syncNavigationMenu();
         updateHeader(getCurrentFragment());
     }
 
-    public void onConfigurationUpdate() {
-        setupMenuItems();
+    public void onConfigurationUpdate(boolean frostWireUpdateAvailable) {
+        updateNavigationMenu(frostWireUpdateAvailable);
     }
 
     public void shutdown() {
@@ -253,70 +240,53 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (isShutdown()) {
             return;
         }
-        leftDrawer = findView(R.id.activity_main_left_drawer);
-        listMenu = findView(R.id.left_drawer);
-        initPlayerItemListener();
-        initAdMenuItemListener();
+        updateNavigationMenu(false);
         setupFragments();
-        setupMenuItems();
         setupInitialFragment(savedInstanceState);
         playerSubscription = TimerService.subscribe(((PlayerNotifierView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
         onNewIntent(getIntent());
         SoftwareUpdater.instance().addConfigurationUpdateListener(this);
         setupActionBar();
-        setupDrawer();
     }
 
-    private void initPlayerItemListener() {
-        playerItem = findView(R.id.slidemenu_player_menuitem);
-        playerItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.launchPlayerActivity();
-            }
-        });
-    }
-
-    private void initAdMenuItemListener() {
-        menuRemoveAdsItem = findView(R.id.slidermenu_ad_menuitem);
-        RelativeLayout menuAd = findView(R.id.view_ad_menu_item_ad);
-        menuAd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, BuyActivity.class);
-                startActivity(intent);
-            }
-        });
+    private void updateNavigationMenu(boolean updateAvailable) {
+        if (navigationMenu == null) {
+            setupDrawer();
+        }
+        if (updateAvailable) {
+            navigationMenu.onUpdateAvailable();
+        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        if (intent == null) {
-            return;
-        }
-        if (isShutdown(intent)) {
+        if (intent == null || isShutdown(intent)) {
             return;
         }
         if (isGoHome(intent)) {
             finish();
             return;
         }
-
         String action = intent.getAction();
         if (action != null) {
-            if (action.equals(Constants.ACTION_SHOW_TRANSFERS)) {
-                intent.setAction(null);
-                controller.showTransfers(TransferStatus.ALL);
-            } else if (action.equals(Intent.ACTION_VIEW)) {
-                openTorrentUrl(intent);
-            } else if (action.equals(Constants.ACTION_START_TRANSFER_FROM_PREVIEW)) {
-                if (Ref.alive(NewTransferDialog.srRef)) {
-                    SearchFragment.startDownload(this, NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
-                    UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE_FROM_PREVIEW);
-                }
-            } else if (action.equals(Constants.ACTION_REQUEST_SHUTDOWN)) {
-                UXStats.instance().log(UXAction.MISC_NOTIFICATION_EXIT);
-                showShutdownDialog();
+            switch (action) {
+                case Constants.ACTION_SHOW_TRANSFERS:
+                    intent.setAction(null);
+                    controller.showTransfers(TransferStatus.ALL);
+                    break;
+                case Intent.ACTION_VIEW:
+                    openTorrentUrl(intent);
+                    break;
+                case Constants.ACTION_START_TRANSFER_FROM_PREVIEW:
+                    if (Ref.alive(NewTransferDialog.srRef)) {
+                        SearchFragment.startDownload(this, NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
+                        UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE_FROM_PREVIEW);
+                    }
+                    break;
+                case Constants.ACTION_REQUEST_SHUTDOWN:
+                    UXStats.instance().log(UXAction.MISC_NOTIFICATION_EXIT);
+                    showShutdownDialog();
+                    break;
             }
         }
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
@@ -325,8 +295,9 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             try {
                 ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(Constants.NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED);
                 Bundle extras = intent.getExtras();
-                if (extras.containsKey(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH)) {
-                    File file = new File(extras.getString(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH));
+                String downloadCompletePath = extras.getString(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH);
+                if (downloadCompletePath != null) {
+                    File file = new File(downloadCompletePath);
                     if (file.isFile()) {
                         UIUtils.openFile(this, file.getAbsoluteFile());
                     }
@@ -348,15 +319,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             i.setAction(Constants.ACTION_SHOW_TRANSFERS);
             i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(i);
-
             //go!
             final String uri = intent.getDataString();
             intent.setAction(null);
             if (uri != null) {
                 if (uri.startsWith("file") ||
-                        uri.startsWith("http") ||
-                        uri.startsWith("https") ||
-                        uri.startsWith("magnet")) {
+                    uri.startsWith("http") ||
+                    uri.startsWith("https") ||
+                    uri.startsWith("magnet")) {
                     TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this));
                 } else if (uri.startsWith("content")) {
                     String newUri = saveViewContent(this, Uri.parse(uri), "content-intent.torrent");
@@ -377,10 +347,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     protected void onResume() {
         super.onResume();
         setupDrawer();
-        initPlayerItemListener();
-        initAdMenuItemListener();
-        refreshPlayerItem();
-        refreshMenuRemoveAdsItem();
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
             Offers.initAdNetworks(this);
@@ -389,7 +355,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
         checkLastSeenVersion();
         registerMainBroadcastReceiver();
-        syncSlideMenu();
+        syncNavigationMenu();
         //uncomment to test social links dialog
         //UIUtils.showSocialLinksDialog(this, true, null, "");
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
@@ -410,8 +376,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
-    private Map<Integer, DangerousPermissionsChecker> initPermissionsCheckers() {
-        Map<Integer, DangerousPermissionsChecker> checkers = new HashMap<>();
+    private SparseArray<DangerousPermissionsChecker> initPermissionsCheckers() {
+        SparseArray<DangerousPermissionsChecker> checkers = new SparseArray<>();
 
         // EXTERNAL STORAGE ACCESS CHECKER.
         final DangerousPermissionsChecker externalStorageChecker =
@@ -438,7 +404,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 }
             }
         };
-
         IntentFilter bf = new IntentFilter(Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
         registerReceiver(mainBroadcastReceiver, bf);
     }
@@ -446,6 +411,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (outState != null) {
+            // MIGHT DO: save checkedNavViewMenuItemId in bundle.
             super.onSaveInstanceState(outState);
             saveLastFragment(outState);
             saveFragmentsStack(outState);
@@ -456,6 +422,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.Theme_FrostWire);
         super.onCreate(savedInstanceState);
 
         if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
@@ -506,10 +473,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         //avoid memory leaks when the device is tilted and the menu gets recreated.
         SoftwareUpdater.instance().removeConfigurationUpdateListener(this);
 
-        if (playerItem != null) {
-            playerItem.unbindDrawables();
-        }
-
         if (mToken != null) {
             MusicUtils.unbindFromService(mToken);
             mToken = null;
@@ -529,11 +492,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void mainResume() {
         checkSDPermission();
 
-        syncSlideMenu();
+        syncNavigationMenu();
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
                     !NetworkManager.instance().isTunnelUp()) {
-                UIUtils.showDismissableMessage(getWindow().getDecorView().getRootView(), R.string.cannot_start_engine_without_vpn);
+                UIUtils.showDismissableMessage(findView(R.id.activity_main_parent_layout), R.string.cannot_start_engine_without_vpn);
             } else {
                 firstTime = false;
                 Engine.instance().startServices(); // it's necessary for the first time after wizard
@@ -568,8 +531,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void handleSDPermissionDialogClick(int which) {
         if (which == Dialog.BUTTON_POSITIVE) {
             StoragePicker.show(this);
-        } else {
-            // TODO:
         }
     }
 
@@ -599,13 +560,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void toggleDrawer() {
-        if (drawerLayout.isDrawerOpen(leftDrawer)) {
-            drawerLayout.closeDrawer(leftDrawer);
+        if (navigationMenu.isOpen()) {
+            navigationMenu.hide();
         } else {
-            drawerLayout.openDrawer(leftDrawer);
-            syncSlideMenu();
+            navigationMenu.show();
+            syncNavigationMenu();
         }
-
         updateHeader(getCurrentFragment());
     }
 
@@ -618,7 +578,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         dlg.show(getFragmentManager()); //see onDialogClick
     }
 
-    private void showShutdownDialog() {
+    public void showShutdownDialog() {
         UXStats.instance().flush();
         YesNoDialog dlg = YesNoDialog.newInstance(
                 SHUTDOWN_DIALOG_ID,
@@ -646,109 +606,21 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, true, false);
     }
 
-    private void syncSlideMenu() {
-        listMenu.clearChoices();
+    public void syncNavigationMenu() {
         invalidateOptionsMenu();
-
-        Fragment fragment = getCurrentFragment();
-        int menuId = R.id.menu_main_search;
-        if (fragment instanceof SearchFragment) {
-            menuId = R.id.menu_main_search;
-        } else if (fragment instanceof BrowsePeerFragment) {
-            menuId = R.id.menu_main_library;
-        } else if (fragment instanceof TransfersFragment) {
-            menuId = R.id.menu_main_transfers;
-        }
-        setCheckedItem(menuId);
-    }
-
-    private void setCheckedItem(int id) {
-        try {
-            listMenu.clearChoices();
-            ((MainMenuAdapter) listMenu.getAdapter()).notifyDataSetChanged();
-
-            int position = 0;
-            MainMenuAdapter adapter = (MainMenuAdapter) listMenu.getAdapter();
-            for (int i = 0; i < adapter.getCount(); i++) {
-                listMenu.setItemChecked(i, false);
-                if (adapter.getItemId(i) == id) {
-                    position = i;
-                    break;
-                }
-            }
-
-            if (id != -1) {
-                listMenu.setItemChecked(position, true);
-            }
-
-            invalidateOptionsMenu();
-
-            if (drawerToggle != null) {
-                drawerToggle.syncState();
-            }
-        } catch (Throwable e) { // protecting from weird android UI engine issues
-            LOG.warn("Error setting slide menu item selected", e);
-        }
-    }
-
-    private void refreshPlayerItem() {
-        if (playerItem != null) {
-            playerItem.refresh();
-        }
-    }
-
-    private void refreshMenuRemoveAdsItem() {
-        // only visible for basic or debug build
-        int visibility = View.GONE;
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
-            // if they haven't paid for ads
-            if (!Offers.disabledAds() &&
-                    (playerItem == null || playerItem.getVisibility() == View.GONE)) {
-                visibility = View.VISIBLE;
-            }
-        }
-        menuRemoveAdsItem.setVisibility(visibility);
-    }
-
-    private void setupMenuItems() {
-        listMenu.setAdapter(new MainMenuAdapter(this));
-        listMenu.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-        listMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //onItemClick(AdapterView<?> parent, View view, int position, long id)
-                syncSlideMenu();
-                Engine.instance().getVibrator().hapticFeedback();
-                controller.closeSlideMenu();
-                try {
-                    if (id == R.id.menu_main_settings) {
-                        controller.showPreferences();
-                    } else if (id == R.id.menu_main_shutdown) {
-                        showShutdownDialog();
-                    } else if (id == R.id.menu_main_my_music) {
-                        controller.launchMyMusic();
-                    } else if (id == R.id.menu_main_support) {
-                        UIUtils.openURL(MainActivity.this, Constants.SUPPORT_URL);
-                    } else {
-                        listMenu.setItemChecked(position, true);
-                        controller.switchFragment((int) id);
-                    }
-                } catch (Throwable e) { // protecting from weird android UI engine issues
-                    LOG.error("Error clicking slide menu item", e);
-                }
-            }
-        });
+        navigationMenu.updateCheckedItem(getNavMenuIdByFragment(getCurrentFragment()));
     }
 
     private void setupFragments() {
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
         library = (BrowsePeerFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_browse_peer);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
-        hideFragments(getFragmentManager().beginTransaction()).commit();
     }
 
-    private FragmentTransaction hideFragments(FragmentTransaction ts) {
-        return ts.hide(search).hide(library).hide(transfers);
+    private void hideFragments() {
+        FragmentTransaction tx = getFragmentManager().beginTransaction();
+        tx.hide(search).hide(library).hide(transfers);
+        tx.commit();
     }
 
     private void setupInitialFragment(Bundle savedInstanceState) {
@@ -764,6 +636,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         switchContent(fragment);
+    }
+
+    private void setCheckedItem(int navMenuItemId) {
+        if (navigationMenu != null) {
+            navigationMenu.updateCheckedItem(navMenuItemId);
+        }
     }
 
     private void saveFragmentsStack(Bundle outState) {
@@ -796,8 +674,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             if (fragment instanceof MainFragment) {
                 View header = ((MainFragment) fragment).getHeader(this);
                 if (header != null) {
-                    setToolbarView(header, Gravity.CENTER);
+                    setToolbarView(header);
                 }
+            }
+            if (navigationMenu != null) {
+                MenuItem item = navigationMenu.getCheckedItem();
+                setTitle(item.getTitle());
             }
         } catch (Throwable e) {
             LOG.error("Error updating main header", e);
@@ -805,7 +687,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void switchContent(Fragment fragment, boolean addToStack) {
-        hideFragments(getFragmentManager().beginTransaction()).show(fragment).commitAllowingStateLoss();
+        hideFragments();
+        getFragmentManager().beginTransaction().show(fragment).commitAllowingStateLoss();
         if (addToStack && (fragmentsStack.isEmpty() || fragmentsStack.peek() != fragment.getId())) {
             fragmentsStack.push(fragment.getId());
         }
@@ -821,7 +704,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
      * The following methods are only public to be able to use them from another package(internal).
      */
 
-    public Fragment getFragmentByMenuId(int id) {
+    public Fragment getFragmentByNavMenuId(int id) {
         switch (id) {
             case R.id.menu_main_search:
                 return search;
@@ -834,6 +717,18 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
     }
 
+    private int getNavMenuIdByFragment(Fragment fragment) {
+        int menuId = -1;
+        if (fragment == search) {
+            menuId = R.id.menu_main_search;
+        } else if (fragment == library) {
+            menuId = R.id.menu_main_library;
+        } else if (fragment == transfers) {
+            menuId = R.id.menu_main_transfers;
+        }
+        return menuId;
+    }
+
     public void switchContent(Fragment fragment) {
         switchContent(fragment, true);
     }
@@ -842,15 +737,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         return currentFragment;
     }
 
-    public void closeSlideMenu() {
-        drawerLayout.closeDrawer(leftDrawer);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle != null) {
+        if (navigationMenu != null) {
             try {
-                drawerToggle.onOptionsItemSelected(item);
+                navigationMenu.onOptionsItemSelected(item);
             } catch (Throwable t) {
                 // usually java.lang.IllegalArgumentException: No drawer view found with gravity LEFT
                 return false;
@@ -871,13 +762,13 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
+        navigationMenu.onConfigurationChanged(newConfig);
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
+        navigationMenu.syncState();
     }
 
     private void setupActionBar() {
@@ -891,19 +782,15 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void setupDrawer() {
-        drawerLayout = findView(R.id.drawer_layout);
+        DrawerLayout drawerLayout = findView(R.id.drawer_layout);
         Toolbar toolbar = findToolbar();
-        drawerToggle = new MenuDrawerToggle(this, drawerLayout, toolbar);
-        drawerLayout.setDrawerListener(drawerToggle);
+        navigationMenu = new NavigationMenu(controller, drawerLayout, toolbar);
     }
 
     public void onServiceConnected(final ComponentName name, final IBinder service) {
         musicPlaybackService = IApolloService.Stub.asInterface(service);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void onServiceDisconnected(final ComponentName name) {
         musicPlaybackService = null;
     }
@@ -917,46 +804,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         Offers.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private static final class MenuDrawerToggle extends ActionBarDrawerToggle {
-        private final WeakReference<MainActivity> activityRef;
-
-        MenuDrawerToggle(MainActivity activity, DrawerLayout drawerLayout, Toolbar toolbar) {
-            super(activity, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
-
-            // aldenml: even if the parent class holds a strong reference, I decided to keep a weak one
-            this.activityRef = Ref.weak(activity);
-        }
-
-        @Override
-        public void onDrawerClosed(View view) {
-            if (Ref.alive(activityRef)) {
-                activityRef.get().invalidateOptionsMenu();
-                activityRef.get().syncSlideMenu();
-            }
-        }
-
-        @Override
-        public void onDrawerOpened(View drawerView) {
-            if (Ref.alive(activityRef)) {
-                UIUtils.hideKeyboardFromActivity(activityRef.get());
-                activityRef.get().invalidateOptionsMenu();
-                activityRef.get().syncSlideMenu();
-            }
-        }
-
-        @Override
-        public void onDrawerStateChanged(int newState) {
-            if (Ref.alive(activityRef)) {
-                MainActivity activity = activityRef.get();
-                activity.refreshPlayerItem();
-                activity.refreshMenuRemoveAdsItem();
-                activity.syncSlideMenu();
-            }
-        }
-    }
-
     public void performYTSearch(String ytUrl) {
-        SearchFragment searchFragment = (SearchFragment) getFragmentByMenuId(R.id.menu_main_search);
+        SearchFragment searchFragment = (SearchFragment) getFragmentByNavMenuId(R.id.menu_main_search);
         searchFragment.performYTSearch(ytUrl);
         switchContent(searchFragment);
     }
@@ -966,7 +815,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         InputStream inStream = null;
         OutputStream outStream = null;
         if (!Platforms.temp().exists()) {
-            Platforms.temp().mkdirs();
+            boolean mkdirs = Platforms.temp().mkdirs();
+            if (!mkdirs) {
+                LOG.warn("saveViewContent() could not create Platforms.temp() directory.");
+            }
         }
         File target = new File(Platforms.temp(), name);
         try {
@@ -975,7 +827,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
             byte[] buffer = new byte[16384]; // MAGIC_NUMBER
             int bytesRead;
-            if (inStream != null && outStream != null) {
+            if (inStream != null) {
                 while ((bytesRead = inStream.read(buffer)) != -1) {
                     outStream.write(buffer, 0, bytesRead);
                 }

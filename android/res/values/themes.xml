@@ -22,7 +22,7 @@
 
     <style name="Theme.FrostWire" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/basic_blue</item>
-        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="colorPrimaryDark">@color/app_dark_blue</item>
         <item name="colorAccent">@color/basic_blue_darker_highlight</item>
         <item name="android:textColorPrimary">@color/app_text_primary</item>
         <item name="android:textColorSecondary">@color/app_text_secondary</item>
@@ -32,6 +32,11 @@
         <item name="android:listPreferredItemPaddingLeft">16dp</item>
         <item name="android:listPreferredItemPaddingRight">16dp</item>
         <item name="vpiTitlePageIndicatorStyle">@style/TitlePageIndicatorStyle</item>
+    </style>
+
+    <style name="SplashScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/frostwire_splash_screen</item>
+        <item name="colorPrimaryDark">@color/basic_blue_darker_highlight</item>
     </style>
 
     <style name="PreferenceThemeOverlay" parent="PreferenceThemeOverlay.v14.Material">

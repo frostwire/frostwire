@@ -623,6 +623,32 @@
     <string name="remove_ads">Odstrániť reklamy</string>
     <string name="your_connection_has_dropped_stopping_services">Vaše pripojenie Wifi poklesla. Zastavenie služby.</string>
     <string name="use_tpb_summary">TPB je magnet na báze funguje iba na Wifi</string>
-
+    <string name="cloud_download_aborted_on_mobile_data">Aktuálne nastavenie zabraňuje sťahovanie, pokiaľ nie je v sieti Wi-Fi</string>
+    <string name="sharing_privacy_settings">Zdieľanie a ochrana osobných údajov</string>
+    <string name="delete_started_torrents_summary">Mazať súbory torrentov po začiatku sťahovania</string>
+    <string name="dismiss">Zamietnuť</string>
+    <string name="torrent_preferences_header">Torrent preferencie</string>
+    <string name="search_preferences_one_engine_checked_always">V predvolenom nastavení potrebuje jeden vyhľadávač ktoré majú byť kontrolované po celú dobu</string>
+    <string name="switch_off_engine_without_vpn">VPN je neaktívny, zastavovanie motora BitTorrent.</string>
+    <string name="notification_other_header">Oznámenie a ostatné</string>
+    <string name="number_picker_tip">Tip: dotykový zvolený počet používať klávesnicu</string>
+    <string name="search_torrent_settings">Vyhľadávanie a nastavenia Torrent</string>
+    <string name="general_settings">Všeobecný</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">k dispozícii Wifi, všetky prevody boli zastavené</string>
+    <string name="vpn_drop_protection_title">VPN Ochrana je neaktívny</string>
+    <string name="deselect_all">Odznačiť všetko</string>
+    <string name="data_saving_kill_http_warning">Tým sa zastaví všetky nedokončené prevody prebiehajúce</string>
+    <string name="delete_started_torrents">Mazať súbory torrentov</string>
+    <string name="search_header">Vyhľadávanie</string>
+    <string name="bandwidth_usage_settings">Využitie šírky pásma</string>
+    <string name="unlimited">Neobmedzený</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">V závislosti od nastavenia Nemôžem začať siatie, ak ste na Wi-Fi, vďaka úspore dát. Súbor bude pripravená na siatie automaticky, keď sa vrátiš k internetu povolené sieť Wi-Fi.</string>
+    <string name="vpn_drop_protection_summary">Chráňte svoje súkromie. Zakázať automatické prevody BitTorrentu, ak je aktívny šifrovaná pripojenia VPN</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent sa nespustí, kým je k dispozícii VPN. (Skontrolujte nastavenie)</string>
+    <string name="use_magnet_summary">na odkazy magnet na báze funguje iba na Wifi</string>
+    <string name="mobile_data_saving">Mobilné dátové sporiteľ</string>
+    <string name="data_saving_kill_http_warning_title">Výstražné: Http prevody prebiehajúcej</string>
 
 </resources>

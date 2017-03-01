@@ -623,5 +623,31 @@
     <string name="remove_ads">Премахни рекламите</string>
     <string name="your_connection_has_dropped_stopping_services">Вашият Wifi връзка е намалял. Спиране услуги.</string>
     <string name="use_tpb_summary">TPB е магнит на основата, работи само на Wifi</string>
-
+    <string name="cloud_download_aborted_on_mobile_data">Текуща настройка позволява да се тегли, когато не по Wifi мрежа</string>
+    <string name="sharing_privacy_settings">Споделяне и поверителност</string>
+    <string name="delete_started_torrents_summary">Изтриване торентни файлове след началото на изтеглянето</string>
+    <string name="dismiss">Отхвърляне</string>
+    <string name="torrent_preferences_header">Торент Предпочитания</string>
+    <string name="search_preferences_one_engine_checked_always">По подразбиране, една търсачка, трябва да бъдат проверявани по всяко време</string>
+    <string name="switch_off_engine_without_vpn">VPN е неактивна, спиране на двигателя BitTorrent.</string>
+    <string name="notification_other_header">Уведомления и Други</string>
+    <string name="number_picker_tip">Съвет: докосване избран номер, за да използвате клавиатура</string>
+    <string name="search_torrent_settings">Търсене/Торент Настройки</string>
+    <string name="general_settings">Общ</string>
+    <string name="pro">PRO</string>
+    <string name="build">build</string>
+    <string name="data_saving_turn_off_transfers">Няма налична Wifi. са били спрени Всички трансфери.</string>
+    <string name="vpn_drop_protection_title">VPN защита е неактивна</string>
+    <string name="deselect_all">Премахване на избора</string>
+    <string name="data_saving_kill_http_warning">Това ще спре всички незавършени трансфери в прогрес</string>
+    <string name="delete_started_torrents">Изтриване торентни файлове</string>
+    <string name="search_header">Търсене</string>
+    <string name="bandwidth_usage_settings">Използване на пропускателната способност</string>
+    <string name="unlimited">неограничен</string>
+    <string name="according_to_settings_i_cant_seed_due_to_data_savings">Според настройките си, че не може да започне засяването, освен ако не сте на Wi-Fi, поради икономии от данни. Файлът ще бъде готова за засяване автоматично, когато се върнем към интернет поддръжка за Wi-Fi мрежа.</string>
+    <string name="vpn_drop_protection_summary">Защитете своя личен живот. Автоматично деактивиране на BitTorrent трансфери, освен ако криптиран VPN връзка е активна</string>
+    <string name="cannot_start_engine_without_vpn">BitTorrent няма да започне, освен ако VPN е достъпно. (Проверете вашите настройки)</string>
+    <string name="use_magnet_summary">базиран магнитни линкове, работи само на Wifi</string>
+    <string name="mobile_data_saving">Мобилни данни спестяване</string>
+    <string name="data_saving_kill_http_warning_title">Предупреждение: Http трансфери в прогрес</string>
 </resources>
