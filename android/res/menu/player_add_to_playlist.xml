@@ -22,6 +22,7 @@
 
     <item
         android:id="@+id/menu_player_add_to_playlist"
+        android:icon="@drawable/contextmenu_icon_playlist_add_dark"
         android:title="@string/add_to_playlist"
         app:showAsAction="never" />
 

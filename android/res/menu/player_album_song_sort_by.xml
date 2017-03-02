@@ -22,23 +22,29 @@
 
     <item
         android:id="@+id/menu_player_sort_by"
+        android:icon="@drawable/contextmenu_icon_sort"
         android:title="@string/menu_sort_by"
         app:showAsAction="never">
         <menu>
             <item
                 android:id="@+id/menu_player_sort_by_az"
+                android:icon="@drawable/contextmenu_icon_sort_down"
                 android:title="@string/sort_order_entry_az" />
             <item
                 android:id="@+id/menu_player_sort_by_za"
+                android:icon="@drawable/contextmenu_icon_sort_up"
                 android:title="@string/sort_order_entry_za" />
             <item
                 android:id="@+id/menu_player_sort_by_duration"
+                android:icon="@drawable/contextmenu_icon_time"
                 android:title="@string/sort_order_entry_duration" />
             <item
                 android:id="@+id/menu_player_sort_by_track_list"
+                android:icon="@drawable/contextmenu_icon_track_list"
                 android:title="@string/sort_order_entry_track_list" />
             <item
                 android:id="@+id/menu_player_sort_by_filename"
+                android:icon="@drawable/contextmenu_icon_file"
                 android:title="@string/sort_order_entry_filename" />
         </menu>
     </item>

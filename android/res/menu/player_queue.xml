@@ -22,10 +22,12 @@
 
     <item
         android:id="@+id/menu_player_save_queue"
+        android:icon="@drawable/contextmenu_icon_queue_add"
         android:title="@string/menu_save_queue"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_player_clear_queue"
+        android:icon="@drawable/contextmenu_icon_queue_clear"
         android:title="@string/menu_clear_queue"
         app:showAsAction="never" />
 
