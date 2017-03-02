@@ -46,6 +46,7 @@ import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.menu.PhotoSelectionDialog;
 import com.andrew.apollo.menu.PhotoSelectionDialog.ProfileType;
 import com.andrew.apollo.ui.fragments.TabFragmentOrder;
+import com.andrew.apollo.ui.fragments.helpers.ToolbarMenuOptionalIconsEnabler;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
@@ -241,6 +242,8 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
+        ToolbarMenuOptionalIconsEnabler.setOptionalIconsVisible(menu, true);
+
         if (isEmptyPlaylist()) {
             menu.removeItem(R.id.menu_player_shuffle);
         } else {

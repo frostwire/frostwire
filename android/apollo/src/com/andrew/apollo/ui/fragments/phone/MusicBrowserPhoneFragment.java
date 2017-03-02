@@ -35,6 +35,7 @@ import com.andrew.apollo.ui.fragments.ArtistFragment;
 import com.andrew.apollo.ui.fragments.RecentFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.ui.fragments.TabFragmentOrder;
+import com.andrew.apollo.ui.fragments.helpers.ToolbarMenuOptionalIconsEnabler;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
@@ -134,6 +135,7 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        ToolbarMenuOptionalIconsEnabler.setOptionalIconsVisible(menu, true);
         menu.findItem(R.id.menu_player_favorite).setIcon(MusicUtils.isFavorite() ?
                 R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
     }

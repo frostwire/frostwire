@@ -64,6 +64,7 @@ import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.ui.fragments.QueueFragment;
+import com.andrew.apollo.ui.fragments.helpers.ToolbarMenuOptionalIconsEnabler;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
@@ -319,6 +320,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
+        ToolbarMenuOptionalIconsEnabler.setOptionalIconsVisible(menu, true);
+
         // Hide the EQ option if it can't be opened
         final Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         if (getPackageManager().resolveActivity(intent, 0) == null) {
