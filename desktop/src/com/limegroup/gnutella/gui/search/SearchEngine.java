@@ -21,17 +21,16 @@ package com.limegroup.gnutella.gui.search;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.bitsnoop.BitSnoopSearchPerformer;
-import com.frostwire.search.btjunkie.BtjunkieSearchPerformer;
 import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
+import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.mininova.MininovaSearchPerformer;
 import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
-import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.youtube.YouTubeSearchPerformer;
@@ -176,13 +175,6 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine BTJUNKIE = new SearchEngine(BTJUNKIE_ID, "BTJunkie", SearchEnginesSettings.BTJUNKIE_SEARCH_ENABLED, "btjunkie.eu") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new BtjunkieSearchPerformer(BTJUNKIE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
     public SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
@@ -218,7 +210,7 @@ public abstract class SearchEngine {
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        return Arrays.asList(YOUTUBE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, MONOVA, ARCHIVEORG, TORLOCK, YIFY, BTJUNKIE, BITSNOOP, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
+        return Arrays.asList(YOUTUBE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, MONOVA, ARCHIVEORG, TORLOCK, YIFY, BITSNOOP, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
     }
 
     public static List<SearchEngine> getActiveEngines() {

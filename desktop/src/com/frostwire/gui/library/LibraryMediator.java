@@ -281,6 +281,8 @@ public class LibraryMediator {
         _tablesPanel = new JPanel(_tablesViewLayout);
 
         _tablesPanel.add(LibraryFilesTableMediator.instance().getComponent(), FILES_TABLE_KEY);
+
+        // TODO: Here we'll have a PlaylistComponent instead, which will have the playlist mediator.
         _tablesPanel.add(LibraryPlaylistsTableMediator.instance().getComponent(), PLAYLISTS_TABLE_KEY);
 
         panel.add(getLibrarySearch(), BorderLayout.PAGE_START);
