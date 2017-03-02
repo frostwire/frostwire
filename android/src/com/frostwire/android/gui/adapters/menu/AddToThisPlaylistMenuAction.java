@@ -38,7 +38,7 @@ public final class AddToThisPlaylistMenuAction extends MenuAction {
     private final long[] fileDescriptors;
 
     public AddToThisPlaylistMenuAction(Context context, long playlistId, String playlistName, long[] fileDescriptors) {
-        super(context, R.drawable.contextmenu_icon_playlist_add_dark, playlistName);
+        super(context, R.drawable.contextmenu_icon_add_to_existing_playlist_dark, playlistName);
         this.playlistId = playlistId;
         this.fileDescriptors = fileDescriptors;
     }
