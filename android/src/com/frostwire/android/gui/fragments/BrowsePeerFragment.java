@@ -588,7 +588,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     
     private void updateHeaderText(byte fileType, int numTotalFinal) {
         String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
-        int filterNumTotal = adapter.getCount();
+        int filterNumTotal = adapter != null ? adapter.getCount() : 0;
         TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
         TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
         if (currentFragmentState == checkState) {
@@ -1078,6 +1078,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             menuButton.setVisibility(View.GONE);
             selectAllContainer.setVisibility(View.GONE);
             overlay.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void updateViews() {
+            super.updateViews();
+            UIUtils.hideKeyboardFromActivity(getActivity());
         }
     }
 
