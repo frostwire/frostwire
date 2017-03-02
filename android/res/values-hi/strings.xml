@@ -602,7 +602,6 @@
     <string name="cheaper_than_cigarettes">सिगरेट की तुलना में सस्ता</string>
     <string name="days_left">दिन शेष</string>
     <string name="six_months">6 महीने</string>
-    <string name="use_btjunkie">उपयोग BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ आप इंटरनेट का उपयोग करते हुए एक वीपीएन से जुड़े रहे हैं। <br><br> आप पहले से ही नहीं कर रहे हैं, हम उपयोग करने की सिफारिश <b>ExpressVPN</b> अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">चयनित पथ एक निर्देशिका नहीं है</string>
     <string name="protect_my_privacy">मेरी गोपनीयता की सुरक्षा</string>

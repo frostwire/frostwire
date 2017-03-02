@@ -485,7 +485,6 @@
     <string name="error_not_enough_peers">Spróbuj ponowie, nie wystarczająco peerów</string>
     <string name="free_sponsored_app">Darmowa Sponsorowana Aplikacja</string>
     <string name="support">Pomoc</string>
-    <string name="use_btjunkie">Używaj BTJunkie</string>
     <string name="enable_dht_summary">Używaj Rozproszonej Tablicy Mieszającej aby ogłosić/wyszukać peery torrentów</string>
     <string name="send_bitcoin_tip">Wyślij Napiwek w Bitcoin</string>
     <string name="basic">Podstawowy</string>

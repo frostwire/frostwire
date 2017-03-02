@@ -469,7 +469,6 @@
     <string name="storage_setting_confirm_dialog_text">Entiendo que todos los archivos descargados a la tarjeta SD por FrostWire serán borrados POR ANDROID en el momento que la aplicación FrostWire sea desinstalada de este dispositivo y no voy a mantener a FrostWire LLC como responsable de archivos perdidos.</string>
     <string name="saving_to_sd_card">Guardando en la tarjeta SD.</string>
     <string name="wifi_sharing_settings">Compartiendo en Wi-Fi</string>
-    <string name="use_btjunkie">Usar BTJunkie</string>
     <string name="torrent_max_peers">Max Usuarios</string>
     <string name="app_shutdown_dlg_message">Esto cancelará todas las transferencias y servicios ejecutados en segundo plano. ¿Estás seguro?</string>
     <string name="use_kat_summary">KAT está basado en magnets, funciona sólo con Wi-Fi</string>

@@ -602,7 +602,6 @@
     <string name="cheaper_than_cigarettes">Goedkoper dan sigaretten</string>
     <string name="days_left">dagen over</string>
     <string name="six_months">6 months</string>
-    <string name="use_btjunkie">Gebruik BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ U bent verbonden met het internet via een VPN. <br><br> Als u nog niet bent, raden wij u aan <b>ExpressVPN</b> om uw verbinding te versleutelen en <b>bescherm uw privacy</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">De geselecteerde pad is geen map</string>
     <string name="protect_my_privacy">Bescherm ik mijn levenssfeer</string>

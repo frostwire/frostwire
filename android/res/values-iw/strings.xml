@@ -614,7 +614,6 @@
     <string name="are_you_sure">האם אתה בטוח?</string>
     <string name="application">יישום</string>
     <string name="update_title">עדכון זמן!</string>
-    <string name="use_btjunkie">השתמש BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
     <string name="peer_http_download_status_downloading">הורדת</string>
     <string name="picture">תְמוּנָה</string>

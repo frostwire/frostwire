@@ -604,7 +604,6 @@
     <string name="cheaper_than_cigarettes">Moins cher que les cigarettes</string>
     <string name="days_left">jours restants</string>
     <string name="six_months">6 mois</string>
-    <string name="use_btjunkie">Utilisez BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si vous n\'êtes pas déjà, nous vous recommandons d\'utiliser <b>ExpressVPN</b> pour chiffrer votre connexion et <b>préserver votre vie privée</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Le chemin sélectionné est pas un répertoire</string>
     <string name="protect_my_privacy">Protéger ma vie privée</string>

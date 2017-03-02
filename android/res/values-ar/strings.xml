@@ -607,7 +607,6 @@
     <string name="cheaper_than_cigarettes">أرخص من السجائر</string>
     <string name="days_left">ايام متبقية</string>
     <string name="six_months">6 اشهر</string>
-    <string name="use_btjunkie">استخدام BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ كنت متصلا بالإنترنت باستخدام VPN. إذا لم تكن بالفعل، ونحن نوصي باستخدام ExpressVPN لتشفير اتصالك وحماية خصوصيتك. ]]></string>
     <string name="storage_picker_treeuri_not_directory">المسار المحدد ليس دليلا</string>
     <string name="protect_my_privacy">حماية خصوصيتي</string>

@@ -602,7 +602,6 @@
     <string name="cheaper_than_cigarettes">Günstiger als Zigaretten</string>
     <string name="days_left">nur noch Tage</string>
     <string name="six_months">6 Monate</string>
-    <string name="use_btjunkie">Benutze BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sie sind mit dem Internet verbunden, um ein VPN. <br><br> Wenn Sie nicht bereits sind, empfehlen wir <b>ExpressVPN</b> verwenden verschlüsseln Sie Ihre Verbindung und <b>Schutz Ihrer Privatsphäre</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Der ausgewählte Pfad ist kein Verzeichnis</string>
     <string name="protect_my_privacy">Schützen Sie meine Privatsphäre</string>

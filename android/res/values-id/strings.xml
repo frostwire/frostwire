@@ -604,7 +604,6 @@
     <string name="cheaper_than_cigarettes">Lebih murah daripada rokok</string>
     <string name="days_left">hari lagi</string>
     <string name="six_months">6 bulan</string>
-    <string name="use_btjunkie">Gunakan BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum, sebaiknya gunakan <b>ExpressVPN</b> untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Jalur yang dipilih bukan sebuah direktori</string>
     <string name="protect_my_privacy">Melindungi privasi saya</string>

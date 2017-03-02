@@ -605,7 +605,6 @@
     <string name="cheaper_than_cigarettes">Billigere end cigaretter</string>
     <string name="days_left">dage tilbage</string>
     <string name="six_months">6 måneder</string>
-    <string name="use_btjunkie">Brug BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Du har forbindelse til internettet via en VPN. <br><br> Hvis du ikke allerede er, anbefaler vi at bruge <b>ExpressVPN</b> til at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Den valgte sti er ikke en mappe</string>
     <string name="protect_my_privacy">Beskyt mine personlige oplysninger</string>

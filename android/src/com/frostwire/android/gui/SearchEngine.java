@@ -19,12 +19,12 @@
 package com.frostwire.android.gui;
 
 import android.os.Build;
+
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.bitsnoop.BitSnoopSearchPerformer;
-import com.frostwire.search.btjunkie.BtjunkieSearchPerformer;
 import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
@@ -226,18 +226,5 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine BTJUNKIE = new SearchEngine("Btjunkie.eu", Constants.PREF_KEY_SEARCH_USE_BTJUNKIE) {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            BtjunkieSearchPerformer performer = null;
-            if (NetworkManager.instance().isDataWIFIUp()) {
-                performer = new BtjunkieSearchPerformer("btjunkie.eu", token, keywords, DEFAULT_TIMEOUT);
-            } else {
-                LOG.info("No BtjunkieSearchPerformer, WiFi not up");
-            }
-            return performer;
-        }
-    };
-
-    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, BTJUNKIE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, LIMETORRENTS, BITSNOOP, EZTV);
+    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, LIMETORRENTS, BITSNOOP, EZTV);
 }

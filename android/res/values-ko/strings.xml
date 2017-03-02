@@ -610,7 +610,6 @@
     <string name="cheaper_than_cigarettes">담배보다 쌉니다.</string>
     <string name="days_left">일 남음</string>
     <string name="six_months">6 개월</string>
-    <string name="use_btjunkie">BTJunkie사용</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 사용하지 않으 셨다면 사용을 권장합니다 <b>ExpressVPN</b> 연결을 암호화하고 <b>개인 정보 보호</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">선택한 경로가 디렉토리가 아닙니다.</string>
     <string name="protect_my_privacy">내 개인 정보 보호</string>

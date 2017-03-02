@@ -607,7 +607,6 @@
     <string name="cheaper_than_cigarettes">Sigaradan daha ucuz</string>
     <string name="days_left">kalan günler</string>
     <string name="six_months">6 ay</string>
-    <string name="use_btjunkie">BTJunkie\'u Kullan</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Bir VPN kullanarak internete bağlısınız. <br><br> Zaten yapmadıysanız kullanmanızı öneririz <b>ExpressVPN</b> bağlantınızı şifrelemek ve <b>gizliliğinizi korumak</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Seçilen yol bir dizin değil</string>
     <string name="protect_my_privacy">Gizliliğimi korumak</string>

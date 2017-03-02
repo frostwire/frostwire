@@ -489,7 +489,6 @@
     <string name="saving_to_sd_card">儲存到 SD 卡中。</string>
     <string name="torrent_max_peers_summary">最大連接數</string>
     <string name="transfers_context_menu_stop_delete_data">停止並刪除數據</string>
-    <string name="use_btjunkie">使用 BTJunkie</string>
     <string name="use_tpb_summary">TPB 基於磁力，僅適用於 Wi-Fi</string>
     <string name="help">帮帮我</string>
     <string name="vpn_not_found">无VPN。 考虑加密连接。.</string>

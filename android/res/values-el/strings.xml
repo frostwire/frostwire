@@ -608,7 +608,6 @@
     <string name="cheaper_than_cigarettes">Φθηνότερο από τα τσιγάρα</string>
     <string name="days_left">μέρες που απομένουν</string>
     <string name="six_months">6 μήνες</string>
-    <string name="use_btjunkie">Χρήση BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Έχετε συνδεθεί με το Internet χρησιμοποιώντας ένα VPN. <br><br> Εάν δεν είστε ήδη, σας συνιστούμε να χρησιμοποιείτε <b>ExpressVPN</b> για την κρυπτογράφηση της σύνδεσής σας και <b>διαφύλαξη του απορρήτου σας</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Η επιλεγμένη διαδρομή δεν είναι κατάλογος</string>
     <string name="protect_my_privacy">Προστασία της ιδιωτικής ζωής μου</string>

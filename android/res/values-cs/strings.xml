@@ -605,7 +605,6 @@
     <string name="cheaper_than_cigarettes">Levnější než cigarety</string>
     <string name="days_left">vlevo dní</string>
     <string name="six_months">6 měsíců</string>
-    <string name="use_btjunkie">Použít BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>ExpressVPN</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Vybraná cesta není adresář</string>
     <string name="protect_my_privacy">Chránit své soukromí</string>

@@ -610,7 +610,6 @@
     <string name="media_player_failed">میڈیا پلیئر میں ناکام رہے</string>
     <string name="six_months">6 ماہ</string>
     <string name="update_title">بار اپ ڈیٹ کریں!</string>
-    <string name="use_btjunkie">استعمال BTJunkie</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
     <string name="files_shared">فائلوں کا اشتراک کیا</string>
     <string name="storage_picker_treeuri_not_directory">منتخب شدہ راستے کی ایک ڈائریکٹری نہیں ہے</string>
