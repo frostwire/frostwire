@@ -143,7 +143,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 } else {
                     menuButton.setVisibility(View.GONE);
                 }
-                updateHeader(false);
+                updateHeader();
             }
         }
     };
@@ -531,12 +531,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         loader.forceLoad();
         return loader;
     }
-    
-    private void updateHeader() {
-        updateHeader(true);
-    }
 
-    private void updateHeader(boolean updateFinger) {
+    private void updateHeader() {
+        boolean updateFinger = currentFragmentState == normalState || currentFragmentState == filteredState;
         if (peer == null) {
             LOG.warn("Something wrong. peer is null");
             return;
@@ -718,7 +715,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     } else {
                         menuButton.setVisibility(View.GONE);
                     }
-                    updateHeader(false);
+                    updateHeader();
                 }
             });
             restorePreviouslyChecked();
