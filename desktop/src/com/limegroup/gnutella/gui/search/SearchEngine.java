@@ -38,7 +38,6 @@ import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.BooleanSetting;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,73 +57,72 @@ public abstract class SearchEngine {
     private final String _domainName;
     private final BooleanSetting _setting;
 
-    public static final int MININOVA_ID = 1;
-    public static final int EXTRATORRENT_ID = 4;
-    public static final int TPB_ID = 6;
-    public static final int MONOVA_ID = 7;
-    public static final int YOUTUBE_ID = 9;
-    public static final int SOUNDCLOUD_ID = 10;
-    public static final int ARCHIVEORG_ID = 11;
-    public static final int FROSTCLICK_ID = 12;
-    public static final int BITSNOOP_ID = 13;
-    public static final int TORLOCK_ID = 14;
-    public static final int EZTV_ID = 15;
+    private static final int MININOVA_ID = 1;
+    private static final int EXTRATORRENT_ID = 4;
+    private static final int TPB_ID = 6;
+    private static final int MONOVA_ID = 7;
+    private static final int YOUTUBE_ID = 9;
+    private static final int SOUNDCLOUD_ID = 10;
+    private static final int ARCHIVEORG_ID = 11;
+    private static final int FROSTCLICK_ID = 12;
+    private static final int BITSNOOP_ID = 13;
+    private static final int TORLOCK_ID = 14;
+    private static final int EZTV_ID = 15;
 
-    public static final int YIFI_ID = 17;
-    public static final int BTJUNKIE_ID = 18;
-    public static final int TORRENTDOWNLOADS_ID = 19;
-    public static final int LIMETORRENTS_ID = 20;
+    private static final int YIFI_ID = 17;
+    private static final int TORRENTDOWNLOADS_ID = 19;
+    private static final int LIMETORRENTS_ID = 20;
 
-    public static final SearchEngine MININOVA = new SearchEngine(MININOVA_ID, "Mininova", SearchEnginesSettings.MININOVA_SEARCH_ENABLED, "www.mininova.org") {
+    private static final SearchEngine MININOVA = new SearchEngine(MININOVA_ID, "Mininova", SearchEnginesSettings.MININOVA_SEARCH_ENABLED, "www.mininova.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new MininovaSearchPerformer(MININOVA.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine EXTRATORRENT = new SearchEngine(EXTRATORRENT_ID, "Extratorrent", SearchEnginesSettings.EXTRATORRENT_SEARCH_ENABLED, "extratorrent.cc") {
+    private static final SearchEngine EXTRATORRENT = new SearchEngine(EXTRATORRENT_ID, "Extratorrent", SearchEnginesSettings.EXTRATORRENT_SEARCH_ENABLED, "extratorrent.cc") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new ExtratorrentSearchPerformer(EXTRATORRENT.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, "thepiratebay.se") {
+    private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, "thepiratebay.se") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TPBSearchPerformer(TPB.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine MONOVA = new SearchEngine(MONOVA_ID, "Monova", SearchEnginesSettings.MONOVA_SEARCH_ENABLED, "monova.org") {
+    private static final SearchEngine MONOVA = new SearchEngine(MONOVA_ID, "Monova", SearchEnginesSettings.MONOVA_SEARCH_ENABLED, "monova.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new MonovaSearchPerformer(MONOVA.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine YOUTUBE = new SearchEngine(YOUTUBE_ID, "YouTube", SearchEnginesSettings.YOUTUBE_SEARCH_ENABLED, "www.youtube.com") {
+    private static final SearchEngine YOUTUBE = new SearchEngine(YOUTUBE_ID, "YouTube", SearchEnginesSettings.YOUTUBE_SEARCH_ENABLED, "www.youtube.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new YouTubeSearchPerformer(YOUTUBE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine SOUNDCLOUD = new SearchEngine(SOUNDCLOUD_ID, "Soundcloud", SearchEnginesSettings.SOUNDCLOUD_SEARCH_ENABLED, "api.sndcdn.com") {
+    private static final SearchEngine SOUNDCLOUD = new SearchEngine(SOUNDCLOUD_ID, "Soundcloud", SearchEnginesSettings.SOUNDCLOUD_SEARCH_ENABLED, "api.sndcdn.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new SoundcloudSearchPerformer(SOUNDCLOUD.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine ARCHIVEORG = new SearchEngine(ARCHIVEORG_ID, "Archive.org", SearchEnginesSettings.ARCHIVEORG_SEARCH_ENABLED, "archive.org") {
+    private static final SearchEngine ARCHIVEORG = new SearchEngine(ARCHIVEORG_ID, "Archive.org", SearchEnginesSettings.ARCHIVEORG_SEARCH_ENABLED, "archive.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new ArchiveorgSearchPerformer(ARCHIVEORG.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine FROSTCLICK = new SearchEngine(FROSTCLICK_ID, "FrostClick", SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED, "api.frostclick.com") {
+    private static final SearchEngine FROSTCLICK = new SearchEngine(FROSTCLICK_ID, "FrostClick", SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED, "api.frostclick.com") {
         private final UserAgent userAgent = new UserAgent(org.limewire.util.OSUtils.getFullOS(), FrostWireUtils.getFrostWireVersion(), String.valueOf(FrostWireUtils.getBuildNumber()));
 
         @Override
@@ -133,42 +131,42 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine BITSNOOP = new SearchEngine(BITSNOOP_ID, "BitSnoop", SearchEnginesSettings.BITSNOOP_SEARCH_ENABLED, "bitsnoop.com") {
+    private static final SearchEngine BITSNOOP = new SearchEngine(BITSNOOP_ID, "BitSnoop", SearchEnginesSettings.BITSNOOP_SEARCH_ENABLED, "bitsnoop.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new BitSnoopSearchPerformer(BITSNOOP.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine TORLOCK = new SearchEngine(TORLOCK_ID, "TorLock", SearchEnginesSettings.TORLOCK_SEARCH_ENABLED, "www.torlock.com") {
+    private static final SearchEngine TORLOCK = new SearchEngine(TORLOCK_ID, "TorLock", SearchEnginesSettings.TORLOCK_SEARCH_ENABLED, "www.torlock.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TorLockSearchPerformer(TORLOCK.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine TORRENTDOWNLOADS = new SearchEngine(TORRENTDOWNLOADS_ID, "TorrentDownloads", SearchEnginesSettings.TORRENTDOWNLOADS_SEARCH_ENABLED, "www.torrentdownloads.me") {
+    private static final SearchEngine TORRENTDOWNLOADS = new SearchEngine(TORRENTDOWNLOADS_ID, "TorrentDownloads", SearchEnginesSettings.TORRENTDOWNLOADS_SEARCH_ENABLED, "www.torrentdownloads.me") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TorrentDownloadsSearchPerformer(TORRENTDOWNLOADS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine LIMETORRENTS = new SearchEngine(LIMETORRENTS_ID, "LimeTorrents", SearchEnginesSettings.LIMETORRENTS_SEARCH_ENABLED, "www.limetorrents.cc") {
+    private static final SearchEngine LIMETORRENTS = new SearchEngine(LIMETORRENTS_ID, "LimeTorrents", SearchEnginesSettings.LIMETORRENTS_SEARCH_ENABLED, "www.limetorrents.cc") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new LimeTorrentsSearchPerformer(LIMETORRENTS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine EZTV = new SearchEngine(EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.ag") {
+    private static final SearchEngine EZTV = new SearchEngine(EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.ag") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new EztvSearchPerformer(EZTV.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    public static final SearchEngine YIFY = new SearchEngine(YIFI_ID, "Yify", SearchEnginesSettings.YIFY_SEARCH_ENABLED, "www.yify-torrent.org") {
+    private static final SearchEngine YIFY = new SearchEngine(YIFI_ID, "Yify", SearchEnginesSettings.YIFY_SEARCH_ENABLED, "www.yify-torrent.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new YifySearchPerformer(YIFY.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
@@ -213,22 +211,10 @@ public abstract class SearchEngine {
         return Arrays.asList(YOUTUBE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, MONOVA, ARCHIVEORG, TORLOCK, YIFY, BITSNOOP, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
     }
 
-    public static List<SearchEngine> getActiveEngines() {
-        final List<SearchEngine> result = new ArrayList<SearchEngine>();
-        final List<SearchEngine> activeEngines = getEngines();
-
-        for (SearchEngine searchEngine : activeEngines) {
-            if (searchEngine.isEnabled()) {
-                result.add(searchEngine);
-            }
-        }
-
-        return result;
-    }
 
     public abstract SearchPerformer getPerformer(long token, String keywords);
 
-    public static SearchEngine getSearchEngineByName(String name) {
+    static SearchEngine getSearchEngineByName(String name) {
         List<SearchEngine> searchEngines = getEngines();
 
         for (SearchEngine engine : searchEngines) {
@@ -237,20 +223,6 @@ public abstract class SearchEngine {
             }
         }
 
-        return null;
-    }
-
-    /**
-     * Used in Domain Alias Manifest QA test, don't delete.
-     */
-    public static SearchEngine getSearchEngineByDefaultDomainName(String domainName) {
-        List<SearchEngine> searchEngines = getEngines();
-
-        for (SearchEngine engine : searchEngines) {
-            if (domainName.equalsIgnoreCase(engine.getDomainName())) {
-                return engine;
-            }
-        }
         return null;
     }
 

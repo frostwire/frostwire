@@ -461,8 +461,8 @@ public class LibraryUtils {
         }
     }
 
-    private static int addToPlaylist(Playlist playlist, File[] files, boolean starred, Set<File> ignore) {
-        return addToPlaylist(playlist, files, starred || playlist.isStarred(), -1, ignore);
+    private static void addToPlaylist(Playlist playlist, File[] files, boolean starred, Set<File> ignore) {
+        addToPlaylist(playlist, files, starred || playlist.isStarred(), -1, ignore);
     }
 
     private static int addToPlaylist(Playlist playlist, File[] files, boolean starred, int index, Set<File> ignore) {

@@ -55,7 +55,6 @@ public final class SearchManager {
     private final List<WeakReference<SearchTable>> tables;
 
     private SearchListener listener;
-    private SearchTable lastTable;
 
     private SearchManager(int nThreads) {
         this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
@@ -116,26 +115,6 @@ public final class SearchManager {
         stopTasks(token);
     }
 
-    public SearchTable newTable(long token) {
-        synchronized (tables) {
-            Iterator<WeakReference<SearchTable>> it = tables.iterator();
-            while (it.hasNext()) {
-                WeakReference<SearchTable> t = it.next();
-                if (!Ref.alive(t)) {
-                    it.remove();
-                }
-            }
-        }
-        SearchTable t = new SearchTable(token);
-        lastTable = t;
-        tables.add(Ref.weak(t));
-        return t;
-    }
-
-    public SearchTable lastTable() {
-        return lastTable;
-    }
-
     public SearchListener getListener() {
         return listener;
     }
@@ -150,7 +129,7 @@ public final class SearchManager {
     }
 
     private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
-        List<SearchResult> list = new LinkedList<SearchResult>();
+        List<SearchResult> list = new LinkedList<>();
 
         for (SearchResult sr : results) {
             if (sr instanceof CrawlableSearchResult) {
@@ -182,6 +161,7 @@ public final class SearchManager {
                 while (it.hasNext()) {
                     WeakReference<SearchTable> t = it.next();
                     if (Ref.alive(t)) {
+                        //noinspection ConstantConditions
                         t.get().add(results);
                     } else {
                         it.remove();
@@ -228,9 +208,7 @@ public final class SearchManager {
 
     private void stopTasks(long token) {
         synchronized (tasks) {
-            Iterator<SearchTask> it = tasks.iterator();
-            while (it.hasNext()) {
-                SearchTask task = it.next();
+            for (SearchTask task : tasks) {
                 if (token == -1L || task.token() == token) {
                     task.stopSearch();
                 }
@@ -263,9 +241,7 @@ public final class SearchManager {
     private int nextOrdinal(long token) {
         int ordinal = 0;
         synchronized (tasks) {
-            Iterator<SearchTask> it = tasks.iterator();
-            while (it.hasNext()) {
-                SearchTask task = it.next();
+            for (SearchTask task : tasks) {
                 if (task.token() == token) {
                     ordinal = ordinal + 1;
                 }
@@ -280,7 +256,7 @@ public final class SearchManager {
         protected final SearchPerformer performer;
         private final int ordinal;
 
-        public SearchTask(SearchManager manager, SearchPerformer performer, int ordinal) {
+        SearchTask(SearchManager manager, SearchPerformer performer, int ordinal) {
             this.manager = manager;
             this.performer = performer;
             this.ordinal = ordinal;
@@ -295,7 +271,7 @@ public final class SearchManager {
             return performer.isStopped();
         }
 
-        public void stopSearch() {
+        void stopSearch() {
             performer.stop();
         }
 
@@ -309,7 +285,7 @@ public final class SearchManager {
 
     private static final class PerformTask extends SearchTask {
 
-        public PerformTask(SearchManager manager, SearchPerformer performer, int order) {
+        PerformTask(SearchManager manager, SearchPerformer performer, int order) {
             super(manager, performer, order);
         }
 
@@ -333,7 +309,7 @@ public final class SearchManager {
 
         private final CrawlableSearchResult sr;
 
-        public CrawlTask(SearchManager manager, SearchPerformer performer, CrawlableSearchResult sr, int order) {
+        CrawlTask(SearchManager manager, SearchPerformer performer, CrawlableSearchResult sr, int order) {
             super(manager, performer, order);
             this.sr = sr;
         }
@@ -358,103 +334,104 @@ public final class SearchManager {
 
     private static final int DEFAULT_SEARCH_PERFORMER_TIMEOUT = 10000;
 
-    public static final SearchEngine EXTRATORRENT = new SearchEngine("Extratorrent", AppSettings.SEARCH_EXTRATORRENT_ENABLED) {
+    private static final SearchEngine EXTRATORRENT = new SearchEngine("Extratorrent", AppSettings.SEARCH_EXTRATORRENT_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new ExtratorrentSearchPerformer("extratorrent.cc", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine MININOVA = new SearchEngine("Mininova", AppSettings.SEARCH_MININOVA_ENABLED) {
+    private static final SearchEngine MININOVA = new SearchEngine("Mininova", AppSettings.SEARCH_MININOVA_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new MininovaSearchPerformer("www.mininova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine YOUTUBE = new SearchEngine("YouTube", AppSettings.SEARCH_YOUTUBE_ENABLED) {
+    private static final SearchEngine YOUTUBE = new SearchEngine("YouTube", AppSettings.SEARCH_YOUTUBE_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new YouTubeSearchPerformer("www.youtube.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine SOUNCLOUD = new SearchEngine("Soundcloud", AppSettings.SEARCH_SOUNDCLOUD_ENABLED) {
+    private static final SearchEngine SOUNCLOUD = new SearchEngine("Soundcloud", AppSettings.SEARCH_SOUNDCLOUD_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new SoundcloudSearchPerformer("api.sndcdn.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine ARCHIVE = new SearchEngine("Archive", AppSettings.SEARCH_ARCHIVE_ENABLED) {
+    private static final SearchEngine ARCHIVE = new SearchEngine("Archive", AppSettings.SEARCH_ARCHIVE_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new ArchiveorgSearchPerformer("archive.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine FROSTCLICK = new SearchEngine("FrostClick", AppSettings.SEARCH_FROSTCLICK_ENABLED) {
+    private static final SearchEngine FROSTCLICK = new SearchEngine("FrostClick", AppSettings.SEARCH_FROSTCLICK_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new FrostClickSearchPerformer("api.frostclick.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT, null);
         }
     };
 
-    public static final SearchEngine BITSNOOP = new SearchEngine("BitSnoop", AppSettings.SEARCH_BITSNOOP_ENABLED) {
+    private static final SearchEngine BITSNOOP = new SearchEngine("BitSnoop", AppSettings.SEARCH_BITSNOOP_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new BitSnoopSearchPerformer("bitsnoop.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine TORLOCK = new SearchEngine("TorLock", AppSettings.SEARCH_TORLOCK_ENABLED) {
+    private static final SearchEngine TORLOCK = new SearchEngine("TorLock", AppSettings.SEARCH_TORLOCK_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new TorLockSearchPerformer("www.torlock.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine TORRENTDOWNLOADS = new SearchEngine("TorrentDownloads", AppSettings.SEARCH_TORRENTDOWNLOADS_ENABLED) {
+    private static final SearchEngine TORRENTDOWNLOADS = new SearchEngine("TorrentDownloads", AppSettings.SEARCH_TORRENTDOWNLOADS_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new TorrentDownloadsSearchPerformer("www.torrentdownloads.me", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine LIMETORRENTS = new SearchEngine("LimeTorrents", AppSettings.SEARCH_LIMETORRENTS_ENABLED) {
+    private static final SearchEngine LIMETORRENTS = new SearchEngine("LimeTorrents", AppSettings.SEARCH_LIMETORRENTS_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new LimeTorrentsSearchPerformer("www.limetorrents.cc", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine EZTV = new SearchEngine("Eztv", AppSettings.SEARCH_EZTV_ENABLED) {
+    private static final SearchEngine EZTV = new SearchEngine("Eztv", AppSettings.SEARCH_EZTV_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new EztvSearchPerformer("eztv.ag", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine TPB = new SearchEngine("TPB", AppSettings.SEARCH_TBP_ENABLED, false) {
+    private static final SearchEngine TPB = new SearchEngine("TPB", AppSettings.SEARCH_TBP_ENABLED, false) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new TPBSearchPerformer("thepiratebay.se", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine MONOVA = new SearchEngine("Monova", AppSettings.SEARCH_MONOVA_ENABLED, false) {
+    private static final SearchEngine MONOVA = new SearchEngine("Monova", AppSettings.SEARCH_MONOVA_ENABLED, false) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new MonovaSearchPerformer("monova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
-    public static final SearchEngine YIFY = new SearchEngine("Yify", AppSettings.SEARCH_YIFY_ENABLED, false) {
+    private static final SearchEngine YIFY = new SearchEngine("Yify", AppSettings.SEARCH_YIFY_ENABLED, false) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new YifySearchPerformer("www.yify-torrent.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
+    @SuppressWarnings("unused")
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, BITSNOOP, EZTV, LIMETORRENTS);
 }
