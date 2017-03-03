@@ -60,6 +60,8 @@ public final class RecentFragment extends BaseAlbumFragment {
         int layout;
         if (isSimpleLayout()) {
             layout = R.layout.list_item_normal;
+        } else if (isDetailedLayout()) {
+            layout = R.layout.list_item_detailed_no_background;
         } else {
             layout = R.layout.grid_items_normal;
         }
