@@ -285,6 +285,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                     TabFragmentOrder.ALBUMS_POSITION,
                     FragmentMenuItems.ADD_TO_PLAYLIST,
                     Menu.NONE, R.string.add_to_playlist);
+            subMenu.setIcon(R.drawable.contextmenu_icon_playlist_add_dark);
             MusicUtils.makePlaylistMenu(this, TabFragmentOrder.ALBUMS_POSITION, subMenu, false);
         }
 
