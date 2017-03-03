@@ -48,10 +48,6 @@
         <item name="android:src">@drawable/ic_menu_moreoverflow</item>
     </style>
 
-    <style name="Widget.CompoundButton.CheckBox" parent="android:Widget.CompoundButton.CheckBox">
-        <item name="android:button">@drawable/checkbox_button_selector</item>
-    </style>
-
     <style name="Widget.Button" parent="android:Widget.Holo.Light.Button">
         <item name="android:background">@android:drawable/btn_default</item>
     </style>
