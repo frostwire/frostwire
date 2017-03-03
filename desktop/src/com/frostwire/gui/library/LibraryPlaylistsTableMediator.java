@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.alexandria.db.LibraryDatabase;
 import com.frostwire.gui.bittorrent.CreateTorrentDialog;
+import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.gui.theme.SkinMenu;
@@ -506,8 +507,9 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
 
         System.out.println("LibraryPlaylistsTableMediator::handleSelection() - sel.length == " + sel.length);
         if (sel.length == 1) {
-            LibraryMediator.instance().getLibraryCoverArt().setFile(getSelectedLibraryLines()[0].getFile());
-            LibraryUtils.asyncParseLyrics(selectedFile, new LibraryUtils.OnLyricsParsedUICallback() {
+            TagsReader tagsReader = new TagsReader(selectedFile);
+            LibraryMediator.instance().getLibraryCoverArt().setTagsReader(tagsReader).asyncRetrieveImage();
+            LibraryUtils.asyncParseLyrics(tagsReader, new LibraryUtils.OnLyricsParsedUICallback() {
                 @Override
                 public void run() {
                     onLyricsParsed(getLyrics());
@@ -536,6 +538,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
         CREATE_TORRENT_ACTION.setEnabled(false);
         DELETE_ACTION.setEnabled(false);
         SEND_TO_ITUNES_ACTION.setEnabled(false);
+        // TODO: Update UI and hide lyrics
     }
 
     private boolean hasExploreAction() {

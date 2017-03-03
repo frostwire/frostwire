@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
 
 package com.frostwire.gui.library.tags;
 
+import com.frostwire.util.Logger;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
-
-import com.frostwire.util.Logger;
 
 /**
  * 
  * @author aldenml
+ * @author gubatron
  *
  */
 public class TagsReader {
@@ -32,19 +33,17 @@ public class TagsReader {
     private static final Logger LOG = Logger.getLogger(TagsReader.class);
 
     private final File file;
+    private final TagsParser parser;
 
     public TagsReader(File file) {
         this.file = file;
+        parser = new TagsParserFactory().getInstance(file);
     }
 
     public TagsData parse() {
         TagsData data = null;
-
-        TagsParser parser = new TagsParserFactory().getInstance(file);
-
         if (parser != null) {
             data = parser.parse();
-
             // aldenml: fallback to mplayer parsing, refactor this logic (remove it)
             if (data == null || isEmpty(data)) {
                 data = new MPlayerParser(file).parse();
@@ -52,24 +51,25 @@ public class TagsReader {
         } else {
             LOG.warn("Unable to create tags parser for file: " + file);
         }
-
         return data;
     }
 
     public BufferedImage getArtwork() {
         BufferedImage image = null;
-
-        TagsParser parser = new TagsParserFactory().getInstance(file);
         if (parser != null) {
             image = parser.getArtwork();
         } else {
             LOG.warn("Unable to create tags parser for file: " + file);
         }
-
         return image;
     }
 
+    @SuppressWarnings("unused")
     private boolean isEmpty(TagsData data) {
         return false; // default behavior for now
+    }
+
+    public File getFile() {
+        return file;
     }
 }

@@ -26,7 +26,7 @@ import java.awt.image.BufferedImage;
  */
 interface TagsParser {
 
-    public TagsData parse();
+    TagsData parse();
 
-    public BufferedImage getArtwork();
+    BufferedImage getArtwork();
 }

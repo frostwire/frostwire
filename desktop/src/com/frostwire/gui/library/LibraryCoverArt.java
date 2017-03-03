@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,20 +18,14 @@
 
 package com.frostwire.gui.library;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
+import com.frostwire.gui.library.tags.TagsReader;
+import com.limegroup.gnutella.gui.GUIMediator;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-
-import javax.swing.JPanel;
-
-import com.frostwire.gui.library.tags.TagsReader;
-import com.limegroup.gnutella.gui.GUIMediator;
 
 /**
  * @author gubatron
@@ -44,12 +38,12 @@ public final class LibraryCoverArt extends JPanel {
     private final Image defaultCoverArt;
 
     private Image coverArtImage;
-    private File file;
+    private TagsReader tagsReader;
 
-    public LibraryCoverArt() {
+    LibraryCoverArt() {
         background = new BufferedImage(350, 350, BufferedImage.TYPE_INT_ARGB);
         defaultCoverArt = GUIMediator.getThemeImage("default_cover_art").getImage();
-        setFile(null);
+        setTagsReader(null);
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -58,35 +52,22 @@ public final class LibraryCoverArt extends JPanel {
         });
     }
 
-    /**
-     * Async
-     * @param file
-     */
-    public void setFile(final File file) {
-        if (this.file != null && file != null && this.file.equals(file)) {
-            return;
+    public LibraryCoverArt setTagsReader(TagsReader reader) {
+        if (this.tagsReader != null && reader != null && this.tagsReader.equals(reader)) {
+            return this;
         }
-        this.file = file;
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                Image image = retrieveImage(file);
-                if (file != null && file.equals(LibraryCoverArt.this.file)) {
-                    setPrivateImage(image);
-                }
-            }
-        }, "Cover Art extract");
-        t.setDaemon(true);
-        t.start();
+        this.tagsReader = reader;
+        return this;
     }
 
     public void setDefault() {
-        this.file = null;
-        new Thread(new Runnable() {
+        this.tagsReader = null;
+        LibraryUtils.getExecutor().submit(new Runnable() {
             public void run() {
-                Image image = retrieveImage(file);
+                Image image = retrieveImage();
                 setPrivateImage(image);
             }
-        }).start();
+        });
     }
 
     @Override
@@ -95,18 +76,29 @@ public final class LibraryCoverArt extends JPanel {
         g.drawImage(background, 0, 0, null);
     }
 
+    public void asyncRetrieveImage() {
+        if (tagsReader == null) {
+            System.err.println("LibraryCoverArt.asyncFetchImage() aborted. No tagsReader set. Check your logic");
+            return;
+        }
+        LibraryUtils.getExecutor().submit(new Runnable() {
+            public void run() {
+                Image image = retrieveImage();
+                if (tagsReader.getFile() != null) {
+                    setPrivateImage(image);
+                }
+            }
+        });
+    }
+
     /**
      * Synchronous.
-     * @param file
-     * @return
      */
-    private Image retrieveImage(File file) {
-        if (file == null) {
+    private Image retrieveImage() {
+        if (tagsReader == null || tagsReader.getFile() == null) {
             return defaultCoverArt;
         }
-        Image image = new TagsReader(file).getArtwork();
-
-        return image;
+        return tagsReader.getArtwork();
     }
 
     private void setPrivateImage(Image image) {

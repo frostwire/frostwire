@@ -61,6 +61,10 @@ public class LibraryUtils {
         executor = ExecutorsHelper.newProcessingQueue("LibraryUtils-Executor");
     }
 
+    public static ExecutorService getExecutor() {
+        return executor;
+    }
+
     private static void addPlaylistItem(Playlist playlist, File file) {
         addPlaylistItem(playlist, file, playlist.isStarred(), -1);
     }
@@ -738,7 +742,8 @@ public class LibraryUtils {
         });
     }
 
-    static void asyncParseLyrics(final File audioFile, final OnLyricsParsedUICallback uiCallback) {
+    static void asyncParseLyrics(final TagsReader tagsReader, final OnLyricsParsedUICallback uiCallback) {
+        File audioFile = tagsReader.getFile();
         if (audioFile == null || !audioFile.isFile() || !audioFile.canRead() || uiCallback == null) {
             if (uiCallback != null) {
                 uiCallback.setLyrics("");
@@ -749,7 +754,7 @@ public class LibraryUtils {
         executor.submit(new Runnable() {
             @Override
             public void run() {
-                TagsData tagsData = new TagsReader(audioFile).parse();
+                TagsData tagsData = tagsReader.parse();
                 if (tagsData != null) {
                     uiCallback.setLyrics(tagsData.getLyrics()); // can't be null, only ""
                     GUIMediator.safeInvokeLater(uiCallback);

@@ -20,14 +20,15 @@ package com.frostwire.gui.library;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.mp4.Mp4Demuxer;
-import com.frostwire.mp4.Mp4Info;
 import com.frostwire.gui.bittorrent.*;
+import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
+import com.frostwire.mp4.Mp4Demuxer;
+import com.frostwire.mp4.Mp4Info;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
@@ -46,7 +47,6 @@ import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -179,8 +179,8 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         boolean dirSelected = false;
         boolean fileSelected = false;
 
-        for (int i = 0; i < rows.length; i++) {
-            File f = DATA_MODEL.get(rows[i]).getFile();
+        for (int row : rows) {
+            File f = DATA_MODEL.get(row).getFile();
             if (f.isDirectory()) {
                 dirSelected = true;
                 //				if (IncompleteFileManager.isTorrentFolder(f))
@@ -289,27 +289,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     }
 
     /**
-     * Cancels all editing of fields in the tree and table.
-     */
-    void cancelEditing() {
-        if (TABLE.isEditing()) {
-            TableCellEditor editor = TABLE.getCellEditor();
-            editor.cancelCellEditing();
-        }
-    }
-
-    /**
-     * Adds the mouse listeners to the wrapped <tt>JTable</tt>.
-     *
-     * @param listener the <tt>MouseInputListener</tt> that handles mouse events
-     *                 for the library
-     */
-    void addMouseInputListener(final MouseInputListener listener) {
-        TABLE.addMouseListener(listener);
-        TABLE.addMouseMotionListener(listener);
-    }
-
-    /**
      * Updates the Table based on the selection of the given table.
      * Perform lookups to remove any store files from the shared folder
      * view and to only display store files in the store view
@@ -394,18 +373,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         return TABLE;
     }
 
-    ButtonRow getButtonRow() {
-        return BUTTON_ROW;
-    }
-
-    /**
-     * Accessor for the <tt>ListSelectionModel</tt> for the wrapped
-     * <tt>JTable</tt> instance.
-     */
-    ListSelectionModel getSelectionModel() {
-        return TABLE.getSelectionModel();
-    }
-
     /**
      * Returns the options offered to the user when removing files.
      *
@@ -423,7 +390,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
     public List<MediaSource> getFilesView() {
         int size = DATA_MODEL.getRowCount();
-        List<MediaSource> result = new ArrayList<MediaSource>(size);
+        List<MediaSource> result = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             try {
                 File file = DATA_MODEL.get(i).getFile();
@@ -453,7 +420,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
             editor.cancelCellEditing();
         }
 
-        List<File> files = new ArrayList<File>(rows.length);
+        List<File> files = new ArrayList<>(rows.length);
 
         // sort row indices and go backwards so list indices don't change when
         // removing the files from the model list
@@ -463,7 +430,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
             files.add(file);
         }
 
-        CheckBoxListPanel<File> listPanel = new CheckBoxListPanel<File>(files, new FileTextProvider(), true);
+        CheckBoxListPanel<File> listPanel = new CheckBoxListPanel<>(files, new FileTextProvider(), true);
         listPanel.getList().setVisibleRowCount(4);
 
         // display list of files that should be deleted
@@ -481,13 +448,14 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
         // remove still selected files
         List<File> selected = listPanel.getSelectedElements();
-        List<String> undeletedFileNames = new ArrayList<String>();
+        List<String> undeletedFileNames;
+        undeletedFileNames = new ArrayList<>();
 
         boolean somethingWasRemoved = false;
 
         for (File file : selected) {
             // stop seeding if seeding
-            BittorrentDownload dm = null;
+            BittorrentDownload dm;
             if ((dm = TorrentUtil.getDownloadManager(file)) != null) {
                 dm.setDeleteDataWhenRemove(false);
                 dm.setDeleteTorrentWhenRemove(false);
@@ -532,7 +500,8 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
      * Creates a JList of files and sets and makes it non-selectable.
      */
     private static JList<String> createFileList(List<String> fileNames) {
-        JList<String> fileList = new JList<String>(fileNames.toArray(new String[0]));
+        JList<String> fileList;
+        fileList = new JList<>(fileNames.toArray(new String[0]));
         fileList.setVisibleRowCount(5);
         fileList.setCellRenderer(new FileNameListCellRenderer());
         //fileList.setSelectionForeground(fileList.getForeground());
@@ -559,19 +528,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
             UXStats.instance().log(UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
             return;
         }
-
-        int[] rows = TABLE.getSelectedRows();
-        //LibraryTableModel ltm = DATA_MODEL;
-        //File file;
-        for (int i = 0; i < rows.length; i++) {
-            //file = ltm.getFile(rows[i]);
-            // if it's a directory try to select it in the library tree
-            // if it could be selected return
-            //			if (file.isDirectory()
-            //				&& LibraryMediator.setSelectedDirectory(file))
-            //				return;
-        }
-
         launch(true);
     }
 
@@ -579,7 +535,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
      * Launches the associated applications for each selected file
      * in the library if it can.
      */
-    void launch(boolean playAudio) {
+    private void launch(boolean playAudio) {
         int[] rows = TABLE.getSelectedRows();
         if (rows.length == 0) {
             return;
@@ -608,7 +564,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         for (int i = 0; i < rows.length; i++) {
             try {
                 MediaType mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(DATA_MODEL.getFile(rows[i]).getName()));
-                if (mt.equals(MediaType.getVideoMediaType())) {
+                if (mt != null && mt.equals(MediaType.getVideoMediaType())) {
                     stopAudio = true;
                 }
             } catch (Throwable e) {
@@ -673,19 +629,15 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
             }
         }
 
-        if (sel.length == 1 && selectedFile.isFile() && selectedFile.getParentFile() != null) {
+        if (sel.length == 1 && selectedFile != null && selectedFile.isFile() && selectedFile.getParentFile() != null) {
             OPEN_IN_FOLDER_ACTION.setEnabled(true);
         } else {
             OPEN_IN_FOLDER_ACTION.setEnabled(false);
         }
 
         if (sel.length == 1) {
-            LibraryMediator.instance().getLibraryCoverArt().setFile(selectedFile);
+            LibraryMediator.instance().getLibraryCoverArt().setTagsReader(new TagsReader(selectedFile)).asyncRetrieveImage();
         }
-
-//        boolean anyBeingShared = isAnyBeingShared();
-//        WIFI_SHARE_ACTION.setEnabled(!anyBeingShared);
-//        WIFI_UNSHARE_ACTION.setEnabled(!anyBeingShared);
     }
 
     /**
@@ -702,15 +654,8 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         SEND_TO_ITUNES_ACTION.setEnabled(false);
     }
 
-    /**
-     * Refreshes the enabledness of the Enqueue button based
-     * on the player enabling state.
-     */
-    public void setPlayerEnabled(boolean value) {
-        handleSelection(TABLE.getSelectedRow());
-    }
-
-    public boolean setFileSelected(File file) {
+    @SuppressWarnings("UnusedReturnValue")
+    boolean setFileSelected(File file) {
         int i = DATA_MODEL.getRow(file);
         if (i != -1) {
             TABLE.setSelectedRow(i);
@@ -726,19 +671,15 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
     /**
      * Split a collection in Lists of up to partitionSize elements.
-     * @param <T>
-     * @param partitionSize
-     * @param collection
-     * @return
      */
     public static <T> List<List<T>> split(int partitionSize, List<T> collection) {
-        List<List<T>> lists = new LinkedList<List<T>>();
+        List<List<T>> lists = new LinkedList<>();
 
         for (int i = 0; i < collection.size(); i+=partitionSize) {
             //the compiler might not know if the collection has changed size
             //so it might not optimize this by itself.
             int jLimit = Math.min(collection.size(),i+partitionSize);
-            List<T> newList = new LinkedList<T>();
+            List<T> newList = new LinkedList<>();
             for (int j=i; j < jLimit;j++) {
                 newList.add(collection.get(j));
             }
@@ -837,6 +778,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
             File selectedFile = DATA_MODEL.getFile(TABLE.getSelectedRow());
 
             //can't create torrents out of empty folders.
+            //noinspection ConstantConditions
             if (selectedFile.isDirectory() && selectedFile.listFiles().length == 0) {
                 JOptionPane.showMessageDialog(null, I18n.tr("The folder you selected is empty."), I18n.tr("Invalid Folder"), JOptionPane.ERROR_MESSAGE);
                 return;
@@ -906,7 +848,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         DemuxMP4AudioAction() {
             putValue(Action.NAME, I18n.tr("Extract Audio"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Extract .m4a Audio from this .mp4 video"));
-            demuxedFiles = new ArrayList<File>();
+            demuxedFiles = new ArrayList<>();
         }
 
         boolean isDemuxing() {
@@ -915,7 +857,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
         private List<File> getSelectedFiles() {
             int[] rows = TABLE.getSelectedRows();
-            List<File> files = new ArrayList<File>(rows.length);
+            List<File> files = new ArrayList<>(rows.length);
             for (int index : rows) {
                 File file = DATA_MODEL.getFile(index);
                 files.add(file);
