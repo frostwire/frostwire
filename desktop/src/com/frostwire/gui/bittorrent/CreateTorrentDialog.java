@@ -42,10 +42,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,23 +94,39 @@ public class CreateTorrentDialog extends JDialog {
     private String _invalidTrackerURL;
     private JButton _buttonClose;
 
-    private JComboBox _pieceSizeComboBox;
-    private JLabel _labelPieceSize;
+    private JComboBox pieceSizeComboBox;
     private int pieceSize;
-    private static final String[] PIECE_SIZE_OPTIONS = {
-            "(Auto Detect)",
-            "16 kB",
-            "32 kB",
-            "64 kB",
-            "128 kB",
-            "256 kB",
-            "512 kB",
-            "1024 kB",
-            "2048 kB",
-            "4096 kB"
-    };
+    private static final int _1024BYTES = 1024;
+    private enum PieceSize {
+        AUTO_DETECT(0,"(" + I18n.tr("Auto Detect") + ")"),
+        _16KB(16),
+        _32KB(32),
+        _64KB(64),
+        _128KB(128),
+        _256KB(256),
+        _512KB(512),
+        _1024KB(1024),
+        _2048KB(2048),
+        _4096KB(4096);
 
-    private static final int[] PIECE_SIZES = {0, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096};
+        public final int kb;
+        private final String humanRep;
+
+        PieceSize(int k, String rep) {
+            kb = k;
+            humanRep = rep;
+        }
+
+        PieceSize(int k) {
+            this(k, k + " kB");
+        }
+
+        @Override
+        public String toString() {
+            return humanRep;
+        }
+    }
+
 
     public CreateTorrentDialog(JFrame frame) {
         super(frame);
@@ -226,13 +240,13 @@ public class CreateTorrentDialog extends JDialog {
 
         _textWebSeeds = new JTextArea(4, 70);
         ThemeMediator.fixKeyStrokes(_textWebSeeds);
-        torrentTrackingPanel.add(new JScrollPane(_textWebSeeds), "gapright 5, gapleft 80, gapbottom 5, hmin 165px, growx 60, growy");
+        torrentTrackingPanel.add(new JScrollPane(_textWebSeeds), "gapright 5, gapleft 80, gapbottom 5, hmin 165px, growx 60, growy, wrap");
 
-        // Select piece size
-        _labelPieceSize = new JLabel(I18n.tr("Piece Size"));
-        torrentTrackingPanel.add(_labelPieceSize, "align left, pushy, gapleft 5");
-        _pieceSizeComboBox = new JComboBox(PIECE_SIZE_OPTIONS);
-        torrentTrackingPanel.add(_pieceSizeComboBox, "align left, pushx, gapright 80");
+        JLabel labelPieceSize = new JLabel(I18n.tr("Piece Size"));
+        torrentTrackingPanel.add(labelPieceSize, "aligny top, pushy, gapleft 5, gapright 10, wmin 150px");
+
+        pieceSizeComboBox = new JComboBox(PieceSize.values());
+        torrentTrackingPanel.add(pieceSizeComboBox, "gapright 5, gapleft 80, width 175px");
 
         //suggest DHT by default 
         updateTrackerRelatedControlsAvailability(true);
@@ -308,15 +322,18 @@ public class CreateTorrentDialog extends JDialog {
             }
         });
 
-        _pieceSizeComboBox.addActionListener(
+        pieceSizeComboBox.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        pieceSize = PIECE_SIZES[_pieceSizeComboBox.getSelectedIndex()];
-                        System.out.println(pieceSize);
+                        onPieceSizeSelected(pieceSizeComboBox.getSelectedIndex());
                     }
                 }
         );
+    }
+
+    private void onPieceSizeSelected(int selectedIndex) {
+        pieceSize = PieceSize.values()[selectedIndex].kb*_1024BYTES;
     }
 
     private void updateTrackerRelatedControlsAvailability(boolean useDHT) {
