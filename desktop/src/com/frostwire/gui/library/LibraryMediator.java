@@ -281,10 +281,7 @@ public class LibraryMediator {
         _tablesPanel = new JPanel(_tablesViewLayout);
 
         _tablesPanel.add(LibraryFilesTableMediator.instance().getComponent(), FILES_TABLE_KEY);
-
-        LibraryPlaylistsTableMediator libraryPlaylistsTableMediator = LibraryPlaylistsTableMediator.instance();
-        JComponent component = libraryPlaylistsTableMediator.getComponent();
-        _tablesPanel.add(component, PLAYLISTS_TABLE_KEY);
+        _tablesPanel.add(LibraryPlaylistsTableMediator.instance().getComponent(), PLAYLISTS_TABLE_KEY);
 
         panel.add(getLibrarySearch(), BorderLayout.PAGE_START);
         panel.add(_tablesPanel, BorderLayout.CENTER);
