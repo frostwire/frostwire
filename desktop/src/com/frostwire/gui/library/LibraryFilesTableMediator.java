@@ -636,7 +636,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         }
 
         if (sel.length == 1) {
-            LibraryMediator.instance().getLibraryCoverArt().setTagsReader(new TagsReader(selectedFile)).asyncRetrieveImage();
+            LibraryMediator.instance().getLibraryCoverArtPanel().setTagsReader(new TagsReader(selectedFile)).asyncRetrieveImage();
         }
     }
 

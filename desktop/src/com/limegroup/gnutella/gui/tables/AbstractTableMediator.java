@@ -609,14 +609,14 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     /**
      * Resorts the underlying data. Maintains highlighted rows.
      */
-    public void resort() {
+    private void resort() {
         RESORTER.doResort(false);
     }
 
     /**
      * Resorts the underlying data, regardless of if the column is dynamic.
      */
-    public void forceResort() {
+    protected void forceResort() {
         RESORTER.doResort(true);
     }
 

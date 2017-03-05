@@ -41,14 +41,14 @@ public class LibraryLeftPanel extends JPanel {
 
     private final LibraryExplorer libraryExplorer;
     private final LibraryPlaylists libraryPlaylists;
-    private final LibraryCoverArt libraryCoverArt;
+    private final LibraryCoverArtPanel libraryCoverArtPanel;
 
     private final JSplitPane splitPane;
 
-    public LibraryLeftPanel(LibraryExplorer libraryExplorer, LibraryPlaylists libraryPlaylists, LibraryCoverArt libraryCoverArt) {
+    public LibraryLeftPanel(LibraryExplorer libraryExplorer, LibraryPlaylists libraryPlaylists, LibraryCoverArtPanel libraryCoverArtPanel) {
         this.libraryExplorer = libraryExplorer;
         this.libraryPlaylists = libraryPlaylists;
-        this.libraryCoverArt = libraryCoverArt;
+        this.libraryCoverArtPanel = libraryCoverArtPanel;
 
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         setupUI();
@@ -66,10 +66,10 @@ public class LibraryLeftPanel extends JPanel {
 
         Dimension minSize = new Dimension(MIN_WIDTH, MIN_WIDTH);
         Dimension maxSize = new Dimension(MAX_WIDTH, MAX_WIDTH);
-        libraryCoverArt.setPreferredSize(minSize);
-        libraryCoverArt.setMinimumSize(minSize);
-        libraryCoverArt.setMaximumSize(maxSize);
-        add(libraryCoverArt, BorderLayout.PAGE_END);
+        libraryCoverArtPanel.setPreferredSize(minSize);
+        libraryCoverArtPanel.setMinimumSize(minSize);
+        libraryCoverArtPanel.setMaximumSize(maxSize);
+        add(libraryCoverArtPanel, BorderLayout.PAGE_END);
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -82,10 +82,10 @@ public class LibraryLeftPanel extends JPanel {
     }
 
     protected void layoutComponents() {
-        Dimension size = libraryCoverArt.getSize();
+        Dimension size = libraryCoverArtPanel.getSize();
         size.height = size.width;
-        libraryCoverArt.setSize(size);
-        libraryCoverArt.setPreferredSize(size);
+        libraryCoverArtPanel.setSize(size);
+        libraryCoverArtPanel.setPreferredSize(size);
 
         revalidate();
     }

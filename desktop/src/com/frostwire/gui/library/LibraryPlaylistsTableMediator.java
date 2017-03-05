@@ -40,6 +40,7 @@ import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.gui.util.GUILauncher;
 import com.limegroup.gnutella.gui.util.GUILauncher.LaunchableProvider;
 import com.limegroup.gnutella.util.QueryUtils;
+import net.miginfocom.swing.MigLayout;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
@@ -86,6 +87,8 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
      */
     private static LibraryPlaylistsTableMediator INSTANCE;
 
+    private JPanel mainContainer;
+
     public static LibraryPlaylistsTableMediator instance() {
         if (INSTANCE == null) {
             INSTANCE = new LibraryPlaylistsTableMediator();
@@ -102,7 +105,6 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
      */
     protected void buildListeners() {
         super.buildListeners();
-
         LAUNCH_ACTION = new LaunchAction();
         LAUNCH_OS_ACTION = new LaunchOSAction();
         OPEN_IN_FOLDER_ACTION = new OpenInFolderAction();
@@ -340,6 +342,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
         currentPlaylist = playlist;
         List<PlaylistItem> items = currentPlaylist.getItems();
 
+        updatePlaylistComponentHeader();
         clearTable();
         for (final PlaylistItem item : items) {
             GUIMediator.safeInvokeLater(new Runnable() {
@@ -350,6 +353,59 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
             });
         }
         forceResort();
+    }
+
+    @Override
+    public JComponent getComponent() {
+        System.out.println("LibraryPlaylistsTableMediator.getComponent() invoked");
+        mainContainer = new JPanel(new MigLayout("fillx, wrap 1","[]", "[][fill, grow]"));
+
+        mainContainer.add(new JPanel(), "wrap"); // dummy
+        mainContainer.add(super.getComponent(),"grow");
+
+        return mainContainer;
+    }
+
+
+    private void updatePlaylistComponentHeader() {
+        JPanel playlistHeaderRow = new JPanel(new MigLayout("insets 0, fillx, wrap 2","[]"));
+        LibraryCoverArtPanel artWorkLabel = new LibraryCoverArtPanel();
+        if (currentPlaylist == null) {
+            return;
+        }
+        if (!currentPlaylist.isStarred()) {
+            PlaylistItem playlistItem = currentPlaylist.getItems().get(0);
+            if (playlistItem != null) {
+                TagsReader tagsReader = new TagsReader(new File(playlistItem.getFilePath()));
+                artWorkLabel.setTagsReader(tagsReader).asyncRetrieveImage();
+            }
+        }
+        Dimension artDimensions = new Dimension(210, 210);
+        artWorkLabel.setPreferredSize(artDimensions);
+        artWorkLabel.setMinimumSize(artDimensions);
+        artWorkLabel.setMaximumSize(artDimensions);
+        playlistHeaderRow.add(artWorkLabel);
+
+        JPanel rightSideContainer = new JPanel(new MigLayout("fillx, wrap 1"));
+        JLabel playlistSectionTitle = new JLabel(I18n.tr("Playlist"));
+        // Replace this for a text edit or show a dialog to rename it
+        JLabel playlistTitle = new JLabel(currentPlaylist.getName());
+        Font font = new Font("Helvetica", Font.BOLD, 30);
+        playlistTitle.setFont(font);
+        JLabel duration = new JLabel(LibraryUtils.getPlaylistDurationInDDHHMMSS(currentPlaylist) + ", " + currentPlaylist.getItems().size() + " " + I18n.tr("tracks"));
+
+        rightSideContainer.add(playlistSectionTitle, "wrap");
+        rightSideContainer.add(playlistTitle, "wrap");
+        rightSideContainer.add(duration, "wrap");
+
+        playlistHeaderRow.add(rightSideContainer, "aligny top, wrap");
+
+        mainContainer.removeAll();
+        mainContainer.add(playlistHeaderRow,"wrap");
+        mainContainer.add(super.getComponent(),"grow");
+        mainContainer.invalidate();
+        mainContainer.repaint();
+        mainContainer.updateUI();
     }
 
     /**
@@ -508,7 +564,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
         System.out.println("LibraryPlaylistsTableMediator::handleSelection() - sel.length == " + sel.length);
         if (sel.length == 1) {
             TagsReader tagsReader = new TagsReader(selectedFile);
-            LibraryMediator.instance().getLibraryCoverArt().setTagsReader(tagsReader).asyncRetrieveImage();
+            LibraryMediator.instance().getLibraryCoverArtPanel().setTagsReader(tagsReader).asyncRetrieveImage();
             LibraryUtils.asyncParseLyrics(tagsReader, new LibraryUtils.OnLyricsParsedUICallback() {
                 @Override
                 public void run() {
@@ -634,6 +690,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
             File selectedFile = DATA_MODEL.getFile(TABLE.getSelectedRow());
 
             //can't create torrents out of empty folders.
+            //noinspection ConstantConditions
             if (selectedFile.isDirectory() && selectedFile.listFiles() != null && selectedFile.listFiles().length == 0) {
                 JOptionPane.showMessageDialog(null, I18n.tr("The folder you selected is empty."), I18n.tr("Invalid Folder"), JOptionPane.ERROR_MESSAGE);
                 return;

@@ -32,7 +32,7 @@ import java.awt.image.BufferedImage;
  * @author aldenml
  *
  */
-public final class LibraryCoverArt extends JPanel {
+public final class LibraryCoverArtPanel extends JPanel {
 
     private final BufferedImage background;
     private final Image defaultCoverArt;
@@ -40,7 +40,7 @@ public final class LibraryCoverArt extends JPanel {
     private Image coverArtImage;
     private TagsReader tagsReader;
 
-    LibraryCoverArt() {
+    LibraryCoverArtPanel() {
         background = new BufferedImage(350, 350, BufferedImage.TYPE_INT_ARGB);
         defaultCoverArt = GUIMediator.getThemeImage("default_cover_art").getImage();
         setTagsReader(null);
@@ -52,7 +52,7 @@ public final class LibraryCoverArt extends JPanel {
         });
     }
 
-    public LibraryCoverArt setTagsReader(TagsReader reader) {
+    public LibraryCoverArtPanel setTagsReader(TagsReader reader) {
         if (this.tagsReader != null && reader != null && this.tagsReader.equals(reader)) {
             return this;
         }
@@ -78,7 +78,7 @@ public final class LibraryCoverArt extends JPanel {
 
     public void asyncRetrieveImage() {
         if (tagsReader == null) {
-            System.err.println("LibraryCoverArt.asyncFetchImage() aborted. No tagsReader set. Check your logic");
+            System.err.println("LibraryCoverArtPanel.asyncFetchImage() aborted. No tagsReader set. Check your logic");
             return;
         }
         LibraryUtils.getExecutor().submit(new Runnable() {

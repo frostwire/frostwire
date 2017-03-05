@@ -59,7 +59,7 @@ public class LibraryMediator {
 
     private LibraryExplorer libraryExplorer;
     private LibraryPlaylists libraryPlaylists;
-    private LibraryCoverArt libraryCoverArt;
+    private LibraryCoverArtPanel libraryCoverArtPanel;
     private LibraryLeftPanel libraryLeftPanel;
     private LibrarySearch librarySearch;
 
@@ -158,11 +158,11 @@ public class LibraryMediator {
         return librarySearch;
     }
 
-    public LibraryCoverArt getLibraryCoverArt() {
-        if (libraryCoverArt == null) {
-            libraryCoverArt = new LibraryCoverArt();
+    public LibraryCoverArtPanel getLibraryCoverArtPanel() {
+        if (libraryCoverArtPanel == null) {
+            libraryCoverArtPanel = new LibraryCoverArtPanel();
         }
-        return libraryCoverArt;
+        return libraryCoverArtPanel;
     }
 
     public JComponent getComponent() {
@@ -269,7 +269,7 @@ public class LibraryMediator {
 
     private JComponent getLibraryLeftPanel() {
         if (libraryLeftPanel == null) {
-            libraryLeftPanel = new LibraryLeftPanel(getLibraryExplorer(), getLibraryPlaylists(), getLibraryCoverArt());
+            libraryLeftPanel = new LibraryLeftPanel(getLibraryExplorer(), getLibraryPlaylists(), getLibraryCoverArtPanel());
         }
         return libraryLeftPanel;
     }
@@ -282,8 +282,9 @@ public class LibraryMediator {
 
         _tablesPanel.add(LibraryFilesTableMediator.instance().getComponent(), FILES_TABLE_KEY);
 
-        // TODO: Here we'll have a PlaylistComponent instead, which will have the playlist mediator.
-        _tablesPanel.add(LibraryPlaylistsTableMediator.instance().getComponent(), PLAYLISTS_TABLE_KEY);
+        LibraryPlaylistsTableMediator libraryPlaylistsTableMediator = LibraryPlaylistsTableMediator.instance();
+        JComponent component = libraryPlaylistsTableMediator.getComponent();
+        _tablesPanel.add(component, PLAYLISTS_TABLE_KEY);
 
         panel.add(getLibrarySearch(), BorderLayout.PAGE_START);
         panel.add(_tablesPanel, BorderLayout.CENTER);
