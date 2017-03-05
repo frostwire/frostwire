@@ -126,7 +126,7 @@ public class CreateTorrentDialog extends JDialog {
             return humanRep;
         }
     }
-
+    private static final PieceSize[] values = PieceSize.values();
 
     public CreateTorrentDialog(JFrame frame) {
         super(frame);
@@ -245,7 +245,7 @@ public class CreateTorrentDialog extends JDialog {
         JLabel labelPieceSize = new JLabel(I18n.tr("Piece Size"));
         torrentTrackingPanel.add(labelPieceSize, "aligny top, pushy, gapleft 5, gapright 10, wmin 150px");
 
-        pieceSizeComboBox = new JComboBox(PieceSize.values());
+        pieceSizeComboBox = new JComboBox(values);
         torrentTrackingPanel.add(pieceSizeComboBox, "gapright 5, gapleft 80, width 175px");
 
         //suggest DHT by default 
@@ -333,7 +333,9 @@ public class CreateTorrentDialog extends JDialog {
     }
 
     private void onPieceSizeSelected(int selectedIndex) {
-        pieceSize = PieceSize.values()[selectedIndex].kb*_1024BYTES;
+        if (selectedIndex > 0 && values.length > selectedIndex && values[selectedIndex] != null) {
+            pieceSize = values[selectedIndex].kb*_1024BYTES;
+        }
     }
 
     private void updateTrackerRelatedControlsAvailability(boolean useDHT) {
