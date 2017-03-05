@@ -342,7 +342,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
         currentPlaylist = playlist;
         List<PlaylistItem> items = currentPlaylist.getItems();
 
-        updatePlaylistComponentHeader();
+        updatePlaylistComponentHeader(null);
         clearTable();
         for (final PlaylistItem item : items) {
             GUIMediator.safeInvokeLater(new Runnable() {
@@ -367,8 +367,8 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
     }
 
 
-    private void updatePlaylistComponentHeader() {
-        JPanel playlistHeaderRow = new JPanel(new MigLayout("insets 0, fillx, wrap 2","[]"));
+    private void updatePlaylistComponentHeader(String lyrics) {
+        JPanel playlistHeaderRow = new JPanel(new MigLayout("insets 10, fillx","[][grow][]"));
         LibraryCoverArtPanel artWorkLabel = new LibraryCoverArtPanel();
         if (currentPlaylist == null) {
             return;
@@ -380,13 +380,16 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
                 artWorkLabel.setTagsReader(tagsReader).asyncRetrieveImage();
             }
         }
+
+        // left
         Dimension artDimensions = new Dimension(210, 210);
         artWorkLabel.setPreferredSize(artDimensions);
         artWorkLabel.setMinimumSize(artDimensions);
         artWorkLabel.setMaximumSize(artDimensions);
         playlistHeaderRow.add(artWorkLabel);
 
-        JPanel rightSideContainer = new JPanel(new MigLayout("fillx, wrap 1"));
+        // center
+        JPanel centerContainer = new JPanel(new MigLayout("fillx, wrap 1"));
         JLabel playlistSectionTitle = new JLabel(I18n.tr("Playlist"));
         // Replace this for a text edit or show a dialog to rename it
         JLabel playlistTitle = new JLabel(currentPlaylist.getName());
@@ -394,18 +397,43 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
         playlistTitle.setFont(font);
         JLabel duration = new JLabel(LibraryUtils.getPlaylistDurationInDDHHMMSS(currentPlaylist) + ", " + currentPlaylist.getItems().size() + " " + I18n.tr("tracks"));
 
-        rightSideContainer.add(playlistSectionTitle, "wrap");
-        rightSideContainer.add(playlistTitle, "wrap");
-        rightSideContainer.add(duration, "wrap");
+        centerContainer.add(playlistSectionTitle, "wrap");
+        centerContainer.add(playlistTitle, "wrap");
+        centerContainer.add(duration);
+        playlistHeaderRow.add(centerContainer, "alignx left, aligny top, growx, pushx");
 
-        playlistHeaderRow.add(rightSideContainer, "aligny top, wrap");
-
+        if (lyrics != null && !lyrics.isEmpty()) {
+            JPanel lyricsPanel = createLyricsPanel(lyrics);
+            playlistHeaderRow.add(lyricsPanel, "aligny top");
+        }
         mainContainer.removeAll();
-        mainContainer.add(playlistHeaderRow,"wrap");
+        mainContainer.add(playlistHeaderRow,"wrap, growx");
         mainContainer.add(super.getComponent(),"grow");
         mainContainer.invalidate();
         mainContainer.repaint();
         mainContainer.updateUI();
+    }
+
+    private JPanel createLyricsPanel(String lyrics) {
+        int[] sel = TABLE.getSelectedRows();
+        String songTitle = "";
+        if (sel.length == 1) {
+            PlaylistItem playlistItem = currentPlaylist.getItems().get(sel[0]);
+            songTitle = playlistItem.getTrackTitle() + " ";
+        }
+
+        File selectedFile = getFile(sel[0]);
+        JPanel lyricsPanel = new JPanel(new MigLayout("fillx, wrap 1, insets 0","[]"));
+        lyricsPanel.add(new JLabel(songTitle + I18n.tr("Lyrics")),"wrap");
+        JTextArea lyricsTextArea = new JTextArea(lyrics);
+        lyricsTextArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(lyricsTextArea);
+        Dimension d = new Dimension(500, 210);
+        scrollPane.setPreferredSize(d);
+        scrollPane.setMaximumSize(d);
+        scrollPane.setMaximumSize(d);
+        lyricsPanel.add(scrollPane, "growx");
+        return lyricsPanel;
     }
 
     /**
@@ -561,25 +589,16 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
             OPEN_IN_FOLDER_ACTION.setEnabled(false);
         }
 
-        System.out.println("LibraryPlaylistsTableMediator::handleSelection() - sel.length == " + sel.length);
         if (sel.length == 1) {
             TagsReader tagsReader = new TagsReader(selectedFile);
             LibraryMediator.instance().getLibraryCoverArtPanel().setTagsReader(tagsReader).asyncRetrieveImage();
             LibraryUtils.asyncParseLyrics(tagsReader, new LibraryUtils.OnLyricsParsedUICallback() {
                 @Override
                 public void run() {
-                    onLyricsParsed(getLyrics());
+                    updatePlaylistComponentHeader(getLyrics());
                 }
             });
         }
-    }
-
-    private void onLyricsParsed(String lyrics) {
-        System.out.println("====================================================================================================");
-        System.out.println("LibraryPlaylistsTableMediator.onLyricsParsed() <" + lyrics.length() + " bytes> (thread -> " + Thread.currentThread().getName() + ")");
-        System.out.println(lyrics);
-        System.out.println("====================================================================================================");
-        // TODO: Update UI and show or hide lyrics depending on what we get.
     }
 
     /**
