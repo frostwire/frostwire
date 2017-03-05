@@ -401,6 +401,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         list.repaint();
         textName.setVisible(false);
         UXStats.instance().log(UXAction.LIBRARY_PLAYLIST_RENAMED);
+        LibraryPlaylistsTableMediator.instance().updateTableItems(selectedPlaylist);
     }
 
     private void createNewPlaylist() {
