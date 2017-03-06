@@ -1,10 +1,11 @@
 frostwire (6.4.6) stable; urgency=high
+  * New revision of jlibtorrent 1.2.0.6 fixes BitTorrent bugs.
   * New VPN-Drop protection setting. Automatically stop all BitTorrent traffic
     if no VPN connection is available
   * BTJunkie.eu search discontinued
   * Library > Playlists UI improvements. Support to display lyrics when available
 	
- -- FrostWire Team <contact@frostwire.com>  Sat, 4 Mar 2017 11:04:50 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 6 Mar 2017 09:41:49 -0600
 	
 frostwire (6.4.5) stable; urgency=high
   * New jlibtorrent 1.2.0.6 fixes BitTorrent connectivity issues

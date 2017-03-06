@@ -1,10 +1,11 @@
-FrostWire 1.9.0 - MAR/01/2017
+FrostWire 1.9.0 - MAR/06/2017
  - New material-design navigation menu
  - Fixes bug where equalizer window would not open
  - Music player cleanup
  - InMobi network removed
  - All translations up to date
  - BTJunkie.eu search discontinued
+ - New jlibtorrent 1.2.0.6 (final release) fixes BitTorrent bugs
 
 FrostWire 1.8.9 - FEB/13/2017
  - New privacy enhancing setting to automatically disable all bittorrent activity if a VPN
