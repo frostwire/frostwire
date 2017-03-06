@@ -37,18 +37,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,6 +93,40 @@ public class CreateTorrentDialog extends JDialog {
     private JScrollPane _textTrackersScrollPane;
     private String _invalidTrackerURL;
     private JButton _buttonClose;
+
+    private JComboBox pieceSizeComboBox;
+    private int pieceSize;
+    private static final int _1024BYTES = 1024;
+    private enum PieceSize {
+        AUTO_DETECT(0,"(" + I18n.tr("Auto Detect") + ")"),
+        _16KB(16),
+        _32KB(32),
+        _64KB(64),
+        _128KB(128),
+        _256KB(256),
+        _512KB(512),
+        _1024KB(1024),
+        _2048KB(2048),
+        _4096KB(4096);
+
+        public final int kb;
+        private final String humanRep;
+
+        PieceSize(int k, String rep) {
+            kb = k;
+            humanRep = rep;
+        }
+
+        PieceSize(int k) {
+            this(k, k + " kB");
+        }
+
+        @Override
+        public String toString() {
+            return humanRep;
+        }
+    }
+    private static final PieceSize[] values = PieceSize.values();
 
     public CreateTorrentDialog(JFrame frame) {
         super(frame);
@@ -182,7 +211,7 @@ public class CreateTorrentDialog extends JDialog {
 
     private void initTorrentTracking() {
         JPanel torrentTrackingPanel = new JPanel(new MigLayout("fill"));
-        GUIUtils.setTitledBorderOnPanel(torrentTrackingPanel, I18n.tr("Tracking"));
+        GUIUtils.setTitledBorderOnPanel(torrentTrackingPanel, I18n.tr("Torrent Properties"));
 
         _checkUseDHT = new JCheckBox(I18n.tr("Trackerless Torrent (DHT)"), true);
         _checkUseDHT.setToolTipText(I18n.tr("Select this option to create torrents that don't need trackers, completely descentralized. (Recommended)"));
@@ -211,7 +240,13 @@ public class CreateTorrentDialog extends JDialog {
 
         _textWebSeeds = new JTextArea(4, 70);
         ThemeMediator.fixKeyStrokes(_textWebSeeds);
-        torrentTrackingPanel.add(new JScrollPane(_textWebSeeds), "gapright 5, gapleft 80, gapbottom 5, hmin 165px, growx 60, growy");
+        torrentTrackingPanel.add(new JScrollPane(_textWebSeeds), "gapright 5, gapleft 80, gapbottom 5, hmin 165px, growx 60, growy, wrap");
+
+        JLabel labelPieceSize = new JLabel(I18n.tr("Piece Size"));
+        torrentTrackingPanel.add(labelPieceSize, "aligny top, pushy, gapleft 5, gapright 10, wmin 150px");
+
+        pieceSizeComboBox = new JComboBox(values);
+        torrentTrackingPanel.add(pieceSizeComboBox, "gapright 5, gapleft 80, width 175px");
 
         //suggest DHT by default 
         updateTrackerRelatedControlsAvailability(true);
@@ -286,6 +321,21 @@ public class CreateTorrentDialog extends JDialog {
                 }
             }
         });
+
+        pieceSizeComboBox.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        onPieceSizeSelected(pieceSizeComboBox.getSelectedIndex());
+                    }
+                }
+        );
+    }
+
+    private void onPieceSizeSelected(int selectedIndex) {
+        if (selectedIndex > 0 && values.length > selectedIndex && values[selectedIndex] != null) {
+            pieceSize = values[selectedIndex].kb*_1024BYTES;
+        }
     }
 
     private void updateTrackerRelatedControlsAvailability(boolean useDHT) {
@@ -570,7 +620,7 @@ public class CreateTorrentDialog extends JDialog {
             reportCurrentTask(I18n.tr("Adding files..."));
             libtorrent.add_files(fs, f.getPath());
 
-            create_torrent torrent = new create_torrent(fs);
+            create_torrent torrent = new create_torrent(fs, pieceSize);
             torrent.set_priv(false);
             torrent.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
 
