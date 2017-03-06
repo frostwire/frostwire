@@ -47,9 +47,10 @@ class SocialRecommendationsWindow extends SetupWindow {
         mainPanel.add(new IconButton("SOCIAL_MEDIA_CHECK", 150, 150), "growx, center, span, wrap");
         mainPanel.add(new JLabel(I18n.tr("<html><b>Keep in Touch!</b></html>")),"center, span, wrap, height 40px");
         int socialButtonW = 100;
+
+        mainPanel.add(createSocialButton("SOCIAL_WIZARD_TWITTER" , GUIConstants.TWITTER_FROSTWIRE_URL , socialButtonW), "alignx center");
         mainPanel.add(createSocialButton("SOCIAL_WIZARD_FACEBOOK", GUIConstants.FACEBOOK_FROSTWIRE_URL, socialButtonW), "alignx center");
         mainPanel.add(createSocialButton("SOCIAL_WIZARD_REDDIT"  , GUIConstants.REDDIT_FROSTWIRE_URL  , socialButtonW), "alignx center");
-        mainPanel.add(createSocialButton("SOCIAL_WIZARD_TWITTER" , GUIConstants.TWITTER_FROSTWIRE_URL , socialButtonW), "alignx center");
 
         setSetupComponent(mainPanel);
     }
