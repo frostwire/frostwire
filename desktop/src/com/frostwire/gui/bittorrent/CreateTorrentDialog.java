@@ -17,13 +17,13 @@
 
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.bittorrent.CopyrightLicenseBroker;
+import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.swig.*;
-import com.frostwire.bittorrent.CopyrightLicenseBroker;
-import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.http.HttpClient;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.*;
@@ -37,13 +37,18 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,8 +59,6 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("serial")
 public class CreateTorrentDialog extends JDialog {
-
-    private final static String COMMENT = I18n.tr("Torrent File Created with FrostWire http://www.frostwire.com");
     private boolean create_from_dir;
     private String singlePath = null;
     private String directoryPath = null;
@@ -64,39 +67,39 @@ public class CreateTorrentDialog extends JDialog {
     private final List<String> trackers;
 
     private boolean autoOpen = true;
-    private File _saveDir;
+    private File saveDir;
 
-    private final Container _container;
-    private final JTabbedPane _tabbedPane;
-    private final JPanel _basicTorrentPane;
-    private final JPanel _licensesPane;
-    private final JPanel _paymentsPane;
-    private final CopyrightLicenseSelectorPanel _licenseSelectorPanel;
-    private final PaymentOptionsPanel _paymentOptionsPanel;
+    private final Container container;
+    private final JTabbedPane tabbedPane;
+    private final JPanel basicTorrentPane;
+    private final JPanel licensesPane;
+    private final JPanel paymentsPane;
+    private final CopyrightLicenseSelectorPanel licenseSelectorPanel;
+    private final PaymentOptionsPanel paymentOptionsPanel;
 
-    private LimeTextField _textSelectedContent;
-    private JButton _buttonSelectFile;
+    private LimeTextField textSelectedContent;
+    private JButton buttonSelectFile;
 
     /** Only used on MacOSX, as FileChooser does not support both File and Directory selection. */
-    private JButton _buttonSelectFolder;
-    private JLabel _labelTrackers;
-    private JTextArea _textTrackers;
-    private JCheckBox _checkStartSeeding;
-    private JCheckBox _checkUseDHT;
-    private JTextArea _textWebSeeds;
+    private JButton buttonSelectFolder;
+    private JLabel labelTrackers;
+    private JTextArea textTrackers;
+    private JCheckBox checkStartSeeding;
+    private JCheckBox checkUseDHT;
+    private JTextArea textWebSeeds;
 
-    private JButton _buttonSaveAs;
-    private JProgressBar _progressBar;
+    private JButton buttonSaveAs;
+    private JProgressBar progressBar;
 
     private final Dimension MINIMUM_DIALOG_DIMENSIONS = new Dimension(942, 750);
 
-    private JScrollPane _textTrackersScrollPane;
-    private String _invalidTrackerURL;
-    private JButton _buttonClose;
+    private JScrollPane textTrackersScrollPane;
+    private String invalidTrackerURL;
+    private JButton buttonClose;
 
-    private JComboBox pieceSizeComboBox;
+    private JComboBox<PieceSize> pieceSizeComboBox;
     private int pieceSize;
-    private static final int _1024BYTES = 1024;
+    private static final PieceSize[] values = PieceSize.values();
     private enum PieceSize {
         AUTO_DETECT(0,"(" + I18n.tr("Auto Detect") + ")"),
         _16KB(16),
@@ -109,7 +112,7 @@ public class CreateTorrentDialog extends JDialog {
         _2048KB(2048),
         _4096KB(4096);
 
-        public final int kb;
+        private final int kb;
         private final String humanRep;
 
         PieceSize(int k, String rep) {
@@ -121,25 +124,28 @@ public class CreateTorrentDialog extends JDialog {
             this(k, k + " kB");
         }
 
+        public int bytes() {
+            return kb * 1024;
+        }
+
         @Override
         public String toString() {
             return humanRep;
         }
     }
-    private static final PieceSize[] values = PieceSize.values();
 
     public CreateTorrentDialog(JFrame frame) {
         super(frame);
-        trackers = new ArrayList<String>();
+        trackers = new ArrayList<>();
 
-        _container = getContentPane();
-        _tabbedPane = new JTabbedPane();
+        container = getContentPane();
+        tabbedPane = new JTabbedPane();
 
-        _basicTorrentPane = new JPanel();
-        _licensesPane = new JPanel();
-        _paymentsPane = new JPanel();
-        _licenseSelectorPanel = new CopyrightLicenseSelectorPanel();
-        _paymentOptionsPanel = new PaymentOptionsPanel();
+        basicTorrentPane = new JPanel();
+        licensesPane = new JPanel();
+        paymentsPane = new JPanel();
+        licenseSelectorPanel = new CopyrightLicenseSelectorPanel();
+        paymentOptionsPanel = new PaymentOptionsPanel();
 
         initContainersLayouts();
         initComponents();
@@ -148,20 +154,20 @@ public class CreateTorrentDialog extends JDialog {
     }
 
     private void initContainersLayouts() {
-        _container.setLayout(new MigLayout("fill, insets 3px 3px 3px 3px"));
-        _basicTorrentPane.setLayout(new MigLayout("fill"));
-        _licensesPane.setLayout(new MigLayout("fill"));
-        _paymentsPane.setLayout(new MigLayout("fill"));
+        container.setLayout(new MigLayout("fill, insets 3px 3px 3px 3px"));
+        basicTorrentPane.setLayout(new MigLayout("fill"));
+        licensesPane.setLayout(new MigLayout("fill"));
+        paymentsPane.setLayout(new MigLayout("fill"));
     }
 
     private void initTabbedPane() {
-        _container.add(_tabbedPane, "grow, pushy, wrap");
-        _licensesPane.add(_licenseSelectorPanel, "grow");
-        _paymentsPane.add(_paymentOptionsPanel, "grow");
+        container.add(tabbedPane, "grow, pushy, wrap");
+        licensesPane.add(licenseSelectorPanel, "grow");
+        paymentsPane.add(paymentOptionsPanel, "grow");
         
-        _tabbedPane.addTab("1. " + I18n.tr("Contents and Tracking"), _basicTorrentPane);
-        _tabbedPane.addTab("2. " + I18n.tr("Copyright License"), _licensesPane);
-        _tabbedPane.addTab("3. " + I18n.tr("Payments/Tips"), _paymentsPane);
+        tabbedPane.addTab("1. " + I18n.tr("Contents and Tracking"), basicTorrentPane);
+        tabbedPane.addTab("2. " + I18n.tr("Copyright License"), licensesPane);
+        tabbedPane.addTab("3. " + I18n.tr("Payments/Tips"), paymentsPane);
     }
 
     private void initComponents() {
@@ -185,72 +191,72 @@ public class CreateTorrentDialog extends JDialog {
         //setMaximumSize(MINIMUM_DIALOG_DIMENSIONS);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setModalityType(ModalityType.APPLICATION_MODAL);
-        GUIUtils.addHideAction((JComponent) _container);
+        GUIUtils.addHideAction((JComponent) container);
     }
 
     private void initTorrentContents() {
         JPanel torrentContentsPanel = new JPanel(new MigLayout("fillx, wrap 1", "[]"));
         GUIUtils.setTitledBorderOnPanel(torrentContentsPanel, I18n.tr("Torrent Contents"));
-        _textSelectedContent = new LimeTextField();
-        _textSelectedContent.setEditable(false);
-        _textSelectedContent.setToolTipText(I18n.tr("These box shows the contents you've selected for your new .torrent.\nEither a file, or the contents of a folder."));
-        torrentContentsPanel.add(_textSelectedContent, "north, growx, gap 5 5 0 0, wrap");
+        textSelectedContent = new LimeTextField();
+        textSelectedContent.setEditable(false);
+        textSelectedContent.setToolTipText(I18n.tr("These box shows the contents you've selected for your new .torrent.\nEither a file, or the contents of a folder."));
+        torrentContentsPanel.add(textSelectedContent, "north, growx, gap 5 5 0 0, wrap");
 
         JPanel contentSelectionButtonsPanel = new JPanel(new MigLayout("ins 0, nogrid, fillx, wrap 1",""));
-        _buttonSelectFile = new JButton(I18n.tr("Select File"));
-        _buttonSelectFile.setToolTipText(I18n.tr("Click here to select a single file as the content indexed by your new .torrent"));
-        _buttonSelectFolder = new JButton(I18n.tr("Select Folder"));
-        _buttonSelectFolder.setToolTipText(I18n.tr("Click here to select a folder as the content indexed by your new .torrent"));
+        buttonSelectFile = new JButton(I18n.tr("Select File"));
+        buttonSelectFile.setToolTipText(I18n.tr("Click here to select a single file as the content indexed by your new .torrent"));
+        buttonSelectFolder = new JButton(I18n.tr("Select Folder"));
+        buttonSelectFolder.setToolTipText(I18n.tr("Click here to select a folder as the content indexed by your new .torrent"));
 
-        contentSelectionButtonsPanel.add(_buttonSelectFile, "align right, width 175px, gaptop 5, gapright 5, gapbottom 5");
-        contentSelectionButtonsPanel.add(_buttonSelectFolder, "align right, width 175px, gaptop 5, gapright 5, gapbottom 5");
+        contentSelectionButtonsPanel.add(buttonSelectFile, "align right, width 175px, gaptop 5, gapright 5, gapbottom 5");
+        contentSelectionButtonsPanel.add(buttonSelectFolder, "align right, width 175px, gaptop 5, gapright 5, gapbottom 5");
         torrentContentsPanel.add(contentSelectionButtonsPanel,"width 380px, align right, gaptop 5, gapright 5, gapbottom 5");
 
-        _basicTorrentPane.add(torrentContentsPanel, "growx, wrap");
+        basicTorrentPane.add(torrentContentsPanel, "growx, wrap");
     }
 
     private void initTorrentTracking() {
         JPanel torrentTrackingPanel = new JPanel(new MigLayout("fill"));
         GUIUtils.setTitledBorderOnPanel(torrentTrackingPanel, I18n.tr("Torrent Properties"));
 
-        _checkUseDHT = new JCheckBox(I18n.tr("Trackerless Torrent (DHT)"), true);
-        _checkUseDHT.setToolTipText(I18n.tr("Select this option to create torrents that don't need trackers, completely descentralized. (Recommended)"));
-        torrentTrackingPanel.add(_checkUseDHT, "align left, gapleft 5");
+        checkUseDHT = new JCheckBox(I18n.tr("Trackerless Torrent (DHT)"), true);
+        checkUseDHT.setToolTipText(I18n.tr("Select this option to create torrents that don't need trackers, completely descentralized. (Recommended)"));
+        torrentTrackingPanel.add(checkUseDHT, "align left, gapleft 5");
 
-        _checkStartSeeding = new JCheckBox(I18n.tr("Start seeding"), true);
-        _checkStartSeeding.setToolTipText(I18n
+        checkStartSeeding = new JCheckBox(I18n.tr("Start seeding"), true);
+        checkStartSeeding.setToolTipText(I18n
                 .tr("Announce yourself as a seed for the content indexed by this torrent as soon as it's created.\nIf nobody is seeding the torrent won't work. (Recommended)"));
-        torrentTrackingPanel.add(_checkStartSeeding, "align right, gapright 10, wrap");
+        torrentTrackingPanel.add(checkStartSeeding, "align right, gapright 10, wrap");
 
-        _labelTrackers = new JLabel("<html><p>" + I18n.tr("Tracker Announce URLs") + "</p><p>(" + I18n.tr("One tracker per line") + ")</p></html>");
-        _labelTrackers.setToolTipText(I18n.tr("Enter a list of valid BitTorrent Tracker Server URLs.\nYour new torrent will be announced to these trackers if you start seeding the torrent."));
-        torrentTrackingPanel.add(_labelTrackers, "aligny top, pushy, growx 40, gapleft 5, gapright 10, wmin 150px");
+        labelTrackers = new JLabel("<html><p>" + I18n.tr("Tracker Announce URLs") + "</p><p>(" + I18n.tr("One tracker per line") + ")</p></html>");
+        labelTrackers.setToolTipText(I18n.tr("Enter a list of valid BitTorrent Tracker Server URLs.\nYour new torrent will be announced to these trackers if you start seeding the torrent."));
+        torrentTrackingPanel.add(labelTrackers, "aligny top, pushy, growx 40, gapleft 5, gapright 10, wmin 150px");
 
-        _textTrackers = new JTextArea(10, 70);
-        ThemeMediator.fixKeyStrokes(_textTrackers);
-        _textTrackers.setToolTipText(_labelTrackers.getToolTipText());
-        _textTrackers.setLineWrap(false);
-        _textTrackers.setText("udp://open.demonii.com:1337\nudp://tracker.coppersurfer.tk:6969\nudp://tracker.leechers-paradise.org:6969\nudp://exodus.desync.com:6969\nudp://tracker.pomf.se");
-        _textTrackersScrollPane = new JScrollPane(_textTrackers);
-        torrentTrackingPanel.add(_textTrackersScrollPane, "gapright 5, gapleft 80, gapbottom 5, hmin 165px, growx 60, growy, wrap");
+        textTrackers = new JTextArea(10, 70);
+        ThemeMediator.fixKeyStrokes(textTrackers);
+        textTrackers.setToolTipText(labelTrackers.getToolTipText());
+        textTrackers.setLineWrap(false);
+        textTrackers.setText("udp://open.demonii.com:1337\nudp://tracker.coppersurfer.tk:6969\nudp://tracker.leechers-paradise.org:6969\nudp://exodus.desync.com:6969\nudp://tracker.pomf.se");
+        textTrackersScrollPane = new JScrollPane(textTrackers);
+        torrentTrackingPanel.add(textTrackersScrollPane, "gapright 5, gapleft 80, gapbottom 5, hmin 165px, growx 60, growy, wrap");
 
         JLabel _labelWebseeds = new JLabel(I18n.tr("Web Seeds Mirror URLs"));
         _labelWebseeds.setToolTipText(I18n.tr("If these files can be downloaded from the web, enter the URLs of each possible mirror, one per line (GetRight style)."));
         torrentTrackingPanel.add(_labelWebseeds, "aligny top, pushy, gapleft 5, gapright 10, wmin 150px");
 
-        _textWebSeeds = new JTextArea(4, 70);
-        ThemeMediator.fixKeyStrokes(_textWebSeeds);
-        torrentTrackingPanel.add(new JScrollPane(_textWebSeeds), "gapright 5, gapleft 80, gapbottom 5, hmin 165px, growx 60, growy, wrap");
+        textWebSeeds = new JTextArea(4, 70);
+        ThemeMediator.fixKeyStrokes(textWebSeeds);
+        torrentTrackingPanel.add(new JScrollPane(textWebSeeds), "gapright 5, gapleft 80, gapbottom 5, hmin 165px, growx 60, growy, wrap");
 
         JLabel labelPieceSize = new JLabel(I18n.tr("Piece Size"));
         torrentTrackingPanel.add(labelPieceSize, "aligny top, pushy, gapleft 5, gapright 10, wmin 150px");
 
-        pieceSizeComboBox = new JComboBox(values);
+        pieceSizeComboBox = new JComboBox<>(values);
         torrentTrackingPanel.add(pieceSizeComboBox, "gapright 5, gapleft 80, width 175px");
 
         //suggest DHT by default 
         updateTrackerRelatedControlsAvailability(true);
-        _basicTorrentPane.add(torrentTrackingPanel, "grow, push");
+        basicTorrentPane.add(torrentTrackingPanel, "grow, push");
     }
 
     private void initSaveCloseButtons() {
@@ -258,24 +264,24 @@ public class CreateTorrentDialog extends JDialog {
         buttonContainer.setLayout(new MigLayout("fillx, insets 5 5 5 5"));
 
         //first button will dock all the way east,
-        _buttonSaveAs = new JButton(I18n.tr("Save torrent as..."));
-        buttonContainer.add(_buttonSaveAs, "pushx, alignx right, gapleft 5");
+        buttonSaveAs = new JButton(I18n.tr("Save torrent as..."));
+        buttonContainer.add(buttonSaveAs, "pushx, alignx right, gapleft 5");
 
         //then this one will dock east (west of) the next to the existing component
-        _buttonClose = new JButton(I18n.tr("Close"));
-        buttonContainer.add(_buttonClose, "alignx right, gapright 5");
+        buttonClose = new JButton(I18n.tr("Close"));
+        buttonContainer.add(buttonClose, "alignx right, gapright 5");
 
-        _container.add(buttonContainer, "alignx right, pushx");
+        container.add(buttonContainer, "alignx right, pushx");
     }
 
     private void initProgressBar() {
-        _progressBar = new JProgressBar(0, 100);
-        _progressBar.setStringPainted(true);
-        _container.add(_progressBar, "growx, gap 5px 0, wrap");
+        progressBar = new JProgressBar(0, 100);
+        progressBar.setStringPainted(true);
+        container.add(progressBar, "growx, gap 5px 0, wrap");
     }
 
     private void buildListeners() {
-        _buttonSelectFile.addActionListener(new ActionListener() {
+        buttonSelectFile.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -283,21 +289,21 @@ public class CreateTorrentDialog extends JDialog {
             }
         });
 
-        _buttonSelectFolder.addActionListener(new ActionListener() {
+        buttonSelectFolder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onButtonSelectFolder();
             }
         });
 
-        _buttonClose.addActionListener(new ActionListener() {
+        buttonClose.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onButtonClose(e);
             }
         });
 
-        _buttonSaveAs.addActionListener(new ActionListener() {
+        buttonSaveAs.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -305,19 +311,19 @@ public class CreateTorrentDialog extends JDialog {
             }
         });
 
-        _checkUseDHT.addChangeListener(new ChangeListener() {
+        checkUseDHT.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent arg0) {
-                boolean useDHT = _checkUseDHT.isSelected();
+                boolean useDHT = checkUseDHT.isSelected();
                 updateTrackerRelatedControlsAvailability(useDHT);
             }
         });
 
-        _textTrackers.addMouseListener(new MouseAdapter() {
+        textTrackers.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (_checkUseDHT.isSelected()) {
-                    _checkUseDHT.setSelected(false);
+                if (checkUseDHT.isSelected()) {
+                    checkUseDHT.setSelected(false);
                 }
             }
         });
@@ -334,20 +340,20 @@ public class CreateTorrentDialog extends JDialog {
 
     private void onPieceSizeSelected(int selectedIndex) {
         if (selectedIndex > 0 && values.length > selectedIndex && values[selectedIndex] != null) {
-            pieceSize = values[selectedIndex].kb*_1024BYTES;
+            pieceSize = values[selectedIndex].bytes();
         }
     }
 
     private void updateTrackerRelatedControlsAvailability(boolean useDHT) {
-        _labelTrackers.setEnabled(!useDHT);
-        _textTrackers.setEnabled(!useDHT);
-        _textTrackersScrollPane.setEnabled(!useDHT);
-        _textTrackersScrollPane.getHorizontalScrollBar().setEnabled(!useDHT);
-        _textTrackersScrollPane.getVerticalScrollBar().setEnabled(!useDHT);
-        _labelTrackers.setForeground(useDHT ? Color.GRAY : Color.BLACK);
+        labelTrackers.setEnabled(!useDHT);
+        textTrackers.setEnabled(!useDHT);
+        textTrackersScrollPane.setEnabled(!useDHT);
+        textTrackersScrollPane.getHorizontalScrollBar().setEnabled(!useDHT);
+        textTrackersScrollPane.getVerticalScrollBar().setEnabled(!useDHT);
+        labelTrackers.setForeground(useDHT ? Color.GRAY : Color.BLACK);
     }
 
-    void onButtonClose(ActionEvent e) {
+    private void onButtonClose(ActionEvent e) {
         GUIUtils.getDisposeAction().actionPerformed(e);
     }
 
@@ -395,7 +401,7 @@ public class CreateTorrentDialog extends JDialog {
     public void setChosenContent(File chosenFile, int fileChoosingMode) {
         // if we don't have read permissions on that file/folder...
         if (!chosenFile.canRead()) {
-            _textSelectedContent.setText(I18n.tr("Error: You can't read on that file/folder."));
+            textSelectedContent.setText(I18n.tr("Error: You can't read on that file/folder."));
             return;
         }
 
@@ -406,7 +412,7 @@ public class CreateTorrentDialog extends JDialog {
 
     private void displayChosenContent(File chosenFile) {
         String prefix = (chosenFile.isFile()) ? "[file] " : "[folder] ";
-        _textSelectedContent.setText(prefix + chosenFile.getAbsolutePath());
+        textSelectedContent.setText(prefix + chosenFile.getAbsolutePath());
     }
 
     private void setTorrentPathFromChosenFile(File chosenFile) {
@@ -440,24 +446,24 @@ public class CreateTorrentDialog extends JDialog {
     }
 
 
-    void onContentSelectionButton(int onContentSelectionButton) {
+    private void onContentSelectionButton(int onContentSelectionButton) {
         showFileChooser(onContentSelectionButton);
         revertSaveCloseButtons();
     }
 
-    void onButtonSelectFile() {
+    private void onButtonSelectFile() {
             onContentSelectionButton(JFileChooser.FILES_ONLY);
     }
 
-    void onButtonSelectFolder() {
+    private void onButtonSelectFolder() {
         onContentSelectionButton(JFileChooser.DIRECTORIES_ONLY);
     }
 
-    void onButtonSaveAs() {
+    private void onButtonSaveAs() {
         //Make sure a readable file or folder has been selected.
         if (singlePath == null && directoryPath == null) {
             JOptionPane.showMessageDialog(this, I18n.tr("Please select a file or a folder.\nYour new torrent will need content to index."), I18n.tr("Something's missing"), JOptionPane.ERROR_MESSAGE);
-            _tabbedPane.setSelectedIndex(0);
+            tabbedPane.setSelectedIndex(0);
             return;
         }
 
@@ -467,18 +473,18 @@ public class CreateTorrentDialog extends JDialog {
             ((fileArray = new File(directoryPath).listFiles()) != null) &&
             fileArray.length == 0) {
             JOptionPane.showMessageDialog(this, I18n.tr("The folder you selected is empty."), I18n.tr("Invalid Folder"), JOptionPane.ERROR_MESSAGE);
-            _tabbedPane.setSelectedIndex(0);
+            tabbedPane.setSelectedIndex(0);
             return;
         }
 
         //if it's not tracker-less make sure we have valid tracker urls
-        boolean useTrackers = !_checkUseDHT.isSelected();
+        boolean useTrackers = !checkUseDHT.isSelected();
         if (useTrackers) {
             if (!validateAndFixTrackerURLS()) {
-                if (_invalidTrackerURL == null) {
-                    _invalidTrackerURL = "";
+                if (invalidTrackerURL == null) {
+                    invalidTrackerURL = "";
                 }
-                JOptionPane.showMessageDialog(this, I18n.tr("Check again your tracker URL(s).\n" + _invalidTrackerURL), I18n.tr("Invalid Tracker URL\n"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, I18n.tr("Check again your tracker URL(s).\n" + invalidTrackerURL), I18n.tr("Invalid Tracker URL\n"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
         } else {
@@ -486,7 +492,7 @@ public class CreateTorrentDialog extends JDialog {
         }
 
         //Whether or not to start seeding this torrent right away
-        autoOpen = _checkStartSeeding.isSelected();
+        autoOpen = checkStartSeeding.isSelected();
 
         //show save as dialog
         if (!showSaveAsDialog()) {
@@ -499,7 +505,7 @@ public class CreateTorrentDialog extends JDialog {
             public void run() {
                 if (makeTorrent()) {
                     revertSaveCloseButtons();
-                    _progressBar.setString(I18n.tr("Torrent Created."));
+                    progressBar.setString(I18n.tr("Torrent Created."));
 
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -511,7 +517,7 @@ public class CreateTorrentDialog extends JDialog {
                     if (autoOpen) {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                GUIMediator.instance().openTorrentForSeed(new File(dotTorrentSavePath), _saveDir);
+                                GUIMediator.instance().openTorrentForSeed(new File(dotTorrentSavePath), saveDir);
                             }
                         });
                     }
@@ -557,7 +563,7 @@ public class CreateTorrentDialog extends JDialog {
     }
 
     private boolean validateAndFixTrackerURLS() {
-        String trackersText = _textTrackers.getText();
+        String trackersText = textTrackers.getText();
         if (trackersText == null || trackersText.length() == 0) {
             return false;
         }
@@ -566,7 +572,7 @@ public class CreateTorrentDialog extends JDialog {
         Pattern pattern = Pattern.compile(patternStr);
 
         String[] tracker_urls = trackersText.split("\n");
-        List<String> valid_tracker_urls = new ArrayList<String>();
+        List<String> valid_tracker_urls = new ArrayList<>();
 
         for (String tracker_url : tracker_urls) {
 
@@ -583,7 +589,7 @@ public class CreateTorrentDialog extends JDialog {
 
             Matcher matcher = pattern.matcher(tracker_url.trim());
             if (!matcher.matches()) {
-                _invalidTrackerURL = tracker_url.trim();
+                invalidTrackerURL = tracker_url.trim();
                 return false;
             } else {
                 valid_tracker_urls.add(tracker_url.trim());
@@ -595,7 +601,7 @@ public class CreateTorrentDialog extends JDialog {
         //update the trackers list of lists
         trackers.clear();
         trackers.addAll(valid_tracker_urls);
-        _invalidTrackerURL = null;
+        invalidTrackerURL = null;
         return true;
     }
 
@@ -607,11 +613,11 @@ public class CreateTorrentDialog extends JDialog {
             builder.append("\n");
         }
 
-        _textTrackers.setText(builder.toString());
+        textTrackers.setText(builder.toString());
     }
 
-    boolean makeTorrent() {
-        boolean result = false;
+    private boolean makeTorrent() {
+        boolean result;
         disableSaveCloseButtons();
         File f = new File((create_from_dir) ? directoryPath : singlePath);
 
@@ -631,36 +637,34 @@ public class CreateTorrentDialog extends JDialog {
                 }
             }
 
-            if (torrent != null) {
-                if (addAvailableWebSeeds(torrent, create_from_dir)) {
-                    reportCurrentTask(I18n.tr("Calculating piece hashes..."));
-                    _saveDir = f.getParentFile();
-                    error_code ec = new error_code();
-                    libtorrent.set_piece_hashes(torrent, _saveDir.getAbsolutePath(), ec);
-                    reportCurrentTask(I18n.tr("Generating torrent entry..."));
+            if (addAvailableWebSeeds(torrent, create_from_dir)) {
+                reportCurrentTask(I18n.tr("Calculating piece hashes..."));
+                saveDir = f.getParentFile();
+                error_code ec = new error_code();
+                libtorrent.set_piece_hashes(torrent, saveDir.getAbsolutePath(), ec);
+                reportCurrentTask(I18n.tr("Generating torrent entry..."));
 
-                    Entry entry = new Entry(torrent.generate());
-                    Map<String, Entry> entryMap = entry.dictionary();
-                    addAvailablePaymentOptions(entryMap);
-                    addAvailableCopyrightLicense(entryMap);
+                Entry entry = new Entry(torrent.generate());
+                Map<String, Entry> entryMap = entry.dictionary();
+                addAvailablePaymentOptions(entryMap);
+                addAvailableCopyrightLicense(entryMap);
 
-                    final File torrent_file = new File(dotTorrentSavePath);
-                    reportCurrentTask(I18n.tr("Saving torrent to disk..."));
+                final File torrent_file = new File(dotTorrentSavePath);
+                reportCurrentTask(I18n.tr("Saving torrent to disk..."));
 
-                    Entry entryFromUpdatedMap = entryFromMap(entryMap);
-                    final byte[] bencoded_torrent_bytes = entryFromUpdatedMap.bencode();
-                    FileOutputStream fos = new FileOutputStream(torrent_file);
-                    BufferedOutputStream bos = new BufferedOutputStream(fos);
-                    bos.write(bencoded_torrent_bytes);
-                    bos.flush();
-                    bos.close();
-                    result = true;
-                    reportCurrentTask("");
-                } else {
-                    result = false;
-                    revertSaveCloseButtons();
-                    _textWebSeeds.selectAll();
-                }
+                Entry entryFromUpdatedMap = entryFromMap(entryMap);
+                final byte[] bencoded_torrent_bytes = entryFromUpdatedMap.bencode();
+                FileOutputStream fos = new FileOutputStream(torrent_file);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                bos.write(bencoded_torrent_bytes);
+                bos.flush();
+                bos.close();
+                result = true;
+                reportCurrentTask("");
+            } else {
+                result = false;
+                revertSaveCloseButtons();
+                textWebSeeds.selectAll();
             }
         } catch (Throwable e) {
             result = false;
@@ -673,7 +677,7 @@ public class CreateTorrentDialog extends JDialog {
     }
 
     // TODO: Add this fix to Entry.fromMap() on jlibtorrent and delete this.
-    static Entry entryFromMap(Map<?, ?> map) {
+    private static Entry entryFromMap(Map<?, ?> map) {
         entry e = new entry(entry.data_type.dictionary_t);
 
         string_entry_map d = e.dict();
@@ -703,8 +707,8 @@ public class CreateTorrentDialog extends JDialog {
 
     private boolean addAvailableWebSeeds(create_torrent torrent, boolean isMultiFile) {
         boolean result = true;
-	    if (_textWebSeeds.getText().length() > 0) {
-	       List<String> mirrors = Arrays.asList(_textWebSeeds.getText().split("\n"));
+	    if (textWebSeeds.getText().length() > 0) {
+	       List<String> mirrors = Arrays.asList(textWebSeeds.getText().split("\n"));
 	       
 	       if (!mirrors.isEmpty()) {
 	           //check just the first file on all mirrors.
@@ -738,8 +742,8 @@ public class CreateTorrentDialog extends JDialog {
         GUIMediator.safeInvokeLater(new Runnable() {
             @Override
             public void run() {
-                String text = _textWebSeeds.getText();
-                _textWebSeeds.setText(text.replaceAll(mirror, mirror + "/"));
+                String text = textWebSeeds.getText();
+                textWebSeeds.setText(text.replaceAll(mirror, mirror + "/"));
             }
         });
     }
@@ -782,8 +786,8 @@ public class CreateTorrentDialog extends JDialog {
     }
 
     private void addAvailableCopyrightLicense(final Map<String, Entry> entryMap) {
-        if (_licenseSelectorPanel.hasConfirmedRightfulUseOfLicense()) {
-            CopyrightLicenseBroker license = _licenseSelectorPanel.getLicenseBroker();
+        if (licenseSelectorPanel.hasConfirmedRightfulUseOfLicense()) {
+            CopyrightLicenseBroker license = licenseSelectorPanel.getLicenseBroker();
             if (license != null) {
                 final Map<String, Entry> info = entryMap.get("info").dictionary();
                 info.put("license", Entry.fromMap(license.asMap()));
@@ -793,8 +797,8 @@ public class CreateTorrentDialog extends JDialog {
     }
 
     private void addAvailablePaymentOptions(final Map<String, Entry> entryMap) {
-        if (_paymentOptionsPanel.hasPaymentOptions()) {
-            PaymentOptions paymentOptions = _paymentOptionsPanel.getPaymentOptions();
+        if (paymentOptionsPanel.hasPaymentOptions()) {
+            PaymentOptions paymentOptions = paymentOptionsPanel.getPaymentOptions();
             if (paymentOptions != null) {
                 final Map<String, Entry> info = entryMap.get("info").dictionary();
                 info.put("paymentOptions", Entry.fromMap(paymentOptions.asMap()));
@@ -804,9 +808,9 @@ public class CreateTorrentDialog extends JDialog {
     }
 
     private void revertSaveCloseButtons() {
-        _buttonSaveAs.setText(I18n.tr("Save torrent as..."));
-        _buttonSaveAs.setEnabled(true);
-        _buttonClose.setEnabled(true);
+        buttonSaveAs.setText(I18n.tr("Save torrent as..."));
+        buttonSaveAs.setEnabled(true);
+        buttonClose.setEnabled(true);
     }
 
     /**
@@ -816,9 +820,9 @@ public class CreateTorrentDialog extends JDialog {
     private void disableSaveCloseButtons() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                _buttonSaveAs.setText(I18n.tr("Saving Torrent..."));
-                _buttonSaveAs.setEnabled(false);
-                _buttonClose.setEnabled(false);
+                buttonSaveAs.setText(I18n.tr("Saving Torrent..."));
+                buttonSaveAs.setEnabled(false);
+                buttonClose.setEnabled(false);
             }
         });
     }
@@ -834,21 +838,11 @@ public class CreateTorrentDialog extends JDialog {
         });
     }
 
-    public void reportProgress(final int percent_complete) {
+    private void reportCurrentTask(final String task_description) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                System.out.println("reportProgress: " + percent_complete);
-                _progressBar.setValue(percent_complete);
-            }
-        });
-    }
-
-    public void reportCurrentTask(final String task_description) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                _progressBar.setString(task_description);
+                progressBar.setString(task_description);
             }
         });
     }
