@@ -59,7 +59,10 @@ public final class BTEngine extends SessionManager {
 
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
     private static final String STATE_VERSION_KEY = "state_version";
-    private static final String STATE_VERSION_VALUE = "1.2.0.6-RC4";
+    // this constant only changes when the libtorrent settings_pack ABI is
+    // incompatible with the previous version, it should only happen from
+    // time to time, not in every version
+    private static final String STATE_VERSION_VALUE = "1.2.0.6";
     public static BTContext ctx;
 
     private final InnerListener innerListener;
