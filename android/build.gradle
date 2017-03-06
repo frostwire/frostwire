@@ -157,6 +157,7 @@ dependencies {
     compile("com.mopub:mopub-sdk-banner:4.11.0@aar") { transitive = true }
     compile("com.mopub:mopub-sdk-interstitial:4.11.0@aar") { transitive = true }
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'org.nanohttpd:nanohttpd:2.3.1'
 
     compile "com.frostwire:jlibtorrent-android-arm:1.2.0.6-RC4"
     compile "com.frostwire:jlibtorrent-android-x86:1.2.0.6-RC4"
