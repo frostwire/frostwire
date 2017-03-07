@@ -63,6 +63,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private ListAdapterFilter<T> filter;
     private boolean checkboxesVisibility;
     private boolean showMenuOnClick;
+    private boolean showMenuOnLongClick;
 
     private final List<Dialog> dialogs;
 
@@ -335,6 +336,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         this.showMenuOnClick = showMenuOnClick;
     }
 
+    public boolean getShowMenuOnLongClick() {
+        return showMenuOnLongClick;
+    }
+
+    public void setShowMenuOnLongClick(boolean showMenuOnLongClick) {
+        this.showMenuOnLongClick = showMenuOnLongClick;
+    }
+
     /**
      * Implement this method to refresh the UI contents of the List Item with the data.
      */
@@ -389,6 +398,17 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
     }
 
+    protected void changeCheckboxStateForItem(T item, boolean state) {
+        if (item != null) {
+            if (state && !checked.contains(item)) {
+                checked.add(item);
+            } else {
+                checked.remove(item);
+            }
+        }
+        onItemCheckedListener.onItemChecked(null, item, state);
+        notifyDataSetChanged();
+    }
 
     private void updateLastRadioButtonChecked(int position) {
         lastSelectedRadioButtonIndex = position;
@@ -538,10 +558,12 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     private final class ViewOnLongClickListener implements OnLongClickListener {
         public boolean onLongClick(View v) {
-            MenuAdapter adapter = getMenuAdapter(v);
-            if (adapter != null && adapter.getCount() > 0) {
-                trackDialog(new MenuBuilder(adapter).show());
-                return true;
+            if (showMenuOnLongClick) {
+                MenuAdapter adapter = getMenuAdapter(v);
+                if (adapter != null && adapter.getCount() > 0) {
+                    trackDialog(new MenuBuilder(adapter).show());
+                    return true;
+                }
             }
             return onItemLongClicked(v);
         }

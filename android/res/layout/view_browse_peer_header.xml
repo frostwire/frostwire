@@ -18,22 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:baselineAligned="false" >
+    android:focusableInTouchMode="true"
+    android:orientation="horizontal">
+
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/view_browse_peer_header_text_container"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:paddingRight="30dip" >
+        android:layout_marginLeft="5dp"
+        android:layout_gravity="center_vertical">
 
         <TextView
             android:id="@+id/view_browse_peer_header_text_title"
             style="@style/MainFragmentSimpleHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="@string/dummy_title" />
 
         <TextView
@@ -41,9 +47,85 @@
             style="@style/BrowsePeerFragmentFileCounterHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:maxLines="1"
             android:layout_marginLeft="5dip"
             android:text="@null" />
     </LinearLayout>
 
-</RelativeLayout>
+
+    <!--todo move to style-->
+    <EditText
+        android:id="@+id/view_browse_peer_header_search_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/basic_white"
+        android:hint="@string/type_here_to_filter"
+        android:textColorHint="@color/basic_gray_dark"
+        android:textCursorDrawable="@null"
+        android:background="@null"
+        android:imeOptions="actionDone"
+        android:maxLines="1"
+        android:inputType="textNoSuggestions" />
+
+
+    <LinearLayout
+        android:id="@+id/view_browse_peer_header_button_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="3dp"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/view_browse_peer_header_search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="5dp"
+            android:contentDescription="@null"
+            android:src="@drawable/action_bar_search" />
+
+        <ImageView
+            android:id="@+id/view_browse_peer_header_action_button_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="5dp"
+            android:contentDescription="@null"
+            android:visibility="gone"
+            android:src="@drawable/action_bar_search" />
+
+        <ImageView
+            android:id="@+id/view_browse_peer_header_action_button_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="5dp"
+            android:contentDescription="@null"
+            android:visibility="gone"
+            android:src="@drawable/action_bar_search" />
+
+        <ImageView
+            android:id="@+id/view_browse_peer_header_menu_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="5dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_menu_moreoverflow" />
+
+        <ImageView
+            android:id="@+id/view_browse_peer_header_check_mode_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="5dp"
+            android:contentDescription="@null"
+            android:src="@drawable/action_bar_checkbox" />
+
+    </LinearLayout>
+
+</LinearLayout>
+

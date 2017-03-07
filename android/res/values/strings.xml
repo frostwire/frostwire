@@ -679,4 +679,6 @@
     <string name="vpn_drop_protection_title">VPN-Drop Protection</string>
     <string name="vpn_drop_protection_summary">Protect your privacy. Automatically disable BitTorrent transfers unless an encrypted VPN connection is active</string>
     <string name="dismiss">Dismiss</string>
+    <string name="checkmode_hint_message">You can also enter the selection mode by pressing and holding one of the items</string>
+    <string name="checkmode_invalid_type_message">You cannot select multiple ringtones</string>
 </resources>

@@ -38,7 +38,13 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.*;
+import com.frostwire.android.gui.views.AbstractListAdapter;
+import com.frostwire.android.gui.views.BrowseThumbnailImageButton;
+import com.frostwire.android.gui.views.ListAdapterFilter;
+import com.frostwire.android.gui.views.MediaPlaybackOverlay;
+import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.gui.views.MenuAdapter;
+import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
@@ -50,7 +56,13 @@ import com.frostwire.uxstats.UXStats;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -66,7 +78,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     private final byte fileType;
     private final ImageLoader thumbnailLoader;
+    private boolean checkState = false;
     private final DownloadButtonClickListener downloadButtonClickListener;
+    private final DownloadButtonLongClickListener downloadButtonLongClickListener;
 
     protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType) {
         super(context, R.layout.view_browse_thumbnail_peer_list_item, convertFiles(files));
@@ -78,9 +92,12 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         this.fileType = fileType;
         this.thumbnailLoader = ImageLoader.getInstance(context);
         this.downloadButtonClickListener = new DownloadButtonClickListener();
+        this.downloadButtonLongClickListener = new DownloadButtonLongClickListener();
+        this.setShowMenuOnClick(false);
+        this.setShowMenuOnLongClick(false);
 
         checkSDStatus();
-        setCheckboxesVisibility(fileType != Constants.FILE_TYPE_RINGTONES);
+        setCheckboxesVisibility(fileType != Constants.FILE_TYPE_RINGTONES && checkState);
     }
 
     public byte getFileType() {
@@ -89,10 +106,31 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     @Override
     protected final void populateView(View view, FileDescriptorItem item) {
+
+        FileDescriptor fd = item.fd;
+
+        BrowseThumbnailImageButton fileThumbnail = findView(view, R.id.view_browse_peer_list_item_file_thumbnail);
+        fileThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        fileThumbnail.setTag(fd);
+        fileThumbnail.setOnClickListener(downloadButtonClickListener);
+        fileThumbnail.setOnLongClickListener(downloadButtonLongClickListener);
+
+        TextView title = findView(view, R.id.view_browse_peer_list_item_file_title);
+        title.setText(fd.title);
+
+        TextView fileSize = findView(view, R.id.view_browse_peer_list_item_file_size);
+        fileSize.setText(UIUtils.getBytesInHuman(fd.fileSize));
+
+        populateSDState(view, item);
+
+        populateSingleMenuIcon(view);
+
+
         if (hasThumbnailView()) {
-            populateViewThumbnail(view, item);
+            populateViewThumbnail(view, fd, fileThumbnail);
         } else {
-            populateViewPlain(view, item);
+            populateViewPlain(view, fd, fileThumbnail);
         }
     }
 
@@ -100,21 +138,27 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return !in(fileType, Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_TORRENTS);
     }
 
-    @Override
-    protected MenuAdapter getMenuAdapter(View view) {
+    //move up?
+    public void setCheckState(boolean state) {
+        checkState = state;
+        setCheckboxesVisibility(fileType != Constants.FILE_TYPE_RINGTONES && checkState);
+    }
+
+    public void showMenuForSelectedItems(int x, int y) {
+        showMenuForSelectedItems(null, x, y);
+    }
+
+    public MenuAdapter getMenuForSelectedItems() {
+        if (checked.size() > 0) {
+            return getMenuAdapter(checked.iterator().next().fd, false);
+        }
+        return null;
+    }
+
+    private MenuAdapter getMenuAdapter(FileDescriptor fd, boolean forceSingle) {
         Context context = getContext();
 
         List<MenuAction> items = new ArrayList<>();
-
-        // due to long click generic handle
-        FileDescriptor fd = null;
-
-        if (view.getTag() instanceof FileDescriptorItem) {
-            FileDescriptorItem item = (FileDescriptorItem) view.getTag();
-            fd = item.fd;
-        } else if (view.getTag() instanceof FileDescriptor) {
-            fd = (FileDescriptor) view.getTag();
-        }
 
         if (checkIfNotExists(fd)) {
             return null;
@@ -123,11 +167,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         List<FileDescriptor> checked = convertItems(getChecked());
         ensureCorrectMimeType(fd);
         boolean canOpenFile = fd.mime != null && (fd.mime.contains("audio") || fd.mime.contains("bittorrent") || fd.filePath != null);
-        int numChecked = checked.size();
+        int numChecked = forceSingle ? 1 : checked.size();
 
-        boolean showSingleOptions = showSingleOptions(checked, fd);
-
-        if (showSingleOptions) {
+        if (showSingleOptions(checked, fd) || forceSingle) {
             if (!AndroidPlatform.saf(new File(fd.filePath)) &&
                     fd.fileType != Constants.FILE_TYPE_RINGTONES) {
                 items.add(new SeedAction(context, fd));
@@ -168,7 +210,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
 
         List<FileDescriptor> list = checked;
-        if (list.size() == 0) {
+        if (list.size() == 0 || forceSingle) {
             list = Arrays.asList(fd);
         }
 
@@ -185,7 +227,43 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return new MenuAdapter(context, fd.title, items);
     }
 
+    private MenuAdapter getMenuAdapter(View view, boolean forceSingle) {
+        // due to long click generic handle
+        FileDescriptor fd = null;
+
+        if (view.getTag() instanceof FileDescriptorItem) {
+            FileDescriptorItem item = (FileDescriptorItem) view.getTag();
+            fd = item.fd;
+        } else if (view.getTag() instanceof FileDescriptor) {
+            fd = (FileDescriptor) view.getTag();
+        }
+
+        return getMenuAdapter(fd, forceSingle);
+
+    }
+
+    @Override
+    protected MenuAdapter getMenuAdapter(View view) {
+        return getMenuAdapter(view, false);
+    }
+
     protected void onLocalPlay() {
+    }
+
+    @Override
+    protected void onItemClicked(View v) {
+        FileDescriptorItem fileDescriptorItem = (FileDescriptorItem) v.getTag();
+        if (checkState) {
+            changeCheckboxStateForItem(fileDescriptorItem, !checked.contains(fileDescriptorItem));
+        } else {
+            localPlay(fileDescriptorItem.fd, v);
+        }
+    }
+
+    @Override
+    protected boolean onItemLongClicked(View v) {
+        onItemClicked(v);
+        return true;
     }
 
     private void localPlay(FileDescriptor fd, View view) {
@@ -244,11 +322,16 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
     }
 
-    private void populateViewThumbnail(View view, FileDescriptorItem item) {
-        FileDescriptor fd = item.fd;
+    private void populateViewThumbnail(View view, FileDescriptor fd, BrowseThumbnailImageButton fileThumbnail) {
 
-        BrowseThumbnailImageButton fileThumbnail = findView(view, R.id.view_browse_peer_list_item_file_thumbnail);
-        fileThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        TextView fileExtra = findView(view, R.id.view_browse_peer_list_item_extra_text);
+
+        if (fd.fileType == Constants.FILE_TYPE_AUDIO || fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
+
+            fileExtra.setText(fd.artist);
+        } else {
+            fileExtra.setText(R.string.empty_string);
+        }
 
         if (fileType == Constants.FILE_TYPE_APPLICATIONS) {
             Uri uri = Uri.withAppendedPath(ImageLoader.APPLICATION_THUMBNAILS_URI, fd.album);
@@ -282,32 +365,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 thumbnailLoader.load(uri, fileThumbnail, 96, 96);
             }
         }
-
-        TextView title = findView(view, R.id.view_browse_peer_list_item_file_title);
-        title.setText(fd.title);
-
-        if (fd.fileType == Constants.FILE_TYPE_AUDIO || fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
-            TextView fileExtra = findView(view, R.id.view_browse_peer_list_item_extra_text);
-            fileExtra.setText(fd.artist);
-        } else {
-            TextView fileExtra = findView(view, R.id.view_browse_peer_list_item_extra_text);
-            fileExtra.setText(R.string.empty_string);
-        }
-
-        TextView fileSize = findView(view, R.id.view_browse_peer_list_item_file_size);
-        fileSize.setText(UIUtils.getBytesInHuman(fd.fileSize));
-
-        fileThumbnail.setTag(fd);
-        fileThumbnail.setOnClickListener(downloadButtonClickListener);
-
-        populateSDState(view, item);
     }
 
-    private void populateViewPlain(View view, FileDescriptorItem item) {
-        FileDescriptor fd = item.fd;
-
-        TextView title = findView(view, R.id.view_browse_peer_list_item_file_title);
-        title.setText(fd.title);
+    private void populateViewPlain(View view, FileDescriptor fd, BrowseThumbnailImageButton fileThumbnail) {
 
         TextView fileExtra = findView(view, R.id.view_browse_peer_list_item_extra_text);
         if (fd.fileType == Constants.FILE_TYPE_AUDIO || fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
@@ -318,21 +378,22 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             fileExtra.setText(R.string.empty_string);
         }
 
-        TextView fileSize = findView(view, R.id.view_browse_peer_list_item_file_size);
-        fileSize.setText(UIUtils.getBytesInHuman(fd.fileSize));
-
-        BrowseThumbnailImageButton downloadButton = findView(view, R.id.view_browse_peer_list_item_file_thumbnail);
-
         if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD()) || fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD())) {
-            downloadButton.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.STOP);
+            fileThumbnail.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.STOP);
         } else {
-            downloadButton.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.PLAY);
+            fileThumbnail.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.PLAY);
         }
+    }
 
-        downloadButton.setTag(fd);
-        downloadButton.setOnClickListener(downloadButtonClickListener);
-
-        populateSDState(view, item);
+    private void populateSingleMenuIcon(View view) {
+        ImageView icon = findView(view, R.id.view_browse_peer_list_item_menu_icon);
+        icon.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                trackDialog(new MenuBuilder(getMenuAdapter(view, true)).show());
+            }
+        });
+        icon.setVisibility(checkState ? View.GONE : View.VISIBLE);
     }
 
     private void populateSDState(View v, FileDescriptorItem item) {
@@ -519,6 +580,23 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return result;
     }
 
+    public void showMenuForSelectedItems(MenuAction mask, int x, int y) {
+        if (checked.size() > 0) {
+            MenuAdapter adapter = getMenuAdapter(checked.iterator().next().fd, false);
+            if (adapter != null) {
+                if (mask != null) {
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        MenuAction item = adapter.getItem(i);
+                        if (item.getText().equals(mask.getText())) {
+                            adapter.removeItem(item);
+                        }
+                    }
+                }
+                trackDialog(new MenuBuilder(adapter).show(x, y));
+            }
+        }
+    }
+
     private static class FileListFilter implements ListAdapterFilter<FileDescriptorItem> {
         public boolean accept(FileDescriptorItem obj, CharSequence constraint) {
             String keywords = constraint.toString();
@@ -550,8 +628,24 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             if (checkIfNotExists(fd)) {
                 return;
             }
-
             localPlay(fd, v);
+        }
+    }
+
+    private final class DownloadButtonLongClickListener implements View.OnLongClickListener {
+        @Override
+        public boolean onLongClick(View v) {
+            FileDescriptor fd = (FileDescriptor) v.getTag();
+
+            if (fd == null) {
+                return false;
+            }
+
+            if (checkIfNotExists(fd)) {
+                return false;
+            }
+            localPlay(fd, v);
+            return true;
         }
     }
 

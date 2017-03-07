@@ -77,6 +77,10 @@ public class MenuAdapter extends BaseAdapter {
         return convertView;
     }
 
+    public boolean removeItem(MenuAction action) {
+        return  items.remove(action);
+    }
+
     public int getCount() {
         return items.size();
     }
