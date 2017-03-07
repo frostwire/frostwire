@@ -213,12 +213,6 @@ public final class BTDownload implements BittorrentDownload {
             return 0;
         }
 
-        // TODO: Add logic to check completion logic for merkle based torrents.
-        //if (th.getTorrentInfo().isMerkleTorrent()) {
-        //final ArrayList<Sha1Hash> sha1Hashes = th.getTorrentInfo().merkleTree();
-        //perform sha1Hash check
-        //}
-
         if (th.status() == null) {
             return 0;
         }
@@ -230,17 +224,8 @@ public final class BTDownload implements BittorrentDownload {
             return 100;
         }
 
-        int p = (int) (th.status().progress() * 100);
+        int p = (int) (fp * 100);
         if (p > 0 && state != TorrentStatus.State.CHECKING_FILES) {
-            return Math.min(p, 100);
-        }
-        final long received = getTotalBytesReceived();
-        final long size = getSize();
-        if (size == received) {
-            return 100;
-        }
-        if (size > 0) {
-            p = (int) ((received * 100) / size);
             return Math.min(p, 100);
         }
 
@@ -253,7 +238,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public long getBytesReceived() {
-        return th.isValid() ? th.status().totalDownload() : 0;
+        return th.isValid() ? th.status().totalDone() : 0;
     }
 
     public long getTotalBytesReceived() {
