@@ -357,7 +357,6 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
 
     @Override
     public JComponent getComponent() {
-        System.out.println("LibraryPlaylistsTableMediator.getComponent() invoked");
         mainContainer = new JPanel(new MigLayout("fillx, wrap 1","[]", "[][fill, grow]"));
 
         mainContainer.add(new JPanel(), "wrap"); // dummy
