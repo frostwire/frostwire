@@ -16,6 +16,6 @@
 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@color/app_dark_blue"></item>
+    <item android:drawable="@color/basic_blue_dark"></item>
 
 </selector>

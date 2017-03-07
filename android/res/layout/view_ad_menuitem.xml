@@ -22,7 +22,7 @@
     android:id="@+id/view_ad_menu_item_ad"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/basic_blue_darker_highlight"
+    android:background="@color/basic_blue_highlight_dark"
     android:clickable="true">
 
     <RelativeLayout

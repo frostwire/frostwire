@@ -45,7 +45,7 @@
         android:fastScrollEnabled="true"
         android:paddingLeft="@dimen/fast_scroll_padding_left"
         android:paddingRight="@dimen/fast_scroll_padding_right"
-        android:background="@color/body_background_gray_light"
+        android:background="@color/app_background_body_light"
         android:dividerHeight="0dp"
         android:divider="@color/transparent"
         android:overScrollHeader="@null"

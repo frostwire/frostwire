@@ -155,7 +155,7 @@ public final class SearchFragment extends AbstractPreferenceFragment {
 
     @Override
     protected RecyclerView.Adapter onCreateAdapter(PreferenceScreen preferenceScreen) {
-        return new CheckedAwarePreferenceGroupAdapter(preferenceScreen, R.color.selected_search_background, R.color.basic_white);
+        return new CheckedAwarePreferenceGroupAdapter(preferenceScreen, R.color.app_selection_background, R.color.basic_white);
     }
 
     private static class CheckedAwarePreferenceGroupAdapter extends PreferenceGroupAdapter {

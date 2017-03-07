@@ -26,6 +26,6 @@
         android:id="@+id/fragment_audio_plauer_queue_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/body_background_gray_light" />
+        android:background="@color/app_background_body_light" />
 
 </FrameLayout>

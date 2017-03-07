@@ -66,7 +66,7 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         checkSeedFinishedTorrents.setChecked(ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS));
         checkSeedFinishedTorrentsWifiOnly.setChecked(ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
         checkSeedFinishedTorrentsWifiOnly.setEnabled(checkSeedFinishedTorrents.isChecked());
-        checkSeedFinishedTorrentsWifiOnly.setTextColor((checkSeedFinishedTorrents.isChecked()) ? Color.WHITE : getContext().getResources().getColor(R.color.frostwire_gray_explanation_text_dark));
+        checkSeedFinishedTorrentsWifiOnly.setTextColor((checkSeedFinishedTorrents.isChecked()) ? Color.WHITE : getContext().getResources().getColor(R.color.app_text_wizard_dark));
         checkUXStats.setChecked(ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_UXSTATS_ENABLED));
         validate();
     }
@@ -115,8 +115,8 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         checkSeedFinishedTorrents.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 checkSeedFinishedTorrentsWifiOnly.setEnabled(isChecked);
-                checkSeedFinishedTorrentsWifiOnly.setTextColor((isChecked) ? Color.WHITE : getContext().getResources().getColor(R.color.frostwire_gray_explanation_text_dark));
-                textWifiOnly.setTextColor(getContext().getResources().getColor(checkSeedFinishedTorrents.isChecked() ? R.color.frostwire_gray_explanation_text : R.color.frostwire_gray_explanation_text_dark));
+                checkSeedFinishedTorrentsWifiOnly.setTextColor((isChecked) ? Color.WHITE : getContext().getResources().getColor(R.color.app_text_wizard_dark));
+                textWifiOnly.setTextColor(getContext().getResources().getColor(checkSeedFinishedTorrents.isChecked() ? R.color.app_text_wizard : R.color.app_text_wizard_dark));
                 validate();
             }
         });

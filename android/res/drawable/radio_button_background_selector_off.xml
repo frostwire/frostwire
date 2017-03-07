@@ -21,7 +21,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
     <item>
         <shape>
-            <solid android:color="@color/app_dark_blue_selector" />
+            <solid android:color="@color/app_background_dark" />
         </shape>
     </item>
 </layer-list>

@@ -74,7 +74,7 @@
         android:padding="14dp"
         android:text="@string/remove_ads"
         android:textAllCaps="true"
-        android:textColor="@color/app_dark_blue"
+        android:textColor="@color/basic_blue_dark"
         android:textSize="@dimen/text_small"
         android:textStyle="bold"
         android:visibility="gone" />

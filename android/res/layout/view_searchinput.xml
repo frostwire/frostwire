@@ -27,7 +27,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@color/app_menu_item_line" />
+        android:background="@color/app_background_dark_highlight" />
     <!-- Dummy item to prevent EditText from receiving focus at startup -->
     <LinearLayout
         android:id="@+id/view_search_input_linearlayout_dummy"

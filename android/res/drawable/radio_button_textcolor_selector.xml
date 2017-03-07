@@ -19,12 +19,12 @@
  */
 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/frostwire_light_blue" android:state_checked="true" android:state_window_focused="false"/>
+    <item android:color="@color/app_text_highlight_light" android:state_checked="true" android:state_window_focused="false"/>
     <item android:color="#e7ebee" android:state_checked="false" android:state_window_focused="false"/>
-    <item android:color="@color/frostwire_light_blue" android:state_checked="true" android:state_pressed="true"/>
-    <item android:color="@color/frostwire_light_blue" android:state_checked="false" android:state_pressed="true"/>
-    <item android:color="@color/frostwire_light_blue" android:state_checked="true" android:state_focused="true"/>
+    <item android:color="@color/app_text_highlight_light" android:state_checked="true" android:state_pressed="true"/>
+    <item android:color="@color/app_text_highlight_light" android:state_checked="false" android:state_pressed="true"/>
+    <item android:color="@color/app_text_highlight_light" android:state_checked="true" android:state_focused="true"/>
     <item android:color="#e7ebee" android:state_checked="false" android:state_focused="true"/>
     <item android:color="#e7ebee" android:state_checked="false"/>
-    <item android:color="@color/frostwire_light_blue" android:state_checked="true"/>
+    <item android:color="@color/app_text_highlight_light" android:state_checked="true"/>
 </selector>

@@ -22,7 +22,7 @@
     android:id="@+id/view_frostwire_features_all_downloads"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/basic_gray_lighter"
+    android:background="@color/basic_gray_light"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="horizontal">
     <TextView

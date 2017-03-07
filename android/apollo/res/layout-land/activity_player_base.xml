@@ -18,7 +18,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/body_background_gray_light"
+    android:background="@color/app_background_body_light"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_main" />
@@ -58,7 +58,7 @@
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="right"
-                android:background="@drawable/layout_divider_1_gray" />
+                android:background="@drawable/divider_line" />
         </FrameLayout>
 
         <LinearLayout
@@ -122,7 +122,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/audio_player_large_album_frame"
-            android:background="@color/body_background_white"
+            android:background="@color/app_background_white"
             android:baselineAligned="false"
             android:orientation="horizontal"
             android:padding="0dp">
@@ -187,7 +187,7 @@
             android:layout_height="1dp"
             android:layout_alignBottom="@+id/audio_player_header"
             android:layout_toRightOf="@+id/audio_player_large_album_frame"
-            android:background="@drawable/layout_divider_1_gray" />
+            android:background="@drawable/divider_line" />
 
         <TextView
             android:id="@+id/audio_player_current_time"
@@ -264,7 +264,7 @@
             android:layout_toRightOf="@+id/audio_player_current_time"
             android:gravity="center"
             android:text="@string/remove_ads"
-            android:textColor="@color/basic_blue_darker_highlight"
+            android:textColor="@color/basic_blue_highlight_dark"
             android:textSize="@dimen/text_large"
             android:textStyle="bold"
             android:visibility="gone" />

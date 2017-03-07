@@ -26,7 +26,7 @@
     </item>
     <item android:bottom="5dp">
         <shape>
-            <solid android:color="@color/app_dark_blue_selector"></solid>
+            <solid android:color="@color/app_background_dark"></solid>
         </shape>
     </item>
 </layer-list>
