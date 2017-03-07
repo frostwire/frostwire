@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
-        android:background="@drawable/listview_item_press_background_selector">
+        android:background="@drawable/listview_item_background_selector">
 
         <TextView
             android:id="@+id/view_bittorrent_search_result_list_item_title"

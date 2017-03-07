@@ -44,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:id="@+id/imageView"
-        android:background="@color/basic_gray_dark" />
+        android:background="@color/app_divider" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -69,7 +69,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:id="@+id/imageView1"
-        android:background="@color/basic_gray_dark" />
+        android:background="@color/basic_gray_medium" />
 
     <ListView
         android:id="@+id/dialog_confirm_list_listview"
@@ -123,7 +123,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:background="@color/app_light_background"
+            android:background="@color/app_background_white"
             android:minLines="1"
             android:text="@android:string/no" />
 
@@ -133,7 +133,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="1dp"
             android:layout_weight="0.5"
-            android:background="@color/app_light_background"
+            android:background="@color/app_background_white"
             android:minLines="1"
             android:text="@android:string/yes" />
     </LinearLayout>

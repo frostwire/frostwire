@@ -20,7 +20,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/body_background_gray_light"
+    android:background="@color/app_background_body_light"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_main" />
@@ -109,7 +109,7 @@
         android:id="@+id/activity_preview_player_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@drawable/layout_divider_1_gray" />
+        android:background="@drawable/divider_line" />
 
     <FrameLayout
         android:id="@+id/activity_preview_player_framelayout"

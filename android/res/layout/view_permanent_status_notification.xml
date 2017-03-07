@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
                 android:text="\u2193"
-                android:textColor="@color/app_dark_grey_text"
+                android:textColor="@color/app_text_secondary"
                 android:textSize="14sp" />
 
             <!-- downloads @ download rate -->
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
                 android:text="\u2191"
-                android:textColor="@color/app_dark_grey_text"
+                android:textColor="@color/app_text_secondary"
                 android:textSize="14sp" />
 
             <!-- uploads @ upload rate -->

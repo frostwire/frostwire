@@ -32,7 +32,7 @@
     <item android:id="@android:id/secondaryProgress">
         <clip>
             <shape>
-                <solid android:color="@color/basic_blue_darker_highlight" />
+                <solid android:color="@color/basic_blue_highlight_dark" />
 
                 <stroke
                     android:width="1px"
@@ -43,7 +43,7 @@
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <solid android:color="@color/basic_blue_darker_highlight" />
+                <solid android:color="@color/basic_blue_highlight_dark" />
 
                 <stroke
                     android:width="1px"

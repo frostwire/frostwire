@@ -20,13 +20,13 @@
 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@color/app_dark_blue_highlight" android:state_checked="true" android:state_window_focused="false"/>
+    <item android:drawable="@color/app_background_dark_highlight" android:state_checked="true" android:state_window_focused="false"/>
     <item android:drawable="@android:color/transparent" android:state_checked="false" android:state_window_focused="false"/>
-    <item android:drawable="@color/app_dark_blue_highlight" android:state_checked="true" android:state_pressed="true"/>
-    <item android:drawable="@color/app_dark_blue_highlight" android:state_checked="false" android:state_pressed="true"/>
-    <item android:drawable="@color/app_dark_blue_highlight" android:state_checked="true" android:state_focused="true"/>
+    <item android:drawable="@color/app_background_dark_highlight" android:state_checked="true" android:state_pressed="true"/>
+    <item android:drawable="@color/app_background_dark_highlight" android:state_checked="false" android:state_pressed="true"/>
+    <item android:drawable="@color/app_background_dark_highlight" android:state_checked="true" android:state_focused="true"/>
     <item android:drawable="@android:color/transparent" android:state_checked="false" android:state_focused="true"/>
     <item android:drawable="@android:color/transparent" android:state_checked="false"/>
-    <item android:drawable="@color/app_dark_blue_highlight" android:state_checked="true"/>
+    <item android:drawable="@color/app_background_dark_highlight" android:state_checked="true"/>
 
 </selector>

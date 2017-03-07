@@ -22,7 +22,7 @@
     xmlns:frostwire="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/app_search_blue"
+    android:background="@color/app_background"
     android:orientation="horizontal" >
 
     <!-- Dummy item to prevent EditText from receiving focus at startup -->

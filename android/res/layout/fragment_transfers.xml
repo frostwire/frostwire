@@ -102,7 +102,7 @@
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:background="@color/body_background_gray_light">
+                    android:background="@color/app_background_body_light">
         <com.frostwire.android.gui.views.SwipeLayout
                 android:id="@+id/fragment_transfers_swipe"
                 android:layout_width="match_parent"
@@ -112,7 +112,7 @@
                     android:id="@+id/fragment_transfers_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/body_background_gray_light"
+                    android:background="@color/app_background_body_light"
                     android:fadingEdge="none"
                     android:groupIndicator="@android:color/transparent"/>
         </com.frostwire.android.gui.views.SwipeLayout>
@@ -154,7 +154,7 @@
         <TextView android:id="@+id/fragment_transfers_dht_peers"
                   android:layout_width="wrap_content"
                   android:layout_height="match_parent"
-                  android:textColor="@color/app_light_gray_text"
+                  android:textColor="@color/app_text_white"
                   android:textSize="@dimen/text_size_extra_micro"
                   android:gravity="center_vertical"
                   android:layout_gravity="center_vertical"

@@ -60,7 +60,7 @@
         style="@style/WizardText.Header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/app_dark_blue"
+        android:background="@color/basic_blue_dark"
         android:paddingTop="7dp"
         android:paddingBottom="7dp"
         android:text="@string/seeding_settings" />
@@ -94,7 +94,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="35dp"
-        android:textColor="@color/frostwire_gray_explanation_text_dark"
+        android:textColor="@color/app_text_wizard_dark"
         android:text="@string/seeding_wifi_settings_explanation" />
 
     <TextView
@@ -102,7 +102,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:background="@color/app_dark_blue"
+        android:background="@color/basic_blue_dark"
         android:paddingTop="7dp"
         android:paddingBottom="7dp"
         android:text="@string/other_settings" />

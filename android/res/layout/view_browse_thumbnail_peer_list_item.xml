@@ -21,7 +21,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/listview_item_press_background_selector" >
+    android:background="@drawable/listview_item_background_selector" >
 
     <com.frostwire.android.gui.views.BrowseThumbnailImageButton
         android:id="@+id/view_browse_peer_list_item_file_thumbnail"
@@ -29,7 +29,7 @@
         android:layout_height="65dp"
         android:layout_marginBottom="3dp"
         android:layout_marginTop="3dp"
-        android:background="@color/app_list_cell_line"
+        android:background="@color/app_browse_thumbnail_background"
         android:contentDescription="@null" />
 
     <TextView

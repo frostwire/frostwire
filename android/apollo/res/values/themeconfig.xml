@@ -25,9 +25,9 @@
     <color name="action_bar_subtitle">@color/transparent_white</color>
 
     <!-- Adpater lines -->
-    <color name="line_one">@color/app_list_item_title_text_color</color>
-    <color name="line_two">@color/app_list_item_title_text_color</color>
-    <color name="line_three">@color/app_list_item_title_text_color</color>
+    <color name="line_one">@color/app_text_primary</color>
+    <color name="line_two">@color/app_text_primary</color>
+    <color name="line_three">@color/app_text_primary</color>
 
     <!-- Now playing -->
     <color name="audio_player_current_time">#ff000000</color>
@@ -37,7 +37,7 @@
     <color name="audio_player_pager_container">@color/action_bar_color</color>
 
     <!-- Bottom action bar -->
-    <color name="bottom_action_bar">@color/app_dark_blue_highlight</color>
+    <color name="bottom_action_bar">@color/app_background_dark_highlight</color>
     <color name="bab_line_one">@color/white</color>
     <color name="bab_line_two">@color/transparent_white</color>
 

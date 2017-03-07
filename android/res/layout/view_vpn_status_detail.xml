@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_horizontal"
-                android:textColor="@color/approval_green" />
+                android:textColor="@color/app_approval_green" />
 
             <!-- VPN description text -->
             <TextView

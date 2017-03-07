@@ -32,7 +32,7 @@
     <item android:id="@android:id/secondaryProgress">
         <clip>
             <shape>
-                <solid android:color="@color/app_highlight_text" />
+                <solid android:color="@color/basic_blue_highlight" />
 
                 <stroke
                     android:width="1px"

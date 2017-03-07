@@ -25,14 +25,12 @@
     android:background="@color/basic_white"
     android:baselineAligned="false"
     android:orientation="horizontal"
-    android:paddingBottom="1px"
-    android:paddingTop="1px"
     tools:ignore="PxUsage" >
 
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/body_background_gray_light"
+        android:background="@color/app_background_body_light"
         android:gravity="center|center_vertical"
         android:paddingBottom="10dp"
         android:paddingLeft="5dp"

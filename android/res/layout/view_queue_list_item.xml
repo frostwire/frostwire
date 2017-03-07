@@ -64,6 +64,6 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/view_queue_list_item_author"
-        android:background="@drawable/layout_divider_1_gray" />
+        android:background="@drawable/divider_line" />
 
 </RelativeLayout>

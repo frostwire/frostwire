@@ -22,8 +22,8 @@
 
     <style name="Theme.FrostWire" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/basic_blue</item>
-        <item name="colorPrimaryDark">@color/app_dark_blue</item>
-        <item name="colorAccent">@color/basic_blue_darker_highlight</item>
+        <item name="colorPrimaryDark">@color/basic_blue_dark</item>
+        <item name="colorAccent">@color/basic_blue_highlight_dark</item>
         <item name="android:textColorPrimary">@color/app_text_primary</item>
         <item name="android:textColorSecondary">@color/app_text_secondary</item>
         <item name="toolbarNavigationButtonStyle">@style/ToolbarNavigationButtonStyle</item>
@@ -36,7 +36,7 @@
 
     <style name="SplashScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@drawable/frostwire_splash_screen</item>
-        <item name="colorPrimaryDark">@color/basic_blue_darker_highlight</item>
+        <item name="colorPrimaryDark">@color/basic_blue_highlight_dark</item>
     </style>
 
     <style name="PreferenceThemeOverlay" parent="PreferenceThemeOverlay.v14.Material">
@@ -45,7 +45,7 @@
 
     <style name="Preference.Category.Material">
         <item name="android:layout">@layout/view_preference_category_material</item>
-        <item name="android:textColor">@color/basic_blue_darker_highlight</item>
+        <item name="android:textColor">@color/basic_blue_highlight_dark</item>
         <item name="android:textStyle">bold</item>
     </style>
     

@@ -19,7 +19,8 @@
  */
 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:drawable="@drawable/listview_item_background"/>
-
+    <item android:state_pressed="true" android:drawable="@color/app_selection_background"/> <!-- pressed -->
+    <item android:state_focused="true" android:drawable="@color/app_selection_background"/> <!-- focused -->
+    <item android:state_selected="true" android:drawable="@color/app_selection_background"/> <!-- selected -->
+    <item android:drawable="@color/app_background_white"/> <!-- default -->
 </selector>

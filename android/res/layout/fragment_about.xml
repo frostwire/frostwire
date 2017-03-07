@@ -32,7 +32,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/body_background_gray"
+            android:background="@color/app_background_body_dark"
             android:orientation="vertical">
 
             <TextView
@@ -116,14 +116,14 @@
             android:layout_gravity="center_horizontal"
             android:padding="18dp"
             android:text="@string/frostwire_sticker_and_more"
-            android:textColor="@color/basic_blue_darker_highlight"
+            android:textColor="@color/basic_blue_highlight_dark"
             android:textSize="@dimen/text_medium"
             android:textStyle="bold" />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/layout_divider_1_gray" />
+            android:background="@drawable/divider_line" />
 
         <TextView
             android:id="@+id/fragment_about_feedback"
@@ -132,14 +132,14 @@
             android:layout_gravity="center_horizontal"
             android:padding="18dp"
             android:text="@string/send_feedback"
-            android:textColor="@color/basic_blue_darker_highlight"
+            android:textColor="@color/basic_blue_highlight_dark"
             android:textSize="@dimen/text_medium"
             android:textStyle="bold" />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/layout_divider_1_gray" />
+            android:background="@drawable/divider_line" />
 
         <TextView
             android:id="@+id/fragment_about_content"
@@ -155,14 +155,14 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/layout_divider_1_gray" />
+            android:background="@drawable/divider_line" />
 
         <TextView
             android:id="@+id/fragment_about_changelog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/changelog"
-            android:textColor="@color/basic_blue_darker_highlight"
+            android:textColor="@color/basic_blue_highlight_dark"
             android:textSize="@dimen/text_medium"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
@@ -172,12 +172,12 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/layout_divider_1_gray" />
+            android:background="@drawable/divider_line" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/body_background_gray"
+            android:background="@color/app_background_body_dark"
             android:gravity="center"
             android:orientation="vertical"
             android:paddingBottom="30dp"
@@ -197,7 +197,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/help_translate_or_proofread_frostwire"
-                android:textColor="@color/basic_blue_darker_highlight"
+                android:textColor="@color/basic_blue_highlight_dark"
                 android:textSize="@dimen/text_medium"
                 android:textStyle="bold" />
 

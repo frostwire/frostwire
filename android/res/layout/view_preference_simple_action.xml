@@ -74,5 +74,5 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@drawable/layout_divider_1_gray" />
+        android:background="@drawable/divider_line"/>
 </LinearLayout>
