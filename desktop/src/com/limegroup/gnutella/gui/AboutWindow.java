@@ -1,6 +1,8 @@
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.jlibtorrent.LibTorrent;
 import com.limegroup.gnutella.util.FrostWireUtils;
+import net.miginfocom.swing.MigLayout;
 import org.limewire.service.ErrorService;
 import org.limewire.util.OSUtils;
 import org.limewire.util.VersionUtils;
@@ -12,37 +14,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-/**
- * Contains the <tt>JDialog</tt> instance that shows "about" information for the
- * application.
- */
-// 2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 final class AboutWindow {
-	/**
-	 * Constant handle to the <tt>JDialog</tt> that contains about information.
-	 */
 	private final JDialog DIALOG;
-
-	/**
-	 * Constant for the scolling pane of credits.
-	 */
 	private final ScrollingTextPane SCROLLING_PANE;
-
-	private final JLabel EULA_LABEL;
-
-	private final JLabel PRIVACY_POLICY_LABEL;
-
-	/**
-	 * Constructs the elements of the about window.
-	 */
 	AboutWindow() {
 		DIALOG = new JDialog(GUIMediator.getAppFrame());
 
 		if (!OSUtils.isMacOSX())
 			DIALOG.setModal(true);
 
-		DIALOG.setSize(new Dimension(600, 400));
-		DIALOG.setResizable(false);
+		DIALOG.setSize(new Dimension(800, 600));
+		DIALOG.setResizable(true);
 		DIALOG.setTitle(I18n.tr("About FrostWire"));
 		DIALOG.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		DIALOG.addWindowListener(new WindowAdapter() {
@@ -59,11 +41,10 @@ final class AboutWindow {
 		SCROLLING_PANE = createScrollingPane();
 		SCROLLING_PANE.addHyperlinkListener(GUIUtils.getHyperlinkListener());
 
-		// set up limewire version label
+		// set up FrostWire version label
 		JLabel client = new JLabel("FrostWire" + " "
-				+ FrostWireUtils.getFrostWireVersion() + " (build " + FrostWireUtils.getBuildNumber() + ")");
+				+ FrostWireUtils.getFrostWireVersion() + " (build " + FrostWireUtils.getBuildNumber() + ") - JLibTorrent v"+ LibTorrent.version());
 		client.setHorizontalAlignment(SwingConstants.CENTER);
-
 		client.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -84,88 +65,48 @@ final class AboutWindow {
 		url.setHorizontalAlignment(SwingConstants.CENTER);
 
 
-		EULA_LABEL = new URLLabel("http://www.frostwire.com/eula",I18n.tr("End User License Agreement"));
-		PRIVACY_POLICY_LABEL = new URLLabel("http://www.frostwire.com/privacy",I18n.tr("Privacy Policy"));
+		JLabel EULA_LABEL = new URLLabel("http://www.frostwire.com/eula", I18n.tr("End User License Agreement"));
+		JLabel PRIVACY_POLICY_LABEL = new URLLabel("http://www.frostwire.com/privacy", I18n.tr("Privacy Policy"));
 
-		// set up close button
-		JButton button = new JButton(I18n.tr("Close"));
-		DIALOG.getRootPane().setDefaultButton(button);
-		button.setToolTipText(I18n.tr("Close This Window"));
-		button.addActionListener(GUIUtils.getDisposeAction());
+		// set up close closeButton
+		JButton closeButton = new JButton(I18n.tr("Close"));
+		DIALOG.getRootPane().setDefaultButton(closeButton);
+		closeButton.setToolTipText(I18n.tr("Close This Window"));
+		closeButton.addActionListener(GUIUtils.getDisposeAction());
 
 		// layout window
 		JComponent pane = (JComponent) DIALOG.getContentPane();
 		GUIUtils.addHideAction(pane);
 
-		pane.setLayout(new GridBagLayout());
+		pane.setLayout(new MigLayout("insets 0 0 0 0, wrap 1","[grow]"));
 		pane.setBorder(BorderFactory.createEmptyBorder(GUIConstants.SEPARATOR,
 				GUIConstants.SEPARATOR, GUIConstants.SEPARATOR,
 				GUIConstants.SEPARATOR));
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.CENTER;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.weightx = 1;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gbc.gridwidth = 2;
-		gbc.gridy = 0;
 
 		LogoPanel logo = new LogoPanel();
-		pane.add(logo, gbc);
+		pane.add(logo, "align center, wrap");
+		pane.add(Box.createVerticalStrut(GUIConstants.SEPARATOR), "wrap");
+		pane.add(client, "align center, wrap");
+		pane.add(osInfo, "align center, wrap");
+		pane.add(java, "align center, wrap");
+		pane.add(url, "align center, wrap");
+		pane.add(Box.createVerticalStrut(GUIConstants.SEPARATOR), "wrap");
 
-		gbc.gridy = 1;
-		pane.add(Box.createVerticalStrut(GUIConstants.SEPARATOR), gbc);
-
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridy = 2;
-		pane.add(client, gbc);
-
-		gbc.gridy = 3;
-		pane.add(osInfo, gbc);
-
-		gbc.gridy = 4;
-		pane.add(java, gbc);
-
-		gbc.gridy = 5;
-		pane.add(url, gbc);
-
-		gbc.gridy = 6;
-		pane.add(Box.createVerticalStrut(GUIConstants.SEPARATOR), gbc);
-
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.gridy = 7;
-		pane.add(SCROLLING_PANE, gbc);
-
-		gbc.gridy = 8;
-		gbc.weighty = 0;
-		gbc.fill = GridBagConstraints.NONE;
-		pane.add(Box.createVerticalStrut(GUIConstants.SEPARATOR), gbc);
+		pane.add(SCROLLING_PANE, "pushy, wrap");
+		pane.add(Box.createVerticalStrut(GUIConstants.SEPARATOR), "wrap");
 
 		JPanel legalLinksPanel = new JPanel();
 		legalLinksPanel.setPreferredSize(new Dimension(300,27));
 		legalLinksPanel.setMinimumSize(new Dimension(300,27));
 		legalLinksPanel.add(EULA_LABEL,BorderLayout.LINE_START);
 		legalLinksPanel.add(PRIVACY_POLICY_LABEL,BorderLayout.LINE_END);
-
-		gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.gridwidth = 1;
-		gbc.gridy = 9;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.anchor = GridBagConstraints.WEST;
-		pane.add(legalLinksPanel, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.gridy = 10;
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		gbc.anchor = GridBagConstraints.EAST;
-		pane.add(button, gbc);
-
+		pane.add(legalLinksPanel, "alignx center, wrap");
+		pane.add(closeButton, "align right, wrap");
 	}
 
 	private void appendListOfNames(String commaSepNames, StringBuilder sb) {
 		for (String name : commaSepNames.split(","))
-			sb.append("<li>"+name+"</li>");
+			sb.append("<li>").append(name).append("</li>");
 	}
 
 	private ScrollingTextPane createScrollingPane() {
@@ -177,46 +118,55 @@ final class AboutWindow {
         int g = color.getGreen();
         int b = color.getBlue();
         String hex = toHex(r) + toHex(g) + toHex(b);
-        sb.append("<body text='#" + hex + "'>");
+        sb.append("<body text='#").append(hex).append("'>");
+
+		sb.append("<h1>Powered by</h1>").
+				append("<ul>").
+				append("<li><a href='http://jlibtorrent.org'>JLibTorrent</a>").append(LibTorrent.version()).append("</li>").
+				append("<li><a href='http://www.boost.org/'>Boost</a> ").append(LibTorrent.boostVersion()).append("</li>").
+				append("<li><a href='https://www.openssl.org/'>OpenSSL</a> ").append(LibTorrent.opensslVersionNum()).
+				append("<li><a href='http://www.mplayerhq.hu/'>MPlayer</a> 1.3.0</li>").
+				append("</ul>");
 
         //  introduction
-        sb.append("<h1>" + I18n.tr("FrostWire Logo Designer") + "</h1>");
+        sb.append("<h1>").append(I18n.tr("FrostWire Logo Designer")).append("</h1>");
         sb.append("<ul><li>Luis Ramirez (Venezuela - <a href='http://www.elblogo.com'>ElBlogo.com</a>)</li></ul>");
 
-        sb.append("<h1>" + I18n.tr("FrostWire Graphics Designers/Photographers") + "</h1>");
+        sb.append("<h1>").append(I18n.tr("FrostWire Graphics Designers/Photographers")).append("</h1>");
         sb.append("<ul>");
         sb.append("<li>Kirill Grouchnikov - Substance library <a href='http://www.pushing-pixels.org/'>Pushing-Pixels.org</a></li>");
-        sb.append("<li>Arianys Wilson - Splash 4.18 (New York - <a href='http://nanynany.com/blog/?from=frostwire'>NanyNany.com</a>)</li>");
+        sb.append("<li>Arianys Wilson - Splash 4.18 (New York - <a href='http://www.arianyswilson.com/'>Arianys Wilson Photography</a>)</li>");
         sb.append("<li>Scott Kellum - Splash 4.17 (New York - <a href='http://www.scottkellum.net'>ScottKellum.net</a>)</li>");
-        sb.append("<li>Shelby Allen - Splash 4.13 (New Zealand - <a href='http://www.stitzu.com'>Stitzu.com</a>)</li>");
+        sb.append("<li>Shelby Allen - Splash 4.13 (New Zealand)</li>");
         sb.append("<li>Cecko Hanssen - <a href='http://www.flickr.com/photos/cecko/95013472/'>Frozen Brothers</a> CC Photograph for 4.17 Splash (Tilburg, Netherlands)</li>");
         sb.append("<li>Marcelina Knitter - <a href='https://twitter.com/#!/marcelinkaaa'>@Marcelinkaaa</a></li>");
         sb.append("</ul>");
 
-        sb.append("<h1>" + I18n.tr("Thanks to Former FrostWire Developers") + "</h1>");
+        sb.append("<h1>").append(I18n.tr("Thanks to Former FrostWire Developers")).append("</h1>");
         sb.append("<li>Gregorio Roper (Germany)</li>");
-        sb.append("<li>Fernando Toussaint '<strong>FTA</strong>' - <a href='http://www.cybercultura.net'>Web</a></li>");
+        sb.append("<li>Fernando Toussaint '<strong>FTA</strong>' - <a href='http://www.cybercultura.com'>Web</a></li>");
+        sb.append("<li>Erich Pleny</li>");
         sb.append("<br><br>");
 
-        sb.append("<h1>" + I18n.tr("Thanks to the FrostWire Chat Community!") + "</h1>");
+        sb.append("<h1>").append(I18n.tr("Thanks to the FrostWire Chat Community!")).append("</h1>");
         sb.append(I18n.tr("Thanks to everybody that has helped us everyday in the forums and chatrooms, " +
         		"you not only help new users but you also warn the FrostWire team of any problem that " +
                 "occur on our networks. Thank you all, without you this wouldn't be possible!"));
         sb.append(I18n.tr("<br><br>In Special we give thanks to the Chatroom Operators and Forum Moderators"));
         sb.append("<ul>");
 
-        sb.append("<h1>" + I18n.tr("FrostWire Chat Operators") + "</h1>");
+        sb.append("<h1>").append(I18n.tr("FrostWire Chat Operators")).append("</h1>");
         String chat_operators = "Aubrey,Casper,COOTMASTER,Emily,Gummo,Hobo,Humanoid,iDan,lexie,OfficerSparker,Scott1x,THX1138,WolfWalker,Wyrdjax,Daemon,Trinity";
         appendListOfNames(chat_operators, sb);
         sb.append("</ul>");
 
-        sb.append("<h1>" + I18n.tr("FrostWire Forum Moderators") + "</h1>");
+        sb.append("<h1>").append(I18n.tr("FrostWire Forum Moderators")).append("</h1>");
         String forum_moderators="Aaron.Walkhouse,Calliope,cootmaster,Efrain,et voil&agrave;,nonprofessional,Only A Hobo,spuggy,stief,The_Fox";
         sb.append("<ul>");
         appendListOfNames(forum_moderators,sb);
         sb.append("</ul>");
 
-        sb.append("<h1>" + I18n.tr("Many Former Chat Operators") + "</h1>");
+        sb.append("<h1>").append(I18n.tr("Many Former Chat Operators")).append("</h1>");
         String former_operators="AlleyCat,Coelacanth,Gollum,Jewels,Jordan,Kaapeli,Malachi,Maya,Sabladowah,Sweet_Songbird,UB4T,jwb,luna_moon,nonproffessional,sug,the-jack,yummy-brummy";
         sb.append("<ul>");
         appendListOfNames(former_operators, sb);
@@ -227,15 +177,22 @@ final class AboutWindow {
         appendListOfNames("dutchboy,Lelu,udsteve",sb);
         sb.append("</ul>");
 
+		sb.append("<h1>").append(I18n.tr("Thanks to the LibTorrent Team")).append("</h1>");
+		sb.append("<ul>\n");
+		sb.append("<li>Arvid Norberg</li>");
+		sb.append("<li>Steven Siloti</li>");
+		sb.append("<li>Andrew Resch</li>");
+		sb.append("</ul>\n");
+
         // azureus/vuze devs.
-        sb.append("<h1>" + I18n.tr("Thanks to the Azureus Core Developers") + "</h1>");
+        sb.append("<h1>").append(I18n.tr("Thanks to the Azureus Core Developers")).append("</h1>");
         String az_devs = "Olivier Chalouhi (gudy),Alon Rohter (nolar),Paul Gardner (parg),ArronM (TuxPaper),Paul Duran (fatal_2),Jonathan Ledlie(ledlie),Allan Crooks (amc1),Xyrio (muxumx),Michael Parker (shadowmatter),Aaron Grunthal (the8472)";
         sb.append("<ul>");
         appendListOfNames(az_devs, sb);
         sb.append("</ul>");
 
         //  developers
-        sb.append("<h1>" + I18n.tr("Thanks to the LimeWire Developer Team") + "</h1>");
+        sb.append("<h1>").append(I18n.tr("Thanks to the LimeWire Developer Team")).append("</h1>");
         sb.append("<ul>\n" +
         		"  <li>Greg Bildson</li>\n" +
         		"  <li>Sam Berlin</li>\n" +
@@ -273,17 +230,8 @@ final class AboutWindow {
         		"  <li>Kath Whittle</li>\n" +
         "</ul>");
 
-        sb.append("<h1>" + I18n.tr("Thanks to the PJIRC Staff") + "</h1>");
-        sb.append("<ul>");
-        sb.append("<li>Plouf</li>");
-        sb.append("<li>Jiquera</li>");
-        sb.append("<li>Ezequiel</li>");
-        sb.append("<li>Superchatbar.nl</li>");
-        sb.append("<li>Thema</li>");
-        sb.append("</ul>");
-
-        sb.append("<h1>" + I18n.tr("Thanks to the Automatix Team") + "</h1>");
-        sb.append("<p>" + I18n.tr("For helping distribute Frostwire to opensource communities in a very simple manner.") + "</p>");
+        sb.append("<h1>").append(I18n.tr("Thanks to the Automatix Team")).append("</h1>");
+        sb.append("<p>").append(I18n.tr("For helping distribute Frostwire to opensource communities in a very simple manner.")).append("</p>");
         sb.append("<ul>");
         sb.append("<li>Arnieboy</li>");
         sb.append("<li>JimmyJazz</li>");
@@ -291,14 +239,23 @@ final class AboutWindow {
         sb.append("<li>WildTangent</li>");
         sb.append("</ul>");
 
-        sb.append("<h1>" + I18n.tr("Thanks to Ubuntu/Kubuntu Teams") + "</h1>");
-        sb.append("<p>" + I18n.tr("For making the world a better place with such an excellent distro, you'll be the ones to make a difference on the desktop.")+"</p>");
+        sb.append("<h1>").append(I18n.tr("Thanks to Ubuntu/Kubuntu Teams")).append("</h1>");
+        sb.append("<p>").append(I18n.tr("For making the world a better place with such an excellent distro, you'll be the ones to make a difference on the desktop.")).append("</p>");
 
-        sb.append("<h1>" + I18n.tr("Thanks to the NSIS Project") + "</h1>");
-        sb.append("<p>" + I18n.tr("Thanks for such an awesome installer builder system and documentation.") + "</p>");
+        sb.append("<h1>").append(I18n.tr("Thanks to the NSIS Project")).append("</h1>");
+        sb.append("<p>").append(I18n.tr("Thanks for such an awesome installer builder system and documentation.")).append("</p>");
 
-        sb.append("<h1>" + I18n.tr("Thanks to our families") + "</h1>");
+        sb.append("<h1>").append(I18n.tr("Thanks to our families")).append("</h1>");
         sb.append(I18n.tr("For being patient during our many sleepless nights"));
+
+		sb.append("<h1>").append("FrostWire Dev Team").append("</h1>");
+		sb.append("<ul>\n");
+		sb.append("<li>Angel Leon (<a href='https://github.com/frostwire/frostwire/commits?author=gubatron'>@gubatron</a>)</li>");
+		sb.append("<li>Alden Torres (<a href='https://github.com/frostwire/frostwire/commits?author=aldenml'>@aldenml</a>)</li>");
+		sb.append("<li>Marcelina Knitter (<a href='https://github.com/frostwire/frostwire/commits?author=marcelinkaaa'>@marcelinkaaa</a>)</li>");
+		sb.append("<li>Erika Acosta (<a href='https://github.com/frostwire/frostwire/commits?author=muckachina'>@muckachina</a>)</li>");
+		sb.append("<li>Alejandro Martinez (<a href='https://github.com/frostwire/frostwire/commits?author=alejandroarturom'>@alejandroarturom</a>)</li>");
+		sb.append("</ul>");
 
         // bt notice
         sb.append("<small>");
