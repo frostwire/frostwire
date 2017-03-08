@@ -43,7 +43,9 @@ public final class FrostWireUtils {
     /**
      * Build number for the current version, gets reset to 1 on every version bump
      */
-    private static final int BUILD_NUMBER = 223;
+    private static final int BUILD_NUMBER = 227;
+
+    private static final boolean IS_RUNNING_FROM_SOURCE = new File("README.md").exists();
 
     /**
      * Make sure the constructor can never be called.
@@ -62,6 +64,8 @@ public final class FrostWireUtils {
     public static int getBuildNumber() {
         return BUILD_NUMBER;
     }
+
+    public static boolean isIsRunningFromSource() { return IS_RUNNING_FROM_SOURCE; }
 
     /**
      * Returns whether or not failures were encountered in load/save settings on startup.
