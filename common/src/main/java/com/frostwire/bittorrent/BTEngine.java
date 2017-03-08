@@ -103,6 +103,7 @@ public final class BTEngine extends SessionManager {
         sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
         sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
         sp.set_str(settings_pack.string_types.dht_bootstrap_nodes.swigValue(), dhtBootstrapNodes());
+        sp.set_int(settings_pack.int_types.active_limit.swigValue(), 2000);
 
         super.start(params);
     }
