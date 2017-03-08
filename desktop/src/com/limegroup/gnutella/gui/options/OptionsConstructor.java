@@ -90,6 +90,7 @@ public final class OptionsConstructor {
     static final String ADVANCED_KEY = "OPTIONS_ADVANCED_MAIN_TITLE";
     static final String PREFERENCING_KEY = "OPTIONS_PREFERENCING_MAIN_TITLE";
     static final String FIREWALL_KEY = "OPTIONS_FIREWALL_MAIN_TITLE";
+    static final String EXPERIMENTAL_KEY = "OPTIONS_EXPERIMENTAL_MAIN_TITLE";
     static final String GUI_KEY = "OPTIONS_GUI_MAIN_TITLE";
     static final String STARTUP_KEY = "OPTIONS_STARTUP_MAIN_TITLE";
     static final String UXSTATS_KEY = "OPTIONS_UXSTATS_MAIN_TITLE";
@@ -244,6 +245,7 @@ public final class OptionsConstructor {
         // advanced options
         addGroupTreeNode(OptionsMediator.ROOT_NODE_KEY, ADVANCED_KEY, I18n.tr("Advanced"));
         addOption(ADVANCED_KEY, PREFERENCING_KEY, I18n.tr("Updates"), AutomaticInstallerDownloadPaneItem.class);
+        addOption(ADVANCED_KEY, EXPERIMENTAL_KEY, I18n.tr("Experimental"), ExperimentalFeaturesPaneItem.class);
         addOption(ADVANCED_KEY, FIREWALL_KEY, I18n.tr("Firewall"), ForceIPPaneItem.class);
         addOption(ADVANCED_KEY, PROXY_KEY, I18n.tr("Proxy"), ProxyPaneItem.class, ProxyLoginPaneItem.class);
         addOption(ADVANCED_KEY, NETWORK_INTERFACE_KEY, I18n.tr("Network Interface"), NetworkInterfacePaneItem.class);

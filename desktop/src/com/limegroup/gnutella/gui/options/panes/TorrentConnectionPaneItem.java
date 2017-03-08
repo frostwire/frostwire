@@ -66,13 +66,15 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         panel.add(comp.getComponent());
         panel.addVerticalComponentGap();
 
-        comp = new LabeledComponent(VPN_DROP_PROTECTION,
-                VPN_DROP_PROTECTION_CHECKBOX,
-                LabeledComponent.LEFT_GLUE,
-                LabeledComponent.LEFT);
+        if (GUIConstants.Feature.VPN_DROP_GUARD.enabled()) {
+            comp = new LabeledComponent(VPN_DROP_PROTECTION,
+                    VPN_DROP_PROTECTION_CHECKBOX,
+                    LabeledComponent.LEFT_GLUE,
+                    LabeledComponent.LEFT);
 
-        panel.add(comp.getComponent());
-        panel.addVerticalComponentGap();
+            panel.add(comp.getComponent());
+            panel.addVerticalComponentGap();
+        }
 
         comp = new LabeledComponent(
                 MAX_ACTIVE_DOWNLOADS,
