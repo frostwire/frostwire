@@ -15,10 +15,20 @@
 
 package com.limegroup.gnutella.gui.init;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import com.frostwire.uxstats.UXAction;
+import com.frostwire.uxstats.UXStats;
+import com.limegroup.gnutella.gui.*;
+import com.limegroup.gnutella.gui.shell.FrostAssociations;
+import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.settings.ApplicationSettings;
+import com.limegroup.gnutella.settings.InstallSettings;
+import com.limegroup.gnutella.util.FrostWireUtils;
+import org.limewire.setting.SettingsGroupManager;
+import org.limewire.util.CommonUtils;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -27,34 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-
-import org.limewire.setting.SettingsGroupManager;
-import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
-
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
-import com.limegroup.gnutella.gui.ButtonRow;
-import com.limegroup.gnutella.gui.FramedDialog;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.GUIUtils;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.Line;
-import com.limegroup.gnutella.gui.SplashWindow;
-import com.limegroup.gnutella.gui.shell.FrostAssociations;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
-import com.limegroup.gnutella.settings.ApplicationSettings;
-import com.limegroup.gnutella.settings.InstallSettings;
-import com.limegroup.gnutella.util.FrostWireUtils;
 
 /**
  * This class manages the setup wizard.  It constructs all of the primary
@@ -119,7 +101,7 @@ public class SetupManager {
             return SaveStatus.NEEDS;
         }
 
-        if (!InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED.getValue().equals(FrostWireUtils.getFrostWireVersion())) {
+        if (!InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED.getValue().equals(String.valueOf(FrostWireUtils.getBuildNumber()))) {
             performAdditionalResets();
             return SaveStatus.NEEDS;
         }
@@ -383,7 +365,7 @@ public class SetupManager {
     /**
      * Cancels the setup.
      */
-    public void cancelSetup() {
+    private void cancelSetup() {
         dialogFrame.getDialog().dispose();
         System.exit(0);
     }
@@ -391,7 +373,7 @@ public class SetupManager {
     /**
      * Completes the setup.
      */
-    public void finishSetup() {
+    private void finishSetup() {
 
         if (_currentWindow != null) {
             try {
@@ -423,7 +405,7 @@ public class SetupManager {
             InstallSettings.FIREWALL_WARNING.setValue(true);
         InstallSettings.ASSOCIATION_OPTION.setValue(FrostAssociations.CURRENT_ASSOCIATIONS);
 
-        InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED.setValue(FrostWireUtils.getFrostWireVersion());
+        InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED.setValue(String.valueOf(FrostWireUtils.getBuildNumber()));
 
         Future<Void> future = BackgroundExecutorService.submit(new Callable<Void>() {
             public Void call() {
@@ -447,16 +429,14 @@ public class SetupManager {
         }
 
         dialogFrame.getDialog().dispose();
-
-        return;
     }
 
     /**
      * Instructs the buttons to redo their text.
      */
-    public void updateLanguage() {
-        for (int i = 0; i < actions.length; i++) {
-            actions[i].updateLanguage();
+    private void updateLanguage() {
+        for (LanguageAwareAction action : actions) {
+            action.updateLanguage();
         }
         try {
             _currentWindow.applySettings(false);
@@ -486,12 +466,12 @@ public class SetupManager {
         private static final long serialVersionUID = -9116039417985018834L;
         private final String nameKey;
 
-        public LanguageAwareAction(String nameKey) {
+        LanguageAwareAction(String nameKey) {
             super(I18n.tr(nameKey));
             this.nameKey = nameKey;
         }
 
-        public void updateLanguage() {
+        void updateLanguage() {
             putValue(Action.NAME, I18n.tr(nameKey));
         }
     }
@@ -503,7 +483,7 @@ public class SetupManager {
          */
         private static final long serialVersionUID = -337264221787811634L;
 
-        public CancelAction() {
+        CancelAction() {
             super(I18n.tr("Cancel"));
         }
 
@@ -519,7 +499,7 @@ public class SetupManager {
          */
         private static final long serialVersionUID = 8396346766881170337L;
 
-        public NextAction() {
+        NextAction() {
             super(I18n.tr("Next >>"));
         }
 
@@ -535,7 +515,7 @@ public class SetupManager {
          */
         private static final long serialVersionUID = -6355909946850317926L;
 
-        public PreviousAction() {
+        PreviousAction() {
             super(I18n.tr("<< Back"));
         }
 
@@ -551,7 +531,7 @@ public class SetupManager {
          */
         private static final long serialVersionUID = 7243495030424309213L;
 
-        public FinishAction() {
+        FinishAction() {
             super(I18n.tr("Finish"));
         }
 
