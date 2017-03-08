@@ -17,8 +17,6 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <string name="app_name">My Music</string>
-
     <!-- Page titles -->
     <string name="page_last_added">Last Added</string>
     <string name="page_playlists">Playlists</string>

@@ -135,8 +135,7 @@ public abstract class BaseActivity extends AbstractActivity
         setToolbarView(v);
 
         TextView title = findView(R.id.view_toolbar_header_title);
-        // R.string.app_name is actually "My Music" (from original apollo code)
-        title.setText(R.string.app_name);
+        title.setText(R.string.my_music);
     }
 
     @Override
