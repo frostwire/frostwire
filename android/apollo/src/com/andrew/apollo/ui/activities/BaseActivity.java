@@ -30,7 +30,6 @@ import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.support.v7.widget.Toolbar;
@@ -69,7 +68,7 @@ import java.util.ArrayList;
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
- * A base {@link FragmentActivity} used to update the bottom bar and
+ * A base {@link Activity} used to update the bottom bar and
  * bind to Apollo's service.
  * <p>
  * {@link HomeActivity} extends from this skeleton.

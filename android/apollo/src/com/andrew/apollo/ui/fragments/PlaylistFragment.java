@@ -117,7 +117,6 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
                     return true;
                 case FragmentMenuItems.DELETE:
                     final PlaylistFragmentDeleteDialog playlistFragmentDeleteDialog = buildDeleteDialog();
-                    // This is to avoid casting issues between android.support.v4.app.FragmentManager and android.app.FragmentManager
                     playlistFragmentDeleteDialog.show(getActivity().getFragmentManager());
                     return true;
                 default:
