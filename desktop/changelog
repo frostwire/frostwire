@@ -1,13 +1,17 @@
 frostwire (6.4.6) stable; urgency=high
+  * New Options > Advanced > Experimental. Users can now try ALPHA and BETA features
+    at their own risk.
   * New revision of jlibtorrent 1.2.0.6 fixes BitTorrent bugs
-  * New VPN-Drop protection setting. Automatically stop all BitTorrent traffic
-    if no VPN connection is available
   * New piece size selection on torrent creation dialog
   * Library > Playlists UI improvements. Support to display lyrics when available
   * BTJunkie.eu search discontinued
   * Fixes issues with SoundCloud search
+  * FrostWire wizard is now displayed when a new build number is detected
+  * jlibtorrent version number available in about window
+  * ALPHA: New VPN-Drop protection setting. Automatically stop all BitTorrent traffic
+    if no VPN connection is available
 	
- -- FrostWire Team <contact@frostwire.com>  Tue, 7 Mar 2017 17:43:51 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 7 Mar 2017 19:45:51 -0600
 	
 frostwire (6.4.5) stable; urgency=high
   * New jlibtorrent 1.2.0.6 fixes BitTorrent connectivity issues
