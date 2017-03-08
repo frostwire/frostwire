@@ -37,6 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import com.limegroup.gnutella.settings.UISettings;
 import org.apache.commons.io.IOUtils;
 import org.limewire.concurrent.ExecutorsHelper;
 import org.limewire.util.FileUtils;
@@ -180,8 +181,10 @@ public final class BugManager {
             classPath += "  " + urls[i].getFile() + "\n";
         }       
           
-        //Add CLASSPATH to the report
-        detail = detail + "\nCLASSPATH:\n" + classPath;
+        // Add CLASSPATH and EXPERIMENTAL FEATURE SETTINGS to the report
+        detail = detail + "\nCLASSPATH:\n" + classPath + "\nEXPERIMENTAL FEATURES SETTINGS:\n" +
+               "    ALPHA FEATURES: " + UISettings.ALPHA_FEATURES_ENABLED.getValue() + "\n" +
+               "    BETA FEATURES: " + UISettings.BETA_FEATURES_ENABLED.getValue() + "\n";
 	    
         bug.printStackTrace();
         

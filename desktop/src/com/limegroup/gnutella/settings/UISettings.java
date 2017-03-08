@@ -130,4 +130,10 @@ public final class UISettings extends LimeProps {
     /** Use Classic Search/Transfer tab, or new Search, Transfer tabs */
     public static final BooleanSetting UI_SEARCH_TRANSFERS_SPLIT_VIEW =
             FACTORY.createBooleanSetting("UI_SEARCH_TRANSFERS_SPLIT_VIEW", false);
+
+    // See com.limegroup.gnutella.gui.GUIConstants.Feature enum for available experimental features and their states.
+
+    public static final BooleanSetting ALPHA_FEATURES_ENABLED = FACTORY.createBooleanSetting("ALPHA_FEATURES_ENABLED", false);
+
+    public static final BooleanSetting BETA_FEATURES_ENABLED = FACTORY.createBooleanSetting("BETA_FEATURES_ENABLED", true);
 }

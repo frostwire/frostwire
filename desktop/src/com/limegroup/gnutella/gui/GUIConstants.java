@@ -15,6 +15,9 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.limegroup.gnutella.settings.UISettings;
+import com.limegroup.gnutella.util.FrostWireUtils;
+
 import java.io.File;
 
 /**
@@ -22,17 +25,17 @@ import java.io.File;
  */
 public final class GUIConstants {
 
-    public static final String FROSTWIRE_64x64_ICON = "frostwire64x64";
+    static final String FROSTWIRE_64x64_ICON = "frostwire64x64";
 
     /**
      * Constant for the path to the LimeWire Windows launcher.
      */
-    public static final File FROSTWIRE_EXE_FILE = new File("FrostWire.exe").getAbsoluteFile();
+    static final File FROSTWIRE_EXE_FILE = new File("FrostWire.exe").getAbsoluteFile();
 
     /**
      * The number of pixels in the margin of a padded panel.
      */
-    public static final int OUTER_MARGIN = 6;
+    static final int OUTER_MARGIN = 6;
 
     /**
      * Standard number of pixels that should separate many
@@ -40,9 +43,37 @@ public final class GUIConstants {
      */
     public static final int SEPARATOR = 6;
 
-    // TODO: move this constants to a better place
     public static final String TWITTER_FROSTWIRE_URL = "https://twitter.com/frostwire";
     public static final String FACEBOOK_FROSTWIRE_URL = "https://www.facebook.com/FrostwireOfficial";
     public static final String REDDIT_FROSTWIRE_URL = "https://www.reddit.com/r/frostwire";
-    public static final String GPLUS_FROSTWIRE_URL = "https://plus.google.com/+frostwire/posts";
+    static final String GPLUS_FROSTWIRE_URL = "https://plus.google.com/+frostwire/posts";
+
+    // Continuous Integration
+
+    enum State {
+        ALPHA, // alpha features are DISABLED by default in Experimental settings. User can enable ALPHA features.
+        BETA   // beta features are ENABLED by default in Experimental settings. User can disable BETA features.
+    }
+
+    // alpha and beta features are always enabled when running from source.
+
+    public enum Feature {
+        VPN_DROP_GUARD(State.ALPHA);
+
+        private final State status;
+
+        Feature(State status) {
+            this.status = status;
+        }
+
+        public boolean enabled() {
+            // All features are enabled if running from source.
+            boolean enabled =
+                    (status == State.ALPHA && UISettings.ALPHA_FEATURES_ENABLED.getValue()) ||
+                    (status == State.BETA && UISettings.BETA_FEATURES_ENABLED.getValue()) ||
+                    (FrostWireUtils.isIsRunningFromSource());
+            System.out.println("INFO: " + status.name() + " Feature." + this.name() + " enabled: " + enabled);
+            return enabled;
+        }
+    }
 }
