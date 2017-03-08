@@ -4,9 +4,10 @@ frostwire (6.4.6) stable; urgency=high
     if no VPN connection is available
   * New piece size selection on torrent creation dialog
   * Library > Playlists UI improvements. Support to display lyrics when available
-  * BTJunkie.eu search discontinued	
+  * BTJunkie.eu search discontinued
+  * Fixes issues with SoundCloud search
 	
- -- FrostWire Team <contact@frostwire.com>  Mon, 6 Mar 2017 11:03:08 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 7 Mar 2017 17:43:51 -0600
 	
 frostwire (6.4.5) stable; urgency=high
   * New jlibtorrent 1.2.0.6 fixes BitTorrent connectivity issues
