@@ -93,8 +93,7 @@
             android:elevation="1dp"
             android:gravity="end"
             android:src="@drawable/menu_update"
-            android:tint="@color/basic_green"
-            android:visibility="visible" />
+            android:tint="@color/basic_green" />
 
     </RelativeLayout>
 
