@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,11 +65,25 @@ public final class Offers {
             return;
         }
         lastInitAdnetworksInvocationTimestamp = now;
+        boolean appLovinActive = false;
+        boolean mopubActive = false;
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
             if (adNetwork != null) { // because of a typo on config file this can happen
                 adNetwork.initialize(activity);
+                if (adNetwork == APP_LOVIN) {
+                    appLovinActive = true;
+                }
+                if (adNetwork == MOPUB) {
+                    mopubActive = true;
+                }
             }
         }
+
+        // AppLovin being accessed via MoPub
+        if (mopubActive && !appLovinActive) {
+            APP_LOVIN.initialize(activity);
+        }
+
         stopAdNetworksIfPurchasedRemoveAds(activity);
     }
 
