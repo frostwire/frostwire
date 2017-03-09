@@ -29,8 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
+        android:layout_marginTop="22dp"
         android:layout_toLeftOf="@+id/view_ad_menu_item_thumbnail"
-        android:layout_marginTop="30dp"
         android:paddingLeft="12dp">
 
         <TextView
@@ -38,9 +38,9 @@
             style="@style/SlideMenuAdHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/support_frostwire"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true" />
+            android:text="@string/support_frostwire" />
 
         <TextView
             android:id="@+id/view_ad_menu_item_subtitle"
