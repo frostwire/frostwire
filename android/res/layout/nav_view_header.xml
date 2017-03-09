@@ -19,50 +19,24 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="132dp"
-              android:background="@color/basic_blue"
-              android:gravity="bottom"
-              android:orientation="vertical"
-              android:paddingBottom="10dp"
-              android:paddingLeft="16dp"
-              android:paddingRight="16dp" >
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/app_toolbar_background"
+    android:orientation="horizontal"
+    android:padding="14dp">
 
     <ImageView
         android:id="@+id/nav_view_header_main_app_logo"
-        android:layout_width="54dp"
-        android:layout_height="54dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="12dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="10dp"
         android:src="@drawable/app_icon" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="bottom">
-
-        <TextView
-            android:id="@+id/nav_view_header_main_build"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/nav_view_header_main_title"
-            android:text="@string/dummy_build"
-            android:textColor="@color/basic_gray_medium"
-            android:textSize="@dimen/text_size_micro" />
-
-        <ImageView
-            android:id="@+id/nav_view_header_main_update"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:background="@color/transparent"
-            android:elevation="1dp"
-            android:gravity="end"
-            android:src="@drawable/menu_update"
-            android:tint="@color/basic_green"
-            android:clickable="true"/>
+        android:layout_height="match_parent"
+        android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/nav_view_header_main_title"
@@ -75,6 +49,53 @@
             android:textColor="@color/basic_white"
             android:textSize="@dimen/text_size_small"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/nav_view_header_main_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/nav_view_header_main_title"
+            android:text="@string/dummy_title"
+            android:textColor="@color/basic_gray_medium"
+            android:textSize="@dimen/text_size_micro" />
+
+        <TextView
+            android:id="@+id/nav_view_header_main_comma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/nav_view_header_main_title"
+            android:layout_toRightOf="@+id/nav_view_header_main_version"
+            android:text=","
+            android:textColor="@color/basic_gray_medium"
+            android:textSize="@dimen/text_size_micro" />
+
+        <TextView
+            android:id="@+id/nav_view_header_main_build"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/nav_view_header_main_title"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/nav_view_header_main_comma"
+            android:text="@string/dummy_build"
+            android:textColor="@color/basic_gray_medium"
+            android:textSize="@dimen/text_size_micro" />
+
+        <ImageView
+            android:id="@+id/nav_view_header_main_update"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:background="@color/transparent"
+            android:clickable="true"
+            android:elevation="1dp"
+            android:gravity="end"
+            android:src="@drawable/menu_update"
+            android:tint="@color/basic_green"
+            android:visibility="visible" />
+
     </RelativeLayout>
 
 </LinearLayout>
