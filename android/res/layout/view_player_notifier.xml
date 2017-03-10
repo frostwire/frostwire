@@ -64,6 +64,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="right"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:orientation="horizontal">
 
         <ImageView
@@ -78,7 +80,7 @@
             style="@style/PlayerNotifierIcons"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:src="@drawable/btn_playback_play_bottom" />
+            android:background="@drawable/btn_playback_play_bottom" />
 
         <ImageView
             android:id="@+id/view_player_notifier_next"

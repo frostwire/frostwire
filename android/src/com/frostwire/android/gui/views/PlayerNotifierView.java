@@ -23,9 +23,6 @@ import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -39,25 +36,17 @@ import com.frostwire.android.gui.services.Engine;
 /**
  * @author gubatron
  * @author aldenml
- *
+ * 
  */
 public class PlayerNotifierView extends LinearLayout {
 
-    private String lastStatusShown;
-    private TextView statusText;
-    private LinearLayout statusContainer;
-
-    private TranslateAnimation fromRightAnimation;
-
-    private TranslateAnimation showNotifierAnimation;
-    private TranslateAnimation hideNotifierAnimation;
-
+    private TextView titleText;
+    private TextView artistText;
+    private ImageView coverImage;
     private TimerObserver refresher;
 
     public PlayerNotifierView(Context context, AttributeSet set) {
         super(context, set);
-
-        initAnimations();
 
         refresher = new TimerObserver() {
             @Override
@@ -71,33 +60,21 @@ public class PlayerNotifierView extends LinearLayout {
         return refresher;
     }
 
-    private void initAnimations() {
-        fromRightAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
-        fromRightAnimation.setDuration(500);
-        fromRightAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-
-        showNotifierAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
-        showNotifierAnimation.setDuration(300);
-        showNotifierAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-
-        hideNotifierAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 1.0f);
-        hideNotifierAnimation.setDuration(300);
-        hideNotifierAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-    }
-
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        
+
         View.inflate(getContext(), R.layout.view_player_notifier, this);
-        
+
         if (isInEditMode()) {
             return;
         }
 
-        statusText = (TextView) findViewById(R.id.view_player_notifier_status);
-        statusContainer = (LinearLayout) findViewById(R.id.view_player_notifier_status_container);
-        
+        titleText = (TextView) findViewById(R.id.view_player_notifier_title);
+        artistText = (TextView) findViewById(R.id.view_player_notifier_artist);
+        coverImage = (ImageView) findViewById(R.id.view_player_notifier_cover);
+        coverImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
         refreshPlayerStateIndicator();
     }
 
@@ -106,10 +83,12 @@ public class PlayerNotifierView extends LinearLayout {
         if (mediaPlayer == null) {
             return;
         }
-        ImageView notifierIconImageView = (ImageView) findViewById(R.id.view_player_notifier_icon);
-        int notifierResourceId = R.drawable.playernotifier_icon_play; 
+        ImageView notifierIconImageView = (ImageView) findViewById(R.id.view_player_notifier_play_pause);
+        int notifierResourceId;
         if (!mediaPlayer.isPlaying()) {
-            notifierResourceId = R.drawable.playernotifier_icon_pause;
+            notifierResourceId = R.drawable.btn_playback_play_bottom;
+        } else {
+            notifierResourceId = R.drawable.btn_playback_pause_bottom;
         }
         notifierIconImageView.setBackgroundResource(notifierResourceId);
     }
@@ -119,26 +98,22 @@ public class PlayerNotifierView extends LinearLayout {
         if (mp != null) {
             FileDescriptor fd = mp.getCurrentFD();
 
-            String status = "";
+            String title = "";
+            String artist = "";
             refreshPlayerStateIndicator();
             if (fd != null) {
-                status = fd.artist + " - " + fd.title;
+                title = fd.title;
+                artist = fd.artist;
                 if (getVisibility() == View.GONE) {
                     setVisibility(View.VISIBLE);
-                    startAnimation(showNotifierAnimation);
                 }
             } else {
                 if (getVisibility() == View.VISIBLE) {
-                    startAnimation(hideNotifierAnimation);
                     setVisibility(View.GONE);
                 }
             }
-            if (!status.equals(lastStatusShown)) {
-                statusText.setText(status);
-                lastStatusShown = status;
-                statusContainer.startAnimation(fromRightAnimation);
-            }
-
+            titleText.setText(title);
+            artistText.setText(artist);
         }
     }
 
