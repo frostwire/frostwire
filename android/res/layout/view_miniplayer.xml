@@ -47,6 +47,7 @@
             android:layout_gravity="center_vertical|left"
             android:text="@string/dummy_title"
             android:textAllCaps="true"
+            android:maxLines="1"
             android:textColor="@color/app_text_white"
             android:textSize="@dimen/text_extra_micro"
             android:textStyle="bold" />
@@ -58,6 +59,7 @@
             android:layout_gravity="center_vertical|left"
             android:text="@string/dummy_title"
             android:textAllCaps="true"
+            android:maxLines="1"
             android:textColor="@color/app_text_light"
             android:textSize="@dimen/text_extra_micro" />
     </LinearLayout>
@@ -74,8 +76,8 @@
             android:id="@+id/view_miniplayer_previous"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingLeft="12dp"
-            android:paddingRight="24dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="20dp"
             android:src="@drawable/btn_playback_previous_bottom" />
 
         <ImageView
@@ -88,7 +90,7 @@
             android:id="@+id/view_miniplayer_next"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingLeft="24dp"
+            android:paddingLeft="20dp"
             android:paddingRight="12dp"
             android:src="@drawable/btn_playback_next_bottom" />
     </LinearLayout>

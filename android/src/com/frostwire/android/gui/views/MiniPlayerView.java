@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -71,6 +72,8 @@ public class MiniPlayerView extends LinearLayout {
         artistText = (TextView) findViewById(R.id.view_miniplayer_artist);
         coverImage = (ImageView) findViewById(R.id.view_miniplayer_cover);
         coverImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        titleText.setEllipsize(TextUtils.TruncateAt.END);
+        artistText.setEllipsize(TextUtils.TruncateAt.END);
         initEventHandlers();
         refreshComponents();
     }
