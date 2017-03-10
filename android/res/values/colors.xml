@@ -48,6 +48,7 @@
     <color name="app_background_body_light">@color/basic_gray_light</color>
     <color name="app_background_body_dark">@color/basic_gray_medium</color>
     <color name="app_toolbar_background">@color/basic_blue</color>
+    <color name="app_toolbar_background_bottom">@color/basic_blue_dark_highlight</color>
     <color name="app_selection_background">@color/basic_gray_light</color>
     <color name="app_rich_notification_background">@color/basic_yellow</color>
     <color name="app_browse_thumbnail_background">@color/basic_gray_light</color>
