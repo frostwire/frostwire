@@ -19,6 +19,7 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,6 +32,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.ImageLoader;
 
 /**
  * @author gubatron
@@ -41,13 +43,11 @@ public class MiniPlayerView extends LinearLayout {
 
     private TextView titleText;
     private TextView artistText;
-    private LinearLayout statusContainer;
     private ImageView coverImage;
     private TimerObserver refresher;
 
     public MiniPlayerView(Context context, AttributeSet set) {
         super(context, set);
-
         refresher = new TimerObserver() {
             @Override
             public void onTime() {
@@ -63,21 +63,16 @@ public class MiniPlayerView extends LinearLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-
         View.inflate(getContext(), R.layout.view_miniplayer, this);
-
         if (isInEditMode()) {
             return;
         }
-        statusContainer = (LinearLayout) findViewById(R.id.view_miniplayer_status_container);
         titleText = (TextView) findViewById(R.id.view_miniplayer_title);
         artistText = (TextView) findViewById(R.id.view_miniplayer_artist);
         coverImage = (ImageView) findViewById(R.id.view_miniplayer_cover);
         coverImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
         initEventHandlers();
-
-        refreshPlayerStateIndicator();
+        refreshComponents();
     }
 
     private void initEventHandlers() {
@@ -88,6 +83,8 @@ public class MiniPlayerView extends LinearLayout {
             }
         };
         coverImage.setOnClickListener(goToAudioPlayerActivityListener);
+
+        LinearLayout statusContainer = (LinearLayout) findViewById(R.id.view_miniplayer_status_container);
         statusContainer.setOnClickListener(goToAudioPlayerActivityListener);
 
         ImageView previous = (ImageView) findViewById(R.id.view_miniplayer_previous);
@@ -113,7 +110,6 @@ public class MiniPlayerView extends LinearLayout {
                 return true;
             }
         });
-
         ImageView next = (ImageView) findViewById(R.id.view_miniplayer_next);
         next.setOnClickListener(new OnClickListener() {
             @Override
@@ -125,10 +121,12 @@ public class MiniPlayerView extends LinearLayout {
 
     private void onPreviousClick() {
         MusicUtils.previous(getContext());
+        refreshComponents();
     }
 
     private void onNextClick() {
         MusicUtils.next();
+        refreshComponents();
     }
 
     private void onPlayPauseLongClick() {
@@ -146,18 +144,33 @@ public class MiniPlayerView extends LinearLayout {
             return;
         }
         MusicUtils.playOrPause();
-        refreshPlayerStateIndicator();
+        refreshComponents();
     }
 
-    private void refreshPlayerStateIndicator() {
-        ImageView notifierIconImageView = (ImageView) findViewById(R.id.view_miniplayer_play_pause);
+    private void refreshComponents() {
+        refreshPlayPauseIcon();
+        refreshAlbumCover();
+    }
+
+    private void refreshAlbumCover() {
+        long currentAlbumId = MusicUtils.getCurrentAlbumId();
+        if (currentAlbumId != -1) {
+            Uri albumUri = ImageLoader.getAlbumArtUri(currentAlbumId);
+            ImageLoader.getInstance(getContext()).load(albumUri, coverImage);
+        } else {
+            coverImage.setBackgroundResource(R.drawable.default_artwork);
+        }
+    }
+
+    private void refreshPlayPauseIcon() {
+        ImageView playPauseButton = (ImageView) findViewById(R.id.view_miniplayer_play_pause);
         int notifierResourceId;
         if (!MusicUtils.isPlaying()) {
             notifierResourceId = R.drawable.btn_playback_play_bottom;
         } else {
             notifierResourceId = R.drawable.btn_playback_pause_bottom;
         }
-        notifierIconImageView.setBackgroundResource(notifierResourceId);
+        playPauseButton.setBackgroundResource(notifierResourceId);
     }
 
     public void refresherOnTime() {
@@ -167,7 +180,7 @@ public class MiniPlayerView extends LinearLayout {
 
             String title = "";
             String artist = "";
-            refreshPlayerStateIndicator();
+            refreshComponents();
             if (fd != null) {
                 title = fd.title;
                 artist = fd.artist;
