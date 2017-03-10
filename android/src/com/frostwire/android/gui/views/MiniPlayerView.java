@@ -41,6 +41,7 @@ public class MiniPlayerView extends LinearLayout {
 
     private TextView titleText;
     private TextView artistText;
+    private LinearLayout statusContainer;
     private ImageView coverImage;
     private TimerObserver refresher;
 
@@ -68,7 +69,7 @@ public class MiniPlayerView extends LinearLayout {
         if (isInEditMode()) {
             return;
         }
-
+        statusContainer = (LinearLayout) findViewById(R.id.view_miniplayer_status_container);
         titleText = (TextView) findViewById(R.id.view_miniplayer_title);
         artistText = (TextView) findViewById(R.id.view_miniplayer_artist);
         coverImage = (ImageView) findViewById(R.id.view_miniplayer_cover);
@@ -87,8 +88,7 @@ public class MiniPlayerView extends LinearLayout {
             }
         };
         coverImage.setOnClickListener(goToAudioPlayerActivityListener);
-        titleText.setOnClickListener(goToAudioPlayerActivityListener);
-        artistText.setOnClickListener(goToAudioPlayerActivityListener);
+        statusContainer.setOnClickListener(goToAudioPlayerActivityListener);
 
         ImageView previous = (ImageView) findViewById(R.id.view_miniplayer_previous);
         previous.setOnClickListener(new OnClickListener() {
