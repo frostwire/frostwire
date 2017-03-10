@@ -569,7 +569,6 @@
         <item name="android:layout_marginBottom">0dp</item>
     </style>
 
-
     <!-- Used within entire app -->
 
     <style name="divider_line">

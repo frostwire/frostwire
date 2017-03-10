@@ -65,7 +65,7 @@
                     android:tag="transfers_fragment" />
             </FrameLayout>
 
-            <com.frostwire.android.gui.views.PlayerNotifierView
+            <com.frostwire.android.gui.views.MiniPlayerView
                 android:id="@+id/activity_main_player_notifier"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
