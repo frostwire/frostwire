@@ -26,20 +26,20 @@
     android:orientation="horizontal">
 
     <ImageView
-        android:id="@+id/view_player_notifier_cover"
+        android:id="@+id/view_miniplayer_cover"
         android:layout_width="48dp"
         android:layout_height="match_parent"
         android:background="@drawable/default_artwork" />
 
     <LinearLayout
-        android:id="@+id/view_player_notifier_status_container"
+        android:id="@+id/view_miniplayer_status_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingLeft="10dp">
 
         <TextView
-            android:id="@+id/view_player_notifier_title"
+            android:id="@+id/view_miniplayer_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|left"
@@ -50,7 +50,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/view_player_notifier_artist"
+            android:id="@+id/view_miniplayer_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|left"
@@ -69,21 +69,21 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/view_player_notifier_previous"
+            android:id="@+id/view_miniplayer_previous"
             style="@style/PlayerNotifierIcons"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:src="@drawable/btn_playback_previous_bottom" />
 
         <ImageView
-            android:id="@+id/view_player_notifier_play_pause"
+            android:id="@+id/view_miniplayer_play_pause"
             style="@style/PlayerNotifierIcons"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="@drawable/btn_playback_play_bottom" />
 
         <ImageView
-            android:id="@+id/view_player_notifier_next"
+            android:id="@+id/view_miniplayer_next"
             style="@style/PlayerNotifierIcons"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

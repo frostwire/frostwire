@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.views;
@@ -36,16 +35,16 @@ import com.frostwire.android.gui.services.Engine;
 /**
  * @author gubatron
  * @author aldenml
- * 
+ * @author marcelinkaaa
  */
-public class PlayerNotifierView extends LinearLayout {
+public class MiniPlayerView extends LinearLayout {
 
     private TextView titleText;
     private TextView artistText;
     private ImageView coverImage;
     private TimerObserver refresher;
 
-    public PlayerNotifierView(Context context, AttributeSet set) {
+    public MiniPlayerView(Context context, AttributeSet set) {
         super(context, set);
 
         refresher = new TimerObserver() {
@@ -64,15 +63,15 @@ public class PlayerNotifierView extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        View.inflate(getContext(), R.layout.view_player_notifier, this);
+        View.inflate(getContext(), R.layout.view_miniplayer, this);
 
         if (isInEditMode()) {
             return;
         }
 
-        titleText = (TextView) findViewById(R.id.view_player_notifier_title);
-        artistText = (TextView) findViewById(R.id.view_player_notifier_artist);
-        coverImage = (ImageView) findViewById(R.id.view_player_notifier_cover);
+        titleText = (TextView) findViewById(R.id.view_miniplayer_title);
+        artistText = (TextView) findViewById(R.id.view_miniplayer_artist);
+        coverImage = (ImageView) findViewById(R.id.view_miniplayer_cover);
         coverImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         refreshPlayerStateIndicator();
@@ -83,7 +82,7 @@ public class PlayerNotifierView extends LinearLayout {
         if (mediaPlayer == null) {
             return;
         }
-        ImageView notifierIconImageView = (ImageView) findViewById(R.id.view_player_notifier_play_pause);
+        ImageView notifierIconImageView = (ImageView) findViewById(R.id.view_miniplayer_play_pause);
         int notifierResourceId;
         if (!mediaPlayer.isPlaying()) {
             notifierResourceId = R.drawable.btn_playback_play_bottom;
