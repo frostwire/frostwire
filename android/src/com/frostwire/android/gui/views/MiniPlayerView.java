@@ -20,13 +20,13 @@ package com.frostwire.android.gui.views;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
@@ -74,17 +74,85 @@ public class MiniPlayerView extends LinearLayout {
         coverImage = (ImageView) findViewById(R.id.view_miniplayer_cover);
         coverImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
+        initEventHandlers();
+
         refreshPlayerStateIndicator();
     }
 
-    private void refreshPlayerStateIndicator() {
+    private void initEventHandlers() {
+        OnClickListener goToAudioPlayerActivityListener = new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAudioPlayerActivity();
+            }
+        };
+        coverImage.setOnClickListener(goToAudioPlayerActivityListener);
+        titleText.setOnClickListener(goToAudioPlayerActivityListener);
+        artistText.setOnClickListener(goToAudioPlayerActivityListener);
+
+        ImageView previous = (ImageView) findViewById(R.id.view_miniplayer_previous);
+        previous.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPreviousClick();
+            }
+        });
+
+        ImageView playPause = (ImageView) findViewById(R.id.view_miniplayer_play_pause);
+        playPause.setClickable(true);
+        playPause.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPlayPauseClick();
+            }
+        });
+        playPause.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                onPlayPauseLongClick();
+                return true;
+            }
+        });
+
+        ImageView next = (ImageView) findViewById(R.id.view_miniplayer_next);
+        next.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onNextClick();
+            }
+        });
+    }
+
+    private void onPreviousClick() {
+        MusicUtils.previous(getContext());
+    }
+
+    private void onNextClick() {
+        MusicUtils.next();
+    }
+
+    private void onPlayPauseLongClick() {
         CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
         if (mediaPlayer == null) {
             return;
         }
+        mediaPlayer.stop();
+        setVisibility(View.GONE);
+    }
+
+    private void onPlayPauseClick() {
+        CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
+        if (mediaPlayer == null) {
+            return;
+        }
+        MusicUtils.playOrPause();
+        refreshPlayerStateIndicator();
+    }
+
+    private void refreshPlayerStateIndicator() {
         ImageView notifierIconImageView = (ImageView) findViewById(R.id.view_miniplayer_play_pause);
         int notifierResourceId;
-        if (!mediaPlayer.isPlaying()) {
+        if (!MusicUtils.isPlaying()) {
             notifierResourceId = R.drawable.btn_playback_play_bottom;
         } else {
             notifierResourceId = R.drawable.btn_playback_pause_bottom;
@@ -116,13 +184,9 @@ public class MiniPlayerView extends LinearLayout {
         }
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (Engine.instance().getMediaPlayer().getCurrentFD() != null) {
-            Intent i = new Intent(getContext(), AudioPlayerActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            getContext().startActivity(i);
-        }
-        return true;
+    private void openAudioPlayerActivity() {
+        Intent i = new Intent(getContext(), AudioPlayerActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(i);
     }
 }
