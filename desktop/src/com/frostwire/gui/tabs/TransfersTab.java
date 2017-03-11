@@ -32,7 +32,7 @@ import java.awt.event.*;
  * @author aldenml
  */
 public final class TransfersTab extends AbstractTab {
-    final BTDownloadMediator downloadMediator;
+    private final BTDownloadMediator downloadMediator;
 
     // it will be a reference to the download mediator above who is the one interested.
     private TransfersFilterModeListener transfersFilterModeListener;
@@ -155,9 +155,9 @@ public final class TransfersTab extends AbstractTab {
             restoreFilterTextHint();
         } else {
             filterText.setForeground(Color.BLACK);
-            if (transfersFilterModeListener != null) {
-                transfersFilterModeListener.onFilterUpdate(text);
-            }
+        }
+        if (transfersFilterModeListener != null) {
+            transfersFilterModeListener.onFilterUpdate(text);
         }
     }
 
@@ -193,6 +193,11 @@ public final class TransfersTab extends AbstractTab {
     }
 
     private class TextFilterKeyAdapter extends KeyAdapter {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            onTextFilterKeyTyped();
+        }
+
         @Override
         public void keyReleased(KeyEvent e) {
             onTextFilterKeyTyped();
