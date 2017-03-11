@@ -74,7 +74,7 @@ final class LibraryFilesTransferHandler extends TransferHandler {
         return false;
     }
 
-    private boolean droppingFoldersToAddToLibrary(TransferSupport support, DirectoryHolder dirHolder, boolean invokingFromCanImport) throws UnsupportedFlavorException, IOException {
+    private boolean droppingFoldersToAddToLibrary(TransferSupport support, DirectoryHolder dirHolder, boolean invokingFromCanImport) {
         try {
             //Mac doesn't have the data flavors until importData() is invoked.
             if (invokingFromCanImport && OSUtils.isMacOSX()) {

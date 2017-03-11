@@ -177,7 +177,7 @@ public class JFIFOutputStream extends OutputStream {
     }
 
     /** Returns the offset of the current segment or -1 if none has been pushed. */
-    public long getSegmentOffset() throws IOException {
+    public long getSegmentOffset() {
         if (stack.peek() == null) {
             return -1;
         } else {

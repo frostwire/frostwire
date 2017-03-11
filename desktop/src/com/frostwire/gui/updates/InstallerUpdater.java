@@ -188,7 +188,7 @@ public class InstallerUpdater implements Runnable {
         }
     }
 
-    private void startTorrentDownload(String torrentFile, String saveDataPath) throws Exception {
+    private void startTorrentDownload(String torrentFile, String saveDataPath) {
 
         TorrentInfo tinfo = new TorrentInfo(new File(torrentFile));
         final Sha1Hash updateInfoHash = tinfo.infoHash();
@@ -452,7 +452,7 @@ public class InstallerUpdater implements Runnable {
         return lastMD5;
     }
 
-    private static void downloadTorrentFile(String torrentURL, File saveLocation) throws IOException, URISyntaxException {
+    private static void downloadTorrentFile(String torrentURL, File saveLocation) throws IOException {
         byte[] contents = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).getBytes(torrentURL);
 
         // save the torrent locally if you have to

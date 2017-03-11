@@ -191,7 +191,7 @@ public class ExternalControl {
         return true;
     }
     
-    private void writeNotFound(OutputStream os) throws IOException {
+    private void writeNotFound(OutputStream os) {
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(os));
         pw.print("HTTP/1.0 404 Not Found" + NL + NL);
         pw.flush();

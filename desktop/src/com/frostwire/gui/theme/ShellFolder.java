@@ -143,7 +143,7 @@ abstract class ShellFolder extends File {
      * @return The shell folder linked to by this shell folder, or null
      * if this shell folder is not a link
      */
-    public abstract ShellFolder getLinkLocation() throws FileNotFoundException;
+    public abstract ShellFolder getLinkLocation();
 
     /**
      * @return The name used to display this shell folder

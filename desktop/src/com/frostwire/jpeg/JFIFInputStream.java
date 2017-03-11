@@ -210,7 +210,7 @@ public class JFIFInputStream extends FilterInputStream {
      * the end of the stream.
      * @throws java.io.IOException
      */
-    public Segment getSegment() throws IOException {
+    public Segment getSegment() {
         return segment;
     }
 

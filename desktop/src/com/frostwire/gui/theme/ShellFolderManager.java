@@ -44,7 +44,7 @@ class ShellFolderManager {
      * Create a shell folder from a file.
      * Override to return machine-dependent behavior.
      */
-    public ShellFolder createShellFolder(File file) throws FileNotFoundException {
+    public ShellFolder createShellFolder(File file) {
         return new DefaultShellFolder(null, file);
     }
 
@@ -71,11 +71,7 @@ class ShellFolderManager {
         if (key.equals("fileChooserDefaultFolder")) {
             // Return the default shellfolder for a new filechooser
             File homeDir = new File(System.getProperty("user.home"));
-            try {
-                return createShellFolder(homeDir);
-            } catch (FileNotFoundException e) {
-                return homeDir;
-            }
+            return createShellFolder(homeDir);
         } else if (key.equals("roots")) {
             // The root(s) of the displayable hieararchy
             return File.listRoots();
