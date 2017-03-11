@@ -166,7 +166,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public BTDownload findBTDownload(File saveLocation) {
-        if (saveLocation == null || saveLocation.equals("")) {
+        if (saveLocation == null) {
             return null;
         }
         final List<BTDownload> downloads = getDownloads();
@@ -181,7 +181,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
     // Linear complexity, take it easy, try no to use on refresh methods, only on actions.
     public boolean isActiveTorrentDownload(File saveLocation) {
-        if (saveLocation == null || saveLocation.equals("")) {
+        if (saveLocation == null) {
             return false;
         }
         int active = getActiveDownloads() + getActiveUploads();
@@ -264,7 +264,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         }
     }
 
-    public void updateTableFilters() {
+    void updateTableFilters() {
         if (TABLE == null || DATA_MODEL == null) {
             return;
         }
@@ -558,6 +558,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         //in case it's a single picked .torrent/magnet download
         if (saveLocation != null && saveLocation.isDirectory() && LibraryUtils.directoryContainsASinglePlayableFile(saveLocation)) {
             try {
+                //noinspection ConstantConditions
                 saveLocation = saveLocation.listFiles()[0];
             } catch (Throwable t) {
                 saveLocation = null;

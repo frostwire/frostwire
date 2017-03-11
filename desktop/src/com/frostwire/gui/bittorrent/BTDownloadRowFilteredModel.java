@@ -14,9 +14,6 @@ import java.util.List;
  * 
  */
 public class BTDownloadRowFilteredModel extends BTDownloadModel {
-
-    private static final long serialVersionUID = -581151930850193368L;
-
     /**
      * The filter to use in this row filter.
      */
@@ -25,16 +22,14 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
     /**
      * A list of all filtered results.
      */
-    protected final List<BTDownloadDataLine> HIDDEN;
+    private final List<BTDownloadDataLine> HIDDEN;
 
     /**
      * Constructs a TableRowFilter with the specified TableLineFilter.
      */
-    public BTDownloadRowFilteredModel(TableLineFilter<BTDownloadDataLine> f) {
-
+    BTDownloadRowFilteredModel(TableLineFilter<BTDownloadDataLine> f) {
         if (f == null)
             throw new NullPointerException("null filter");
-
         FILTER = f;
         HIDDEN = new ArrayList<>();
     }
@@ -43,14 +38,12 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
      * Determines whether or not this line should be added.
      */
     public int add(BTDownloadDataLine tl, int row) {
-
         if (!allow(tl)) {
             HIDDEN.add(tl);
             return -1;
         } else {
             return super.add(tl, row);
         }
-
     }
 
     @Override
@@ -78,19 +71,18 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
      * Rebuilds the internal map to denote a new filter.
      */
     private void rebuild() {
-        List<BTDownloadDataLine> existing = new ArrayList<BTDownloadDataLine>(_list);
-        List<BTDownloadDataLine> hidden = new ArrayList<BTDownloadDataLine>(HIDDEN);
+        List<BTDownloadDataLine> existing = new ArrayList<>(_list);
+        List<BTDownloadDataLine> hidden = new ArrayList<>(HIDDEN);
 
         clear();
 
         // For stuff in _list, we can just re-add the DataLines as-is.
-        for (int i = 0; i < existing.size(); i++) {
-            addSorted(existing.get(i));
+        for (BTDownloadDataLine anExisting : existing) {
+            addSorted(anExisting);
         }
 
         // Merge the hidden TableLines
-        for (int i = 0; i < hidden.size(); i++) {
-            BTDownloadDataLine tl = hidden.get(i);
+        for (BTDownloadDataLine tl : hidden) {
             addSorted(tl);
         }
     }
@@ -115,12 +107,9 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
     @Override
     int getActiveUploads() {
         int count = super.getActiveUploads();
-
-        int size = HIDDEN.size();
-
         try {
-            for (int i = 0; i < size; i++) {
-                BTDownload downloader = HIDDEN.get(i).getInitializeObject();
+            for (BTDownloadDataLine aHIDDEN : HIDDEN) {
+                BTDownload downloader = aHIDDEN.getInitializeObject();
                 if (downloader.isCompleted() && downloader.getState() == TransferState.SEEDING) {
                     count++;
                 }
