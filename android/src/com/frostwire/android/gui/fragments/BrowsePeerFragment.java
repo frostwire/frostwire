@@ -24,8 +24,11 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.SearchView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CompoundButton;
@@ -33,6 +36,7 @@ import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.app.SearchManager;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
@@ -94,6 +98,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public BrowsePeerFragment() {
         super(R.layout.fragment_browse_peer);
         broadcastReceiver = new LocalBroadcastReceiver();
+        setHasOptionsMenu(true);
+
         this.peer = new Peer();
         toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_RINGTONES);   //0x00 - Audio -> Ringtones
         toTheRightOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_DOCUMENTS); //0x01 - Pictures -> Documents
@@ -142,6 +148,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     @Override
     public void onLoaderReset(Loader<Object> loader) {
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_browse_peer_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
     }
 
     @Override
