@@ -29,6 +29,7 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CompoundButton;
@@ -36,7 +37,6 @@ import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.app.SearchManager;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
@@ -60,6 +60,7 @@ import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
 import java.util.*;
+
 
 /**
  * @author gubatron
@@ -155,6 +156,21 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         inflater.inflate(R.menu.fragment_browse_peer_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
+        SearchView searchView = (SearchView) menu.findItem(R.id.fragment_browse_peer_menu_filter).getActionView();
+        searchView.setQueryHint("Filter...");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.fragment_browse_peer_menu_filter:
+                return true;
+            case R.id.fragment_browse_peer_menu_selection:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

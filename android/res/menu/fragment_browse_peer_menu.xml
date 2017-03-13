@@ -22,17 +22,17 @@
 
     <item
         android:id="@+id/fragment_browse_peer_menu_filter"
-        android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/ic_action_search"
         android:orderInCategory="1"
-        android:title="@string/search"
-        app:showAsAction="collapseActionView|always" />
+        android:title="@string/type_to_filter_results"
+        app:showAsAction="collapseActionView|always"
+        app:actionViewClass="android.support.v7.widget.SearchView"/>
     <item
         android:id="@+id/fragment_browse_peer_menu_selection"
         android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/action_bar_checkbox"
-        android:orderInCategory="1"
+        android:orderInCategory="2"
         android:title="@string/search"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
 </menu>
