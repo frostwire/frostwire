@@ -47,10 +47,7 @@
                 android:ellipsize="marquee"
                 android:maxLines="2"
                 android:text="@string/dummy_title"
-                android:textAllCaps="true"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/app_text_primary"
-                android:textStyle="bold" />
+                style="@style/SelectDeselectAllText" />
 
         </RelativeLayout>
 

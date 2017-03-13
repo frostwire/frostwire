@@ -43,6 +43,7 @@ import android.widget.Filter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.andrew.apollo.MusicPlaybackService;
@@ -80,7 +81,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private ListView list;
     private FileListAdapter adapter;
     private MenuItem checkBoxMenuItem;
-    private LinearLayout selectAllCheckboxContainer;
+    private RelativeLayout selectAllCheckboxContainer;
     private CheckBox selectAllCheckbox;
     private boolean selectAllModeOn;
     private Peer peer;
