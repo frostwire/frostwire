@@ -83,6 +83,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private MenuItem checkBoxMenuItem;
     private RelativeLayout selectAllCheckboxContainer;
     private CheckBox selectAllCheckbox;
+    private CompoundButton.OnCheckedChangeListener selectAllCheckboxListener;
     private boolean selectAllModeOn;
     private Peer peer;
     private View header;
@@ -532,18 +533,21 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     private CompoundButton.OnCheckedChangeListener getSelectAllOnCheckedChangeListener() {
-        return new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                TextView textView = findView(getView(), R.id.fragment_browse_peer_selection_mode_label);
-                textView.setText(isChecked ? R.string.deselect_all : R.string.select_all);
-                if (isChecked) {
-                    adapter.checkAll();
-                } else {
-                    adapter.clearChecked();
+        if (selectAllCheckboxListener == null) {
+            selectAllCheckboxListener = new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    TextView textView = findView(getView(), R.id.fragment_browse_peer_selection_mode_label);
+                    textView.setText(isChecked ? R.string.deselect_all : R.string.select_all);
+                    if (isChecked) {
+                        adapter.checkAll();
+                    } else {
+                        adapter.clearChecked();
+                    }
                 }
-            }
-        };
+            };
+        }
+        return selectAllCheckboxListener;
     }
 
     private final class RadioButtonListener implements OnClickListener, CompoundButton.OnCheckedChangeListener {
