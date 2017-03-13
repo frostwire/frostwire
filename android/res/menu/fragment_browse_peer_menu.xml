@@ -28,11 +28,11 @@
         app:showAsAction="collapseActionView|always"
         app:actionViewClass="android.support.v7.widget.SearchView"/>
     <item
-        android:id="@+id/fragment_browse_peer_menu_selection"
-        android:actionViewClass="android.widget.SearchView"
+        android:id="@+id/fragment_browse_peer_menu_checkbox"
+        android:checkable="true"
         android:icon="@drawable/action_bar_checkbox"
         android:orderInCategory="2"
-        android:title="@string/search"
+        android:title="@string/select_all"
         app:showAsAction="ifRoom" />
 
 </menu>

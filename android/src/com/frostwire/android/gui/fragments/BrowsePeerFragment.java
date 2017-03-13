@@ -19,7 +19,12 @@ package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.*;
+import android.content.AsyncTaskLoader;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.Loader;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -32,8 +37,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Filter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -50,16 +57,15 @@ import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
-import com.frostwire.android.gui.views.BrowsePeerSearchBarView;
-import com.frostwire.android.gui.views.BrowsePeerSearchBarView.OnActionListener;
 import com.frostwire.android.gui.views.FileTypeRadioButtonSelectorFactory;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.util.Logger;
-import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -70,15 +76,18 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private static final Logger LOG = Logger.getLogger(BrowsePeerFragment.class);
     private static final int LOADER_FILES_ID = 0;
     private final BroadcastReceiver broadcastReceiver;
-    private BrowsePeerSearchBarView filesBar;
     private SwipeRefreshLayout swipeRefresh;
     private ListView list;
     private FileListAdapter adapter;
+    private MenuItem checkBoxMenuItem;
+    private LinearLayout selectAllCheckboxContainer;
+    private CheckBox selectAllCheckbox;
+    private boolean selectAllModeOn;
     private Peer peer;
     private View header;
     private long lastAdapterRefresh;
     private String previousFilter;
-    private HashMap<Byte, Set<FileListAdapter.FileDescriptorItem>> checkedItemsMap;
+    private SparseArray<Set<FileListAdapter.FileDescriptorItem>> checkedItemsMap;
 
     // given the byte:fileType as the index, this array will match the corresponding UXAction code.
     // no if's necessary, random access -> O(1)
@@ -94,7 +103,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private final SparseArray<Byte> toTheRightOf = new SparseArray<>(6);
     private final SparseArray<Byte> toTheLeftOf = new SparseArray<>(6);
-    private final Map<Byte, RadioButton> radioButtonFileTypeMap;
+    private final SparseArray<RadioButton> radioButtonFileTypeMap;
 
     public BrowsePeerFragment() {
         super(R.layout.fragment_browse_peer);
@@ -114,8 +123,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         toTheLeftOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_PICTURES); //0x03 - Documents <- Pictures
         toTheLeftOf.put(Constants.FILE_TYPE_RINGTONES, Constants.FILE_TYPE_AUDIO);    //0x05 - Ringtones <- Audio
         toTheLeftOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_DOCUMENTS); //0x06 - Torrents <- Documents
-        checkedItemsMap = new HashMap<>();
-        radioButtonFileTypeMap = new HashMap<>();  // see initRadioButton(...)
+        checkedItemsMap = new SparseArray<>();
+        radioButtonFileTypeMap = new SparseArray<>();  // see initRadioButton(...)
     }
 
     @Override
@@ -155,9 +164,44 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_browse_peer_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
+        initToolbarSearchFilter(menu);
+        initToolbarCheckbox(menu);
+    }
 
-        SearchView searchView = (SearchView) menu.findItem(R.id.fragment_browse_peer_menu_filter).getActionView();
+    private void initToolbarCheckbox(Menu menu) {
+        checkBoxMenuItem = menu.findItem(R.id.fragment_browse_peer_menu_checkbox);
+        checkBoxMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                selectAllModeOn = !selectAllModeOn;
+                selectAllCheckboxContainer.setVisibility(selectAllModeOn && adapter.getCount() > 0 ? View.VISIBLE : View.GONE);
+                adapter.setCheckboxesVisibility(selectAllModeOn);
+                selectAllCheckbox.setChecked(selectAllModeOn);
+                return true;
+            }
+        });
+        selectAllCheckbox = findView(getView(), R.id.fragment_browse_peer_select_all_checkbox);
+        selectAllCheckboxContainer = findView(getView(), R.id.fragment_browse_peer_select_all_container);
+        selectAllCheckbox.setOnCheckedChangeListener(getSelectAllOnCheckedChangeListener());
+    }
+
+    private void initToolbarSearchFilter(Menu menu) {
+        final SearchView searchView = (SearchView) menu.findItem(R.id.fragment_browse_peer_menu_filter).getActionView();
         searchView.setQueryHint("Filter...");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                performFilter(query);
+                UIUtils.hideKeyboardFromActivity(getActivity());
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                performFilter(newText);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -166,7 +210,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         switch (item.getItemId()) {
             case R.id.fragment_browse_peer_menu_filter:
                 return true;
-            case R.id.fragment_browse_peer_menu_selection:
+            case R.id.fragment_browse_peer_menu_checkbox:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -179,22 +223,17 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         initBroadcastReceiver();
         if (adapter != null) {
             restorePreviouslyChecked();
-            restorePreviousFilter();
             browseFilesButtonClick(adapter.getFileType());
         }
         updateHeader();
     }
 
     private void restorePreviouslyChecked() {
-        Set<FileListAdapter.FileDescriptorItem> previouslyChecked = checkedItemsMap.get(adapter.getFileType());
-        if (previouslyChecked != null && !previouslyChecked.isEmpty()) {
-            adapter.setChecked(previouslyChecked);
-        }
-    }
-
-    private void restorePreviousFilter() {
-        if (previousFilter != null && filesBar != null) {
-            filesBar.setText(previousFilter);
+        if (adapter != null) {
+            Set<FileListAdapter.FileDescriptorItem> previouslyChecked = checkedItemsMap.get(adapter.getFileType());
+            if (previouslyChecked != null && !previouslyChecked.isEmpty()) {
+                adapter.setChecked(previouslyChecked);
+            }
         }
     }
 
@@ -209,16 +248,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 checkedItemsMap.put(adapter.getFileType(), checkedCopy);
             }
         }
-    }
-
-    private void savePreviousFilter() {
-        if (!StringUtils.isNullOrEmpty(filesBar.getText())) {
-            previousFilter = filesBar.getText();
-        }
-    }
-
-    private void clearPreviousFilter() {
-        previousFilter = null;
     }
 
     private void initBroadcastReceiver() {
@@ -238,7 +267,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public void onPause() {
         super.onPause();
         savePreviouslyCheckedFileDescriptors();
-        savePreviousFilter();
         MusicUtils.stopSimplePlayer();
         getActivity().unregisterReceiver(broadcastReceiver);
     }
@@ -257,27 +285,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     @Override
     protected void initComponents(View v) {
-        filesBar = findView(v, R.id.fragment_browse_peer_files_bar);
-        filesBar.setOnActionListener(new OnActionListener() {
-            public void onCheckAll(View v, boolean isChecked) {
-                if (adapter != null) {
-                    if (isChecked) {
-                        adapter.checkAll();
-                    } else {
-                        adapter.clearChecked();
-                    }
-                }
-            }
+        selectAllCheckboxContainer = findView(getView(), R.id.fragment_browse_peer_select_all_container);
+        selectAllCheckbox = findView(getView(), R.id.fragment_browse_peer_select_all_checkbox);
 
-            public void onFilter(View v, String str) {
-                performFilter(str);
-            }
-
-            @Override
-            public void onClear() {
-                clearPreviousFilter();
-            }
-        });
         swipeRefresh = findView(v, R.id.fragment_browse_peer_swipe_refresh);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -311,12 +321,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         initRadioButton(v, R.id.fragment_browse_peer_radio_torrents, Constants.FILE_TYPE_TORRENTS);
     }
 
-    private void updateCheckAllStatusInSearchBar() {
-        if (adapter != null && filesBar != null) {
-            filesBar.setCheckAllVisible(adapter.getFileType() != Constants.FILE_TYPE_RINGTONES);
-        }
-    }
-
     private RadioButton initRadioButton(View v, int viewId, final byte fileType) {
         RadioButton button = findView(v, viewId);
         Resources r = button.getResources();
@@ -336,13 +340,22 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private void browseFilesButtonClick(byte fileType) {
         if (adapter != null) {
-            savePreviouslyCheckedFileDescriptors();
-            savePreviousFilter();
             saveListViewVisiblePosition(adapter.getFileType());
             adapter.clear();
+            adapter.clearChecked();
         }
-        filesBar.clearCheckAll();
         reloadFiles(fileType);
+
+        if (checkBoxMenuItem != null) {
+            checkBoxMenuItem.setVisible(fileType != Constants.FILE_TYPE_RINGTONES);
+        }
+
+        if (selectAllCheckbox != null) {
+            selectAllModeOn = false;
+            selectAllCheckbox.setChecked(false);
+            selectAllCheckboxContainer.setVisibility(View.GONE);
+        }
+
         logBrowseAction(fileType);
     }
 
@@ -416,7 +429,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
         }
         MusicUtils.stopSimplePlayer();
-        updateCheckAllStatusInSearchBar();
         restoreListViewScrollPosition();
     }
 
@@ -439,22 +451,24 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             List<FileDescriptor> items = (List<FileDescriptor>) data[1];
             adapter = new FileListAdapter(getActivity(), items, fileType) {
                 @Override
-                protected void onItemChecked(CompoundButton v, boolean isChecked) {
-                    if (!isChecked) {
-                        filesBar.clearCheckAll();
-                    }
-                    super.onItemChecked(v, isChecked);
-                }
-
-                @Override
                 protected void onLocalPlay() {
                     if (adapter != null) {
                         saveListViewVisiblePosition(adapter.getFileType());
                     }
                 }
+
+                @Override
+                protected void onItemChecked(CompoundButton v, boolean isChecked) {
+                    super.onItemChecked(v, isChecked);
+                    selectAllCheckbox.setOnCheckedChangeListener(null);
+                    if (selectAllModeOn) {
+                        selectAllCheckbox.setChecked(adapter.getCheckedCount() == adapter.getCount());
+                    }
+                    selectAllCheckbox.setOnCheckedChangeListener(getSelectAllOnCheckedChangeListener());
+                }
             };
+            adapter.setCheckboxesVisibility(false);
             restorePreviouslyChecked();
-            restorePreviousFilter();
             if (previousFilter != null) {
                 performFilter(previousFilter);
             } else {
@@ -514,6 +528,21 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             nextButton.setChecked(true);
             nextButton.callOnClick();
         }
+    }
+
+    private CompoundButton.OnCheckedChangeListener getSelectAllOnCheckedChangeListener() {
+        return new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                TextView textView = findView(getView(), R.id.fragment_browse_peer_selection_mode_label);
+                textView.setText(isChecked ? R.string.deselect_all : R.string.select_all);
+                if (isChecked) {
+                    adapter.checkAll();
+                } else {
+                    adapter.clearChecked();
+                }
+            }
+        };
     }
 
     private final class RadioButtonListener implements OnClickListener, CompoundButton.OnCheckedChangeListener {
