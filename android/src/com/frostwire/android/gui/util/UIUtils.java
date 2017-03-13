@@ -33,6 +33,7 @@ import android.support.design.widget.Snackbar;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -563,5 +564,22 @@ public final class UIUtils {
         int resId = PITCHES[offset + new Random().nextInt(PITCHES.length - offset)];
 
         return resId;
+    }
+
+    public static void setOptionalIconsVisible(Menu menu, boolean visible) {
+        Class menuClass = menu.getClass();
+        if (menu != null && menuClass.getSimpleName().equals("MenuBuilder")) {
+            try {
+                Method m = menuClass.getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                if (m != null) {
+                    m.setAccessible(true);
+                    m.invoke(menu, visible);
+                } else {
+                    LOG.warn("unable to set icons for overflow menu. MenuBuilder.setOptionalIconsVisible(boolean) method not available");
+                }
+            } catch (Throwable e) {
+                LOG.warn("unable to set icons for overflow menu", e);
+            }
+        }
     }
 }

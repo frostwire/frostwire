@@ -46,7 +46,6 @@ import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.menu.PhotoSelectionDialog;
 import com.andrew.apollo.menu.PhotoSelectionDialog.ProfileType;
 import com.andrew.apollo.ui.fragments.TabFragmentOrder;
-import com.andrew.apollo.ui.fragments.helpers.ToolbarMenuOptionalIconsEnabler;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
@@ -62,6 +61,7 @@ import com.andrew.apollo.utils.SortOrder;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.ProfileTabCarousel.Listener;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Ref;
 
 /**
@@ -242,7 +242,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        ToolbarMenuOptionalIconsEnabler.setOptionalIconsVisible(menu, true);
+        UIUtils.setOptionalIconsVisible(menu, true);
 
         if (isEmptyPlaylist()) {
             menu.removeItem(R.id.menu_player_shuffle);
