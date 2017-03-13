@@ -182,8 +182,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 return true;
             }
         });
-        selectAllCheckbox = findView(getView(), R.id.fragment_browse_peer_select_all_checkbox);
-        selectAllCheckboxContainer = findView(getView(), R.id.fragment_browse_peer_select_all_container);
         selectAllCheckbox.setOnCheckedChangeListener(getSelectAllOnCheckedChangeListener());
     }
 
@@ -287,8 +285,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     @Override
     protected void initComponents(View v) {
-        selectAllCheckboxContainer = findView(getView(), R.id.fragment_browse_peer_select_all_container);
-        selectAllCheckbox = findView(getView(), R.id.fragment_browse_peer_select_all_checkbox);
+        selectAllCheckbox = findView(v, R.id.fragment_browse_peer_select_all_checkbox);
+        selectAllCheckboxContainer = findView(v, R.id.fragment_browse_peer_select_all_container);
 
         swipeRefresh = findView(v, R.id.fragment_browse_peer_swipe_refresh);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
