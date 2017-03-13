@@ -55,36 +55,39 @@
     </RadioGroup>
 
     <!-- Checkbox and Search Box for Browse Peer, see view_browse_peer_search_bar.xml -->
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/fragment_browse_peer_select_all_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:layout_height="?android:attr/listPreferredItemHeightSmall"
+        android:background="@color/app_background_white"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:visibility="gone">
 
         <CheckBox
             android:id="@+id/fragment_browse_peer_select_all_checkbox"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="6dip"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="5dp"
+            android:gravity="center_vertical" />
 
         <TextView
             android:id="@+id/fragment_browse_peer_selection_mode_label"
-            android:text="@string/select_all"
-            android:layout_gravity="center_vertical"
+            style="@style/SelectDeselectAllText"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/fragment_browse_peer_select_all_checkbox"
+            android:gravity="center_vertical"
+            android:text="@string/select_all" />
 
-        <!-- Fake element so that we have same height as files bar-->
-        <RadioButton
-            android:id="@+id/fragment_browse_peer_selection_mode_fake_spacer"
-            style="@style/BrowseFileTypeButton"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:visibility="invisible"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/divider_line" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
             android:id="@+id/progressContainer"

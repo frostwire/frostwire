@@ -580,6 +580,13 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="SelectDeselectAllText">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!-- Default Dialog -->
     <style name="DefaultDialogTheme">
         <item name="android:windowMinWidthMajor">@dimen/dialog_min_width_major</item>
