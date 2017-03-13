@@ -745,7 +745,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 // usually java.lang.IllegalArgumentException: No drawer view found with gravity LEFT
                 return false;
             }
-            return true;
+            return false;
         }
 
         if (item == null) {
