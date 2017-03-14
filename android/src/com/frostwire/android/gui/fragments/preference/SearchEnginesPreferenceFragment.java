@@ -44,7 +44,7 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
     private final Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences;
 
     public SearchEnginesPreferenceFragment() {
-        super(R.xml.settings_search);
+        super(R.xml.settings_search_engines);
         activeSearchEnginePreferences = new HashMap<>();
     }
 

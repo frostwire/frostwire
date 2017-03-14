@@ -123,7 +123,7 @@ public class NewTransferDialog extends AbstractDialog {
         @Override
         public void onClick(NewTransferDialog owner, View v) {
             if (positive) {
-                // see SearchEnginesPreferenceFragment::OnDialogClickListener::onDialogClick(tag,which)
+                // see SearchFragment::OnDialogClickListener::onDialogClick(tag,which)
                 owner.performDialogClick(Dialog.BUTTON_POSITIVE);
             }
             owner.dismiss();
