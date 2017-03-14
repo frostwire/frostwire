@@ -646,7 +646,7 @@ public final class SearchFragment extends AbstractFragment implements
                 }
 
                 // yes, these requests are done only once per session.
-                //LOG.info("SearchFragment.LoadSlidesTask performed http request to " + url);
+                //LOG.info("SearchEnginesPreferenceFragment.LoadSlidesTask performed http request to " + url);
                 return slides != null ? slides.slides : null;
             } catch (Throwable e) {
                 LOG.error("Error loading slides from url", e);

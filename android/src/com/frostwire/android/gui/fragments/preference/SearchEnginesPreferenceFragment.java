@@ -37,13 +37,13 @@ import java.util.Map;
  * @author gubatron
  * @author aldenml
  */
-public final class SearchFragment extends AbstractPreferenceFragment {
+public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFragment {
 
     public static final String PREF_KEY_SEARCH_SELECT_ALL = "frostwire.prefs.search.preference_category.select_all";
 
     private final Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences;
 
-    public SearchFragment() {
+    public SearchEnginesPreferenceFragment() {
         super(R.xml.settings_search);
         activeSearchEnginePreferences = new HashMap<>();
     }
