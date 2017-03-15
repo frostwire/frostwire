@@ -67,7 +67,6 @@ public final class BuyActivity extends AbstractActivity {
 
     public BuyActivity() {
         super(R.layout.activity_buy);
-
     }
 
     private void purchaseProduct(int tagId) {

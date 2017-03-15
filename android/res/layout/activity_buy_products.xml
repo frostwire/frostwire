@@ -32,6 +32,8 @@
                   android:layout_height="wrap_content"
                   android:padding="8dp"
                   android:weightSum="1.0"
+                  android:background="@color/app_toolbar_background"
+                  android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                   android:visibility="gone">
 
         <TextView android:id="@+id/activity_buy_actionbar_interstitial_buy_activity_title"
