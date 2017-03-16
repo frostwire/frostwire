@@ -274,6 +274,13 @@
             </intent-filter>
         </receiver>
 
+        <!-- Google Cast -->
+
+        <meta-data
+            android:name=
+                "com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+            android:value="com.frostwire.android.core.providers.CastOptionsProvider" />
+
         <!-- AppLovin -->
         <meta-data
             android:name="applovin.sdk.key"
