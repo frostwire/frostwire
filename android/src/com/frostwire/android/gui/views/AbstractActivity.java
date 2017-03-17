@@ -154,7 +154,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
         toolbarView = view;
         if (toolbarView != null && placeholder != null) {
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
             params.gravity = gravity;
             placeholder.addView(toolbarView, params);
