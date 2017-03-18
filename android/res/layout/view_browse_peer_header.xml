@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,32 +18,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:baselineAligned="false" >
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingRight="30dp">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/view_browse_peer_header_text_title"
+        style="@style/ToolbarMainHeaderTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:paddingRight="30dip" >
+        android:text="@string/dummy_title" />
 
-        <TextView
-            android:id="@+id/view_browse_peer_header_text_title"
-            style="@style/MainFragmentSimpleHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dummy_title" />
+    <TextView
+        android:id="@+id/view_browse_peer_header_text_total"
+        style="@style/ToolbarMainHeaderCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:text="@null" />
 
-        <TextView
-            android:id="@+id/view_browse_peer_header_text_total"
-            style="@style/BrowsePeerFragmentFileCounterHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="5dip"
-            android:text="@null" />
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

@@ -79,6 +79,7 @@ public final class BuyActivity extends AbstractActivity {
     @Override
     protected void initToolbar(Toolbar toolbar) {
         toolbar.setTitle(getActionBarTitle());
+        toolbar.setTitleMarginStart(20);
     }
 
     @Override
