@@ -108,7 +108,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
         Toolbar toolbar = findToolbar();
         if (toolbar != null) {
             toolbar.setTitle(title);
-            toolbar.setTitleMarginStart(20);
         }
     }
 
