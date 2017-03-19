@@ -24,9 +24,7 @@
     android:clipToPadding="false"
     android:focusable="true"
     android:gravity="center_vertical"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall"
-    android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-    android:paddingRight="?android:attr/listPreferredItemPaddingRight">
+    android:minHeight="?android:attr/listPreferredItemHeightSmall" >
 
 
     <LinearLayout
@@ -39,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingBottom="16dp"
+            android:paddingLeft="@dimen/settings_list_item_inner_horizontal_padding"
             android:paddingTop="16dp">
 
             <TextView
@@ -46,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="marquee"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead" />
 
             <TextView
@@ -68,7 +67,8 @@
             android:layout_height="match_parent"
             android:gravity="end|center_vertical"
             android:orientation="vertical"
-            android:paddingLeft="16dp" />
+            android:paddingLeft="@dimen/settings_list_item_inner_horizontal_padding"
+            android:paddingRight="@dimen/settings_list_item_inner_horizontal_padding" />
 
     </LinearLayout>
 </LinearLayout>
