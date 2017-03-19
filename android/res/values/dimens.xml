@@ -51,5 +51,5 @@
     <dimen name="dialog_min_width_minor">300dp</dimen>
 
     <!-- Settings -->
-    <dimen name="settings_list_item_inner_padding">16dp</dimen>
+    <dimen name="settings_list_item_inner_horizontal_padding">16dp</dimen>
 </resources>
