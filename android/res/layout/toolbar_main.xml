@@ -23,13 +23,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/toolbar_main"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
+    android:layout_height="54dp"
     android:background="@color/app_toolbar_background"
     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
     app:navigationContentDescription="@string/abc_action_bar_up_description"
     app:navigationIcon="?attr/homeAsUpIndicator"
     app:title="@string/application_label"
+    app:titleMarginStart="10dp"
     app:titleTextColor="@color/action_bar_title"
     tools:ignore="PrivateResource">
 
@@ -37,6 +38,8 @@
         android:id="@+id/toolbar_main_placeholder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingStart="10dp"
         android:visibility="gone" />
 
 </android.support.v7.widget.Toolbar>

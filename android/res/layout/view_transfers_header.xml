@@ -18,9 +18,9 @@
  */
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:baselineAligned="false">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -34,29 +34,27 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:contentDescription="@null"
-            android:src="@drawable/add_transfer"/>
+            android:src="@drawable/add_transfer" />
 
         <ImageButton
             android:id="@+id/view_transfers_header_button_menu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="15dp"
             android:background="@null"
             android:contentDescription="@null"
             android:src="@drawable/ic_menu_moreoverflow"
-            android:visibility="visible"/>
-
+            android:visibility="visible" />
 
     </LinearLayout>
 
-
     <TextView
         android:id="@+id/view_transfers_header_text_title"
-        style="@style/MainFragmentSimpleHeader"
+        style="@style/ToolbarMainHeaderTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:paddingRight="40dp"
-        android:text="@null"/>
+        android:text="@null" />
 </RelativeLayout>

@@ -147,24 +147,15 @@
 
     <!-- Main Fragment Simple Header begin -->
 
-    <style name="MainFragmentSimpleHeader" parent="@android:style/TextAppearance.Large">
-        <item name="android:textSize">18sp</item>
-        <item name="android:gravity">center</item>
+    <style name="ToolbarMainHeaderTitle">
+        <item name="android:textSize">@dimen/text_large</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <!-- Main Fragment Simple Header end -->
-
-
-    <!-- Browse Peer fragment file counter header begin -->
-
-    <style name="BrowsePeerFragmentFileCounterHeader" parent="@android:style/TextAppearance.Small">
-        <item name="android:gravity">center</item>
+    <style name="ToolbarMainHeaderCounter">
+        <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
-
-    <!-- Browse Peer fragment file counter header end -->
-
 
     <!-- Menu Media Type begin -->
 
