@@ -1,3 +1,8 @@
+frostwire (6.4.7) stable; urgency=high
+  * Spanish, Portuguese translations updated
+	
+ -- FrostWire Team <contact@frostwire.com>  Mon, 20 Mar 2017 08:36:36 -0600
+
 frostwire (6.4.6) stable; urgency=high
   * New Options > Advanced > Experimental. Users can now try ALPHA and BETA features
     at their own risk.
