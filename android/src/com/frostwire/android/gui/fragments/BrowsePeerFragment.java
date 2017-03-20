@@ -17,6 +17,7 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncTaskLoader;
@@ -40,7 +41,6 @@ import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Filter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
@@ -175,10 +175,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         checkBoxMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                selectAllModeOn = !selectAllModeOn;
-                selectAllCheckboxContainer.setVisibility(selectAllModeOn && adapter.getCount() > 0 ? View.VISIBLE : View.GONE);
-                adapter.setCheckboxesVisibility(selectAllModeOn);
-                selectAllCheckbox.setChecked(selectAllModeOn);
+                onToolbarMenuSelectModeCheckboxClick();
                 return true;
             }
         });
@@ -271,6 +268,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         getActivity().unregisterReceiver(broadcastReceiver);
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public View getHeader(Activity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
@@ -460,13 +458,15 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 @Override
                 protected void onItemChecked(CompoundButton v, boolean isChecked) {
                     super.onItemChecked(v, isChecked);
-                    selectAllCheckbox.setOnCheckedChangeListener(null);
-                    if (selectAllModeOn) {
-                        selectAllCheckbox.setChecked(adapter.getCheckedCount() == adapter.getCount());
-                    }
-                    selectAllCheckbox.setOnCheckedChangeListener(getSelectAllOnCheckedChangeListener());
+                    autoCheckUnCheckSelectAllCheckbox();
+                }
+
+                @Override
+                protected boolean onItemLongClicked(View v) {
+                    return onFileItemLongClicked(v);
                 }
             };
+
             adapter.setCheckboxesVisibility(false);
             restorePreviouslyChecked();
             if (previousFilter != null) {
@@ -477,6 +477,49 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         } catch (Throwable e) {
             LOG.error("Error updating files in list", e);
         }
+    }
+
+    private void onToolbarMenuSelectModeCheckboxClick() {
+        selectAllModeOn = !selectAllModeOn;
+        enableSelectAllMode(selectAllModeOn, selectAllModeOn);
+    }
+
+    private void enableSelectAllMode(boolean selectAll, boolean autoCheckAll) {
+        selectAllModeOn = selectAll;
+        selectAllCheckboxContainer.setVisibility(selectAllModeOn && adapter.getCount() > 0 ? View.VISIBLE : View.GONE);
+        adapter.setCheckboxesVisibility(selectAllModeOn);
+        selectAllCheckbox.setChecked(autoCheckAll);
+    }
+
+    private void autoCheckUnCheckSelectAllCheckbox() {
+        selectAllCheckbox.setOnCheckedChangeListener(null);
+        if (selectAllModeOn) {
+            selectAllCheckbox.setChecked(adapter.getCheckedCount() == adapter.getCount());
+        }
+        selectAllCheckbox.setOnCheckedChangeListener(getSelectAllOnCheckedChangeListener());
+    }
+
+    private void onSelectAllChecked(boolean isChecked) {
+        TextView textView = findView(getView(), R.id.fragment_browse_peer_selection_mode_label);
+        textView.setText(isChecked ? R.string.deselect_all : R.string.select_all);
+        if (isChecked) {
+            adapter.checkAll();
+        } else {
+            adapter.clearChecked();
+        }
+    }
+
+    private boolean onFileItemLongClicked(View v) {
+        if (adapter == null || adapter.getFileType() == Constants.FILE_TYPE_RINGTONES) {
+            return false;
+        }
+        int position = adapter.getViewPosition(v);
+        if (position == -1) {
+            return false;
+        }
+        enableSelectAllMode(!selectAllModeOn, false);
+        adapter.setChecked(position, selectAllModeOn);
+        return true;
     }
 
     private void updateAdapter() {
@@ -535,13 +578,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             selectAllCheckboxListener = new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    TextView textView = findView(getView(), R.id.fragment_browse_peer_selection_mode_label);
-                    textView.setText(isChecked ? R.string.deselect_all : R.string.select_all);
-                    if (isChecked) {
-                        adapter.checkAll();
-                    } else {
-                        adapter.clearChecked();
-                    }
+                    onSelectAllChecked(isChecked);
                 }
             };
         }

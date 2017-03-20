@@ -38,7 +38,13 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.*;
+import com.frostwire.android.gui.views.AbstractListAdapter;
+import com.frostwire.android.gui.views.BrowseThumbnailImageButton;
+import com.frostwire.android.gui.views.ListAdapterFilter;
+import com.frostwire.android.gui.views.MediaPlaybackOverlay;
+import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.gui.views.MenuAdapter;
+import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
@@ -50,7 +56,13 @@ import com.frostwire.uxstats.UXStats;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -71,6 +83,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType) {
         super(context, R.layout.view_browse_thumbnail_peer_list_item, convertFiles(files));
         setShowMenuOnClick(true);
+        setShowMenuOnLongClick(false);
 
         FileListFilter fileListFilter = new FileListFilter();
         setAdapterFilter(fileListFilter);
