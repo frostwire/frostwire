@@ -237,7 +237,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public View getHeader(Activity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
 
-        View header = inflater.inflate(R.layout.view_transfers_header, null);
+        View header = inflater.inflate(R.layout.view_transfers_header, null, false);
 
         TextView text = findView(header, R.id.view_transfers_header_text_title);
         text.setText(R.string.transfers);
