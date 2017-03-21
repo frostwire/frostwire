@@ -421,7 +421,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
             title.setText(fileTypeStr);
             total.setText("(" + String.valueOf(numTotal) + ")");
-            LOG.info("updateHeader(title="+fileTypeStr+") - what thread is this? " + Thread.currentThread().getName());
         }
         if (adapter == null) {
             browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
