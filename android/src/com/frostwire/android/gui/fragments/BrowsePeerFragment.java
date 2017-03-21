@@ -17,7 +17,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncTaskLoader;
@@ -38,6 +37,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Filter;
@@ -268,11 +268,10 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         getActivity().unregisterReceiver(broadcastReceiver);
     }
 
-    @SuppressLint("InflateParams")
     @Override
     public View getHeader(Activity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
-        header = inflater.inflate(R.layout.view_browse_peer_header, null);
+        header = inflater.inflate(R.layout.view_browse_peer_header, (ViewGroup) getView());
         updateHeader();
         return header;
     }
@@ -518,6 +517,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             return false;
         }
         enableSelectAllMode(!selectAllModeOn, false);
+        onSelectAllChecked(false);
         adapter.setChecked(position, selectAllModeOn);
         return true;
     }
