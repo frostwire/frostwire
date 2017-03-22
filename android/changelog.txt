@@ -1,3 +1,8 @@
+FrostWire 1.9.1 - MAR/22/2017
+ - My Files checkbox selection mode can be started by long pressing on
+   a file (as long as it's not a ringtone)
+ - Updated android support library to 25.3.0 and gms to 10.2.1
+
 FrostWire 1.9.0 - MAR/10/2017
  - New material-design navigation menu
  - Full featured miniplayer available outside My Music
