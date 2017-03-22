@@ -59,6 +59,10 @@ public final class Offers {
     }
 
     public static void initAdNetworks(Activity activity) {
+        if (stopAdNetworksIfPurchasedRemoveAds(activity)) {
+            LOG.info("Offers.initAdNetworks() aborted, user paid for ad removal.");
+            return;
+        }
         long now = System.currentTimeMillis();
         if (now - lastInitAdnetworksInvocationTimestamp < 5000) {
             LOG.info("Offers.initAdNetworks() aborted, too soon to reinitialize networks.");
@@ -78,13 +82,10 @@ public final class Offers {
                 }
             }
         }
-
         // AppLovin being accessed via MoPub
         if (mopubActive && !appLovinActive) {
             APP_LOVIN.initialize(activity);
         }
-
-        stopAdNetworksIfPurchasedRemoveAds(activity);
     }
 
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -212,15 +213,18 @@ public final class Offers {
         }
     }
 
-    private static void stopAdNetworksIfPurchasedRemoveAds(Context context) {
+    private static boolean stopAdNetworksIfPurchasedRemoveAds(Context context) {
         //final ConfigurationManager CM = ConfigurationManager.instance();
+        boolean stopped = false;
         final PlayStore playStore = PlayStore.getInstance();
         final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
         if (purchasedProducts != null && purchasedProducts.size() > 0) {
             //CM.setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
             Offers.stopAdNetworks(context);
+            stopped = true;
             LOG.info("Turning off ads, user previously purchased AdRemoval");
         }
+        return stopped;
     }
 
     /**
