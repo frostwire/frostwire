@@ -112,12 +112,12 @@ public class PromotionsView extends LinearLayout {
                 // FROSTWIRE FEATURES VIEW
                 if (!inLandscapeMode && ((!Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 0) ||
                     (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 1))) {
-                    promoAdapter.onAllFeaturedDownloadsClick();
+                    promoAdapter.onAllFeaturedDownloadsClick("topHeader");
                     return;
                 }
 
                 if (position ==  promoAdapter.getCount()-1) {
-                    promoAdapter.onAllFeaturedDownloadsClick();
+                    promoAdapter.onAllFeaturedDownloadsClick("allFreeDownloadsButton");
                     return;
                 }
             }

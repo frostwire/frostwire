@@ -263,8 +263,8 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         return specialOfferLayout;
     }
 
-    public void onAllFeaturedDownloadsClick() {
-        UIUtils.openURL(getContext(), Constants.ALL_FEATURED_DOWNLOADS_URL);
+    public void onAllFeaturedDownloadsClick(String from) {
+        UIUtils.openURL(getContext(), Constants.ALL_FEATURED_DOWNLOADS_URL+"?from="+from);
     }
 
     public void onSpecialOfferClick() {
