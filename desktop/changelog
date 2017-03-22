@@ -1,7 +1,8 @@
 frostwire (6.4.7) stable; urgency=high
   * Spanish, Portuguese translations updated
+  * Windows: runtime update (1.8.0_102 -> 1.8.0_121)
 	
- -- FrostWire Team <contact@frostwire.com>  Mon, 20 Mar 2017 08:36:36 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 21 Mar 2017 07:54:43 -0600
 
 frostwire (6.4.6) stable; urgency=high
   * New Options > Advanced > Experimental. Users can now try ALPHA and BETA features
