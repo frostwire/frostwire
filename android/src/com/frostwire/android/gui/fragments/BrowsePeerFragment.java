@@ -466,7 +466,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 }
             };
 
-            adapter.setCheckboxesVisibility(false);
+            adapter.setCheckboxesVisibility(selectAllModeOn);
             restorePreviouslyChecked();
             if (previousFilter != null) {
                 performFilter(previousFilter);
