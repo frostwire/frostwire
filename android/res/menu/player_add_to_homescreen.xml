@@ -25,6 +25,6 @@
         android:icon="@drawable/ic_action_pinn_to_home"
         android:orderInCategory="2"
         android:title="@string/menu_add_to_homescreen"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
 </menu>
