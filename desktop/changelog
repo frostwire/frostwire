@@ -1,8 +1,8 @@
 frostwire (6.4.7) stable; urgency=high
-  * Spanish, Portuguese, French translations updated
+  * Spanish, Portuguese, French, Italian translations updated
   * Windows, Mac: JRE update (1.8.0_102 -> 1.8.0_121)
 	
- -- FrostWire Team <contact@frostwire.com>  Tue, 22 Mar 2017 14:10:12 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 24 Mar 2017 21:55:34 -0600
 
 frostwire (6.4.6) stable; urgency=high
   * New Options > Advanced > Experimental. Users can now try ALPHA and BETA features
