@@ -13,8 +13,7 @@ In the past these sources were held at [frostwire-android](https://github.com/fr
 
 # Coding Guidelines
 
-[5 Object Oriented Programming Principles learned during the last 15 years][3]
-[3]: <http://bit.ly/y0hdR4>
+[5 Object Oriented Programming Principles learned during the last 15 years](http://bit.ly/y0hdR4)
 
 * Keep it simple, stupid. ([KISS](https://en.wikipedia.org/wiki/KISS_principle))
 * Do not repeat yourself. ([DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)) Re-use your own code and our code. It'll be faster to code, and easier to maintain.
