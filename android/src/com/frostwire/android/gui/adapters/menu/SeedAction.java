@@ -122,6 +122,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         // in case user seeds only on wifi and there's no wifi, we let them know what will occur.
         if (seedingOnlyOnWifiButNoWifi()) {
             showNoWifiInformationDialog();
+            return;
         } else if (TransferManager.instance().isMobileAndDataSavingsOn()) {
             showMobileDataProtectionInformationDialog();
         }

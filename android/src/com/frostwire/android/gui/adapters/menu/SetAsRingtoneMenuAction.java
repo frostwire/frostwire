@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,10 @@ import com.frostwire.android.gui.views.MenuAction;
  * @author aldenml
  *
  */
-class SetAsRingtoneMenuAction extends MenuAction {
+public class SetAsRingtoneMenuAction extends MenuAction {
     private final FileDescriptor fd;
 
-    SetAsRingtoneMenuAction(final Context context, FileDescriptor fd) {
+    public SetAsRingtoneMenuAction(final Context context, FileDescriptor fd) {
         super(context, R.drawable.contextmenu_icon_ringtone, R.string.context_menu_use_as_ringtone);
         this.fd = fd;
     }

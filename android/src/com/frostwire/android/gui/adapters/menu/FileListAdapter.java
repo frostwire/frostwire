@@ -190,7 +190,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
 
         if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS &&
-                fd.fileType != Constants.FILE_TYPE_RINGTONES) {
+            fd.fileType != Constants.FILE_TYPE_RINGTONES) {
             items.add(new SendFileMenuAction(context, fd));
             items.add(new DeleteFileMenuAction(context, this, list));
         }
@@ -510,7 +510,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return false;
     }
 
-    private static String readInfoFromTorrent(String torrent, boolean magnet) {
+    public static String readInfoFromTorrent(String torrent, boolean magnet) {
         if (torrent == null) {
             return "";
         }

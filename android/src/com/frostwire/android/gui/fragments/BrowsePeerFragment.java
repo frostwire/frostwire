@@ -1,6 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +19,7 @@
 package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncTaskLoader;
 import android.content.BroadcastReceiver;
@@ -29,6 +31,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.SearchView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -37,17 +40,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -55,7 +59,17 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Finger;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
+import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
+import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
+import com.frostwire.android.gui.adapters.menu.DeleteFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter;
+import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
+import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
+import com.frostwire.android.gui.adapters.menu.SeedAction;
+import com.frostwire.android.gui.adapters.menu.SendFileMenuAction;
+import com.frostwire.android.gui.adapters.menu.SetAsRingtoneMenuAction;
+import com.frostwire.android.gui.adapters.menu.SetAsWallpaperMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.FileTypeRadioButtonSelectorFactory;
@@ -64,14 +78,16 @@ import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 /**
- * @author gubatron
  * @author aldenml
+ * @author gubatron
+ * @author marcelinkaaa
  */
 public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment {
     private static final Logger LOG = Logger.getLogger(BrowsePeerFragment.class);
@@ -107,11 +123,15 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private final SparseArray<Byte> toTheLeftOf = new SparseArray<>(6);
     private final SparseArray<RadioButton> radioButtonFileTypeMap;
 
+    /**
+     * This implements the toolbar's action mode view and its menu
+     */
+    private final MyFilesActionModeCallback selectionModeCallback;
+
     public BrowsePeerFragment() {
         super(R.layout.fragment_browse_peer);
         broadcastReceiver = new LocalBroadcastReceiver();
         setHasOptionsMenu(true);
-
         this.peer = new Peer();
         toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_RINGTONES);   //0x00 - Audio -> Ringtones
         toTheRightOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_DOCUMENTS); //0x01 - Pictures -> Documents
@@ -127,6 +147,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         toTheLeftOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_DOCUMENTS); //0x06 - Torrents <- Documents
         checkedItemsMap = new SparseArray<>();
         radioButtonFileTypeMap = new SparseArray<>();  // see initRadioButton(...)
+        selectionModeCallback = new MyFilesActionModeCallback();
     }
 
     @Override
@@ -284,7 +305,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     protected void initComponents(View v) {
         selectAllCheckbox = findView(v, R.id.fragment_browse_peer_select_all_checkbox);
         selectAllCheckboxContainer = findView(v, R.id.fragment_browse_peer_select_all_container);
-
         swipeRefresh = findView(v, R.id.fragment_browse_peer_swipe_refresh);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -342,18 +362,20 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             adapter.clearChecked();
         }
         reloadFiles(fileType);
-
         if (checkBoxMenuItem != null) {
             checkBoxMenuItem.setVisible(fileType != Constants.FILE_TYPE_RINGTONES);
         }
-
         if (selectAllCheckbox != null) {
             selectAllModeOn = false;
             selectAllCheckbox.setChecked(false);
             selectAllCheckboxContainer.setVisibility(View.GONE);
         }
-
         logBrowseAction(fileType);
+    }
+
+    private void showBrowseFileTypeRadioButtons(boolean show) {
+        RadioGroup radioGroup = findView(getView(), R.id.fragment_browse_peer_radiogroup_browse_type);
+        radioGroup.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void logBrowseAction(byte fileType) {
@@ -458,6 +480,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 protected void onItemChecked(CompoundButton v, boolean isChecked) {
                     super.onItemChecked(v, isChecked);
                     autoCheckUnCheckSelectAllCheckbox();
+                    selectionModeCallback.onItemChecked(getActivity(), adapter.getCheckedCount());
                 }
 
                 @Override
@@ -465,7 +488,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                     return onFileItemLongClicked(v);
                 }
             };
-
             adapter.setCheckboxesVisibility(selectAllModeOn);
             restorePreviouslyChecked();
             if (previousFilter != null) {
@@ -481,6 +503,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private void onToolbarMenuSelectModeCheckboxClick() {
         selectAllModeOn = !selectAllModeOn;
         enableSelectAllMode(selectAllModeOn, selectAllModeOn);
+        if (selectAllModeOn) {
+            selectionModeCallback.onItemChecked(getActivity(), adapter.getCheckedCount());
+        }
     }
 
     private void enableSelectAllMode(boolean selectAll, boolean autoCheckAll) {
@@ -488,6 +513,10 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         selectAllCheckboxContainer.setVisibility(selectAllModeOn && adapter.getCount() > 0 ? View.VISIBLE : View.GONE);
         adapter.setCheckboxesVisibility(selectAllModeOn);
         selectAllCheckbox.setChecked(autoCheckAll);
+        if (selectAllModeOn) {
+            ((MainActivity) getActivity()).startSupportActionMode(selectionModeCallback);
+        }
+        showBrowseFileTypeRadioButtons(!selectAllModeOn);
     }
 
     private void autoCheckUnCheckSelectAllCheckbox() {
@@ -506,6 +535,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         } else {
             adapter.clearChecked();
         }
+        selectionModeCallback.onItemChecked(getActivity(), isChecked ? adapter.getCount() : 0);
     }
 
     private boolean onFileItemLongClicked(View v) {
@@ -519,6 +549,11 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         enableSelectAllMode(!selectAllModeOn, false);
         onSelectAllChecked(false);
         adapter.setChecked(position, selectAllModeOn);
+        if (selectAllModeOn) {
+            selectionModeCallback.onItemChecked(getActivity(), 1);
+        } else {
+            selectionModeCallback.onDestroyActionMode(null);
+        }
         return true;
     }
 
@@ -583,6 +618,178 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             };
         }
         return selectAllCheckboxListener;
+    }
+
+    private class MyFilesActionModeCallback implements android.support.v7.view.ActionMode.Callback {
+        private ActionMode mode;
+        private Menu menu;
+        private int numChecked;
+
+        public void onItemChecked(Context context, int numChecked) {
+            this.numChecked = numChecked;
+            if (mode != null) {
+                mode.setTitle(numChecked + " " + context.getString(R.string.selected));
+                mode.invalidate();
+            }
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            this.mode = mode;
+            this.menu = menu;
+            mode.getMenuInflater().inflate(R.menu.fragment_browse_peer_action_mode_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            if (numChecked == 0) {
+                hideAllMenuActions();
+            } else if (numChecked > 0) {
+                FileListAdapter.FileDescriptorItem[] fileDescriptorItems =
+                        adapter.getChecked().toArray(new FileListAdapter.FileDescriptorItem[0]);
+                if (fileDescriptorItems.length > 0) {
+                    updateMenuActionsVisibility(fileDescriptorItems[0]);
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            boolean result = false;
+            Activity context = getActivity();
+            FileListAdapter.FileDescriptorItem[] fileDescriptorItems =
+                    adapter.getChecked().toArray(new FileListAdapter.FileDescriptorItem[0]);
+            if (fileDescriptorItems.length == 0) {
+                return false;
+            }
+            List<FileDescriptor> fileDescriptors = new ArrayList<>(fileDescriptorItems.length);
+            for (FileListAdapter.FileDescriptorItem fileDescriptorItem : fileDescriptorItems) {
+                fileDescriptors.add(fileDescriptorItem.fd);
+            }
+            FileListAdapter.FileDescriptorItem fileDescriptorItem = fileDescriptorItems[0];
+            final FileDescriptor fd = fileDescriptorItem.fd;
+            switch (item.getItemId()) {
+                case R.id.fragment_browse_peer_action_mode_menu_delete:
+                    new DeleteFileMenuAction(context, adapter, fileDescriptors).onClick();
+                    result = true;
+                    break;
+                case R.id.fragment_browse_peer_action_mode_menu_seed:
+                    new SeedAction(context, fd, null) {
+                        @Override
+                        public void onDialogClick(String tag, int which) {
+                            super.onDialogClick(tag, which);
+                            if (which == Dialog.BUTTON_POSITIVE) {
+                                enableSelectAllMode(false, false);
+                                MyFilesActionModeCallback.this.mode.finish();
+                            }
+                        }
+                    }.onClick();
+                    result = false;
+                    break;
+                case R.id.fragment_browse_peer_action_mode_menu_open:
+                    new OpenMenuAction(context, fd.filePath, fd.mime, fd.fileType).onClick();
+                    result = true;
+                    break;
+                case R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone:
+                    new SetAsRingtoneMenuAction(context, fd).onClick();
+                    result = true;
+                    break;
+                case R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper:
+                    new SetAsWallpaperMenuAction(context, fd).onClick();
+                    result = true;
+                    break;
+                case R.id.fragment_browse_peer_action_mode_menu_copy_magnet:
+                    new CopyToClipboardMenuAction(context,
+                            R.drawable.contextmenu_icon_magnet,
+                            R.string.transfers_context_menu_copy_magnet,
+                            R.string.transfers_context_menu_copy_magnet_copied,
+                            FileListAdapter.readInfoFromTorrent(fd.filePath, true)
+                    ).onClick();
+                    result = true;
+                    break;
+                case R.id.fragment_browse_peer_action_mode_menu_copy_info_hash:
+                    new CopyToClipboardMenuAction(context,
+                            R.drawable.contextmenu_icon_copy,
+                            R.string.transfers_context_menu_copy_infohash,
+                            R.string.transfers_context_menu_copy_infohash_copied,
+                            FileListAdapter.readInfoFromTorrent(fd.filePath, false)
+                    ).onClick();
+                    result = true;
+                    break;
+                case R.id.fragment_browse_peer_action_mode_menu_rename:
+                    new RenameFileMenuAction(context, adapter, fd).onClick();
+                    result = true;
+                    break;
+                case R.id.fragment_browse_peer_action_mode_menu_add_to_playlist:
+                    new AddToPlaylistMenuAction(context, fileDescriptors).onClick();
+                    result = true;
+                    break;
+                case R.id.fragment_browse_peer_action_mode_menu_share:
+                    new SendFileMenuAction(context, fd).onClick();
+                    result = true;
+                    break;
+            }
+            if (result) {
+                enableSelectAllMode(false, false);
+                mode.finish();
+            }
+            return result;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            enableSelectAllMode(false, false);
+            this.mode.finish();
+        }
+
+        private void hideAllMenuActions() {
+            if (menu != null && menu.size() > 0) {
+                for (int i = 0; i < menu.size(); i++) {
+                    menu.getItem(i).setVisible(false);
+                }
+            }
+        }
+
+        private void updateMenuActionsVisibility(FileListAdapter.FileDescriptorItem selectedFileDescriptor) {
+            List<Integer> actionsToHide = new ArrayList<>();
+            FileDescriptor fd = selectedFileDescriptor.fd;
+            boolean canOpenFile = fd.mime != null && (fd.mime.contains("audio") || fd.mime.contains("bittorrent") || fd.filePath != null);
+            if (numChecked > 1 || (fd.filePath != null && AndroidPlatform.saf(new File(fd.filePath)))) {
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_seed);
+            }
+            if (numChecked > 1 || (numChecked == 1 && !canOpenFile)) {
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_open);
+            }
+            if (numChecked > 1 || (numChecked == 1 && fd.fileType != Constants.FILE_TYPE_AUDIO)) {
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone);
+            }
+            if (numChecked > 1 || (numChecked == 1 && fd.fileType != Constants.FILE_TYPE_PICTURES)) {
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper);
+            }
+            if (numChecked > 1 ||
+                    (numChecked == 1 && fd.fileType == Constants.FILE_TYPE_APPLICATIONS)) {
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_rename);
+            }
+            if (numChecked > 1 || (numChecked == 1 && fd.mime != null && !fd.mime.equals(Constants.MIME_TYPE_BITTORRENT))) {
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_magnet);
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_info_hash);
+            }
+            if (numChecked > 1) {
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_share);
+            }
+            if (numChecked == 1 && fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_share);
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_delete);
+            }
+            if (menu != null && menu.size() > 0) {
+                for (int i = 0; i < menu.size(); i++) {
+                    MenuItem item = menu.getItem(i);
+                    item.setVisible(!actionsToHide.contains(item.getItemId()));
+                }
+            }
+        }
     }
 
     private final class RadioButtonListener implements OnClickListener, CompoundButton.OnCheckedChangeListener {
