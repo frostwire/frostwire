@@ -151,8 +151,8 @@ dependencies {
     compile "com.android.support:support-v13:25.3.0"
     compile "com.google.android.gms:play-services-ads-lite:10.2.1"
     compile "com.google.android.gms:play-services-base:10.2.1"
-    compile("com.mopub:mopub-sdk-banner:4.12.0@aar") { transitive = true }
-    compile("com.mopub:mopub-sdk-interstitial:4.12.0@aar") { transitive = true }
+    compile("com.mopub:mopub-sdk-banner:4.13.0@aar") { transitive = true }
+    compile("com.mopub:mopub-sdk-interstitial:4.13.0@aar") { transitive = true }
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     compile "com.frostwire:jlibtorrent-android-arm:1.2.0.6"
