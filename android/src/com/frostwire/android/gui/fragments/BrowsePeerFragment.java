@@ -657,7 +657,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            boolean result = false;
             Activity context = getActivity();
             FileListAdapter.FileDescriptorItem[] fileDescriptorItems =
                     adapter.getChecked().toArray(new FileListAdapter.FileDescriptorItem[0]);
@@ -673,32 +672,18 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             switch (item.getItemId()) {
                 case R.id.fragment_browse_peer_action_mode_menu_delete:
                     new DeleteFileMenuAction(context, adapter, fileDescriptors).onClick();
-                    result = true;
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_seed:
-                    new SeedAction(context, fd, null) {
-                        @Override
-                        public void onDialogClick(String tag, int which) {
-                            super.onDialogClick(tag, which);
-                            if (which == Dialog.BUTTON_POSITIVE) {
-                                enableSelectAllMode(false, false);
-                                MyFilesActionModeCallback.this.mode.finish();
-                            }
-                        }
-                    }.onClick();
-                    result = false;
+                    new SeedAction(context, fd, null).onClick();
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_open:
                     new OpenMenuAction(context, fd.filePath, fd.mime, fd.fileType).onClick();
-                    result = true;
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone:
                     new SetAsRingtoneMenuAction(context, fd).onClick();
-                    result = true;
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper:
                     new SetAsWallpaperMenuAction(context, fd).onClick();
-                    result = true;
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_copy_magnet:
                     new CopyToClipboardMenuAction(context,
@@ -707,7 +692,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                             R.string.transfers_context_menu_copy_magnet_copied,
                             FileListAdapter.readInfoFromTorrent(fd.filePath, true)
                     ).onClick();
-                    result = true;
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_copy_info_hash:
                     new CopyToClipboardMenuAction(context,
@@ -716,26 +700,20 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                             R.string.transfers_context_menu_copy_infohash_copied,
                             FileListAdapter.readInfoFromTorrent(fd.filePath, false)
                     ).onClick();
-                    result = true;
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_rename:
                     new RenameFileMenuAction(context, adapter, fd).onClick();
-                    result = true;
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_add_to_playlist:
                     new AddToPlaylistMenuAction(context, fileDescriptors).onClick();
-                    result = true;
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_share:
                     new SendFileMenuAction(context, fd).onClick();
-                    result = true;
                     break;
             }
-            if (result) {
-                enableSelectAllMode(false, false);
-                mode.finish();
-            }
-            return result;
+            enableSelectAllMode(false, false);
+            mode.finish();
+            return true;
         }
 
         @Override
