@@ -32,8 +32,23 @@
         <item name="android:listPreferredItemPaddingLeft">16dp</item>
         <item name="android:listPreferredItemPaddingRight">16dp</item>
         <item name="vpiTitlePageIndicatorStyle">@style/TitlePageIndicatorStyle</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/ActionModeStyle</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>
 
+    <style name="ActionModeStyle" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="background">@color/app_toolbar_background</item>
+        <item name="titleTextStyle">@style/ActionModeStyle.Title</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+    </style>
+
+    <style name="ActionModeStyle.Title">
+        <item name="android:textSize">19sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/app_text_white</item>
+    </style>
+    
     <style name="SplashScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@drawable/frostwire_splash_screen</item>
         <item name="colorPrimaryDark">@color/basic_blue_highlight_dark</item>
