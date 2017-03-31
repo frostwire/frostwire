@@ -58,12 +58,8 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
 
         if (!isTablet) {
             placements.put(Offers.PLACEMENT_INTERSTITIAL_EXIT, "399a20d69bdc449a8e0ca171f82179c8");
-            placements.put(Offers.PLACEMENT_INTERSTITIAL_HOME, "e3b83b39766544bebe91d567cbc3f8e0");
-            placements.put(Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, "f8d5aad13317448287aab91308faa1cd");
         } else {
             placements.put(Offers.PLACEMENT_INTERSTITIAL_EXIT, "cebdbc56b37c4d31ba79e861d1cb0de4");
-            placements.put(Offers.PLACEMENT_INTERSTITIAL_HOME, "06d585ac80e54e7f9abb485bc2153ee9");
-            placements.put(Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, "381bc8b0a9b243ac86e32088e918e653");
         }
     }
 
