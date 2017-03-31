@@ -208,7 +208,7 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
 
                 UIUtils.showTransfersOnDownloadStart(ctxRef.get());
                 if (ctxRef.get() instanceof Activity) {
-                    Offers.showInterstitialOfferIfNecessary((Activity) ctxRef.get(), Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, false, false);
+                    Offers.showInterstitialOfferIfNecessary((Activity) ctxRef.get(), Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
                 }
             }
         }

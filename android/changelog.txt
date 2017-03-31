@@ -1,9 +1,9 @@
-FrostWire 1.9.1 - MAR/29/2017
+FrostWire 1.9.1 - MAR/30/2017
  - My Files checkbox selection mode has a new action toolbar
  - My Files checkbox selection mode can be started by long pressing on
    a file (as long as it's not a ringtone)
- - Updated android support library to 25.3.0 and gms to 10.2.1
- - MoPub 4.13.0 update
+ - Updated android support library to 25.3.1 and gms to 10.2.1
+ - MoPub 4.13.0 update and optimizations, less bandwidth usage
 
 FrostWire 1.9.0 - MAR/10/2017
  - New material-design navigation menu

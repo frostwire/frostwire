@@ -538,7 +538,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePicker.handle(this, requestCode, resultCode, data);
         } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
-            Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_TRANSFERS, false, false);
+            Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
         }
         if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
@@ -598,7 +598,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void onLastDialogButtonPositive() {
-        Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_HOME, false, true);
+        Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, true);
     }
 
     private void onShutdownDialogButtonPositive() {
