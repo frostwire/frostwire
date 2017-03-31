@@ -19,7 +19,6 @@
 package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncTaskLoader;
 import android.content.BroadcastReceiver;
@@ -734,32 +733,43 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             List<Integer> actionsToHide = new ArrayList<>();
             FileDescriptor fd = selectedFileDescriptor.fd;
             boolean canOpenFile = fd.mime != null && (fd.mime.contains("audio") || fd.mime.contains("bittorrent") || fd.filePath != null);
-            if (numChecked > 1 || (fd.filePath != null && AndroidPlatform.saf(new File(fd.filePath)))) {
+
+            if (numChecked > 1) {
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_seed);
-            }
-            if (numChecked > 1 || (numChecked == 1 && !canOpenFile)) {
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_open);
-            }
-            if (numChecked > 1 || (numChecked == 1 && fd.fileType != Constants.FILE_TYPE_AUDIO)) {
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone);
-            }
-            if (numChecked > 1 || (numChecked == 1 && fd.fileType != Constants.FILE_TYPE_PICTURES)) {
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper);
-            }
-            if (numChecked > 1 ||
-                    (numChecked == 1 && fd.fileType == Constants.FILE_TYPE_APPLICATIONS)) {
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_rename);
-            }
-            if (numChecked > 1 || (numChecked == 1 && fd.mime != null && !fd.mime.equals(Constants.MIME_TYPE_BITTORRENT))) {
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_magnet);
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_info_hash);
-            }
-            if (numChecked > 1) {
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_share);
+            } else {
+                if (numChecked == 1) {
+                    if (!canOpenFile) {
+                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_open);
+                    }
+                    if (fd.fileType != Constants.FILE_TYPE_AUDIO) {
+                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone);
+                    }
+                    if (fd.fileType != Constants.FILE_TYPE_PICTURES) {
+                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper);
+                    }
+                    if (fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
+                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_rename);
+                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_share);
+                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_delete);
+                    }
+                    if (fd.mime != null && !fd.mime.equals(Constants.MIME_TYPE_BITTORRENT)) {
+                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_magnet);
+                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_info_hash);
+                    }
+                }
             }
-            if (numChecked == 1 && fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_share);
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_delete);
+            if (fd.filePath != null && AndroidPlatform.saf(new File(fd.filePath))) {
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_seed);
+            }
+            if (fd.fileType != Constants.FILE_TYPE_AUDIO) {
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_add_to_playlist);
             }
             if (menu != null && menu.size() > 0) {
                 for (int i = 0; i < menu.size(); i++) {
