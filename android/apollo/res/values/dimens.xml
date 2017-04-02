@@ -35,72 +35,72 @@
     <!-- grid view vertical and horizontal spacing -->
     <dimen name="grid_item_spacing">0dp</dimen>
     <!-- List item detailed height -->
-    <dimen name="list_item_detailed_height">120.0dip</dimen>
+    <dimen name="list_item_detailed_height">120.0dp</dimen>
     <!-- Top margin of "line_two" -->
-    <dimen name="list_item_line_two_margin_top">4.0dip</dimen>
+    <dimen name="list_item_line_two_margin_top">4.0dp</dimen>
     <!-- Left padding in the grid text -->
-    <dimen name="grid_item_padding_left">8.0dip</dimen>
+    <dimen name="grid_item_padding_left">8.0dp</dimen>
     <!-- Grid and list item normal height -->
-    <dimen name="item_normal_height">64.0dip</dimen>
+    <dimen name="item_normal_height">64.0dp</dimen>
     <!-- Padding in simple list view -->
-	<dimen name="list_simple_horizontal_padding">12.0dip</dimen>
-	<dimen name="list_simple_vertical_padding">10.0dip</dimen>
+	<dimen name="list_simple_horizontal_padding">12.0dp</dimen>
+	<dimen name="list_simple_vertical_padding">10.0dp</dimen>
 
 
     <!-- Bottom Action Bar -->
-    <dimen name="bottom_action_bar_height">48.0dip</dimen>
-    <dimen name="bottom_action_bar_item_width">56.0dip</dimen>
-    <dimen name="bottom_action_bar_item_padding_left">12.0dip</dimen>
-    <dimen name="bottom_action_bar_item_padding_right">12.0dip</dimen>
-    <dimen name="bottom_action_bar_album_art_width">30.0dip</dimen>
-    <dimen name="bottom_action_bar_album_art_height">30.0dip</dimen>
-    <dimen name="bottom_action_bar_info_padding_left">5.0dip</dimen>
-    <dimen name="bottom_action_bar_button_container_width">165.0dip</dimen>
+    <dimen name="bottom_action_bar_height">48.0dp</dimen>
+    <dimen name="bottom_action_bar_item_width">56.0dp</dimen>
+    <dimen name="bottom_action_bar_item_padding_left">12.0dp</dimen>
+    <dimen name="bottom_action_bar_item_padding_right">12.0dp</dimen>
+    <dimen name="bottom_action_bar_album_art_width">30.0dp</dimen>
+    <dimen name="bottom_action_bar_album_art_height">30.0dp</dimen>
+    <dimen name="bottom_action_bar_info_padding_left">5.0dp</dimen>
+    <dimen name="bottom_action_bar_button_container_width">165.0dp</dimen>
 
     <!-- Notification template -->
-    <dimen name="notification_big_icon_height">64.0dip</dimen>
-    <dimen name="notification_big_icon_width">64.0dip</dimen>
-    <dimen name="notification_info_container_padding_left">8.0dip</dimen>
-    <dimen name="notification_info_container_padding_bottom">4.0dip</dimen>
-    <dimen name="notification_action_padding">8.0dip</dimen>
-    <dimen name="notification_action_height">48.0dip</dimen>
-    <dimen name="notification_action_width">48.0dip</dimen>
+    <dimen name="notification_big_icon_height">64.0dp</dimen>
+    <dimen name="notification_big_icon_width">64.0dp</dimen>
+    <dimen name="notification_info_container_padding_left">8.0dp</dimen>
+    <dimen name="notification_info_container_padding_bottom">4.0dp</dimen>
+    <dimen name="notification_action_padding">8.0dp</dimen>
+    <dimen name="notification_action_height">48.0dp</dimen>
+    <dimen name="notification_action_width">48.0dp</dimen>
 
     <!-- Notification template expanded -->
-    <dimen name="notification_expanded_height">128.0dip</dimen>
-    <dimen name="notification_expanded_buttons_divider_padding">12.0dip</dimen>
-    <dimen name="notification_expanded_button_height">48.0dip</dimen>
-    <dimen name="notification_expanded_button_padding">10.0dip</dimen>
-    <dimen name="notification_expanded_content_padding_top">8.0dip</dimen>
-    <dimen name="notification_expanded_collapse_padding">8.0dip</dimen>
+    <dimen name="notification_expanded_height">128.0dp</dimen>
+    <dimen name="notification_expanded_buttons_divider_padding">12.0dp</dimen>
+    <dimen name="notification_expanded_button_height">48.0dp</dimen>
+    <dimen name="notification_expanded_button_padding">10.0dp</dimen>
+    <dimen name="notification_expanded_content_padding_top">8.0dp</dimen>
+    <dimen name="notification_expanded_collapse_padding">8.0dp</dimen>
 
     <!-- Height of the text label in the carousel -->
-    <dimen name="profile_carousel_label_height">45.0dip</dimen>
-    <dimen name="profile_indicator_height">5.0dip</dimen>
-    <dimen name="profile_label_padding">16.0dip</dimen>
+    <dimen name="profile_carousel_label_height">45.0dp</dimen>
+    <dimen name="profile_indicator_height">5.0dp</dimen>
+    <dimen name="profile_label_padding">16.0dp</dimen>
 
     <!-- Audio player -->
-    <dimen name="audio_player_header_height">60.0dip</dimen>
-    <dimen name="audio_player_header_padding_left">16.0dip</dimen>
-    <dimen name="audio_player_header_padding_right">16.0dip</dimen>
-    <dimen name="audio_player_switch_padding">10.0dip</dimen>
-    <dimen name="audio_player_time_width">56.0dip</dimen>
-    <dimen name="audio_player_seek_bar_margin_bottom">2.0dip</dimen>
-    <dimen name="audio_player_controls_end_button_width">50.0dip</dimen>
-    <dimen name="audio_player_controls_end_button_height">50.0dip</dimen>
-    <dimen name="audio_player_controls_main_button_width">58.0dip</dimen>
-    <dimen name="audio_player_controls_main_button_height">58.0dip</dimen>
+    <dimen name="audio_player_header_height">60.0dp</dimen>
+    <dimen name="audio_player_header_padding_left">16.0dp</dimen>
+    <dimen name="audio_player_header_padding_right">16.0dp</dimen>
+    <dimen name="audio_player_switch_padding">10.0dp</dimen>
+    <dimen name="audio_player_time_width">56.0dp</dimen>
+    <dimen name="audio_player_seek_bar_margin_bottom">2.0dp</dimen>
+    <dimen name="audio_player_controls_end_button_width">50.0dp</dimen>
+    <dimen name="audio_player_controls_end_button_height">50.0dp</dimen>
+    <dimen name="audio_player_controls_main_button_width">58.0dp</dimen>
+    <dimen name="audio_player_controls_main_button_height">58.0dp</dimen>
 
     <!-- Shadow height -->
-    <dimen name="shadow_height">0dip</dimen>
+    <dimen name="shadow_height">0dp</dimen>
 
     <!-- Colorstrip -->
-    <dimen name="colorstrip_height">0.0dip</dimen>
+    <dimen name="colorstrip_height">0.0dp</dimen>
 
     <!-- Drag and drop -->
-    <dimen name="drag_and_drop_handle">26.0dip</dimen>
+    <dimen name="drag_and_drop_handle">26.0dp</dimen>
 
     <!-- Color scheme dialog -->
-    <dimen name="color_scheme_dialog_row_padding">8.0dip</dimen>
+    <dimen name="color_scheme_dialog_row_padding">8.0dp</dimen>
 
 </resources>
