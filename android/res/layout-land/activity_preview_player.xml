@@ -126,7 +126,7 @@
 
             <com.mopub.mobileads.MoPubView
                 android:id="@+id/activity_preview_player_mopubview"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_below="@+id/activity_preview_advertisement_header_layout"
                 android:layout_gravity="center_horizontal"
