@@ -39,6 +39,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -113,10 +114,20 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem fullscreen = menu.findItem(R.id.activity_preview_player_menu_fullscreen);
+        fullscreen.setVisible(!audio);  //userRegistered is boolean, pointing if the user has registered or not.
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.activity_preview_player_menu_fullscreen:
+                final TextureView videoTexture = findView(R.id.activity_preview_player_videoview);
+                toggleFullScreen(videoTexture);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -147,9 +158,6 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         final TextureView videoTexture = findView(R.id.activity_preview_player_videoview);
         videoTexture.setSurfaceTextureListener(this);
 
-        final ImageButton toggleFullscreenButton = findView(R.id.activity_preview_player_fullscreen_button);
-        toggleFullscreenButton.setVisibility(audio ? View.GONE : View.VISIBLE);
-
         // when previewing audio, we make the video view really tiny.
         // hiding it will cause the player not to play.
         if (audio) {
@@ -174,19 +182,13 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                     return false;
                 }
             });
-            toggleFullscreenButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    toggleFullScreen(videoTexture);
-                }
-            });
         }
 
         if (thumbnailUrl != null) {
             ImageLoader.getInstance(this).load(Uri.parse(thumbnailUrl), img, R.drawable.default_artwork);
         }
 
-        final ImageButton downloadButton = findView(R.id.activity_preview_player_download_button);
+        final Button downloadButton = findView(R.id.activity_preview_player_download_button);
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -284,7 +286,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     private void onVideoViewPrepared(final ImageView img) {
-        final ImageButton downloadButton = findView(R.id.activity_preview_player_download_button);
+        final Button downloadButton = findView(R.id.activity_preview_player_download_button);
         downloadButton.setVisibility(View.VISIBLE);
         if (!audio) {
             img.setVisibility(View.GONE);
@@ -359,11 +361,11 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
         LinearLayout playerMetadataHeader = findView(R.id.activity_preview_player_metadata_header);
         ImageView thumbnail = findView(R.id.activity_preview_player_thumbnail);
-        LinearLayout buttonsContainer = findView(R.id.activity_preview_player_buttons_container);
+
+        final Button downloadButton = findView(R.id.activity_preview_player_download_button);
 
         // these ones only exist on landscape mode.
         ViewGroup rightSide = findView(R.id.activity_preview_player_right_side);
-        View divider = findView(R.id.activity_preview_player_divider);
 
         // these might not even be there
         LinearLayout advertisementHeaderLayout = findView(R.id.activity_preview_advertisement_header_layout);
@@ -372,7 +374,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         // Let's Go into full screen mode.
         if (!isFullScreen) {
             findToolbar().setVisibility(View.GONE);
-            setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, divider, buttonsContainer, rightSide);
+            setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, downloadButton, rightSide);
             setViewsVisibility(View.GONE, advertisementHeaderLayout, moPubView);
 
             // TODO: refactor to properly avoid warnings
@@ -391,7 +393,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         } else {
             // restore components back from full screen mode.
             findToolbar().setVisibility(View.VISIBLE);
-            setViewsVisibility(View.VISIBLE, playerMetadataHeader, divider, buttonsContainer, rightSide);
+            setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton, rightSide);
             if (mopubLoaded) {
                 setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, moPubView);
             }

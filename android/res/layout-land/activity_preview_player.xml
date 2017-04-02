@@ -23,6 +23,8 @@
     android:background="@color/app_background_body_light"
     android:orientation="vertical">
 
+    <include layout="@layout/toolbar_main" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -32,115 +34,74 @@
             android:id="@+id/activity_preview_player_framelayout"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="0dp"
             android:layout_weight="0.5"
-            android:background="@drawable/default_artwork"
-            android:clickable="true"
-            android:padding="0dp">
+            android:background="@color/basic_gray_medium">
 
             <TextureView
                 android:id="@+id/activity_preview_player_videoview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center" />
+                android:layout_gravity="center_horizontal|center_vertical" />
 
             <ImageView
                 android:id="@+id/activity_preview_player_thumbnail"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_gravity="center"
-                android:background="@drawable/default_artwork"
-                android:contentDescription="@null"
-                android:scaleType="fitCenter" />
-
-            <LinearLayout
-                android:id="@+id/activity_preview_player_buttons_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_gravity="center_horizontal|bottom"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp">
-                <ImageButton
-                    android:id="@+id/activity_preview_player_download_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:contentDescription="@null"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/download_icon"
-                    android:layout_marginRight="10dp"/>
-                <ImageButton
-                    android:id="@+id/activity_preview_player_fullscreen_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:contentDescription="@null"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/fullscreen"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="2.5dp"/>
-            </LinearLayout>
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:contentDescription="@null" />
         </FrameLayout>
 
-        <View
-            android:id="@+id/activity_preview_player_divider"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/divider_line" />
-
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/activity_preview_player_right_side"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
             android:orientation="vertical">
+
             <LinearLayout
                 android:id="@+id/activity_preview_player_metadata_header"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:padding="5dp"
-                android:paddingBottom="0dp"
+                android:layout_height="@dimen/audio_player_header_height"
                 android:background="@color/basic_white"
                 android:baselineAligned="false"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:layout_alignParentTop="true"
+                android:paddingEnd="@dimen/audio_player_header_padding_right"
+                android:paddingLeft="@dimen/audio_player_header_padding_left"
+                android:paddingRight="@dimen/audio_player_header_padding_right"
+                android:paddingStart="@dimen/audio_player_header_padding_left">
+
                 <TextView
                     android:id="@+id/activity_preview_player_track_name"
+                    style="@style/BodyListTitleText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@string/dummy_title"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/text_size_medium"
-                    android:textStyle="bold"/>
+                    android:text="@string/dummy_title" />
+
                 <TextView
                     android:id="@+id/activity_preview_player_artist_name"
+                    style="@style/BodyListSubtitleText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@string/dummy_author"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/text_size_small"/>
+                    android:text="@string/dummy_author" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/activity_preview_advertisement_header_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_below="@+id/activity_preview_player_metadata_header"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
                 android:visibility="gone">
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|right"
-                    android:layout_marginRight="7dp"
-                    android:layout_marginTop="2dp"
-                    android:background="@null"
-                    android:src="@drawable/ad_cancel"
-                    android:visibility="invisible" />
+
                 <TextView
                     android:id="@+id/activity_preview_player_advertisement_text"
                     android:layout_width="wrap_content"
@@ -165,15 +126,26 @@
 
             <com.mopub.mobileads.MoPubView
                 android:id="@+id/activity_preview_player_mopubview"
-                android:layout_width="300dp"
-                android:layout_height="250dp"
-                android:visibility="visible"
-                android:layout_gravity="center_horizontal|center_vertical"/>
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_below="@+id/activity_preview_advertisement_header_layout"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="20dp"
+                android:visibility="visible" />
 
-        </LinearLayout>
+            <Button
+                android:id="@+id/activity_preview_player_download_button"
+                style="@style/BlueButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:drawableLeft="@drawable/promo_download_arrow_button"
+                android:minHeight="45dp"
+                android:minWidth="150dp"
+                android:layout_margin="20dp"
+                android:text="@string/download" />
 
+        </RelativeLayout>
     </LinearLayout>
-
-    <include layout="@layout/toolbar_main" />
-
 </LinearLayout>
