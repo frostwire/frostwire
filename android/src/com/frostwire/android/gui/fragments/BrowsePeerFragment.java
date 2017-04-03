@@ -511,6 +511,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         selectAllModeOn = selectAll;
         selectAllCheckboxContainer.setVisibility(selectAllModeOn && adapter.getCount() > 0 ? View.VISIBLE : View.GONE);
         adapter.setCheckboxesVisibility(selectAllModeOn);
+        adapter.setShowMenuOnClick(!selectAll);
         selectAllCheckbox.setChecked(autoCheckAll);
         if (selectAllModeOn) {
             ((MainActivity) getActivity()).startSupportActionMode(selectionModeCallback);
