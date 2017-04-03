@@ -339,6 +339,7 @@ public final class Librarian {
             int count = 1;
             do {
                 FileDescriptor fd = fetcher.fetch(c);
+
                 if (!isInvalidDocument(fd)) {
                     result.add(fd);
                 }

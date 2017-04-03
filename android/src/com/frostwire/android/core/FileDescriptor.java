@@ -17,6 +17,10 @@
 
 package com.frostwire.android.core;
 
+import com.frostwire.util.MimeDetector;
+
+import org.apache.commons.io.FilenameUtils;
+
 /**
  * 
  * @author gubatron
@@ -77,6 +81,7 @@ public class FileDescriptor implements Cloneable {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.shared = isShared;
+        ensureCorrectMimeType(this);
     }
 
     @Override
@@ -111,5 +116,11 @@ public class FileDescriptor implements Cloneable {
     @Override
     public FileDescriptor clone() {
         return new FileDescriptor(id, artist, title, album, year, filePath, fileType, mime, fileSize, dateAdded, dateModified, shared);
+    }
+
+    private void ensureCorrectMimeType(FileDescriptor fd) {
+        if (fd.mime == null || fd.filePath.endsWith(".torrent") || fd.filePath.endsWith(".apk")) {
+            fd.mime = MimeDetector.getMimeType(FilenameUtils.getExtension(fd.filePath));
+        }
     }
 }

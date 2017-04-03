@@ -134,7 +134,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
 
         List<FileDescriptor> checked = convertItems(getChecked());
-        ensureCorrectMimeType(fd);
         boolean canOpenFile = fd.mime != null && (fd.mime.contains("audio") || fd.mime.contains("bittorrent") || fd.filePath != null);
         int numChecked = checked.size();
 
@@ -208,9 +207,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         onLocalPlay();
         Context ctx = getContext();
-
-        ensureCorrectMimeType(fd);
-
         if (fd.mime != null && fd.mime.contains("audio")) {
             if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD())) {
                 Engine.instance().getMediaPlayer().stop();
@@ -246,15 +242,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
         MusicUtils.playSimple(fileDescriptor.filePath);
         notifyDataSetChanged();
-    }
-
-    private void ensureCorrectMimeType(FileDescriptor fd) {
-        if (fd.filePath.endsWith(".apk")) {
-            fd.mime = Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE;
-        }
-        if (fd.filePath.endsWith(".torrent")) {
-            fd.mime = Constants.MIME_TYPE_BITTORRENT;
-        }
     }
 
     private void populateViewThumbnail(View view, FileDescriptorItem item) {
