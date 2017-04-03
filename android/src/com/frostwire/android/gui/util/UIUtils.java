@@ -20,8 +20,10 @@ package com.frostwire.android.gui.util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -30,6 +32,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Looper;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.FileProvider;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -46,6 +49,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -329,8 +333,10 @@ public final class UIUtils {
         try {
             if (filePath != null && !openAudioInternal(filePath)) {
                 Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setDataAndType(Uri.fromFile(new File(filePath)), mime);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                //Uri uri = Uri.fromFile(new File(filePath));
+                Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", new File(filePath));
+                i.setDataAndType(uri, Intent.normalizeMimeType(mime));
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                 if (mime != null && mime.contains("video")) {
                     if (MusicUtils.isPlaying()) {
@@ -338,7 +344,7 @@ public final class UIUtils {
                     }
                     UXStats.instance().log(UXAction.LIBRARY_VIDEO_PLAY);
                 }
-
+                context.grantUriPermission(context.getPackageName(), uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 context.startActivity(i);
             }
         } catch (Throwable e) {
