@@ -333,7 +333,6 @@ public final class UIUtils {
         try {
             if (filePath != null && !openAudioInternal(filePath)) {
                 Intent i = new Intent(Intent.ACTION_VIEW);
-                //Uri uri = Uri.fromFile(new File(filePath));
                 Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath));
                 i.setDataAndType(uri, Intent.normalizeMimeType(mime));
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -344,7 +343,7 @@ public final class UIUtils {
                     }
                     UXStats.instance().log(UXAction.LIBRARY_VIDEO_PLAY);
                 }
-                context.grantUriPermission(context.getPackageName(), uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
                 context.startActivity(i);
             }
         } catch (Throwable e) {
