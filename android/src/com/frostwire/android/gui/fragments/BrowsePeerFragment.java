@@ -530,6 +530,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         adapter.setCheckboxesVisibility(selectAllModeOn);
         adapter.setShowMenuOnClick(!selectAll);
         selectAllCheckbox.setChecked(autoCheckAll);
+        swipeRefresh.setEnabled(!selectAll);
         if (selectAllModeOn) {
             startActionMode(selectionModeCallback);
         } else {
