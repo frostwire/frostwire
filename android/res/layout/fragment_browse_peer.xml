@@ -71,19 +71,12 @@
 
         <CheckBox
             android:id="@+id/fragment_browse_peer_select_all_checkbox"
+            style="@style/SelectDeselectAllText"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="6dp"
             android:layout_marginRight="5dp"
-            android:gravity="center_vertical" />
-
-        <TextView
-            android:id="@+id/fragment_browse_peer_selection_mode_label"
-            style="@style/SelectDeselectAllText"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/fragment_browse_peer_select_all_checkbox"
             android:gravity="center_vertical"
             android:text="@string/select_all" />
 

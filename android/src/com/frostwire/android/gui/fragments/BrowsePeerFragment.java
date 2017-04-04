@@ -547,8 +547,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     private void onSelectAllChecked(boolean isChecked) {
-        TextView textView = findView(getView(), R.id.fragment_browse_peer_selection_mode_label);
-        textView.setText(isChecked ? R.string.deselect_all : R.string.select_all);
+        selectAllCheckbox.setText(isChecked ? R.string.deselect_all : R.string.select_all);
         if (isChecked) {
             adapter.checkAll();
         } else {
