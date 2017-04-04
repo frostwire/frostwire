@@ -551,6 +551,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private void onSelectAllChecked(boolean isChecked) {
         selectAllCheckbox.setText(isChecked ? R.string.deselect_all : R.string.select_all);
+        selectAllCheckbox.setPadding(15, 0, 0, 0);
         if (isChecked) {
             adapter.checkAll();
         } else {
