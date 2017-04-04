@@ -89,9 +89,12 @@ import java.util.Set;
  * @author marcelinkaaa
  */
 public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment {
+
     private static final Logger LOG = Logger.getLogger(BrowsePeerFragment.class);
     private static final int LOADER_FILES_ID = 0;
+
     private final BroadcastReceiver broadcastReceiver;
+
     private SwipeRefreshLayout swipeRefresh;
     private ListView list;
     private FileListAdapter adapter;
@@ -199,7 +202,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 return true;
             }
         });
-        selectAllCheckbox.setOnCheckedChangeListener(getSelectAllOnCheckedChangeListener());
+        selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxListener);
     }
 
     private void initToolbarSearchFilter(Menu menu) {
@@ -302,6 +305,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     @Override
     protected void initComponents(View v) {
+        selectAllCheckboxListener = new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                onSelectAllChecked(isChecked);
+            }
+        };
+
         selectAllCheckbox = findView(v, R.id.fragment_browse_peer_select_all_checkbox);
         selectAllCheckboxContainer = findView(v, R.id.fragment_browse_peer_select_all_container);
         swipeRefresh = findView(v, R.id.fragment_browse_peer_swipe_refresh);
@@ -530,7 +540,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         if (selectAllModeOn) {
             selectAllCheckbox.setChecked(adapter.getCheckedCount() == adapter.getCount());
         }
-        selectAllCheckbox.setOnCheckedChangeListener(getSelectAllOnCheckedChangeListener());
+        selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxListener);
     }
 
     private void onSelectAllChecked(boolean isChecked) {
@@ -630,18 +640,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             nextButton.setChecked(true);
             nextButton.callOnClick();
         }
-    }
-
-    private CompoundButton.OnCheckedChangeListener getSelectAllOnCheckedChangeListener() {
-        if (selectAllCheckboxListener == null) {
-            selectAllCheckboxListener = new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    onSelectAllChecked(isChecked);
-                }
-            };
-        }
-        return selectAllCheckboxListener;
     }
 
     private class MyFilesActionModeCallback implements android.support.v7.view.ActionMode.Callback {
