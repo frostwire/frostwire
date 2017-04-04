@@ -351,6 +351,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private RadioButton initRadioButton(View v, int viewId, final byte fileType) {
         RadioButton button = findView(v, viewId);
+        button.setButtonDrawable(null);
         Resources r = button.getResources();
         FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory =
                 new FileTypeRadioButtonSelectorFactory(fileType,
