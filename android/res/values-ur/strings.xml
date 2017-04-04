@@ -196,7 +196,7 @@
     <string name="choose_email_app">ایک ای میل اپلی کیشن کا انتخاب کریں</string>
     <string name="failed_to_add_download">ڈاؤن شامل کرنے میں ناکام</string>
     <string name="vibrate_on_finished_download">لوڈ فارغ ہونے پر مرتعش</string>
-    <string name="my_filetype">میرا s%</string>
+    <string name="my_filetype">میرا %s</string>
     <string name="stop_all_transfers_message">یہ تمام جاری اور قطار کے ڈاؤن لوڈ منسوخ کر دیں گے. تمام منتقل ڈیٹا ضائع ہو جائے گا. کیا تمہیں یقین ہے؟</string>
     <string name="share">سیکنڈ اور</string>
     <string name="accept">قبول کریں</string>

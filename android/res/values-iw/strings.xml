@@ -125,7 +125,7 @@
     <string name="choose_email_app">בחר יישום דוא"ל…</string>
     <string name="failed_to_add_download">נכשל ניסיון להוסיף להורדה</string>
     <string name="vibrate_on_finished_download">רטט בעת ההורדה מסיים</string>
-    <string name="my_filetype">שֶׁלִי s%</string>
+    <string name="my_filetype">שֶׁלִי %s</string>
     <string name="stop_all_transfers_message">פעולה זו תבטל את כל ההורדות השוטפות שבתור. כל הנתונים המועברים יאבדו. האם אתה בטוח?</string>
     <string name="share">לַחֲלוֹק</string>
     <string name="accept">לְקַבֵּל</string>

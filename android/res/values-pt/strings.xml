@@ -364,7 +364,7 @@
     <string name="donate_10">"Doar $10"</string>
     <string name="donate_25">"Doar $25"</string>
     <string name="playing_now_colon">"Rodando agora"</string>
-    <string name="my_filetype">"Meu %s"</string>
+    <string name="my_filetype">Meu %s</string>
     <string name="paused">"Pausado"</string>
     <string name="use_youtube">"Usar YouTube.com"</string>
     <string name="use_soundcloud">"Usar Soundcloud.com"</string>
