@@ -530,7 +530,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         adapter.setShowMenuOnClick(!selectAll);
         selectAllCheckbox.setChecked(autoCheckAll);
         if (selectAllModeOn) {
-            ((MainActivity) getActivity()).startSupportActionMode(selectionModeCallback);
+            startActionMode(selectionModeCallback);
         }
         showBrowseFileTypeRadioButtons(!selectAllModeOn);
     }

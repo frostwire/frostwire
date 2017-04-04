@@ -17,8 +17,11 @@
 
 package com.frostwire.android.gui.views;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +67,15 @@ public abstract class AbstractFragment extends Fragment {
 
     public boolean isPaused() {
         return paused;
+    }
+
+    public final void startActionMode(ActionMode.Callback callback) {
+        Activity activity = getActivity();
+
+        if (!(activity instanceof AppCompatActivity))
+            throw new UnsupportedOperationException("operation only supported when using AppCompatActivity");
+
+        ((AppCompatActivity) activity).startSupportActionMode(callback);
     }
 
     protected void initComponents(View rootView) {
