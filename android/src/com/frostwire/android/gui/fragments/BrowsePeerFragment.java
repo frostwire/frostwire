@@ -100,6 +100,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private MenuItem checkBoxMenuItem;
     private RelativeLayout selectAllCheckboxContainer;
     private CheckBox selectAllCheckbox;
+    private RadioGroup browseTypeRadioGroup;
     private CompoundButton.OnCheckedChangeListener selectAllCheckboxListener;
     private boolean selectAllModeOn;
     private Peer peer;
@@ -341,6 +342,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 switchToThe(false);
             }
         });
+
+        browseTypeRadioGroup = findView(v, R.id.fragment_browse_peer_radiogroup_browse_type);
         initRadioButton(v, R.id.fragment_browse_peer_radio_audio, Constants.FILE_TYPE_AUDIO);
         initRadioButton(v, R.id.fragment_browse_peer_radio_ringtones, Constants.FILE_TYPE_RINGTONES);
         initRadioButton(v, R.id.fragment_browse_peer_radio_videos, Constants.FILE_TYPE_VIDEOS);
@@ -383,11 +386,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             selectAllCheckboxContainer.setVisibility(View.GONE);
         }
         logBrowseAction(fileType);
-    }
-
-    private void showBrowseFileTypeRadioButtons(boolean show) {
-        RadioGroup radioGroup = findView(getView(), R.id.fragment_browse_peer_radiogroup_browse_type);
-        radioGroup.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void logBrowseAction(byte fileType) {
@@ -537,7 +535,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         } else {
             adapter.clearChecked();
         }
-        showBrowseFileTypeRadioButtons(!selectAllModeOn);
+        browseTypeRadioGroup.setVisibility(!selectAllModeOn ? View.VISIBLE : View.GONE);
     }
 
     private void autoCheckUnCheckSelectAllCheckbox() {
