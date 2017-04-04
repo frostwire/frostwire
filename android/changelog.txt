@@ -1,4 +1,5 @@
-FrostWire 1.9.1 - APR/02/2017
+FrostWire 1.9.1 - APR/04/2017
+ - Video/Audio search preview screen material design updates
  - My Files checkbox selection mode has a new action toolbar
  - My Files checkbox selection mode can be started by long pressing on
    a file (as long as it's not a ringtone)
