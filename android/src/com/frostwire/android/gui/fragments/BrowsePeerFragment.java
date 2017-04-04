@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Marcelina Knitter (@marcelinkaaa)
+ *            Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -305,6 +305,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     @Override
     protected void initComponents(View v) {
+        findView(v, R.id.fragment_browse_peer_select_all_container).setVisibility(View.GONE);
+        findView(v, R.id.progressContainer).setVisibility(View.GONE);
+
         selectAllCheckboxListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

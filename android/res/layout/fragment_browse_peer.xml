@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,8 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeightSmall"
         android:background="@color/app_background_white"
-        android:minHeight="?android:attr/listPreferredItemHeightSmall"
-        android:visibility="gone">
+        android:minHeight="?android:attr/listPreferredItemHeightSmall">
 
         <CheckBox
             android:id="@+id/fragment_browse_peer_select_all_checkbox"
@@ -94,8 +93,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:orientation="vertical">
 
         <ProgressBar
                 style="?android:attr/progressBarStyleLarge"
