@@ -206,6 +206,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     private void initMopubView() {
         if (Offers.disabledAds()) {
+            // TODO: Load some place holder graphic for users that already paid to remove ads
             return;
         }
         final int mopubPreviewBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD);
@@ -223,13 +224,11 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         dismissButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mopubLoaded = false;
-                advertisementHeaderLayout.setVisibility(View.GONE);
-                mopubView.setVisibility(View.GONE);
-
+                destroyMopubView();
             }
         });
-        mopubView.setTesting(true);
+
+        mopubView.setTesting(false);
         mopubView.setAutorefreshEnabled(true);
         boolean isVertical = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         mopubView.setAdUnitId(isVertical ? "a8be0cad4ad0419dbb19601aef3a18d2" : "2fd0fafe3d3c4d668385a620caaa694e");
@@ -247,6 +246,13 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                 advertisementHeaderLayout.setVisibility(View.GONE);
                 mopubView.setVisibility(View.GONE);
                 mopubLoaded = false;
+                destroyMopubView(); // also hides the ad-header view ("advertisement")
+
+                if (!Offers.disabledAds()) {
+                    // TODO: Replace with hardcoded house ads for donations, stickers, fw gear
+                } else {
+                    // TODO: Load some place holder graphic for users that already paid to remove ads
+                }
             }
 
             @Override
@@ -652,9 +658,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        destroyMopubView();
         stopAnyOtherPlayers();
         releaseMediaPlayer();
+        super.onDestroy();
     }
 
 
@@ -667,8 +674,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private void destroyMopubView() {
         try {
             if (mopubView != null) {
+                mopubLoaded = false;
                 LinearLayout advertisementHeaderLayout = findView(R.id.activity_preview_advertisement_header_layout);
                 advertisementHeaderLayout.setVisibility(View.GONE);
+                mopubView.setVisibility(View.GONE);
                 mopubView.destroy(); // -> mopubView.unregisterScreenStateBroadcastReceiver() private method call
             }
         } catch (Throwable ignored) {
