@@ -58,7 +58,6 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Finger;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
-import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
 import com.frostwire.android.gui.adapters.menu.DeleteFileMenuAction;
