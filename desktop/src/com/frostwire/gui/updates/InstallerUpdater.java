@@ -200,7 +200,7 @@ public class InstallerUpdater implements Runnable {
             public int[] types() {
                 return new int[]{
                         TORRENT_RESUMED.swig(),
-                        TORRENT_ADDED.swig(),
+                        ADD_TORRENT.swig(),
                         PIECE_FINISHED.swig(),
                         TORRENT_FINISHED.swig(),
                 };
@@ -224,7 +224,7 @@ public class InstallerUpdater implements Runnable {
                         return;
                     }
 
-                    if (alert.type().equals(TORRENT_ADDED) && alertSha1Hash.toHex().equals(updateInfoHash.toHex())) {
+                    if (alert.type().equals(ADD_TORRENT) && alertSha1Hash.toHex().equals(updateInfoHash.toHex())) {
                         Sha1Hash sha1 = ((TorrentAlert<?>) alert).handle().infoHash();
                         th = BTEngine.getInstance().find(sha1);
                         _manager = th;

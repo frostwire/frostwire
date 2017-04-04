@@ -350,7 +350,7 @@ public class TorrentFetcherDownload implements BTDownload {
         add_torrent_params params = add_torrent_params.create_instance();
         // TODO: replace this with the public API
         error_code ec = new error_code();
-        libtorrent.parse_magnet_uri(magnet, params, ec);
+        add_torrent_params.parse_magnet_uri(magnet, params, ec);
         tcp_endpoint_vector v = params.getPeers();
         int size = (int) v.size();
         ArrayList<TcpEndpoint> l = new ArrayList<>();

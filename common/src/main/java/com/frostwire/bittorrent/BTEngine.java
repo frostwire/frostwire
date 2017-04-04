@@ -18,14 +18,35 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.*;
-import com.frostwire.jlibtorrent.alerts.*;
+import com.frostwire.jlibtorrent.AlertListener;
+import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.jlibtorrent.Priority;
+import com.frostwire.jlibtorrent.SessionManager;
+import com.frostwire.jlibtorrent.SessionParams;
+import com.frostwire.jlibtorrent.SettingsPack;
+import com.frostwire.jlibtorrent.TcpEndpoint;
+import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.Vectors;
+import com.frostwire.jlibtorrent.alerts.Alert;
 import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.swig.*;
+import com.frostwire.jlibtorrent.alerts.ExternalIpAlert;
+import com.frostwire.jlibtorrent.alerts.FastresumeRejectedAlert;
+import com.frostwire.jlibtorrent.alerts.ListenFailedAlert;
+import com.frostwire.jlibtorrent.alerts.ListenSucceededAlert;
+import com.frostwire.jlibtorrent.alerts.TorrentAlert;
+import com.frostwire.jlibtorrent.swig.bdecode_node;
+import com.frostwire.jlibtorrent.swig.byte_vector;
+import com.frostwire.jlibtorrent.swig.entry;
+import com.frostwire.jlibtorrent.swig.error_code;
+import com.frostwire.jlibtorrent.swig.libtorrent;
+import com.frostwire.jlibtorrent.swig.session_params;
+import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -36,7 +57,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import static com.frostwire.jlibtorrent.alerts.AlertType.*;
+import static com.frostwire.jlibtorrent.alerts.AlertType.ADD_TORRENT;
+import static com.frostwire.jlibtorrent.alerts.AlertType.EXTERNAL_IP;
+import static com.frostwire.jlibtorrent.alerts.AlertType.FASTRESUME_REJECTED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_FAILED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_SUCCEEDED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.PEER_LOG;
+import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_LOG;
 
 /**
  * @author gubatron
@@ -47,7 +74,7 @@ public final class BTEngine extends SessionManager {
     private static final Logger LOG = Logger.getLogger(BTEngine.class);
 
     private static final int[] INNER_LISTENER_TYPES = new int[]{
-            TORRENT_ADDED.swig(),
+            ADD_TORRENT.swig(),
             LISTEN_SUCCEEDED.swig(),
             LISTEN_FAILED.swig(),
             EXTERNAL_IP.swig(),
@@ -484,9 +511,13 @@ public final class BTEngine extends SessionManager {
     private void fireDownloadAdded(TorrentAlert<?> alert) {
         try {
             TorrentHandle th = find(alert.handle().infoHash());
-            BTDownload dl = new BTDownload(this, th);
-            if (listener != null) {
-                listener.downloadAdded(this, dl);
+            if (th != null) {
+                BTDownload dl = new BTDownload(this, th);
+                if (listener != null) {
+                    listener.downloadAdded(this, dl);
+                }
+            } else {
+                LOG.info("torrent was not successfully added");
             }
         } catch (Throwable e) {
             LOG.error("Unable to create and/or notify the new download", e);
@@ -647,7 +678,7 @@ public final class BTEngine extends SessionManager {
             AlertType type = alert.type();
 
             switch (type) {
-                case TORRENT_ADDED:
+                case ADD_TORRENT:
                     TorrentAlert<?> torrentAlert = (TorrentAlert<?>) alert;
                     fireDownloadAdded(torrentAlert);
                     runNextRestoreDownloadTask();
