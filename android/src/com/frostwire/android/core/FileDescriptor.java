@@ -17,9 +17,7 @@
 
 package com.frostwire.android.core;
 
-import com.frostwire.util.MimeDetector;
-
-import org.apache.commons.io.FilenameUtils;
+import com.frostwire.android.gui.util.UIUtils;
 
 /**
  * 
@@ -120,7 +118,7 @@ public class FileDescriptor implements Cloneable {
 
     private void ensureCorrectMimeType(FileDescriptor fd) {
         if (fd.mime == null || fd.filePath.endsWith(".torrent") || fd.filePath.endsWith(".apk")) {
-            fd.mime = MimeDetector.getMimeType(FilenameUtils.getExtension(fd.filePath));
+            fd.mime = UIUtils.getMimeType(fd.filePath);
         }
     }
 }
