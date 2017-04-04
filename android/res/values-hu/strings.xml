@@ -234,7 +234,6 @@
     <string name="clear_torrent_index_summary">Tiszta torrent index</string>
     <string name="frostwire_features">FROSTWIRE JELLEMZÖK</string>
     <string name="free_apps">Ingyenes alkalmazások</string>
-    <string name="send_to_third_party">Küldj/feltöltése</string>
     <string name="support_free_software">Támogassa a szabad szoftver</string>
     <string name="send_my_geo_location_summary">Pingek küld a hozzávetőleges földrajzi helymeghatározó találni legközelebb társaik.</string>
     <string name="wants_to_share_a_file">akar osztani egy fájlt</string>

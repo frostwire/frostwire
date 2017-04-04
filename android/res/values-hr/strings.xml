@@ -93,7 +93,6 @@
     <string name="done">Gotovo</string>
     <string name="home">Početni zaslon</string>
     <string name="about">O FrostWire-u</string>
-    <string name="send_to_third_party">Poslati/uploadati</string>
     <string name="send_file_using">Poslati datoteku koristeći</string>
     <string name="my_files">Moji dokumenti</string>
     <string name="clear_messages">Izbriši poruku</string>

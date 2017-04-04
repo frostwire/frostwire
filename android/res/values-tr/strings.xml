@@ -93,7 +93,6 @@
     <string name="done">Bitti</string>
     <string name="home">Ana Sayfa</string>
     <string name="about">Hakkında</string>
-    <string name="send_to_third_party">Gönder/Yükle</string>
     <string name="send_file_using">Dosyayı şunu kullanarak gönder:</string>
     <string name="my_files">Dosyalarım</string>
     <string name="clear_messages">Mesajları temizle</string>

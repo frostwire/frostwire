@@ -99,7 +99,6 @@
     <string name="done">Listo</string>
     <string name="home">Inicio</string>
     <string name="about">Acerca de</string>
-    <string name="send_to_third_party">Enviar/Cargar</string>
     <string name="send_file_using">Enviar el archivo usando</string>
     <string name="my_files">Mis archivos</string>
     <string name="clear_messages">Borrar mensajes</string>

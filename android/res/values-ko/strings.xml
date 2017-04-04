@@ -93,7 +93,6 @@
     <string name="done">완료</string>
     <string name="home">메인홈</string>
     <string name="about">어바웃</string>
-    <string name="send_to_third_party">보내기/업로드하기</string>
     <string name="send_file_using">다음을 사용해 파일 보내기</string>
     <string name="my_files">내 파일</string>
     <string name="clear_messages">메세지 모두 비우기</string>

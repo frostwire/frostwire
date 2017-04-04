@@ -93,7 +93,6 @@
     <string name="done">Fatto</string>
     <string name="home">Home</string>
     <string name="about">FrostWire</string>
-    <string name="send_to_third_party">Invia/Upload</string>
     <string name="send_file_using">Invia file utilizzando</string>
     <string name="my_files">I miei file</string>
     <string name="clear_messages">Cancella i messaggi</string>

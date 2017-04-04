@@ -93,7 +93,6 @@
     <string name="done">Έτοιμο</string>
     <string name="home">Αρχική</string>
     <string name="about">Πληροφορίες</string>
-    <string name="send_to_third_party">Αποστολή/Ανέβασμα</string>
     <string name="send_file_using">Αποστολή αρχείου χρησιμοποιώντας</string>
     <string name="my_files">Τα αρχεία μου</string>
     <string name="clear_messages">Καθαρισμός μηνυμάτων</string>

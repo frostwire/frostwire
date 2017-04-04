@@ -93,7 +93,6 @@
     <string name="done">Xong</string>
     <string name="home">Home</string>
     <string name="about">Giới thiệu</string>
-    <string name="send_to_third_party">Gửi/Tải lên</string>
     <string name="send_file_using">Gửi tập tin đang dùng</string>
     <string name="my_files">Tập tin của tôi</string>
     <string name="clear_messages">Xóa tin nhắn</string>

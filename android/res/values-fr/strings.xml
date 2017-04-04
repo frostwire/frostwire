@@ -94,7 +94,6 @@
     <string name="done">Terminer</string>
     <string name="home">Accueil</string>
     <string name="about">À propos</string>
-    <string name="send_to_third_party">Envoyer/Transférer </string>
     <string name="send_file_using">Envoyer le ficher avec</string>
     <string name="my_files">Mes fichiers</string>
     <string name="clear_messages">Effacer les messages</string>

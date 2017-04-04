@@ -92,7 +92,6 @@
     <string name="done">Сделано</string>
     <string name="home">Главная</string>
     <string name="about">О приложении</string>
-    <string name="send_to_third_party">Отправить/Загрузить</string>
     <string name="send_file_using">Отправить файл с помощью</string>
     <string name="my_files">Мои файлы</string>
     <string name="clear_messages">Удалить сообщения</string>

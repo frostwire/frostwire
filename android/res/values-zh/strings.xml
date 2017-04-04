@@ -93,7 +93,6 @@
     <string name="done">完成</string>
     <string name="home">主页</string>
     <string name="about">关于</string>
-    <string name="send_to_third_party">发送/上传</string>
     <string name="send_file_using">发送文件使用</string>
     <string name="my_files">我的文件</string>
     <string name="clear_messages">清除信息</string>

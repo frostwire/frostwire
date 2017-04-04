@@ -241,7 +241,6 @@
     <string name="clear_torrent_index_summary">Klar Torrent index</string>
     <string name="frostwire_features">FROSTWIRE INTRODUCERAR</string>
     <string name="free_apps">Gratis appar</string>
-    <string name="send_to_third_party">Skicka/Ladda</string>
     <string name="support_free_software">Stöd fri programvara</string>
     <string name="send_my_geo_location_summary">Ping skickar din ungefärliga geografisk plats för att hitta närmaste kamrater.</string>
     <string name="wants_to_share_a_file">vill dela en fil</string>

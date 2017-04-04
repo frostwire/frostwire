@@ -93,7 +93,6 @@
     <string name="done">完了</string>
     <string name="home">ホーム</string>
     <string name="about">FrostWireについて</string>
-    <string name="send_to_third_party">送信/アップロード</string>
     <string name="send_file_using">以下を使用してファイルを送信する</string>
     <string name="my_files">マイファイル</string>
     <string name="clear_messages">メッセージをクリアする</string>
