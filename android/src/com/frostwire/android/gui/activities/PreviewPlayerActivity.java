@@ -1,6 +1,7 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -383,7 +384,6 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, downloadButton, rightSide);
             setViewsVisibility(View.GONE, advertisementHeaderLayout, moPubView);
 
-            // TODO: refactor to properly avoid warnings
             if (isPortrait) {
                 //noinspection SuspiciousNameCombination
                 frameLayoutParams.width = metrics.heightPixels;
@@ -398,6 +398,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             isFullScreen = true;
         } else {
             // restore components back from full screen mode.
+            //final TextureView videoTexture = findView(R.id.activity_preview_player_videoview);
             findToolbar().setVisibility(View.VISIBLE);
             setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton, rightSide);
             if (mopubLoaded) {
@@ -406,16 +407,11 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             v.setRotation(0);
 
             // restore the thumbnail on the way back only if doing audio preview.
-            thumbnail.setVisibility(!audio ? View.GONE : View.VISIBLE);
+            //thumbnail.setVisibility(!audio ? View.GONE : View.VISIBLE);
+            frameLayoutParams.width = FrameLayout.LayoutParams.MATCH_PARENT;
+            frameLayoutParams.height = FrameLayout.LayoutParams.MATCH_PARENT;
+            frameLayoutParams.weight = 1.0f;
 
-            if (isPortrait) {
-                frameLayoutParams.width = FrameLayout.LayoutParams.MATCH_PARENT;
-                frameLayoutParams.height = FrameLayout.LayoutParams.MATCH_PARENT;
-            } else {
-                frameLayoutParams.width = 0;
-                frameLayoutParams.height = FrameLayout.LayoutParams.MATCH_PARENT;
-                frameLayoutParams.weight = 0.5f;
-            }
             isFullScreen = false;
         }
 

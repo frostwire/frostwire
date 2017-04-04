@@ -2,6 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -73,7 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_weight="1"
+                android:layout_weight="1.0"
                 android:background="@color/basic_gray_medium">
 
                 <TextureView
