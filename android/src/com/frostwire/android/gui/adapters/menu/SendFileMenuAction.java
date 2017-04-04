@@ -40,7 +40,7 @@ public class SendFileMenuAction extends MenuAction {
     private final FileDescriptor fd;
 
     public SendFileMenuAction(Context context, FileDescriptor fd) {
-        super(context, R.drawable.contextmenu_icon_send, R.string.send_to_third_party);
+        super(context, R.drawable.contextmenu_icon_send, R.string.share);
 
         this.fd = fd;
     }

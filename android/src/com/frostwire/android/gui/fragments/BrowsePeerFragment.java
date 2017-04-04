@@ -486,6 +486,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 protected boolean onItemLongClicked(View v) {
                     return onFileItemLongClicked(v);
                 }
+
+                @Override
+                protected void onItemClicked(View v) {
+                    onFileItemClicked(v);
+                }
+
             };
             adapter.setCheckboxesVisibility(selectAllModeOn);
             restorePreviouslyChecked();
@@ -536,6 +542,24 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             adapter.clearChecked();
         }
         selectionModeCallback.onItemChecked(getActivity(), isChecked ? adapter.getCount() : 0);
+    }
+
+    private void onFileItemClicked(View v) {
+        if (adapter == null || adapter.getFileType() == Constants.FILE_TYPE_RINGTONES) {
+            return;
+        }
+        if (selectAllModeOn) {
+            int position = adapter.getViewPosition(v);
+            if (position == -1) {
+                return;
+            }
+            Set<FileListAdapter.FileDescriptorItem> checked = adapter.getChecked();
+            boolean wasChecked = checked.contains(v.getTag());
+            adapter.setChecked(position, !wasChecked);
+            adapter.notifyDataSetInvalidated();
+            selectionModeCallback.onItemChecked(getActivity(), adapter.getCheckedCount());
+        }
+
     }
 
     private boolean onFileItemLongClicked(View v) {
