@@ -7,6 +7,7 @@ FrostWire 1.9.1 - APR/04/2017
    on some devices
  - Updated android support library to 25.3.1 and gms to 10.2.1
  - MoPub 4.13.0 update and optimizations, less bandwidth usage
+ - New jlibtorrent 1.2.0.7-RC3
 
 FrostWire 1.9.0 - MAR/10/2017
  - New material-design navigation menu
