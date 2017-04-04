@@ -24,6 +24,7 @@
     <!-- Basic colors -->
     <color name="basic_white">@android:color/white</color>
     <color name="basic_blue">#38536a</color>
+    <color name="basic_blue_transparent">#642889AC</color>
     <color name="basic_blue_dark">#264053</color>
     <color name="basic_blue_dark_highlight">#21313f</color>
     <color name="basic_blue_highlight">#33b5e5</color>
@@ -52,6 +53,7 @@
     <color name="app_selection_background">@color/basic_gray_light</color>
     <color name="app_rich_notification_background">@color/basic_yellow</color>
     <color name="app_browse_thumbnail_background">@color/basic_gray_medium</color>
+    <color name="app_grid_selected_background">@color/basic_blue_transparent</color>
 
     <!-- Text Colors -->
     <color name="app_text_primary">@color/basic_gray_text_dark</color>

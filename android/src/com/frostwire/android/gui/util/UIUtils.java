@@ -567,4 +567,13 @@ public final class UIUtils {
 
         return resId;
     }
+
+    public static double getScreenInches(Activity activity) {
+        DisplayMetrics dm = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+        double x_sq = Math.pow(dm.widthPixels/dm.xdpi, 2);
+        double y_sq = Math.pow(dm.heightPixels/dm.ydpi, 2);
+        // pitagoras
+        return Math.sqrt(x_sq + y_sq);
+    }
 }

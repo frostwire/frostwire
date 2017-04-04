@@ -111,10 +111,11 @@
     </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/listContainer"
+        android:id="@+id/fragment_browse_peer_grid_container"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:padding="2dp">
 
         <com.frostwire.android.gui.views.SwipeLayout
             android:id="@+id/fragment_browse_peer_swipe"
@@ -126,14 +127,19 @@
                 android:id="@+id/fragment_browse_peer_swipe_refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
-                <ListView
-                    android:id="@+id/fragment_browse_peer_list"
+                <GridView
+                    android:id="@+id/fragment_browse_peer_gridview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:numColumns="1"
+                    android:gravity="center"
+                    android:verticalSpacing="2dp"
+                    android:horizontalSpacing="2dp"
+                    android:stretchMode="columnWidth"
                     android:background="@color/app_background_body_light"
                     android:fastScrollEnabled="true"
-                    android:textFilterEnabled="true" />
+                    android:textFilterEnabled="true"
+                    />
             </android.support.v4.widget.SwipeRefreshLayout>
         </com.frostwire.android.gui.views.SwipeLayout>
 

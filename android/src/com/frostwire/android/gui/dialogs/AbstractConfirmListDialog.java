@@ -27,14 +27,24 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This dialog should evolve to allow us for reuse on a number of situations in which you
@@ -423,9 +433,9 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxOnCheckedChangeListener);
     }
 
-    // AbstractListAdapter.OnItemCheckedListener.onItemChecked(CompoundButton v, boolean checked)
+    // AbstractListAdapter.OnItemCheckedListener.onItemChecked(View v, boolean checked)
     @Override
-    public void onItemChecked(CompoundButton v, T item, boolean checked) {
+    public void onItemChecked(View v, T item, boolean checked) {
         if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
             updateSelectedCount();
         }

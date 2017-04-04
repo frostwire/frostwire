@@ -197,13 +197,34 @@ public final class ImageLoader {
     }
 
     public void load(final Uri uri, final Uri uriRetry, final ImageView target, final int targetWidth, final int targetHeight) {
+        load(uri, uriRetry, target, targetWidth, targetHeight, null);
+    }
+
+    public void load(final Uri uri, final Uri uriRetry, final ImageView target, final int targetWidth, final int targetHeight, final Callback.EmptyCallback callback) {
         if (!shutdown) {
             picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new Callback.EmptyCallback() {
                 @Override
+                public void onSuccess() {
+                    if (callback != null) {
+                        callback.onSuccess();
+                    }
+                }
+
+                @Override
                 public void onError() {
-                    load(uriRetry, target, targetWidth, targetHeight);
+                    if (callback != null) {
+                        load(uriRetry, target, targetWidth, targetHeight, callback);
+                    } else {
+                        load(uriRetry, target, targetWidth, targetHeight);
+                    }
                 }
             });
+        }
+    }
+
+    private void load(Uri uri, ImageView target, int targetWidth, int targetHeight, Callback.EmptyCallback callback) {
+        if (!shutdown) {
+            picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, callback);
         }
     }
 

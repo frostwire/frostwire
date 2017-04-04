@@ -43,7 +43,7 @@ import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Filter;
-import android.widget.ListView;
+import android.widget.GridView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -96,7 +96,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private final BroadcastReceiver broadcastReceiver;
 
     private SwipeRefreshLayout swipeRefresh;
-    private ListView list;
+    private GridView list;
     private FileListAdapter adapter;
     private MenuItem checkBoxMenuItem;
     private RelativeLayout selectAllCheckboxContainer;
@@ -304,6 +304,10 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public void onShow() {
     }
 
+    public boolean getSelectAllMode() {
+        return selectAllModeOn;
+    }
+
     @Override
     protected void initComponents(View v) {
         findView(v, R.id.fragment_browse_peer_select_all_container).setVisibility(View.GONE);
@@ -330,7 +334,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 }
             }
         });
-        list = findView(v, R.id.fragment_browse_peer_list);
+        list = findView(v, R.id.fragment_browse_peer_gridview);
         SwipeLayout swipe = findView(v, R.id.fragment_browse_peer_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override
@@ -477,9 +481,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         }
         try {
             byte fileType = (Byte) data[0];
-            @SuppressWarnings("unchecked")
             List<FileDescriptor> items = (List<FileDescriptor>) data[1];
-            adapter = new FileListAdapter(getActivity(), items, fileType) {
+            adapter = new FileListAdapter(getActivity(), items, fileType, selectAllModeOn) {
                 @Override
                 protected void onLocalPlay() {
                     if (adapter != null) {
@@ -488,7 +491,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 }
 
                 @Override
-                protected void onItemChecked(CompoundButton v, boolean isChecked) {
+                protected void onItemChecked(View v, boolean isChecked) {
                     super.onItemChecked(v, isChecked);
                     autoCheckUnCheckSelectAllCheckbox();
                     selectionModeCallback.onItemChecked(getActivity(), adapter.getCheckedCount());
@@ -506,6 +509,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
             };
             adapter.setCheckboxesVisibility(selectAllModeOn);
+            list.setNumColumns(adapter.getNumColumns());
             restorePreviouslyChecked();
             if (previousFilter != null) {
                 performFilter(previousFilter);
@@ -528,6 +532,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private void enableSelectAllMode(boolean selectAll, boolean autoCheckAll) {
         selectAllModeOn = selectAll;
         selectAllCheckboxContainer.setVisibility(selectAllModeOn && adapter.getCount() > 0 ? View.VISIBLE : View.GONE);
+        adapter.setSelectAllMode(selectAllModeOn);
         adapter.setCheckboxesVisibility(selectAllModeOn);
         adapter.setShowMenuOnClick(!selectAll);
         selectAllCheckbox.setChecked(autoCheckAll);
