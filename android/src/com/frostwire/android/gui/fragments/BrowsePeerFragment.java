@@ -541,7 +541,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private void autoCheckUnCheckSelectAllCheckbox() {
         selectAllCheckbox.setOnCheckedChangeListener(null);
         if (selectAllModeOn) {
-            selectAllCheckbox.setChecked(adapter.getCheckedCount() == adapter.getCount());
+            boolean allChecked = adapter.getCheckedCount() == adapter.getCount();
+            selectAllCheckbox.setChecked(allChecked);
+            selectAllCheckbox.setText(allChecked ? R.string.deselect_all : R.string.select_all);
         }
         selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxListener);
     }
