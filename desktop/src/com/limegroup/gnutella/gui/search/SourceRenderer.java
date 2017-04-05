@@ -45,14 +45,10 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             sourceIcons.put("soundcloud", GUIMediator.getThemeImage("soundcloud_off"));
             sourceIcons.put("youtube", GUIMediator.getThemeImage("youtube_on"));
             sourceIcons.put("archive.org", GUIMediator.getThemeImage("archive_source"));
-            sourceIcons.put("isohunt", GUIMediator.getThemeImage("isohunt_source"));
-            sourceIcons.put("clearbits", GUIMediator.getThemeImage("clearbits_source"));
             sourceIcons.put("extratorrent", GUIMediator.getThemeImage("extratorrent_source"));
-            sourceIcons.put("kat", GUIMediator.getThemeImage("kat_source"));
             sourceIcons.put("mininova", GUIMediator.getThemeImage("mininova_source"));
             sourceIcons.put("monova", GUIMediator.getThemeImage("monova_source"));
             sourceIcons.put("tpb", GUIMediator.getThemeImage("tpb_source"));
-            sourceIcons.put("bitsnoop", GUIMediator.getThemeImage("bitsnoop_off"));
             sourceIcons.put("torlock", GUIMediator.getThemeImage("torlock_off"));
             sourceIcons.put("torrentdownloads", GUIMediator.getThemeImage("torrentdownloads_source"));
             sourceIcons.put("limetorrents", GUIMediator.getThemeImage("torrentdownloads_source")); // TO-DO: @Marcelina

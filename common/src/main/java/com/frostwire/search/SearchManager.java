@@ -425,5 +425,5 @@ public final class SearchManager {
     };
 
     @SuppressWarnings("unused")
-    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, BITSNOOP, EZTV, LIMETORRENTS);
+    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, EZTV, LIMETORRENTS);
 }

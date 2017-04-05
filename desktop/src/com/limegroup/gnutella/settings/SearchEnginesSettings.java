@@ -29,11 +29,7 @@ public class SearchEnginesSettings extends LimeProps {
     // In the near future, we will refactor this code to allow a configurable amount of
     // search providers.
 
-    public static final BooleanSetting CLEARBITS_SEARCH_ENABLED = FACTORY.createBooleanSetting("CLEARBITS_SEARCH2_ENABLED", true);
-
     public static final BooleanSetting MININOVA_SEARCH_ENABLED = FACTORY.createBooleanSetting("MININOVA_SEARCH2_ENABLED", true);
-
-    public static final BooleanSetting KAT_SEARCH_ENABLED = FACTORY.createBooleanSetting("KAT_SEARCH2_ENABLED", true);
 
     public static final BooleanSetting EXTRATORRENT_SEARCH_ENABLED = FACTORY.createBooleanSetting("EXTRATORRENT_SEARCH2_ENABLED", true);
 
@@ -48,8 +44,6 @@ public class SearchEnginesSettings extends LimeProps {
     public static final BooleanSetting ARCHIVEORG_SEARCH_ENABLED = FACTORY.createBooleanSetting("ARCHIVEORG_SEARCH2_ENABLED", true);
 
     public static final BooleanSetting FROSTCLICK_SEARCH_ENABLED = FACTORY.createBooleanSetting("FROSTCLICK_SEARCH_ENABLED", true);
-
-    public static final BooleanSetting BITSNOOP_SEARCH_ENABLED = FACTORY.createBooleanSetting("BITSNOOP_SEARCH_ENABLED", true);
 
     public static final BooleanSetting TORLOCK_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORLOCK_SEARCH_ENABLED", true);
 

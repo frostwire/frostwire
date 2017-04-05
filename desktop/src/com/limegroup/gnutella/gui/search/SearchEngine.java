@@ -20,7 +20,6 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
-import com.frostwire.search.bitsnoop.BitSnoopSearchPerformer;
 import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
@@ -65,7 +64,6 @@ public abstract class SearchEngine {
     private static final int SOUNDCLOUD_ID = 10;
     private static final int ARCHIVEORG_ID = 11;
     private static final int FROSTCLICK_ID = 12;
-    private static final int BITSNOOP_ID = 13;
     private static final int TORLOCK_ID = 14;
     private static final int EZTV_ID = 15;
 
@@ -128,13 +126,6 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new FrostClickSearchPerformer(FROSTCLICK.getDomainName(), token, keywords, DEFAULT_TIMEOUT, userAgent);
-        }
-    };
-
-    private static final SearchEngine BITSNOOP = new SearchEngine(BITSNOOP_ID, "BitSnoop", SearchEnginesSettings.BITSNOOP_SEARCH_ENABLED, "bitsnoop.com") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new BitSnoopSearchPerformer(BITSNOOP.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
@@ -208,9 +199,8 @@ public abstract class SearchEngine {
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        return Arrays.asList(YOUTUBE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, MONOVA, ARCHIVEORG, TORLOCK, YIFY, BITSNOOP, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
+        return Arrays.asList(YOUTUBE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, MONOVA, ARCHIVEORG, TORLOCK, YIFY, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
     }
-
 
     public abstract SearchPerformer getPerformer(long token, String keywords);
 
