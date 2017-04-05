@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.content.res.Resources;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -354,7 +355,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private RadioButton initRadioButton(View v, int viewId, final byte fileType) {
         RadioButton button = findView(v, viewId);
-        button.setButtonDrawable(null);
+        button.setButtonDrawable(new StateListDrawable());
         Resources r = button.getResources();
         FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory =
                 new FileTypeRadioButtonSelectorFactory(fileType,
