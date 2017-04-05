@@ -1,8 +1,9 @@
 frostwire (6.4.7) stable; urgency=high
+  * New jlibtorrent 1.2.0.7-RC3
   * Spanish, Portuguese, French, Italian, German, Dutch translations updated
   * Windows, Mac: JRE update (1.8.0_102 -> 1.8.0_121)
 	
- -- FrostWire Team <contact@frostwire.com>  Tue, 28 Mar 2017 10:58:34 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 05 Apr 2017 09:38:55 -0600
 
 frostwire (6.4.6) stable; urgency=high
   * New Options > Advanced > Experimental. Users can now try ALPHA and BETA features
