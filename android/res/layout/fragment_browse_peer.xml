@@ -77,7 +77,7 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="6dp"
             android:layout_marginRight="5dp"
-            android:paddingLeft="15dp"
+            android:paddingLeft="5dp"
             android:gravity="center_vertical"
             android:text="@string/select_all" />
 
