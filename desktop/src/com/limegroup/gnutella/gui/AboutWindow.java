@@ -123,7 +123,7 @@ final class AboutWindow {
 
         sb.append("<h1>Powered by</h1>").
                 append("<ul>").
-                append("<li><a href='http://jlibtorrent.org'>JLibTorrent</a>").append(LibTorrent.version()).append("</li>").
+                append("<li><a href='http://jlibtorrent.org'>JLibTorrent</a>").append(LibTorrent.jlibtorrentVersion()).append("</li>").
                 append("<li><a href='http://www.boost.org/'>Boost</a> ").append(LibTorrent.boostVersion()).append("</li>").
                 append("<li><a href='https://www.openssl.org/'>OpenSSL</a> ").append(LibTorrent.opensslVersionNum()).
                 append("<li><a href='http://www.mplayerhq.hu/'>MPlayer</a> 1.3.0</li>").
