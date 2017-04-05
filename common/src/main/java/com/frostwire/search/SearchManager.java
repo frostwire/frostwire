@@ -19,7 +19,6 @@ package com.frostwire.search;
 
 import com.frostwire.platform.AppSettings;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
-import com.frostwire.search.bitsnoop.BitSnoopSearchPerformer;
 import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.filter.SearchTable;
@@ -373,13 +372,6 @@ public final class SearchManager {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new FrostClickSearchPerformer("api.frostclick.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT, null);
-        }
-    };
-
-    private static final SearchEngine BITSNOOP = new SearchEngine("BitSnoop", AppSettings.SEARCH_BITSNOOP_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new BitSnoopSearchPerformer("bitsnoop.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 
