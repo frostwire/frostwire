@@ -221,13 +221,9 @@
     <string name="media_player_failed">Medya oynatıcı hata verdi</string>
     <string name="activity_media_player_name">Medya Oynatıcı</string>
     <string name="search_settings">Arama Ayarları</string>
-    <string name="use_kat">KAT.ph\'u Kullan</string>
-    <string name="use_clearbits">ClearBits.net\'u Kullan</string>
     <string name="use_extratorrent">ExtraTorrent.com\'u Kullan</string>
-    <string name="use_isohunt">ISOHunt.com\'u Kullan</string>
     <string name="use_mininova">Mininova.org\'u Kullan</string>
     <string name="use_tpb">ThePirateBay.org\'u Kullan</string>
-    <string name="use_vertor">Vertor.com\'u Kullan</string>
     <string name="activity_media_player_image_description">Medya Resmi</string>
     <string name="ringtone_set">Cep Melodisi Ayarlandı</string>
     <string name="search">Arama</string>
@@ -459,7 +455,6 @@
     <string name="one_year">1 yıl</string>
     <string name="transfers_select_completed">tamamlanmış</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Tüm transferleri duraklatın/durdurun</string>
-    <string name="use_kat_summary">KAT, mıknatıs tabanlı, yalnızca Wifi üzerinde çalışıyor</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Korunmasız bir bağlantı, çevrimiçi yaptığınız her şeyi ifade eder (dahil olmak üzere <b>aramalar, mesajlaşma ve indirmeler</b>) Şebekenizdeki herhangi biri tarafından ve hatta İnternet servis sağlayıcınız tarafından izlenebilir.<br><br>Bağlantınızı şifrelemek için ExpressVPN\'yi kullanmanızı öneririz <b>gizliliğinizi korumak</b>.]]></string>
     <string name="transfers_select_downloading">indirme</string>
     <string name="frostwire_features">FROSTWIRE ÖZELLİKLERİ</string>
@@ -521,7 +516,6 @@
     <string name="vpn_client_feature_1">Askeri sınıf şifreleme</string>
     <string name="transfers_context_resume_all_torrent_transfers">Tüm torrent transferlerini devam ettirin</string>
     <string name="vpn_client_feature_3">Özel ve logless tarama</string>
-    <string name="use_bitsnoop">BitSnoop\'u Kullan</string>
     <string name="free_download">Bedava indir</string>
     <string name="couldnt_share_file">Dosya paylaşılamadı. Garip yol bulundu.</string>
     <string name="try_frostwire_plus_for_more_results">Daha fazla sonuç için FrostWire Plus\'ı deneyin</string>

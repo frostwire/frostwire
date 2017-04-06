@@ -221,13 +221,9 @@
     <string name="media_player_failed">Multimediální přehrávač selhal</string>
     <string name="activity_media_player_name">Multimediální Přehrávač</string>
     <string name="search_settings">Nastavení Vyhledávání</string>
-    <string name="use_kat">Použít KAT.ph</string>
-    <string name="use_clearbits">Použít ClearBits.net</string>
     <string name="use_extratorrent">Použít ExtraTorrent.com</string>
-    <string name="use_isohunt">Použít ISOHunt.com</string>
     <string name="use_mininova">Použít Mininova.org</string>
     <string name="use_tpb">Použít ThePirateBay.se</string>
-    <string name="use_vertor">Použít Vertor.com</string>
     <string name="activity_media_player_image_description">Medialní obraz</string>
     <string name="ringtone_set">Nastavit Vyzváněcí Tón</string>
     <string name="search">Vyhledávání</string>
@@ -431,7 +427,6 @@
     <string name="one_year">1 rok</string>
     <string name="transfers_select_completed">dokončený</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pozastavení/Zastavit všechny převody</string>
-    <string name="use_kat_summary">KAT je magnet na bázi funguje pouze na Wifi</string>
     <string name="wifi_sharing">Wifi Sdílení</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nechráněný spojení znamená, že všechno, co děláte on-line (počítaje v to <b>hledání, zasílání zpráv a stahování</b>) může být sledován kýmkoli v síti a dokonce i ze strany poskytovatele připojení k Internetu.<br><br>Doporučujeme používat ExpressVPN k zašifrování připojení a <b>ochránili svoje soukromí</b>.]]></string>
     <string name="transfers_select_downloading">stahování</string>
@@ -508,7 +503,6 @@
     <string name="vpn_client_feature_1">Šifrování vojensko-grade</string>
     <string name="transfers_context_resume_all_torrent_transfers">Obnoví veškeré převody torrent</string>
     <string name="vpn_client_feature_3">Soukromé a logless prohlížení</string>
-    <string name="use_bitsnoop">Použít BitSnoop</string>
     <string name="free_download">Stažení zdarma</string>
     <string name="couldnt_share_file">Nemohl sdílení souboru. Divný nalezena cesta.</string>
     <string name="try_frostwire_plus_for_more_results">Zkuste FrostWire Plus pro další výsledky</string>

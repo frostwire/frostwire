@@ -88,7 +88,6 @@
     <string name="send_to_chat">Адправіць у чат</string>
     <string name="delete_this_track">Выдаліць гэты кавалак</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">Выкарыстоўвайце ISOHunt.com</string>
     <string name="loading_indeterminate">Загрузка…</string>
     <string name="nickname_hint">Нік</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -159,7 +158,6 @@
     <string name="seeding_settings">Пасеў Налады</string>
     <string name="love_frostwire">Каханне FrostWire</string>
     <string name="or_enter_url">або ўвядзіце URL</string>
-    <string name="use_vertor">Выкарыстоўвайце Vertor.com</string>
     <string name="azureus_manager_item_initializing">Ініцыялізацыя</string>
     <string name="documents">Дакументы</string>
     <string name="fetching_file_list">Fetching спіс агульных</string>
@@ -222,12 +220,10 @@
     <string name="one_year">1 год</string>
     <string name="transfers_select_completed">завершана</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Паўза/Спыніць усе пераклады</string>
-    <string name="use_kat_summary">KAT з\'яўляецца магнітам на аснове, працуе толькі на Wi-Fi</string>
     <string name="sharing_num_files">Сумеснае выкарыстанне %1$s файлы тыпу %2$s</string>
     <string name="cancel_transfer">Адмяніць перадачу</string>
     <string name="support_frostwire">Падтрымка FrostWire</string>
     <string name="wifi_sharing">Wi-Fi агульнага доступу</string>
-    <string name="use_clearbits">Выкарыстоўвайце ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">Макс Усяго падключэнняў</string>
     <string name="toast_on_disconnect">Адключаны ад BitTorrent. Усе пераклады BitTorrent спыніліся.</string>
     <string name="transfers_select_downloading">загрузка</string>
@@ -385,7 +381,6 @@
     <string name="vpn_client_feature_1">шыфраванне ваеннага класа</string>
     <string name="transfers_context_resume_all_torrent_transfers">Рэзюмэ усе трансферы торэнт</string>
     <string name="vpn_client_feature_3">Прыватны і logless прагляд</string>
-    <string name="use_bitsnoop">Выкарыстоўвайце BitSnoop</string>
     <string name="free_download">Спампаваць бясплатна</string>
     <string name="internet_discovery_summary">Падключэнне да выдаленых аналагам ў сетцы Інтэрнэт.</string>
     <string name="couldnt_share_file">Не атрымалася падзяліць файл. Дзіўны шлях знойдзены.</string>
@@ -504,7 +499,6 @@
     <string name="error_not_enough_peers">Паспрабуйце яшчэ раз, не хапае аднагодкаў</string>
     <string name="seed_finished_torrents_summary">Падзяліся кавалкі загрузкі торэнтаў з любой карыстальнік Інтэрнэту праз BitTorrent</string>
     <string name="support_frostwire_summary">Паказаць аб\'явы, каб падтрымаць развіццё гэтага прыкладання.</string>
-    <string name="use_kat">Выкарыстоўвайце KAT</string>
     <string name="back">назад</string>
     <string name="searchable_activity_label">Searchable актыўнасць</string>
     <string name="visit_vpn_client">Наведванне ExpressVPN</string>

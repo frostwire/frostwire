@@ -219,13 +219,9 @@
     <string name="media_player_failed">Media player falhou</string>
     <string name="activity_media_player_name">Media Player</string>
     <string name="search_settings">Pesquisar Configurações</string>
-    <string name="use_kat">Utilize KAT.ph</string>
-    <string name="use_clearbits">Utilize ClearBits.net</string>
     <string name="use_extratorrent">Utilize ExtraTorrent.com</string>
-    <string name="use_isohunt">Utilize ISOHunt.com</string>
     <string name="use_mininova">Utilize Mininova.org</string>
     <string name="use_tpb">Utilize ThePirateBay.org</string>
-    <string name="use_vertor">Utilize Vertor.com</string>
     <string name="activity_media_player_image_description">Imagem Media</string>
     <string name="ringtone_set">Definir Toque</string>
     <string name="search">Pesquisar</string>
@@ -437,7 +433,6 @@
     <string name="use_yify">Use Yify</string>
     <string name="torrent_transfer_consuming_mobile_data">Aviso: Esta transferência torrente está usando seus dados 3G/4G. (Verifique as preferências de rede se que você deseja usar BitTorrent somente em WiFi)</string>
     <string name="transfers_context_resume_all_torrent_transfers">Retomar todos Transferências torrent</string>
-    <string name="use_bitsnoop">Use BitSnoop</string>
     <string name="storage_setting_confirm_dialog_title">SD CARD</string>
     <string name="cant_resume_torrent_transfers"> "Conectividade"</string>
     <string name="storage_setting_warning">ATENÇÃO: Todos os arquivos baixados por FrostWire para o cartão SD será deletado por ANDROID se desinstalar FrostWire.</string>
@@ -461,7 +456,6 @@
     <string name="wifi_sharing_settings">Configurações de Compartilhamento Wi-Fi</string>
     <string name="torrent_max_peers">Max Pares</string>
     <string name="app_shutdown_dlg_message">Isto vai fechar todas as transferências e serviços em segundo plano. Você tem certeza?</string>
-    <string name="use_kat_summary">O motor de busca KAT está baseado no Magnet e somente funciona via Wi-Fi</string>
     <string name="checking_ellipsis">Verificando&#8230;</string>
     <string name="error_wrong_md5_hash">Erro: Hash MD5 errado</string>
     <string name="error_wrong_signature">Erro: Assinatura errada</string>

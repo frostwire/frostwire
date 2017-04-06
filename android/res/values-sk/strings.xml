@@ -88,7 +88,6 @@
     <string name="send_to_chat">Odoslať na chat</string>
     <string name="delete_this_track">Zmazať tento kus</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">Použiť ISOHunt.com</string>
     <string name="loading_indeterminate">Načítava…</string>
     <string name="nickname_hint">Prezývka</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -161,7 +160,6 @@
     <string name="love_frostwire">Láske FrostWire</string>
     <string name="wifi_networks_only_summary">Uloženie dát. Stiahnuť iba vtedy, ak sa zistí Wi-Fi pripojenie. </string>
     <string name="or_enter_url">alebo zadať URL</string>
-    <string name="use_vertor">Použiť Vertor.com</string>
     <string name="azureus_manager_item_initializing">Inicializácia</string>
     <string name="documents">Dokumenty</string>
     <string name="fetching_file_list">Načítanie zoznamu zdieľaných</string>
@@ -225,12 +223,10 @@
     <string name="one_year">1 rok</string>
     <string name="transfers_select_completed">dokončený</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pauza/Zastaviť všetky prevody</string>
-    <string name="use_kat_summary">KAT je magnet na báze funguje iba na Wifi</string>
     <string name="sharing_num_files">Zdieľanie %1$s súbory typu %2$s</string>
     <string name="cancel_transfer">Zrušiť prevod</string>
     <string name="support_frostwire">Podpora FrostWire</string>
     <string name="wifi_sharing">Wifi Zdieľanie</string>
-    <string name="use_clearbits">Použiť ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">Max Celkom Connections</string>
     <string name="toast_on_disconnect">Disconnected from BitTorrent. All BitTorrent transfers have stopped.</string>
     <string name="transfers_select_downloading">downloading</string>
@@ -390,7 +386,6 @@
     <string name="vpn_client_feature_1">Šifrovanie vojensko-grade</string>
     <string name="transfers_context_resume_all_torrent_transfers">Obnoví všetky prevody torrent</string>
     <string name="vpn_client_feature_3">Súkromné a logless prehliadanie</string>
-    <string name="use_bitsnoop">Použiť BitSnoop</string>
     <string name="free_download">Bezplatné stiahnutie</string>
     <string name="internet_discovery_summary">Connect to remote peers on the Internet.</string>
     <string name="couldnt_share_file">Could not share the file. Weird path found.</string>
@@ -512,7 +507,6 @@
     <string name="error_not_enough_peers">Skúste to znova, nie je dostatok rovesníkmi</string>
     <string name="seed_finished_torrents_summary">Zdieľanie kusy torrent na stiahnutie s kýmkoľvek na internete cez BitTorrent</string>
     <string name="support_frostwire_summary">Zobrazovať reklamy na podporu rozvoja tejto aplikácie.</string>
-    <string name="use_kat">Použiť KAT</string>
     <string name="back">Späť</string>
     <string name="searchable_activity_label">Prehľadávateľný aktivity</string>
     <string name="visit_vpn_client">Návšteva ExpressVPN</string>

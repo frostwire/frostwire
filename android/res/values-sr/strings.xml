@@ -236,17 +236,12 @@
     <string name="media_player_failed">Медиа плаиер фаилед</string>
     <string name="activity_media_player_name">медиа плаиер</string>
     <string name="search_settings">Подешавања претраге</string>
-    <string name="use_clearbits">Користе ClearBits.net</string>
     <string name="use_tpb">Користе TPB</string>
     <string name="use_tpb_summary">TPB је магнет за базиран, ради само на Вифи</string>
     <string name="use_monova">Користе Monova</string>
     <string name="use_monova_summary">Monova је магнет за базиран, ради само на Вифи</string>
-    <string name="use_kat">Користе KAT</string>
-    <string name="use_kat_summary">КАТ магнета заснована, ради само на Вифи</string>
     <string name="use_extratorrent">Користе ExtraTorrent.com</string>
-    <string name="use_isohunt">Користе ISOHunt.com</string>
     <string name="use_mininova">Користе Mininova.org</string>
-    <string name="use_vertor">Користе Vertor.com</string>
     <string name="use_yify">Користе Yify</string>
     <string name="use_yify_summary">Yify је магнет за базиран, ради само на Вифи</string>
     <string name="activity_media_player_image_description">Medijska слика</string>
@@ -429,7 +424,6 @@
     <string name="anonymous_usage_statistics">Анонимни Статистика приступа</string>
     <string name="anonymous_usage_statistics_summary">Пошаљи анонимну статистику коришћења. Нема информација да лично не идентификује ће се чувати на диску или послати преко мреже.</string>
     <string name="paused_song_name">Паузирано %s</string>
-    <string name="use_bitsnoop">Користе BitSnoop</string>
     <string name="use_torlock">Користе TorLock</string>
     <string name="use_torrentdownloads">Користе TorrentDownloads</string>
     <string name="use_limetorrents">Користе Limetorrents</string>

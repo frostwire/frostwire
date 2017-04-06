@@ -86,7 +86,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_SOUNDCLOUD, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_FROSTCLICK, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_BITSNOOP, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORLOCK, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_LIMETORRENTS, true);

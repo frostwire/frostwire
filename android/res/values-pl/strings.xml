@@ -224,13 +224,9 @@
     <string name="media_player_failed">Odtwarzacz multimedialny nie działa</string>
     <string name="activity_media_player_name">Odtwarzacz Multimedialny</string>
     <string name="search_settings">Ustawienia Wyszukiwania</string>
-    <string name="use_kat">Używaj KAT.ph</string>
-    <string name="use_clearbits">Używaj ClearBits.net</string>
     <string name="use_extratorrent">Używaj ExtraTorrent.com</string>
-    <string name="use_isohunt">Używaj ISOHunt.com</string>
     <string name="use_mininova">Używaj Mininova.org</string>
     <string name="use_tpb">Używaj ThePirateBay.org</string>
-    <string name="use_vertor">Używaj Vertor.com</string>
     <string name="activity_media_player_image_description">Obraz medialny</string>
     <string name="ringtone_set">Ustawiono Dzwonek</string>
     <string name="search">Szukaj</string>
@@ -426,7 +422,6 @@
     <string name="use_yify">Używaj Yify</string>
     <string name="torrent_transfer_consuming_mobile_data">Uwaga: Ten transfer torrentu zużywa Twój mobilny plan internetowy. (Sprawdź ustawienia Sieci jeśli chcesz pobierać pliki z sieci BitTorrent tylko poprzez Wi-Fi.)</string>
     <string name="transfers_context_resume_all_torrent_transfers">Wznów wszystkie transfery torrentów</string>
-    <string name="use_bitsnoop">Używaj BitSnoop</string>
     <string name="use_yify_summary">Yify jest oparty na magnetach, działa tylko na Wi-Fi</string>
     <string name="donate_in_btc">Podaruj bitcoin</string>
     <string name="transfers_context_menu_stop_delete_data">Zatrzymaj i Usuń Dane</string>
@@ -473,7 +468,6 @@
     <string name="torrent_max_peers_summary">Maksimum Peerów</string>
     <string name="wifi_sharing_settings">Ustawienia Udostępniania przez Wi-Fi</string>
     <string name="app_shutdown_dlg_message">Zamknięcie aplikacji zakończy wszystkie transfery i serwisy. Jesteś pewien?</string>
-    <string name="use_kat_summary">KAT jest oparty na magnetach, działa tylko na Wi-Fi</string>
     <string name="error_no_space_left_on_device">Błąd: Brak miejsca na zachowanie pliku</string>
     <string name="my_music">Moja Muzyka</string>
     <string name="yes_no_cancel_transfer_question_cloud">Czy jesteś pewnien, że chcesz zatrzymać i usunąć ten transfer z listy?</string>

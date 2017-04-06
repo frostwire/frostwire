@@ -89,7 +89,6 @@
     <string name="send_to_chat">Skicka till Chat</string>
     <string name="delete_this_track">Radera detta spår</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">Använda ISOHunt.com</string>
     <string name="loading_indeterminate">Läser in…</string>
     <string name="nickname_hint">Smeknamn</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -163,7 +162,6 @@
     <string name="love_frostwire">Kärlek FrostWire</string>
     <string name="wifi_networks_only_summary">Spara data. Hämta endast om Wi-Fi-anslutning har upprättats. </string>
     <string name="or_enter_url">eller ange URL</string>
-    <string name="use_vertor">Använda Vertor.com</string>
     <string name="azureus_manager_item_initializing">Initierar</string>
     <string name="documents">Dokument</string>
     <string name="fetching_file_list">Hämtning lista över delade</string>
@@ -229,12 +227,10 @@
     <string name="one_year">1 år</string>
     <string name="transfers_select_completed">avslutad</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Paus/Stoppa alla överföringar</string>
-    <string name="use_kat_summary">KAT är magnet baserad, fungerar endast på Wifi</string>
     <string name="sharing_num_files">Delning %1$s filer av typen %2$s</string>
     <string name="cancel_transfer">Avbryta överföring</string>
     <string name="support_frostwire">Stöd FrostWire</string>
     <string name="wifi_sharing">Wi-Fi-delning</string>
-    <string name="use_clearbits">Använda ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">Max totala antalet anslutningar</string>
     <string name="toast_on_disconnect">Frånkopplad från BitTorrent. Alla BitTorrent överföringar har slutat.</string>
     <string name="transfers_select_downloading">nerladdning</string>
@@ -396,7 +392,6 @@
     <string name="vpn_client_feature_1">Militär kryptering</string>
     <string name="transfers_context_resume_all_torrent_transfers">Återuppta alla torrent överföringar</string>
     <string name="vpn_client_feature_3">Privata och logless surfning</string>
-    <string name="use_bitsnoop">Använda BitSnoop</string>
     <string name="free_download">Gratis nedladdning</string>
     <string name="internet_discovery_summary">Ansluta till fjärr kamrater på Internet.</string>
     <string name="couldnt_share_file">Det gick inte att dela filen. Konstig väg hittas.</string>
@@ -520,7 +515,6 @@
     <string name="error_not_enough_peers">Försök igen, inte tillräckligt kamrater</string>
     <string name="seed_finished_torrents_summary">Dela bitar av torrent downloads med någon på Internet via BitTorrent</string>
     <string name="support_frostwire_summary">Visa annonser för att stödja utvecklingen av denna applikation.</string>
-    <string name="use_kat">Använda KAT</string>
     <string name="back">Tillbaka</string>
     <string name="searchable_activity_label">Sökbar Aktivitet</string>
     <string name="visit_vpn_client">Besök ExpressVPN</string>

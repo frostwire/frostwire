@@ -88,7 +88,6 @@
     <string name="send_to_chat">Send to Chat</string>
     <string name="delete_this_track">ลบงานชิ้นนี้</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">ใช้ ISOHunt.com</string>
     <string name="loading_indeterminate">กำลังโหลด…</string>
     <string name="nickname_hint">ชื่อเล่น</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -161,7 +160,6 @@
     <string name="love_frostwire">รัก FrostWire</string>
     <string name="wifi_networks_only_summary">บันทึกข้อมูล. ดาวน์โหลดเฉพาะหากการเชื่อมต่อ Wi-Fi จะจัดตั้งขึ้น</string>
     <string name="or_enter_url">หรือป้อน URL</string>
-    <string name="use_vertor">ใช้ Vertor.com</string>
     <string name="azureus_manager_item_initializing">การเริ่มต้น</string>
     <string name="documents">เอกสาร</string>
     <string name="fetching_file_list">รายการดึงข้อมูลที่ใช้ร่วมกัน</string>
@@ -225,12 +223,10 @@
     <string name="one_year">1 ปี</string>
     <string name="transfers_select_completed">เสร็จ</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">หยุดชั่วคราว/หยุดการถ่ายโอนทั้งหมด</string>
-    <string name="use_kat_summary">KAT เป็นแม่เหล็กที่ใช้งานได้เฉพาะใน WiFi</string>
     <string name="sharing_num_files">ใช้งานร่วมกัน %1$s ไฟล์ประเภท %2$s</string>
     <string name="cancel_transfer">ยกเลิกการโอน</string>
     <string name="support_frostwire">FrostWire สนับสนุน</string>
     <string name="wifi_sharing">Wi-Fi ที่ใช้ร่วมกัน</string>
-    <string name="use_clearbits">ใช้ ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">การเชื่อมต่อสูงสุดรวม</string>
     <string name="toast_on_disconnect">ตัดการเชื่อมต่อจาก BitTorrent ทั้งหมดการโอน BitTorrent ได้หยุด</string>
     <string name="transfers_select_downloading">ดาวน์โหลด</string>
@@ -390,7 +386,6 @@
     <string name="vpn_client_feature_1">การเข้ารหัสทหารชั้น</string>
     <string name="transfers_context_resume_all_torrent_transfers">การถ่ายโอนงานทั้งหมดฝนตกหนัก</string>
     <string name="vpn_client_feature_3">ภาคเอกชนและการเรียกดู logless</string>
-    <string name="use_bitsnoop">ใช้ BitSnoop</string>
     <string name="free_download">ดาวน์โหลดฟรี</string>
     <string name="internet_discovery_summary">เชื่อมต่อไปยังเพื่อนที่ห่างไกลบนอินเทอร์เน็ต</string>
     <string name="couldnt_share_file">ไม่สามารถแชร์ไฟล์ เส้นทางแปลกพบ</string>
@@ -512,7 +507,6 @@
     <string name="error_not_enough_peers">ลองเพื่อนอีกครั้งไม่เพียงพอ</string>
     <string name="seed_finished_torrents_summary">แบ่งปันชิ้นส่วนของการดาวน์โหลดฝนตกหนักกับใครบนอินเทอร์เน็ตผ่านทาง BitTorrent</string>
     <string name="support_frostwire_summary">แสดงโฆษณาเพื่อสนับสนุนการพัฒนาของ app นี้</string>
-    <string name="use_kat">ใช้ KAT</string>
     <string name="back">กลับ</string>
     <string name="searchable_activity_label">กิจกรรมที่สามารถค้นหาได้</string>
     <string name="visit_vpn_client">เยี่ยม ExpressVPN</string>

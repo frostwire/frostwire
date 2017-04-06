@@ -224,13 +224,9 @@
     <string name="media_player_failed">미디어플레이어 실패</string>
     <string name="activity_media_player_name">미디어플레이어</string>
     <string name="search_settings">설정 검색</string>
-    <string name="use_kat">KAT.ph 사용</string>
-    <string name="use_clearbits">ClearBits.net 사용</string>
     <string name="use_extratorrent">ExtraTorrent.com사용</string>
-    <string name="use_isohunt">ISOHunt.com사용</string>
     <string name="use_mininova">Mininova.org사용</string>
     <string name="use_tpb">ThePirateBay.org사용</string>
-    <string name="use_vertor">Vertor.com사용</string>
     <string name="activity_media_player_image_description">미디어 이미지</string>
     <string name="ringtone_set">벨소리 지정</string>
     <string name="search">검색</string>
@@ -429,7 +425,6 @@
     <string name="one_year">일년</string>
     <string name="transfers_select_completed">완료된</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">모든 전송 일시 중지 / 중지</string>
-    <string name="use_kat_summary">KAT는 마그넷 기반으로 Wifi에서만 작동합니다.</string>
     <string name="wifi_sharing">Wi-Fi 공유</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ 보호되지 않은 연결은 온라인에서하는 모든 것을 의미합니다. (포함 <b>검색, 메시징 및 다운로드</b>) 는 네트워크의 모든 사용자와 인터넷 서비스 공급자가 모니터 할 수 있습니다.<br><br>ExpressVPN을 사용하여 연결을 암호화하고 <b>개인 정보 보호</b>.]]></string>
     <string name="transfers_select_downloading">다운로드 중</string>
@@ -510,7 +505,6 @@
     <string name="vpn_client_feature_1">군대 급 암호화</string>
     <string name="transfers_context_resume_all_torrent_transfers">모든 급류 전송 재개</string>
     <string name="vpn_client_feature_3">비공개 및 로그인 검색</string>
-    <string name="use_bitsnoop">BitSnoop사용</string>
     <string name="free_download">무료 다운로드</string>
     <string name="couldnt_share_file">파일을 공유 할 수 없습니다. 이상한 경로가 발견되었습니다.</string>
     <string name="try_frostwire_plus_for_more_results">더 많은 결과를 얻으려면 FrostWire Plus를 사용해보십시오.</string>

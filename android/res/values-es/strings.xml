@@ -227,13 +227,9 @@
     <string name="media_player_failed">El Reproductor Multimedia ha fallado</string>
     <string name="activity_media_player_name">Reproductor Multimedia</string>
     <string name="search_settings">Ajustes de Búsqueda</string>
-    <string name="use_kat">Usar KAT.ph</string>
-    <string name="use_clearbits"> Usar ClearBits.net</string>
     <string name="use_extratorrent"> Usar ExtraTorrent.com</string>
-    <string name="use_isohunt"> Usar ISOHunt.com</string>
     <string name="use_mininova"> Usar Mininova.org</string>
     <string name="use_tpb"> Usar TPB</string>
-    <string name="use_vertor"> Usar Vertor.com</string>
     <string name="activity_media_player_image_description">Imagen</string>
     <string name="ringtone_set">Establecer Ringtone</string>
     <string name="search">Buscar</string>
@@ -407,7 +403,6 @@
     <string name="anonymous_usage_statistics">Estadísticas de uso anónimo</string>
     <string name="anonymous_usage_statistics_summary">Envía estadísticas de uso anónimo. Ninguna información sobre contenido buscado, compartido o reproducido será almacenada en disco ni enviada a través de la red así como ninguna información que pueda identificarte personalmente.</string>
     <string name="paused_song_name">Pausado %s</string>
-    <string name="use_bitsnoop">Usar BitSnoop</string>
     <string name="use_torlock">Usar TorLock</string>
     <string name="use_torrentdownloads">Usar TorrentDownloads</string>
     <string name="use_limetorrents">Usar Limetorrents</string>
@@ -470,7 +465,6 @@
     <string name="wifi_sharing_settings">Compartiendo en Wi-Fi</string>
     <string name="torrent_max_peers">Max Usuarios</string>
     <string name="app_shutdown_dlg_message">Esto cancelará todas las transferencias y servicios ejecutados en segundo plano. ¿Estás seguro?</string>
-    <string name="use_kat_summary">KAT está basado en magnets, funciona sólo con Wi-Fi</string>
     <string name="checking_ellipsis">Chequeando&#8230;</string>
     <string name="error_wrong_md5_hash">Error: MD5 hash incorrecto</string>
     <string name="error_wrong_signature">Error: Firma incorrecta</string>

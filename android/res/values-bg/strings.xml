@@ -88,7 +88,6 @@
     <string name="send_to_chat">Изпрати на чат</string>
     <string name="delete_this_track">Изтриване на това парче</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">Използвайте ISOHunt.com</string>
     <string name="loading_indeterminate">Зареждане…</string>
     <string name="nickname_hint">Псевдоним</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -161,7 +160,6 @@
     <string name="love_frostwire">Любовта FrostWire</string>
     <string name="wifi_networks_only_summary">Запазване на данни. Свали само ако се установи, Wi-Fi връзка. </string>
     <string name="or_enter_url">или въведете URL</string>
-    <string name="use_vertor">Използвайте Vertor.com</string>
     <string name="azureus_manager_item_initializing">Инициализиране</string>
     <string name="documents">Документи</string>
     <string name="fetching_file_list">Извличането списък на споделена</string>
@@ -225,12 +223,10 @@
     <string name="one_year">Една година</string>
     <string name="transfers_select_completed">завършена</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Пауза/Стоп всички трансфери</string>
-    <string name="use_kat_summary">KAT е магнит на основата, работи само на Wifi</string>
     <string name="sharing_num_files">Споделяне %1$s файлове от типа %2$s</string>
     <string name="cancel_transfer">Отмени трансфер</string>
     <string name="support_frostwire">Подкрепа FrostWire</string>
     <string name="wifi_sharing">Wi-Fi Sharing</string>
-    <string name="use_clearbits">Използвайте ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">Максимална обща връзки</string>
     <string name="toast_on_disconnect">Връзката с BitTorrent. Всички трансфери BitTorrent са спрели.</string>
     <string name="transfers_select_downloading">изтегляне</string>
@@ -390,7 +386,6 @@
     <string name="vpn_client_feature_1">Военно-клас криптиране</string>
     <string name="transfers_context_resume_all_torrent_transfers">Възобновяване на всички торент трансфери</string>
     <string name="vpn_client_feature_3">Частен и logless сърфиране</string>
-    <string name="use_bitsnoop">Използвайте BitSnoop</string>
     <string name="free_download">Безплатно сваляне</string>
     <string name="internet_discovery_summary">Се свързва с отдалечени връстници в интернет.</string>
     <string name="couldnt_share_file">Не може да споделите файла. Странни път намери.</string>
@@ -512,7 +507,6 @@
     <string name="error_not_enough_peers">Опитайте отново, не е достатъчно връстници</string>
     <string name="seed_finished_torrents_summary">Сподели парчета на торенти с никого в Интернет чрез BitTorrent</string>
     <string name="support_frostwire_summary">Показване на реклами в подкрепа на развитието на това приложение.</string>
-    <string name="use_kat">Използвайте KAT</string>
     <string name="back">Обратно</string>
     <string name="searchable_activity_label">За търсене на активност</string>
     <string name="visit_vpn_client">Посетете ExpressVPN</string>

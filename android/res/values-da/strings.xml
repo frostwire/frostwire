@@ -221,13 +221,9 @@
     <string name="media_player_failed">Media player mislykkedes</string>
     <string name="activity_media_player_name">Media Player</string>
     <string name="search_settings">Søgning indstillinger</string>
-    <string name="use_kat">Brug KAT.ph</string>
-    <string name="use_clearbits">Brug ClearBits.net</string>
     <string name="use_extratorrent">Brug ExtraTorrent.com</string>
-    <string name="use_isohunt">Brug ISOHunt.com</string>
     <string name="use_mininova">Brug Mininova.org</string>
     <string name="use_tpb">Brug ThePirateBay.org</string>
-    <string name="use_vertor">Brug Vertor.com</string>
     <string name="activity_media_player_image_description">Mediebillede</string>
     <string name="ringtone_set">Ringtone indstillet</string>
     <string name="search">Søg</string>
@@ -431,7 +427,6 @@
     <string name="one_year">1 år</string>
     <string name="transfers_select_completed">afsluttet</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pause/Stop alle overførsler</string>
-    <string name="use_kat_summary">KAT er magnet baseret, fungerer kun på Wifi</string>
     <string name="wifi_sharing">Wifi Deling</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ En ubeskyttet forbindelse betyder alt hvad du gør online (inklusive <b>søgninger, messaging, og downloads</b>) kan overvåges af alle på dit netværk og endda af din internetudbyder.<br><br>Vi anbefaler at bruge ExpressVPN at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>.]]></string>
     <string name="transfers_select_downloading">downloading</string>
@@ -508,7 +503,6 @@
     <string name="vpn_client_feature_1">Militær-grade kryptering</string>
     <string name="transfers_context_resume_all_torrent_transfers">Genoptag alle torrent overførsler</string>
     <string name="vpn_client_feature_3">Private and logless browsing</string>
-    <string name="use_bitsnoop">Brug BitSnoop</string>
     <string name="free_download">Gratis download</string>
     <string name="couldnt_share_file">Kunne ikke dele filen. Weird sti fundet.</string>
     <string name="try_frostwire_plus_for_more_results">Prøv FrostWire Plus for flere resultater</string>

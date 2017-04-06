@@ -164,7 +164,6 @@
     <string name="send_to_chat">چیٹ کو بھیجیں</string>
     <string name="delete_this_track">اس ٹریک چھپانا</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">استعمال ISOHunt.com</string>
     <string name="loading_indeterminate">لوڈ کر رہا ہے…</string>
     <string name="nickname_hint">عرفیت</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -228,7 +227,6 @@
     <string name="love_frostwire">FrostWire محبت</string>
     <string name="wifi_networks_only_summary">ڈیٹا کو محفوظ کریں. لوڈ صرف وائی فائی کنکشن قائم ہے تو.</string>
     <string name="or_enter_url">یا یو آر ایل درج کریں</string>
-    <string name="use_vertor">استعمال Vertor.com</string>
     <string name="azureus_manager_item_initializing">شروع</string>
     <string name="fetching_file_list">اشتراک کیا کی بازیابی فہرست</string>
     <string name="toast_on_connect">BitTorrent کے کور کا آغاز کیا.</string>
@@ -279,11 +277,9 @@
     <string name="one_year">1 سال</string>
     <string name="transfers_select_completed">مکمل ہو گیا</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">توقف / تمام کی منتقلی بند کرو</string>
-    <string name="use_kat_summary">KAT مقناطیس کی بنیاد پر ہے، صرف وائی فائی پر کام کرتا ہے</string>
     <string name="sharing_num_files">Sharing %1$s files of type %2$s</string>
     <string name="cancel_transfer">منتقلی منسوخ</string>
     <string name="support_frostwire">سپورٹ FrostWire</string>
-    <string name="use_clearbits">استعمال ClearBits.net</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
     <string name="toast_on_disconnect">BitTorrent کے سے رابطہ منقطع ہوگیا. تمام BitTorrent کے ٹرانسفر بند کر دیا ہے.</string>
     <string name="transfers_select_downloading">ڈاؤن لوڈ کرنے</string>
@@ -423,7 +419,6 @@
     <string name="vpn_client_feature_1">فوجی گریڈ خفیہ کاری</string>
     <string name="transfers_context_resume_all_torrent_transfers">تمام سیلاب کی منتقلی دوبارہ شروع</string>
     <string name="vpn_client_feature_3">ذاتی اور logless براؤزنگ</string>
-    <string name="use_bitsnoop">استعمال BitSnoop</string>
     <string name="free_download">مفت ڈاؤنلوڈ</string>
     <string name="internet_discovery_summary">انٹرنیٹ پر ریموٹ ساتھیوں سے منسلک ہوں.</string>
     <string name="couldnt_share_file">فائل کا اشتراک نہیں کر سکا. عجیب راستہ مل گیا.</string>
@@ -531,7 +526,6 @@
     <string name="fetching_torrent_ellipsis">نکال رہا سیلاب…</string>
     <string name="error_not_enough_peers">ایک بار پھر، یہ کافی نہیں ساتھیوں کوشش</string>
     <string name="support_frostwire_summary">اس اپلی کیشن کی ترقی کی حمایت کرنے کے لئے اشتھارات دکھائیں.</string>
-    <string name="use_kat">استعمال KAT</string>
     <string name="searchable_activity_label">تلاش سرگرمی</string>
     <string name="visit_vpn_client">ملاحظہ ExpressVPN</string>
     <string name="media_preview">%s پیش نظارہ</string>

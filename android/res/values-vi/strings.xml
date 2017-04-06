@@ -220,13 +220,9 @@
     <string name="media_player_failed">Nghe nhạc thất bại</string>
     <string name="activity_media_player_name">Trình nghe nhạc</string>
     <string name="search_settings">Thiết lập tìm kiếm</string>
-    <string name="use_kat">Chọn KAT.ph</string>
-    <string name="use_clearbits">Chọn ClearBits.net</string>
     <string name="use_extratorrent">Chọn ExtraTorrent.com</string>
-    <string name="use_isohunt">Chọn ISOHunt.com</string>
     <string name="use_mininova">Chọn Mininova.org</string>
     <string name="use_tpb">Chọn ThePirateBay.org</string>
-    <string name="use_vertor">Chọn Vertor.com</string>
     <string name="activity_media_player_image_description">Biểu tượng chơi nhạc</string>
     <string name="ringtone_set">Đặt làm nhạc chuông</string>
     <string name="search">Tìm kiếm</string>
@@ -430,7 +426,6 @@
     <string name="one_year">1 năm</string>
     <string name="transfers_select_completed">hoàn thành</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Tạm dừng/Dừng tất cả các chuyển</string>
-    <string name="use_kat_summary">KAT là nam châm dựa, chỉ hoạt động trên Wifi</string>
     <string name="wifi_sharing">Wi-Fi Sharing</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Một kết nối không an toàn có nghĩa là tất cả mọi thứ bạn làm trực tuyến (kể cả <b>tìm kiếm, tin nhắn, và tải về</b>) có thể được theo dõi bởi bất cứ ai trên mạng của bạn và thậm chí bởi nhà cung cấp dịch vụ Internet của bạn.<br><br>Chúng tôi khuyên bạn nên sử dụng ExpressVPN để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>.]]></string>
     <string name="transfers_select_downloading">tải</string>
@@ -507,7 +502,6 @@
     <string name="vpn_client_feature_1">mã hóa cấp độ quân sự</string>
     <string name="transfers_context_resume_all_torrent_transfers">Tiếp tục tất cả các chuyển torrent</string>
     <string name="vpn_client_feature_3">Tin và logless duyệt</string>
-    <string name="use_bitsnoop">Chọn BitSnoop</string>
     <string name="free_download">Tải xuống miễn phí</string>
     <string name="couldnt_share_file">Không thể chia sẻ các tập tin. con đường kỳ lạ được tìm thấy.</string>
     <string name="try_frostwire_plus_for_more_results">Hãy thử FrostWire Plus cho kết quả hơn</string>

@@ -88,7 +88,6 @@
     <string name="send_to_chat">Küldje el a chat</string>
     <string name="delete_this_track">A szám törlése</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">Használja ISOHunt.com</string>
     <string name="loading_indeterminate">Betöltés…</string>
     <string name="nickname_hint">Becenév</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -159,7 +158,6 @@
     <string name="seeding_settings">Vetés beállítások</string>
     <string name="love_frostwire">Szerelem FrostWire</string>
     <string name="or_enter_url">Vagy adja meg az URL-t</string>
-    <string name="use_vertor">Használja Vertor.com</string>
     <string name="azureus_manager_item_initializing">Inicializálása</string>
     <string name="documents">Dokumentumok</string>
     <string name="fetching_file_list">Listájának lekérése megosztott</string>
@@ -222,12 +220,10 @@
     <string name="one_year">1 év</string>
     <string name="transfers_select_completed">befejezték</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Szünet/Megáll összes transzfer</string>
-    <string name="use_kat_summary">KAT mágnes alapú, csak akkor működik, Wifi</string>
     <string name="sharing_num_files">Megosztása %1$s típusú fájlok %2$s</string>
     <string name="cancel_transfer">Mégsem transzfer</string>
     <string name="support_frostwire">Támogatás FrostWire</string>
     <string name="wifi_sharing">Wi-Fi megosztási</string>
-    <string name="use_clearbits">Használja ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">Maximális teljes kapcsolatok</string>
     <string name="toast_on_disconnect">Leválasztva a BitTorrent. Minden BitTorrent transzferek abbahagyta.</string>
     <string name="transfers_select_downloading">letöltését</string>
@@ -384,7 +380,6 @@
     <string name="vpn_client_feature_1">Katonai szintű titkosítást</string>
     <string name="transfers_context_resume_all_torrent_transfers">Folytatás minden torrent transzferek</string>
     <string name="vpn_client_feature_3">Magán és logless böngészés</string>
-    <string name="use_bitsnoop">Használja BitSnoop</string>
     <string name="free_download">Ingyenes letöltés</string>
     <string name="internet_discovery_summary">Csatlakozás távoli társak az interneten.</string>
     <string name="couldnt_share_file">Nem sikerült megosztani a fájlt. Furcsa utat talált.</string>
@@ -502,7 +497,6 @@
     <string name="error_not_enough_peers">Próbálja újra, nem elég társaik</string>
     <string name="seed_finished_torrents_summary">Megosztása darab torrent letöltések bárki az interneten keresztül BitTorrent</string>
     <string name="support_frostwire_summary">Itt található az hirdetéseket, hogy támogassa a ennek kb.</string>
-    <string name="use_kat">Használja KAT</string>
     <string name="back">Hát</string>
     <string name="searchable_activity_label">Kereshető tevékenység</string>
     <string name="visit_vpn_client">Látogassa ExpressVPN</string>

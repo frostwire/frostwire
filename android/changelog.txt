@@ -1,4 +1,4 @@
-FrostWire 1.9.1 - APR/04/2017
+FrostWire 1.9.1 - APR/06/2017
  - Video/Audio search preview screen material design updates
  - My Files checkbox selection mode has a new action toolbar
  - My Files checkbox selection mode can be started by long pressing on
@@ -8,6 +8,7 @@ FrostWire 1.9.1 - APR/04/2017
  - Updated android support library to 25.3.1 and gms to 10.2.1
  - MoPub 4.13.0 update and optimizations, less bandwidth usage
  - New jlibtorrent 1.2.0.7-RC3
+ - BitSnoop search removed
 
 FrostWire 1.9.0 - MAR/10/2017
  - New material-design navigation menu

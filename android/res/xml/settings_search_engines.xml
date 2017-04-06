@@ -27,10 +27,6 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_archiveorg" />
     <android.support.v7.preference.CheckBoxPreference
-        android:key="frostwire.prefs.search.use_bitsnoop"
-        android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_bitsnoop" />
-    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_extratorrent"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_extratorrent" />

@@ -174,15 +174,11 @@
     <string name="torrent_fetcher_download_status_downloading_torrent">Preuzimam torrent</string>
     <string name="torrent_fetcher_download_status_error">Greška</string>
     <string name="torrent_fetcher_download_status_canceled">Prekinuto</string>
-    <string name="use_kat">Koristi KAT.ph</string>
-    <string name="use_clearbits">Koristi ClearBits.net</string>
     <string name="use_tpb">Koristi TPB</string>
     <string name="use_tpb_summary">TPB je baziran na magnet poveznicama i radi samo na Wi-Fiu</string>
     <string name="use_monova">Koristi Monova</string>
     <string name="use_extratorrent">Koristi ExtraTorrent.com</string>
-    <string name="use_isohunt">Koristi ISOHunt.com</string>
     <string name="use_mininova">Koristi Mininova.org</string>
-    <string name="use_vertor">Koristi Vertor.com</string>
     <string name="use_yify">Koristi Yify</string>
     <string name="ringtone_set">Zvonjava postavljena</string>
     <string name="search">Traži</string>
@@ -271,7 +267,6 @@
     <string name="free_apps">Besplatne aplikacije</string>
     <string name="use_frostclick">Koristi FrostClick</string>
     <string name="delete_this_track">Izbriši ovu pjesmu</string>
-    <string name="use_bitsnoop">Koristi BitSnoop</string>
     <string name="use_torlock">Koristi TorLock</string>
     <string name="use_eztv">Koristi Eztv</string>
     <string name="btc">BTC</string>
@@ -508,7 +503,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet kopiran u međuspremnik</string>
     <string name="wifi_seeding_has_been_turned_off">Wi-Fi nije dostupan, dijeljenje je ugašeno</string>
     <string name="frostwire_shutting_down_no_permissions">Oprostite, FrostWire ne može nastaviti bez vaše dozvole za pristup disku.</string>
-    <string name="use_kat_summary">KAT je baziran na magnet linkovima, radi samo putem Wi-Fia</string>
     <string name="enable_dht_summary">Koristi DHT za najavu/traženje torrent peerova</string>
     <string name="transfers_context_menu_copy_infohash_copied">Infohash je kopiran u međuspremnik</string>
     <string name="issue_with_tip_donation_uri">Nešto nije u redu s vašom adresom za napojnice/donacije</string>

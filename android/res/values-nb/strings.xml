@@ -89,7 +89,6 @@
     <string name="send_to_chat">Send til Chat</string>
     <string name="delete_this_track">Slett dette stykket</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">Bruk ISOHunt.com</string>
     <string name="loading_indeterminate">Laster…</string>
     <string name="nickname_hint">Kallenavn</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -163,7 +162,6 @@
     <string name="love_frostwire">Elsker Frostwire</string>
     <string name="wifi_networks_only_summary">Lagre data. Last ned bare hvis Wi-Fi-forbindelse er etablert. </string>
     <string name="or_enter_url">eller skriv inn URL</string>
-    <string name="use_vertor">Bruk Vertor.com</string>
     <string name="azureus_manager_item_initializing">Initial</string>
     <string name="documents">Dokumenter</string>
     <string name="fetching_file_list">Henter liste over delte</string>
@@ -229,12 +227,10 @@
     <string name="one_year">1 år</string>
     <string name="transfers_select_completed">fullført</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pause/Stopp alle overføringer</string>
-    <string name="use_kat_summary">KAT er magnet basert, fungerer bare på Wifi</string>
     <string name="sharing_num_files">Deling %1$s filer av typen %2$s</string>
     <string name="cancel_transfer">Avbryt overføring</string>
     <string name="support_frostwire">Støtte Frostwire</string>
     <string name="wifi_sharing">Wi-Fi-deling</string>
-    <string name="use_clearbits">Bruk ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">Max Totalt Tilkoblinger</string>
     <string name="toast_on_disconnect">Koblet fra BitTorrent. Alle BitTorrent overføringer har stoppet.</string>
     <string name="transfers_select_downloading">nedlasting</string>
@@ -396,7 +392,6 @@
     <string name="vpn_client_feature_1">Militær-grade kryptering</string>
     <string name="transfers_context_resume_all_torrent_transfers">Gjenoppta alle torrent overføringer</string>
     <string name="vpn_client_feature_3">Private og logless surfing</string>
-    <string name="use_bitsnoop">Bruk BitSnoop</string>
     <string name="free_download">Gratis nedlasting</string>
     <string name="internet_discovery_summary">Koble til eksterne jevnaldrende på Internett.</string>
     <string name="couldnt_share_file">Kunne ikke dele filen. Weird banen funnet.</string>
@@ -520,7 +515,6 @@
     <string name="error_not_enough_peers">Prøv igjen, ikke nok jevnaldrende</string>
     <string name="seed_finished_torrents_summary">Del biter av torrent nedlastinger med noen på internett via BitTorrent</string>
     <string name="support_frostwire_summary">Vis annonser for å støtte utviklingen av dette programmet.</string>
-    <string name="use_kat">Bruk KAT</string>
     <string name="back">Tilbake</string>
     <string name="searchable_activity_label">Søkbar aktivitet</string>
     <string name="visit_vpn_client">Besøk ExpressVPN</string>

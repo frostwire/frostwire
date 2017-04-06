@@ -221,13 +221,9 @@
     <string name="media_player_failed">Impossibile avviare il riproduttore suoni</string>
     <string name="activity_media_player_name">Riproduttore suoni</string>
     <string name="search_settings">Impostazioni di ricerca</string>
-    <string name="use_kat">Usa KAT.ph</string>
-    <string name="use_clearbits">Usa ClearBits.net</string>
     <string name="use_extratorrent">Usa ExtraTorrent.com</string>
-    <string name="use_isohunt">Usa ISOHunt.com</string>
     <string name="use_mininova">Usa Mininova.org</string>
     <string name="use_tpb">Usa ThePirateBay.org</string>
-    <string name="use_vertor">Usa Vertor.com</string>
     <string name="activity_media_player_image_description">Lettore immagini</string>
     <string name="ringtone_set">Suonerie</string>
     <string name="search">Cerca</string>
@@ -431,7 +427,6 @@
     <string name="one_year">1 anno</string>
     <string name="transfers_select_completed">completato</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pausa/Stop tutti i trasferimenti</string>
-    <string name="use_kat_summary">KAT è magnete base, funziona solo su Wi-Fi</string>
     <string name="wifi_sharing">Condivisione del WiFi</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Una connessione non protetta, tutto ciò che fai online (compresi <b>ricerche, messaggistica e download</b>) possono essere monitorati da chiunque sulla rete e anche da parte di provider di servizi Internet.<br><br>Si consiglia di utilizzare ExpressVPN per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>.]]></string>
     <string name="transfers_select_downloading">downloading</string>
@@ -506,7 +501,6 @@
     <string name="vpn_client_feature_1">Crittografia di livello militare</string>
     <string name="transfers_context_resume_all_torrent_transfers">Riprendere tutti i trasferimenti torrent</string>
     <string name="vpn_client_feature_3">Navigazione privata e logless</string>
-    <string name="use_bitsnoop">Utilizzare BitSnoop</string>
     <string name="free_download">Scarica gratis</string>
     <string name="couldnt_share_file">Impossibile condividere il file. Percorso strano trovato.</string>
     <string name="try_frostwire_plus_for_more_results">Prova FrostWire Plus per più risultati</string>

@@ -221,17 +221,12 @@
     <string name="media_player_failed">メディアプレイヤーに失敗しました</string>
     <string name="activity_media_player_name">メディアプレイヤー</string>
     <string name="search_settings">検索設定</string>
-    <string name="use_clearbits">ClearBits.netを使用する</string>
     <string name="use_tpb">ThePirateBay.orgを使用する</string>
     <string name="use_tpb_summary">TPBはマグネットベースで、Wi-Fi上のみ動作します</string>
     <string name="use_monova">Monovaを使用する</string>
     <string name="use_monova_summary">MonovaはマグネットベースでWi-Fi上のみ動作します</string>
-    <string name="use_kat">KATを使用する</string>
-    <string name="use_kat_summary">KATはマグネットベースでWi-Fi上のみ動作します</string>
     <string name="use_extratorrent">ExtraTorrent.comを使用する</string>
-    <string name="use_isohunt">ISOHunt.comを使用する</string>
     <string name="use_mininova">Mininova.orgを使用する</string>
-    <string name="use_vertor">Vertor.comを使用する</string>
     <string name="use_yify">Yifyを使用する</string>
     <string name="use_yify_summary">Yifyはマグネットベースで、Wi-Fi上のみ動作します</string>
     <string name="activity_media_player_image_description">メディア画像</string>
@@ -414,7 +409,6 @@
     <string name="anonymous_usage_statistics">Anonymous使用状況</string>
     <string name="anonymous_usage_statistics_summary">anonymous使用状況を送信します。検索、共有、再生した内容、その他のいかなる個人を識別する情報もディスクに保存したりネットワークに送信したりしません。</string>
     <string name="paused_song_name">%sを一時停止しました</string>
-    <string name="use_bitsnoop">BitSnoopを使用する</string>
     <string name="use_torlock">TorLockを使用する</string>
     <string name="use_eztv">Eztvを使用する</string>
     <string name="transfer_status_demuxing">分離中</string>

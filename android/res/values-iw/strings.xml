@@ -86,7 +86,6 @@
     <string name="send_to_chat">שלח צ\'\אט</string>
     <string name="delete_this_track">האם למחוק רצועה זו</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">השתמש ISOHunt.com</string>
     <string name="loading_indeterminate">טוען…</string>
     <string name="nickname_hint">כינוי</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -160,7 +159,6 @@
     <string name="love_frostwire">אהבת FrostWire</string>
     <string name="wifi_networks_only_summary">לשמור מידע. הורד רק אם חיבור ה- Wi-Fi היא הוקמה. </string>
     <string name="or_enter_url">או זן כתובת האתר</string>
-    <string name="use_vertor">השתמש Vertor.com</string>
     <string name="azureus_manager_item_initializing">מאתחל</string>
     <string name="documents">מסמכים</string>
     <string name="fetching_file_list">באחזור רשימה משותף</string>
@@ -226,12 +224,10 @@
     <string name="one_year">1 שנה</string>
     <string name="transfers_select_completed">הושלם</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pause / Stop כל ההעברות</string>
-    <string name="use_kat_summary">KAT הוא מבוסס מגנט, עובד רק על Wifi</string>
     <string name="sharing_num_files">Sharing %1$s files of type %2$s</string>
     <string name="cancel_transfer">בטל העברה</string>
     <string name="support_frostwire">FrostWire תמיכה</string>
     <string name="wifi_sharing">שיתוף אינטרנט אלחוטי</string>
-    <string name="use_clearbits">השתמש ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">חיבורי מקס סה"כ</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
     <string name="toast_on_disconnect">מנותק ביטורנט. כל ההעברות ביטורנט הפסיקו.</string>
@@ -395,7 +391,6 @@
     <string name="vpn_client_feature_1">הצפנה ברמה צבאית</string>
     <string name="transfers_context_resume_all_torrent_transfers">חדש את כל העברות הסיקור</string>
     <string name="vpn_client_feature_3">גלישה פרטית logless</string>
-    <string name="use_bitsnoop">השתמש BitSnoop</string>
     <string name="free_download">הורדה חינמית</string>
     <string name="internet_discovery_summary">חבר עמיתים מרחוק באינטרנט.</string>
     <string name="couldnt_share_file">לא ניתן לשתף את הקובץ. נתיב מוזר מצא.</string>
@@ -519,7 +514,6 @@
     <string name="error_not_enough_peers">נסה שוב, לא מספיק עמיתים</string>
     <string name="seed_finished_torrents_summary">חתיכות חלקם של הורדות טורנט עם מישהו באינטרנט באמצעות ביטורנט</string>
     <string name="support_frostwire_summary">הצג מודעות כדי לתמוך בפיתוח של יישום זה.</string>
-    <string name="use_kat">השתמש KAT</string>
     <string name="back">חזור</string>
     <string name="searchable_activity_label">פעילות לחיפוש</string>
     <string name="visit_vpn_client">בקר ExpressVPN</string>

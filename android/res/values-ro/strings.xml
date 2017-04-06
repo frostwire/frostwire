@@ -88,7 +88,6 @@
     <string name="send_to_chat">Trimite pe chat</string>
     <string name="delete_this_track">Șterge această piesă</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">Utilizați ISOHunt.com</string>
     <string name="loading_indeterminate">Se incarca…</string>
     <string name="nickname_hint">Poreclă</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -159,7 +158,6 @@
     <string name="seeding_settings">Setări insamintare</string>
     <string name="love_frostwire">Iubesc FrostWire</string>
     <string name="or_enter_url">sau introduceți URL-ul</string>
-    <string name="use_vertor">Utilizați Vertor.com</string>
     <string name="azureus_manager_item_initializing">Inițializează</string>
     <string name="documents">Documente</string>
     <string name="fetching_file_list">Lista de partajat încarc</string>
@@ -222,12 +220,10 @@
     <string name="one_year">1 an</string>
     <string name="transfers_select_completed">terminat</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Întrerupere/oprire toate transferurile</string>
-    <string name="use_kat_summary">KAT este pe bază de magnet, funcționează numai pe Wi-Fi</string>
     <string name="sharing_num_files">Împărtăşi %1$s fișiere de tip %2$s</string>
     <string name="cancel_transfer">Cancel Transfer</string>
     <string name="support_frostwire">Suport FrostWire</string>
     <string name="wifi_sharing">Wi-Fi Sharing</string>
-    <string name="use_clearbits">Utilizați ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">Maxima total Conexiuni</string>
     <string name="toast_on_disconnect">Deconectată de la BitTorrent. Toate transferurile BitTorrent s-au oprit.</string>
     <string name="transfers_select_downloading">descărcarea</string>
@@ -384,7 +380,6 @@
     <string name="vpn_client_feature_1">Criptare de grad militar</string>
     <string name="transfers_context_resume_all_torrent_transfers">Relua toate transferurile torrent</string>
     <string name="vpn_client_feature_3">Navigare privată și logless</string>
-    <string name="use_bitsnoop">Utilizați BitSnoop</string>
     <string name="free_download">Descărcare gratuită</string>
     <string name="internet_discovery_summary">Conectați-vă la colegii de la distanță de pe Internet.</string>
     <string name="couldnt_share_file">Nu a putut împărtăși fișierul. Cale ciudat găsită.</string>
@@ -502,7 +497,6 @@
     <string name="error_not_enough_peers">Încercați din nou, nu sunt suficient de colegii</string>
     <string name="seed_finished_torrents_summary">Socializează bucăți de download-uri torrent cu oricine pe internet prin intermediul BitTorrent</string>
     <string name="support_frostwire_summary">Afișați anunțuri pentru a sprijini dezvoltarea acestei aplicații.</string>
-    <string name="use_kat">Utilizați KAT</string>
     <string name="back">Înapoi</string>
     <string name="searchable_activity_label">Activitatea interogată</string>
     <string name="visit_vpn_client">Activitatea interogată. ExpressVPN</string>

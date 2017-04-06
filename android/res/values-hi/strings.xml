@@ -221,13 +221,9 @@
     <string name="media_player_failed">मीडिया प्लेयर विफल</string>
     <string name="activity_media_player_name">मीडिया प्लेयर </string>
     <string name="search_settings">खोज सेटिंग्स</string>
-    <string name="use_kat">KAT.ph का प्रयोग करें</string>
-    <string name="use_clearbits">ClearBits.net का प्रयोग करें</string>
     <string name="use_extratorrent">ExtraTorrent.com का प्रयोग करें</string>
-    <string name="use_isohunt">ISOHunt.com का प्रयोग करें</string>
     <string name="use_mininova">Mininova.org का प्रयोग करें</string>
     <string name="use_tpb">ThePirateBay.org का प्रयोग करें</string>
-    <string name="use_vertor">Vertor.com का प्रयोग करें</string>
     <string name="activity_media_player_image_description">मीडिया छवि</string>
     <string name="ringtone_set">रिंगटोन्स सेट</string>
     <string name="search">खोज</string>
@@ -420,7 +416,6 @@
     <string name="one_year">1 साल</string>
     <string name="transfers_select_completed">पूरा कर लिया है</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">रोकें/सभी स्थानान्तरण बंद करो</string>
-    <string name="use_kat_summary">कैट चुंबक आधारित है, केवल वाईफाई पर काम करता है</string>
     <string name="support_frostwire">समर्थन FrostWire</string>
     <string name="wifi_sharing">वाईफ़ाई शेयरिंग</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ एक असुरक्षित कनेक्शन सब कुछ आप ऑनलाइन कर का मतलब (समेत <b>खोजों, संदेश, और डाउनलोड</b>) अपने नेटवर्क पर और यहां तक कि अपने इंटरनेट सेवा प्रदाता द्वारा किसी के द्वारा नजर रखी जा सकती है।<br><br>हम उपयोग करने की सिफारिश ExpressVPN अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>.]]></string>
@@ -501,7 +496,6 @@
     <string name="vpn_client_feature_1">सैन्य ग्रेड एन्क्रिप्शन</string>
     <string name="transfers_context_resume_all_torrent_transfers">सभी धार स्थानान्तरण फिर से शुरू</string>
     <string name="vpn_client_feature_3">निजी और लॉग ब्राउज़िंग के बिना</string>
-    <string name="use_bitsnoop">उपयोग BitSnoop</string>
     <string name="free_download">मुफ्त डाउनलोड</string>
     <string name="couldnt_share_file">फ़ाइल का हिस्सा नहीं हो सका। अजीब पथ पाया।</string>
     <string name="try_frostwire_plus_for_more_results">अधिक परिणामों के लिए प्रयास करें FrostWire प्लस</string>

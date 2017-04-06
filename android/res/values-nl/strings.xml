@@ -221,13 +221,9 @@
     <string name="media_player_failed">Media player mislukt</string>
     <string name="activity_media_player_name">Media Player</string>
     <string name="search_settings">Zoek Instellingen</string>
-    <string name="use_kat">Gebruik KAT.ph</string>
-    <string name="use_clearbits">Gebruik ClearBits.net</string>
     <string name="use_extratorrent">Gebruik ExtraTorrent.com</string>
-    <string name="use_isohunt">Gebruik ISOHunt.com</string>
     <string name="use_mininova">Gebruik Mininova.org</string>
     <string name="use_tpb">Gebruik ThePirateBay.org</string>
-    <string name="use_vertor">Gebruik Vertor.com</string>
     <string name="activity_media_player_image_description">Media afbeelding</string>
     <string name="ringtone_set">Ringtone Instelling</string>
     <string name="search">Zoek</string>
@@ -431,7 +427,6 @@
     <string name="one_year">1 jaar</string>
     <string name="transfers_select_completed">voltooid</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pauze/Stop alle transfers</string>
-    <string name="use_kat_summary">KAT is de magneet gebaseerd, werkt alleen op de website Wifi</string>
     <string name="wifi_sharing">Wi-Fi Sharing</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Een onbeveiligde verbinding betekent dat alles wat je online doet (inclusief <b>zoekopdrachten, messaging, en downloads</b>) kan worden gecontroleerd door iedereen op uw netwerk en zelfs door uw Internet service provider.<br><br>Wij raden u aan ExpressVPN om uw verbinding te versleutelen en <b>bescherm uw privacy</b>.]]></string>
     <string name="transfers_select_downloading">downloaden</string>
@@ -506,7 +501,6 @@
     <string name="vpn_client_feature_1">Militaire graad van versleuteling</string>
     <string name="transfers_context_resume_all_torrent_transfers">Hervat alle torrent transfers</string>
     <string name="vpn_client_feature_3">Prive en logless browsing</string>
-    <string name="use_bitsnoop">Gebruik BitSnoop</string>
     <string name="free_download">Gratis download</string>
     <string name="couldnt_share_file">Kan het bestand niet delen. gevonden raar pad.</string>
     <string name="try_frostwire_plus_for_more_results">Probeer FrostWire Plus voor meer resultaten</string>

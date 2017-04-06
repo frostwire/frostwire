@@ -221,16 +221,12 @@
     <string name="media_player_failed">Το media player απέτυχε</string>
     <string name="activity_media_player_name">Media Player</string>
     <string name="search_settings">Ρυθμίσεις Αναζήτησης</string>
-    <string name="use_kat">Χρήση KAT.ph</string>
-    <string name="use_clearbits">Χρήση ClearBits.net</string>
     <string name="use_tpb">Χρήση TPB</string>
     <string name="use_tpb_summary">Το TPB είναι βασισμένο σε magnet, δουλεύει μόνο σε ασύρματο δίκτυο</string>
     <string name="use_monova">Χρήση Monova</string>
     <string name="use_monova_summary">Το Monova είναι βασισμένο σε magnet, δουλεύει μόνο σε ασύρματο δίκτυο</string>
     <string name="use_extratorrent">Χρήση ExtraTorrent.com</string>
-    <string name="use_isohunt">Χρήση ISOHunt.com</string>
     <string name="use_mininova">Χρήση Mininova.org</string>
-    <string name="use_vertor">Χρήση Vertor.com</string>
     <string name="use_yify">Χρήση Yify</string>
     <string name="use_yify_summary">Το Yify είναι βασισμένο σε magnet, δουλεύει μόνο σε ασύρματο δίκτυο</string>
     <string name="activity_media_player_image_description">Εικόνα Media</string>
@@ -407,7 +403,6 @@
     <string name="anonymous_usage_statistics">Ανώνυμα Στατιστικά Χρήστης</string>
     <string name="anonymous_usage_statistics_summary">Στείλε ανώνυμα στατιστικά χρήσης. Καμία πληροφορία που να περιλαμβάνει το περιεχόμενο που αναζητάς, μοιράζεσαι ή παίζεις και καμία πληροφορία που να μπορεί να σε ταυτοποιήσει προσωπικά δεν θα αποθηκευτεί στο δίσκο ούτε θα σταλεί στο δίκτυο.</string>
     <string name="paused_song_name">Έγινε παύση %s</string>
-    <string name="use_bitsnoop">Χρήση BitSnoop</string>
     <string name="use_torlock">Χρήση TorLock</string>
     <string name="use_eztv">Χρήση Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -496,7 +491,6 @@
     <string name="one_time_purchase">Αγορασε τωρα!</string>
     <string name="activity_VPN">Σύνδεση</string>
     <string name="one_year">1 χρόνος</string>
-    <string name="use_kat_summary">ΚΑΤ είναι μαγνήτης βάση, λειτουργεί μόνο σε Wi-Fi</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Μία ακάλυπτος σύνδεση σημαίνει ό, τι κάνετε σε απευθείας σύνδεση (συμπεριλαμβανομένου <b>αναζητήσεις, μηνύματα, και λήψεις</b>) μπορεί να παρακολουθείται από οποιονδήποτε στο δίκτυό σας, ακόμα και από τον πάροχο υπηρεσιών Διαδικτύου σας.<br><br>Σας προτείνουμε να χρησιμοποιείτε ExpressVPN να κρυπτογραφήσετε τη σύνδεσή σας και <b> διαφύλαξη του απορρήτου σας</b>.]]></string>
     <string name="frostwire_features">ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ FROSTWIRE</string>
     <string name="i_have_read_and_agree_to_the">Έχω διαβάσει και συμφωνώ με το</string>

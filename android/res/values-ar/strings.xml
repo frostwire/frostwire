@@ -221,13 +221,9 @@
     <string name="media_player_failed">فشل الميديا بلاير</string>
     <string name="activity_media_player_name">مشغل الوسائط</string>
     <string name="search_settings">إعدادات البحث</string>
-    <string name="use_kat">KAT.phاستخدم </string>
-    <string name="use_clearbits">ClearBits.net استخدم </string>
     <string name="use_extratorrent">ExtraTorrent.com استخدم </string>
-    <string name="use_isohunt">ISOHunt.com استخدم </string>
     <string name="use_mininova"> Mininova.org استخدم</string>
     <string name="use_tpb">ThePirateBay.se استخدم </string>
-    <string name="use_vertor">Vertor.com استخدم </string>
     <string name="activity_media_player_image_description">صورة وسائط</string>
     <string name="ringtone_set">مجموعة نغمات</string>
     <string name="search">بحث</string>
@@ -459,7 +455,6 @@
     <string name="one_year">1 سنة</string>
     <string name="transfers_select_completed">منجز</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">وقفة/إيقاف كافة عمليات النقل</string>
-    <string name="use_kat_summary">KAT هو المغناطيس مقرها، يعمل فقط على واي فاي</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ اتصال غير محمي يعني كل شيء تفعله على شبكة الإنترنت (بما فيها عمليات البحث، والرسائل، وتنزيل) قد يخضع للمراقبة من قبل أي شخص على الشبكة وحتى من قبل مزود خدمة الإنترنت الخاص بك.<br><br>نوصي باستخدام ExpressVPN لتشفير اتصالك و حماية خصوصيتك. ]]></string>
     <string name="transfers_select_downloading">تحميل</string>
     <string name="frostwire_features">المميزات برنامج FrostWire</string>
@@ -521,7 +516,6 @@
     <string name="vpn_client_feature_1">التشفير الرتب العسكرية</string>
     <string name="transfers_context_resume_all_torrent_transfers">استئناف جميع عمليات نقل سيل</string>
     <string name="vpn_client_feature_3">التصفح الخاص وlogless</string>
-    <string name="use_bitsnoop">استخدام BitSnoop</string>
     <string name="free_download">تحميل مجانا</string>
     <string name="couldnt_share_file">لا يمكن مشاركة الملف. العثور على مسار غريب.</string>
     <string name="try_frostwire_plus_for_more_results">محاولة برنامج FrostWire بلس لمزيد من النتائج</string>

@@ -88,7 +88,6 @@
     <string name="send_to_chat">Hantar ke Dinding</string>
     <string name="delete_this_track">Memadam trek ini</string>
     <string name="five_dollars">$5</string>
-    <string name="use_isohunt">Gunakan ISOHunt.com</string>
     <string name="loading_indeterminate">Pembebanan…</string>
     <string name="nickname_hint">Nama samaran</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -161,7 +160,6 @@
     <string name="love_frostwire">Cinta FrostWire</string>
     <string name="wifi_networks_only_summary">Simpan data. Turun hanya jika sambungan Wi-Fi ditubuhkan. </string>
     <string name="or_enter_url">atau masukkan URL</string>
-    <string name="use_vertor">Gunakan Vertor.com</string>
     <string name="azureus_manager_item_initializing">Memulakan</string>
     <string name="documents">Dokumen</string>
     <string name="fetching_file_list">Senarai Mengambil dikongsi</string>
@@ -225,12 +223,10 @@
     <string name="one_year">1 tahun</string>
     <string name="transfers_select_completed">siap</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Jeda/Hentikan semua pemindahan</string>
-    <string name="use_kat_summary">KAT berasaskan magnet, hanya berfungsi pada Wifi</string>
     <string name="sharing_num_files">Berkongsi %1$s fail dari jenis %2$s</string>
     <string name="cancel_transfer">Batalkan Pemindahan</string>
     <string name="support_frostwire">Sokongan FrostWire</string>
     <string name="wifi_sharing">Perkongsian Wi-Fi</string>
-    <string name="use_clearbits">Gunakan ClearBits.net</string>
     <string name="torrent_max_total_connections_summary">Maksimum Jumlah Dalam Sambungan</string>
     <string name="toast_on_disconnect">Dicabut dari BitTorrent. Semua pindahan BitTorrent telah berhenti.</string>
     <string name="transfers_select_downloading">muat turun</string>
@@ -390,7 +386,6 @@
     <string name="vpn_client_feature_1">Penyulitan gred tentera</string>
     <string name="transfers_context_resume_all_torrent_transfers">Meneruskan semua pemindahan torrent</string>
     <string name="vpn_client_feature_3">Swasta dan logless melayari</string>
-    <string name="use_bitsnoop">Gunakan BitSnoop</string>
     <string name="free_download">Muat turun percuma</string>
     <string name="internet_discovery_summary">Sambung kepada rakan-rakan jauh di Internet.</string>
     <string name="couldnt_share_file">Tidak boleh berkongsi fail. jalan pelik dijumpai.</string>
@@ -512,7 +507,6 @@
     <string name="error_not_enough_peers">Cuba rakan-rakan lagi, tidak cukup</string>
     <string name="seed_finished_torrents_summary">Keping bahagian muat turun torrent dengan sesiapa di internet melalui BitTorrent</string>
     <string name="support_frostwire_summary">Memaparkan iklan untuk menyokong pembangunan aplikasi ini.</string>
-    <string name="use_kat">Gunakan KAT</string>
     <string name="back">Kembali</string>
     <string name="searchable_activity_label">Aktiviti dicari</string>
     <string name="visit_vpn_client">Lawati ExpressVPN</string>

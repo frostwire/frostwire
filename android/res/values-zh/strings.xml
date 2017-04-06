@@ -220,13 +220,9 @@
     <string name="media_player_failed">播放器失败</string>
     <string name="activity_media_player_name">播放器</string>
     <string name="search_settings">搜索设置</string>
-    <string name="use_kat">使用 KAT.ph</string>
-    <string name="use_clearbits">使用 ClearBits.net</string>
     <string name="use_extratorrent">使用 ExtraTorrent.com</string>
-    <string name="use_isohunt">使用 ISOHunt.com</string>
     <string name="use_mininova">使用 Mininova.org</string>
     <string name="use_tpb">使用 ThePirateBay.org</string>
-    <string name="use_vertor">使用 Vertor.com</string>
     <string name="activity_media_player_image_description">媒体图像</string>
     <string name="ringtone_set">铃声设置</string>
     <string name="search">搜索</string>
@@ -394,7 +390,6 @@
     <string name="transfers_select_completed">完成</string>
     <string name="enable_wifi_sharing">Wi-Fi 共享</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">暫停/停止全部傳輸</string>
-    <string name="use_kat_summary">KAT 基於磁力，僅適用於 Wi-Fi</string>
     <string name="sharing_num_files">分享類型 %2$s 的 %1$s 個檔案</string>
     <string name="wifi_sharing">Wi-Fi 共享</string>
     <string name="dialog_desktop_upload_request_title">上傳請求</string>
@@ -445,7 +440,6 @@
         BitTorrent，請檢查網絡設置）
     </string>
     <string name="transfers_context_resume_all_torrent_transfers">恢復全部 Torrent 傳輸</string>
-    <string name="use_bitsnoop">使用 BitSnoop</string>
     <string name="free_download">免費下載</string>
     <string name="couldnt_share_file">檔案無法分享。路徑怪異。</string>
     <string name="storage_setting_confirm_dialog_title">SD 卡</string>

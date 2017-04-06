@@ -222,13 +222,9 @@
     <string name="media_player_failed">Le lecteur multimédia a échoué </string>
     <string name="activity_media_player_name">Lecteur multimédia </string>
     <string name="search_settings">Paramètres de recherche</string>
-    <string name="use_kat">Avec KAT.ph</string>
-    <string name="use_clearbits">Avec ClearBits.net</string>
     <string name="use_extratorrent">Avec ExtraTorrent.com</string>
-    <string name="use_isohunt">Avec ISOHunt.com</string>
     <string name="use_mininova">Avec Mininova.org</string>
     <string name="use_tpb">Avec ThePirateBay.org</string>
-    <string name="use_vertor">Avec Vertor.com</string>
     <string name="activity_media_player_image_description">Image médiatique </string>
     <string name="ringtone_set">Sonnerie définie </string>
     <string name="search">Rechercher </string>
@@ -440,7 +436,6 @@
     <string name="use_yify">Utilisez Yify</string>
     <string name="torrent_transfer_consuming_mobile_data">Attention: Ce transfert de torrent utilise vos données 3G/4G. (Vérifiez vos préférences de réseau si vous souhaitez utiliser BitTorrent uniquement sur WiFi)</string>
     <string name="transfers_context_resume_all_torrent_transfers">Reprendre tous les transferts torrent</string>
-    <string name="use_bitsnoop">Utilisez BitSnoop</string>
     <string name="storage_setting_confirm_dialog_title">CARTE SD</string>
     <string name="cant_resume_torrent_transfers"> "Connectivité"</string>
     <string name="storage_setting_warning">AVERTISSEMENT: Tous les fichiers téléchargés par FrostWire dans la carte SD seront supprimées par ANDROID si vous désinstallez FrostWire.</string>
@@ -493,7 +488,6 @@
     <string name="one_time_purchase">Acheter une fois</string>
     <string name="activity_VPN">Connexion</string>
     <string name="one_year">1 an</string>
-    <string name="use_kat_summary">KAT est basé sur Magnet, ne fonctionne que sur Wifi</string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Un moyen de connexion non protégée tout ce que vous faites en ligne (y compris <b>recherches, messagerie et téléchargements</b>) peut être contrôlée par une personne sur votre réseau et même par votre fournisseur de services Internet.<br><br>Nous vous recommandons d\'utiliser ExpressVPN pour chiffrer votre connexion et <b>préserver votre vie privée</b>.]]></string>
     <string name="i_have_read_and_agree_to_the">J\'ai lu et accepté les</string>
     <string name="scanning">Finition - Scanning</string>
