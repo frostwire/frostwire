@@ -650,4 +650,5 @@
     <string name="use_magnet_summary">Berdasarkan link magnet, bekerja hanya pada Wifi</string>
     <string name="mobile_data_saving">Menyimpan Data Ponsel</string>
     <string name="data_saving_kill_http_warning_title">Peringatan: Http transfer berlangsung</string>
+    <string name="fullscreen">layar penuh</string>
 </resources>

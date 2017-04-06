@@ -646,5 +646,6 @@
     <string name="use_magnet_summary">Baseado em links magnéticos, funciona apenas em Wifi</string>
     <string name="mobile_data_saving">Economia de dados móveis</string>
     <string name="data_saving_kill_http_warning_title">Aviso: transferências HTTP em andamento</string>
+    <string name="fullscreen">tela cheia</string>
 
 </resources>

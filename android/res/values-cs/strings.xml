@@ -648,4 +648,5 @@
     <string name="use_magnet_summary">Magnet odkazy na bázi funguje pouze na Wifi</string>
     <string name="mobile_data_saving">Mobilní Záchrana dat</string>
     <string name="data_saving_kill_http_warning_title">Výstražné: Http převody probíhající</string>
+    <string name="fullscreen">celá obrazovka</string>
 </resources>

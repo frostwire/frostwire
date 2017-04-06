@@ -648,4 +648,5 @@
     <string name="use_magnet_summary">Dựa trên các liên kết từ, chỉ hoạt động trên Wifi</string>
     <string name="mobile_data_saving">Điện thoại di động tiết kiệm dữ liệu</string>
     <string name="data_saving_kill_http_warning_title">Cảnh báo: Http chuyển in progress</string>
+    <string name="fullscreen">toàn màn hình</string>
 </resources>

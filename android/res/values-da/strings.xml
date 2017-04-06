@@ -648,4 +648,5 @@
     <string name="use_magnet_summary">Magnet baseret, fungerer kun på Wifi</string>
     <string name="mobile_data_saving">Mobildata besparelse</string>
     <string name="data_saving_kill_http_warning_title">Advarsel: Http overførsler igangværende</string>
+    <string name="fullscreen">fuld skærm</string>
 </resources>

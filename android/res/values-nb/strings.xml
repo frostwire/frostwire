@@ -648,4 +648,5 @@
     <string name="use_magnet_summary">Basert på magnet linker, fungerer bare på Wifi</string>
     <string name="mobile_data_saving">Mobildata vises Lagre</string>
     <string name="data_saving_kill_http_warning_title">Advarsel: Http overføringer i fremgang</string>
+    <string name="fullscreen">full skjerm</string>
 </resources>

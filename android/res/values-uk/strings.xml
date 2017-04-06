@@ -648,5 +648,6 @@
     <string name="use_magnet_summary">На основі магнітних посилань, працює тільки на Wi-Fi</string>
     <string name="mobile_data_saving">збереження даних мобільних</string>
     <string name="data_saving_kill_http_warning_title">Попередження: Http переклади в прогресі</string>
+    <string name="fullscreen">повноекранний</string>
 
 </resources>

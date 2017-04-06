@@ -648,5 +648,6 @@
     <string name="use_magnet_summary">Bazat pe link-uri cu magneți, funcționează numai pe Wi-Fi</string>
     <string name="mobile_data_saving">Salvarea datelor mobile</string>
     <string name="data_saving_kill_http_warning_title">Atenție: Http transferurile în curs de desfășurare</string>
+    <string name="fullscreen">ecran complet</string>
 
 </resources>

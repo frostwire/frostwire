@@ -655,5 +655,6 @@
     <string name="use_magnet_summary">基于磁铁链接，只能在Wifi上工作</string>
     <string name="mobile_data_saving">移动数据保存</string>
     <string name="data_saving_kill_http_warning_title">警告：Http正在进行传输</string>
+    <string name="fullscreen">全屏</string>
 
 </resources>

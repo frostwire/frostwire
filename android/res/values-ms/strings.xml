@@ -648,5 +648,6 @@
     <string name="use_magnet_summary">Berdasarkan pautan magnet, hanya berfungsi pada Wifi</string>
     <string name="mobile_data_saving">Data Mudah Alih Penjimatan</string>
     <string name="data_saving_kill_http_warning_title">Amaran: Http pemindahan dalam kemajuan</string>
+    <string name="fullscreen">skrin penuh</string>
 
 </resources>

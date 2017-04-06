@@ -653,5 +653,6 @@
     <string name="use_magnet_summary">На основу магнетних линкова, ради само на Вифи</string>
     <string name="mobile_data_saving">Мобиле података Уштеда</string>
     <string name="data_saving_kill_http_warning_title">Упозорење: хттп трансфери у току</string>
+    <string name="fullscreen">цео екран</string>
 
 </resources>
