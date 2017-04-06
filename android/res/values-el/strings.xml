@@ -650,4 +650,5 @@
     <string name="use_magnet_summary">Μαγνήτη βάση, λειτουργεί μόνο σε Wi-Fi</string>
     <string name="mobile_data_saving">Κινητό Αποθήκευση δεδομένων</string>
     <string name="data_saving_kill_http_warning_title">Προειδοποίηση: http μεταφορές σε εξέλιξη</string>
+    <string name="fullscreen">πλήρους οθόνης</string>
 </resources>

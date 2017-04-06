@@ -649,4 +649,5 @@
     <string name="use_magnet_summary">Sulla base di magnet link, funziona solo su Wi-Fi</string>
     <string name="mobile_data_saving">Salvataggio dei dati mobile</string>
     <string name="data_saving_kill_http_warning_title">Attenzione: Http trasferimenti in corso</string>
+    <string name="fullscreen">a schermo intero</string>
 </resources>

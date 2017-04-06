@@ -648,4 +648,5 @@
     <string name="use_magnet_summary">Op basis van de magneet links werkt alleen op de website Wifi</string>
     <string name="mobile_data_saving">Mobiele gegevens opslaan</string>
     <string name="data_saving_kill_http_warning_title">Waarschuwing: Http transfers in uitvoering</string>
+    <string name="fullscreen">volledig scherm</string>
 </resources>

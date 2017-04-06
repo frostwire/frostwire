@@ -653,5 +653,6 @@
     <string name="use_magnet_summary">자석 링크를 기반으로 Wi-Fi에서만 작동합니다.</string>
     <string name="mobile_data_saving">모바일 데이터 저장</string>
     <string name="data_saving_kill_http_warning_title">경고 : HTTP 전송 진행 중 </string>
+    <string name="fullscreen">전체 화면</string>
 
 </resources>

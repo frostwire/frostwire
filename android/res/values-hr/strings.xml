@@ -649,4 +649,5 @@
     <string name="use_magnet_summary">Na temelju magnet linkove, radi samo na Wifi</string>
     <string name="mobile_data_saving">Mobitel Spremanje podataka</string>
     <string name="data_saving_kill_http_warning_title">Upozorenje: http transferi u tijeku</string>
+    <string name="fullscreen">puni zaslon</string>
 </resources>

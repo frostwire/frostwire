@@ -648,4 +648,5 @@
     <string name="use_magnet_summary">आधारित चुंबक, केवल वाईफाई पर काम करता है</string>
     <string name="mobile_data_saving">मोबाइल डेटा की बचत</string>
     <string name="data_saving_kill_http_warning_title">चेतावनी: प्रगति में HTTP स्थानान्तरण</string>
+    <string name="fullscreen">पूर्ण स्क्रीन</string>
 </resources>

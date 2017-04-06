@@ -650,4 +650,5 @@
     <string name="use_magnet_summary">Basado en enlaces magnet, funciona solo en Wi-Fi</string>
     <string name="mobile_data_saving">Ahorrador de datos móviles</string>
     <string name="data_saving_kill_http_warning_title">Advertencia: Transferencias HTTP en curso</string>
+    <string name="fullscreen">pantalla completa</string>
 </resources>

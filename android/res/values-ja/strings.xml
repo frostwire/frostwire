@@ -651,4 +651,5 @@
     <string name="use_magnet_summary">マグネットリンクに基づいて、Wifiでのみ動作します</string>
     <string name="mobile_data_saving">モバイルデータの保存</string>
     <string name="data_saving_kill_http_warning_title">警告：HTTP転送が進行中です</string>
+    <string name="fullscreen">全画面表示</string>
 </resources>

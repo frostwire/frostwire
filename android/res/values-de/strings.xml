@@ -648,5 +648,6 @@
     <string name="use_magnet_summary">Magnet basiert, funktioniert nur auf Wifi</string>
     <string name="mobile_data_saving">Mobile Daten sparen</string>
     <string name="data_saving_kill_http_warning_title">Warnung: Http geht weiter</string>
+    <string name="fullscreen">Vollbild</string>
 
 </resources>

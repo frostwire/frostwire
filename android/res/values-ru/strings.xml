@@ -650,4 +650,5 @@
     <string name="use_magnet_summary">На основе магнитных ссылок, работает только на Wi-Fi</string>
     <string name="mobile_data_saving">Мобильных данных на летнее</string>
     <string name="data_saving_kill_http_warning_title">Предупреждение: Http переводы в прогрессе</string>
+    <string name="fullscreen">полноэкранный</string>
 </resources>

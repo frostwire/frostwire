@@ -648,6 +648,7 @@
     <string name="use_magnet_summary">ขึ้นอยู่กับการเชื่อมโยงแม่เหล็กทำงานเฉพาะใน Wifi</string>
     <string name="mobile_data_saving">การบันทึกข้อมูลมือถือ</string>
     <string name="data_saving_kill_http_warning_title">คำเตือน: http โอนในความคืบหน้า</string>
+    <string name="fullscreen">เต็มจอ</string>
 
 
 </resources>

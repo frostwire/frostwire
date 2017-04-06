@@ -648,5 +648,6 @@
     <string name="use_magnet_summary">مقناطیس لنکس بنا پر، صرف وائی فائی پر کام کرتا ہے</string>
     <string name="mobile_data_saving">موبائل ڈیٹا کی بچت</string>
     <string name="data_saving_kill_http_warning_title">Wانتباہ: پیش رفت میں HTTP ٹرانسفر</string>
+    <string name="fullscreen">مکمل اسکرین یا بڑی اسکرین</string>
 
 </resources>
