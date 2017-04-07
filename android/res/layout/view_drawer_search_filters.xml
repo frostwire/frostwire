@@ -68,10 +68,15 @@
         android:weightSum="1">
 
         <EditText
+            android:id="@+id/view_drawer_search_filters_keyword_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="25dp"
-            android:hint="@string/filter_by_keyword"/>
+            android:hint="@string/filter_by_keyword"
+            android:inputType="text"
+            android:maxLines="1"
+            android:imeOptions="actionDone"
+            android:singleLine="true"/>
 
         <!-- CURRENT PIPELINE -->
         <com.frostwire.android.gui.views.FlowLayout

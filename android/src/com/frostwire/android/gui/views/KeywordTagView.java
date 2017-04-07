@@ -23,6 +23,7 @@ import android.content.res.TypedArray;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -51,7 +52,6 @@ public class KeywordTagView extends LinearLayout {
 
     public KeywordTagView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-
         if (attrs != null) {
             TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.KeywordTagView, 0, 0);
             String keyword = attributes.getString(R.styleable.KeywordTagView_keyword_tag_keyword);
@@ -69,6 +69,30 @@ public class KeywordTagView extends LinearLayout {
         this.count = count;
         this.dismissable = dismissable;
         this.listener = listener;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        System.out.println("KeywordTagView.onMeasure(wSpec=" + widthMeasureSpec + ", hSpec=" + heightMeasureSpec + ")");
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        System.out.println("KeywordTagView.onLayout(changed=" + changed + ", l=" + l + ", t=" + t + ", r=" + r + ", b=" + b + ")");
+        super.onLayout(changed, l, t, r, b);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        System.out.println("KeywordTagView.onAttachedToWindow()");
+        super.onAttachedToWindow();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        System.out.println("KeywordTagView.onDetachedFromWindow()");
+        super.onDetachedFromWindow();
     }
 
     @Override

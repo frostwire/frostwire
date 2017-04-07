@@ -275,24 +275,28 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     public void setKeywordFiltersPipeline(List<KeywordFilter> keywordFiltersPipeline) {
-        this.keywordFiltersPipeline.clear();
+        if (keywordFiltersPipeline != this.keywordFiltersPipeline) {
+            this.keywordFiltersPipeline.clear();
+        }
         this.keywordFiltersPipeline.addAll(keywordFiltersPipeline);
-        notifyDataSetInvalidated();
+        filter();
     }
 
     public void addKeywordFilter(KeywordFilter kf) {
-        this.keywordFiltersPipeline.add(kf);
-        notifyDataSetInvalidated();
+        if (!keywordFiltersPipeline.contains(kf)) {
+            this.keywordFiltersPipeline.add(kf);
+            filter();
+        }
     }
 
     public void removeKeywordFilter(KeywordFilter kf) {
         this.keywordFiltersPipeline.remove(kf);
-        notifyDataSetInvalidated();
+        filter();
     }
 
     public void clearKeywordFilters() {
         this.keywordFiltersPipeline.clear();
-        notifyDataSetInvalidated();
+        filter();
     }
 
     private static class OnLinkClickListener implements OnClickListener {
