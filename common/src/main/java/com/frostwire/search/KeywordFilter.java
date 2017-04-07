@@ -62,6 +62,20 @@ public class KeywordFilter {
         }
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        KeywordFilter other = (KeywordFilter) obj;
+        return inclusive == other.inclusive && keyword.equals(other.keyword);
+    }
+
+    @Override
+    public int hashCode() {
+        return keyword.hashCode() * (inclusive ? 1 : -1);
+    }
+
     public boolean isInclusive() {
         return inclusive;
     }

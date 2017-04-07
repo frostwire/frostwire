@@ -858,5 +858,21 @@ public final class SearchFragment extends AbstractFragment implements
         public void onPipelineUpdate(List<KeywordFilter> pipeline) {
             adapter.setKeywordFiltersPipeline(pipeline);
         }
+
+        @Override
+        public void onAddKeywordFilter(KeywordFilter keywordFilter) {
+            adapter.addKeywordFilter(keywordFilter);
+            keywordFilterDrawerView.updateData(adapter.getKeywordFiltersPipeline(), null, null);
+        }
+
+        @Override
+        public void onRemoveKeywordFilter(KeywordFilter keywordFilter) {
+            adapter.removeKeywordFilter(keywordFilter);
+        }
+
+        @Override
+        public void clearPipeline() {
+            adapter.clearKeywordFilters();
+        }
     }
 }
