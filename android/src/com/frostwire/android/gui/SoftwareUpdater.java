@@ -475,7 +475,7 @@ public final class SoftwareUpdater {
         @Override
         public void onClick(View v) {
             Engine.instance().stopServices(false);
-            UIUtils.openFile(context, getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE);
+            UIUtils.openFile(context, getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, false);
             newSoftwareUpdaterDialog.dismiss();
         }
     }

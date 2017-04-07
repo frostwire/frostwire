@@ -225,7 +225,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 if (fd.fileType == Constants.FILE_TYPE_RINGTONES) {
                     playRingtone(fd);
                 } else {
-                    UIUtils.openFile(ctx, fd.filePath, fd.mime);
+                    UIUtils.openFile(ctx, fd.filePath, fd.mime, true);
                 }
             } else {
                 // it will automatically remove the 'Open' entry.

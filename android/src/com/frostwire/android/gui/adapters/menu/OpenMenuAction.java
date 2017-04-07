@@ -60,7 +60,7 @@ public class OpenMenuAction extends MenuAction {
     @Override
     protected void onClick(Context context) {
         if (fileType != Constants.FILE_TYPE_RINGTONES) {
-            UIUtils.openFile(context, path, mime);
+            UIUtils.openFile(context, path, mime, true);
         } else {
             MusicUtils.playSimple(path);
         }
