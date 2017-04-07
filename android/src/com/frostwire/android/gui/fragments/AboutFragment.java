@@ -53,7 +53,7 @@ public final class AboutFragment extends AbstractFragment {
         //Title, build number and changelog setup
         TextView title = findView(rootView, R.id.fragment_about_title);
         String basicOrPlus = (String) getText(Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? R.string.basic : R.string.plus);
-        title.setText(getText(R.string.application_label) + " " + basicOrPlus + " v" + Constants.FROSTWIRE_VERSION_STRING);
+        title.setText("FrostWire " + basicOrPlus + " v" + Constants.FROSTWIRE_VERSION_STRING);
 
         TextView buildNumber = findView(rootView, R.id.fragment_about_build_number);
         buildNumber.setText(getText(R.string.build) + " " + BuildConfig.VERSION_CODE + ", sdk level " + Build.VERSION.SDK_INT);
