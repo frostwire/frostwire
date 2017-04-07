@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui;
@@ -34,6 +33,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -42,25 +42,32 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.util.Logger;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXStats;
 import com.frostwire.uxstats.UXStatsConf;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- *
  * @author gubatron
  * @author aldenml
  */
 public final class SoftwareUpdater {
+
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
     private final boolean ALWAYS_SHOW_UPDATE_DIALOG = false; // debug flag.
 
@@ -517,7 +524,7 @@ public final class SoftwareUpdater {
 
             final ListView listview = findView(dlg, R.id.dialog_default_update_list_view);
             String[] values = new String[update.changelog.size()];
-            for (int i=0; i < values.length; i++) {
+            for (int i = 0; i < values.length; i++) {
                 values[i] = String.valueOf(Html.fromHtml("&#8226; " + update.changelog.get(i)));
             }
 
@@ -533,7 +540,7 @@ public final class SoftwareUpdater {
 
             Button yesButton = findView(dlg, R.id.dialog_default_update_button_yes);
             yesButton.setText(android.R.string.ok);
-            yesButton.setOnClickListener(new PositiveButtonOnClickListener(getActivity(),dlg));
+            yesButton.setOnClickListener(new PositiveButtonOnClickListener(getActivity(), dlg));
             noButton.setOnClickListener(new NegativeButtonOnClickListener(dlg));
         }
     }
