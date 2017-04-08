@@ -107,6 +107,10 @@ public final class SoftwareUpdater {
     public void checkForUpdate(final Context context) {
         long now = System.currentTimeMillis();
 
+        if (context instanceof ConfigurationUpdateListener) {
+            addConfigurationUpdateListener((ConfigurationUpdateListener) context);
+        }
+
         if (now - updateTimestamp < UPDATE_MESSAGE_TIMEOUT) {
             return;
         }
@@ -234,6 +238,7 @@ public final class SoftwareUpdater {
         try {
             configurationUpdateListeners.add(listener);
         } catch (Throwable ignored) {
+            LOG.error("Could not add configuration update listener", ignored);
         }
     }
 
@@ -269,6 +274,7 @@ public final class SoftwareUpdater {
             }
         } catch (Throwable e) {
             Log.e(TAG, "Failed to notify update", e);
+            updateTimestamp = -1; // try again next time MainActivity is resumed
         }
     }
 
@@ -403,6 +409,7 @@ public final class SoftwareUpdater {
             try {
                 listener.onConfigurationUpdate(result);
             } catch (Throwable ignored) {
+                LOG.error(ignored.getMessage(), ignored);
             }
         }
     }

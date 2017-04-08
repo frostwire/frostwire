@@ -490,7 +490,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void mainResume() {
         checkSDPermission();
-
         syncNavigationMenu();
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
