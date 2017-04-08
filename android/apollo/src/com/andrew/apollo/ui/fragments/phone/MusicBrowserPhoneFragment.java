@@ -136,8 +136,15 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
     public void onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
         UIUtils.setOptionalIconsVisible(menu, true);
-        menu.findItem(R.id.menu_player_favorite).setIcon(MusicUtils.isFavorite() ?
-                R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
+        updateFavoriteMenuItemIcon(menu);
+    }
+
+    private void updateFavoriteMenuItemIcon(Menu menu) {
+        MenuItem favMenuItem = menu.findItem(R.id.menu_player_favorite);
+        if (favMenuItem != null) {
+            favMenuItem.setIcon(MusicUtils.isFavorite() ?
+                    R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
+        }
     }
 
     @Override
@@ -148,7 +155,9 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
         }
 
         // Favorite action
-        inflater.inflate(R.menu.player_favorite, menu);
+        if (isSongPage()) {
+            inflater.inflate(R.menu.player_favorite, menu);
+        }
         // Shuffle all
         inflater.inflate(R.menu.player_shuffle, menu);
         // Sort orders
