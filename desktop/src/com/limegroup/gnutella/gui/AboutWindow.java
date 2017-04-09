@@ -44,7 +44,7 @@ final class AboutWindow {
 
         // set up FrostWire version label
         JLabel client = new JLabel("FrostWire" + " "
-                + FrostWireUtils.getFrostWireVersion() + " (build " + FrostWireUtils.getBuildNumber() + ") - JLibTorrent v" + LibTorrent.version());
+                + FrostWireUtils.getFrostWireVersion() + " (build " + FrostWireUtils.getBuildNumber() + ") - JLibTorrent v" + LibTorrent.jlibtorrentVersion());
         client.setHorizontalAlignment(SwingConstants.CENTER);
         client.addMouseListener(new MouseAdapter() {
             @Override
