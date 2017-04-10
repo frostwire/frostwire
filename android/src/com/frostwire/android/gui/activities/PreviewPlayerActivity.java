@@ -207,7 +207,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     private void initMopubView() {
         if (Offers.disabledAds()) {
-            // TODO: Load some place holder graphic for users that already paid to remove ads
+            hideHorizontalAdContainer();
             return;
         }
         final int mopubPreviewBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD);
@@ -252,7 +252,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                 if (!Offers.disabledAds()) {
                     // TODO: Replace with hardcoded house ads for donations, stickers, fw gear
                 } else {
-                    // TODO: Load some place holder graphic for users that already paid to remove ads
+                    hideHorizontalAdContainer();
                 }
             }
 
@@ -403,6 +403,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton, rightSide);
             if (mopubLoaded) {
                 setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, moPubView);
+            } else {
+                hideHorizontalAdContainer();
             }
             v.setRotation(0);
 
@@ -674,6 +676,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                 LinearLayout advertisementHeaderLayout = findView(R.id.activity_preview_advertisement_header_layout);
                 advertisementHeaderLayout.setVisibility(View.GONE);
                 mopubView.setVisibility(View.GONE);
+                hideHorizontalAdContainer();
                 mopubView.destroy(); // -> mopubView.unregisterScreenStateBroadcastReceiver() private method call
             }
         } catch (Throwable ignored) {
@@ -681,6 +684,13 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
     }
 
+    private void hideHorizontalAdContainer() {
+        if (!isPortrait) {
+            LinearLayout horizontalAdContainer = findView(R.id.activity_preview_player_right_side);
+            horizontalAdContainer.setVisibility(View.GONE);
+        }
+    }
+    
     @Override
     protected void onStop() {
         super.onStop();
