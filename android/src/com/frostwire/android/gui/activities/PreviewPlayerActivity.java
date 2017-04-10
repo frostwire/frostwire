@@ -685,8 +685,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     private void hideHorizontalAdContainer() {
-        LinearLayout horizontalAdContainer = findView(R.id.activity_preview_player_right_side);
-        horizontalAdContainer.setVisibility(View.GONE);
+        if (!isPortrait) {
+            LinearLayout horizontalAdContainer = findView(R.id.activity_preview_player_right_side);
+            horizontalAdContainer.setVisibility(View.GONE);
+        }
     }
     
     @Override
