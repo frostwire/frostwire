@@ -239,8 +239,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             @Override
             public void onBannerLoaded(MoPubView banner) {
                 mopubLoaded = true;
-                advertisementHeaderLayout.setVisibility(View.VISIBLE);
-                mopubView.setVisibility(View.VISIBLE);
+                if (!isFullScreen) {
+                    advertisementHeaderLayout.setVisibility(View.VISIBLE);
+                    mopubView.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -295,7 +297,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     private void onVideoViewPrepared(final ImageView img) {
         final Button downloadButton = findView(R.id.activity_preview_player_download_button);
-        downloadButton.setVisibility(View.VISIBLE);
+        downloadButton.setVisibility(!isFullScreen ? View.VISIBLE : View.GONE);
         if (!audio) {
             img.setVisibility(View.GONE);
         }
