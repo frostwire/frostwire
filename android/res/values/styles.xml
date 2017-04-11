@@ -657,5 +657,12 @@
         <item name="android:paddingRight">0dp</item>
     </style>
 
-
+    <!-- OGURY -->
+    <style name="Presage.Theme.Transparent" parent="android:Theme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 </resources>
