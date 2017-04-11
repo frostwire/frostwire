@@ -97,6 +97,15 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
     public void onInterstitialDismissed(MoPubInterstitial interstitial) {
         LOG.info("onInterstitialDismissed");
         Activity activity = interstitial.getActivity();
+
+        if (interstitial != null) {
+            try {
+                interstitial.destroy();
+            } catch (Throwable t) {
+                LOG.warn("MoPubInterstitial.onInterstitialDismissed() - could not destroy dismissed interstitial", t);
+            }
+        }
+
         Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(mopubAdNetwork, activity, finishAfterDismiss, shutDownAfter, true, activity.getApplication());
         if (!shutDownAfter && !finishAfterDismiss) {
             mopubAdNetwork.loadMoPubInterstitial(activity, placement);
