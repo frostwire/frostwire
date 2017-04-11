@@ -25,12 +25,11 @@ import com.applovin.adview.AppLovinInterstitialAdDialog;
 import com.applovin.sdk.AppLovinAd;
 import com.applovin.sdk.AppLovinAdClickListener;
 import com.applovin.sdk.AppLovinAdDisplayListener;
+import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
+import com.frostwire.android.offers.AppLovinAdNetwork;
 import com.frostwire.util.Logger;
-import com.mopub.mobileads.CustomEventInterstitial;
-import com.applovin.sdk.AppLovinAdLoadListener;
-import com.mopub.mobileads.MoPubErrorCode;
 
 import java.util.Map;
 
@@ -41,12 +40,16 @@ public final class AppLovinInterstitialAdapter extends CustomEventInterstitial i
     private Activity parentActivity;
     private AppLovinSdk sdk;
     private AppLovinAd lastReceived;
+    private boolean APP_LOVIN_STARTED = false;
 
     /*
      * Abstract methods from CustomEventInterstitial
      */
     @Override
     public void loadInterstitial(Context context, CustomEventInterstitial.CustomEventInterstitialListener interstitialListener, Map<String, Object> localExtras, Map<String, String> serverExtras) {
+        if (context instanceof Activity) {
+            startAppLovin((Activity) context);
+        }
         mInterstitialListener = interstitialListener;
         if (context instanceof Activity) {
             parentActivity = (Activity) context;
@@ -120,5 +123,20 @@ public final class AppLovinInterstitialAdapter extends CustomEventInterstitial i
                 }
             }
         });
+    }
+
+    private void startAppLovin(Activity activity) {
+        if (APP_LOVIN_STARTED) {
+            return;
+        }
+        try {
+            AppLovinAdNetwork.getInstance().initialize(activity);
+            APP_LOVIN_STARTED = true;
+            LOG.info("AppLovinAdNetwork started from MoPub-AppLovin adapter");
+        } catch (Throwable t) {
+            APP_LOVIN_STARTED = false;
+            LOG.error("Could not start AppLovinAdNetwork from MoPub-AppLovin adapter", t);
+        }
+
     }
 }

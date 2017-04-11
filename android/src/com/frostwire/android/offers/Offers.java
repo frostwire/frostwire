@@ -48,7 +48,7 @@ public final class Offers {
     private static long lastInterstitialShownTimestamp = -1;
     private static Map<String,AdNetwork> AD_NETWORKS;
     private final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
-    private final static AppLovinAdNetwork APP_LOVIN = new AppLovinAdNetwork();
+    private final static AppLovinAdNetwork APP_LOVIN = AppLovinAdNetwork.getInstance();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
     private final static Long STARTUP_TIME = System.currentTimeMillis();
     private static long lastInitAdnetworksInvocationTimestamp;
@@ -67,22 +67,10 @@ public final class Offers {
             return;
         }
         lastInitAdnetworksInvocationTimestamp = now;
-        boolean appLovinActive = false;
-        boolean mopubActive = false;
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
             if (adNetwork != null) { // because of a typo on config file this can happen
                 adNetwork.initialize(activity);
-                if (adNetwork == APP_LOVIN) {
-                    appLovinActive = true;
-                }
-                if (adNetwork == MOPUB) {
-                    mopubActive = true;
-                }
             }
-        }
-        // AppLovin being accessed via MoPub
-        if (mopubActive && !appLovinActive) {
-            APP_LOVIN.initialize(activity);
         }
     }
 
