@@ -56,6 +56,8 @@ public interface Platform {
      */
     NetworkType networkType();
 
+    VPNMonitor vpn();
+
     enum NetworkType {
 
         /**

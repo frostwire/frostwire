@@ -32,6 +32,7 @@ import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
+import com.frostwire.platform.VPNMonitor;
 import com.frostwire.util.Logger;
 
 import java.io.File;
@@ -79,6 +80,11 @@ public final class AndroidPlatform extends AbstractPlatform {
         }
 
         return NetworkType.NONE;
+    }
+
+    @Override
+    public VPNMonitor vpn() {
+        return null;
     }
 
     public static boolean saf() {

@@ -15,27 +15,28 @@
  * limitations under the License.
  */
 
-package com.frostwire.desktop;
-
-import com.frostwire.platform.AbstractPlatform;
-import com.frostwire.platform.DefaultFileSystem;
-import com.frostwire.platform.VPNMonitor;
+package com.frostwire.platform;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class DesktopPlatform extends AbstractPlatform {
+public interface VPNMonitor {
 
-    private final DesktopVPNMonitor vpn;
+    /**
+     * This indicate if the OS networking is under active VPN or not.
+     * It's based on routing heuristics, and not 100% reliable, but it's usable.
+     * The value could be cached for speed and optimization purposes. The actual
+     * implementation should not block for a long period of time and should be
+     * safe to call it from the UI.
+     *
+     * @return if under VPN or not
+     */
+    boolean active();
 
-    public DesktopPlatform() {
-        super(new DefaultFileSystem(), new DesktopPaths(), new DesktopSettings());
-        this.vpn = new DesktopVPNMonitor();
-    }
-
-    @Override
-    public VPNMonitor vpn() {
-        return vpn;
-    }
+    /**
+     * Perform a manual status refresh, don't do this from the UI since a blocking
+     * code could be used in any given implementation.
+     */
+    void refresh();
 }
