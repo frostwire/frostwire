@@ -40,6 +40,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -380,6 +381,9 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
         // Let's Go into full screen mode.
         if (!isFullScreen) {
+            //hides the status bar
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
             findToolbar().setVisibility(View.GONE);
             setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, downloadButton, rightSide);
             setViewsVisibility(View.GONE, advertisementHeaderLayout, moPubView);
@@ -399,6 +403,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         } else {
             // restore components back from full screen mode.
             //final TextureView videoTexture = findView(R.id.activity_preview_player_videoview);
+
+            //restores the status bar to view
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
             findToolbar().setVisibility(View.VISIBLE);
             setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton, rightSide);
             if (mopubLoaded) {
