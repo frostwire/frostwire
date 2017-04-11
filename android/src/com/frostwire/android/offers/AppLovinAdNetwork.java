@@ -25,14 +25,14 @@ import com.applovin.sdk.AppLovinSdk;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 
-class AppLovinAdNetwork extends AbstractAdNetwork {
+public class AppLovinAdNetwork extends AbstractAdNetwork {
 
     private static final Logger LOG = Logger.getLogger(AppLovinAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
-
+    private static AppLovinAdNetwork APP_LOVIN_ADNETWORK = null;
     private AppLovinInterstitialAdapter interstitialAdapter = null;
 
-    AppLovinAdNetwork() {
+    private AppLovinAdNetwork() {
     }
 
     @Override
@@ -105,5 +105,12 @@ class AppLovinAdNetwork extends AbstractAdNetwork {
             }
         }
         return result;
+    }
+
+    public static AppLovinAdNetwork getInstance() {
+        if (APP_LOVIN_ADNETWORK == null) {
+            APP_LOVIN_ADNETWORK = new AppLovinAdNetwork();
+        }
+        return APP_LOVIN_ADNETWORK;
     }
 }
