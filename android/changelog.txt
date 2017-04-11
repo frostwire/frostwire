@@ -1,3 +1,9 @@
+FrostWire 1.9.2 - APR/11/2017
+ - New jlibtorrent 1.2.0.8
+ - Fixes video preview bug that would overlay ad and download button
+   over video if user went to full screenmode too soon
+ - Mopub/Ogury integration
+
 FrostWire 1.9.1 - APR/06/2017
  - Video/Audio search preview screen material design updates
  - My Files checkbox selection mode has a new action toolbar
