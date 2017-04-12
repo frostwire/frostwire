@@ -4,8 +4,6 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.limewire.concurrent.ThreadExecutor;
-import org.limewire.listener.EventListener;
-import org.limewire.listener.EventListenerList;
 import org.limewire.service.ErrorService;
 import org.limewire.setting.SettingsGroupManager;
 import org.limewire.util.OSUtils;
@@ -42,8 +40,6 @@ public class LifecycleManagerImpl implements LifecycleManager {
     /** The time when this finished starting. */
     private long startFinishedTime;
     
-    private final EventListenerList<LifeCycleEvent> listenerList;
-    
     public static enum LifeCycleEvent {
         STARTING, STARTED, SHUTINGDOWN, SHUTDOWN
     }
@@ -52,9 +48,6 @@ public class LifecycleManagerImpl implements LifecycleManager {
     /**/
     public LifecycleManagerImpl(
             LimeCoreGlue limeCoreGlue) {
-        
-        this.listenerList = new EventListenerList<LifeCycleEvent>();
-
         this.limeCoreGlue = limeCoreGlue;
     }
     /**/
@@ -85,30 +78,6 @@ public class LifecycleManagerImpl implements LifecycleManager {
         LimeCoreGlue.preinstall();
        
         preinitializeDone.set(true);
-
-        //NEW, for azureus core to be notified of FrostWire's lifecycle events.
-        installBittorrentListeners();
-    }
-    
-    
-    /**
-     * Make sure the azureus core knows about our LifeCycleEvents and does the right thing
-     * when we shut down.
-     */
-    private void installBittorrentListeners() {
-    	addListener(new EventListener<LifecycleManagerImpl.LifeCycleEvent>() {
-
-			@Override
-			public void handleEvent(
-					com.limegroup.gnutella.LifecycleManagerImpl.LifeCycleEvent event) {
-				if (event == LifeCycleEvent.SHUTINGDOWN) {
-
-				    // TODO: cleanup the entire event framework
-                    //BTEngine.getInstance().stop();
-				} 
-			}
-			
-		});
     }
     
     /* (non-Javadoc)
@@ -144,9 +113,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
             return;
         
         try {
-            listenerList.broadcast(LifeCycleEvent.STARTING);
             doStart();
-            listenerList.broadcast(LifeCycleEvent.STARTED);
         } finally {
             startLatch.countDown();
         }
@@ -167,9 +134,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
      */
     public void shutdown() {
         try {
-            listenerList.broadcast(LifeCycleEvent.SHUTINGDOWN);
             doShutdown();
-            listenerList.broadcast(LifeCycleEvent.SHUTDOWN);
         } catch(Throwable t) {
             ErrorService.error(t);
         }
@@ -292,13 +257,5 @@ public class LifecycleManagerImpl implements LifecycleManager {
         t.setDaemon(true);
         t.start();
         //LOG.info("Started manual GC thread.");
-    }
-
-    public void addListener(EventListener<LifeCycleEvent> listener) {
-        listenerList.addListener(listener);
-    }
-
-    public boolean removeListener(EventListener<LifeCycleEvent> listener) {
-        return listenerList.removeListener(listener);
     }
 }
