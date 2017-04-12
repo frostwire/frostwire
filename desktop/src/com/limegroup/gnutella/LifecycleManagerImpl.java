@@ -190,7 +190,9 @@ public class LifecycleManagerImpl implements LifecycleManager {
         // save frostwire.props & other settings
         SettingsGroupManager.instance().save();
 
+        System.out.println("Stopping BTEngine...");
         BTEngine.getInstance().stop();
+        System.out.println("BTEngine stopped");
         
         shutdownDone.set(true);
     }
