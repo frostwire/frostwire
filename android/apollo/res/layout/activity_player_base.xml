@@ -179,6 +179,12 @@
                             android:layout_height="250dp"
                             android:visibility="gone" />
 
+                        <ImageView
+                            android:id="@+id/audio_player_fallback_imageview"
+                            android:layout_width="match_parent"
+                            android:layout_height="250dp"
+                            android:visibility="gone"/>
+
                         <TextView
                             android:id="@+id/audio_player_remove_ads_text_link"
                             android:layout_width="match_parent"

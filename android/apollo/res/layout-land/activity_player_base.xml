@@ -113,6 +113,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/audio_player_fallback_imageview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
         </LinearLayout>
 
         <LinearLayout

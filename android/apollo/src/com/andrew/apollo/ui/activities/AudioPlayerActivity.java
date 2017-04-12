@@ -82,6 +82,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.SwipeLayout;
+import com.frostwire.android.offers.InHouseBannerFactory;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.util.Logger;
@@ -131,7 +132,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private TextView mArtistName;
 
     // Ad on top of Album art
-    private MoPubView mAlbumArtAd;
+    private MoPubView mMopubAd;
+
+    // Fallbakc Ad ImageView
+    private ImageView mFallbackAd;
 
     // 'advertisement' label
     private TextView mAdvertisementText;
@@ -183,6 +187,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     private long mLastShortSeekEventTime;
 
+    private long lastInitAlbumArtBanner;
+
     private boolean mIsPaused = false;
 
     private boolean mFromTouch = false;
@@ -219,7 +225,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         initPlaybackControls();
 
         // Album Art Ad Controls
-        mAlbumArtAd = findView(R.id.audio_player_mopubview);
+        mMopubAd = findView(R.id.audio_player_mopubview);
+        mFallbackAd = findView(R.id.audio_player_fallback_imageview);
         mDismissAlbumArtAdButton = findView(R.id.audio_player_dismiss_mopubview_button);
         mAdvertisementText = findView(R.id.audio_player_advertisement_text);
         initAlbumArtBanner();
@@ -247,7 +254,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             removeAdsTextView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setAlbumArtAdVisibility(false);
+                    setBannerViewVisibility(mMopubAd, false);
+                    setBannerViewVisibility(mFallbackAd, false);
                     PlayStore.getInstance().endAsync();
                     Intent i = new Intent(AudioPlayerActivity.this, BuyActivity.class);
                     startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
@@ -494,8 +502,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mIsPaused = false;
 
         try {
-            if (mAlbumArtAd != null) {
-                mAlbumArtAd.destroy();
+            if (mMopubAd != null) {
+                mMopubAd.destroy();
             }
         } catch (Throwable ignored) {
             LOG.error(ignored.getMessage(), ignored);
@@ -585,11 +593,20 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     private void initAlbumArtBanner() {
+        long timeSinceLastBannerInit = System.currentTimeMillis() - lastInitAlbumArtBanner;
+
+        if (timeSinceLastBannerInit < 5000) {
+            LOG.info("initAlbumArtBanner() aborted, too soon to attempt another banner load");
+            return;
+        }
+
         if (Offers.disabledAds()) {
             return;
         }
 
-        if (mAlbumArtAd != null && mAlbumArtAd.getVisibility() == View.VISIBLE) {
+        if ((mMopubAd != null && mMopubAd.getVisibility() == View.VISIBLE) ||
+            (mFallbackAd != null && mFallbackAd.getVisibility() == View.VISIBLE)) {
+            // ad is already visible, leave as is
             return;
         }
 
@@ -599,6 +616,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (r > mopubAlbumArtBannerThreshold) {
             return;
         }
+
+        lastInitAlbumArtBanner = System.currentTimeMillis();
 
         StringBuilder keywords = new StringBuilder("music,audio,ringtone");
         String artistName = MusicUtils.getArtistName();
@@ -610,31 +629,34 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             keywords.append(",").append(albumName);
         }
 
-        if (mAlbumArtAd != null && mDismissAlbumArtAdButton != null) {
+        if (mMopubAd != null && mDismissAlbumArtAdButton != null) {
             mDismissAlbumArtAdButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setAlbumArtAdVisibility(false);
+                    setBannerViewVisibility(mMopubAd, false);
+                    setBannerViewVisibility(mFallbackAd, false);
                 }
             });
 
-            setAlbumArtAdVisibility(false);
+            setBannerViewVisibility(mMopubAd, false);
+            setBannerViewVisibility(mFallbackAd, false);
 
-            //mAlbumArtAd.setTesting(true);
-            mAlbumArtAd.setAutorefreshEnabled(true);
-            mAlbumArtAd.setAdUnitId("c737d8a55b2e41189aa1532ae0520ad1");
-            mAlbumArtAd.setKeywords(keywords.toString());
-            mAlbumArtAd.setBannerAdListener(new MoPubView.BannerAdListener() {
+            //mMopubAd.setTesting(true);
+            mMopubAd.setAutorefreshEnabled(true);
+            mMopubAd.setAdUnitId("c737d8a55b2e41189aa1532ae0520ad1");
+            mMopubAd.setKeywords(keywords.toString());
+            mMopubAd.setBannerAdListener(new MoPubView.BannerAdListener() {
                 @Override
                 public void onBannerLoaded(MoPubView banner) {
                     LOG.info("onBannerLoaded()");
-                    setAlbumArtAdVisibility(true);
+                    setBannerViewVisibility(mFallbackAd, false);
+                    setBannerViewVisibility(mMopubAd, true);
                 }
 
                 @Override
                 public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
                     LOG.info("onBannerFailed");
-                    setAlbumArtAdVisibility(false);
+                    loadFallbackBanner();
                 }
 
                 @Override
@@ -645,28 +667,36 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 @Override
                 public void onBannerExpanded(MoPubView banner) {
                     LOG.info("onBannerExpanded");
-                    setAlbumArtAdVisibility(true);
+                    setBannerViewVisibility(mMopubAd, true);
                 }
 
                 @Override
                 public void onBannerCollapsed(MoPubView banner) {
                     LOG.info("onBannerCollapsed");
-                    setAlbumArtAdVisibility(false);
+                    setBannerViewVisibility(mMopubAd, false);
                 }
             });
             try {
-                mAlbumArtAd.loadAd();
+                mMopubAd.loadAd();
             } catch (Throwable e) {
                 LOG.warn("AudioPlayer Mopub banner could not be loaded", e);
+                loadFallbackBanner();
             }
         }
     }
 
-    private void setAlbumArtAdVisibility(boolean visible) {
-        if (mAlbumArtAd != null && mDismissAlbumArtAdButton != null) {
+    private void loadFallbackBanner() {
+        LOG.info("loadFallbackBanner");
+        InHouseBannerFactory.loadAd(mFallbackAd, InHouseBannerFactory.AdFormat.BIG_300x250);
+        setBannerViewVisibility(mMopubAd, false);
+        setBannerViewVisibility(mFallbackAd, true);
+    }
+
+    private void setBannerViewVisibility(View bannerView, boolean visible) {
+        if (bannerView != null && mDismissAlbumArtAdButton != null) {
             int adVisibility = visible ? View.VISIBLE : View.GONE;
             int albumArtVisibility = visible ? View.GONE : View.VISIBLE;
-            mAlbumArtAd.setVisibility(adVisibility);
+            bannerView.setVisibility(adVisibility);
             mDismissAlbumArtAdButton.setVisibility(adVisibility);
             mAdvertisementText.setVisibility(adVisibility);
             mAlbumArt.setVisibility(albumArtVisibility);
@@ -1137,6 +1167,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 case MusicPlaybackService.PLAYSTATE_CHANGED:
                     // Set the play and pause image
                     activity.mPlayPauseButton.updateState();
+                    activity.initAlbumArtBanner();
                     break;
                 case MusicPlaybackService.REPEATMODE_CHANGED:
                 case MusicPlaybackService.SHUFFLEMODE_CHANGED:
@@ -1144,6 +1175,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                     activity.mRepeatButton.updateRepeatState();
                     // Set the shuffle image
                     activity.mShuffleButton.updateShuffleState();
+                    activity.initAlbumArtBanner();
                     break;
             }
         }
