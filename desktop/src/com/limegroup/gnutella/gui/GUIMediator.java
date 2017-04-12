@@ -828,7 +828,11 @@ public final class GUIMediator {
      * Shutdown the program cleanly.
      */
     public static void shutdown() {
+        hideVideoPlayerWindow();
+        Finalizer.shutdown();
+    }
 
+    private static void hideVideoPlayerWindow() {
         // hide video player if visible
         try {
             if (MPlayerMediator.instance() != null) {
@@ -839,8 +843,6 @@ public final class GUIMediator {
                 }
             }
         } catch (Throwable ignored) {}
-
-        Finalizer.shutdown();
     }
 
     public void showTransfers(TransfersTab.FilterMode mode) {

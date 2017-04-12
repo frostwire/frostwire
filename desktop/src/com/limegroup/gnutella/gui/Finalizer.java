@@ -55,14 +55,7 @@ final class Finalizer {
      * necessary cleanups.
      */
     static void shutdown() {
-        UXStats.instance().flush();
-
-        SearchMediator.instance().shutdown();
-
-        MediaPlayer.instance().stop();
-
         GUIMediator.applyWindowSettings();
-
         GUIMediator.setAppVisible(false);
         ShutdownWindow window = new ShutdownWindow();
         GUIUtils.centerOnScreen(window);
@@ -78,9 +71,19 @@ final class Finalizer {
         Thread shutdown = new Thread("Shutdown Thread") {
             public void run() {
                 try {
-                    sleep(3000);
+                    System.out.println("Shutdown thread started");
+                    System.out.println("Flushing UXStats...");
+                    UXStats.instance().flush();
+                    System.out.println("SearchMediator shutting down...");
+                    SearchMediator.instance().shutdown();
+                    System.out.println("MediaPlayer stopping...");
+                    MediaPlayer.instance().stop();
+                    System.out.println("BugManager stopping...");
                     BugManager.instance().shutdown();
+                    sleep(3000);
+                    System.out.println("Shutting down [updateCommand=" + toExecute + "]");
                     GuiCoreMediator.getLifecycleManager().shutdown(toExecute);
+                    System.out.println("System exit");
                     System.exit(0);
                 } catch (Throwable t) {
                     t.printStackTrace();

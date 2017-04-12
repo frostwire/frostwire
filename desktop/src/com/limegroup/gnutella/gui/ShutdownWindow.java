@@ -22,7 +22,7 @@ class ShutdownWindow extends JDialog {
     private static final long serialVersionUID = 446845150731872693L;
     private ImageIcon backgroundImage;
 
-    public ShutdownWindow() {
+    ShutdownWindow() {
         super(GUIMediator.getAppFrame());
         backgroundImage = ResourceManager.getImageFromResourcePath("org/limewire/gui/images/app_shutdown.jpg");
         setResizable(false);
