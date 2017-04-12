@@ -104,7 +104,8 @@ public class LifecycleManagerImpl implements LifecycleManager {
 					com.limegroup.gnutella.LifecycleManagerImpl.LifeCycleEvent event) {
 				if (event == LifeCycleEvent.SHUTINGDOWN) {
 
-                    BTEngine.getInstance().stop();
+				    // TODO: cleanup the entire event framework
+                    //BTEngine.getInstance().stop();
 				} 
 			}
 			
