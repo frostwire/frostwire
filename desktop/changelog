@@ -1,8 +1,8 @@
 frostwire (6.4.8) stable; urgency=high
   * New jlibtorrent 1.2.0.8
-  * Possible crash on shutdown fixed
+  * Freeze/Slowdown on shutdown fixed
 	
- -- FrostWire Team <contact@frostwire.com>  Mon, 10 Apr 2017 04:48:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 12 Apr 2017 09:15:00 -0600
 
 frostwire (6.4.7) stable; urgency=high
   * New jlibtorrent 1.2.0.7-RC3
