@@ -1,6 +1,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.bugs.BugManager;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
@@ -14,6 +15,8 @@ import com.limegroup.gnutella.gui.search.SearchMediator;
  * is about to be exited.
  */
 final class Finalizer {
+
+    private static final Logger LOG = Logger.getLogger(Finalizer.class);
 
     /** Stores whether a shutdown operation has been
      * initiated.
@@ -71,19 +74,19 @@ final class Finalizer {
         Thread shutdown = new Thread("Shutdown Thread") {
             public void run() {
                 try {
-                    System.out.println("Shutdown thread started");
-                    System.out.println("Flushing UXStats...");
+                    LOG.info("Shutdown thread started");
+                    LOG.info("Flushing UXStats...");
                     UXStats.instance().flush();
-                    System.out.println("SearchMediator shutting down...");
+                    LOG.info("SearchMediator shutting down...");
                     SearchMediator.instance().shutdown();
-                    System.out.println("MediaPlayer stopping...");
+                    LOG.info("MediaPlayer stopping...");
                     MediaPlayer.instance().stop();
-                    System.out.println("BugManager stopping...");
+                    LOG.info("BugManager stopping...");
                     BugManager.instance().shutdown();
                     sleep(3000);
-                    System.out.println("Shutting down [updateCommand=" + toExecute + "]");
+                    LOG.info("Shutting down [updateCommand=" + toExecute + "]");
                     GuiCoreMediator.getLifecycleManager().shutdown(toExecute);
-                    System.out.println("System exit");
+                    LOG.info("System exit");
                     System.exit(0);
                 } catch (Throwable t) {
                     t.printStackTrace();

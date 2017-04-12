@@ -1,13 +1,8 @@
 package com.limegroup.gnutella;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.util.Logger;
+import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.limewire.concurrent.ThreadExecutor;
 import org.limewire.listener.EventListener;
 import org.limewire.listener.EventListenerList;
@@ -16,8 +11,12 @@ import org.limewire.setting.SettingsGroupManager;
 import org.limewire.util.OSUtils;
 import org.limewire.util.SystemUtils;
 
-import com.frostwire.util.Logger;
-import com.limegroup.gnutella.settings.ApplicationSettings;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LifecycleManagerImpl implements LifecycleManager {
     
@@ -34,7 +33,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
     
     private final CountDownLatch startLatch = new CountDownLatch(1);
     
-    private static enum State { NONE, STARTING, STARTED, STOPPED };
+    private enum State { NONE, STARTING, STARTED, STOPPED };
 
     private final LimeCoreGlue limeCoreGlue;
     
@@ -191,9 +190,9 @@ public class LifecycleManagerImpl implements LifecycleManager {
         // save frostwire.props & other settings
         SettingsGroupManager.instance().save();
 
-        System.out.println("Stopping BTEngine...");
+        LOG.info("Stopping BTEngine...");
         BTEngine.getInstance().stop();
-        System.out.println("BTEngine stopped");
+        LOG.info("BTEngine stopped");
         
         shutdownDone.set(true);
     }
