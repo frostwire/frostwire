@@ -1,5 +1,6 @@
-FrostWire 1.9.2 - APR/11/2017
+FrostWire 1.9.2 - APR/12/2017
  - New jlibtorrent 1.2.0.8
+ - Hides Android top status bar when previewing videos in full screen mode
  - Fixes video preview bug that would overlay ad and download button
    over video if user went to full screenmode too soon
  - Mopub/Ogury integration
