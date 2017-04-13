@@ -58,6 +58,8 @@ public class EngineService extends Service implements IEngineService {
     private static final Logger LOG = Logger.getLogger(EngineService.class);
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
 
+    private static final String SHUTDOWN_ACTION = "com.frostwire.android.engine.SHUTDOWN";
+
     private final IBinder binder;
     static final ExecutorService threadPool = ThreadPool.newThreadPool("Engine");
     // services in background
@@ -84,6 +86,12 @@ public class EngineService extends Service implements IEngineService {
         if (intent == null) {
             return 0;
         }
+
+        if (SHUTDOWN_ACTION.equals(intent.getAction())) {
+            shutdownSupport();
+            return START_NOT_STICKY;
+        }
+
         LOG.info("FrostWire's EngineService started by this intent:");
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
@@ -97,7 +105,11 @@ public class EngineService extends Service implements IEngineService {
 
     @Override
     public void onDestroy() {
-        LOG.debug("EngineService onDestroy");
+        LOG.debug("onDestroy");
+    }
+
+    private void shutdownSupport() {
+        LOG.debug("shutdownSupport");
         enableReceivers(false);
         disablePermanentNotificationUpdates();
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
@@ -108,6 +120,9 @@ public class EngineService extends Service implements IEngineService {
         ImageLoader.getInstance(this).shutdown();
         PlayStore.getInstance().dispose();
         stopOkHttp();
+
+        stopForeground(true);
+        stopSelf();
     }
 
     // what a bad design to properly shutdown the framework threads!
@@ -257,9 +272,12 @@ public class EngineService extends Service implements IEngineService {
 
     @Override
     public void shutdown() {
-        LOG.info("shutdown()");
-        stopForeground(true);
-        stopSelf();
+        LOG.info("shutdown");
+
+        Context ctx = getApplication();
+        Intent i = new Intent(ctx, EngineService.class);
+        i.setAction(SHUTDOWN_ACTION);
+        ctx.startService(i);
     }
 
     public class EngineServiceBinder extends Binder {
