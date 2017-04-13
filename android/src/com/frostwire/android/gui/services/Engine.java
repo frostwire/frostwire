@@ -267,7 +267,7 @@ public final class Engine implements IEngineService {
                     registerStatusReceiver(context);
                 }
             }
-        }, Context.BIND_AUTO_CREATE);
+        }, 0);
     }
 
     private void registerStatusReceiver(Context context) {
