@@ -152,6 +152,13 @@
                 android:visibility="visible"
                 android:layout_gravity="center_horizontal|center_vertical"/>
 
+            <ImageView
+                android:id="@+id/activity_preview_fallback_imageview"
+                android:layout_width="300dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:visibility="gone"/>
+
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

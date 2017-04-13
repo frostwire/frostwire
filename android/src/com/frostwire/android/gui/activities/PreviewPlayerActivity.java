@@ -58,6 +58,7 @@ import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
+import com.frostwire.android.offers.InHouseBannerFactory;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.search.FileSearchResult;
@@ -97,11 +98,12 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private String streamUrl;
     private boolean hasVideo;
     private boolean audio;
-    private boolean isPortrait = true;
     private boolean isFullScreen = false;
     private boolean videoSizeSetupDone = false;
     private boolean changedActionBarTitleToNonBuffering = false;
+    private LinearLayout advertisementHeaderLayout;
     private MoPubView mopubView;
+    private ImageView fallbackImageView;
     private boolean mopubLoaded = false;
 
     public PreviewPlayerActivity() {
@@ -218,15 +220,18 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             return;
         }
         mopubView = (MoPubView) findViewById(R.id.activity_preview_player_mopubview);
-        final LinearLayout advertisementHeaderLayout = (LinearLayout) findViewById(R.id.activity_preview_advertisement_header_layout);
+        advertisementHeaderLayout = (LinearLayout) findViewById(R.id.activity_preview_advertisement_header_layout);
+        fallbackImageView = findView(R.id.activity_preview_fallback_imageview);
         final ImageButton dismissButton = (ImageButton) findViewById(R.id.audio_player_dismiss_mopubview_button);
         if (mopubView == null || advertisementHeaderLayout == null || dismissButton == null) {
             return;
         }
+        fallbackImageView.setVisibility(View.GONE);
         dismissButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 destroyMopubView();
+                fallbackImageView.setVisibility(View.GONE);
             }
         });
 
@@ -240,20 +245,17 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             public void onBannerLoaded(MoPubView banner) {
                 mopubLoaded = true;
                 if (!isFullScreen) {
-                    advertisementHeaderLayout.setVisibility(View.VISIBLE);
-                    mopubView.setVisibility(View.VISIBLE);
+                    setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, mopubView);
+                    fallbackImageView.setVisibility(View.GONE);
                 }
             }
 
             @Override
             public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
-                advertisementHeaderLayout.setVisibility(View.GONE);
-                mopubView.setVisibility(View.GONE);
-                mopubLoaded = false;
-                destroyMopubView(); // also hides the ad-header view ("advertisement")
+                destroyMopubView(); // mopubLoaded = false, also hides the ad-header view ("advertisement")
 
                 if (!Offers.disabledAds()) {
-                    // TODO: Replace with hardcoded house ads for donations, stickers, fw gear
+                    loadFallbackBanner();
                 } else {
                     hideHorizontalAdContainer();
                 }
@@ -275,8 +277,18 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             mopubView.loadAd();
         } catch (Throwable e) {
             LOG.warn("AudioPlayer Mopub banner could not be loaded", e);
+            mopubLoaded = false;
+            loadFallbackBanner();
         }
     }
+
+    private void loadFallbackBanner() {
+        advertisementHeaderLayout.setVisibility(View.VISIBLE);
+        InHouseBannerFactory.AdFormat adFormat = isPortrait() ?
+                InHouseBannerFactory.AdFormat.SMALL_320x50 : InHouseBannerFactory.AdFormat.BIG_300x250;
+        InHouseBannerFactory.loadAd(fallbackImageView, adFormat);
+    }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -359,12 +371,17 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
     }
 
+    private boolean isPortrait() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+    }
+
     private void toggleFullScreen(TextureView v) {
         videoSizeSetupDone = false;
         DisplayMetrics metrics = new DisplayMetrics();
         final Display defaultDisplay = getWindowManager().getDefaultDisplay();
         defaultDisplay.getMetrics(metrics);
-        isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+
+        boolean isPortrait = isPortrait();
 
         final FrameLayout frameLayout = findView(R.id.activity_preview_player_framelayout);
         LinearLayout.LayoutParams frameLayoutParams = (LinearLayout.LayoutParams) frameLayout.getLayoutParams();
@@ -378,8 +395,12 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         ViewGroup rightSide = findView(R.id.activity_preview_player_right_side);
 
         // these might not even be there
-        LinearLayout advertisementHeaderLayout = findView(R.id.activity_preview_advertisement_header_layout);
-        MoPubView moPubView = findView(R.id.activity_preview_player_mopubview);
+        if (advertisementHeaderLayout == null) {
+            advertisementHeaderLayout = findView(R.id.activity_preview_advertisement_header_layout);
+        }
+        if (mopubView == null) {
+            mopubView = findView(R.id.activity_preview_player_mopubview);
+        }
 
         // Let's Go into full screen mode.
         if (!isFullScreen) {
@@ -388,7 +409,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
             findToolbar().setVisibility(View.GONE);
             setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, downloadButton, rightSide);
-            setViewsVisibility(View.GONE, advertisementHeaderLayout, moPubView);
+            setViewsVisibility(View.GONE, advertisementHeaderLayout, mopubView, fallbackImageView);
 
             if (isPortrait) {
                 //noinspection SuspiciousNameCombination
@@ -411,10 +432,18 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
             findToolbar().setVisibility(View.VISIBLE);
             setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton, rightSide);
-            if (mopubLoaded) {
-                setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, moPubView);
-            } else {
+            if (Offers.disabledAds()) {
                 hideHorizontalAdContainer();
+                setViewsVisibility(View.GONE, advertisementHeaderLayout, mopubView, fallbackImageView);
+            } else {
+                if (mopubLoaded) {
+                    setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, mopubView);
+                    setViewsVisibility(View.GONE, fallbackImageView);
+                } else {
+                    loadFallbackBanner();
+                    setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, fallbackImageView);
+                    setViewsVisibility(View.GONE, mopubView);
+                }
             }
             v.setRotation(0);
 
@@ -443,11 +472,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         defaultDisplay.getMetrics(metrics);
 
         final android.widget.FrameLayout.LayoutParams params = (android.widget.FrameLayout.LayoutParams) v.getLayoutParams();
-        isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        boolean isPortrait = isPortrait();
         float hRatio = (videoHeight * 1.0f) / (videoWidth * 1.0f);
         float rotation = 0;
 
-        // TODO: refactor to properly avoid warnings
         if (isPortrait) {
             if (isFullScreen) {
                 //noinspection SuspiciousNameCombination
@@ -484,6 +512,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     public void onConfigurationChanged(Configuration newConfig) {
         //Disable rotation once the activity has started.
         super.onConfigurationChanged(newConfig);
+        boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         if (isPortrait && newConfig.orientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else if (!isPortrait && newConfig.orientation != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
@@ -676,31 +705,31 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     @Override
     protected void onPause() {
         destroyMopubView();
+        releaseMediaPlayer();
         super.onPause();
     }
 
     private void destroyMopubView() {
         try {
             if (mopubView != null) {
-                mopubLoaded = false;
-                LinearLayout advertisementHeaderLayout = findView(R.id.activity_preview_advertisement_header_layout);
-                advertisementHeaderLayout.setVisibility(View.GONE);
-                mopubView.setVisibility(View.GONE);
+                setViewsVisibility(View.GONE, advertisementHeaderLayout, mopubView);
                 hideHorizontalAdContainer();
                 mopubView.destroy(); // -> mopubView.unregisterScreenStateBroadcastReceiver() private method call
             }
         } catch (Throwable ignored) {
             LOG.error(ignored.getMessage(), ignored);
+        } finally {
+            mopubLoaded = false;
         }
     }
 
     private void hideHorizontalAdContainer() {
-        if (!isPortrait) {
+        if (!isPortrait()) {
             LinearLayout horizontalAdContainer = findView(R.id.activity_preview_player_right_side);
             horizontalAdContainer.setVisibility(View.GONE);
         }
     }
-    
+
     @Override
     protected void onStop() {
         super.onStop();
