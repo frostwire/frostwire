@@ -103,7 +103,9 @@ public class EngineService extends Service implements IEngineService {
         disablePermanentNotificationUpdates();
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
         stopServices(false);
+        LOG.debug("onDestroy, stopping BTEngine...");
         BTEngine.getInstance().stop();
+        LOG.debug("onDestroy, BTEngine stopped");
         ImageLoader.getInstance(this).shutdown();
         PlayStore.getInstance().dispose();
         stopOkHttp();
@@ -217,7 +219,9 @@ public class EngineService extends Service implements IEngineService {
 
         state = STATE_STOPPING;
 
+        LOG.info("Pausing BTEngine...");
         BTEngine.getInstance().pause();
+        LOG.info("Pausing BTEngine paused");
 
         state = disconnected ? STATE_DISCONNECTED : STATE_STOPPED;
         LOG.info("Engine stopped, state: " + state);
