@@ -200,7 +200,7 @@ public final class SystemUtils {
      * @param context
      * @param timeout timeout in ms. set to -1 to wait forever.
      * @param serviceClasses
-     */\
+     */
     public static void waitWhileServicesAreRunning(Context context, long timeout, Class<?> ... serviceClasses) {
         final long startTime = System.currentTimeMillis();
         Set<Class<?>> serviceClassesNotRunningAnymore = new HashSet<>();
