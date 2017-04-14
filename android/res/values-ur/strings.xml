@@ -643,5 +643,9 @@
     <string name="mobile_data_saving">موبائل ڈیٹا کی بچت</string>
     <string name="data_saving_kill_http_warning_title">Wانتباہ: پیش رفت میں HTTP ٹرانسفر</string>
     <string name="fullscreen">مکمل اسکرین یا بڑی اسکرین</string>
+    <string name="lock_screen_orientation_summary">سکرین واقفیت جب اپلی کیشن شروع ہوتا پایا رکھیں. صرف باہر نکلیں اور
+        دوبارہ شروع کرنے پر تبدیلیاں
+    </string>
+    <string name="lock_screen_orientation">لاک سکرین واقفیت</string>
 
 </resources>

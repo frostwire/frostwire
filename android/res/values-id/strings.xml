@@ -645,4 +645,8 @@
     <string name="mobile_data_saving">Menyimpan Data Ponsel</string>
     <string name="data_saving_kill_http_warning_title">Peringatan: Http transfer berlangsung</string>
     <string name="fullscreen">layar penuh</string>
+    <string name="lock_screen_orientation">Kunci layar Orientasi</string>
+    <string name="lock_screen_orientation_summary">Menjaga orientasi layar ditemukan ketika aplikasi dimulai. Perubahan
+        hanya pada Keluar dan Restart
+    </string>
 </resources>

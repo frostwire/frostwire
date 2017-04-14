@@ -646,4 +646,6 @@
     <string name="mobile_data_saving">モバイルデータの保存</string>
     <string name="data_saving_kill_http_warning_title">警告：HTTP転送が進行中です</string>
     <string name="fullscreen">全画面表示</string>
+    <string name="lock_screen_orientation_summary">アプリの起動時に見つかった画面の向きを保持します。 Exitと再起動時にのみ変更</string>
+    <string name="lock_screen_orientation">ロック画面の方向</string>
 </resources>

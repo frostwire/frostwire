@@ -648,5 +648,7 @@
     <string name="mobile_data_saving">모바일 데이터 저장</string>
     <string name="data_saving_kill_http_warning_title">경고 : HTTP 전송 진행 중 </string>
     <string name="fullscreen">전체 화면</string>
+    <string name="lock_screen_orientation">잠금 화면 방향</string>
+    <string name="lock_screen_orientation_summary">앱이 시작되면 화면 방향을 유지합니다. 이탈 및 재시작시에만 변경됩니다.</string>
 
 </resources>
