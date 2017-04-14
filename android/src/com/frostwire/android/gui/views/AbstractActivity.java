@@ -71,12 +71,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
     protected void onResume() {
         paused = false;
         super.onResume();
-        new OrientationEventListener(this, SensorManager.SENSOR_DELAY_NORMAL) {
-            @Override
-            public void onOrientationChanged(int orientation) {
-                UIUtils.ScreenOrientationLocker.onRotationRequested(AbstractActivity.this,  orientation);
-            }
-        }.enable();
+        UIUtils.ScreenOrientationLocker.onRotationRequested(AbstractActivity.this,  getWindowManager().getDefaultDisplay().getRotation());
     }
 
     @Override
