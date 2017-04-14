@@ -148,7 +148,7 @@
             android:label="@string/about" />
         <activity
             android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
-            android:configChanges="orientation|screenSize"
+            android:configChanges="screenSize"
             android:label="@string/playing" />
         <activity
             android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
