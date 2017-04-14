@@ -200,24 +200,24 @@ public final class SystemUtils {
      * @param context
      * @param timeout timeout in ms. set to -1 to wait forever.
      * @param serviceClasses
-     */
+     */\
     public static void waitWhileServicesAreRunning(Context context, long timeout, Class<?> ... serviceClasses) {
         final long startTime = System.currentTimeMillis();
         Set<Class<?>> serviceClassesNotRunningAnymore = new HashSet<>();
         while (serviceClasses.length != serviceClassesNotRunningAnymore.size()) {
-
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            long timeLeft = timeout - elapsedTime;
             for (Class serviceClass : serviceClasses) {
                 if (isServiceRunning(context, serviceClass)) {
-                    LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is still running.");
+                    LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is still running. (" + timeLeft + " ms left)");
                     break;
                 } else {
-                    LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is shutdown.");
+                    LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is shutdown. (" + timeLeft + " ms left)");
                     serviceClassesNotRunningAnymore.add(serviceClass);
                 }
             }
 
             try {
-                long elapsedTime = System.currentTimeMillis() - startTime;
                 if (timeout != -1 && elapsedTime > timeout) {
                     LOG.info("waitWhileServicesAreRunning(...) timed out, exiting now (" + timeout + "ms)");
                     break;

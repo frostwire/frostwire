@@ -183,7 +183,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         new Thread("shutdown-halt") {
             @Override
             public void run() {
-                SystemUtils.waitWhileServicesAreRunning(MainActivity.this, 5000, MusicPlaybackService.class, EngineService.class);
+                SystemUtils.waitWhileServicesAreRunning(MainActivity.this, 15000, MusicPlaybackService.class, EngineService.class);
                 LOG.info("MainActivity::shutdown()/shutdown-halt thread: android.os.Process.killProcess(" + android.os.Process.myPid() + ")");
                 android.os.Process.killProcess(android.os.Process.myPid());
             }

@@ -1236,9 +1236,7 @@ public class MusicPlaybackService extends Service {
      *                 otherwise.
      */
     private void openCurrentAndMaybeNext(final boolean openNext) {
-        LOG.info("openCurrentAndMaybeNext() waiting for synchronized(this)");
         synchronized (this) {
-            LOG.info("openCurrentAndMaybeNext() DONE waiting for synchronized(this)\n");
             closeCursor();
 
             if (mPlayListLen == 0 || mPlayList == null) {
