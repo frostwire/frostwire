@@ -145,10 +145,15 @@ public class EngineService extends Service implements IEngineService {
 
     private void enableComponents(boolean enable) {
         PackageManager pm = getPackageManager();
+
+        // receivers
         enableComponent(pm, EngineBroadcastReceiver.class, enable);
         enableComponent(pm, MediaButtonIntentReceiver.class, enable);
         enableComponent(pm, io.presage.receiver.NetworkChangeReceiver.class, enable);
         enableComponent(pm, io.presage.receiver.AlarmReceiver.class, enable);
+
+        // third party services
+        enableComponent(pm, io.presage.PresageService.class, enable);
     }
 
     private void enableComponent(PackageManager pm, Class<?> clazz, boolean enable) {
