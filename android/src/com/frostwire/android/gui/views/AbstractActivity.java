@@ -19,7 +19,7 @@ package com.frostwire.android.gui.views;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.res.Configuration;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -71,7 +71,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
     protected void onResume() {
         paused = false;
         super.onResume();
-        new OrientationEventListener(this) {
+        new OrientationEventListener(this, SensorManager.SENSOR_DELAY_NORMAL) {
             @Override
             public void onOrientationChanged(int orientation) {
                 UIUtils.ScreenOrientationLocker.onRotationRequested(AbstractActivity.this,  orientation);
