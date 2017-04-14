@@ -645,8 +645,6 @@
     <string name="mobile_data_saving">حفظ البيانات المتنقلة</string>
     <string name="data_saving_kill_http_warning_title">تحذير: المتشعب نقل في التقدم</string>
     <string name="lock_screen_orientation">قفل اتجاه الشاشة</string>
-    <string name="lock_screen_orientation_summary">الحفاظ على اتجاه الشاشة وجدت عند بدء تشغيل التطبيق. التغييرات فقط عند
-        الخروج وإعادة التشغيل
-    </string>
+    <string name="lock_screen_orientation_summary">الحفاظ على اتجاه الشاشة وجدت عند بدء تشغيل التطبيق. التغييرات فقط عند الخروج وإعادة التشغيل.</string>
 
 </resources>
