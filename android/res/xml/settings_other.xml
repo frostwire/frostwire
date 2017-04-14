@@ -36,6 +36,10 @@
         android:key="frostwire.prefs.gui.haptic_feedback_on"
         android:title="@string/haptic_feedback" />
     <android.support.v7.preference.CheckBoxPreference
+        android:key="frostwire.prefs.gui.lock_screen_orientation_on_start"
+        android:title="@string/lock_screen_orientation"
+        android:summary="@string/lock_screen_orientation_summary"/>
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.gui.distraction_free_search"
         android:summary="@string/distraction_free_search_results_summary"
         android:title="@string/distraction_free_search_results" />

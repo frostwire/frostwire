@@ -508,18 +508,6 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         videoSizeSetupDone = true;
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        //Disable rotation once the activity has started.
-        super.onConfigurationChanged(newConfig);
-        boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-        if (isPortrait && newConfig.orientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else if (!isPortrait && newConfig.orientation != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
-    }
-
     /**
      * Utility method: change the visibility for a bunch of views. Skips null views.
      */

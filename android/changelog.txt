@@ -1,5 +1,6 @@
-FrostWire 1.9.2 - APR/13/2017
+FrostWire 1.9.2 - APR/14/2017
  - New jlibtorrent 1.2.0.8
+ - New setting to lock the screen orientation of the app, on by default
  - Fixes issues preventing FrostWire to cleanly shutdown its services on Exit
  - Hides Android top status bar when previewing videos in full screen mode
  - Fixes video preview bug that would overlay ad and download button

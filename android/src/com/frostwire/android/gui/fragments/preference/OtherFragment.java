@@ -48,6 +48,7 @@ public final class OtherFragment extends AbstractPreferenceFragment {
     protected void initComponents() {
         setupPermanentStatusNotificationOption();
         setupHapticFeedback();
+        setupLockScreenOrientation();
         setupUXStatsOption();
         setupClearIndex();
     }
@@ -80,6 +81,21 @@ public final class OtherFragment extends AbstractPreferenceFragment {
                 public boolean onPreferenceClick(Preference preference) {
                     ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, cb.isChecked());
                     Engine.instance().getVibrator().onPreferenceChanged();
+                    return true;
+                }
+            });
+        }
+    }
+
+    private void setupLockScreenOrientation() {
+        final CheckBoxPreference cb = findPreference(Constants.PREF_KEY_GUI_LOCK_SCREEN_ORIENTATION_ON_START);
+        if (cb != null) {
+            cb.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    boolean enabled = cb.isChecked();
+                    ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_LOCK_SCREEN_ORIENTATION_ON_START,enabled);
+                    UIUtils.ScreenOrientationLocker.enable(getActivity(), enabled);
                     return true;
                 }
             });
