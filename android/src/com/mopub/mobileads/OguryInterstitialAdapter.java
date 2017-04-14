@@ -94,25 +94,40 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
         @Override
         public void onAdNotFound() {
+            if (interstitialListener == null) {
+                return;
+            }
             interstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
         }
 
         @Override
         public void onAdFound() {
+            if (interstitialListener == null) {
+                return;
+            }
             interstitialListener.onInterstitialLoaded();
         }
 
         @Override
         public void onAdClosed() {
+            if (interstitialListener == null) {
+                return;
+            }
             interstitialListener.onInterstitialDismissed();
         }
         @Override
         public void onAdError(int code) {
+            if (interstitialListener == null) {
+                return;
+            }
             interstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
         }
 
         @Override
         public void onAdDisplayed() {
+            if (interstitialListener == null) {
+                return;
+            }
             interstitialListener.onInterstitialShown();
         }
     }
