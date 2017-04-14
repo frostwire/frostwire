@@ -96,7 +96,7 @@ public class EngineService extends Service implements IEngineService {
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
 
-        enableReceivers(true);
+        enableComponents(true);
 
         initializePermanentNotificationUpdates();
 
@@ -110,7 +110,7 @@ public class EngineService extends Service implements IEngineService {
 
     private void shutdownSupport() {
         LOG.debug("shutdownSupport");
-        enableReceivers(false);
+        enableComponents(false);
         disablePermanentNotificationUpdates();
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
         stopServices(false);
@@ -143,15 +143,15 @@ public class EngineService extends Service implements IEngineService {
         }
     }
 
-    private void enableReceivers(boolean enable) {
+    private void enableComponents(boolean enable) {
         PackageManager pm = getPackageManager();
-        enableReceiver(pm, EngineBroadcastReceiver.class, enable);
-        enableReceiver(pm, MediaButtonIntentReceiver.class, enable);
-        enableReceiver(pm, io.presage.receiver.NetworkChangeReceiver.class, enable);
-        enableReceiver(pm, io.presage.receiver.AlarmReceiver.class, enable);
+        enableComponent(pm, EngineBroadcastReceiver.class, enable);
+        enableComponent(pm, MediaButtonIntentReceiver.class, enable);
+        enableComponent(pm, io.presage.receiver.NetworkChangeReceiver.class, enable);
+        enableComponent(pm, io.presage.receiver.AlarmReceiver.class, enable);
     }
 
-    private void enableReceiver(PackageManager pm, Class<?> clazz, boolean enable) {
+    private void enableComponent(PackageManager pm, Class<?> clazz, boolean enable) {
         int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
         ComponentName receiver = new ComponentName(this, clazz);
