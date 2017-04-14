@@ -644,4 +644,8 @@
     <string name="mobile_data_saving">Mobitel Spremanje podataka</string>
     <string name="data_saving_kill_http_warning_title">Upozorenje: http transferi u tijeku</string>
     <string name="fullscreen">puni zaslon</string>
+    <string name="lock_screen_orientation">Zaključavanje zaslona Orijentacija</string>
+    <string name="lock_screen_orientation_summary">Držite orijentacije zaslona naći kad se aplikacija pokrene. Promjene
+        samo na izlazu i ponovno pokretanje
+    </string>
 </resources>

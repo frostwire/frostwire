@@ -673,6 +673,6 @@
     <string name="vpn_drop_protection_summary">Protect your privacy. Automatically disable BitTorrent transfers unless an encrypted VPN connection is active</string>
     <string name="dismiss">Dismiss</string>
     <string name="fullscreen">fullscreen</string>
-    <string name="lock_screen_orientation">Lock Screen Orientation</string>
     <string name="lock_screen_orientation_summary">Keep the screen orientation found when the app starts. Changes only upon Exit and restart</string>
+    <string name="lock_screen_orientation">Lock Screen Orientation</string>
 </resources>

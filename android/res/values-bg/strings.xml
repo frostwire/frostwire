@@ -643,4 +643,8 @@
     <string name="mobile_data_saving">Мобилни данни спестяване</string>
     <string name="data_saving_kill_http_warning_title">Предупреждение: Http трансфери в прогрес</string>
     <string name="fullscreen">цял екран</string>
+    <string name="lock_screen_orientation">Заключване на екрана Ориентация</string>
+    <string name="lock_screen_orientation_summary">Дръжте ориентацията на екрана намери, когато приложението се
+        стартира. Промените само при излизане и рестартиране
+    </string>
 </resources>
