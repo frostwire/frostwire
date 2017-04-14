@@ -29,6 +29,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
+import com.frostwire.android.gui.util.ScreenOrientationLocker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
@@ -95,7 +96,7 @@ public final class OtherFragment extends AbstractPreferenceFragment {
                 public boolean onPreferenceClick(Preference preference) {
                     boolean enabled = cb.isChecked();
                     ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_LOCK_SCREEN_ORIENTATION_ON_START,enabled);
-                    UIUtils.ScreenOrientationLocker.enable(getActivity(), enabled);
+                    ScreenOrientationLocker.enable(getActivity(), enabled);
                     return true;
                 }
             });

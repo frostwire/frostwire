@@ -19,19 +19,17 @@ package com.frostwire.android.gui.views;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.util.ScreenOrientationLocker;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -71,7 +69,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
     protected void onResume() {
         paused = false;
         super.onResume();
-        UIUtils.ScreenOrientationLocker.onRotationRequested(AbstractActivity.this,  getWindowManager().getDefaultDisplay().getRotation());
+        ScreenOrientationLocker.onRotationRequested(AbstractActivity.this,  getWindowManager().getDefaultDisplay().getRotation());
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Looper;
@@ -69,8 +68,6 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-
-import static com.frostwire.android.gui.util.UIUtils.ScreenOrientationLocker.Orientation.UNSET;
 
 /**
  * @author gubatron
@@ -591,68 +588,6 @@ public final class UIUtils {
             } catch (Throwable e) {
                 LOG.warn("unable to set icons for overflow menu", e);
             }
-        }
-    }
-
-    public static class ScreenOrientationLocker {
-        private static Logger LOG = Logger.getLogger(ScreenOrientationLocker.class);
-        private static boolean ENABLED = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_LOCK_SCREEN_ORIENTATION_ON_START);
-
-        enum Orientation {
-            PORTRAIT(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT),
-            LANDSCAPE(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),
-            UNSET(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-            final int androidValue;
-            Orientation(int androidValue) {
-                this.androidValue = androidValue;
-            }
-            static Orientation fromDegrees(int degrees) {
-                switch (degrees) {
-                    case 0:
-                    case 180:
-                        return PORTRAIT;
-                    case 90:
-                    case 270:
-                        return LANDSCAPE;
-                    default:
-                        return UNSET;
-                }
-            }
-        }
-
-        private static Orientation initialOrientation = UNSET;
-
-        public static void enable(final Activity activity, boolean enabled) {
-            initialOrientation = UNSET;
-            ENABLED = enabled;
-            if (activity != null) {
-                int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-                onRotationRequested(activity, rotation);
-            }
-        }
-
-        public static void onRotationRequested(final Activity activity, int orientationInDegrees) {
-            Orientation newOrientation = Orientation.fromDegrees(orientationInDegrees);
-            if (newOrientation == UNSET) {
-                return;
-            }
-            if (initialOrientation == UNSET) {
-                setInitialRotation(activity, newOrientation);
-            }
-            if (ENABLED && newOrientation != initialOrientation) {
-                activity.setRequestedOrientation(initialOrientation.androidValue);
-            } else if (!ENABLED) {
-                activity.setRequestedOrientation(newOrientation.androidValue);
-            }
-        }
-
-        private static void setInitialRotation(final Activity activity, Orientation orientation) {
-            if (initialOrientation != UNSET || activity == null) {
-                LOG.info("setInitialRotation() aborted. Kept initialRotation="+initialOrientation+" , activity="+activity);
-                return;
-            }
-            initialOrientation = orientation;
-            LOG.info("setInitialRotation() set to " + initialOrientation);
         }
     }
 }
