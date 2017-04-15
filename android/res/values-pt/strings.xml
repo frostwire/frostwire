@@ -642,8 +642,6 @@
     <string name="data_saving_kill_http_warning_title">Aviso: transferências HTTP em andamento</string>
     <string name="fullscreen">tela cheia</string>
     <string name="lock_screen_orientation">Bloquear a orientação da tela</string>
-    <string name="lock_screen_orientation_summary">Manter a orientação da tela encontrada quando o aplicativo é
-        iniciado. Alterações somente ao sair e reiniciar
-    </string>
+    <string name="lock_screen_orientation_summary">Manter a orientação da tela encontrada quando o aplicativo é iniciado. Alterações somente ao sair e reiniciar</string>
 
 </resources>

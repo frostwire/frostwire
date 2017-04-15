@@ -643,9 +643,7 @@
     <string name="mobile_data_saving">Mobilné dátové sporiteľ</string>
     <string name="data_saving_kill_http_warning_title">Výstražné: Http prevody prebiehajúcej</string>
     <string name="fullscreen">celá obrazovka</string>
-    <string name="lock_screen_orientation_summary">Zachovať orientáciu obrazovky nájdený pri spustení aplikácie. Zmeny
-        len na výstupe a reštart
-    </string>
+    <string name="lock_screen_orientation_summary">Zachovať orientáciu obrazovky nájdený pri spustení aplikácie. Zmeny len na výstupe a reštart</string>
     <string name="lock_screen_orientation">Uzamknutie orientácie obrazovky</string>
 
 </resources>

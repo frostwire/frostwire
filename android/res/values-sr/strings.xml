@@ -649,8 +649,6 @@
     <string name="data_saving_kill_http_warning_title">Упозорење: хттп трансфери у току</string>
     <string name="fullscreen">цео екран</string>
     <string name="lock_screen_orientation">Лоцк положај екрана</string>
-    <string name="lock_screen_orientation_summary">Држите положај екрана наћи када се апликација покрене. Промене само
-        по изласку и рестарт
-    </string>
+    <string name="lock_screen_orientation_summary">Држите положај екрана наћи када се апликација покрене. Промене само по изласку и рестарт</string>
 
 </resources>

@@ -643,8 +643,6 @@
     <string name="mobile_data_saving">Mobil adatok mentése</string>
     <string name="data_saving_kill_http_warning_title">Figyelmeztetés: Http transzferek folyamatban</string>
     <string name="fullscreen">teljes képernyő</string>
-    <string name="lock_screen_orientation_summary">Tartsa a képernyő tájolását található, amikor az alkalmazás elindul.
-        Változások csak azt követően újraindítani
-    </string>
+    <string name="lock_screen_orientation_summary">Tartsa a képernyő tájolását található, amikor az alkalmazás elindul. Változások csak azt követően újraindítani</string>
     <string name="lock_screen_orientation">Képernyő lezárása orientációja</string>
 </resources>

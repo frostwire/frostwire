@@ -645,9 +645,7 @@
     <string name="mobile_data_saving">Mobil Veri Tasarrufu</string>
     <string name="data_saving_kill_http_warning_title">Uyarı: Http aktarımı devam ediyor</string>
     <string name="fullscreen">tam ekran</string>
-    <string name="lock_screen_orientation_summary">Uygulama başladığında ekran yönlendirmesini bulunmasını sağlayın.
-        Yalnızca Çıkış ve yeniden başlatıldığında değişiklik olur
-    </string>
+    <string name="lock_screen_orientation_summary">Uygulama başladığında ekran yönlendirmesini bulunmasını sağlayın. Yalnızca Çıkış ve yeniden başlatıldığında değişiklik olur</string>
     <string name="lock_screen_orientation">Ekran Yönünü Kilitleme</string>
 
 </resources>

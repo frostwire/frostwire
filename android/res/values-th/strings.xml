@@ -644,9 +644,6 @@
     <string name="data_saving_kill_http_warning_title">คำเตือน: http โอนในความคืบหน้า</string>
     <string name="fullscreen">เต็มจอ</string>
     <string name="lock_screen_orientation">ล็อคการวางแนวหน้าจอ</string>
-    <string name="lock_screen_orientation_summary">ให้วางแนวหน้าจอเมื่อเริ่มต้นแอพฯ
-        มีการเปลี่ยนแปลงเฉพาะเมื่อออกและรีสตาร์ท
-    </string>
-
+    <string name="lock_screen_orientation_summary">ให้วางแนวหน้าจอเมื่อเริ่มต้นแอพฯ มีการเปลี่ยนแปลงเฉพาะเมื่อออกและรีสตาร์ท</string>
 
 </resources>

@@ -644,8 +644,6 @@
     <string name="data_saving_kill_http_warning_title">Попередження: Http переклади в прогресі</string>
     <string name="fullscreen">повноекранний</string>
     <string name="lock_screen_orientation">Блокування екрану Орієнтація</string>
-    <string name="lock_screen_orientation_summary">Тримайте орієнтацію екрану знайдений під час запуску програми. Зміни
-        тільки після виходу і перезапуску
-    </string>
+    <string name="lock_screen_orientation_summary">Тримайте орієнтацію екрану знайдений під час запуску програми. Зміни тільки після виходу і перезапуску</string>
 
 </resources>

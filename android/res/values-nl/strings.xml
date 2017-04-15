@@ -643,8 +643,6 @@
     <string name="mobile_data_saving">Mobiele gegevens opslaan</string>
     <string name="data_saving_kill_http_warning_title">Waarschuwing: Http transfers in uitvoering</string>
     <string name="fullscreen">volledig scherm</string>
-    <string name="lock_screen_orientation_summary">Houd het scherm oriëntatie gevonden wanneer de app start. Wijzigingen
-        alleen op beëindigen en opnieuw starten
-    </string>
+    <string name="lock_screen_orientation_summary">Houd het scherm oriëntatie gevonden wanneer de app start. Wijzigingen alleen op beëindigen en opnieuw starten</string>
     <string name="lock_screen_orientation">Blokkeer de Schermoriëntatie</string>
 </resources>

@@ -646,7 +646,5 @@
     <string name="data_saving_kill_http_warning_title">Предупреждение: Http переводы в прогрессе</string>
     <string name="fullscreen">полноэкранный</string>
     <string name="lock_screen_orientation">Ориентация экрана блокировки</string>
-    <string name="lock_screen_orientation_summary">Сохраняйте ориентацию экрана, найденную при запуске приложения.
-        Изменения только после выхода и перезапуска
-    </string>
+    <string name="lock_screen_orientation_summary">Сохраняйте ориентацию экрана, найденную при запуске приложения. Изменения только после выхода и перезапуска</string>
 </resources>

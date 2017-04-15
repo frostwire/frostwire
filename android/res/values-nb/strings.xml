@@ -644,7 +644,5 @@
     <string name="data_saving_kill_http_warning_title">Advarsel: Http overføringer i fremgang</string>
     <string name="fullscreen">full skjerm</string>
     <string name="lock_screen_orientation">Lås skjerm Orientering</string>
-    <string name="lock_screen_orientation_summary">Hold skjermretningen funnet når programmet starter. Endringer kun ved
-        avslutning og omstart
-    </string>
+    <string name="lock_screen_orientation_summary">Hold skjermretningen funnet når programmet starter. Endringer kun ved avslutning og omstart</string>
 </resources>

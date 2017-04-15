@@ -615,7 +615,6 @@
     <string name="distraction_free_search_results">Distrazione Ricerca libera (beta)</string>
     <string name="help_translate_or_proofread_frostwire">Aiutare a tradurre o correggere le bozze FrostWire</string>
     <string name="changelog">Changelog</string>
-
     <string name="cloud_download_aborted_on_mobile_data">Impostazione corrente impedisce scaricano quando non è in rete Wifi</string>
     <string name="sharing_privacy_settings">Condivisione e opzioni di privacy</string>
     <string name="delete_started_torrents_summary">Eliminare i file .torrent dopo l\'inizio il download</string>
@@ -645,7 +644,5 @@
     <string name="data_saving_kill_http_warning_title">Attenzione: Http trasferimenti in corso</string>
     <string name="fullscreen">a schermo intero</string>
     <string name="lock_screen_orientation">Bloccare l\'orientamento dello schermo</string>
-    <string name="lock_screen_orientation_summary">Mantenere l\'orientamento dello schermo trovato quando si avvia
-        l\'applicazione. Le modifiche solo su Esci e riavviare
-    </string>
+    <string name="lock_screen_orientation_summary">Mantenere l\'orientamento dello schermo trovato quando si avvia l\'applicazione. Le modifiche solo su Esci e riavviare</string>
 </resources>

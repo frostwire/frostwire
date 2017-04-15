@@ -644,7 +644,5 @@
     <string name="data_saving_kill_http_warning_title">Varoitus: Http siirrot käynnissä</string>
     <string name="fullscreen">koko näyttö</string>
     <string name="lock_screen_orientation">Lukitse näyttö Suunta</string>
-    <string name="lock_screen_orientation_summary">Pidä näytön suunta löysi sovellus käynnistyy. Muutokset vain tullessa
-        ulos ja uudelleenkäynnistyksen
-    </string>
+    <string name="lock_screen_orientation_summary">Pidä näytön suunta löysi sovellus käynnistyy. Muutokset vain tullessa ulos ja uudelleenkäynnistyksen</string>
 </resources>

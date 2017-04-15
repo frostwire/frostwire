@@ -645,8 +645,6 @@
     <string name="mobile_data_saving">Ahorrador de datos móviles</string>
     <string name="data_saving_kill_http_warning_title">Advertencia: Transferencias HTTP en curso</string>
     <string name="fullscreen">pantalla completa</string>
-    <string name="lock_screen_orientation_summary">Mantener la orientación de la pantalla cuando se inicia la
-        aplicación. Cambiar sólo al salir y reiniciar
-    </string>
+    <string name="lock_screen_orientation_summary">Mantener la orientación de la pantalla cuando se inicia la aplicación. Cambiar sólo al salir y reiniciar</string>
     <string name="lock_screen_orientation">Bloquear la orientación de la pantalla</string>
 </resources>

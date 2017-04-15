@@ -642,9 +642,7 @@
     <string name="use_magnet_summary">На аснове магнітных спасылак, працуе толькі на Wi-Fi</string>
     <string name="mobile_data_saving">Мабільны захаванне дадзеных</string>
     <string name="data_saving_kill_http_warning_title">Папярэджанне: Http пераклады ў прагрэсе</string>
-    <string name="lock_screen_orientation_summary">Трымаеце арыентацыю экрана знойдзены пры запуску прыкладання. Змены
-        толькі пасля выхаду і перазапуску
-    </string>
+    <string name="lock_screen_orientation_summary">Трымаеце арыентацыю экрана знойдзены пры запуску прыкладання. Змены толькі пасля выхаду і перазапуску</string>
     <string name="lock_screen_orientation">Блакаванне экрана Арыентацыя</string>
 
 

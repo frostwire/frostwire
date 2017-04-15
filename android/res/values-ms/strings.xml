@@ -643,9 +643,7 @@
     <string name="mobile_data_saving">Data Mudah Alih Penjimatan</string>
     <string name="data_saving_kill_http_warning_title">Amaran: Http pemindahan dalam kemajuan</string>
     <string name="fullscreen">skrin penuh</string>
-    <string name="lock_screen_orientation_summary">Menjaga orientasi skrin ditemui apabila app bermula. Perubahan hanya
-        selepas Keluar dan mulakan semula
-    </string>
+    <string name="lock_screen_orientation_summary">Menjaga orientasi skrin ditemui apabila app bermula. Perubahan hanya selepas Keluar dan mulakan semula</string>
     <string name="lock_screen_orientation">Mengunci Orientasi skrin</string>
 
 </resources>
