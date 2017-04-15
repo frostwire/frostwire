@@ -18,108 +18,112 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/view_general_wizard_page_welcome_to_frostwire"
-        style="@style/WizardTitle"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/welcome_to_frostwire" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/view_general_wizard_page_title_horizontal_break"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/WizardDivider"/>
+        <TextView
+            android:id="@+id/view_general_wizard_page_welcome_to_frostwire"
+            style="@style/WizardTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/welcome_to_frostwire" />
 
-    <TextView
-        android:id="@+id/view_general_wizard_page_storage_path_title"
-        style="@style/WizardSubTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/storage_path" />
+        <TextView
+            android:id="@+id/view_general_wizard_page_title_horizontal_break"
+            style="@style/WizardDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/view_general_wizard_page_storage_path_textview"
-        style="@style/WizardText.Sub"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:key="frostwire.prefs.storage.path_asf"
-        android:text="/storage/emulated/0" />
+        <TextView
+            android:id="@+id/view_general_wizard_page_storage_path_title"
+            style="@style/WizardSubTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/storage_path" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/WizardDivider.Bottom"/>
+        <TextView
+            android:id="@+id/view_general_wizard_page_storage_path_textview"
+            style="@style/WizardText.Sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:key="frostwire.prefs.storage.path_asf"
+            android:text="/storage/emulated/0" />
 
-    <TextView
-        style="@style/WizardText.Header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/basic_blue_dark"
-        android:paddingTop="7dp"
-        android:paddingBottom="7dp"
-        android:text="@string/seeding_settings" />
+        <TextView
+            style="@style/WizardDivider.Bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-    <CheckBox
-        android:id="@+id/view_general_wizard_page_check_seed_finished_torrents"
-        style="@style/WizardSubTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="8dp"
-        android:text="@string/seed_finished_torrents" />
+        <TextView
+            style="@style/WizardText.Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/basic_blue_dark"
+            android:paddingBottom="7dp"
+            android:paddingTop="7dp"
+            android:text="@string/seeding_settings" />
 
-    <TextView
-        style="@style/WizardText.Sub"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/seeding_settings_explanation" />
+        <CheckBox
+            android:id="@+id/view_general_wizard_page_check_seed_finished_torrents"
+            style="@style/WizardSubTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/seed_finished_torrents" />
 
-    <CheckBox
-        android:id="@+id/view_general_wizard_page_check_seed_finished_torrents_wifi_only"
-        style="@style/WizardSubTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:text="@string/seed_finished_torrents_wifi_only" />
+        <TextView
+            style="@style/WizardText.Sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/seeding_settings_explanation" />
 
-    <TextView
-        style="@style/WizardText.Sub"
-        android:id="@+id/view_general_wizard_page_wifi_only_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="35dp"
-        android:textColor="@color/app_text_wizard_dark"
-        android:text="@string/seeding_wifi_settings_explanation" />
+        <CheckBox
+            android:id="@+id/view_general_wizard_page_check_seed_finished_torrents_wifi_only"
+            style="@style/WizardSubTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:text="@string/seed_finished_torrents_wifi_only" />
 
-    <TextView
-        style="@style/WizardText.Header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:background="@color/basic_blue_dark"
-        android:paddingTop="7dp"
-        android:paddingBottom="7dp"
-        android:text="@string/other_settings" />
+        <TextView
+            android:id="@+id/view_general_wizard_page_wifi_only_text"
+            style="@style/WizardText.Sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="35dp"
+            android:text="@string/seeding_wifi_settings_explanation"
+            android:textColor="@color/app_text_wizard_dark" />
 
-    <CheckBox
-        android:id="@+id/view_general_wizard_page_check_ux_stats"
-        style="@style/WizardSubTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/anonymous_usage_statistics" />
+        <TextView
+            style="@style/WizardText.Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:background="@color/basic_blue_dark"
+            android:paddingBottom="7dp"
+            android:paddingTop="7dp"
+            android:text="@string/other_settings" />
 
-    <TextView
-        style="@style/WizardText.Sub"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/anonymous_usage_statistics_summary" />
+        <CheckBox
+            android:id="@+id/view_general_wizard_page_check_ux_stats"
+            style="@style/WizardSubTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/anonymous_usage_statistics" />
 
-</LinearLayout>
+        <TextView
+            style="@style/WizardText.Sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/anonymous_usage_statistics_summary" />
+    </LinearLayout>
+</ScrollView>

@@ -135,7 +135,6 @@
         <activity
             android:name="com.frostwire.android.gui.activities.WizardActivity"
             android:label="@string/application_label"
-            android:screenOrientation="portrait"
             android:theme="@style/WizardActivity" />
         <activity
             android:name="com.frostwire.android.gui.activities.SettingsActivity"

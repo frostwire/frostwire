@@ -19,50 +19,50 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <com.frostwire.android.gui.views.ViewFlipper
         android:id="@+id/activity_wizard_view_flipper"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="5dp"
-        android:layout_weight="1.0" >
+        android:layout_weight="1.0">
 
         <com.frostwire.android.gui.views.GeneralWizardPage
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <com.frostwire.android.gui.views.IntentWizardPage
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.frostwire.android.gui.views.ViewFlipper>
 
     <LinearLayout
         android:id="@+id/activity_wizard_buttons"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/activity_wizard_button_previous"
-            android:theme="@style/Button"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_margin="5dp"
             android:layout_weight="0.5"
             android:text="@string/wizard_previous"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_margin="5dp" />
+            android:theme="@style/Button" />
 
         <Button
             android:id="@+id/activity_wizard_button_next"
-            android:theme="@style/Button"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_margin="5dp"
             android:layout_weight="0.5"
             android:text="@string/wizard_next"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_margin="5dp" />
+            android:theme="@style/Button" />
     </LinearLayout>
 
 </LinearLayout>
