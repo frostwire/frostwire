@@ -19,17 +19,20 @@ package com.frostwire.android.gui.views;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.ScreenOrientationLocker;
+import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -41,17 +44,18 @@ import java.util.List;
  */
 public abstract class AbstractActivity extends AppCompatActivity {
 
+    private Logger LOG = Logger.getLogger(AbstractActivity.class);
     private final int layoutResId;
     private final ArrayList<String> fragmentTags;
 
     private boolean paused;
     private View toolbarView;
+    private OrientationEventListener orientationEventListener;
 
 
     public AbstractActivity(int layoutResId) {
         this.layoutResId = layoutResId;
         this.fragmentTags = new ArrayList<>();
-
         this.paused = false;
     }
 
@@ -69,7 +73,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
     protected void onResume() {
         paused = false;
         super.onResume();
-        ScreenOrientationLocker.onRotationRequested(AbstractActivity.this,  getWindowManager().getDefaultDisplay().getRotation());
+        nudgeOrientationListener();
     }
 
     @Override
@@ -166,5 +170,16 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     protected final void setToolbarView(View view) {
         setToolbarView(view, Gravity.LEFT | Gravity.CENTER_VERTICAL);
+    }
+
+    public void nudgeOrientationListener() {
+        orientationEventListener = new OrientationEventListener(this, SensorManager.SENSOR_DELAY_NORMAL) {
+            @Override
+            public void onOrientationChanged(int orientation) {
+                LOG.info("onOrientationChanged() -> " + orientation);
+                ScreenOrientationLocker.onRotationRequested(AbstractActivity.this, orientation);
+            }
+        };
+        orientationEventListener.enable();
     }
 }

@@ -20,9 +20,14 @@ package com.frostwire.android.gui.util;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.graphics.Point;
+import android.view.Display;
+import android.view.OrientationEventListener;
+import android.view.Surface;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.util.Logger;
 
 /**
@@ -49,9 +54,12 @@ public final class ScreenOrientationLocker {
             switch (degrees) {
                 case 0:
                 case 180:
+                case Surface.ROTATION_180:
                     return PORTRAIT;
                 case 90:
                 case 270:
+                case Surface.ROTATION_90:
+                case Surface.ROTATION_270:
                     return LANDSCAPE;
                 default:
                     return UNSET;
@@ -64,14 +72,15 @@ public final class ScreenOrientationLocker {
     public static void enable(final Activity activity, boolean enabled) {
         initialOrientation = Orientation.UNSET;
         ENABLED = enabled;
-        if (activity != null) {
-            int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-            onRotationRequested(activity, rotation);
+        if (activity instanceof AbstractActivity) {
+            ((AbstractActivity) activity).nudgeOrientationListener();
+
         }
     }
 
     public static void onRotationRequested(final Activity activity, int orientationInDegrees) {
         Orientation newOrientation = Orientation.fromDegrees(orientationInDegrees);
+        LOG.info("onRotationRequested() degrees="+orientationInDegrees + " -> " + newOrientation);
         if (newOrientation == Orientation.UNSET) {
             return;
         }

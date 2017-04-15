@@ -19,8 +19,10 @@ package com.frostwire.android.gui.fragments.preference;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.hardware.SensorManager;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
+import android.view.OrientationEventListener;
 import android.view.View;
 
 import com.frostwire.android.R;
@@ -31,6 +33,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.util.ScreenOrientationLocker;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
 import com.frostwire.uxstats.UXStats;
