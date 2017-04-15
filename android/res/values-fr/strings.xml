@@ -644,8 +644,6 @@
     <string name="mobile_data_saving">Économie de données mobile</string>
     <string name="data_saving_kill_http_warning_title">Avertissement: transferts HTTP en cours</string>
     <string name="fullscreen">plein écran</string>
-    <string name="lock_screen_orientation_summary">Gardez l\'orientation de l\'écran détectée lorsque l\'application
-        démarre. Modifications uniquement lors de la sortie et redémarrage
-    </string>
+    <string name="lock_screen_orientation_summary">Gardez l\'orientation de l\'écran détectée lorsque l\'application démarre. Modifications uniquement lors de la sortie et redémarrage</string>
     <string name="lock_screen_orientation">Verrouiller l\'orientation de l\'écran</string>
 </resources>

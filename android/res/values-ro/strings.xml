@@ -643,9 +643,7 @@
     <string name="mobile_data_saving">Salvarea datelor mobile</string>
     <string name="data_saving_kill_http_warning_title">Atenție: Http transferurile în curs de desfășurare</string>
     <string name="fullscreen">ecran complet</string>
-    <string name="lock_screen_orientation_summary">Păstrați orientarea ecranului găsit atunci când pornește aplicația.
-        Modificări numai la ieșire și repornire
-    </string>
+    <string name="lock_screen_orientation_summary">Păstrați orientarea ecranului găsit atunci când pornește aplicația. Modificări numai la ieșire și repornire</string>
     <string name="lock_screen_orientation">Blocarea orientării ecranului</string>
 
 </resources>

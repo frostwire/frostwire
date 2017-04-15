@@ -644,7 +644,5 @@
     <string name="data_saving_kill_http_warning_title">Advarsel: Http overførsler igangværende</string>
     <string name="fullscreen">fuld skærm</string>
     <string name="lock_screen_orientation">Lås skærmretningen</string>
-    <string name="lock_screen_orientation_summary">Hold skærmen orientering fundet, når den app starter. Ændringer kun
-        ved udrejse og genstart
-    </string>
+    <string name="lock_screen_orientation_summary">Hold skærmen orientering fundet, når den app starter. Ændringer kun ved udrejse og genstart</string>
 </resources>

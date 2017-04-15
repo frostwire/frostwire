@@ -644,7 +644,5 @@
     <string name="data_saving_kill_http_warning_title">चेतावनी: प्रगति में HTTP स्थानान्तरण</string>
     <string name="fullscreen">पूर्ण स्क्रीन</string>
     <string name="lock_screen_orientation">लॉक स्क्रीन ओरिएंटेशन</string>
-    <string name="lock_screen_orientation_summary">ऐप शुरू होने पर स्क्रीन अभिविन्यास रखो। केवल बाहर निकलें और पुनः आरंभ
-        करने पर परिवर्तन
-    </string>
+    <string name="lock_screen_orientation_summary">ऐप शुरू होने पर स्क्रीन अभिविन्यास रखो। केवल बाहर निकलें और पुनः आरंभ करने पर परिवर्तन</string>
 </resources>

@@ -643,9 +643,7 @@
     <string name="mobile_data_saving">Den mobila data Besparing</string>
     <string name="data_saving_kill_http_warning_title">Varning: Http överföringar pågår</string>
     <string name="fullscreen">fullskärm</string>
-    <string name="lock_screen_orientation_summary">Håll skärmorientering hittades när appen startar. Förändringar endast
-        vid Exit och starta om
-    </string>
+    <string name="lock_screen_orientation_summary">Håll skärmorientering hittades när appen startar. Förändringar endast vid Exit och starta om</string>
     <string name="lock_screen_orientation">Låsskärmen Orientering</string>
 
 </resources>

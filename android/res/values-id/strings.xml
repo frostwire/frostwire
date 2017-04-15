@@ -615,8 +615,6 @@
     <string name="distraction_free_search_results">Cari tanpa gangguan (beta)</string>
     <string name="help_translate_or_proofread_frostwire">Membantu menerjemahkan atau mengoreksi FrostWire</string>
     <string name="changelog">Changelog</string>
-
-
     <string name="cloud_download_aborted_on_mobile_data">Pengaturan arus mencegah download bila tidak pada jaringan Wifi</string>
     <string name="sharing_privacy_settings">Berbagi dan Privasi</string>
     <string name="delete_started_torrents_summary">Hapus file torrent setelah mulai men-download</string>
@@ -646,7 +644,5 @@
     <string name="data_saving_kill_http_warning_title">Peringatan: Http transfer berlangsung</string>
     <string name="fullscreen">layar penuh</string>
     <string name="lock_screen_orientation">Kunci layar Orientasi</string>
-    <string name="lock_screen_orientation_summary">Menjaga orientasi layar ditemukan ketika aplikasi dimulai. Perubahan
-        hanya pada Keluar dan Restart
-    </string>
+    <string name="lock_screen_orientation_summary">Menjaga orientasi layar ditemukan ketika aplikasi dimulai. Perubahan hanya pada Keluar dan Restart</string>
 </resources>

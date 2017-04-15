@@ -646,7 +646,5 @@
     <string name="data_saving_kill_http_warning_title">Προειδοποίηση: http μεταφορές σε εξέλιξη</string>
     <string name="fullscreen">πλήρους οθόνης</string>
     <string name="lock_screen_orientation">Κλείδωμα προσανατολισμού οθόνης</string>
-    <string name="lock_screen_orientation_summary">Κρατήστε τον προσανατολισμό της οθόνης που βρέθηκαν κατά την έναρξη
-        της εφαρμογής. Αλλαγές μόνο κατά την έξοδο και επανεκκίνηση
-    </string>
+    <string name="lock_screen_orientation_summary">Κρατήστε τον προσανατολισμό της οθόνης που βρέθηκαν κατά την έναρξη της εφαρμογής. Αλλαγές μόνο κατά την έξοδο και επανεκκίνηση</string>
 </resources>
