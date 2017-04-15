@@ -19,7 +19,6 @@ package com.frostwire.android.gui.views;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,7 +30,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.util.ScreenOrientationLocker;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
@@ -73,7 +71,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
     protected void onResume() {
         paused = false;
         super.onResume();
-        nudgeOrientationListener();
     }
 
     @Override
@@ -170,16 +167,5 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     protected final void setToolbarView(View view) {
         setToolbarView(view, Gravity.LEFT | Gravity.CENTER_VERTICAL);
-    }
-
-    public void nudgeOrientationListener() {
-        orientationEventListener = new OrientationEventListener(this, SensorManager.SENSOR_DELAY_NORMAL) {
-            @Override
-            public void onOrientationChanged(int orientation) {
-                LOG.info("onOrientationChanged() -> " + orientation);
-                ScreenOrientationLocker.onRotationRequested(AbstractActivity.this, orientation);
-            }
-        };
-        orientationEventListener.enable();
     }
 }

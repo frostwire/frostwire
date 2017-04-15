@@ -643,6 +643,4 @@
     <string name="mobile_data_saving">Điện thoại di động tiết kiệm dữ liệu</string>
     <string name="data_saving_kill_http_warning_title">Cảnh báo: Http chuyển in progress</string>
     <string name="fullscreen">toàn màn hình</string>
-    <string name="lock_screen_orientation">Định hướng màn hình khóa</string>
-    <string name="lock_screen_orientation_summary">Giữ định hướng màn hình tìm thấy khi ứng dụng khởi động. Thay đổi chỉ khi Thoát và khởi động lại</string>
 </resources>

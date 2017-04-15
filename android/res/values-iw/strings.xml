@@ -643,6 +643,4 @@
     <string name="mobile_data_saving">שמירת נתונים ניידת</string>
     <string name="data_saving_kill_http_warning_title">העברות Http בביצוע: אזהרה</string>
     <string name="fullscreen">מסך מלא</string>
-    <string name="lock_screen_orientation">כיוון מסך נעילה</string>
-    <string name="lock_screen_orientation_summary">השאר את כיוון המסך כאשר היישום מתחיל. משתנה רק עם יציאה והפעלה מחדש</string>
 </resources>

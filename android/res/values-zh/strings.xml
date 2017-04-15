@@ -650,7 +650,4 @@
     <string name="mobile_data_saving">移动数据保存</string>
     <string name="data_saving_kill_http_warning_title">警告：Http正在进行传输</string>
     <string name="fullscreen">全屏</string>
-    <string name="lock_screen_orientation_summary">保持在应用程序启动时找到的屏幕方向。 仅在退出并重新启动时进行更改</string>
-    <string name="lock_screen_orientation">锁定屏幕方向</string>
-
 </resources>
