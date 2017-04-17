@@ -29,6 +29,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.Checkable;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Filter;
@@ -497,6 +498,9 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
                 checkbox.setTag(item);
                 checkbox.setOnCheckedChangeListener(checkboxOnCheckedChangeListener);
             }
+        }
+        if (view instanceof Checkable) {
+            ((Checkable) view).setChecked(checked.contains(item));
         }
     }
 
