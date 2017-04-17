@@ -1440,7 +1440,7 @@ public final class MusicUtils {
         subMenu.clearHeader();
         if (showFavorites) {
             subMenu.add(groupId, FragmentMenuItems.ADD_TO_FAVORITES, Menu.NONE,
-                    R.string.add_to_favorites);
+                    R.string.add_to_favorites).setIcon(R.drawable.contextmenu_icon_favorite);
         }
         subMenu.add(groupId, FragmentMenuItems.NEW_PLAYLIST, Menu.NONE, R.string.new_empty_playlist)
                 .setIcon(R.drawable.contextmenu_icon_playlist_add_dark);
@@ -1452,7 +1452,7 @@ public final class MusicUtils {
                 if (name != null) {
                     intent.putExtra("playlist", getIdForPlaylist(context, name));
                     subMenu.add(groupId, FragmentMenuItems.PLAYLIST_SELECTED, Menu.NONE,
-                            name).setIntent(intent);
+                            name).setIntent(intent).setIcon(R.drawable.contextmenu_icon_add_to_existing_playlist_dark);
                 }
                 cursor.moveToNext();
             }
@@ -1460,6 +1460,8 @@ public final class MusicUtils {
         if (cursor != null) {
             cursor.close();
         }
+
+        UIUtils.setOptionalIconsVisible(subMenu, true);
     }
 
     /**
