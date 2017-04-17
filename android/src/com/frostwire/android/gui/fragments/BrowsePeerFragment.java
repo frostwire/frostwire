@@ -666,6 +666,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             this.mode = mode;
             this.menu = menu;
             mode.getMenuInflater().inflate(R.menu.fragment_browse_peer_action_mode_menu, menu);
+            UIUtils.setOptionalIconsVisible(menu, true);
             return true;
         }
 
