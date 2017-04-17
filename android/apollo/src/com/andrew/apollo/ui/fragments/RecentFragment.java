@@ -52,7 +52,7 @@ public final class RecentFragment extends BaseAlbumFragment {
         super.onCreateContextMenu(menu, v, menuInfo);
         // Remove the album from the list
         menu.add(Fragments.RECENT_FRAGMENT_GROUP_ID, FragmentMenuItems.REMOVE_FROM_RECENT, Menu.NONE,
-                getString(R.string.context_menu_remove_from_recent));
+                getString(R.string.context_menu_remove_from_recent)).setIcon(R.drawable.contextmenu_icon_remove_transfer);
     }
 
     @Override
