@@ -234,32 +234,39 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
         // Play the selected songs
         menu.add(GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE, getString(R.string.context_menu_play_selection))
-                .setIcon(R.drawable.app_icon);
+                .setIcon(R.drawable.contextmenu_icon_play);
 
         // Play the next song
-        menu.add(GROUP_ID, FragmentMenuItems.PLAY_NEXT, Menu.NONE, getString(R.string.context_menu_play_next));
+        menu.add(GROUP_ID, FragmentMenuItems.PLAY_NEXT, Menu.NONE, getString(R.string.context_menu_play_next))
+                .setIcon(R.drawable.contextmenu_icon_next);
 
         // Add the song/album to the queue
-        menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_QUEUE, Menu.NONE, getString(R.string.add_to_queue));
+        menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_QUEUE, Menu.NONE, getString(R.string.add_to_queue))
+                .setIcon(R.drawable.contextmenu_icon_queue_add);
 
         // Add the song to favorite's playlist
-        menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_FAVORITES, Menu.NONE, R.string.add_to_favorites);
+        menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_FAVORITES, Menu.NONE, R.string.add_to_favorites)
+                .setIcon(R.drawable.contextmenu_icon_favorite);
 
         // Add the song/album to a playlist
         final SubMenu subMenu =
-                menu.addSubMenu(GROUP_ID, FragmentMenuItems.ADD_TO_PLAYLIST, Menu.NONE, R.string.add_to_playlist);
+                menu.addSubMenu(GROUP_ID, FragmentMenuItems.ADD_TO_PLAYLIST, Menu.NONE, R.string.add_to_playlist)
+                        .setIcon(R.drawable.contextmenu_icon_add_to_existing_playlist_dark);
         MusicUtils.makePlaylistMenu(getActivity(), GROUP_ID, subMenu, true);
 
         if (mItem instanceof Song) {
-            menu.add(GROUP_ID, FragmentMenuItems.USE_AS_RINGTONE, Menu.NONE, getString(R.string.context_menu_use_as_ringtone));
+            menu.add(GROUP_ID, FragmentMenuItems.USE_AS_RINGTONE, Menu.NONE, getString(R.string.context_menu_use_as_ringtone))
+                    .setIcon(R.drawable.contextmenu_icon_ringtone);
         }
 
         // More by artist
-        menu.add(GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE, getString(R.string.context_menu_more_by_artist));
+        menu.add(GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE, getString(R.string.context_menu_more_by_artist))
+                .setIcon(R.drawable.contextmenu_icon_artist);
 
         // Delete the album
-        menu.add(GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE,
-                getString(R.string.context_menu_delete));
+        menu.add(GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE, getString(R.string.context_menu_delete))
+                .setIcon(R.drawable.contextmenu_icon_trash);
+
     }
 
     @Override

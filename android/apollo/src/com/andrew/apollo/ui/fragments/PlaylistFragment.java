@@ -45,6 +45,7 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 
 import java.util.List;
@@ -67,6 +68,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
     public void onCreateContextMenu(final ContextMenu menu, final View v,
                                     final ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+        UIUtils.setOptionalIconsVisible(menu, true);
         // Get the position of the selected item
         final AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
         final int mPosition = info.position;
@@ -75,10 +77,12 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         mItem = mAdapter.getItem(mPosition);
 
         // Play the playlist
-        menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE, R.string.context_menu_play_selection);
+        menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE, R.string.context_menu_play_selection)
+                .setIcon(R.drawable.contextmenu_icon_play);
 
         // Add the playlist to the queue
-        menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.ADD_TO_QUEUE, Menu.NONE, R.string.add_to_queue);
+        menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.ADD_TO_QUEUE, Menu.NONE, R.string.add_to_queue)
+                .setIcon(R.drawable.contextmenu_icon_queue_add);
 
         // Delete and rename (user made playlists)
         if (info.position > 1) {
