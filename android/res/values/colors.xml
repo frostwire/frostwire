@@ -33,7 +33,7 @@
     <color name="basic_red">#ff0000</color>
     <color name="basic_yellow">#ffe16a</color>
     <color name="basic_gray_light">#F2F2F2</color>
-    <color name="basic_gray_medium">#e2e2e2</color>
+    <color name="basic_gray_medium">#e7e7e7</color>
     <color name="basic_gray_dark">#b5b5b5</color>
     <color name="basic_gray_text_dark">#2b2b2b</color>
     <color name="basic_gray_text_medium">#686868</color>
@@ -51,7 +51,7 @@
     <color name="app_toolbar_background_bottom">@color/basic_blue_dark_highlight</color>
     <color name="app_selection_background">@color/basic_gray_light</color>
     <color name="app_rich_notification_background">@color/basic_yellow</color>
-    <color name="app_browse_thumbnail_background">@color/basic_gray_light</color>
+    <color name="app_browse_thumbnail_background">@color/basic_gray_medium</color>
 
     <!-- Text Colors -->
     <color name="app_text_primary">@color/basic_gray_text_dark</color>
