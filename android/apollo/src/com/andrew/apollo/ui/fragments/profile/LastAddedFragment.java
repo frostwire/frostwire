@@ -66,16 +66,6 @@ public final class LastAddedFragment extends ApolloFragment<ProfileSongAdapter, 
     }
 
     @Override
-    public void onCreateContextMenu(final ContextMenu menu, final View v,
-                                    final ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        // View more content by the song artist
-        menu.add(Fragments.LAST_ADDED_PROFILE_FRAGMENT_GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE,
-                getString(R.string.context_menu_more_by_artist));
-    }
-
-    @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
                             final long id) {
         MusicUtils.playAllFromUserItemClick(mAdapter, position);
