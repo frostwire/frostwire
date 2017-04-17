@@ -74,7 +74,7 @@ public final class FavoriteFragment extends ApolloFragment<ProfileSongAdapter, S
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.removeItem(FragmentMenuItems.ADD_TO_FAVORITES);
-        menu.add(Fragments.FAVORITE_PROFILE_FRAGMENT_GROUP_ID, FragmentMenuItems.REMOVE_FROM_FAVORITES, Menu.NONE, getString(R.string.remove_from_favorites));
+        menu.add(Fragments.FAVORITE_PROFILE_FRAGMENT_GROUP_ID, FragmentMenuItems.REMOVE_FROM_FAVORITES, Menu.NONE, getString(R.string.remove_from_favorites)).setIcon(R.drawable.contextmenu_icon_remove_transfer);
     }
 
     @Override
