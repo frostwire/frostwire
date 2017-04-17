@@ -28,7 +28,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.text.Html;
@@ -558,10 +557,6 @@ public final class UIUtils {
             }
         }
         ctx.sendBroadcast(intent);
-    }
-
-    public static boolean inUIThread() {
-        return Looper.myLooper() == Looper.getMainLooper();
     }
 
     public static int randomPitchResId(boolean avoidSupportPitches) {
