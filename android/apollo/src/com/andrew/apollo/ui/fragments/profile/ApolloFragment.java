@@ -59,6 +59,7 @@ import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.viewpagerindicator.TitlePageIndicator;
 
@@ -184,6 +185,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     public void onCreateContextMenu(final ContextMenu menu, final View v,
                                     final ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+        UIUtils.setOptionalIconsVisible(menu, true);
 
         // Get the position of the selected item
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
@@ -231,7 +233,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         }
 
         // Play the selected songs
-        menu.add(GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE, getString(R.string.context_menu_play_selection));
+        menu.add(GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE, getString(R.string.context_menu_play_selection))
+                .setIcon(R.drawable.app_icon);
 
         // Play the next song
         menu.add(GROUP_ID, FragmentMenuItems.PLAY_NEXT, Menu.NONE, getString(R.string.context_menu_play_next));

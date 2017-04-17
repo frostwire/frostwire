@@ -62,6 +62,7 @@ import com.frostwire.uxstats.UXStats;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.NumberFormat;
 import java.util.List;
@@ -582,6 +583,18 @@ public final class UIUtils {
                 }
             } catch (Throwable e) {
                 LOG.warn("unable to set icons for overflow menu", e);
+            }
+        }
+
+        if (menu != null && menuClass.getSimpleName().equals("ContextMenuBuilder")) {
+            try {
+                Field f = menuClass.getSuperclass().getDeclaredField("mOptionalIconsVisible");
+                if (f != null) {
+                    f.setAccessible(true);
+                    f.set(menu, visible);
+                }
+            } catch (Throwable e) {
+                LOG.warn("unable to set icons for context menu", e);
             }
         }
     }
