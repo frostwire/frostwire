@@ -246,7 +246,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
         // Add the song to favorite's playlist
         menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_FAVORITES, Menu.NONE, R.string.add_to_favorites)
-            .setIcon(R.drawable.contextmenu_icon_favorite);
+                .setIcon(R.drawable.contextmenu_icon_favorite);
 
         // Add the song/album to a playlist
         final SubMenu subMenu =
@@ -265,7 +265,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
         // Delete the album
         menu.add(GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE, getString(R.string.context_menu_delete))
-               .setIcon(R.drawable.contextmenu_icon_trash);
+                .setIcon(R.drawable.contextmenu_icon_trash);
 
     }
 

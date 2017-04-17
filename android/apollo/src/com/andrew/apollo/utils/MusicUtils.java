@@ -1442,7 +1442,8 @@ public final class MusicUtils {
             subMenu.add(groupId, FragmentMenuItems.ADD_TO_FAVORITES, Menu.NONE,
                     R.string.add_to_favorites);
         }
-        subMenu.add(groupId, FragmentMenuItems.NEW_PLAYLIST, Menu.NONE, R.string.new_empty_playlist);
+        subMenu.add(groupId, FragmentMenuItems.NEW_PLAYLIST, Menu.NONE, R.string.new_empty_playlist)
+                .setIcon(R.drawable.contextmenu_icon_playlist_add_dark);
         Cursor cursor = PlaylistLoader.makePlaylistCursor(context);
         if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
