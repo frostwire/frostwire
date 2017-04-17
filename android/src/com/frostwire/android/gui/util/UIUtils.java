@@ -572,9 +572,16 @@ public final class UIUtils {
 
     public static void setOptionalIconsVisible(Menu menu, boolean visible) {
         Class menuClass = menu.getClass();
-        if (menu != null && menuClass.getSimpleName().equals("MenuBuilder")) {
+        String className = menuClass.getSimpleName();
+        if (menu != null && (className.equals("MenuBuilder") || className.equals("SubMenuBuilder"))) {
             try {
-                Method m = menuClass.getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                Method m = null;
+                if (className.equals("MenuBuilder")) {
+                    m = menuClass.getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                } else if (className.equals("SubMenuBuilder")) {
+                    m = menuClass.getSuperclass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                }
+
                 if (m != null) {
                     m.setAccessible(true);
                     m.invoke(menu, visible);
@@ -586,7 +593,7 @@ public final class UIUtils {
             }
         }
 
-        if (menu != null && menuClass.getSimpleName().equals("ContextMenuBuilder")) {
+        if (menu != null && className.equals("ContextMenuBuilder")) {
             try {
                 Field f = menuClass.getSuperclass().getDeclaredField("mOptionalIconsVisible");
                 if (f != null) {
