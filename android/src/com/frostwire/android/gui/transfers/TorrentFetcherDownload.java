@@ -267,7 +267,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                     // use our http client, since we can handle referer
                     data = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(uri, 30000, referrer);
                 } else {
-                    data = BTEngine.getInstance().fetchMagnet(uri, 30);
+                    data = BTEngine.getInstance().fetchMagnet(uri, 30, true);
                 }
 
                 if (state == TransferState.CANCELED) {
