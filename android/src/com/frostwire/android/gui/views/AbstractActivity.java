@@ -184,7 +184,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     /**
      * This settings is application wide and apply to all activities and
-     * fragments that use our internal abstract framework. This enable
+     * fragments that use our internal abstract activity. This enable
      * or disable the menu icons for both options and context menu.
      *
      * @param visible if icons are visible or not
@@ -193,7 +193,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
         menuIconsVisible = visible;
     }
 
-    static void setMenuIconsVisible(Menu menu) {
+    private static void setMenuIconsVisible(Menu menu) {
         if (menu == null) { // in case the framework changes
             return;
         }
