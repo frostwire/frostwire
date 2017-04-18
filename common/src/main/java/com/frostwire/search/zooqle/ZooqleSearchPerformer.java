@@ -18,15 +18,10 @@
 
 package com.frostwire.search.zooqle;
 
-import com.frostwire.regex.Matcher;
-import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 import com.frostwire.util.Logger;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * @author aldenml
@@ -46,7 +41,7 @@ public class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSea
             "href=\"/download/(?<torrent>.*?)\\.torrent\"";
 
     public ZooqleSearchPerformer(String domainName, long token, String keywords, int timeout) {
-        super(domainName, token, keywords, timeout, 1, 2, MAX_RESULTS, PRELIMINARY_RESULTS_REGEX, HTML_DETAIL_REGEX);
+        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, PRELIMINARY_RESULTS_REGEX, HTML_DETAIL_REGEX);
     }
 
     @Override
@@ -94,13 +89,14 @@ public class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSea
 
     @Override
     protected int htmlSuffixOffset(String html) {
-        int offset = html.indexOf("Please leave comment");
+        int offset = html.indexOf("Contact & Info");
         if (offset == -1) {
             return super.htmlSuffixOffset(html);
         }
         return offset;
     }
 
+    /**
     public static void main(String[] args) throws Throwable {
         byte[] preliminaryResultsBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/zooqle_preliminary.html"));
         String preliminaryResultsString = new String(preliminaryResultsBytes,"utf-8");
@@ -137,4 +133,5 @@ public class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSea
         }
         System.out.println("-done-");
     }
+     */
 }
