@@ -37,8 +37,6 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
             "<div class=\"col-md-12.*?<h1>\\n(?<filename>.*?) </h1>.*?" +
             // creationtime
             "<td>Added:</td>.*?<td>(?<creationtime>.*?)</td>.*?" +
-            // seeds
-            "<td>(?<seeds>\\d+) seeders.*?" +
             // infohash
             "<td>Hash:</td>.*?<td>(?<infohash>[A-Fa-f0-9]{40})</td>.*?" +
             // size
@@ -74,7 +72,6 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
     @Override
     protected MonovaSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         MonovaSearchResult r = new MonovaSearchResult(sr.getDetailsUrl(), matcher);
-        // filter out magnets
-        return !r.getTorrentUrl().contains("magnet") ? r : null;
+        return r.getTorrentUrl().contains("magnet") ? r : null;
     }
 }

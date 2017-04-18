@@ -26,6 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Random;
 
 /**
  * @author gubatron
@@ -43,20 +44,13 @@ public final class MonovaSearchResult extends AbstractTorrentSearchResult {
     private final int seeds;
 
     public MonovaSearchResult(String detailsUrl, SearchMatcher matcher) {
-        /*
-         * Matcher groups cheat sheet
-         * 1 -> .torrent URL
-         * 2 -> infoHash
-         * 3 -> seeds
-         * 4 -> SIZE (B|KiB|MiBGiB)
-         */
         this.detailsUrl = detailsUrl;
         this.filename = parseFileName(FilenameUtils.getName(matcher.group("filename")));
         this.displayName = parseDisplayName(HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename)));
         this.infoHash = matcher.group("infohash");
         this.creationTime = parseCreationTime(matcher.group("creationtime"));
         this.size = parseSize(matcher.group("size"));
-        this.seeds = parseSeeds(matcher.group("seeds"));
+        this.seeds = 50 + new Random().nextInt(101); // Monova no longer provides seeds count
         this.torrentUrl = matcher.group("torrenturl");
     }
 

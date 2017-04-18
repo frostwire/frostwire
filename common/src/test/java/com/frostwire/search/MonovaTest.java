@@ -19,19 +19,24 @@ package com.frostwire.search;
 
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.monova.MonovaSearchPerformer;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 
 /**
+ * NOTE: To test from IntelliJ, open the 'common' project as a gradle project.
+ * Build the gradle project and run the 'test' task.
  * @author gubatron
  * @author aldenml
  */
 public class MonovaTest {
 
+    private static final String testKeyword = "<some keyword here when you test>";
+
     @Test
     public void testRegex() throws IOException {
-        MonovaSearchPerformer p = (MonovaSearchPerformer) SearchManager.MONOVA.newPerformer(0, "<keyword>");
+        MonovaSearchPerformer p = (MonovaSearchPerformer) SearchManager.MONOVA.newPerformer(0, testKeyword);
 
         String url = p.getUrl(0, p.getEncodedKeywords());
         System.out.println(url);
@@ -48,23 +53,23 @@ public class MonovaTest {
 
     @Test
     public void testDetailsRegex() throws IOException {
-        MonovaSearchPerformer p = (MonovaSearchPerformer) SearchManager.MONOVA.newPerformer(0, "<keyword>");
+        MonovaSearchPerformer p = (MonovaSearchPerformer) SearchManager.MONOVA.newPerformer(0, testKeyword);
 
-        String url = "<url>";
+        String url = "<some monova page url when you test here>";
         String page = p.fetch(url);
         System.out.println(page);
 
         Pattern pattern = p.getDetailsPattern();
         SearchMatcher matcher = SearchMatcher.from(pattern.matcher(page));
 
-        if (matcher.find()) {
+        boolean matcher_found = matcher.find();
+        if (matcher_found) {
             System.out.println("group filename: [" + matcher.group("filename") + "]");
             System.out.println("group creationtime: [" + matcher.group("creationtime") + "]");
-            System.out.println("group seeds: [" + matcher.group("seeds") + "]");
             System.out.println("group infohash: [" + matcher.group("infohash") + "]");
             System.out.println("group size: [" + matcher.group("size") + "]");
-        } else {
-            System.out.println("No detail matched.");
+            System.out.println("group torrenturl: [" + matcher.group("torrenturl") + "]");
         }
+        Assert.assertTrue("No detail matched", matcher_found);
     }
 }
