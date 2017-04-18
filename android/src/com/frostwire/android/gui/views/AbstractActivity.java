@@ -20,7 +20,10 @@ package com.frostwire.android.gui.views;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Gravity;
@@ -138,6 +141,12 @@ public abstract class AbstractActivity extends AppCompatActivity {
         setMenuIconsVisible(menu);
     }
 
+    @Nullable
+    @Override
+    public ActionMode startSupportActionMode(@NonNull ActionMode.Callback callback) {
+        return super.startSupportActionMode(new ActionModeCallback(callback));
+    }
+
     protected void initComponents(Bundle savedInstanceState) {
     }
 
@@ -226,6 +235,37 @@ public abstract class AbstractActivity extends AppCompatActivity {
         } catch (Throwable e) {
             // ignore, unable to set icons for the menu, but visual
             // will reveal that a fix is necessary
+        }
+    }
+
+    private static final class ActionModeCallback implements ActionMode.Callback {
+
+        private ActionMode.Callback cb;
+
+        private ActionModeCallback(ActionMode.Callback cb) {
+            this.cb = cb;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            boolean r = cb.onCreateActionMode(mode, menu);
+            setMenuIconsVisible(menu);
+            return r;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return cb.onPrepareActionMode(mode, menu);
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            return cb.onActionItemClicked(mode, item);
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            cb.onDestroyActionMode(mode);
         }
     }
 }
