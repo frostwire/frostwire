@@ -78,7 +78,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.SwipeLayout;
@@ -328,8 +327,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        UIUtils.setOptionalIconsVisible(menu, true);
-
         // Hide the EQ option if it can't be opened
         final Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         if (getPackageManager().resolveActivity(intent, 0) == null) {
@@ -374,7 +371,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         getMenuInflater().inflate(R.menu.player_shuffle, menu);
         // Share, ringtone, and equalizer
         getMenuInflater().inflate(R.menu.player_audio_player, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

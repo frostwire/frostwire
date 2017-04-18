@@ -1460,8 +1460,6 @@ public final class MusicUtils {
         if (cursor != null) {
             cursor.close();
         }
-
-        UIUtils.setOptionalIconsVisible(subMenu, true);
     }
 
     /**

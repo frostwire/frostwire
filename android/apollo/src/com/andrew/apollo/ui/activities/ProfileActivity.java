@@ -61,7 +61,6 @@ import com.andrew.apollo.utils.SortOrder;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.ProfileTabCarousel.Listener;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Ref;
 
 /**
@@ -242,8 +241,6 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        UIUtils.setOptionalIconsVisible(menu, true);
-
         if (isEmptyPlaylist()) {
             menu.removeItem(R.id.menu_player_shuffle);
         } else {

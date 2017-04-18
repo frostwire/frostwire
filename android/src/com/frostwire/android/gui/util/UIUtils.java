@@ -33,7 +33,6 @@ import android.support.v4.content.FileProvider;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -62,7 +61,6 @@ import com.frostwire.uxstats.UXStats;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.NumberFormat;
 import java.util.List;
@@ -568,41 +566,5 @@ public final class UIUtils {
         int resId = PITCHES[offset + new Random().nextInt(PITCHES.length - offset)];
 
         return resId;
-    }
-
-    public static void setOptionalIconsVisible(Menu menu, boolean visible) {
-        Class menuClass = menu.getClass();
-        String className = menuClass.getSimpleName();
-        if (menu != null && (className.equals("MenuBuilder") || className.equals("SubMenuBuilder"))) {
-            try {
-                Method m = null;
-                if (className.equals("MenuBuilder")) {
-                    m = menuClass.getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
-                } else if (className.equals("SubMenuBuilder")) {
-                    m = menuClass.getSuperclass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
-                }
-
-                if (m != null) {
-                    m.setAccessible(true);
-                    m.invoke(menu, visible);
-                } else {
-                    LOG.warn("unable to set icons for overflow menu. MenuBuilder.setOptionalIconsVisible(boolean) method not available");
-                }
-            } catch (Throwable e) {
-                LOG.warn("unable to set icons for overflow menu", e);
-            }
-        }
-
-        if (menu != null && className.equals("ContextMenuBuilder")) {
-            try {
-                Field f = menuClass.getSuperclass().getDeclaredField("mOptionalIconsVisible");
-                if (f != null) {
-                    f.setAccessible(true);
-                    f.set(menu, visible);
-                }
-            } catch (Throwable e) {
-                LOG.warn("unable to set icons for context menu", e);
-            }
-        }
     }
 }

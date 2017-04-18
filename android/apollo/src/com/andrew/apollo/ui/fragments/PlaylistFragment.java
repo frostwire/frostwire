@@ -45,7 +45,6 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 
 import java.util.List;
@@ -68,7 +67,6 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
     public void onCreateContextMenu(final ContextMenu menu, final View v,
                                     final ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        UIUtils.setOptionalIconsVisible(menu, true);
         // Get the position of the selected item
         final AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
         final int mPosition = info.position;
