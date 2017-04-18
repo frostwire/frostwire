@@ -33,6 +33,7 @@ import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.youtube.YouTubeSearchPerformer;
+import com.frostwire.search.zooqle.ZooqleSearchPerformer;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.BooleanSetting;
@@ -70,6 +71,8 @@ public abstract class SearchEngine {
     private static final int YIFI_ID = 17;
     private static final int TORRENTDOWNLOADS_ID = 19;
     private static final int LIMETORRENTS_ID = 20;
+    private static final int ZOOQLE_ID = 21;
+
 
     private static final SearchEngine MININOVA = new SearchEngine(MININOVA_ID, "Mininova", SearchEnginesSettings.MININOVA_SEARCH_ENABLED, "www.mininova.org") {
         @Override
@@ -164,6 +167,13 @@ public abstract class SearchEngine {
         }
     };
 
+    private static final SearchEngine ZOOQLE = new SearchEngine(ZOOQLE_ID, "Zooqle", SearchEnginesSettings.ZOOQLE_SEARCH_ENABLED, "zooqle.com") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new ZooqleSearchPerformer(ZOOQLE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     public SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
@@ -199,7 +209,7 @@ public abstract class SearchEngine {
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        return Arrays.asList(YOUTUBE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, MONOVA, ARCHIVEORG, TORLOCK, YIFY, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
+        return Arrays.asList(YOUTUBE, ZOOQLE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, MONOVA, ARCHIVEORG, TORLOCK, YIFY, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
     }
 
     public abstract SearchPerformer getPerformer(long token, String keywords);
