@@ -18,7 +18,6 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.PlaylistsColumns;
 import com.andrew.apollo.model.Playlist;
-import com.andrew.apollo.utils.Lists;
 import com.frostwire.android.R;
 
 import java.util.ArrayList;
@@ -72,7 +71,7 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
     /* Adds the favorites and last added playlists */
     private List<Playlist> makeDefaultPlaylists() {
         final Resources resources = getContext().getResources();
-        ArrayList<Playlist> mPlaylistList = Lists.newArrayList();
+        ArrayList<Playlist> mPlaylistList = new ArrayList<>();
 
         /* Favorites list */
         final Playlist favorites = new Playlist(FAVORITE_PLAYLIST_ID,

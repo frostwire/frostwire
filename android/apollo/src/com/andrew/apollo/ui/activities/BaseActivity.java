@@ -46,7 +46,6 @@ import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.MusicStateListener;
 import com.andrew.apollo.utils.ApolloUtils;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
@@ -80,7 +79,7 @@ public abstract class BaseActivity extends AbstractActivity
     /**
      * Play state and meta change listener
      */
-    private final ArrayList<MusicStateListener> mMusicStateListener = Lists.newArrayList();
+    private final ArrayList<MusicStateListener> mMusicStateListener = new ArrayList<>();
 
     /**
      * The service token

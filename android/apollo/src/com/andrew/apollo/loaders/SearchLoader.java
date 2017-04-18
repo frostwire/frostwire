@@ -19,7 +19,6 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import com.andrew.apollo.model.Song;
-import com.andrew.apollo.utils.Lists;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,7 +51,7 @@ public class SearchLoader extends SongLoader {
      */
     @Override
     public List<Song> loadInBackground() {
-        ArrayList<Song> mSongList = Lists.newArrayList();
+        ArrayList<Song> mSongList = new ArrayList<>();
         Cursor mCursor;
         try {
             mCursor = makeCursor(getContext());

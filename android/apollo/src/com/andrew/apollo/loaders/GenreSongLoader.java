@@ -14,10 +14,6 @@ package com.andrew.apollo.loaders;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
-import com.andrew.apollo.model.Song;
-import com.andrew.apollo.utils.Lists;
-
-import java.util.ArrayList;
 
 /**
  * Used to query MediaStore.Audio.Genres.Members.EXTERNAL_CONTENT_URI

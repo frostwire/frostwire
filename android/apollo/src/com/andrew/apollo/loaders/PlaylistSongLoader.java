@@ -16,7 +16,6 @@ import android.database.Cursor;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
 import com.andrew.apollo.model.Song;
-import com.andrew.apollo.utils.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +81,7 @@ public class PlaylistSongLoader extends SongLoader {
 
     @Override
     public List<Song> loadInBackground() {
-        final ArrayList<Song> mSongList = Lists.newArrayList();
+        final ArrayList<Song> mSongList = new ArrayList<>();
         Cursor mCursor = makePlaylistSongCursor(getContext(), mPlaylistID);
         if (mCursor != null && mCursor.moveToFirst()) {
             do {

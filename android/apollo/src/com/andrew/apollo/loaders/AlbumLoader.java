@@ -17,9 +17,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import com.andrew.apollo.model.Album;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
-import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,8 +31,6 @@ import java.util.List;
  * @author Angel Leon (gubatron@gmail.com)
  */
 public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
-
-    private static Logger LOGGER = Logger.getLogger(AlbumLoader.class);
 
     /**
      * Constructor of <code>AlbumLoader</code>
@@ -50,7 +46,7 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
      */
     @Override
     public List<Album> loadInBackground() {
-        final ArrayList<Album> mAlbumsList = Lists.newArrayList();
+        final ArrayList<Album> mAlbumsList = new ArrayList<>();
 
         // Create the Cursor
         Cursor mCursor;

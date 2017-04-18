@@ -31,11 +31,10 @@ import com.andrew.apollo.ui.fragments.LastAddedFragment;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.ui.fragments.RecentFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
-import com.andrew.apollo.utils.Lists;
 import com.frostwire.android.R;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -46,7 +45,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     private final SparseArray<WeakReference<Fragment>> mFragmentArray = new SparseArray<>();
 
-    private final List<Holder> mHolderList = Lists.newArrayList();
+    private final ArrayList<Holder> mHolderList = new ArrayList<>();
 
     private final Activity mFragmentActivity;
 

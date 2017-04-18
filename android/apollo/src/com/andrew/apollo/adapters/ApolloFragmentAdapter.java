@@ -29,11 +29,10 @@ import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.*;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.utils.ApolloUtils;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,7 +61,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     /**
      * Used to set the size of the data in the adapter
      */
-    protected List<I> mDataList = Lists.newArrayList();
+    protected List<I> mDataList = new ArrayList<>();
 
     /**
      * Image cache and image fetcher

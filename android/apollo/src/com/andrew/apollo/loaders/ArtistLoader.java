@@ -17,7 +17,6 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.ArtistColumns;
 import com.andrew.apollo.model.Artist;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
 
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ public class ArtistLoader extends WrappedAsyncTaskLoader<List<Artist>> {
      */
     @Override
     public List<Artist> loadInBackground() {
-        ArrayList<Artist> mArtistsList = Lists.newArrayList();
+        ArrayList<Artist> mArtistsList = new ArrayList<>();
         // Create the Cursor
         Cursor mCursor = makeCursor(getContext());
         // Gather the data

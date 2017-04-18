@@ -37,7 +37,6 @@ import com.andrew.apollo.loaders.AsyncHandler;
 import com.andrew.apollo.loaders.LastAddedLoader;
 import com.andrew.apollo.loaders.SearchLoader;
 import com.andrew.apollo.model.Song;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.R;
@@ -94,7 +93,7 @@ public final class ShortcutActivity extends Activity implements ServiceConnectio
     /**
      * Used with the loader and voice queries
      */
-    private final ArrayList<Song> mSong = Lists.newArrayList();
+    private final ArrayList<Song> mSong = new ArrayList<>();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {

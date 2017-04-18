@@ -16,7 +16,6 @@ import android.database.Cursor;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.FavoritesStore.FavoriteColumns;
-import com.andrew.apollo.utils.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +65,7 @@ public class FavoritesLoader extends SongLoader {
     @Override
     public List<Song> loadInBackground() {
         Cursor mCursor = makeFavoritesCursor(getContext());
-        ArrayList<Song> mSongList = Lists.newArrayList();
+        ArrayList<Song> mSongList = new ArrayList<>();
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
                 // Copy the song Id

@@ -17,7 +17,6 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
 import com.andrew.apollo.model.Song;
-import com.andrew.apollo.utils.Lists;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.util.Logger;
 
@@ -47,7 +46,7 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
      */
     @Override
     public List<Song> loadInBackground() {
-        ArrayList<Song> mSongList = Lists.newArrayList();
+        ArrayList<Song> mSongList = new ArrayList<>();
         // Create the Cursor
         Cursor mCursor;
         try {

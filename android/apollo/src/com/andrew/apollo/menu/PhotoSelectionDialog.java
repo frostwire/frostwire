@@ -22,8 +22,6 @@ import android.widget.ListAdapter;
 import com.andrew.apollo.Config;
 import com.frostwire.android.R;
 import com.andrew.apollo.ui.activities.ProfileActivity;
-import com.andrew.apollo.utils.ApolloUtils;
-import com.andrew.apollo.utils.Lists;
 
 import java.util.ArrayList;
 
@@ -44,7 +42,7 @@ public class PhotoSelectionDialog extends DialogFragment {
 
     private static final int FETCH_IMAGE = 3;
 
-    private final ArrayList<String> mChoices = Lists.newArrayList();
+    private final ArrayList<String> mChoices = new ArrayList<>();
 
     private static ProfileType mProfileType;
 
