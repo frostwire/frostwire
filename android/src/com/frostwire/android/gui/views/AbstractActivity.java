@@ -22,7 +22,9 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +32,7 @@ import android.widget.FrameLayout;
 
 import com.frostwire.android.R;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +48,8 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     private boolean paused;
     private View toolbarView;
+
+    private static boolean menuIconsVisible = false;
 
     public AbstractActivity(int layoutResId) {
         this.layoutResId = layoutResId;
@@ -120,6 +125,19 @@ public abstract class AbstractActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean r = super.onCreateOptionsMenu(menu);
+        setMenuIconsVisible(menu);
+        return r;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        setMenuIconsVisible(menu);
+    }
+
     protected void initComponents(Bundle savedInstanceState) {
     }
 
@@ -162,5 +180,52 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     protected final void setToolbarView(View view) {
         setToolbarView(view, Gravity.START | Gravity.CENTER_VERTICAL);
+    }
+
+    /**
+     * This settings is application wide and apply to all activities and
+     * fragments that use our internal abstract framework. This enable
+     * or disable the menu icons for both options and context menu.
+     *
+     * @param visible if icons are visible or not
+     */
+    public static void setMenuIconsVisible(boolean visible) {
+        menuIconsVisible = visible;
+    }
+
+    static void setMenuIconsVisible(Menu menu) {
+        if (menu == null) { // in case the framework changes
+            return;
+        }
+
+        // android by default set the field to false
+        if (!menuIconsVisible) {
+            return; // quick return
+        }
+
+        Class<?> clazz = menu.getClass();
+        Field f = null;
+        while (clazz != null && f == null) {
+            try {
+                f = clazz.getDeclaredField("mOptionalIconsVisible");
+            } catch (Throwable e) {
+                // next, no need to get them all, balanced cost of exception
+            }
+            clazz = clazz.getSuperclass();
+        }
+
+        if (f == null) {
+            // the menu framework changed, nothing we can do, but visual
+            // will reveal that a fix is necessary
+            return;
+        }
+
+        try {
+            f.setAccessible(true);
+            f.set(menu, menuIconsVisible);
+        } catch (Throwable e) {
+            // ignore, unable to set icons for the menu, but visual
+            // will reveal that a fix is necessary
+        }
     }
 }
