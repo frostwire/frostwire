@@ -35,7 +35,7 @@ public class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSea
             "(?is)<i class=\"zqf zqf-tv text-muted2 zqf-small pad-r2\"></i><a class=\".*?small\"href=\"/(?<detailPath>.*?).html\">.*?</a>";
     private static final String HTML_DETAIL_REGEX = "(?is)<h4 id=torname>(?<filename>.*?)<span.*?" +
             "Seeders: (?<seeds>\\d*).*?" +
-            "title=\"File size\"></i>(?<size>[\\d\\.]*) (?<sizeUnit>.*?)<span class.*?" +
+            "title=\"File size\"></i>(?<size>[\\d\\.\\,]*) (?<sizeUnit>.*?)<span class.*?" +
             "title=\"Date indexed\"></i>(?<month>.*?) (?<day>[\\d]*), (?<year>[\\d]*) <span.*?" +
             "urn:btih:(?<infohash>.*?)&.*?" +
             "href=\"/download/(?<torrent>.*?)\\.torrent\"";

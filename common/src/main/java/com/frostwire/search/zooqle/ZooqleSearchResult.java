@@ -46,7 +46,7 @@ public class ZooqleSearchResult extends AbstractTorrentSearchResult {
         seeds = Integer.valueOf(matcher.group("seeds").trim());
         torrentUrl = urlPrefix + "/download/" + matcher.group("torrent") + ".torrent";
         infoHash = matcher.group("infohash");
-        size = calculateSize(matcher.group("size"), matcher.group("sizeUnit"));
+        size = calculateSize(matcher.group("size").replace(",",""), matcher.group("sizeUnit"));
         creationTime = parseCreationTime(matcher.group("year") + " " + matcher.group("month") + " " + matcher.group("day"));
     }
 
