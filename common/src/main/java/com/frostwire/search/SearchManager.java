@@ -389,7 +389,7 @@ public final class SearchManager {
         }
     };
 
-    private static final SearchEngine LIMETORRENTS = new SearchEngine("LimeTorrents", AppSettings.SEARCH_LIMETORRENTS_ENABLED) {
+    static final SearchEngine LIMETORRENTS = new SearchEngine("LimeTorrents", AppSettings.SEARCH_LIMETORRENTS_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new LimeTorrentsSearchPerformer("www.limetorrents.cc", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
@@ -410,7 +410,7 @@ public final class SearchManager {
         }
     };
 
-    private static final SearchEngine MONOVA = new SearchEngine("Monova", AppSettings.SEARCH_MONOVA_ENABLED, false) {
+    static final SearchEngine MONOVA = new SearchEngine("Monova", AppSettings.SEARCH_MONOVA_ENABLED, false) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
             return new MonovaSearchPerformer("monova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
