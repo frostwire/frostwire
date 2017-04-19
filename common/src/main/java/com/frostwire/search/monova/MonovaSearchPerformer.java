@@ -43,6 +43,7 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
             "<td>Total size:</td>.*?<td>(?<size>.*?)</td>.*?" +
             // download torrent url
             "<a id=\"download-file\" href=\"(?<torrenturl>.*?)\" class=\"btn";
+    private static final long SIX_MONTHS_IN_MILLIS = 86400 * 183 * 1000;
 
     public MonovaSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, String.format(REGEX, domainName), HTML_REGEX);
@@ -72,6 +73,7 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
     @Override
     protected MonovaSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         MonovaSearchResult r = new MonovaSearchResult(sr.getDetailsUrl(), matcher);
-        return r.getTorrentUrl().contains("magnet") ? r : null;
+        boolean less_than_6_months_old = (System.currentTimeMillis() - r.getCreationTime()) < SIX_MONTHS_IN_MILLIS;
+        return r.getTorrentUrl().contains("magnet") && less_than_6_months_old ? r : null;
     }
 }
