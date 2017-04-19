@@ -2,9 +2,10 @@ frostwire (6.4.8) stable; urgency=high
   * New jlibtorrent 1.2.0.8
   * New Zooqle search
   * TorLock, Monova search fixed
+  * Mininova search discontinued
   * Freeze/Slowdown on shutdown fixed
 	
- -- FrostWire Team <contact@frostwire.com>  Mon, 18 Apr 2017 14:54:51 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 19 Apr 2017 09:39:29 -0600
 
 frostwire (6.4.7) stable; urgency=high
   * New jlibtorrent 1.2.0.7-RC3

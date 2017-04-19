@@ -46,7 +46,7 @@
     <string name="activity_uploads_title_text">Uppladdningar</string>
     <string name="torrent_max_peers">Max Totalt Peers</string>
     <string name="request_again">Begäran igen</string>
-    <string name="use_mininova">Använda Mininova.org</string>
+    <string name="use_zooqle">Använda Zooqle.com</string>
     <string name="restarting_summary">FrostWire startar nu för givet tillstånd att träda i kraft</string>
     <string name="clear_search_cache">Tydlig sökning cache</string>
     <string name="unshare">Sluta dela</string>

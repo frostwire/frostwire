@@ -46,7 +46,7 @@
     <string name="activity_uploads_title_text">อัปโหลด</string>
     <string name="torrent_max_peers">ทำเนียบแม็กซ์</string>
     <string name="request_again">ขออีกครั้ง</string>
-    <string name="use_mininova">ใช้ Mininova.org</string>
+    <string name="use_zooqle">ใช้ Zooqle.comg</string>
     <string name="restarting_summary">FrostWire จะเริ่มต้นใหม่ในขณะนี้สำหรับสิทธิ์อนุญาตให้มีผลบังคับใช้</string>
     <string name="clear_search_cache">แคชล้างการค้นหา</string>
     <string name="unshare">ยกเลิกการแบ่งปัน</string>

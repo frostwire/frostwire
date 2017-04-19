@@ -46,7 +46,7 @@
     <string name="activity_uploads_title_text">Încărcările</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Din nou Cerere de</string>
-    <string name="use_mininova">Utilizați Mininova.org</string>
+    <string name="use_zooqle">Utilizați Zooqle.com</string>
     <string name="restarting_summary">FrostWire va reporni acum pentru permisiunile acordate să aibă efect</string>
     <string name="clear_search_cache">Goliți memoria cache căutare</string>
     <string name="unshare">Anulați distribuirea</string>

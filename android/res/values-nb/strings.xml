@@ -46,7 +46,7 @@
     <string name="activity_uploads_title_text">Opplastede</string>
     <string name="torrent_max_peers">Maks Peers</string>
     <string name="request_again">Forespørselen på nytt</string>
-    <string name="use_mininova">Bruk Mininova.org</string>
+    <string name="use_zooqle">Bruk Zooqle.com</string>
     <string name="restarting_summary">Frostwire vil starte på nytt nå for gitt tillatelser til å tre i kraft</string>
     <string name="clear_search_cache">Tøm søke cache</string>
     <string name="unshare">Opphev deling</string>

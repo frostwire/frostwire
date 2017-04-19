@@ -46,7 +46,7 @@
     <string name="activity_uploads_title_text">Uploads</string>
     <string name="torrent_max_peers">максимум Однолітки</string>
     <string name="request_again">запит Знову</string>
-    <string name="use_mininova">користування Mininova.org</string>
+    <string name="use_zooqle">користування Zooqle.com</string>
     <string name="restarting_summary">FrostWire буде перезавантажити комп\'ютер зараз, як само собою зрозуміле дозволу вступили в силу</string>
     <string name="clear_search_cache">Очистити кеш пошуку</string>
     <string name="unshare">видалити з відкритого списку</string>

@@ -39,10 +39,6 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_frostclick" />
     <android.support.v7.preference.CheckBoxPreference
-        android:key="frostwire.prefs.search.use_mininova"
-        android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_mininova" />
-    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_monova"
         android:layout="@layout/view_preference_search_engine"
         android:summary="@string/use_magnet_summary"
@@ -77,4 +73,8 @@
         android:key="frostwire.prefs.search.use_youtube"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_youtube" />
+    <android.support.v7.preference.CheckBoxPreference
+        android:key="frostwire.prefs.search.use_zooqle"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_zooqle" />
 </android.support.v7.preference.PreferenceScreen>

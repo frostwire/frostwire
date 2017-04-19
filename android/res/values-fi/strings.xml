@@ -46,7 +46,7 @@
     <string name="activity_uploads_title_text">Ladatut</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Pyydä Jälleen</string>
-    <string name="use_mininova">Käytä Mininova.org</string>
+    <string name="use_zooqle">Käytä Zooqle.com</string>
     <string name="restarting_summary">FrostWire käynnistyy nyt itsestäänselvyytenä oikeudet otetaan käyttöön</string>
     <string name="clear_search_cache">Tyhjennä haku välimuisti</string>
     <string name="unshare">Unshare</string>

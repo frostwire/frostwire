@@ -25,7 +25,6 @@ import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
-import com.frostwire.search.mininova.MininovaSearchPerformer;
 import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
@@ -57,7 +56,6 @@ public abstract class SearchEngine {
     private final String _domainName;
     private final BooleanSetting _setting;
 
-    private static final int MININOVA_ID = 1;
     private static final int EXTRATORRENT_ID = 4;
     private static final int TPB_ID = 6;
     private static final int MONOVA_ID = 7;
@@ -72,14 +70,6 @@ public abstract class SearchEngine {
     private static final int TORRENTDOWNLOADS_ID = 19;
     private static final int LIMETORRENTS_ID = 20;
     private static final int ZOOQLE_ID = 21;
-
-
-    private static final SearchEngine MININOVA = new SearchEngine(MININOVA_ID, "Mininova", SearchEnginesSettings.MININOVA_SEARCH_ENABLED, "www.mininova.org") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new MininovaSearchPerformer(MININOVA.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
 
     private static final SearchEngine EXTRATORRENT = new SearchEngine(EXTRATORRENT_ID, "Extratorrent", SearchEnginesSettings.EXTRATORRENT_SEARCH_ENABLED, "extratorrent.cc") {
         @Override
@@ -209,7 +199,7 @@ public abstract class SearchEngine {
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        return Arrays.asList(YOUTUBE, ZOOQLE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MININOVA, MONOVA, ARCHIVEORG, TORLOCK, YIFY, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
+        return Arrays.asList(YOUTUBE, ZOOQLE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MONOVA, ARCHIVEORG, TORLOCK, YIFY, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
     }
 
     public abstract SearchPerformer getPerformer(long token, String keywords);

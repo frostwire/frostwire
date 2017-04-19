@@ -46,7 +46,7 @@
     <string name="activity_uploads_title_text">Feltöltések</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Kérése újra</string>
-    <string name="use_mininova">Használja Mininova.org</string>
+    <string name="use_zooqle">Használja Zooqle.com</string>
     <string name="restarting_summary">FrostWire újraindul most biztosra jogosultságok életbe lépéséhez</string>
     <string name="clear_search_cache">Tiszta keresési gyorsítótár</string>
     <string name="unshare">Megosztás megszüntetése</string>

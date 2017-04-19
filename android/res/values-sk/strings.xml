@@ -46,7 +46,7 @@
     <string name="activity_uploads_title_text">Nahranie</string>
     <string name="torrent_max_peers">Maximálna rovesníkmi</string>
     <string name="request_again">Požiadať znovu</string>
-    <string name="use_mininova">Použiť Mininova.org</string>
+    <string name="use_zooqle">Použiť Zooqle.com</string>
     <string name="restarting_summary">FrostWire bude teraz reštartovať za samozrejmé oprávnenie prejavili</string>
     <string name="clear_search_cache">Vymazať cache vyhľadávania</string>
     <string name="unshare">Zrušenie zdieľania</string>

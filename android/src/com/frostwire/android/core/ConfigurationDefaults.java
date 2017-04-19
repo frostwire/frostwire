@@ -83,8 +83,8 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_FULLTEXT_SEARCH_RESULTS_LIMIT, 256);
 
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_EXTRATORRENT, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_MININOVA, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_VERTOR, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ZOOQLE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YOUTUBE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_SOUNDCLOUD, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG, true);

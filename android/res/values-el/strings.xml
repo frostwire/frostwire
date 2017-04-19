@@ -226,7 +226,7 @@
     <string name="use_monova">Χρήση Monova</string>
     <string name="use_monova_summary">Το Monova είναι βασισμένο σε magnet, δουλεύει μόνο σε ασύρματο δίκτυο</string>
     <string name="use_extratorrent">Χρήση ExtraTorrent.com</string>
-    <string name="use_mininova">Χρήση Mininova.org</string>
+    <string name="use_zooqle">Χρήση Zooqle.com</string>
     <string name="use_yify">Χρήση Yify</string>
     <string name="use_yify_summary">Το Yify είναι βασισμένο σε magnet, δουλεύει μόνο σε ασύρματο δίκτυο</string>
     <string name="activity_media_player_image_description">Εικόνα Media</string>

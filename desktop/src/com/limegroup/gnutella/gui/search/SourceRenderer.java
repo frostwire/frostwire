@@ -46,7 +46,6 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             sourceIcons.put("youtube", GUIMediator.getThemeImage("youtube_on"));
             sourceIcons.put("archive.org", GUIMediator.getThemeImage("archive_source"));
             sourceIcons.put("extratorrent", GUIMediator.getThemeImage("extratorrent_source"));
-            sourceIcons.put("mininova", GUIMediator.getThemeImage("mininova_source"));
             sourceIcons.put("monova", GUIMediator.getThemeImage("monova_source"));
             sourceIcons.put("tpb", GUIMediator.getThemeImage("tpb_source"));
             sourceIcons.put("torlock", GUIMediator.getThemeImage("torlock_off"));

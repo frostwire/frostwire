@@ -24,7 +24,6 @@ import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.filter.SearchTable;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
-import com.frostwire.search.mininova.MininovaSearchPerformer;
 import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
@@ -32,6 +31,7 @@ import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.youtube.YouTubeSearchPerformer;
+import com.frostwire.search.zooqle.ZooqleSearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
@@ -340,13 +340,6 @@ public final class SearchManager {
         }
     };
 
-    private static final SearchEngine MININOVA = new SearchEngine("Mininova", AppSettings.SEARCH_MININOVA_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new MininovaSearchPerformer("www.mininova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
     private static final SearchEngine YOUTUBE = new SearchEngine("YouTube", AppSettings.SEARCH_YOUTUBE_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
@@ -424,6 +417,13 @@ public final class SearchManager {
         }
     };
 
+    static final SearchEngine ZOOQLE = new SearchEngine("Zooqle", AppSettings.SEARCH_ZOOQLE_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new ZooqleSearchPerformer("zooqle.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
     @SuppressWarnings("unused")
-    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, MININOVA, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, EZTV, LIMETORRENTS);
+    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, ZOOQLE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, EZTV, LIMETORRENTS);
 }

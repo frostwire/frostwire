@@ -226,7 +226,7 @@
     <string name="use_monova">Monovaを使用する</string>
     <string name="use_monova_summary">MonovaはマグネットベースでWi-Fi上のみ動作します</string>
     <string name="use_extratorrent">ExtraTorrent.comを使用する</string>
-    <string name="use_mininova">Mininova.orgを使用する</string>
+    <string name="use_zooqle">Zooqle.comを使用する</string>
     <string name="use_yify">Yifyを使用する</string>
     <string name="use_yify_summary">Yifyはマグネットベースで、Wi-Fi上のみ動作します</string>
     <string name="activity_media_player_image_description">メディア画像</string>

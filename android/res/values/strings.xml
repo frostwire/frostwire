@@ -243,7 +243,7 @@
     <string name="use_monova">Use Monova</string>
     <string name="use_monova_summary">Monova is magnet based, works only on Wi-Fi</string>
     <string name="use_extratorrent">Use ExtraTorrent.com</string>
-    <string name="use_mininova">Use Mininova.org</string>
+    <string name="use_zooqle">Use Zooqle.com</string>
     <string name="use_yify">Use Yify</string>
     <string name="use_yify_summary">Yify is magnet based, works only on Wi-Fi</string>
     <string name="use_magnet_summary">Magnet based, works only on Wi-Fi</string>

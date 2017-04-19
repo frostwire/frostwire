@@ -1,5 +1,8 @@
-FrostWire 1.9.2 - APR/17/2017
+FrostWire 1.9.2 - APR/19/2017
  - New jlibtorrent 1.2.0.8
+ - New Zooqle search
+ - Torlock, Monova search fixed
+ - Mininova search discontinued
  - All menus now show icons to visually identify actions
  - Fixes issues preventing FrostWire to cleanly shutdown its services on Exit
  - Hides Android top status bar when previewing videos in full screen mode

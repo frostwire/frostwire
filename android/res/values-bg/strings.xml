@@ -46,7 +46,7 @@
     <string name="activity_uploads_title_text">Качвания</string>
     <string name="torrent_max_peers">Макс връстници</string>
     <string name="request_again">Искане отново</string>
-    <string name="use_mininova">Използвайте Mininova.org</string>
+    <string name="use_zooqle">Използвайте Zooqle.com</string>
     <string name="restarting_summary">FrostWire ще се рестартира сега за предоставени разрешения, за да влязат в сила</string>
     <string name="clear_search_cache">Ясно търсене кеш</string>
     <string name="unshare">Премахване на споделянето</string>
