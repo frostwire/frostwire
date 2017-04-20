@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -127,7 +128,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         if (keywordFiltersPipeline != null) {
             updateAppliedKeywordFilters(keywordFiltersPipeline);
         }
-        if (feature != null && histogram != null) {
+        if (feature != null && histogram != null && histogram.length > 0) {
             updateSuggestedKeywordFilters(feature, histogram);
         }
     }
@@ -138,9 +139,16 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         FlowLayout container = (FlowLayout) findViewById(containerId);
         container.removeAllViews();
         for(Map.Entry<String, Integer> entry : histogram) {
-            KeywordTagView keywordTagView = new KeywordTagView(getContext(), new KeywordFilter(true, entry.getKey()), entry.getValue(), false, this);
-            container.addView(keywordTagView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            keywordTagView.postInvalidate();
+            //KeywordTagView keywordTagView = new KeywordTagView(getContext(), new KeywordFilter(true, entry.getKey()), entry.getValue(), false, this);
+            //container.addView(keywordTagView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            //keywordTagView.postInvalidate();
+
+            TextView textView = new TextView(getContext());
+            textView.setBackgroundColor(Color.BLACK);
+            textView.setTextColor(Color.WHITE);
+            textView.setVisibility(View.VISIBLE);
+            textView.setText(entry.getKey() + " (" + entry.getValue() + ")");
+            container.addView(textView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         }
     }
 
@@ -149,8 +157,14 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         flowLayout.removeAllViews();
         for (KeywordFilter filter : keywordFiltersPipeline) {
             int keywordCount = getKeywordCount(filter.getKeyword());
-            KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, keywordCount, true, this);
-            flowLayout.addView(keywordTagView, 50, 30);
+            //KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, keywordCount, true, this);
+            //flowLayout.addView(keywordTagView, 50, 30);
+            TextView textView = new TextView(getContext());
+            textView.setBackgroundColor(Color.BLACK);
+            textView.setTextColor(Color.WHITE);
+            textView.setVisibility(View.VISIBLE);
+            textView.setText(filter.getKeyword() + " (" + keywordCount + ")");
+            flowLayout.addView(textView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         }
         this.keywordFiltersPipeline = keywordFiltersPipeline;
     }
