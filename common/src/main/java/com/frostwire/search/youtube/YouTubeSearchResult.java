@@ -44,9 +44,6 @@ public class YouTubeSearchResult extends AbstractFileSearchResult implements Cra
         if (link.startsWith("/")) {
             link = link.substring(1);
         }
-        if (link.startsWith("https://www.youtube.com/")) {
-            link = link.replace("https://www.youtube.com/", "");
-        }
         this.videoUrl = "https://www.youtube.com/" + link;
         this.user = user;
         this.source = "YouTube - " + user;
