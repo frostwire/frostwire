@@ -37,6 +37,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.SoftwareUpdater;
+import com.frostwire.android.gui.activities.AboutActivity;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.services.Engine;
@@ -108,6 +109,15 @@ public final class NavigationMenu {
                         }
                     });
             View navViewHeader = resultNavView.getHeaderView(0);
+            // Logo
+            ImageView navLogo = (ImageView) navViewHeader.findViewById(R.id.nav_view_header_main_app_logo);
+            navLogo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_GIVE_URL);
+                }
+            });
+
             // Prep title and version
             TextView title = (TextView) navViewHeader.findViewById(R.id.nav_view_header_main_title);
             TextView version = (TextView) navViewHeader.findViewById(R.id.nav_view_header_main_version);
@@ -116,6 +126,17 @@ public final class NavigationMenu {
             version.setText(" v" + Constants.FROSTWIRE_VERSION_STRING);
             TextView build = (TextView) navViewHeader.findViewById(R.id.nav_view_header_main_build);
             build.setText(activity.getText(R.string.build) + " " + BuildConfig.VERSION_CODE);
+            View.OnClickListener aboutActivityLauncher = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), AboutActivity.class);
+                    v.getContext().startActivity(intent);
+                }
+            };
+            title.setOnClickListener(aboutActivityLauncher);
+            version.setOnClickListener(aboutActivityLauncher);
+            build.setOnClickListener(aboutActivityLauncher);
+
             // Prep update button
             ImageView updateButton = (ImageView) navViewHeader.findViewById(R.id.nav_view_header_main_update);
             updateButton.setVisibility(View.GONE);
