@@ -55,6 +55,16 @@
                 android:textColor="@color/app_text_secondary"
                 android:textSize="@dimen/text_medium" />
 
+            <TextView
+                android:id="@+id/fragment_about_jlibtorrent_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/dummy_build"
+                android:textColor="@color/app_text_secondary"
+                android:textSize="@dimen/text_medium" />
+
+
             <Button
                 android:id="@+id/fragment_about_love_frostwire"
                 style="@style/PreferencesBlueButton"
