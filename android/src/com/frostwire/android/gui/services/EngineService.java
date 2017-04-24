@@ -99,6 +99,9 @@ public class EngineService extends Service implements IEngineService {
 
         enableComponents(true);
 
+        // it happens that this is called before Application#onCreate
+        ConfigurationManager.create(getApplication());
+
         initializePermanentNotificationUpdates();
 
         return START_STICKY;
