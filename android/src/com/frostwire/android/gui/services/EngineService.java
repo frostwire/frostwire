@@ -84,7 +84,7 @@ public class EngineService extends Service implements IEngineService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
         if (intent == null) {
-            return 0;
+            return START_NOT_STICKY;
         }
 
         if (SHUTDOWN_ACTION.equals(intent.getAction())) {
