@@ -273,6 +273,18 @@
             </intent-filter>
         </receiver>
 
+        <!-- providers -->
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
         <!-- AppLovin -->
         <meta-data
             android:name="applovin.sdk.key"
@@ -299,21 +311,14 @@
         <activity
             android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name="com.mopub.mobileads.RewardedMraidActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
-
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
-        </provider>
+        <activity
+            android:name="com.mopub.mobileads.RewardedMraidActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <!-- OGURY/PRESAGE LIBRARY -->
-        <meta-data android:name="presage_key" android:value="269485"/>
+        <meta-data
+            android:name="presage_key"
+            android:value="269485" />
         <service
             android:name="io.presage.PresageService"
             android:enabled="true"
@@ -334,6 +339,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <receiver android:name="io.presage.receiver.NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
@@ -342,6 +348,7 @@
             </intent-filter>
         </receiver>
         <receiver android:name="io.presage.receiver.AlarmReceiver" />
+
         <provider
             android:name="io.presage.provider.PresageProvider"
             android:authorities="${applicationId}.PresageProvider"
