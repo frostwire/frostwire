@@ -2,18 +2,17 @@
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.search.zooqle;
@@ -26,10 +25,11 @@ import com.frostwire.util.Logger;
 /**
  * @author aldenml
  * @author gubatron
- * Created on 4/17/17.
  */
 public class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSearchResult> {
+
     private static Logger LOG = Logger.getLogger(ZooqleSearchPerformer.class);
+
     private static final int MAX_RESULTS = 30;
     private static final String PRELIMINARY_RESULTS_REGEX =
             "(?is)<i class=\"zqf zqf-tv text-muted2 zqf-small pad-r2\"></i><a class=\".*?small\"href=\"/(?<detailPath>.*?).html\">.*?</a>";
@@ -46,12 +46,12 @@ public class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSea
 
     @Override
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
-        return new ZooqleTempSearchResult(getDomainName(),matcher.group("detailPath")+".html");
+        return new ZooqleTempSearchResult(getDomainName(), matcher.group("detailPath") + ".html");
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "https://" + getDomainName() + "/search?pg="+page+"&q="+encodedKeywords+"&s=ns&v=t&sd=d";
+        return "https://" + getDomainName() + "/search?pg=" + page + "&q=" + encodedKeywords + "&s=ns&v=t&sd=d";
     }
 
     @Override
@@ -97,41 +97,41 @@ public class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSea
     }
 
     /**
-    public static void main(String[] args) throws Throwable {
-        byte[] preliminaryResultsBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/zooqle_preliminary.html"));
-        String preliminaryResultsString = new String(preliminaryResultsBytes,"utf-8");
-        Pattern preliminaryResultsPattern = Pattern.compile(PRELIMINARY_RESULTS_REGEX);
-        Matcher preliminaryMatcher = preliminaryResultsPattern.matcher(preliminaryResultsString);
-        int found = 0;
-        while (preliminaryMatcher.find()) {
-            found++;
-            LOG.info("found " + found);
-            LOG.info(preliminaryMatcher.group("detailPath")+".html");
-        }
+     public static void main(String[] args) throws Throwable {
+     byte[] preliminaryResultsBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/zooqle_preliminary.html"));
+     String preliminaryResultsString = new String(preliminaryResultsBytes,"utf-8");
+     Pattern preliminaryResultsPattern = Pattern.compile(PRELIMINARY_RESULTS_REGEX);
+     Matcher preliminaryMatcher = preliminaryResultsPattern.matcher(preliminaryResultsString);
+     int found = 0;
+     while (preliminaryMatcher.find()) {
+     found++;
+     LOG.info("found " + found);
+     LOG.info(preliminaryMatcher.group("detailPath")+".html");
+     }
 
 
-        byte[] htmlDetailsBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/zooqle_detail.html"));
-        String htmlDetailsString = new String(htmlDetailsBytes, "utf-8");
-        Pattern htmlDetailPattern = Pattern.compile(HTML_DETAIL_REGEX);
-        Matcher detailMatcher = htmlDetailPattern.matcher(htmlDetailsString);
+     byte[] htmlDetailsBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/zooqle_detail.html"));
+     String htmlDetailsString = new String(htmlDetailsBytes, "utf-8");
+     Pattern htmlDetailPattern = Pattern.compile(HTML_DETAIL_REGEX);
+     Matcher detailMatcher = htmlDetailPattern.matcher(htmlDetailsString);
 
-        while (detailMatcher.find()) {
-            System.out.println("filename: [" + detailMatcher.group("filename") + "]");
-            System.out.println("seeds: [" + detailMatcher.group("seeds") + "]");
-            System.out.println("infohash: [" + detailMatcher.group("infohash") + "]");
-            System.out.println("torrent: [" + detailMatcher.group("torrent") + "]");
-            System.out.println("size: [" + detailMatcher.group("size") + "]");
-            System.out.println("sizeUnit: [" + detailMatcher.group("sizeUnit") + "]");
-            System.out.print("creationtime: [");
+     while (detailMatcher.find()) {
+     System.out.println("filename: [" + detailMatcher.group("filename") + "]");
+     System.out.println("seeds: [" + detailMatcher.group("seeds") + "]");
+     System.out.println("infohash: [" + detailMatcher.group("infohash") + "]");
+     System.out.println("torrent: [" + detailMatcher.group("torrent") + "]");
+     System.out.println("size: [" + detailMatcher.group("size") + "]");
+     System.out.println("sizeUnit: [" + detailMatcher.group("sizeUnit") + "]");
+     System.out.print("creationtime: [");
 
 
-            SearchMatcher sm = new SearchMatcher(detailMatcher);
-            ZooqleSearchResult sr = new ZooqleSearchResult("https://zooqle.com/blabla.html", "http://zooqle.com", sm);
-            System.out.println(sr.getCreationTime() + "]");
-            System.out.println("size in bytes: [" + sr.getSize() + "]");
-            System.out.println("===");
-        }
-        System.out.println("-done-");
-    }
+     SearchMatcher sm = new SearchMatcher(detailMatcher);
+     ZooqleSearchResult sr = new ZooqleSearchResult("https://zooqle.com/blabla.html", "http://zooqle.com", sm);
+     System.out.println(sr.getCreationTime() + "]");
+     System.out.println("size in bytes: [" + sr.getSize() + "]");
+     System.out.println("===");
+     }
+     System.out.println("-done-");
+     }
      */
 }
