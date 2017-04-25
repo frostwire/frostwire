@@ -40,13 +40,13 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
 
     ZooqleSearchResult(String detailsUrl, String urlPrefix, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-        filename = matcher.group("filename") + ".torrent";
-        displayName = matcher.group("filename");
-        seeds = Integer.valueOf(matcher.group("seeds").trim());
-        torrentUrl = urlPrefix + "/download/" + matcher.group("torrent") + ".torrent";
-        infoHash = matcher.group("infohash");
-        size = calculateSize(matcher.group("size").replace(",", ""), matcher.group("sizeUnit"));
-        creationTime = parseCreationTime(matcher.group("year") + " " + matcher.group("month") + " " + matcher.group("day"));
+        this.filename = matcher.group("filename") + ".torrent";
+        this.displayName = matcher.group("filename");
+        this.seeds = Integer.valueOf(matcher.group("seeds").trim());
+        this.torrentUrl = urlPrefix + "/download/" + matcher.group("torrent") + ".torrent";
+        this.infoHash = matcher.group("infohash");
+        this.size = calculateSize(matcher.group("size").replace(",", ""), matcher.group("sizeUnit"));
+        this.creationTime = parseCreationTime(matcher.group("year") + " " + matcher.group("month") + " " + matcher.group("day"));
     }
 
     @Override

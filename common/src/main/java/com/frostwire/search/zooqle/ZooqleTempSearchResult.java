@@ -29,7 +29,7 @@ class ZooqleTempSearchResult extends AbstractSearchResult implements CrawlableSe
     private final String detailUrl;
 
     ZooqleTempSearchResult(String domainName, String detailPath) {
-        detailUrl = "https://" + domainName + "/" + detailPath;
+        this.detailUrl = "https://" + domainName + "/" + detailPath;
     }
 
     @Override
