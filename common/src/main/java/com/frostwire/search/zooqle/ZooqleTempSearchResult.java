@@ -24,9 +24,9 @@ import com.frostwire.search.CrawlableSearchResult;
  * @author aldenml
  * @author gubatron
  */
-public class ZooqleTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
+class ZooqleTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
-    final String detailUrl;
+    private final String detailUrl;
 
     ZooqleTempSearchResult(String domainName, String detailPath) {
         detailUrl = "https://" + domainName + "/" + detailPath;

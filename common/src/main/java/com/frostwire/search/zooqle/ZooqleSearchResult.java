@@ -27,7 +27,7 @@ import java.util.Locale;
  * @author aldenml
  * @author gubatron
  */
-public class ZooqleSearchResult extends AbstractTorrentSearchResult {
+public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
 
     private final String filename;
     private final String displayName;

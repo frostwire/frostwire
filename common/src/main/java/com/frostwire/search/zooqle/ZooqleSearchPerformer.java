@@ -20,15 +20,12 @@ package com.frostwire.search.zooqle;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
-import com.frostwire.util.Logger;
 
 /**
  * @author aldenml
  * @author gubatron
  */
-public class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSearchResult> {
-
-    private static Logger LOG = Logger.getLogger(ZooqleSearchPerformer.class);
+public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSearchResult> {
 
     private static final int MAX_RESULTS = 30;
     private static final String PRELIMINARY_RESULTS_REGEX =
@@ -61,21 +58,12 @@ public class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSea
 
     @Override
     protected int preliminaryHtmlPrefixOffset(String page) {
-        int offset = page.indexOf("<i class=\"spr feed\"></i>");
-        if (offset == -1) {
-            LOG.warn("preliminaryHtmlPrefixOffset() failed to find marker.");
-            return super.preliminaryHtmlPrefixOffset(page);
-        }
-        return offset;
+        return page.indexOf("<i class=\"spr feed\"></i>");
     }
 
     @Override
     protected int preliminaryHtmlSuffixOffset(String page) {
-        int offset = page.indexOf("<ul class=\"pagination");
-        if (offset == -1) {
-            return super.preliminaryHtmlSuffixOffset(page);
-        }
-        return offset;
+        return page.indexOf("<ul class=\"pagination");
     }
 
     @Override
@@ -96,7 +84,7 @@ public class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSea
         return offset;
     }
 
-    /**
+    /*
      public static void main(String[] args) throws Throwable {
      byte[] preliminaryResultsBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/zooqle_preliminary.html"));
      String preliminaryResultsString = new String(preliminaryResultsBytes,"utf-8");
