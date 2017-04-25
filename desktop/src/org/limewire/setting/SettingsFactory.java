@@ -569,21 +569,6 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
         return result;
     }
     
-    /**
-     * Creates a new <tt>PasswordSetting</tt> instance with the specified
-     * key and default value.
-     *
-     * @param key the key for the setting
-     * @param defaultValue the default value for the setting
-     */
-    public synchronized PasswordSetting createPasswordSettingMD5(
-            String key, String defaultValue) {
-        PasswordSetting result = 
-            new PasswordSetting(DEFAULT_PROPS, PROPS, PasswordSetting.MD5, key, defaultValue);
-        handleSettingInternal(result, null);
-        return result;
-    }
-    
     private synchronized void handleSettingInternal(AbstractSetting setting, String remoteKey) {
         settings.add(setting);
         setting.reload();
