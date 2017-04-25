@@ -29,7 +29,7 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 
     private static final int MAX_RESULTS = 30;
     private static final String PRELIMINARY_RESULTS_REGEX =
-            "(?is)<i class=\"zqf zqf-tv text-muted2 zqf-small pad-r2\"></i><a class=\".*?small\"href=\"/(?<detailPath>.*?).html\">.*?</a>";
+            "(?is)<i class=\".*?text-muted2 zqf-small pad-r2\"></i><a class=\".*?small\"href=\"/(?<detailPath>.*?).html\">.*?</a>";
     private static final String HTML_DETAIL_REGEX = "(?is)<h4 id=torname>(?<filename>.*?)<span.*?" +
             "Seeders: (?<seeds>\\d*).*?" +
             "title=\"File size\"></i>(?<size>[\\d\\.\\,]*) (?<sizeUnit>.*?)<span class.*?" +
