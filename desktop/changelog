@@ -1,3 +1,8 @@
+frostwire (6.4.9) stable; urgency=high
+  * Turkish, Dutch, Russian translations updated
+	
+ -- FrostWire Team <contact@frostwire.com>  Mon, 24 Apr 2017 21:52:03 -0600
+
 frostwire (6.4.8) stable; urgency=high
   * New jlibtorrent 1.2.0.9-RC1
   * New Zooqle search
