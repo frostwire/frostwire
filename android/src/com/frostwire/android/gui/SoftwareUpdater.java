@@ -382,6 +382,7 @@ public final class SoftwareUpdater {
         ConfigurationManager CM = ConfigurationManager.instance();
         CM.setStringArray(Constants.PREF_KEY_GUI_OFFERS_WATERFALL, update.config.waterfall);
         CM.setInt(Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD, update.config.mopubPreviewBannerThreshold);
+        CM.setInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD, update.config.oguryThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD, update.config.mopubAlbumArtBannerThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, update.config.removeAdsB2bThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
@@ -461,6 +462,7 @@ public final class SoftwareUpdater {
         int removeAdsB2bThreshold = 50;
         int mopubAlbumArtBannerThreshold = 40;
         int mopubPreviewBannerThreshold = 40;
+        int oguryThreshold = 10;
         int interstitialOffersTransferStarts = 5;
         int interstitialTransferOffersTimeoutInMinutes = 15;
 

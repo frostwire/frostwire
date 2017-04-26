@@ -22,9 +22,12 @@ package com.mopub.mobileads;
 import android.app.Activity;
 import android.content.Context;
 
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 
 import java.util.Map;
+import java.util.Random;
 
 import io.presage.IADHandler;
 import io.presage.Presage;
@@ -41,16 +44,25 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
     private CustomEventInterstitialListener interstitialListener;
     private static boolean OGURY_STARTED = false;
+    private static boolean OGURY_ENABLED = false;
     private static final Logger LOG = Logger.getLogger(OguryInterstitialAdapter.class);
     private final OguryIADHandler oguryInterstitialHandler;
 
     public OguryInterstitialAdapter() {
         super();
         oguryInterstitialHandler = new OguryIADHandler();
+        int oguryThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD);
+        int diceRoll = new Random().nextInt(100) + 1;
+        OGURY_ENABLED = diceRoll < oguryThreshold;
+        LOG.info("OguryInterstitialAdapter() - OGURY_ENABLED -> " + OGURY_ENABLED + " (dice roll: " + diceRoll + " < threshold: " + oguryThreshold + ")");
     }
 
     @Override
     protected void loadInterstitial(Context context, CustomEventInterstitialListener customEventInterstitialListener, Map<String, Object> map, Map<String, String> map1) {
+        if (!OGURY_ENABLED) {
+            LOG.info("OguryInterstitialAdapter.loadInterstitial() aborted, ogury disabled.");
+            return;
+        }
         if (customEventInterstitialListener == null) {
             LOG.error("OguryInterstitialAdapter.loadInterstitial() aborted. CustomEventInterstitialListener was null.");
             return;
@@ -62,7 +74,7 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
     @Override
     protected void showInterstitial() {
-        if (Presage.getInstance().canShow()) {
+        if (OGURY_ENABLED && Presage.getInstance().canShow()) {
             Presage.getInstance().adToServe(oguryInterstitialHandler);
             LOG.info("Showing Ogury-Mopub interstitial");
             interstitialListener.onInterstitialShown();
@@ -77,7 +89,7 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
     }
 
     private void startOgury(Context context) {
-        if (OGURY_STARTED) {
+        if (OGURY_STARTED || !OGURY_ENABLED) {
             return;
         }
         Context baseContext = context.getApplicationContext();
