@@ -1,3 +1,7 @@
+FrostWire 1.9.3 - APR/26/2017
+ - Optimizations and crash fixes
+ - Ogury 2.1.1
+
 FrostWire 1.9.2 - APR/20/2017
  - New jlibtorrent 1.2.0.9-RC1
  - New Zooqle search

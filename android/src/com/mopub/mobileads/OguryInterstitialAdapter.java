@@ -33,7 +33,8 @@ import io.presage.Presage;
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- * Created on 4/10/17.
+ * Created on 4/10/2017 - ogury 2.0.5
+ * Updated 04/26/2017 - ogury 2.1.1
  */
 
 public final class OguryInterstitialAdapter extends CustomEventInterstitial {
@@ -50,14 +51,18 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
     @Override
     protected void loadInterstitial(Context context, CustomEventInterstitialListener customEventInterstitialListener, Map<String, Object> map, Map<String, String> map1) {
+        if (customEventInterstitialListener == null) {
+            LOG.error("OguryInterstitialAdapter.loadInterstitial() aborted. CustomEventInterstitialListener was null.");
+            return;
+        }
         startOgury(context); // starts only once
         interstitialListener = customEventInterstitialListener;
-        Presage.getInstance().loadInterstitial(oguryInterstitialHandler);
+        Presage.getInstance().load(oguryInterstitialHandler);
     }
 
     @Override
     protected void showInterstitial() {
-        if (Presage.getInstance().isInterstitialLoaded()) {
+        if (Presage.getInstance().canShow()) {
             Presage.getInstance().adToServe(oguryInterstitialHandler);
             LOG.info("Showing Ogury-Mopub interstitial");
             interstitialListener.onInterstitialShown();
@@ -93,7 +98,11 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
     private class OguryIADHandler implements IADHandler {
 
         @Override
-        public void onAdNotFound() {
+        public void onAdAvailable() {
+        }
+
+        @Override
+        public void onAdNotAvailable() {
             if (interstitialListener == null) {
                 return;
             }
@@ -101,7 +110,7 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         }
 
         @Override
-        public void onAdFound() {
+        public void onAdLoaded() {
             if (interstitialListener == null) {
                 return;
             }

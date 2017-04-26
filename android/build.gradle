@@ -146,20 +146,17 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:design:25.3.1"
-    compile "com.android.support:preference-v14:25.3.1"
-    compile "com.android.support:support-v13:25.3.1"
-    compile "com.google.android.gms:play-services-ads-lite:10.2.1"
-    compile "com.google.android.gms:play-services-base:10.2.1"
-    compile("com.mopub:mopub-sdk-banner:4.13.0@aar") { transitive = true }
-    compile("com.mopub:mopub-sdk-interstitial:4.13.0@aar") { transitive = true }
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:preference-v14:25.3.1'
+    compile 'com.android.support:support-v13:25.3.1'
+    compile 'com.google.android.gms:play-services-ads-lite:10.2.1'
+    compile 'com.google.android.gms:play-services-base:10.2.1'
+    compile('com.mopub:mopub-sdk-banner:4.13.0@aar') { transitive = true }
+    compile('com.mopub:mopub-sdk-interstitial:4.13.0@aar') { transitive = true }
     compile 'com.squareup.picasso:picasso:2.5.2'
-
-    compile "com.frostwire:jlibtorrent-android-arm:1.2.0.9-RC1"
-    compile "com.frostwire:jlibtorrent-android-x86:1.2.0.9-RC1"
-
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
+    compile 'com.frostwire:jlibtorrent-android-arm:1.2.0.9-RC1'
+    compile 'com.frostwire:jlibtorrent-android-x86:1.2.0.9-RC1'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     //androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
     //    exclude group: 'com.android.support', module: 'support-annotations'
     //}
