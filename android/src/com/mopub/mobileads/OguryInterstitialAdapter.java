@@ -54,32 +54,48 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
     @Override
     protected void loadInterstitial(Context context, CustomEventInterstitialListener customEventInterstitialListener, Map<String, Object> map, Map<String, String> map1) {
-        if (!OGURY_ENABLED) {
-            LOG.info("OguryInterstitialAdapter.loadInterstitial() aborted, ogury disabled.");
-            return;
-        }
         if (customEventInterstitialListener == null) {
-            LOG.error("OguryInterstitialAdapter.loadInterstitial() aborted. CustomEventInterstitialListener was null.");
+            // this should not happen, but just in case
+            LOG.error("loadInterstitial() aborted. CustomEventInterstitialListener was null.");
             return;
         }
-        startOgury(context); // starts only once
+
+        if (!OGURY_ENABLED) {
+            customEventInterstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
+            LOG.info("loadInterstitial() aborted, ogury disabled.");
+            return;
+        }
+
         interstitialListener = customEventInterstitialListener;
+
+        startOgury(context); // starts only once
         presage().load(new OguryIADHandler(interstitialListener));
     }
 
     @Override
     protected void showInterstitial() {
-        if (OGURY_ENABLED && presage().canShow()) {
+        if (!OGURY_ENABLED) {
+            LOG.info("showInterstitial() aborted, ogury disabled.");
+            return;
+        }
+
+        if (interstitialListener == null) {
+            // this should not happen at this point, but just in case
+            LOG.error("showInterstitial() aborted. CustomEventInterstitialListener was null.");
+            return;
+        }
+
+        if (presage().canShow()) {
             presage().adToServe(new OguryIADHandler(interstitialListener));
             LOG.info("Showing Ogury-Mopub interstitial");
         } else {
+            interstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
             LOG.info("Ogury-Mopub show interstitial failed, ad not loaded yet");
         }
     }
 
     @Override
     protected void onInvalidate() {
-        interstitialListener = null;
     }
 
     private static Presage presage() {
