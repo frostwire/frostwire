@@ -36,7 +36,6 @@ import io.presage.Presage;
  *         Created on 4/10/2017 - ogury 2.0.5
  *         Updated 04/26/2017 - ogury 2.1.1
  */
-
 public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
     private CustomEventInterstitialListener interstitialListener;
@@ -73,7 +72,6 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         if (OGURY_ENABLED && Presage.getInstance().canShow()) {
             Presage.getInstance().adToServe(oguryInterstitialHandler);
             LOG.info("Showing Ogury-Mopub interstitial");
-            interstitialListener.onInterstitialShown();
         } else {
             LOG.info("Ogury-Mopub show interstitial failed, ad not loaded yet");
         }
