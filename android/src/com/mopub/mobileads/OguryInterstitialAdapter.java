@@ -64,13 +64,13 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         }
         startOgury(context); // starts only once
         interstitialListener = customEventInterstitialListener;
-        Presage.getInstance().load(new OguryIADHandler(interstitialListener));
+        presage().load(new OguryIADHandler(interstitialListener));
     }
 
     @Override
     protected void showInterstitial() {
-        if (OGURY_ENABLED && Presage.getInstance().canShow()) {
-            Presage.getInstance().adToServe(new OguryIADHandler(interstitialListener));
+        if (OGURY_ENABLED && presage().canShow()) {
+            presage().adToServe(new OguryIADHandler(interstitialListener));
             LOG.info("Showing Ogury-Mopub interstitial");
         } else {
             LOG.info("Ogury-Mopub show interstitial failed, ad not loaded yet");
@@ -82,6 +82,10 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         interstitialListener = null;
     }
 
+    private static Presage presage() {
+        return Presage.getInstance();
+    }
+
     private static boolean diceRoll() {
         int oguryThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD);
         int diceRoll = new Random().nextInt(100) + 1;
@@ -90,15 +94,15 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         return enabled;
     }
 
-    private void startOgury(Context context) {
+    private static void startOgury(Context context) {
         if (OGURY_STARTED || !OGURY_ENABLED) {
             return;
         }
         try {
             OGURY_STARTED = true;
             // presage internally picks the application context
-            Presage.getInstance().setContext(context);
-            Presage.getInstance().start();
+            presage().setContext(context);
+            presage().start();
             LOG.info("Ogury started from Mopub-Ogury adapter");
         } catch (Throwable e) {
             OGURY_STARTED = false;
