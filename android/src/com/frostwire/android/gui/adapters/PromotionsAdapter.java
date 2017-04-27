@@ -40,7 +40,6 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
-import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
 import java.util.Calendar;
@@ -55,7 +54,7 @@ import java.util.List;
  * @author marcelinkaaa
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
-    private static Logger LOG = Logger.getLogger(PromotionsAdapter.class);
+
     private static final int NO_SPECIAL_OFFER = 97999605;
     private final List<Slide> slides;
     private final PromotionDownloader promotionDownloader;
@@ -255,10 +254,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                 specialOfferLayout = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 2 == 0 ?
                         R.layout.view_remove_ads_notification :
                         R.layout.view_less_results_notification;
-            } else {
-                LOG.info("pickSpecialOfferLayout: removeAdsOffersEnabled NOT enabled!");
             }
-
         }
         return specialOfferLayout;
     }
