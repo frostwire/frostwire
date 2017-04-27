@@ -40,9 +40,10 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
     private static final Logger LOG = Logger.getLogger(OguryInterstitialAdapter.class);
 
-    private CustomEventInterstitialListener interstitialListener;
     private static boolean OGURY_STARTED = false;
     private static boolean OGURY_ENABLED = false;
+
+    private CustomEventInterstitialListener interstitialListener;
 
     public OguryInterstitialAdapter() {
         int oguryThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD);
@@ -86,10 +87,10 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
             return;
         }
         try {
+            OGURY_STARTED = true;
             // presage internally picks the application context
             Presage.getInstance().setContext(context);
             Presage.getInstance().start();
-            OGURY_STARTED = true;
             LOG.info("Ogury started from Mopub-Ogury adapter");
         } catch (Throwable e) {
             OGURY_STARTED = false;
