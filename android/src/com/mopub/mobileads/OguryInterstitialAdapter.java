@@ -92,18 +92,15 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         if (OGURY_STARTED || !OGURY_ENABLED) {
             return;
         }
-        Context baseContext = context.getApplicationContext();
-        if (context instanceof Activity) {
-            baseContext = ((Activity) context).getBaseContext();
-        }
         try {
-            Presage.getInstance().setContext(baseContext);
+            // presage internally picks the application context
+            Presage.getInstance().setContext(context);
             Presage.getInstance().start();
             OGURY_STARTED = true;
             LOG.info("Ogury started from Mopub-Ogury adapter");
-        } catch (Throwable t) {
+        } catch (Throwable e) {
             OGURY_STARTED = false;
-            LOG.warn("Could not start Ogury from Mopub-Ogury adapter", t);
+            LOG.error("Could not start Ogury from Mopub-Ogury adapter", e);
         }
     }
 
