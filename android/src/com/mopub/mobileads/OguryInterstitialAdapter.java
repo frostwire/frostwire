@@ -46,10 +46,10 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
     private CustomEventInterstitialListener interstitialListener;
 
     public OguryInterstitialAdapter() {
-        int oguryThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD);
-        int diceRoll = new Random().nextInt(100) + 1;
-        OGURY_ENABLED = diceRoll < oguryThreshold;
-        LOG.info("OguryInterstitialAdapter() - OGURY_ENABLED -> " + OGURY_ENABLED + " (dice roll: " + diceRoll + " < threshold: " + oguryThreshold + ")");
+        // this class should be created only once by the mopub framework
+        // both OGURY_STARTED and OGURY_ENABLED are static to minimize the
+        // risks in case of getting in a multithreaded environment
+        OGURY_ENABLED = diceRoll();
     }
 
     @Override
@@ -80,6 +80,14 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
     @Override
     protected void onInvalidate() {
         interstitialListener = null;
+    }
+
+    private static boolean diceRoll() {
+        int oguryThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD);
+        int diceRoll = new Random().nextInt(100) + 1;
+        boolean enabled = diceRoll < oguryThreshold;
+        LOG.info("OGURY_ENABLED -> " + enabled + " (dice roll: " + diceRoll + " < threshold: " + oguryThreshold + ")");
+        return enabled;
     }
 
     private void startOgury(Context context) {
