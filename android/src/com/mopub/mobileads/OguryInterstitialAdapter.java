@@ -38,14 +38,13 @@ import io.presage.Presage;
  */
 public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
+    private static final Logger LOG = Logger.getLogger(OguryInterstitialAdapter.class);
+
     private CustomEventInterstitialListener interstitialListener;
     private static boolean OGURY_STARTED = false;
     private static boolean OGURY_ENABLED = false;
-    private static final Logger LOG = Logger.getLogger(OguryInterstitialAdapter.class);
-    private final OguryIADHandler oguryInterstitialHandler;
 
     public OguryInterstitialAdapter() {
-        oguryInterstitialHandler = new OguryIADHandler();
         int oguryThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD);
         int diceRoll = new Random().nextInt(100) + 1;
         OGURY_ENABLED = diceRoll < oguryThreshold;
@@ -64,13 +63,13 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         }
         startOgury(context); // starts only once
         interstitialListener = customEventInterstitialListener;
-        Presage.getInstance().load(oguryInterstitialHandler);
+        Presage.getInstance().load(new OguryIADHandler(interstitialListener));
     }
 
     @Override
     protected void showInterstitial() {
         if (OGURY_ENABLED && Presage.getInstance().canShow()) {
-            Presage.getInstance().adToServe(oguryInterstitialHandler);
+            Presage.getInstance().adToServe(new OguryIADHandler(interstitialListener));
             LOG.info("Showing Ogury-Mopub interstitial");
         } else {
             LOG.info("Ogury-Mopub show interstitial failed, ad not loaded yet");
@@ -98,7 +97,13 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         }
     }
 
-    private class OguryIADHandler implements IADHandler {
+    private static final class OguryIADHandler implements IADHandler {
+
+        private final CustomEventInterstitialListener mopubListener;
+
+        private OguryIADHandler(CustomEventInterstitialListener mopubListener) {
+            this.mopubListener = mopubListener;
+        }
 
         @Override
         public void onAdAvailable() {
@@ -106,42 +111,27 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
         @Override
         public void onAdNotAvailable() {
-            if (interstitialListener == null) {
-                return;
-            }
-            interstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
+            mopubListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
         }
 
         @Override
         public void onAdLoaded() {
-            if (interstitialListener == null) {
-                return;
-            }
-            interstitialListener.onInterstitialLoaded();
+            mopubListener.onInterstitialLoaded();
         }
 
         @Override
         public void onAdClosed() {
-            if (interstitialListener == null) {
-                return;
-            }
-            interstitialListener.onInterstitialDismissed();
+            mopubListener.onInterstitialDismissed();
         }
 
         @Override
         public void onAdError(int code) {
-            if (interstitialListener == null) {
-                return;
-            }
-            interstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
+            mopubListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
         }
 
         @Override
         public void onAdDisplayed() {
-            if (interstitialListener == null) {
-                return;
-            }
-            interstitialListener.onInterstitialShown();
+            mopubListener.onInterstitialShown();
         }
     }
 }
