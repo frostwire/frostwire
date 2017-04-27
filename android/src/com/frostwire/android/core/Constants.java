@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.core;
@@ -32,7 +31,6 @@ public final class Constants {
     }
 
     public static final boolean IS_BASIC_AND_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
-    public static final boolean IS_PLUS_OR_DEBUG = BuildConfig.FLAVOR.contains("plus") || BuildConfig.BUILD_TYPE.equals("debug");
     public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic");
 
     private static final String BUILD_PREFIX = !IS_GOOGLE_PLAY_DISTRIBUTION ? "1000" : "";
@@ -48,7 +46,7 @@ public final class Constants {
     public static final String FROSTWIRE_VERSION_STRING = BuildConfig.VERSION_NAME;
 
     // preference keys
-    static final String PREF_KEY_CORE_UUID = "frostwire.prefs.core.uuid";
+    public static final String PREF_KEY_CORE_UUID = "frostwire.prefs.core.uuid";
     public static final String PREF_KEY_CORE_LAST_SEEN_VERSION = "frostwire.prefs.core.last_seen_version";
 
     public static final String PREF_KEY_NETWORK_ENABLE_DHT = "froswire.prefs.network.enable_dht";
@@ -84,9 +82,6 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_TORRENTSFM = "frostwire.prefs.search.use_torrentsfm";
     public static final String PREF_KEY_SEARCH_USE_BTJUNKIE = "frostwire.prefs.search.use_btjunkie";
 
-    public static final String PREF_KEY_SEARCH_PREFERENCE_CATEGORY = "frostwire.prefs.search.preference_category";
-    public static final String PREF_KEY_OTHER_PREFERENCE_CATEGORY = "frostwire.prefs.other.preference_category";
-
     public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD = "frostwire.prefs.gui.vibrate_on_finished_download";
     public static final String PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER = "frostwire.prefs.gui.last_media_type_filter";
     public static final String PREF_KEY_GUI_TOS_ACCEPTED = "frostwire.prefs.gui.tos_accepted";
@@ -109,7 +104,6 @@ public final class Constants {
     public static final String PREF_KEY_GUI_HAPTIC_FEEDBACK_ON = "frostwire.prefs.gui.haptic_feedback_on";
     public static final String PREF_KEY_GUI_DISTRACTION_FREE_SEARCH = "frostwire.prefs.gui.distraction_free_search";
     public static final String PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION = "frostwire.prefs.gui.adnetwork_ask_for_location";
-
 
 
     public static final String PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED = "frostwire.prefs.torrent.max_download_speed";
@@ -173,7 +167,7 @@ public final class Constants {
     public static final String HOW_TO_GET_MORE_SEARCH_RESULTS_URL = "http://support.frostwire.com/hc/en-us/articles/204095909-How-to-fix-FrostWire-for-Android-not-showing-YouTube-search-results-";
     public static final String FROSTWIRE_PREVIEW_DOT_COM_URL = "http://www.frostwire-preview.com/";
 
-    public static final String USER_AGENT = "FrostWire/android-" + (Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic" : "plus" ) + "/" + Constants.FROSTWIRE_VERSION_STRING + "/" + Constants.FROSTWIRE_BUILD;
+    public static final String USER_AGENT = "FrostWire/android-" + (Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic" : "plus") + "/" + Constants.FROSTWIRE_VERSION_STRING + "/" + Constants.FROSTWIRE_BUILD;
 
     public static final long LIBRARIAN_FILE_COUNT_CACHE_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
