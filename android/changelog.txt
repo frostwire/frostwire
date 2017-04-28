@@ -1,4 +1,5 @@
-FrostWire 1.9.3 - APR/26/2017
+FrostWire 1.9.3 - APR/28/2017
+ - Fixes YT search
  - Optimizations and crash fixes
  - Ogury 2.1.1
 
