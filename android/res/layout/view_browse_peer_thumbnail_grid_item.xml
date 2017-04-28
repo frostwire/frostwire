@@ -34,6 +34,22 @@
         android:contentDescription="@null" />
 
     <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true">
+
+        <TextView
+            android:id="@+id/view_browse_peer_thumbnail_grid_item_filesize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="123.5 KB"
+            android:visibility="gone"
+            style="@style/GridThumbnailText"
+             />
+    </FrameLayout>
+
+    <FrameLayout
         android:id="@+id/view_browse_peer_thumbnail_grid_overlay_checkmark_framelayout"
         android:layout_width="match_parent"
         android:layout_height="128dp"

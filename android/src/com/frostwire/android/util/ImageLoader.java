@@ -208,7 +208,7 @@ public final class ImageLoader {
             picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new Callback.EmptyCallback() {
                 @Override
                 public void onError() {
-                        load(uriRetry, target, targetWidth, targetHeight);
+                    load(uriRetry, target, targetWidth, targetHeight);
                 }
             });
         }

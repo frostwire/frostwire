@@ -329,10 +329,7 @@ public final class UIUtils {
         try {
             if (filePath != null && !openAudioInternal(filePath)) {
                 Intent i = new Intent(Intent.ACTION_VIEW);
-                Uri uri = useFileProvider ?
-                        FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath)) :
-                        Uri.fromFile(new File(filePath));
-                i.setDataAndType(uri, Intent.normalizeMimeType(mime));
+                i.setDataAndType(getFileUri(context, filePath, useFileProvider), Intent.normalizeMimeType(mime));
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                 if (mime != null && mime.contains("video")) {
@@ -347,6 +344,12 @@ public final class UIUtils {
             UIUtils.showShortMessage(context, R.string.cant_open_file);
             LOG.error("Failed to open file: " + filePath, e);
         }
+    }
+
+    public static Uri getFileUri(Context context, String filePath, boolean useFileProvider) {
+        return useFileProvider ?
+                FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath)) :
+                Uri.fromFile(new File(filePath));
     }
 
     public static void openFile(Context context, File file) {
