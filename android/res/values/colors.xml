@@ -66,6 +66,7 @@
 
     <!-- Other Colors -->
     <color name="app_divider">@color/basic_gray_medium</color>
+    <color name="app_divider_dark">@color/basic_blue_dark</color>
     <color name="app_approval_green">@color/basic_green_dark</color>
     <color name="app_warning_red">@color/basic_red</color>
 

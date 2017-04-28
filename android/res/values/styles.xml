@@ -223,11 +223,16 @@
 
     <!-- Transfers list end -->
 
-    <style name="TransfersButton">
+    <style name="TransfersFileTypeButton">
         <item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
+        <item name="android:textSize">@dimen/text_x_small</item>
+        <item name="android:gravity">center</item>
+        <item name="android:button">@null</item>
+        <item name="android:background">@drawable/radio_button_background_selector</item>
+        <item name="android:layout_weight">1</item>
     </style>
 
     <!-- Transfers indicator begin -->
@@ -577,6 +582,12 @@
         <item name="android:background">@color/app_divider</item>
         <item name="android:height">1dp</item>
     </style>
+
+    <style name="divider_line_dark">
+        <item name="android:background">@color/app_divider_dark</item>
+        <item name="android:height">1dp</item>
+    </style>
+
     <!--v21-->
     <style name="MediumText">
         <item name="android:textStyle">normal</item>

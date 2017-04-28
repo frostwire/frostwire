@@ -18,12 +18,32 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:frostwire="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="fill_parent"
-              android:orientation="vertical">
+    xmlns:frostwire="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <com.frostwire.android.gui.views.ClearableEditTextView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/basic_blue"
+        android:orientation="vertical">
+
+        <View
+            style="@style/divider_line_dark"
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
+
+        <!-- Dummy item to prevent EditText from receiving focus at startup -->
+        <LinearLayout
+            android:id="@+id/fragment_transfers_input_linearlayout_dummy"
+            android:layout_width="0px"
+            android:layout_height="0px"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal" />
+
+        <com.frostwire.android.gui.views.ClearableEditTextView
             android:id="@+id/fragment_transfers_add_transfer_text_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,161 +53,158 @@
             android:layout_marginTop="6dp"
             android:focusableInTouchMode="true"
             android:visibility="gone"
-            frostwire:clearable_hint="@string/add_transfer_label"/>
+            frostwire:clearable_hint="@string/add_transfer_label" />
+    </LinearLayout>
 
     <RadioGroup
-            android:id="@+id/fragment_transfers_buttons"
+        android:id="@+id/fragment_transfers_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:checkedButton="@+id/fragment_transfers_button_select_all"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/fragment_transfers_button_select_all"
+            style="@style/TransfersFileTypeButton"
+            android:layout_width="match_parent"
+            android:text="@string/transfers_select_all" />
+
+        <RadioButton
+            android:id="@+id/fragment_transfers_button_select_downloading"
+            style="@style/TransfersFileTypeButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="0dp"
-            android:checkedButton="@+id/fragment_transfers_button_select_all"
-            android:orientation="horizontal">
+            android:text="@string/transfers_select_downloading" />
 
         <RadioButton
-                android:id="@+id/fragment_transfers_button_select_all"
-                style="@style/TransfersButton"
-                android:layout_width="fill_parent"
-                android:layout_weight="1"
-                android:background="@drawable/radio_button_background_selector"
-                android:button="@null"
-                android:gravity="center"
-                android:text="@string/transfers_select_all"
-                android:textSize="12sp"/>
-
-        <RadioButton
-                android:id="@+id/fragment_transfers_button_select_downloading"
-                style="@style/TransfersButton"
-                android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:layout_weight="1"
-                android:background="@drawable/radio_button_background_selector"
-                android:button="@null"
-                android:gravity="center"
-                android:text="@string/transfers_select_downloading"
-                android:textSize="12sp"/>
-
-        <RadioButton
-                android:id="@+id/fragment_transfers_button_select_completed"
-                style="@style/TransfersButton"
-                android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:layout_weight="1"
-                android:background="@drawable/radio_button_background_selector"
-                android:button="@null"
-                android:gravity="center"
-                android:text="@string/transfers_select_completed"
-                android:textSize="12sp"/>
+            android:id="@+id/fragment_transfers_button_select_completed"
+            style="@style/TransfersFileTypeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/transfers_select_completed" />
     </RadioGroup>
 
     <com.frostwire.android.gui.views.RichNotification
-            android:id="@+id/fragment_transfers_sd_card_notification"
-            frostwire:rich_notification_icon="@drawable/sd_card_notification"
-            frostwire:rich_notification_title="@string/saving_to_sd_card"
-            frostwire:rich_notification_title_underlined="true"
-            frostwire:rich_notification_description="@string/android_will_erase_files_if_frostwire_is_uninstalled"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-    />
+        android:id="@+id/fragment_transfers_sd_card_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        frostwire:rich_notification_description="@string/android_will_erase_files_if_frostwire_is_uninstalled"
+        frostwire:rich_notification_icon="@drawable/sd_card_notification"
+        frostwire:rich_notification_title="@string/saving_to_sd_card"
+        frostwire:rich_notification_title_underlined="true" />
 
     <com.frostwire.android.gui.views.RichNotification
-            android:id="@+id/fragment_transfers_internal_memory_notification"
-            frostwire:rich_notification_icon="@drawable/internal_memory_notification"
-            frostwire:rich_notification_title="@string/saving_to_internal_memory"
-            frostwire:rich_notification_title_underlined="true"
-            frostwire:rich_notification_description="@string/saving_to_internal_memory_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-    />
+        android:id="@+id/fragment_transfers_internal_memory_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        frostwire:rich_notification_description="@string/saving_to_internal_memory_description"
+        frostwire:rich_notification_icon="@drawable/internal_memory_notification"
+        frostwire:rich_notification_title="@string/saving_to_internal_memory"
+        frostwire:rich_notification_title_underlined="true" />
 
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:background="@color/app_background_body_light">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/app_background_body_light">
+
         <com.frostwire.android.gui.views.SwipeLayout
-                android:id="@+id/fragment_transfers_swipe"
+            android:id="@+id/fragment_transfers_swipe"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ExpandableListView
+                android:id="@+id/fragment_transfers_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
-            <ExpandableListView
-                    android:id="@+id/fragment_transfers_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/app_background_body_light"
-                    android:fadingEdge="none"
-                    android:groupIndicator="@android:color/transparent"/>
+                android:background="@color/app_background_body_light"
+                android:fadingEdge="none"
+                android:groupIndicator="@android:color/transparent" />
         </com.frostwire.android.gui.views.SwipeLayout>
-        <TextView android:id="@+id/fragment_transfers_vpn_notification"
-                  style="@style/GetVPNToastNotification"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="@string/vpn_off_toast_notification"
-                  android:layout_marginLeft="8dp"
-                  android:layout_marginBottom="5dp"
-                  android:background="@drawable/toast_vpn_status_bgd"
-                  android:layout_alignParentBottom="true"/>
+
+        <TextView
+            android:id="@+id/fragment_transfers_vpn_notification"
+            style="@style/GetVPNToastNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="8dp"
+            android:background="@drawable/toast_vpn_status_bgd"
+            android:text="@string/vpn_off_toast_notification" />
     </RelativeLayout>
 
-    <View android:id="@+id/fragment_transfers_indicators_top_border"
-          android:layout_width="match_parent"
-          android:layout_height="1px"
-          android:background="#ff1d2934"/>
+    <View
+        android:id="@+id/fragment_transfers_indicators_top_border"
+        style="@style/divider_line_dark"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
 
     <LinearLayout
-            android:id="@+id/fragment_transfers_indicators"
-            android:layout_width="fill_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/transfers_indicators_background">
+        android:id="@+id/fragment_transfers_indicators"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/transfers_indicators_background">
 
         <!-- VPN status icon -->
-        <ImageView android:id="@+id/fragment_transfers_status_vpn_icon"
-                   android:layout_width="20dp"
-                   android:layout_height="20dp"
-                   android:src="@drawable/notification_vpn_off"
-                   android:scaleType="fitXY"
-                   android:layout_gravity="left|center_vertical"
-                   android:layout_margin="10dp"
-                   android:background="@color/transparent"/>
+        <ImageView
+            android:id="@+id/fragment_transfers_status_vpn_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="left|center_vertical"
+            android:layout_margin="10dp"
+            android:background="@color/transparent"
+            android:scaleType="fitXY"
+            android:src="@drawable/notification_vpn_off" />
 
-        <View android:layout_width="1px" android:layout_height="fill_parent" android:background="@color/black"/>
+        <View
+            android:layout_width="1px"
+            android:layout_height="match_parent"
+            android:background="@color/black" />
 
         <!-- DHT peers -->
-        <TextView android:id="@+id/fragment_transfers_dht_peers"
-                  android:layout_width="wrap_content"
-                  android:layout_height="match_parent"
-                  android:textColor="@color/app_text_white"
-                  android:textSize="@dimen/text_size_extra_micro"
-                  android:gravity="center_vertical"
-                  android:layout_gravity="center_vertical"
-                  android:layout_marginLeft="5dp"
-                  android:layout_weight="1.0"
-                  android:text="@string/dht_contacts"/>
+        <TextView
+            android:id="@+id/fragment_transfers_dht_peers"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1.0"
+            android:gravity="center_vertical"
+            android:text="@string/dht_contacts"
+            android:textColor="@color/app_text_white"
+            android:textSize="@dimen/text_size_extra_micro" />
 
-        <LinearLayout android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_gravity="right|center_vertical">
-            <TextView
-                    android:id="@+id/fragment_transfers_text_downloads"
-                    style="@style/TransfersIndicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/transfers_triangle_downward"
-                    android:paddingRight="8dp"
-                    android:text="@string/dummy_downloads_indicator"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical">
 
             <TextView
-                    android:id="@+id/fragment_transfers_text_uploads"
-                    style="@style/TransfersIndicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/transfers_triangle_upward"
-                    android:paddingRight="8dp"
-                    android:text="@string/dummy_uploads_indicator"/>
+                android:id="@+id/fragment_transfers_text_downloads"
+                style="@style/TransfersIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/transfers_triangle_downward"
+                android:paddingRight="8dp"
+                android:text="@string/dummy_downloads_indicator" />
+
+            <TextView
+                android:id="@+id/fragment_transfers_text_uploads"
+                style="@style/TransfersIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/transfers_triangle_upward"
+                android:paddingRight="8dp"
+                android:text="@string/dummy_uploads_indicator" />
         </LinearLayout>
     </LinearLayout>
 
     <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="#ff1d2934"/>
+        style="@style/divider_line_dark"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
 
 </LinearLayout>
