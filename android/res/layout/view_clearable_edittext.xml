@@ -32,7 +32,7 @@
         android:dropDownVerticalOffset="11dp"
         android:hint="@null"
         android:imeOptions="actionSearch"
-        android:lines="1"
+        android:inputType="text"
         android:maxLines="1"
         android:paddingLeft="12dp"
         android:paddingRight="38dp"
