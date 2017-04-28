@@ -17,6 +17,8 @@
 
 package com.frostwire.android.core;
 
+import android.os.Bundle;
+
 import com.frostwire.android.gui.util.UIUtils;
 
 /**
@@ -80,6 +82,43 @@ public class FileDescriptor implements Cloneable {
         this.dateModified = dateModified;
         this.shared = isShared;
         ensureCorrectMimeType(this);
+    }
+
+    public FileDescriptor(Bundle bundle) {
+        fromBundle(bundle);
+        ensureCorrectMimeType(this);
+    }
+
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", id);
+        bundle.putString("artist", artist);
+        bundle.putString("title", title);
+        bundle.putString("album", album);
+        bundle.putString("year", year);
+        bundle.putString("filePath", filePath);
+        bundle.putByte("fileType", fileType);
+        bundle.putString("mime", mime);
+        bundle.putLong("fileSize", fileSize);
+        bundle.putLong("dateAdded", dateAdded);
+        bundle.putLong("dateModified", dateModified);
+        bundle.putBoolean("shared", shared);
+        return bundle;
+    }
+
+    public void fromBundle(Bundle bundle) {
+        id = bundle.getInt("id");
+        artist = bundle.getString("artist");
+        title = bundle.getString("title");
+        album = bundle.getString("album");
+        year = bundle.getString("year");
+        filePath = bundle.getString("filePath");
+        fileType = bundle.getByte("fileType");
+        mime = bundle.getString("mime");
+        fileSize = bundle.getLong("fileSize");
+        dateAdded = bundle.getLong("dateAdded");
+        dateModified = bundle.getLong("dateModified");
+        shared = bundle.getBoolean("shared");
     }
 
     @Override

@@ -20,6 +20,7 @@ package com.frostwire.android.gui.adapters.menu;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -39,6 +40,8 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.gui.activities.ImageViewerActivity;
+import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.CheckableImageView;
@@ -64,6 +67,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -110,21 +114,23 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     }
 
     private static int getLayoutId(int fileType) {
-        int layout = (fileType == Constants.FILE_TYPE_PICTURES || fileType == Constants.FILE_TYPE_VIDEOS) ?
+        return (fileType == Constants.FILE_TYPE_PICTURES || fileType == Constants.FILE_TYPE_VIDEOS) ?
                 R.layout.view_browse_peer_thumbnail_grid_item :
                 R.layout.view_browse_peer_thumbnail_list_item;
-        return layout;
     }
 
     public View getView(int position, View view, ViewGroup parent) {
         int adapterLayoutId = getViewItemId();
         if (adapterLayoutId == R.layout.view_browse_peer_thumbnail_list_item) {
             return super.getView(position, view, parent);
+        } else {
+            return getGridView(position, view, parent);
         }
+    }
 
+    private View getGridView(int position, View view, ViewGroup parent) {
         // see parent and see where the container inflation happens and try to mimick that here.
-
-        FileDescriptorItem item = getItem(position);
+        final FileDescriptorItem item = getItem(position);
         Context ctx = getContext();
 
         if (view == null && ctx != null) {
@@ -134,7 +140,22 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         try {
             initCheckableGridImageView((RelativeLayout) view, item);
-            initTouchFeedback(view, item);
+            initTouchFeedback(view, item, new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (selectAllMode) {
+                        onItemClicked(v);
+                    } else {
+                        localPlay(item.fd, v);
+                    }
+                }
+            }, new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    // toggles checkbox mode.
+                    return onItemLongClicked(v);
+                }
+            }, null);
         } catch (Throwable e) {
             LOG.error("Fatal error getting view: " + e.getMessage(), e);
         }
@@ -147,22 +168,28 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         boolean isChecked = getChecked().contains(item);
         Uri[] uris = getFileItemThumbnailUris(item);
         MediaPlaybackOverlay.MediaPlaybackState overlay = MediaPlaybackOverlay.MediaPlaybackState.NONE;
+        boolean showFileSize = false;
         if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) {
             overlay = MediaPlaybackOverlay.MediaPlaybackState.PLAY;
+            showFileSize = true;
         }
         final CheckableImageView checkableView = new CheckableImageView(
                 view.getContext(),
                 view,
-                128,
-                128,
+                0, // re-sizing while keeping aspect ratio
+                196,
                 uris,
                 isChecked,
+                showFileSize,
                 overlay,
                 checkboxOnCheckedChangeListener);
         checkboxOnCheckedChangeListener.setEnabled(false);
         checkableView.setCheckableMode(selectAllMode);
         checkableView.setTag(item);
         checkableView.loadImages();
+        if (showFileSize) {
+            checkableView.setFileSize(item.fd.fileSize);
+        }
         checkableView.setVisibility(View.VISIBLE);
         checkboxOnCheckedChangeListener.setEnabled(true);
     }
@@ -265,7 +292,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         List<FileDescriptor> list = checked;
         if (list.size() == 0) {
-            list = Arrays.asList(fd);
+            list = Collections.singletonList(fd);
         }
 
         if (fd.fileType == Constants.FILE_TYPE_AUDIO) {
@@ -273,7 +300,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
 
         if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS &&
-            fd.fileType != Constants.FILE_TYPE_RINGTONES) {
+                fd.fileType != Constants.FILE_TYPE_RINGTONES) {
             items.add(new SendFileMenuAction(context, fd));
             items.add(new DeleteFileMenuAction(context, this, list));
         }
@@ -309,7 +336,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 if (fd.fileType == Constants.FILE_TYPE_RINGTONES) {
                     playRingtone(fd);
                 } else {
-                    UIUtils.openFile(ctx, fd.filePath, fd.mime, true);
+                    if (fd.fileType == Constants.FILE_TYPE_PICTURES && ctx instanceof MainActivity) {
+                        Intent intent = new Intent(ctx, ImageViewerActivity.class);
+                        intent.putExtras(fd.toBundle());
+                        ctx.startActivity(intent);
+                    } else {
+                        UIUtils.openFile(ctx, fd.filePath, fd.mime, true);
+                    }
                 }
             } else {
                 // it will automatically remove the 'Open' entry.
@@ -460,6 +493,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         Resources res = getContext().getResources();
 
+        // TODO: Fix deprecation warning when we hit API 23
         title.setTextColor(res.getColor(R.color.app_text_primary));
         text.setTextColor(res.getColor(R.color.app_text_primary));
         size.setTextColor(res.getColor(R.color.basic_blue_highlight_dark));
@@ -485,11 +519,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         if (fd.fileType == Constants.FILE_TYPE_RINGTONES) {
             return true;
         }
-
-        if (checked.size() > 1) {
-            return false;
-        }
-        return checked.size() != 1 || checked.get(0).equals(fd);
+        return checked.size() <= 1 && (checked.size() != 1 || checked.get(0).equals(fd));
     }
 
     private static ArrayList<FileDescriptor> convertItems(Collection<FileDescriptorItem> items) {

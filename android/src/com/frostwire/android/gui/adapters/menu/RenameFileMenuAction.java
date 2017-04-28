@@ -26,12 +26,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
+
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -42,11 +44,17 @@ import org.apache.commons.io.FilenameUtils;
 public class RenameFileMenuAction extends MenuAction {
     private final FileDescriptor fd;
     private final FileListAdapter adapter;
+    private final AbstractDialog.OnDialogClickListener dialogClickListener;
 
     public RenameFileMenuAction(Context context, FileListAdapter adapter, FileDescriptor fd) {
+        this(context, adapter, fd, null);
+    }
+
+    public RenameFileMenuAction(Context context, FileListAdapter adapter, FileDescriptor fd, AbstractDialog.OnDialogClickListener clickListener) {
         super(context, R.drawable.contextmenu_icon_rename, R.string.rename);
         this.adapter = adapter;
         this.fd = fd;
+        this.dialogClickListener = clickListener;
     }
 
     @Override
@@ -56,7 +64,7 @@ public class RenameFileMenuAction extends MenuAction {
 
     private void showRenameFileDialog() {
         RenameFileMenuActionDialog.renameAction = this;
-        RenameFileMenuActionDialog.newInstance(getFilePath()).show(((Activity) getContext()).getFragmentManager());
+        RenameFileMenuActionDialog.newInstance(getFilePath(), dialogClickListener).show(((Activity) getContext()).getFragmentManager());;
     }
 
     private boolean isValidFileName(String newFileName) {
@@ -73,7 +81,9 @@ public class RenameFileMenuAction extends MenuAction {
         if (isValidFileName(newFileName)) {
             fd.filePath = Librarian.instance().renameFile(fd, newFileName);
             fd.title = FilenameUtils.getBaseName(newFileName);
-            adapter.notifyDataSetChanged();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
         } else {
             UIUtils.showLongMessage(getContext(), R.string.invalid_filename);
         }
@@ -88,8 +98,11 @@ public class RenameFileMenuAction extends MenuAction {
         private static RenameFileMenuAction renameAction;
         private String filePath;
 
-        public static RenameFileMenuActionDialog newInstance(String filePath) {
+        public static RenameFileMenuActionDialog newInstance(String filePath, AbstractDialog.OnDialogClickListener onDialogClickListener) {
             RenameFileMenuActionDialog dlg = new RenameFileMenuActionDialog();
+            if (onDialogClickListener != null) {
+                dlg.setOnDialogClickListener(onDialogClickListener);
+            }
             dlg.filePath = filePath; // bad design having non empty constructors
             // no time to refactor now
             return dlg;
@@ -133,12 +146,14 @@ public class RenameFileMenuAction extends MenuAction {
             noButton.setOnClickListener(new ButtonOnClickListener(this, false));
         }
 
-        public void rename() {
+        public String rename() {
             EditText input = findView(getDialog(), R.id.dialog_default_input_text);
+            String newFileName = input.getText().toString();
             if (RenameFileMenuActionDialog.renameAction != null) {
-                RenameFileMenuActionDialog.renameAction.renameFile(input.getText().toString());
+                RenameFileMenuActionDialog.renameAction.renameFile(newFileName);
             }
             dismiss();
+            return newFileName;
         }
     }
 
@@ -154,10 +169,14 @@ public class RenameFileMenuAction extends MenuAction {
 
         @Override
         public void onClick(View view) {
+            String newFileName = null;
             if (!rename) {
                 newRenameFileDialog.dismiss();
             } else {
-                newRenameFileDialog.rename();
+                newFileName = newRenameFileDialog.rename();
+            }
+            if (newRenameFileDialog.getOnDialogClickListener() != null) {
+                newRenameFileDialog.getOnDialogClickListener().onDialogClick(newFileName, rename ? 1 : 0);
             }
         }
     }

@@ -395,10 +395,10 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     protected void onItemChecked(View v, boolean isChecked) {
-        if (v instanceof Checkable) {
-            onCheckboxItemChecked(v, isChecked);
-        } else if (v instanceof RadioButton) {
+        if (v instanceof RadioButton) {
             onRadioButtonItemChecked((RadioButton) v, isChecked);
+        } else if (v instanceof Checkable) {
+            onCheckboxItemChecked(v, isChecked);
         }
 
         notifyDataSetInvalidated();
@@ -422,7 +422,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     private void updateLastRadioButtonChecked(int position) {
         lastSelectedRadioButtonIndex = position;
-
     }
 
     private void onRadioButtonItemChecked(RadioButton radioButton, boolean isChecked) {
@@ -504,13 +503,17 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     protected void initTouchFeedback(View v, T item) {
+        initTouchFeedback(v, item, viewOnClickListener, viewOnLongClickListener, viewOnKeyListener);
+    }
+
+    protected void initTouchFeedback(View v, T item, OnClickListener clickListener, OnLongClickListener longClickListener, OnKeyListener keyListener) {
         if (v == null || v instanceof CheckBox) {
             return;
         }
 
-        v.setOnClickListener(viewOnClickListener);
-        v.setOnLongClickListener(viewOnLongClickListener);
-        v.setOnKeyListener(viewOnKeyListener);
+        v.setOnClickListener(clickListener);
+        v.setOnLongClickListener(longClickListener);
+        v.setOnKeyListener(keyListener);
         v.setTag(item);
 
         if (v instanceof ViewGroup) {
@@ -519,7 +522,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             for (int i = 0; i < count; i++) {
                 View child = vg.getChildAt(i);
                 if (child != null) {
-                    initTouchFeedback(child, item);
+                    initTouchFeedback(child, item, clickListener, longClickListener, keyListener);
                 }
             }
         }
