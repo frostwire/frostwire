@@ -164,6 +164,10 @@ public abstract class AbstractDialog extends DialogFragment {
         this.onDialogClickListener = onDialogClickListener;
     }
 
+    public OnDialogClickListener getOnDialogClickListener() {
+        return this.onDialogClickListener;
+    }
+
     public interface OnDialogClickListener {
         void onDialogClick(String tag, int which);
     }
