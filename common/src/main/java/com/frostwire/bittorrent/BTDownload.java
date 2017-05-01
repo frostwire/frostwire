@@ -17,22 +17,8 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.AlertListener;
-import com.frostwire.jlibtorrent.AnnounceEntry;
-import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.FileStorage;
-import com.frostwire.jlibtorrent.PiecesTracker;
-import com.frostwire.jlibtorrent.Priority;
-import com.frostwire.jlibtorrent.SessionHandle;
-import com.frostwire.jlibtorrent.TorrentHandle;
-import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.TorrentStatus;
-import com.frostwire.jlibtorrent.Vectors;
-import com.frostwire.jlibtorrent.alerts.Alert;
-import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.alerts.PieceFinishedAlert;
-import com.frostwire.jlibtorrent.alerts.SaveResumeDataAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentAlert;
+import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.add_torrent_params;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
@@ -42,18 +28,11 @@ import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author gubatron
@@ -423,7 +402,7 @@ public final class BTDownload implements BittorrentDownload {
             try {
                 listener.finished(this);
             } catch (Throwable e) {
-                LOG.error("Error calling listener", e);
+                LOG.error("Error calling listener (finished)", e);
             }
         }
         doResumeData(true);
@@ -431,10 +410,21 @@ public final class BTDownload implements BittorrentDownload {
 
     private void torrentRemoved() {
         engine.removeListener(innerListener);
+
         if (parts != null) {
-            parts.delete();
+            boolean deleted = parts.delete();
+            if (!deleted) {
+                LOG.warn("Unable to delete parts file: " + parts);
+            }
         }
-        fireRemoved(incompleteFilesToRemove);
+
+        if (listener != null) {
+            try {
+                listener.removed(this, incompleteFilesToRemove);
+            } catch (Throwable e) {
+                LOG.error("Error calling listener (removed)", e);
+            }
+        }
     }
 
     private void torrentChecked() {
@@ -682,16 +672,6 @@ public final class BTDownload implements BittorrentDownload {
             }
         }
         return flag;
-    }
-
-    private void fireRemoved(Set<File> incompleteFiles) {
-        if (listener != null) {
-            try {
-                listener.removed(this, incompleteFiles);
-            } catch (Throwable e) {
-                LOG.error("Error calling listener", e);
-            }
-        }
     }
 
     private final class InnerListener implements AlertListener {
