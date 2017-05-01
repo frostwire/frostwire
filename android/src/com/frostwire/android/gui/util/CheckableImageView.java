@@ -44,36 +44,31 @@ import com.squareup.picasso.Callback;
 public final class CheckableImageView<T> extends View implements Checkable {
     private static final Logger LOG = Logger.getLogger(CheckableImageView.class);
     private final AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener;
+    private final Uri[] imageUris;
     private boolean checked;
     private BrowseThumbnailImageButton backgroundView;
     private FrameLayout checkedOverlayView;
     private boolean checkableMode;
+    private int width;
+    private int height;
 
-    public CheckableImageView(Context context, ViewGroup containerView, int dimensions, Uri imageUri, Uri imageRetryUri, AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener, boolean checked, MediaPlaybackOverlay.MediaPlaybackState mediaPlaybackOverlay) {
+    public CheckableImageView(Context context, ViewGroup containerView, int width, int height, Uri[] imageUris, boolean checked, MediaPlaybackOverlay.MediaPlaybackState mediaPlaybackOverlay, AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener) {
         super(context);
         setClickable(true);
         this.onCheckedChangeListener = onCheckedChangeListener;
-        initComponents(context, containerView, dimensions, imageUri, imageRetryUri, checked, mediaPlaybackOverlay);
+        initComponents(containerView, checked, mediaPlaybackOverlay);
         this.onCheckedChangeListener.setEnabled(false);
         setChecked(checked);
         this.onCheckedChangeListener.setEnabled(true);
         initClickListeners();
+        this.imageUris = imageUris;
+        this.width = width;
+        this.height = height;
     }
 
-    private void initComponents(Context context, ViewGroup containerView, int dimensions, final Uri imageUri, Uri imageRetryUri, boolean checked, MediaPlaybackOverlay.MediaPlaybackState overlay) {
-        if (containerView == null) {
-            LOG.error("initComponents() containerView can't be null");
-            return;
-        }
-        backgroundView = (BrowseThumbnailImageButton) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button);
-        if (!checked) {
-            backgroundView.setOverlayState(overlay);
-        } else {
-            backgroundView.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.NONE);
-        }
-        checkedOverlayView = (FrameLayout) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_overlay_checkmark_framelayout);
-        ImageLoader imageLoader = ImageLoader.getInstance(context);
-        imageLoader.load(imageUri, imageRetryUri, backgroundView, dimensions, dimensions);
+    public void loadImages() {
+        ImageLoader imageLoader = ImageLoader.getInstance(getContext());
+        imageLoader.load(imageUris[0], imageUris[1], backgroundView, width, height);
     }
 
     @Override
@@ -94,6 +89,20 @@ public final class CheckableImageView<T> extends View implements Checkable {
     @Override
     public void toggle() {
         setChecked(!checked);
+    }
+
+    private void initComponents(ViewGroup containerView, boolean checked, MediaPlaybackOverlay.MediaPlaybackState overlay) {
+        if (containerView == null) {
+            LOG.error("initComponents() containerView can't be null");
+            return;
+        }
+        backgroundView = (BrowseThumbnailImageButton) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button);
+        if (!checked) {
+            backgroundView.setOverlayState(overlay);
+        } else {
+            backgroundView.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.NONE);
+        }
+        checkedOverlayView = (FrameLayout) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_overlay_checkmark_framelayout);
     }
 
     private void initClickListeners() {

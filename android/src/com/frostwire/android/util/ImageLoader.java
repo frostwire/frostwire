@@ -34,8 +34,15 @@ import android.widget.ImageView;
 
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
-import com.squareup.picasso.*;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Picasso.Builder;
+import com.squareup.picasso.Request;
+import com.squareup.picasso.RequestHandler;
+import com.squareup.picasso.Target;
+import com.squareup.picasso.Transformation;
 
 import java.io.File;
 import java.io.IOException;
@@ -197,26 +204,11 @@ public final class ImageLoader {
     }
 
     public void load(final Uri uri, final Uri uriRetry, final ImageView target, final int targetWidth, final int targetHeight) {
-        load(uri, uriRetry, target, targetWidth, targetHeight, null);
-    }
-
-    public void load(final Uri uri, final Uri uriRetry, final ImageView target, final int targetWidth, final int targetHeight, final Callback.EmptyCallback callback) {
         if (!shutdown) {
             picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new Callback.EmptyCallback() {
                 @Override
-                public void onSuccess() {
-                    if (callback != null) {
-                        callback.onSuccess();
-                    }
-                }
-
-                @Override
                 public void onError() {
-                    if (callback != null) {
-                        load(uriRetry, target, targetWidth, targetHeight, callback);
-                    } else {
                         load(uriRetry, target, targetWidth, targetHeight);
-                    }
                 }
             });
         }

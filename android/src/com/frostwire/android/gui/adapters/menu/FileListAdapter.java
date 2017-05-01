@@ -1,4 +1,3 @@
-
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
@@ -144,16 +143,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     }
 
     protected void initCheckableGridImageView(ViewGroup view, FileDescriptorItem item) throws Throwable {
-        Runnable onPostCheckedRunnable = new Runnable() {
-            @Override
-            public void run() {
-                LOG.info("CheckboxOnCheckedChangeListener.onPostCheckedChange() runnable here. selectAllMode=" + selectAllMode);
-            }
-        };
-        final CheckboxOnCheckedChangeListener checkboxOnCheckedChangeListener = new CheckboxOnCheckedChangeListener(onPostCheckedRunnable);
+        final CheckboxOnCheckedChangeListener checkboxOnCheckedChangeListener = new CheckboxOnCheckedChangeListener();
         boolean isChecked = getChecked().contains(item);
-        Uri[] uris = new Uri[2];
-        getFileItemThumbnailUris(item, uris);
+        Uri[] uris = getFileItemThumbnailUris(item);
         MediaPlaybackOverlay.MediaPlaybackState overlay = MediaPlaybackOverlay.MediaPlaybackState.NONE;
         if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) {
             overlay = MediaPlaybackOverlay.MediaPlaybackState.PLAY;
@@ -162,19 +154,21 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 view.getContext(),
                 view,
                 128,
-                uris[0],
-                uris[1],
-                checkboxOnCheckedChangeListener,
+                128,
+                uris,
                 isChecked,
-                overlay);
+                overlay,
+                checkboxOnCheckedChangeListener);
         checkboxOnCheckedChangeListener.setEnabled(false);
         checkableView.setCheckableMode(selectAllMode);
         checkableView.setTag(item);
+        checkableView.loadImages();
         checkableView.setVisibility(View.VISIBLE);
         checkboxOnCheckedChangeListener.setEnabled(true);
     }
 
-    private void getFileItemThumbnailUris(FileDescriptorItem item, Uri[] uris) {
+    private Uri[] getFileItemThumbnailUris(FileDescriptorItem item) {
+        Uri[] uris = new Uri[2];
         if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) {
             uris[0] = ContentUris.withAppendedId(Video.Media.EXTERNAL_CONTENT_URI, item.fd.id);
             uris[1] = ImageLoader.getMetadataArtUri(uris[0]);
@@ -183,6 +177,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             uris[0] = uri;
             uris[1] = null;
         }
+        return uris;
     }
 
     public byte getFileType() {
