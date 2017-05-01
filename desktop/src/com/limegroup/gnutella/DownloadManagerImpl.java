@@ -57,7 +57,7 @@ public final class DownloadManagerImpl implements DownloadManager {
                     }
 
                     String name = dl.getName();
-                    if (name == null || (name != null && name.contains("fetch_magnet:"))) {
+                    if (name == null || name.contains("fetch_magnet:")) {
                         return;
                     }
 
