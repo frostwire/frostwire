@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractListAdapter;
@@ -97,6 +98,7 @@ public final class CheckableImageView<T> extends View implements Checkable {
             return;
         }
         backgroundView = (BrowseThumbnailImageButton) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button);
+        backgroundView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         if (!checked) {
             backgroundView.setOverlayState(overlay);
         } else {

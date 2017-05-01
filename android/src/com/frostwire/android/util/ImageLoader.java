@@ -214,12 +214,6 @@ public final class ImageLoader {
         }
     }
 
-    private void load(Uri uri, ImageView target, int targetWidth, int targetHeight, Callback.EmptyCallback callback) {
-        if (!shutdown) {
-            picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, callback);
-        }
-    }
-
     public void load(Uri uri, ImageView target, int placeholderResId) {
         if (!shutdown) {
             picasso.load(uri).noFade().placeholder(placeholderResId).into(target);

@@ -28,8 +28,9 @@
         android:layout_width="match_parent"
         android:layout_height="128dp"
         android:layout_centerInParent="true"
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
         android:background="@color/app_browse_thumbnail_background"
+        android:adjustViewBounds="true"
         android:contentDescription="@null" />
 
     <FrameLayout
