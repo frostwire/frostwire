@@ -15,22 +15,16 @@
 
 package com.limegroup.gnutella.gui.init;
 
-import java.awt.CardLayout;
-
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * This class serves two purposes.  First, it is a JPanel that
- * contains the body of a LimeWire setup window.  Second, it 
+ * contains the body of a LimeWire setup window.  Second, it
  * serves as a proxy for the underlying SetupWindow object that
  * that handles the actual drawing.
  */
 final class SetupWindowHolder extends JPanel {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -5012114565385150258L;
 
     /**
      * The <tt>CardLayout</tt> instance for the setup windows.
@@ -45,7 +39,7 @@ final class SetupWindowHolder extends JPanel {
     }
 
     /**
-     * Adds the speficied window to the CardLayout based on its title.
+     * Adds the specified window to the CardLayout based on its title.
      *
      * @param window the <tt>SetupWindow</tt> to add
      */
@@ -54,8 +48,8 @@ final class SetupWindowHolder extends JPanel {
     }
 
     /**
-     * Shows the window speficied by its title.
-     * 
+     * Shows the window specified by its title.
+     *
      * @param key the unique key of the <tt>Component</tt> to show
      */
     void show(String key) {
