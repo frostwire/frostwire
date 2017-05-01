@@ -151,10 +151,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
         };
         final CheckboxOnCheckedChangeListener checkboxOnCheckedChangeListener = new CheckboxOnCheckedChangeListener(onPostCheckedRunnable);
-
         boolean isChecked = getChecked().contains(item);
         Uri[] uris = new Uri[2];
         getFileItemThumbnailUris(item, uris);
+        MediaPlaybackOverlay.MediaPlaybackState overlay = MediaPlaybackOverlay.MediaPlaybackState.NONE;
+        if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) {
+            overlay = MediaPlaybackOverlay.MediaPlaybackState.PLAY;
+        }
         final CheckableImageView checkableView = new CheckableImageView(
                 view.getContext(),
                 view,
@@ -162,7 +165,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 uris[0],
                 uris[1],
                 checkboxOnCheckedChangeListener,
-                isChecked);
+                isChecked,
+                overlay);
         checkboxOnCheckedChangeListener.setEnabled(false);
         checkableView.setCheckableMode(selectAllMode);
         checkableView.setTag(item);
