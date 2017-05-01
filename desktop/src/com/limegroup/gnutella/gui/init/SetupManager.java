@@ -43,15 +43,15 @@ import java.util.concurrent.Future;
  * classes and acts as the mediator between the various objects in the
  * setup windows.
  */
-public class SetupManager {
+public final class SetupManager {
 
     /**
      * the dialog window that holds all other gui elements for the setup.
      */
     private FramedDialog dialogFrame;
 
-    /** 
-     * the holder for the setup windows 
+    /**
+     * the holder for the setup windows
      */
     private SetupWindowHolder _setupWindowHolder;
 
@@ -62,13 +62,13 @@ public class SetupManager {
 
     private Dimension holderPreferredSize;
 
-    public static final int ACTION_PREVIOUS = 1;
+    static final int ACTION_PREVIOUS = 1;
 
-    public static final int ACTION_NEXT = 2;
+    static final int ACTION_NEXT = 2;
 
-    public static final int ACTION_FINISH = 4;
+    static final int ACTION_FINISH = 4;
 
-    public static final int ACTION_CANCEL = 8;
+    static final int ACTION_CANCEL = 8;
 
     private PreviousAction previousAction = new PreviousAction();
 
@@ -78,9 +78,7 @@ public class SetupManager {
 
     private CancelAction cancelAction = new CancelAction();
 
-    private LanguageAwareAction[] actions = new LanguageAwareAction[] { previousAction, nextAction, finishAction, cancelAction };
-
-    private List<SetupWindow> windows;
+    private LanguageAwareAction[] actions = new LanguageAwareAction[]{previousAction, nextAction, finishAction, cancelAction};
 
     private boolean shouldShowAssociationsWindow() {
         if (CommonUtils.isPortable() || (InstallSettings.ASSOCIATION_OPTION.getValue() == FrostAssociations.CURRENT_ASSOCIATIONS)) {
@@ -91,9 +89,9 @@ public class SetupManager {
         return !GUIMediator.getAssociationManager().checkAndGrab(false);
     }
 
-    private static enum SaveStatus {
+    private enum SaveStatus {
         NO, NEEDS
-    };
+    }
 
     private SaveStatus shouldShowSaveDirectoryWindow() {
         // If it's not setup, definitely show it!
@@ -102,15 +100,10 @@ public class SetupManager {
         }
 
         if (!InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED.getValue().equals(String.valueOf(FrostWireUtils.getBuildNumber()))) {
-            performAdditionalResets();
             return SaveStatus.NEEDS;
         }
 
         return SaveStatus.NO;
-    }
-
-    private void performAdditionalResets() {
-        //ThemeMediator.changeTheme(ThemeMediator.DEFAULT_THEME);
     }
 
     /**
@@ -119,7 +112,7 @@ public class SetupManager {
     public void createIfNeeded() {
         _setupWindowHolder = new SetupWindowHolder();
 
-        windows = new LinkedList<SetupWindow>();
+        List<SetupWindow> windows = new LinkedList<>();
 
         SaveStatus saveDirectoryStatus = shouldShowSaveDirectoryWindow();
         if (saveDirectoryStatus != SaveStatus.NO) {
@@ -218,13 +211,13 @@ public class SetupManager {
 
         dialogFrame = new FramedDialog();
         dialogFrame.setTitle("FrostWire Setup");
-        
+
         WindowAdapter onCloseAdapter = new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 cancelSetup();
             }
         };
-        
+
         dialogFrame.addWindowListener(onCloseAdapter);
 
         JDialog dialog = dialogFrame.getDialog();
@@ -248,13 +241,13 @@ public class SetupManager {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         dialog.setLocation((screenSize.width - d.width) / 2, (screenSize.height - d.height) / 2);
-        dialog.setSize((int) d.getWidth(),(int) d.getHeight());
+        dialog.setSize((int) d.getWidth(), (int) d.getHeight());
 
         // create the setup buttons panel
         if (OSUtils.isGoodWindows()) {
             _setupWindowHolder.setPreferredSize(holderPreferredSize);
         }
-        
+
         setupPanel.add(_setupWindowHolder);
         setupPanel.add(Box.createVerticalStrut(17));
 
@@ -279,56 +272,25 @@ public class SetupManager {
         container.add(setupPanel);
 
         if (!OSUtils.isGoodWindows()) {
-            ((JComponent) container).setPreferredSize(new Dimension(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT));
+            container.setPreferredSize(new Dimension(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT));
         }
-        
+
         dialog.pack();
-        
-        // hack to deal with paint issues, need to refactor the whole dialog/window creation
-        //if (OSUtils.isLinux()) {
-        	//    dialog.setSize(dialog.getWidth() + 10, dialog.getHeight() + 70);
-        //}
 
         SplashWindow.instance().setVisible(false);
         dialogFrame.showDialog();
         SplashWindow.instance().setVisible(true);
     }
-    
+
     /**
      * Enables the bitmask of specified actions, the other actions are
      * explicitly disabled.
-     * <p>
-     * To enable finish and previous you would call
-     * {@link #enableActions(int) enableActions(SetupManager.ACTION_FINISH|SetupManager.ACTION_PREVIOUS)}.
-     * 
-     * @param actions
      */
-    public void enableActions(int actions) {
+    void enableActions(int actions) {
         previousAction.setEnabled((actions & ACTION_PREVIOUS) != 0);
         nextAction.setEnabled((actions & ACTION_NEXT) != 0);
         finishAction.setEnabled((actions & ACTION_FINISH) != 0);
         cancelAction.setEnabled((actions & ACTION_CANCEL) != 0);
-    }
-
-    public int getEnabledActions() {
-        int actions = 0;
-        if (previousAction.isEnabled()) {
-            actions |= ACTION_PREVIOUS;
-        }
-        if (nextAction.isEnabled()) {
-            actions |= ACTION_NEXT;
-        }
-        if (finishAction.isEnabled()) {
-            actions |= ACTION_FINISH;
-        }
-        if (cancelAction.isEnabled()) {
-            actions |= ACTION_CANCEL;
-        }
-        return actions;
-    }
-
-    public Component getOwnerComponent() {
-        return this.dialogFrame;
     }
 
     /**
@@ -358,7 +320,7 @@ public class SetupManager {
         } catch (ApplySettingsException ase) {
             // ignore errors when going backwards
         }
-        
+
         show(newWindow);
     }
 
@@ -461,7 +423,7 @@ public class SetupManager {
     private abstract class LanguageAwareAction extends AbstractAction {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -9116039417985018834L;
         private final String nameKey;
@@ -479,7 +441,7 @@ public class SetupManager {
     private class CancelAction extends LanguageAwareAction {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -337264221787811634L;
 
@@ -495,7 +457,7 @@ public class SetupManager {
     private class NextAction extends LanguageAwareAction {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 8396346766881170337L;
 
@@ -511,7 +473,7 @@ public class SetupManager {
     private class PreviousAction extends LanguageAwareAction {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -6355909946850317926L;
 
@@ -527,7 +489,7 @@ public class SetupManager {
     private class FinishAction extends LanguageAwareAction {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 7243495030424309213L;
 
@@ -540,7 +502,7 @@ public class SetupManager {
         }
 
     }
-    
+
     public static void main(String[] args) {
         final SetupManager setupManager = new SetupManager();
         setupManager.createIfNeeded();
