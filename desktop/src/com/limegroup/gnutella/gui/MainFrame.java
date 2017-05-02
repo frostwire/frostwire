@@ -19,6 +19,7 @@ import com.apple.eawt.FullScreenUtilities;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.tabs.*;
+import com.frostwire.gui.updates.UpdateManager;
 import com.limegroup.gnutella.gui.GUIMediator.Tabs;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.dnd.TransferHandlerDropTargetListener;
@@ -40,8 +41,8 @@ import java.util.Map;
 import static com.limegroup.gnutella.settings.UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW;
 
 /**
- * This class constructs the main <tt>JFrame</tt> for the program as well as 
- * all of the other GUI classes.  
+ * This class constructs the main <tt>JFrame</tt> for the program as well as
+ * all of the other GUI classes.
  */
 public final class MainFrame {
     /**
@@ -71,12 +72,6 @@ public final class MainFrame {
     private StatusLine STATUS_LINE;
 
     /**
-     * Handle the <tt>MenuMediator</tt> for use in changing the menu
-     * depending on the selected tab.
-     */
-    private MenuMediator MENU_MEDIATOR;
-
-    /**
      * The main <tt>JFrame</tt> for the application.
      */
     private final JFrame FRAME;
@@ -84,7 +79,7 @@ public final class MainFrame {
     /**
      * The array of tabs in the main application window.
      */
-    private Map<GUIMediator.Tabs, Tab> TABS = new HashMap<GUIMediator.Tabs, Tab>(3);
+    private Map<GUIMediator.Tabs, Tab> TABS = new HashMap<>(3);
 
     /**
      * The last state of the X/Y location and the time it was set.
@@ -96,7 +91,9 @@ public final class MainFrame {
 
     private ApplicationHeader APPLICATION_HEADER;
 
-    /** simple state. */
+    /**
+     * simple state.
+     */
     private static class WindowState {
         private final int x;
         private final int y;
@@ -109,7 +106,7 @@ public final class MainFrame {
         }
     }
 
-    /** 
+    /**
      * Initializes the primary components of the main application window,
      * including the <tt>JFrame</tt> and the <tt>JTabbedPane</tt>
      * contained in that window.
@@ -117,10 +114,10 @@ public final class MainFrame {
     MainFrame(JFrame frame) {
         //starts the Frostwire update manager, and will trigger a task in 5 seconds.
         // RELEASE
-        com.frostwire.gui.updates.UpdateManager.scheduleUpdateCheckTask(0);
+        UpdateManager.scheduleUpdateCheckTask(0);
 
         // DEBUG
-        //com.frostwire.gui.updates.UpdateManager.scheduleUpdateCheckTask(0,"http://update1.frostwire.com/example.php");
+        //UpdateManager.scheduleUpdateCheckTask(0,"http://update1.frostwire.com/example.php");
 
         FRAME = frame;
 
@@ -196,17 +193,15 @@ public final class MainFrame {
         if (ApplicationSettings.MAGNET_CLIPBOARD_LISTENER.getValue()) {
             FRAME.addWindowListener(MagnetClipboardListener.getInstance());
         }
-        
+
         if (OSUtils.isMacOSX()) {
             FullScreenUtilities.setWindowCanFullScreen(FRAME, true);
         }
     }
 
     private void setMinimalSize(JFrame frame, JComponent horizontal, JComponent... verticals) {
-        int width = 0;
+        int width = horizontal.getMinimumSize().width;
         int height = 0;
-
-        width = horizontal.getMinimumSize().width;
 
         for (JComponent c : verticals) {
             height += c.getMinimumSize().height;
@@ -225,8 +220,10 @@ public final class MainFrame {
         return APPLICATION_HEADER;
     }
 
-    /** Saves the state of the Window to settings. */
-    void saveWindowState() {
+    /**
+     * Saves the state of the Window to settings.
+     */
+    private void saveWindowState() {
         int state = FRAME.getExtendedState();
         if (state == Frame.NORMAL) {
             // save the screen size and location 
@@ -286,7 +283,7 @@ public final class MainFrame {
      * in the <tt>Tab</tt> instance.
      *
      * @param tab the <tt>Tab</tt> instance containing data for the tab to
-     *  add
+     *            add
      */
     private void addTab(Tab tab) {
         TABBED_PANE.add(tab.getComponent(), tab.getTitle());
@@ -308,7 +305,7 @@ public final class MainFrame {
      *
      * @param tab index to select
      */
-    public final void setSelectedTab(GUIMediator.Tabs tab) {
+    final void setSelectedTab(GUIMediator.Tabs tab) {
         CardLayout cl = (CardLayout) (TABBED_PANE.getLayout());
         Tab t = TABS.get(tab);
         cl.show(TABBED_PANE, t.getTitle());
@@ -367,7 +364,6 @@ public final class MainFrame {
 
     final BTDownloadMediator getBTDownloadMediator() {
         if (BT_DOWNLOAD_MEDIATOR == null) {
-
             BT_DOWNLOAD_MEDIATOR = BTDownloadMediator.instance();
         }
         return BT_DOWNLOAD_MEDIATOR;
@@ -378,7 +374,7 @@ public final class MainFrame {
      *
      * @return a reference to the <tt>LibraryMediator</tt> instance
      */
-    final com.frostwire.gui.library.LibraryMediator getLibraryMediator() {
+    private LibraryMediator getLibraryMediator() {
         if (LIBRARY_MEDIATOR == null) {
             LIBRARY_MEDIATOR = LibraryMediator.instance();
         }
@@ -409,7 +405,7 @@ public final class MainFrame {
         return OPTIONS_MEDIATOR;
     }
 
-    public Tabs getSelectedTab() {
+    final Tabs getSelectedTab() {
         Component comp = getCurrentTabComponent();
         if (comp != null) {
             for (Tabs t : TABS.keySet()) {
@@ -437,7 +433,7 @@ public final class MainFrame {
         return currentPanel;
     }
 
-    public Tab getTab(Tabs tabs) {
+    final Tab getTab(Tabs tabs) {
         return TABS.get(tabs);
     }
 
