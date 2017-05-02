@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.gui.bittorrent;
@@ -68,7 +67,9 @@ import java.util.List;
  * @author aldenml
  */
 public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRowFilteredModel, BTDownloadDataLine, BTDownload> implements TransfersTab.TransfersFilterModeListener {
+
     private static final Logger LOG = Logger.getLogger(BTDownloadMediator.class);
+
     public static final int MIN_HEIGHT = 150;
     /**
      * instance, for singleton access
@@ -104,7 +105,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     private PlaySingleMediaFileAction playSingleMediaFileAction;
 
     /**
-     * Overriden to have different default values for tooltips.
+     * Overridden to have different default values for tooltips.
      */
     protected void buildSettings() {
         SETTINGS = new TableSettings(ID) {
@@ -234,8 +235,8 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         private boolean matchKeywords(BTDownloadDataLine line, String searchKeywords) {
             // "Steve Jobs" iTune's like search.
             if (searchKeywords == null ||
-                searchKeywords.equals("") ||
-                searchKeywords.trim().equals(TransfersTab.FILTER_TEXT_HINT)) {
+                    searchKeywords.equals("") ||
+                    searchKeywords.trim().equals(TransfersTab.FILTER_TEXT_HINT)) {
                 return true;
             }
 
@@ -410,7 +411,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * complete.
      *
      * @param downloader the <tt>Downloader</tt> to remove from the list if it is
-     *                complete.
+     *                   complete.
      */
     public void remove(BTDownload downloader) {
         super.remove(downloader);
@@ -899,11 +900,11 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                         final File savedFile = getSaveLocation();
                         if (savedFile.exists()) {
                             GUIMediator.safeInvokeLater(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                BTDownloadMediator.instance().updateTableFilters();
-                                                            }
-                                                        });
+                                @Override
+                                public void run() {
+                                    BTDownloadMediator.instance().updateTableFilters();
+                                }
+                            });
 
                             if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
                                 if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
