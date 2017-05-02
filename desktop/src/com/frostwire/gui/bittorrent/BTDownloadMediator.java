@@ -172,9 +172,17 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         }
         final List<BTDownload> downloads = getDownloads();
         for (BTDownload dl : downloads) {
-            final File dlSaveLocation = dl.getSaveLocation();
+            File dlSaveLocation = dl.getSaveLocation();
             if (saveLocation.equals(dlSaveLocation)) {
                 return dl;
+            }
+
+            // special consideration if it is an actual torrent transfer
+            if (dl instanceof BittorrentDownload) {
+                dlSaveLocation = ((BittorrentDownload) dl).getDl().getContentSavePath();
+                if (saveLocation.equals(dlSaveLocation)) {
+                    return dl;
+                }
             }
         }
         return null;
