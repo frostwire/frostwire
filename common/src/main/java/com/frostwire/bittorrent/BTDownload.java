@@ -412,10 +412,7 @@ public final class BTDownload implements BittorrentDownload {
         engine.removeListener(innerListener);
 
         if (parts != null) {
-            boolean deleted = parts.delete();
-            if (!deleted) {
-                LOG.warn("Unable to delete parts file: " + parts);
-            }
+            parts.delete();
         }
 
         if (listener != null) {
