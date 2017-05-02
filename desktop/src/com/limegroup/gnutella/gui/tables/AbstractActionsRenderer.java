@@ -139,8 +139,6 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
 
             if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
                 TorrentUtil.makeTorrentAndDownload(lastClickedActionsHolder.getFile(), null, true);
-                final BTDownload dl = BTDownloadMediator.instance().findBTDownload(lastClickedActionsHolder.getFile());
-                dl.setDeleteDataWhenRemove(false);
             }
 
             UXStats.instance().log(LIBRARY_SHARE_FROM_ROW_ACTION);
