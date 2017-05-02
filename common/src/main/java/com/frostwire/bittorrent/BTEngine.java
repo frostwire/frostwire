@@ -132,6 +132,7 @@ public final class BTEngine extends SessionManager {
         sp.set_str(settings_pack.string_types.dht_bootstrap_nodes.swigValue(), dhtBootstrapNodes());
         sp.set_int(settings_pack.int_types.active_limit.swigValue(), 2000);
         sp.set_int(settings_pack.int_types.stop_tracker_timeout.swigValue(), 0);
+        sp.set_int(settings_pack.int_types.alert_queue_size.swigValue(), 5000);
 
         super.start(params);
     }
