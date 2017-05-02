@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.bittorrent.TorrentUtil;
@@ -49,7 +48,6 @@ import org.limewire.util.OSUtils;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -57,7 +55,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,7 +68,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * The TableSettings that all ResultPanels will use.
      */
     private static final TableSettings SEARCH_SETTINGS = new TableSettings("SEARCH_TABLE");
-    private static final java.lang.String FROSTWIRE_FEATURED_DOWNLOADS_URL = "http://www.frostwire.com/featured-downloads/?from=desktop-"+ UrlUtils.encode(OSUtils.getFullOS() + "-" + FrostWireUtils.getFrostWireVersion() + "b" + FrostWireUtils.getBuildNumber());
+    private static final String FROSTWIRE_FEATURED_DOWNLOADS_URL = "http://www.frostwire.com/featured-downloads/?from=desktop-" + UrlUtils.encode(OSUtils.getFullOS() + "-" + FrostWireUtils.getFrostWireVersion() + "b" + FrostWireUtils.getBuildNumber());
 
     /**
      * The search info of this class.
@@ -140,7 +137,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * Constructs a new ResultPanel for search results.
      *
      * @param token the guid of the query.  Used to match results.
-     * @param info the info of the search
+     * @param info  the info of the search
      */
     SearchResultMediator(long token, List<String> searchTokens, SearchInformation info) {
         super(SEARCH_TABLE);
@@ -160,12 +157,12 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         TABLE.setDefaultRenderer(SearchResultActionsHolder.class, getSearchResultsActionsRenderer());
         TABLE.setDefaultRenderer(SourceHolder.class, getSourceRenderer());
     }
-    
+
     protected void setDefaultEditors() {
         TableColumnModel model = TABLE.getColumnModel();
         TableColumn tc;
         tc = model.getColumn(SearchTableColumns.ACTIONS_IDX);
-        
+
         tc.setCellEditor(new GenericCellEditor(getSearchResultsActionsRenderer()));
 
         tc = model.getColumn(SearchTableColumns.SOURCE_IDX);
@@ -179,7 +176,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     /**
-     * Setup the data model 
+     * Setup the data model
      */
     private void setupDataModel() {
         DATA_MODEL = new TableRowFilteredModel(FILTER);
@@ -227,16 +224,18 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         super.addListeners();
     }
 
-    /** Sets all the listeners. */
+    /**
+     * Sets all the listeners.
+     */
     protected void buildListeners() {
         super.buildListeners();
 
         DOWNLOAD_LISTENER = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (e!= null && e.getSource() instanceof JButton) {
+                if (e != null && e.getSource() instanceof JButton) {
                     UXStats.instance().log(UXAction.SEARCH_RESULT_BIG_BUTTON_DOWNLOAD);
                 }
-                
+
                 SearchMediator.doDownload(SearchResultMediator.this);
             }
         };
@@ -257,24 +256,24 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         COPY_MAGNET_ACTION_LISTENER = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 SearchResultDataLine[] lines = getAllSelectedLines();
-                String str = "";
+                StringBuilder sb = new StringBuilder();
                 for (SearchResultDataLine line : lines) {
-                    str += TorrentUtil.getMagnet(line.getInitializeObject().getHash());
-                    str += "\n";
+                    sb.append(TorrentUtil.getMagnet(line.getInitializeObject().getHash()));
+                    sb.append("\n");
                 }
-                GUIMediator.setClipboardContent(str);
+                GUIMediator.setClipboardContent(sb.toString());
             }
         };
 
         COPY_HASH_ACTION_LISTENER = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 SearchResultDataLine[] lines = getAllSelectedLines();
-                String str = "";
+                StringBuilder sb = new StringBuilder();
                 for (SearchResultDataLine line : lines) {
-                    str += line.getInitializeObject().getHash();
-                    str += "\n";
+                    sb.append(line.getInitializeObject().getHash());
+                    sb.append("\n");
                 }
-                GUIMediator.setClipboardContent(str);
+                GUIMediator.setClipboardContent(sb.toString());
             }
         };
 
@@ -294,7 +293,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
                         //if (sr instanceof ScrapedTorrentFileSearchResult) {
                         //    gm.openTorrentSearchResult((ScrapedTorrentFileSearchResult) sr);
                         //} else {
-                        GUIMediator.instance(). openTorrentSearchResult((TorrentSearchResult) sr, true);
+                        GUIMediator.instance().openTorrentSearchResult((TorrentSearchResult) sr, true);
                         //}
                     }
                 }
@@ -312,7 +311,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
     /**
      * Creates the specialized SearchResultMenu for right-click popups.
-     *
+     * <p>
      * Upgraded access from protected to public for SearchResultDisplayer.
      */
     public JPopupMenu createPopupMenu() {
@@ -415,7 +414,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         UXStats.instance().log(UXAction.SEARCH_RESULT_CLICK_DOWNLOAD);
         DOWNLOAD_LISTENER.actionPerformed(null);
     }
-    
+
     /**
      * Forwards the event to DOWNLOAD_LISTENER.
      */
@@ -423,7 +422,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         UXStats.instance().log(UXAction.SEARCH_RESULT_ENTER_KEY_DOWNLOAD);
         DOWNLOAD_LISTENER.actionPerformed(null);
     }
-    
+
     void selectSchemaBoxByMediaType(NamedMediaType type) {
         schemaBox.selectMediaType(type);
     }
@@ -466,16 +465,16 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
     /**
      * Notification that a filter on this panel has changed.
-     *
+     * <p>
      * Updates the data model with the new list, maintains the selection,
      * and moves the viewport to the first still visible selected row.
-     *
+     * <p>
      * Note that the viewport moving cannot be done by just storing the first
      * visible row, because after the filters change, the row might not exist
      * anymore.  Thus, it is necessary to store all visible rows and move to
      * the first still-visible one.
      */
-    boolean filterChanged(TableLineFilter<SearchResultDataLine> filter, int depth) {
+    void filterChanged(TableLineFilter<SearchResultDataLine> filter, int depth) {
         FILTER.setFilter(depth, filter);
         //if(!FILTER.setFilter(depth, filter))
         //    return false;
@@ -510,7 +509,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
         // update the tab count.
         SearchMediator.setTabDisplayCount(this);
-        return true;
     }
 
     int totalResults() {
@@ -523,7 +521,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * search was performed too recently.
      *
      * @return <tt>true</tt> if the repeat search feature is currently
-     *  enabled, otherwise <tt>false</tt>
+     * enabled, otherwise <tt>false</tt>
      */
     private boolean isRepeatSearchEnabled() {
         return FILTER != null;
@@ -545,7 +543,9 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         DATA_MODEL.setJunkFilter(null);
     }
 
-    /** Returns true if this is responsible for results with the given GUID */
+    /**
+     * Returns true if this is responsible for results with the given GUID
+     */
     boolean matches(long token) {
         return this.token == token;
     }
@@ -554,14 +554,16 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         this.token = token;
     }
 
-    /** Returns the search token this is responsible for. */
+    /**
+     * Returns the search token this is responsible for.
+     */
     long getToken() {
         return token;
     }
 
     /**
      * Gets all currently selected TableLines.
-     * 
+     *
      * @return empty array if no lines are selected.
      */
     SearchResultDataLine[] getAllSelectedLines() {
@@ -576,32 +578,9 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     /**
-     * Gets the currently selected TableLine.
-     * 
-     * @return null if there is no selected line.
-     */
-    SearchResultDataLine getSelectedLine() {
-        int selected = TABLE.getSelectedRow();
-        if (selected != -1)
-            return DATA_MODEL.get(selected);
-        else
-            return null;
-    }
-
-    /**
-     * Gets the TableLine at <code>index</code>
-     * 
-     * @param index index of the line you want
-     * @return null if there is no selected line.
-     */
-    final SearchResultDataLine getLine(int index) {
-        return DATA_MODEL.get(index);
-    }
-
-    /**
      * Sets extra values for non dummy ResultPanels.
      * (Used for all tables that will have results.)
-     *
+     * <p>
      * Currently:
      * - Sorts the count column, if it is visible & real-time sorting is on.
      * - Adds listeners, so the filters can be displayed when necessary.
@@ -671,7 +650,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         buttonOptions.setSize(dim);
         buttonOptions.setIcon(GUIMediator.getThemeImage("search_tools_left"));
         buttonOptions.setHorizontalTextPosition(SwingConstants.RIGHT);
-        
+
         //buttonOptions.setMargin(new Insets(0, 0, 0, 0));
         //buttonOptions.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
 
@@ -774,7 +753,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         browseAll.setForeground(Color.WHITE);
         browseAll.setOpaque(true);
         browseAll.setFont(new Font("Helvetica", Font.BOLD, 24));
-        browseAll.setBorder(new EmptyBorder(20,50,20,50));
+        browseAll.setBorder(new EmptyBorder(20, 50, 20, 50));
         browseAll.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -871,7 +850,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         CloseTabsToTheRight() {
             putValue(Action.NAME, SearchMediator.CLOSE_TABS_TO_THE_RIGHT);
             final SearchResultDisplayer searchResultDisplayer = SearchMediator.getSearchResultDisplayer();
-            setEnabled(searchResultDisplayer.currentTabIndex() < (searchResultDisplayer.tabCount()-1));
+            setEnabled(searchResultDisplayer.currentTabIndex() < (searchResultDisplayer.tabCount() - 1));
         }
 
         @Override
@@ -879,7 +858,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             final SearchResultDisplayer searchResultDisplayer = SearchMediator.getSearchResultDisplayer();
             int tabsToRemove = searchResultDisplayer.tabCount() - searchResultDisplayer.currentTabIndex() - 1;
             while (tabsToRemove > 0) {
-                searchResultDisplayer.closeTabAt(searchResultDisplayer.currentTabIndex()+1);
+                searchResultDisplayer.closeTabAt(searchResultDisplayer.currentTabIndex() + 1);
                 tabsToRemove--;
             }
         }
