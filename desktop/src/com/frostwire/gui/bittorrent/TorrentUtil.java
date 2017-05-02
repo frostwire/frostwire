@@ -1,45 +1,20 @@
 /*
- * Created on 9 Jul 2007
- * Created by Allan Crooks
- * Copyright (C) 2007 Aelitis, All Rights Reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * AELITIS, SAS au capital de 46,603.30 euros
- * 8 Allee Lenotre, La Grille Royale, 78600 Le Mesnil le Roi, France.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-/*
- * Created : 7 dec. 2003
- * By      : Olivier
- *
- * Copyright (C) 2004, 2005, 2006 Aelitis SAS, All rights Reserved
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details ( see the LICENSE file ).
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * AELITIS, SAS au capital de 46,603.30 euros,
- * 8 Allee Lenotre, La Grille Royale, 78600 Le Mesnil le Roi, France.
- */
+
 package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.BTEngine;
@@ -48,7 +23,6 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.transfers.TransferItem;
-import com.frostwire.transfers.TransferState;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -66,11 +40,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author gubatron
+ * @author aldenml
+ */
 public final class TorrentUtil {
 
     interface UITorrentMakerListener {
         void onCreateTorrentError(final error_code ec);
+
         void beforeOpenForSeedInUIThread();
+
         void onException();
     }
 
@@ -167,7 +147,7 @@ public final class TorrentUtil {
             }
         }
 
-        if ((oneIsCompleted || downloaders==null) && !SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
+        if ((oneIsCompleted || downloaders == null) && !SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
             DialogOption answer;
             String message1 = "";
             if (downloaders != null) {
@@ -194,7 +174,8 @@ public final class TorrentUtil {
 
     /**
      * Creates a DHT based torrent (no trackers set) and optionally shows the share dialog.
-     * @param file - The file/dir to make a torrent out of
+     *
+     * @param file                   - The file/dir to make a torrent out of
      * @param uiTorrentMakerListener - an optional listener of this process
      * @param showShareTorrentDialog - show the share dialog when done
      */
@@ -203,11 +184,10 @@ public final class TorrentUtil {
     }
 
     /**
-     *
-     * @param file - The file/dir to make a torrent out of
+     * @param file                   - The file/dir to make a torrent out of
      * @param uiTorrentMakerListener - an optional listener of this process
      * @param showShareTorrentDialog - show the share dialog when done
-     * @param dhtTrackedOnly - if true, no trackers are added, otherwise adds a list of default trackers.
+     * @param dhtTrackedOnly         - if true, no trackers are added, otherwise adds a list of default trackers.
      */
     private static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog, boolean dhtTrackedOnly) {
         try {
@@ -229,7 +209,7 @@ public final class TorrentUtil {
             torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
             final File torrentFile = new File(SharingSettings.TORRENTS_DIR_SETTING.getValue(), file.getName() + ".torrent");
             final error_code ec = new error_code();
-            libtorrent.set_piece_hashes(torrentCreator,file.getParentFile().getAbsolutePath(), ec);
+            libtorrent.set_piece_hashes(torrentCreator, file.getParentFile().getAbsolutePath(), ec);
             if (ec.value() != 0 && uiTorrentMakerListener != null) {
                 uiTorrentMakerListener.onCreateTorrentError(ec);
                 return;
