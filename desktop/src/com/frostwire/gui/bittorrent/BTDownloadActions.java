@@ -281,9 +281,7 @@ final class BTDownloadActions {
 
     private static class ClearInactiveAction extends RefreshingAction {
 
-        private static final long serialVersionUID = 808308856961429212L;
-
-        public ClearInactiveAction() {
+        ClearInactiveAction() {
             putValue(Action.NAME, I18n.tr("Clear Inactive"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Clear Inactive"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Clear Inactive (completed) transfers from the Transfers list."));
@@ -294,17 +292,11 @@ final class BTDownloadActions {
         protected void performAction(ActionEvent e) {
             BTDownloadMediator.instance().removeCompleted();
         }
-
     }
 
     private static class CopyMagnetAction extends RefreshingAction {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1602974659454016547L;
-
-        public CopyMagnetAction() {
+        CopyMagnetAction() {
             putValue(Action.NAME, I18n.tr("Copy Magnet"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Copy Magnet"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy Magnet"));
@@ -336,12 +328,7 @@ final class BTDownloadActions {
 
     private static class CopyInfoHashAction extends RefreshingAction {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1138409323772464985L;
-
-        public CopyInfoHashAction() {
+        CopyInfoHashAction() {
             putValue(Action.NAME, I18n.tr("Copy Infohash"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Copy Infohash"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy Infohash"));
@@ -363,12 +350,7 @@ final class BTDownloadActions {
 
     private static class ShareTorrentAction extends RefreshingAction {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1138409323772464985L;
-
-        public ShareTorrentAction() {
+        ShareTorrentAction() {
             putValue(Action.NAME, I18n.tr("Send to friend"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Send to friend"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Send to friend"));
@@ -395,9 +377,7 @@ final class BTDownloadActions {
 
     static class CreateNewPlaylistAction extends AbstractAction {
 
-        private static final long serialVersionUID = 3460908036485828909L;
-
-        public CreateNewPlaylistAction() {
+        CreateNewPlaylistAction() {
             super(I18n.tr("Create New Playlist"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Create and add to a new playlist"));
         }
@@ -426,9 +406,7 @@ final class BTDownloadActions {
 
     static final class PlaySingleMediaFileAction extends AbstractAction {
 
-        private static final long serialVersionUID = -3628469680044329612L;
-
-        public PlaySingleMediaFileAction() {
+        PlaySingleMediaFileAction() {
             super(I18n.tr("Play file"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Play media file"));
         }
