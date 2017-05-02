@@ -166,18 +166,34 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         updateTableFilters();
     }
 
-    public BTDownload findBTDownload(File saveLocation) {
+    private BTDownload findBTDownload(File saveLocation) {
         if (saveLocation == null) {
             return null;
         }
         final List<BTDownload> downloads = getDownloads();
         for (BTDownload dl : downloads) {
             final File dlSaveLocation = dl.getSaveLocation();
-            if (saveLocation.equals(dlSaveLocation) && TorrentUtil.isActive(dl)) {
+            if (saveLocation.equals(dlSaveLocation)) {
                 return dl;
             }
         }
         return null;
+    }
+
+    private static boolean isActive(BTDownload dl) {
+        if (dl == null) {
+            return false;
+        }
+
+        final TransferState state = dl.getState();
+
+        return state == TransferState.ALLOCATING ||
+                state == TransferState.CHECKING ||
+                state == TransferState.DOWNLOADING ||
+                state == TransferState.DOWNLOADING_METADATA ||
+                state == TransferState.DOWNLOADING_TORRENT ||
+                state == TransferState.SEEDING ||
+                state == TransferState.UPLOADING;
     }
 
     // Linear complexity, take it easy, try no to use on refresh methods, only on actions.
@@ -190,7 +206,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             return false;
         }
         final BTDownload btDownload = findBTDownload(saveLocation);
-        return btDownload != null && TorrentUtil.isActive(btDownload);
+        return btDownload != null && isActive(btDownload);
     }
 
     @Override

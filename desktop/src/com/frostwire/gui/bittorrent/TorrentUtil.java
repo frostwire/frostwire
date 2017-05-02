@@ -264,20 +264,4 @@ public final class TorrentUtil {
             }
         }
     }
-
-    static boolean isActive(BTDownload dl) {
-        if (dl == null) {
-            return false;
-        }
-
-        final TransferState state = dl.getState();
-
-        return state == TransferState.ALLOCATING ||
-               state == TransferState.CHECKING ||
-               state == TransferState.DOWNLOADING ||
-               state == TransferState.DOWNLOADING_METADATA ||
-               state == TransferState.DOWNLOADING_TORRENT ||
-               state == TransferState.SEEDING ||
-               state == TransferState.UPLOADING;
-    }
 }
