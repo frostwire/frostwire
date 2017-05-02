@@ -18,7 +18,6 @@
 package com.limegroup.gnutella.gui.tables;
 
 import com.frostwire.gui.AlphaIcon;
-import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.uxstats.UXStats;
@@ -48,7 +47,6 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     private JLabel labelPlay;
     private JLabel labelDownload;
     private boolean showSolid;
-    private AbstractActionsHolder lastClickedActionsHolder;
     protected AbstractActionsHolder actionsHolder;
 
     static {
@@ -70,10 +68,6 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     @Override
     protected void updateUIData(Object dataHolder, JTable table, int row, int column) {
         actionsHolder = (AbstractActionsHolder) dataHolder;
-
-        if (table.getSelectedRowCount() == 1 && row == table.getSelectedRow()) {
-            lastClickedActionsHolder = actionsHolder;
-        }
 
         showSolid = mouseIsOverRow(table, row);
         updatePlayButton();
@@ -132,13 +126,13 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     private void labelShare_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             // already being shared.
-            if (lastClickedActionsHolder == null ||
-                    BTDownloadMediator.instance().isActiveTorrentDownload(lastClickedActionsHolder.getFile())) {
+            if (actionsHolder == null ||
+                    BTDownloadMediator.instance().isActiveTorrentDownload(actionsHolder.getFile())) {
                 return;
             }
 
             if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
-                TorrentUtil.makeTorrentAndDownload(lastClickedActionsHolder.getFile(), null, true);
+                TorrentUtil.makeTorrentAndDownload(actionsHolder.getFile(), null, true);
             }
 
             UXStats.instance().log(LIBRARY_SHARE_FROM_ROW_ACTION);
@@ -147,7 +141,7 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
 
     private void updatePlayButton() {
         cancelEdit();
-        labelPlay.setIcon((actionsHolder.isPlaying()) ? GUIMediator.getThemeImage("speaker") : (showSolid) ? play_solid : play_transparent);
+        labelPlay.setIcon(actionsHolder.isPlaying() ? GUIMediator.getThemeImage("speaker") : (showSolid) ? play_solid : play_transparent);
     }
 
     private void labelPlay_mouseReleased(MouseEvent e) {
