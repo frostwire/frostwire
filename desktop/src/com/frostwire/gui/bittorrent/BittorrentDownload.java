@@ -69,6 +69,12 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
         this.items = calculateItems(dl);
         this.partial = dl.isPartial();
 
+        if (dl.isFinished(true) &&
+                !SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
+            dl.pause();
+            finalCleanup(dl.getIncompleteFiles());
+        }
+
         if (!dl.wasPaused()) {
             dl.resume();
         }
@@ -334,6 +340,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                 }
             });
         }
+
         @Override
         public void removed(BTDownload dl, Set<File> incompleteFiles) {
             finalCleanup(incompleteFiles);
@@ -473,8 +480,8 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
             }
 
             if (dl instanceof BittorrentDownload &&
-                dl.getState().equals(TransferState.SEEDING) &&
-                !showShareTorrentDialog) {
+                    dl.getState().equals(TransferState.SEEDING) &&
+                    !showShareTorrentDialog) {
                 dl.pause();
                 // sorry Dijkstra.
                 return;
