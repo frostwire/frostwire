@@ -163,7 +163,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         // the actual download buttons instance.
         BTDownloadButtons downloadButtons = new BTDownloadButtons(this);
         BUTTON_ROW = downloadButtons.getComponent();
-        updateTableFilters();
     }
 
     private BTDownload findBTDownload(File saveLocation) {
