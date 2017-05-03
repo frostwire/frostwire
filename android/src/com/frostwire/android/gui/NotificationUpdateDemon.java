@@ -74,7 +74,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
         NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager != null) {
-            manager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
+            manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
         }
     }
 
@@ -88,13 +88,21 @@ public final class NotificationUpdateDemon implements TimerObserver {
             return;
         }
 
-        //  format strings
-        String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
-        String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
-
         // number of uploads (seeding) and downloads
         int downloads = TransferManager.instance().getActiveDownloads();
         int uploads = TransferManager.instance().getActiveUploads();
+
+        if (downloads == 0 && uploads == 0) {
+            NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (manager != null) {
+                manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+            }
+            return; // quick return
+        }
+
+        //  format strings
+        String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
+        String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
 
         // Transfers status.
         notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
