@@ -195,7 +195,7 @@ public final class TransferManager {
     public int getActiveUploads() {
         int count = 0;
         for (BittorrentDownload d : bittorrentDownloads) {
-            if (d.isSeeding()) {
+            if (d.isFinished() && !d.isPaused()) {
                 count++;
             }
         }
