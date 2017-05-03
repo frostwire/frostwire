@@ -18,51 +18,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/view_intent_wizard_page_text"
-        style="@style/WizardSubTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
-        android:layout_marginTop="20dp"
-        android:text="@string/intent_text" />
-
-    <CheckBox
-        android:id="@+id/view_intent_wizard_page_check_accept_copyright"
-        style="@style/WizardText.Sub"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/accept_intent" />
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <CheckBox
-            android:id="@+id/view_intent_wizard_page_check_accept_tou"
-            style="@style/WizardText.Sub"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:text="@string/i_have_read_and_agree_to_the" />
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/view_intent_wizard_page_text_tos"
-            style="@style/WizardText.Terms"
-            android:layout_width="wrap_content"
+            android:id="@+id/view_intent_wizard_page_text"
+            style="@style/WizardSubTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:clickable="true"
-            android:text="@string/terms_of_use" />
-    </LinearLayout>
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/intent_text" />
 
-</LinearLayout>
+        <CheckBox
+            android:id="@+id/view_intent_wizard_page_check_accept_copyright"
+            style="@style/WizardText.Sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/accept_intent" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/view_intent_wizard_page_check_accept_tou"
+                style="@style/WizardText.Sub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:text="@string/i_have_read_and_agree_to_the" />
+
+            <TextView
+                android:id="@+id/view_intent_wizard_page_text_tos"
+                style="@style/WizardText.Terms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:clickable="true"
+                android:text="@string/terms_of_use" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
