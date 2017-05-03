@@ -42,7 +42,7 @@ import com.frostwire.util.Logger;
  * @author gubatron
  * @author aldenml
  */
-public class NotificationUpdateDemon implements TimerObserver {
+public final class NotificationUpdateDemon implements TimerObserver {
 
     private static final Logger LOG = Logger.getLogger(NotificationUpdateDemon.class);
 
@@ -71,6 +71,11 @@ public class NotificationUpdateDemon implements TimerObserver {
     public void stop() {
         LOG.debug("Stopping permanent notification demon");
         mTimerSubscription.unsubscribe();
+
+        NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager != null) {
+            manager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
+        }
     }
 
     private void updatePermanentStatusNotification() {

@@ -102,7 +102,7 @@ public class EngineService extends Service implements IEngineService {
         // it happens that this is called before Application#onCreate
         ConfigurationManager.create(getApplication());
 
-        initializePermanentNotificationUpdates();
+        startPermanentNotificationUpdates();
 
         return START_STICKY;
     }
@@ -115,7 +115,7 @@ public class EngineService extends Service implements IEngineService {
     private void shutdownSupport() {
         LOG.debug("shutdownSupport");
         enableComponents(false);
-        disablePermanentNotificationUpdates();
+        stopPermanentNotificationUpdates();
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
         stopServices(false);
         LOG.debug("onDestroy, stopping BTEngine...");
@@ -301,12 +301,14 @@ public class EngineService extends Service implements IEngineService {
         return R.drawable.frostwire_notification_flat;
     }
 
-    private void initializePermanentNotificationUpdates() {
-        notificationUpdateDemon = new NotificationUpdateDemon(getApplicationContext());
+    private void startPermanentNotificationUpdates() {
+        if (notificationUpdateDemon == null) {
+            notificationUpdateDemon = new NotificationUpdateDemon(getApplicationContext());
+        }
         notificationUpdateDemon.start();
     }
 
-    private void disablePermanentNotificationUpdates() {
+    private void stopPermanentNotificationUpdates() {
         if (notificationUpdateDemon != null) {
             notificationUpdateDemon.stop();
         }
