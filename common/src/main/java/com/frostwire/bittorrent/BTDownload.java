@@ -133,7 +133,11 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isFinished() {
-        return th.isValid() && th.status().isFinished();
+        return isFinished(false);
+    }
+
+    public boolean isFinished(boolean force) {
+        return th.isValid() && th.status(force).isFinished();
     }
 
     public TransferState getState() {
