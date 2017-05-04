@@ -18,38 +18,11 @@ final class Finalizer {
 
     private static final Logger LOG = Logger.getLogger(Finalizer.class);
 
-    /** Stores whether a shutdown operation has been
-     * initiated.
-     */
-    private static boolean _shutdownImminent;
-
-    /** Indicates whether file uploads are complete.
-     */
-    private static boolean _uploadsComplete;
-
-    /** Indicates whether file downloads are complete.
-     */
-    private static boolean _downloadsComplete;
-
-    /**
-     * An update command to execute upon shutdown, if any.
-     */
-    private static volatile String _updateCommand;
-
     /**
      * Suppress the default constructor to ensure that this class can never
      * be constructed.
      */
     private Finalizer() {
-    }
-
-    /** Indicates whether the application is waiting to
-     * shutdown.
-     * @return true if the application is waiting to
-     * shutdown, false otherwise
-     */
-    static boolean isShutdownImminent() {
-        return _shutdownImminent;
     }
 
     /**
@@ -70,7 +43,6 @@ final class Finalizer {
         // Do shutdown stuff in another thread.
         // We don't want to lockup the event thread
         // (which this was called on).
-        final String toExecute = _updateCommand;
         Thread shutdown = new Thread("Shutdown Thread") {
             public void run() {
                 try {
@@ -85,7 +57,7 @@ final class Finalizer {
                     BugManager.instance().shutdown();
                     sleep(3000);
                     //LOG.info("Shutting down [updateCommand=" + toExecute + "]");
-                    GuiCoreMediator.getLifecycleManager().shutdown(toExecute);
+                    GuiCoreMediator.getLifecycleManager().shutdown(null);
                     LOG.info("System exit");
                     System.exit(0);
                 } catch (Throwable t) {
@@ -96,50 +68,4 @@ final class Finalizer {
         };
         shutdown.start();
     }
-
-    static void flagUpdate(String toExecute) {
-        _updateCommand = toExecute;
-    }
-
-    /** Notifies the <tt>Finalizer</tt> that all
-     * downloads have been completed.
-     */
-    static void setDownloadsComplete() {
-        _downloadsComplete = true;
-        checkForShutdown();
-    }
-
-    /** Notifies the <tt>Finalizer</tt> that all uploads
-     * have been completed.
-     */
-    static void setUploadsComplete() {
-        _uploadsComplete = true;
-        checkForShutdown();
-    }
-
-    /** Attempts to shutdown the application.  This
-     * method does nothing if all file transfers are
-     * not yet complete.
-     */
-    private static void checkForShutdown() {
-        if (_shutdownImminent && _uploadsComplete && _downloadsComplete) {
-            GUIMediator.shutdown();
-        }
-    }
-
-    /**
-     * Adds the specified <tt>Finalizable</tt> instance to the list of
-     * classes to notify prior to shutdown.
-     * 
-     * @param fin the <tt>Finalizable</tt> instance to register
-     */
-    static void addFinalizeListener(final FinalizeListener fin) {
-        Thread t = new Thread("FinalizeItem") {
-            public void run() {
-                fin.doFinalize();
-            }
-        };
-        GuiCoreMediator.getLifecycleManager().addShutdownItem(t);
-    }
-
 }
