@@ -15,13 +15,12 @@
 
 package com.limegroup.gnutella;
 
+import com.limegroup.gnutella.settings.LibrarySettings;
+import org.limewire.util.CommonUtils;
+
 import java.io.File;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.limewire.util.CommonUtils;
-
-import com.limegroup.gnutella.settings.LibrarySettings;
 
 
 /**
@@ -29,27 +28,26 @@ import com.limegroup.gnutella.settings.LibrarySettings;
  * All various components are wired together here.
  */
 public class LimeCoreGlue {
-	
-    private static AtomicBoolean preinstalled = new AtomicBoolean(false);
+
+    private static final AtomicBoolean preinstalled = new AtomicBoolean(false);
+
     private AtomicBoolean installed = new AtomicBoolean(false);
-    
+
     private static LimeCoreGlue INSTANCE;
-    
+
     public static LimeCoreGlue instance() {
         if (INSTANCE == null) {
             INSTANCE = new LimeCoreGlue();
         }
         return INSTANCE;
     }
-    
+
     private LimeCoreGlue() {
 
-    }    
-    
+    }
+
     /**
      * Wires initial pieces together that are required for nearly everything.
-     * 
-     * @param userSettingsDir the preferred directory for user settings
      */
     public static void preinstall() throws InstallFailedException {
         Properties metaConfiguration = CommonUtils.loadMetaConfiguration();
@@ -57,20 +55,20 @@ public class LimeCoreGlue {
         if (!metaConfiguration.isEmpty()) {
             portableSettingsDir = CommonUtils.getPortableSettingsDir(metaConfiguration);
         }
-        File userSettingsDir = (portableSettingsDir == null) ? CommonUtils.getUserSettingsDir() : portableSettingsDir ;
+        File userSettingsDir = (portableSettingsDir == null) ? CommonUtils.getUserSettingsDir() : portableSettingsDir;
         preinstall(userSettingsDir);
     }
-    
+
     /**
      * Wires initial pieces together that are required for nearly everything.
-     * 
+     *
      * @param userSettingsDir the preferred directory for user settings
      */
-    public static void preinstall(File userSettingsDir) throws InstallFailedException {
+    private static void preinstall(File userSettingsDir) throws InstallFailedException {
         // Only preinstall once
-        if(!preinstalled.compareAndSet(false, true))
+        if (!preinstalled.compareAndSet(false, true))
             return;
-        
+
         // This looks a lot more complicated than it really is.
         // The excess try/catch blocks are just to make debugging easier,
         // to keep track of what messages each successive IOException is.
@@ -85,37 +83,29 @@ public class LimeCoreGlue {
         try {
             CommonUtils.setUserSettingsDir(userSettingsDir);
             LibrarySettings.resetLibraryFoldersIfPortable();
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new InstallFailedException("Settings Directory Failure", e);
         }
     }
 
-    /** Wires all various components together. */
+    /**
+     * Wires all various components together.
+     */
     public void install() {
         // Only install once.
-        if(!installed.compareAndSet(false, true))
+        if (!installed.compareAndSet(false, true))
             return;
-        
+
         preinstall(); // Ensure we're preinstalled.
     }
-    
-    /** Simple exception for failure to install. */
+
+    /**
+     * Simple exception for failure to install.
+     */
     public static class InstallFailedException extends RuntimeException {
-        
-        public InstallFailedException() {
-            super();
-        }
 
-        public InstallFailedException(String message, Throwable cause) {
+        InstallFailedException(String message, Throwable cause) {
             super(message, cause);
-        }
-
-        public InstallFailedException(String message) {
-            super(message);
-        }
-
-        public InstallFailedException(Throwable cause) {
-            super(cause);
         }
     }
 }
