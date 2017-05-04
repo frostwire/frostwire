@@ -35,8 +35,8 @@ import com.frostwire.android.gui.activities.PreviewPlayerActivity;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.ClickAdapter;
-import com.frostwire.android.gui.views.MediaPlaybackOverlay;
-import com.frostwire.android.gui.views.SearchThumbnailImageView;
+import com.frostwire.android.gui.views.MediaPlaybackOverlayPainter;
+import com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.search.FileSearchResult;
@@ -154,18 +154,24 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     private void populateThumbnail(View view, SearchResult sr) {
-        SearchThumbnailImageView fileTypeIcon = findView(view, R.id.view_bittorrent_search_result_list_item_filetype_icon);
+        ImageView fileTypeIcon = findView(view, R.id.view_bittorrent_search_result_list_item_filetype_icon);
         if (sr.getThumbnailUrl() != null) {
             thumbLoader.load(Uri.parse(sr.getThumbnailUrl()), fileTypeIcon, 96, 96, getFileTypeIconId());
         }
 
+        MediaPlaybackStatusOverlayView overlayView = findView(view, R.id.view_bittorrent_search_result_list_item_filetype_icon_media_playback_overlay_view);
+
         fileTypeIcon.setOnClickListener(previewClickListener);
         if (isAudio(sr) || sr instanceof YouTubePackageSearchResult) {
             fileTypeIcon.setTag(sr);
-            fileTypeIcon.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.PREVIEW);
+            overlayView.setTag(sr);
+            overlayView.setVisibility(View.VISIBLE);
+            overlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PREVIEW);
         } else {
             fileTypeIcon.setTag(null);
-            fileTypeIcon.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.NONE);
+            overlayView.setTag(null);
+            overlayView.setVisibility(View.GONE);
+            overlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
         }
     }
 
