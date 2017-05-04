@@ -366,7 +366,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 }
 
                 if (po.paypalUrl != null) {
-                    items.add(new SendFiatTipAction(context.get(), po));
+                    items.add(new SendFiatTipAction(context.get(), po.paypalUrl));
                 }
             }
         }
