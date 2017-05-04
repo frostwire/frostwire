@@ -33,6 +33,7 @@ import android.provider.MediaStore;
 import android.widget.ImageView;
 
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.MemoryPolicy;
@@ -40,6 +41,7 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Picasso.Builder;
 import com.squareup.picasso.Request;
+import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.RequestHandler;
 import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
@@ -154,6 +156,41 @@ public final class ImageLoader {
                 memoryCache(cache).executor(Engine.instance().getThreadPool()).build();
 
         picasso.setIndicatorsEnabled(false);
+    }
+
+    public interface OnBitmapLoadedCallbackRunner {
+        void onBitmapLoaded(final Bitmap bitmap, final RequestCreator requestCreator);
+        void onError();
+    }
+
+    public void loadBitmapAsync(final Uri imageUri, final OnBitmapLoadedCallbackRunner onBitmapLoadedRunner) {
+        if (imageUri == null) {
+            throw new IllegalArgumentException("Uri can't be null");
+        }
+        if (onBitmapLoadedRunner == null) {
+            throw new IllegalArgumentException("OnBitmapLoadedCallbackRunner can't be null");
+        }
+        Runnable bitmapLoadingRunner = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    RequestCreator requestCreator = picasso.load(imageUri);
+                    Bitmap bitmap = requestCreator.get();
+                    if (bitmap != null) {
+                        onBitmapLoadedRunner.onBitmapLoaded(bitmap, requestCreator);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    onBitmapLoadedRunner.onError();
+                }
+            }
+        };
+
+        if (!UIUtils.isMain()) {
+            bitmapLoadingRunner.run();
+        } else {
+            Engine.instance().getThreadPool().submit(bitmapLoadingRunner);
+        }
     }
 
     public void load(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {

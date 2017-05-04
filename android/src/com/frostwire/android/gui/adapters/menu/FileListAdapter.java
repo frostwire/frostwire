@@ -30,6 +30,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -47,9 +48,9 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.CheckableImageView;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
-import com.frostwire.android.gui.views.BrowseThumbnailImageButton;
 import com.frostwire.android.gui.views.ListAdapterFilter;
-import com.frostwire.android.gui.views.MediaPlaybackOverlay;
+import com.frostwire.android.gui.views.MediaPlaybackOverlayPainter;
+import com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
@@ -86,7 +87,6 @@ import java.util.Map.Entry;
 public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     private static final Logger LOG = Logger.getLogger(FileListAdapter.class);
-
     private final byte fileType;
     private final ImageLoader thumbnailLoader;
     private final DownloadButtonClickListener downloadButtonClickListener;
@@ -122,14 +122,42 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     public View getView(int position, View view, ViewGroup parent) {
         int adapterLayoutId = getViewItemId();
         if (adapterLayoutId == R.layout.view_browse_peer_thumbnail_list_item) {
-            return super.getView(position, view, parent);
+            return getListItemView(position, view, parent);
         } else {
-            return getGridView(position, view, parent);
+            return getGridItemView(position, view);
         }
     }
 
-    private View getGridView(int position, View view, ViewGroup parent) {
-        // see parent and see where the container inflation happens and try to mimick that here.
+    private View getListItemView(int position, View view, ViewGroup parent) {
+        view = super.getView(position, view, parent);
+        final FileDescriptorItem item = getItem(position);
+        if (item.fd.fileType == Constants.FILE_TYPE_AUDIO) {
+            initPlaybackStatusOverlayTouchFeedback(view, item);
+        }
+        ImageView thumbnailView = findView(view, R.id.view_browse_peer_thumbnail_list_item_browse_thumbnail_image_button);
+        if (thumbnailView != null) {
+            thumbnailView.setTag(item);
+            thumbnailView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!selectAllMode) {
+                        if (getShowMenuOnClick()) {
+                            if (showMenu(v)) {
+                                return;
+                            }
+                        }
+                        LOG.info("AbstractListAdapter.ViewOnClickListener.onClick()");
+                        onItemClicked(v);
+                    } else {
+                        onItemClicked(v);
+                    }
+                }
+            });
+        }
+        return view;
+    }
+
+    private View getGridItemView(int position, View view) {
         final FileDescriptorItem item = getItem(position);
         Context ctx = getContext();
 
@@ -141,21 +169,29 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         try {
             initCheckableGridImageView((RelativeLayout) view, item);
             initTouchFeedback(view, item, new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (selectAllMode) {
-                        onItemClicked(v);
-                    } else {
-                        localPlay(item.fd, v);
-                    }
-                }
-            }, new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    // toggles checkbox mode.
-                    return onItemLongClicked(v);
-                }
-            }, null);
+                        @Override
+                        public void onClick(View v) {
+                            // background image listener
+                            if (selectAllMode) {
+                                onItemClicked(v);
+                            } else {
+                                if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) {
+                                    LOG.info("getGridItemView() Background ImageView.onClick(), show the menu");
+                                    new MenuBuilder(getMenuAdapter(v)).show();
+                                } else {
+                                    localPlay(item.fd, v);
+                                }
+                            }
+                        }
+                    }, new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View v) {
+                            // toggles checkbox mode.
+                            return onItemLongClicked(v);
+                        }
+                    },
+                    null);
+            initPlaybackStatusOverlayTouchFeedback(view, item);
         } catch (Throwable e) {
             LOG.error("Fatal error getting view: " + e.getMessage(), e);
         }
@@ -163,34 +199,61 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return view;
     }
 
-    protected void initCheckableGridImageView(ViewGroup view, FileDescriptorItem item) throws Throwable {
+    private void initPlaybackStatusOverlayTouchFeedback(View view, final FileDescriptorItem item) {
+        MediaPlaybackStatusOverlayView playbackStatusOverlayView = findView(view,
+                inGridMode() ? R.id.view_browse_peer_thumbnail_grid_item_playback_overlay_view :
+                        R.id.view_browse_peer_thumbnail_list_item_playback_overlay_view);
+        if (selectAllMode) {
+            playbackStatusOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
+        }
+        playbackStatusOverlayView.setTag(item);
+        playbackStatusOverlayView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectAllMode) {
+                    onItemClicked(v);
+                } else {
+                    localPlay(item.fd, v);
+                }
+            }
+        });
+    }
+
+    protected void initCheckableGridImageView(ViewGroup view, final FileDescriptorItem item) throws Throwable {
         final CheckboxOnCheckedChangeListener checkboxOnCheckedChangeListener = new CheckboxOnCheckedChangeListener();
         boolean isChecked = getChecked().contains(item);
-        Uri[] uris = getFileItemThumbnailUris(item);
-        MediaPlaybackOverlay.MediaPlaybackState overlay = MediaPlaybackOverlay.MediaPlaybackState.NONE;
         boolean showFileSize = false;
-        if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) {
-            overlay = MediaPlaybackOverlay.MediaPlaybackState.PLAY;
+
+        Uri[] uris = getFileItemThumbnailUris(item);
+
+        MediaPlaybackStatusOverlayView playbackStatusOverlayView = findView(view, R.id.view_browse_peer_thumbnail_grid_item_playback_overlay_view);
+        MediaPlaybackOverlayPainter.MediaPlaybackState overlayPlaybackState = MediaPlaybackOverlayPainter.MediaPlaybackState.NONE;
+
+        int thumbnailResizeHeight = (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) ? 96 : 196;
+        if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS && !selectAllMode) {
+            overlayPlaybackState = MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY;
             showFileSize = true;
         }
         final CheckableImageView checkableView = new CheckableImageView(
                 view.getContext(),
                 view,
-                0, // re-sizing while keeping aspect ratio
-                196,
+                playbackStatusOverlayView,
+                overlayPlaybackState,
+                0, // re-sizes while keeping aspect ratio based only on given height
+                thumbnailResizeHeight,
                 uris,
                 isChecked,
                 showFileSize,
-                overlay,
                 checkboxOnCheckedChangeListener);
+
         checkboxOnCheckedChangeListener.setEnabled(false);
-        checkableView.setCheckableMode(selectAllMode);
-        checkableView.setTag(item);
-        checkableView.loadImages();
-        if (showFileSize) {
-            checkableView.setFileSize(item.fd.fileSize);
-        }
-        checkableView.setVisibility(View.VISIBLE);
+            checkableView.setCheckableMode(selectAllMode);
+            checkableView.setTag(item);
+            checkableView.loadImages();
+            if (showFileSize) {
+                checkableView.setFileSize(item.fd.fileSize);
+            }
+            checkableView.setVisibility(View.VISIBLE);
         checkboxOnCheckedChangeListener.setEnabled(true);
     }
 
@@ -364,8 +427,15 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private void populateViewThumbnail(View view, FileDescriptorItem item) {
         FileDescriptor fd = item.fd;
 
-        BrowseThumbnailImageButton fileThumbnail = findView(view, R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button);
+        ImageButton fileThumbnail = findView(view,
+                inGridMode() ?
+                        R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button :
+                        R.id.view_browse_peer_thumbnail_list_item_browse_thumbnail_image_button);
         fileThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        MediaPlaybackStatusOverlayView mediaOverlayView = findView(view, inGridMode() ?
+                R.id.view_browse_peer_thumbnail_grid_item_playback_overlay_view :
+                R.id.view_browse_peer_thumbnail_list_item_playback_overlay_view);
 
         boolean inGridMode = inGridMode();
         int thumbnailDimensions = inGridMode ?
@@ -377,15 +447,15 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         } else {
             if (in(fileType, Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS)) {
                 if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD())) {
-                    fileThumbnail.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.STOP);
+                    mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
                 } else {
-                    fileThumbnail.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.PLAY);
+                    mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
                 }
             } else if (fileType == Constants.FILE_TYPE_RINGTONES) {
                 if (fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD())) {
-                    fileThumbnail.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.STOP);
+                    mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
                 } else {
-                    fileThumbnail.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.PLAY);
+                    mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
                 }
             }
 
@@ -445,12 +515,18 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         TextView fileSize = findView(view, R.id.view_browse_peer_thumbnail_list_image_item_file_size);
         fileSize.setText(UIUtils.getBytesInHuman(fd.fileSize));
 
-        BrowseThumbnailImageButton downloadButton = findView(view, R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button);
+        ImageButton downloadButton = findView(view, inGridMode() ?
+                R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button :
+                R.id.view_browse_peer_thumbnail_list_item_browse_thumbnail_image_button);
+
+        MediaPlaybackStatusOverlayView mediaOverlayView = findView(view, inGridMode() ?
+                R.id.view_browse_peer_thumbnail_grid_item_playback_overlay_view :
+                R.id.view_browse_peer_thumbnail_list_item_playback_overlay_view);
 
         if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD()) || fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD())) {
-            downloadButton.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.STOP);
+            mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
         } else {
-            downloadButton.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.PLAY);
+            mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
         }
 
         downloadButton.setTag(fd);
@@ -509,6 +585,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         Resources res = getContext().getResources();
 
+        // TODO: Fix deprecation warning when we hit API 23
         title.setTextColor(res.getColor(R.color.browse_peer_listview_item_inactive_foreground));
         text.setTextColor(res.getColor(R.color.browse_peer_listview_item_inactive_foreground));
         size.setTextColor(res.getColor(R.color.browse_peer_listview_item_inactive_foreground));

@@ -19,19 +19,32 @@
  */
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                xmlns:frostwire="http://schemas.android.com/apk/res-auto"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center">
 
-    <com.frostwire.android.gui.views.BrowseThumbnailImageButton
+    <ImageButton
         android:id="@+id/view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button"
         android:layout_width="match_parent"
         android:layout_height="128dp"
         android:layout_centerInParent="true"
-        android:scaleType="centerCrop"
-        android:background="@color/app_browse_thumbnail_background"
         android:adjustViewBounds="true"
-        android:contentDescription="@null" />
+        android:background="@color/app_browse_thumbnail_background"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"/>
+
+    <com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView
+        android:id="@+id/view_browse_peer_thumbnail_grid_item_playback_overlay_view"
+        frostwire:circleStrokeWidth="10"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"
+        android:clickable="true"
+        android:foregroundGravity="center"
+        android:visibility="gone"/>
 
     <FrameLayout
         android:layout_width="wrap_content"

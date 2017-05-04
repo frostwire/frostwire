@@ -28,14 +28,17 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.text.Html;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -578,5 +581,21 @@ public final class UIUtils {
         double y_sq = Math.pow(dm.heightPixels/dm.ydpi, 2);
         // pitagoras
         return Math.sqrt(x_sq + y_sq);
+    }
+
+    /**
+     * @param context
+     * @return a 3 int array with: { widthInPixels, heightInPixels, Surface#ROTATION_XXX value }
+     */
+    public static int[] getScreenDimensionsAndRotation(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+        return new int[] { metrics.widthPixels, metrics.heightPixels, display.getRotation() };
+    }
+
+    public static boolean isMain() {
+        return Looper.getMainLooper().getThread() == Thread.currentThread();
     }
 }

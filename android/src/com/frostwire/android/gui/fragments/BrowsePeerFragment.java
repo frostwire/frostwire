@@ -304,10 +304,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public void onShow() {
     }
 
-    public boolean getSelectAllMode() {
-        return selectAllModeOn;
-    }
-
     @Override
     protected void initComponents(View v) {
         findView(v, R.id.fragment_browse_peer_select_all_container).setVisibility(View.GONE);
@@ -506,7 +502,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 protected void onItemClicked(View v) {
                     onFileItemClicked(v);
                 }
-
             };
             adapter.setCheckboxesVisibility(selectAllModeOn);
             list.setNumColumns(adapter.getNumColumns());

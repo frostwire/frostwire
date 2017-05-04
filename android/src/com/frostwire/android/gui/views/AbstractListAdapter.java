@@ -506,11 +506,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         initTouchFeedback(v, item, viewOnClickListener, viewOnLongClickListener, viewOnKeyListener);
     }
 
-    protected void initTouchFeedback(View v, T item, OnClickListener clickListener, OnLongClickListener longClickListener, OnKeyListener keyListener) {
+    protected void initTouchFeedback(View v,
+                                     T item,
+                                     OnClickListener clickListener,
+                                     OnLongClickListener longClickListener,
+                                     OnKeyListener keyListener) {
         if (v == null || v instanceof CheckBox) {
             return;
         }
-
         v.setOnClickListener(clickListener);
         v.setOnLongClickListener(longClickListener);
         v.setOnKeyListener(keyListener);
@@ -543,8 +546,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * Meant to be overridden. Here you must return a String that shows the sum of all the checked elements
      * and some significant unit. For files, this would be the amount of total bytes if we summed all the selected
      * files. If you had a list of items to purchase, this could be total amount of money and a currency symbol.
-     *
-     * @return
      */
     public String getCheckedSum() {
         return null;
@@ -558,15 +559,23 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         this.onItemCheckedListener = onItemCheckedListener;
     }
 
+    public boolean showMenu(View v) {
+        MenuAdapter adapter = getMenuAdapter(v);
+        if (adapter != null && adapter.getCount() > 0) {
+            trackDialog(new MenuBuilder(adapter).show());
+            return true;
+        }
+        return false;
+    }
+
+
     private final class ViewOnClickListener implements OnClickListener {
         public void onClick(View v) {
             if (showMenuOnClick) {
-                MenuAdapter adapter = getMenuAdapter(v);
-                if (adapter != null && adapter.getCount() > 0) {
-                    trackDialog(new MenuBuilder(adapter).show());
-                    return;
-                }
+                showMenu(v);
+                return;
             }
+            LOG.info("AbstractListAdapter.ViewOnClickListener.onClick()");
             onItemClicked(v);
         }
     }
@@ -574,9 +583,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private final class ViewOnLongClickListener implements OnLongClickListener {
         public boolean onLongClick(View v) {
             if (showMenuOnLongClick) {
-                MenuAdapter adapter = getMenuAdapter(v);
-                if (adapter != null && adapter.getCount() > 0) {
-                    trackDialog(new MenuBuilder(adapter).show());
+                if (showMenu(v)) {
                     return true;
                 }
             }

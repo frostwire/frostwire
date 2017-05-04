@@ -19,6 +19,9 @@
  */
 -->
 <resources>
+    <declare-styleable name="MediaPlaybackStatusOverlayView">
+        <attr name="circleStrokeWidth" format="integer"/>
+    </declare-styleable>
     <declare-styleable name="ProductCardView">
         <attr name="product_card_title_bold" format="string"/>
         <attr name="product_card_title_normal" format="string"/>

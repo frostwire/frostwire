@@ -19,12 +19,15 @@
 package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
@@ -38,7 +41,11 @@ import com.frostwire.android.gui.adapters.menu.SetAsWallpaperMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractFragment;
+import com.frostwire.android.gui.views.TouchImageView;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.util.Logger;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.RequestCreator;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -53,7 +60,10 @@ import java.util.List;
  * @author votaguz
  */
 public class ImageViewerFragment extends AbstractFragment {
-    private ImageView imageView;
+    private static final Logger LOG = Logger.getLogger(ImageViewerFragment.class);
+    private ImageView preloadImageView; // tried doing this with a single imageviewer, didn't work.
+    private TouchImageView imageView;
+    private ProgressBar progressBar;
     private FileDescriptor fd;
     private ImageViewerActionModeCallback actionModeCallback;
 
@@ -65,7 +75,12 @@ public class ImageViewerFragment extends AbstractFragment {
 
     @Override
     protected void initComponents(View v) {
+        progressBar = findView(v, R.id.fragment_image_viewer_progress_bar);
+        preloadImageView = findView(v, R.id.fragment_image_viewer_preload_image);
         imageView = findView(v, R.id.fragment_image_viewer_image);
+        progressBar.setVisibility(View.VISIBLE);
+        preloadImageView.setVisibility(View.VISIBLE);
+        imageView.setVisibility(View.GONE);
     }
 
     @Override
@@ -81,7 +96,77 @@ public class ImageViewerFragment extends AbstractFragment {
             startActionMode(actionModeCallback);
         }
         Uri fileUri = UIUtils.getFileUri(getActivity(), fd.filePath, false);
-        ImageLoader.getInstance(getActivity()).load(fileUri, imageView);
+
+        progressBar.setVisibility(View.VISIBLE);
+        preloadImageView.setVisibility(View.VISIBLE);
+        imageView.setVisibility(View.GONE);
+
+        ImageLoader imageLoader = ImageLoader.getInstance(getActivity());
+
+        // get screen dimensions and orientation once
+        int[] dimsAndRot = UIUtils.getScreenDimensionsAndRotation(getActivity());
+        final int screenWidth = dimsAndRot[0];
+        final int screenHeight = dimsAndRot[1];
+        int screenRotation = dimsAndRot[2];
+        final boolean screenIsVertical  = screenRotation == Surface.ROTATION_0 || screenRotation == Surface.ROTATION_180;
+
+        // downsize to bad quality for responsive UI when opening fragment
+        int preloadingWidth = screenIsVertical ? 0 : 32;
+        int preloadingHeight = screenIsVertical ? 32 : 0;
+        imageLoader.load(fileUri, preloadImageView, preloadingWidth, preloadingHeight);
+
+        imageLoader.loadBitmapAsync(fileUri, new ImageLoader.OnBitmapLoadedCallbackRunner() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, RequestCreator requestCreator) {
+                ImageViewerFragment.this.onBitmapLoaded(bitmap, requestCreator, screenWidth, screenHeight, screenIsVertical);
+            }
+
+            @Override
+            public void onError() {
+                getActivity().finish();
+            }
+        });
+
+    }
+
+    private void onBitmapLoaded(final Bitmap bitmap,
+                                final RequestCreator requestCreator,
+                                int screenWidth,
+                                int screenHeight, boolean screenIsVertical) {
+        // this should happen in background thread
+        if (UIUtils.isMain()) {
+            LOG.warn("onBitmapLoaded() -> check your logic. You shouldn't be loading this bitmap on the main thread.");
+            return;
+        }
+
+        int finalHeight = (int) (screenHeight / 3.0);
+        int finalWidth = (int) (screenWidth / 3.0);
+        // downsize it if you have to
+        if (screenIsVertical && bitmap.getHeight() > finalHeight) {
+            requestCreator.resize(0, finalHeight);
+        } else if (!screenIsVertical && bitmap.getWidth() > screenWidth) {
+            requestCreator.resize(finalWidth, 0);
+        }
+
+        // final image loading in UI thread
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                requestCreator.into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        progressBar.setVisibility(View.GONE);
+                        preloadImageView.setVisibility(View.GONE);
+                        imageView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
+
+            }
+        });
     }
 
     private class ImageViewerActionModeCallback implements android.support.v7.view.ActionMode.Callback {
@@ -155,7 +240,7 @@ public class ImageViewerFragment extends AbstractFragment {
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             this.mode.finish();
-                getActivity().finish();
+            getActivity().finish();
         }
 
         private void updateMenuActionsVisibility(FileDescriptor fd) {

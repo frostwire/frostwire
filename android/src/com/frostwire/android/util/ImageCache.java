@@ -34,6 +34,8 @@ import com.frostwire.android.util.DiskCache.Entry;
 import com.squareup.picasso.Cache;
 import com.squareup.picasso.LruCache;
 
+import static com.frostwire.android.gui.util.UIUtils.isMain;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -147,9 +149,5 @@ final class ImageCache implements Cache {
 
     private int diskMaxSize() {
         return disk != null ? (int) disk.maxSize() : 0;
-    }
-
-    private static boolean isMain() {
-        return Looper.getMainLooper().getThread() == Thread.currentThread();
     }
 }
