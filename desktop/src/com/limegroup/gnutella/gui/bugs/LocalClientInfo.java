@@ -17,7 +17,6 @@ package com.limegroup.gnutella.gui.bugs;
 
 import com.limegroup.gnutella.LimeWireCore;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.GuiCoreMediator;
 import com.limegroup.gnutella.settings.LimeProps;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.Setting;
