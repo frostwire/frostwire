@@ -75,16 +75,16 @@ final class Finalizer {
             public void run() {
                 try {
                     LOG.info("Shutdown thread started");
-                    LOG.info("Flushing UXStats...");
+                    //LOG.info("Flushing UXStats...");
                     UXStats.instance().flush();
-                    LOG.info("SearchMediator shutting down...");
+                    //LOG.info("SearchMediator shutting down...");
                     SearchMediator.instance().shutdown();
-                    LOG.info("MediaPlayer stopping...");
+                    //LOG.info("MediaPlayer stopping...");
                     MediaPlayer.instance().stop();
-                    LOG.info("BugManager stopping...");
+                    //LOG.info("BugManager stopping...");
                     BugManager.instance().shutdown();
                     sleep(3000);
-                    LOG.info("Shutting down [updateCommand=" + toExecute + "]");
+                    //LOG.info("Shutting down [updateCommand=" + toExecute + "]");
                     GuiCoreMediator.getLifecycleManager().shutdown(toExecute);
                     LOG.info("System exit");
                     System.exit(0);
