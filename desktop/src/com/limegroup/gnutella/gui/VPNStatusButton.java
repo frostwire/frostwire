@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui;
@@ -31,7 +30,7 @@ import java.awt.event.MouseEvent;
 public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.VPNStatusListener {
 
     private final IconButton iconButton;
-    private final ThreadLocal<VPNBitTorrentDisabledWarningLabel> vpnDropGuardLabel;
+    private final VPNBitTorrentDisabledWarningLabel vpnDropGuardLabel;
     private boolean lastVPNStatus;
 
     static final String VPN_URL = "http://www.frostwire.com/vpn";
@@ -39,12 +38,7 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
     VPNStatusButton() {
         iconButton = new IconButton("vpn_off");
         iconButton.setBorder(null);
-        vpnDropGuardLabel = new ThreadLocal<VPNBitTorrentDisabledWarningLabel>() {
-            @Override
-            protected VPNBitTorrentDisabledWarningLabel initialValue() {
-                return createVPNDisconnectLabel();
-            }
-        };
+        vpnDropGuardLabel = createVPNDisconnectLabel();
         initActionListener();
     }
 
@@ -62,7 +56,7 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
      */
     private VPNBitTorrentDisabledWarningLabel createVPNDisconnectLabel() {
         VPNBitTorrentDisabledWarningLabel bitTorrentDisabledWarning = new VPNBitTorrentDisabledWarningLabel();
-        bitTorrentDisabledWarning.setText("<html><b>"+I18n.tr("VPN Off: BitTorrent disabled")+"</b></html>");
+        bitTorrentDisabledWarning.setText("<html><b>" + I18n.tr("VPN Off: BitTorrent disabled") + "</b></html>");
         bitTorrentDisabledWarning.setToolTipText(I18n.tr("Due to current settings without VPN connection BitTorrent will not start. Click to see the settings screen"));
         bitTorrentDisabledWarning.addMouseListener(new MouseAdapter() {
             @Override
@@ -110,8 +104,8 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
         removeAll();
         add(iconButton);
 
-        if (!vpnIsOn && vpnDropGuardLabel.get().shouldBeShown()) {
-            add(vpnDropGuardLabel.get());
+        if (!vpnIsOn && vpnDropGuardLabel.shouldBeShown()) {
+            add(vpnDropGuardLabel);
         }
     }
 
