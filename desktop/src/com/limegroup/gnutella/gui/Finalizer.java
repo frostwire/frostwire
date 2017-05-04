@@ -3,6 +3,7 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXStats;
+import com.limegroup.gnutella.LimeWireCore;
 import com.limegroup.gnutella.gui.bugs.BugManager;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.gui.search.SearchMediator;
@@ -57,7 +58,7 @@ final class Finalizer {
                     BugManager.instance().shutdown();
                     sleep(3000);
                     //LOG.info("Shutting down [updateCommand=" + toExecute + "]");
-                    GuiCoreMediator.getLifecycleManager().shutdown(null);
+                    LimeWireCore.instance().getLifecycleManager().shutdown(null);
                     LOG.info("System exit");
                     System.exit(0);
                 } catch (Throwable t) {

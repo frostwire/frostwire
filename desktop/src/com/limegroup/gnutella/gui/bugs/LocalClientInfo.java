@@ -106,7 +106,7 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         _props = sw.toString();
 
         //Store extra debugging information.
-        if (GUIMediator.isConstructed() && LimeWireCore.instance() != null && GuiCoreMediator.getLifecycleManager().isLoaded()) {
+        if (GUIMediator.isConstructed() && LimeWireCore.instance() != null && LimeWireCore.instance().getLifecycleManager().isLoaded()) {
 //            _upTime = CommonUtils.seconds2time(
 //                (int)(sessionInfo.getCurrentUptime()/1000));
 //            _upToUp = ""+sessionInfo.getNumUltrapeerToUltrapeerConnections();
