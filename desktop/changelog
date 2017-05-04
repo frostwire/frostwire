@@ -1,3 +1,10 @@
+frostwire (6.5.0) stable; urgency=high
+  * Issue where transfers would dissapear until new transfer was added fixed
+  * Cleanup, optimizations in transfer managment
+  * Swedish translation (thanks Josef Andersson)
+	
+ -- FrostWire Team <contact@frostwire.com>  Thu, 04 May 2017 00:52:03 -0600
+
 frostwire (6.4.9) stable; urgency=high
   * YT search fixes
   * Turkish, Dutch, Russian translations updated
