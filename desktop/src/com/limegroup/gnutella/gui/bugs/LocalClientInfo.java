@@ -1,4 +1,30 @@
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.limegroup.gnutella.gui.bugs;
+
+import com.limegroup.gnutella.LimeWireCore;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.GuiCoreMediator;
+import com.limegroup.gnutella.settings.LimeProps;
+import com.limegroup.gnutella.util.FrostWireUtils;
+import org.limewire.setting.Setting;
+import org.limewire.setting.SettingsFactory;
+import org.limewire.util.CommonUtils;
+import org.limewire.util.OSUtils;
+import org.limewire.util.VersionUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -7,48 +33,31 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.limewire.setting.Setting;
-import org.limewire.setting.SettingsFactory;
-import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
-import org.limewire.util.VersionUtils;
-
-import com.limegroup.gnutella.LimeWireCore;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.GuiCoreMediator;
-import com.limegroup.gnutella.settings.LimeProps;
-import com.limegroup.gnutella.util.FrostWireUtils;
+import java.util.*;
 
 /**
  * This class encapsulates all of the data for an individual client machine
  * for an individual bug report.<p>
- *
+ * <p>
  * This class collects all of the data for the local machine and provides
  * access to that data in url-encoded form.
  */
-//2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class LocalClientInfo extends LocalAbstractInfo {
-	
-	/**
-	 * Creates information about this bug from the bug, thread, and detail.
-	 */
-	public LocalClientInfo(Throwable bug, String threadName, String detail, boolean fatal, SessionInfo sessionInfo) {
-	    //Store the basic information ...	    
-	    _limewireVersion = FrostWireUtils.getFrostWireVersion();
-	    _javaVersion = VersionUtils.getJavaVersion();
+
+    /**
+     * Creates information about this bug from the bug, thread, and detail.
+     */
+    public LocalClientInfo(Throwable bug, String threadName, String detail, boolean fatal, SessionInfo sessionInfo) {
+        //Store the basic information ...
+        _limewireVersion = FrostWireUtils.getFrostWireVersion();
+        _javaVersion = VersionUtils.getJavaVersion();
         _javaVendor = prop("java.vendor");
-	    _os = OSUtils.getOS();
-	    _osVersion = prop("os.version");
-	    _architecture = prop("os.arch");
-	    _freeMemory = "" + Runtime.getRuntime().freeMemory();
-	    _totalMemory = "" + Runtime.getRuntime().totalMemory();
-	    _peakThreads = "" + ManagementFactory.getThreadMXBean().getPeakThreadCount();
+        _os = OSUtils.getOS();
+        _osVersion = prop("os.version");
+        _architecture = prop("os.arch");
+        _freeMemory = "" + Runtime.getRuntime().freeMemory();
+        _totalMemory = "" + Runtime.getRuntime().totalMemory();
+        _peakThreads = "" + ManagementFactory.getThreadMXBean().getPeakThreadCount();
         _loadAverage = getLoadAvg();
         _pendingObjects = "" + ManagementFactory.getMemoryMXBean().getObjectPendingFinalizationCount();
         _heapUsage = "" + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
@@ -56,31 +65,31 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         _settingsFreeSpace = getFreeSpace(CommonUtils.getUserSettingsDir());
         _incompleteFreeSpace = "";//getFreeSpace(SharingSettings.INCOMPLETE_DIRECTORY.getValue());
         //_downloadFreeSpace = getFreeSpace(SharingSettings.getSaveDirectory());
-        
-	    
-	    //Store information about the bug and the current thread.
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    bug.printStackTrace(pw);
-	    pw.flush();
-	    _bug = sw.toString();
-	    _currentThread = threadName;
-	    
-	    _bugName = bug.getClass().getName();
-	    
-	    _fatalError = "" + fatal;
-	    
-	    //Store the properties.
-	    sw = new StringWriter();
-	    pw = new PrintWriter(sw);
-		Properties props = new Properties();
-		// Load the properties from SettingsFactory, excluding
-		// FileSettings and FileArraySettings.
-		SettingsFactory sf = LimeProps.instance().getFactory();
-		synchronized(sf) {
-            for(Setting set : sf) {
-		        if(!set.isPrivate() && !set.isDefault())
-		            props.put(set.getKey(), set.getValueAsString());
+
+
+        //Store information about the bug and the current thread.
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        bug.printStackTrace(pw);
+        pw.flush();
+        _bug = sw.toString();
+        _currentThread = threadName;
+
+        _bugName = bug.getClass().getName();
+
+        _fatalError = "" + fatal;
+
+        //Store the properties.
+        sw = new StringWriter();
+        pw = new PrintWriter(sw);
+        Properties props = new Properties();
+        // Load the properties from SettingsFactory, excluding
+        // FileSettings and FileArraySettings.
+        SettingsFactory sf = LimeProps.instance().getFactory();
+        synchronized (sf) {
+            for (Setting set : sf) {
+                if (!set.isPrivate() && !set.isDefault())
+                    props.put(set.getKey(), set.getValueAsString());
             }
         }
 //		sf = MojitoProps.instance().getFactory();
@@ -91,13 +100,13 @@ public final class LocalClientInfo extends LocalAbstractInfo {
 //
 //		    }
 //		}
-		// list the properties in the PrintWriter.
-		props.list(pw);
-		pw.flush();
-		_props = sw.toString();
-		
-		//Store extra debugging information.
-		if( GUIMediator.isConstructed() && LimeWireCore.instance() != null && GuiCoreMediator.getLifecycleManager().isLoaded() ) {
+        // list the properties in the PrintWriter.
+        props.list(pw);
+        pw.flush();
+        _props = sw.toString();
+
+        //Store extra debugging information.
+        if (GUIMediator.isConstructed() && LimeWireCore.instance() != null && GuiCoreMediator.getLifecycleManager().isLoaded()) {
 //            _upTime = CommonUtils.seconds2time(
 //                (int)(sessionInfo.getCurrentUptime()/1000));
 //            _upToUp = ""+sessionInfo.getNumUltrapeerToUltrapeerConnections();
@@ -119,9 +128,9 @@ public final class LocalClientInfo extends LocalAbstractInfo {
 //            _waitingSockets = "" + sessionInfo.getNumberOfWaitingSockets();
 //            _pendingTimeouts = "" + sessionInfo.getNumberOfPendingTimeouts();
 
-         }
-            
-        
+        }
+
+
         //Store the detail, thread counts, and other information.
         _detail = detail;
 
@@ -129,89 +138,93 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         int copied = Thread.enumerate(allThreads);
         _threadCount = "" + copied;
         Map<String, Integer> threads = new HashMap<String, Integer>();
-        for(int i = 0; i < copied; i++) {
+        for (int i = 0; i < copied; i++) {
             String name = allThreads[i].getName();
             Integer val = threads.get(name);
-            if(val == null)
+            if (val == null)
                 threads.put(name, new Integer(1));
             else {
-                int num = val.intValue()+1;
-                threads.put(name,new Integer(num));
+                int num = val.intValue() + 1;
+                threads.put(name, new Integer(num));
             }
         }
         sw = new StringWriter();
         pw = new PrintWriter(sw);
-        for(Map.Entry<String, Integer> info : threads.entrySet())
-            pw.println( info.getKey() + ": " + info.getValue());
+        for (Map.Entry<String, Integer> info : threads.entrySet())
+            pw.println(info.getKey() + ": " + info.getValue());
         pw.flush();
         _otherThreads = sw.toString();
-            
-	}
-	
-    /** Uses reflection to retrieve the free space in the partition the file is located on. */
+
+    }
+
+    /**
+     * Uses reflection to retrieve the free space in the partition the file is located on.
+     */
     private static String getFreeSpace(File f) {
         return invoke16Method(f, File.class, "getUsableSpace", Long.class);
     }
-    
-    /** Uses reflection to get the load average of the computer. */
+
+    /**
+     * Uses reflection to get the load average of the computer.
+     */
     private static String getLoadAvg() {
         return invoke16Method(ManagementFactory.getOperatingSystemMXBean(),
-                              OperatingSystemMXBean.class,
-                             "getSystemLoadAverage",
-                             Double.class);
+                OperatingSystemMXBean.class,
+                "getSystemLoadAverage",
+                Double.class);
     }
-    
+
     /**
      * Attempts to run the given method if it exists running on Java 1.6 or above.
      * This can only be used for calling methods with no parameters.
-     * 
-     * @param obj The object to run the method on
-     * @param type The class the method can be found on
-     * @param method The name of the method to find
+     *
+     * @param obj     The object to run the method on
+     * @param type    The class the method can be found on
+     * @param method  The name of the method to find
      * @param retType The expected return type of the method.
      * @return The result, is some predefined error parameters.
      */
     private static String invoke16Method(Object obj, Class<?> type, String method, Class<?> retType) {
         if (!VersionUtils.isJava16OrAbove())
             return "-1";
-        
+
         try {
             Method m = type.getMethod(method);
             Object ret = m.invoke(obj);
             if (ret == null)
                 return "-7";
-            if (! (retType.isAssignableFrom(ret.getClass())))
+            if (!(retType.isAssignableFrom(ret.getClass())))
                 return "-5";
             return ret.toString();
         } catch (NoSuchMethodException bail) {
             return "-2";
         } catch (IllegalAccessException bail) {
             return "-3";
-        } catch (InvocationTargetException bail){
+        } catch (InvocationTargetException bail) {
             return "-4";
         } catch (Throwable bad) {
             return "-6";
         }
     }
-    
-    /** 
-	 * Returns the System property with the given name, or
-     * "?" if it is unknown. 
-	 */
+
+    /**
+     * Returns the System property with the given name, or
+     * "?" if it is unknown.
+     */
     private final String prop(String name) {
         String value = System.getProperty(name);
         if (value == null) return "?";
         else return value;
-    }	
+    }
 
-	/** 
-	 * Returns a an array of the name/value pairs of this info.
+    /**
+     * Returns a an array of the name/value pairs of this info.
      *
      * @return an array of the name/value pairs of this info.
-	 */
-	//public final NameValuePair[] getPostRequestParams() {
-	public final List<NameValuePair> getPostRequestParams() {
-	    List<NameValuePair> params = new LinkedList<NameValuePair>();
+     */
+    //public final NameValuePair[] getPostRequestParams() {
+    public final List<NameValuePair> getPostRequestParams() {
+        List<NameValuePair> params = new LinkedList<NameValuePair>();
         append(params, LIMEWIRE_VERSION, _limewireVersion);
         append(params, JAVA_VERSION, _javaVersion);
         append(params, OS, _os);
@@ -244,8 +257,8 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         append(params, THREAD_COUNT, _threadCount);
         append(params, BUG_NAME, _bugName);
         append(params, GUESS_CAPABLE, _guessCapable);
-        append(params, SOLICITED_CAPABLE,_solicitedCapable);
-        append(params, LATEST_SIMPP,_latestSIMPP);
+        append(params, SOLICITED_CAPABLE, _solicitedCapable);
+        append(params, LATEST_SIMPP, _latestSIMPP);
         //append(params, IP_STABLE,_ipStable);
         append(params, PORT_STABLE, _portStable);
         append(params, CAN_DO_FWT, _canDoFWT);
@@ -276,11 +289,11 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         append(params, AVG_SELECT_TIME, _avgSelectTime);
         append(params, USER_COMMENTS, _userComments);
         // APPEND OTHER PARAMETERS HERE.
-        
+
         return params;
         //return params.toArray(new NameValuePair[params.size()]);
-	}
-    
+    }
+
     /**
      * @return compact printout of the list of parameters
      */
@@ -290,15 +303,15 @@ public final class LocalClientInfo extends LocalAbstractInfo {
             sb.append(nvp.name).append("=").append(nvp.value).append("\n");
         return sb.toString();
     }
-	
-	/**
-	 * Appends a NameValuePair of k/v to l if v is non-null.
-	 */
-	private final void append(List<? super NameValuePair> l, final String k, final String v){
-	    if( v != null )
-	        l.add(new NameValuePair(k, v));
-	}
-	
+
+    /**
+     * Appends a NameValuePair of k/v to l if v is non-null.
+     */
+    private final void append(List<? super NameValuePair> l, final String k, final String v) {
+        if (v != null)
+            l.add(new NameValuePair(k, v));
+    }
+
     private static final class NameValuePair {
 
         private final String name;
