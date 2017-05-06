@@ -15,7 +15,6 @@
   limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/app_background_body_light"
@@ -259,7 +258,7 @@
             android:id="@android:id/progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/audio_player_controlss"
+            android:layout_above="@+id/audio_player_controls"
             android:layout_marginBottom="@dimen/audio_player_seek_bar_margin_bottom"
             android:layout_toLeftOf="@+id/audio_player_total_time"
             android:layout_toRightOf="@+id/audio_player_current_time"
@@ -268,7 +267,7 @@
             android:progressDrawable="@drawable/audio_player_seekbar" />
 
         <LinearLayout
-            android:id="@+id/audio_player_controlss"
+            android:id="@+id/audio_player_controls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
