@@ -34,7 +34,7 @@ public class PrefixHighlighter {
      * @param prefixHighlightColor The color used to highlight the prefixes.
      */
     public PrefixHighlighter(final Context context) {
-        mPrefixHighlightColor = context.getResources().getColor(R.color.holo_blue_light);
+        mPrefixHighlightColor = context.getResources().getColor(R.color.app_text_highlight);
     }
 
     /**
