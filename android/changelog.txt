@@ -1,7 +1,9 @@
-FrostWire 1.9.4 - MAY/03/2017
+FrostWire 1.9.4 - MAY/07/2017
  - New Gridview for Pictures and Videos in My Files
  - New image viewer screen in My Files
  - UX-Bug: Fixes Wizard Page layout so users with very small screens can finish initial setup
+ - Fixed bug where song queue was showing behind ad
+ - Swich Que and Playlist tile icons updated, color updates, layout code cleanup
 
 FrostWire 1.9.3 - APR/28/2017
  - Fixes YT search
