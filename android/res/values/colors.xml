@@ -76,7 +76,6 @@
     <color name="app_menu_item_pressed">#ff314c61</color>
 
     <!-- Other colors (old) -->
-    <color name="tpi_unselected_text_color">@color/basic_white</color>
     <color name="browse_peer_listview_item_inactive_background">#ffeff0f1</color>
     <color name="browse_peer_listview_item_foreground">@color/app_text_primary</color>
     <color name="browse_peer_listview_item_inactive_foreground">@color/app_text_secondary</color>

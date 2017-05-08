@@ -33,10 +33,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/tpi_background"
-            android:textColor="@color/tpi_unselected_text_color"
+            android:textColor="@color/basic_white"
             android:textSize="@dimen/text_size_micro"
             app:footerColor="@color/holo_blue_light"
-            app:selectedColor="@color/holo_blue_light" />
+            app:selectedColor="@color/basic_white"
+            app:footerIndicatorStyle="background"
+            app:footerIndicatorUnderlinePadding="40dp" />
 
         <android.support.v4.view.ViewPager
             android:id="@+id/fragment_home_phone_pager"
