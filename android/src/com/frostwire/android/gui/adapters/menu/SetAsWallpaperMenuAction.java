@@ -26,6 +26,7 @@ import android.graphics.BitmapFactory;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 
@@ -45,16 +46,21 @@ public class SetAsWallpaperMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    protected void onClick(final Context context) {
         if (fd.fileType != Constants.FILE_TYPE_PICTURES) {
             return;
         }
-
-        try {
-            Bitmap bitmap = BitmapFactory.decodeFile(fd.filePath);
-            WallpaperManager.getInstance(context).setBitmap(bitmap);
-        } catch (Throwable e) {
-            UIUtils.showShortMessage(context, R.string.failed_to_set_wallpaper);
-        }
+        UIUtils.showShortMessage(context, R.string.your_android_wall_paper_will_change);
+        Engine.instance().getThreadPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Bitmap bitmap = BitmapFactory.decodeFile(fd.filePath);
+                    WallpaperManager.getInstance(context).setBitmap(bitmap);
+                } catch (Throwable e) {
+                    UIUtils.showShortMessage(context, R.string.failed_to_set_wallpaper);
+                }
+            }
+        });
     }
 }
