@@ -79,11 +79,11 @@ public class TitlePageIndicator extends View implements PageIndicator {
     }
 
     public enum IndicatorStyle {
-        None(0), Triangle(1), Underline(2);
+        None(0), Triangle(1), Underline(2), Background(3);
 
         public final int value;
 
-        private IndicatorStyle(int value) {
+        IndicatorStyle(int value) {
             this.value = value;
         }
 
@@ -495,6 +495,27 @@ public class TitlePageIndicator extends View implements PageIndicator {
                 mPath.lineTo(rightPlusPadding, heightMinusLine);
                 mPath.lineTo(rightPlusPadding, heightMinusLineMinusIndicator);
                 mPath.lineTo(leftMinusPadding, heightMinusLineMinusIndicator);
+                mPath.close();
+
+                mPaintFooterIndicator.setAlpha((int) (0xFF * selectedPercent));
+                canvas.drawPath(mPath, mPaintFooterIndicator);
+                mPaintFooterIndicator.setAlpha(0xFF);
+                break;
+
+            case Background:
+                if (!currentSelected || page >= boundsSize) {
+                    break;
+                }
+
+                Rect b = bounds.get(page);
+                float r = b.right + mFooterIndicatorUnderlinePadding;
+                float l = b.left - mFooterIndicatorUnderlinePadding;
+
+                mPath.reset();
+                mPath.moveTo(l, height);
+                mPath.lineTo(r, height);
+                mPath.lineTo(r, 0);
+                mPath.lineTo(l, 0);
                 mPath.close();
 
                 mPaintFooterIndicator.setAlpha((int) (0xFF * selectedPercent));
