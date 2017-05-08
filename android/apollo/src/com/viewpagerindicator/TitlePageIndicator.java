@@ -453,47 +453,6 @@ public class TitlePageIndicator extends View implements PageIndicator {
             }
         }
 
-        //Now draw views
-        int colorTextAlpha = mColorText >>> 24;
-        for (int i = 0; i < count; i++) {
-            //Get the title
-            Rect bound = bounds.get(i);
-            //Only if one side is visible
-            if ((bound.left > left && bound.left < right) || (bound.right > left && bound.right < right)) {
-                final boolean currentPage = (i == page);
-                final CharSequence pageTitle = getTitle(i);
-
-                //Only set bold if we are within bounds
-                mPaintText.setFakeBoldText(currentPage && currentBold && mBoldText);
-
-                //Draw text as unselected
-                mPaintText.setColor(mColorText);
-                if (currentPage && currentSelected) {
-                    //Fade out/in unselected text as the selected text fades in/out
-                    mPaintText.setAlpha(colorTextAlpha - (int) (colorTextAlpha * selectedPercent));
-                }
-
-                //Except if there's an intersection with the right view
-                if (i < boundsSize - 1) {
-                    Rect rightBound = bounds.get(i + 1);
-                    //Intersection
-                    if (bound.right + mTitlePadding > rightBound.left) {
-                        int w = bound.right - bound.left;
-                        bound.left = (int) (rightBound.left - w - mTitlePadding);
-                        bound.right = bound.left + w;
-                    }
-                }
-                canvas.drawText(pageTitle, 0, pageTitle.length(), bound.left, bound.bottom + mTopPadding, mPaintText);
-
-                //If we are within the selected bounds draw the selected text
-                if (currentPage && currentSelected) {
-                    mPaintText.setColor(mColorSelected);
-                    mPaintText.setAlpha((int) ((mColorSelected >>> 24) * selectedPercent));
-                    canvas.drawText(pageTitle, 0, pageTitle.length(), bound.left, bound.bottom + mTopPadding, mPaintText);
-                }
-            }
-        }
-
         //If we want the line on the top change height to zero and invert the line height to trick the drawing code
         float footerLineHeight = mFooterLineHeight;
         float footerIndicatorLineHeight = mFooterIndicatorHeight;
@@ -542,6 +501,47 @@ public class TitlePageIndicator extends View implements PageIndicator {
                 canvas.drawPath(mPath, mPaintFooterIndicator);
                 mPaintFooterIndicator.setAlpha(0xFF);
                 break;
+        }
+
+        //Now draw views
+        int colorTextAlpha = mColorText >>> 24;
+        for (int i = 0; i < count; i++) {
+            //Get the title
+            Rect bound = bounds.get(i);
+            //Only if one side is visible
+            if ((bound.left > left && bound.left < right) || (bound.right > left && bound.right < right)) {
+                final boolean currentPage = (i == page);
+                final CharSequence pageTitle = getTitle(i);
+
+                //Only set bold if we are within bounds
+                mPaintText.setFakeBoldText(currentPage && currentBold && mBoldText);
+
+                //Draw text as unselected
+                mPaintText.setColor(mColorText);
+                if (currentPage && currentSelected) {
+                    //Fade out/in unselected text as the selected text fades in/out
+                    mPaintText.setAlpha(colorTextAlpha - (int) (colorTextAlpha * selectedPercent));
+                }
+
+                //Except if there's an intersection with the right view
+                if (i < boundsSize - 1) {
+                    Rect rightBound = bounds.get(i + 1);
+                    //Intersection
+                    if (bound.right + mTitlePadding > rightBound.left) {
+                        int w = bound.right - bound.left;
+                        bound.left = (int) (rightBound.left - w - mTitlePadding);
+                        bound.right = bound.left + w;
+                    }
+                }
+                canvas.drawText(pageTitle, 0, pageTitle.length(), bound.left, bound.bottom + mTopPadding, mPaintText);
+
+                //If we are within the selected bounds draw the selected text
+                if (currentPage && currentSelected) {
+                    mPaintText.setColor(mColorSelected);
+                    mPaintText.setAlpha((int) ((mColorSelected >>> 24) * selectedPercent));
+                    canvas.drawText(pageTitle, 0, pageTitle.length(), bound.left, bound.bottom + mTopPadding, mPaintText);
+                }
+            }
         }
     }
 
