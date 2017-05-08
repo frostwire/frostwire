@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
 import android.util.SparseIntArray;
 import android.view.KeyEvent;
@@ -189,6 +190,7 @@ public class SearchInputView extends LinearLayout {
     private RadioButton initRadioButton(int viewId, final byte fileType) {
         mediaTypeToRadioButtonMap.put(fileType, viewId);
         final RadioButton button = (RadioButton) findViewById(viewId);
+        button.setButtonDrawable(new StateListDrawable());
         final Resources r = getResources();
         final FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory =
                 new FileTypeRadioButtonSelectorFactory(fileType,

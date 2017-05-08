@@ -26,26 +26,32 @@
 
     <RadioButton
         android:id="@+id/view_search_input_radio_audio"
-        style="@style/SearchInputFileTypeButton" />
+        style="@style/SearchInputFileTypeButton"
+        android:button="@drawable/browse_peer_audio_icon_selector_off" />
 
     <RadioButton
         android:id="@+id/view_search_input_radio_videos"
-        style="@style/SearchInputFileTypeButton" />
+        style="@style/SearchInputFileTypeButton"
+        android:button="@drawable/browse_peer_video_icon_selector_off" />
 
     <RadioButton
         android:id="@+id/view_search_input_radio_pictures"
-        style="@style/SearchInputFileTypeButton" />
+        style="@style/SearchInputFileTypeButton"
+        android:button="@drawable/browse_peer_picture_icon_selector_off" />
 
     <RadioButton
         android:id="@+id/view_search_input_radio_applications"
-        style="@style/SearchInputFileTypeButton" />
+        style="@style/SearchInputFileTypeButton"
+        android:button="@drawable/browse_peer_application_icon_selector_off" />
 
     <RadioButton
         android:id="@+id/view_search_input_radio_documents"
-        style="@style/SearchInputFileTypeButton" />
+        style="@style/SearchInputFileTypeButton"
+        android:button="@drawable/browse_peer_document_icon_selector_off" />
 
     <RadioButton
         android:id="@+id/view_search_input_radio_torrents"
-        style="@style/SearchInputFileTypeButton" />
+        style="@style/SearchInputFileTypeButton"
+        android:button="@drawable/browse_peer_torrent_icon_selector_off" />
 
 </RadioGroup>
