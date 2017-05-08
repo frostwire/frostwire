@@ -26,8 +26,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
@@ -51,6 +55,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -61,11 +66,19 @@ import java.util.List;
  */
 public class ImageViewerFragment extends AbstractFragment {
     private static final Logger LOG = Logger.getLogger(ImageViewerFragment.class);
+    private static int EXPANDED_METADATA_LAYOUT_HEIGHT;
+    private static final int CONTRACTED_METADATA_LAYOUT_HEIGHT = 100;
     private ImageView preloadImageView; // tried doing this with a single imageviewer, didn't work.
     private TouchImageView imageView;
     private ProgressBar progressBar;
     private FileDescriptor fd;
     private ImageViewerActionModeCallback actionModeCallback;
+    private ImageButton infoButton;
+    private RelativeLayout metadataLayout;
+    private ViewGroup.LayoutParams metadataLayoutParams;
+    private TextView fileNameTextView;
+    private TextView fileSizeTextView;
+    private TextView fileDateTextView;
 
     public ImageViewerFragment() {
         super(R.layout.fragment_image_viewer);
@@ -75,41 +88,62 @@ public class ImageViewerFragment extends AbstractFragment {
 
     @Override
     protected void initComponents(View v) {
+        fileNameTextView = findView(v, R.id.fragment_image_viewer_metadata_filename);
+        fileSizeTextView = findView(v, R.id.fragment_image_viewer_metadata_filesize);
+        fileDateTextView = findView(v, R.id.fragment_image_viewer_metadata_date_created);
         progressBar = findView(v, R.id.fragment_image_viewer_progress_bar);
         preloadImageView = findView(v, R.id.fragment_image_viewer_preload_image);
         imageView = findView(v, R.id.fragment_image_viewer_image);
+        infoButton = findView(v, R.id.fragment_image_viewer_info_button);
+        metadataLayout = findView(v, R.id.fragment_image_viewer_metadata_layout);
         progressBar.setVisibility(View.VISIBLE);
         preloadImageView.setVisibility(View.VISIBLE);
         imageView.setVisibility(View.GONE);
+        metadataLayout.setVisibility(View.VISIBLE);
+        metadataLayoutParams = metadataLayout.getLayoutParams();
+        EXPANDED_METADATA_LAYOUT_HEIGHT = metadataLayoutParams.height;
+
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onInfoButtonClick();
+            }
+        });
+
+        metadataLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onInfoButtonClick();
+            }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updateImage(fd);
+        updateData(fd);
     }
 
-    public void updateImage(FileDescriptor fd) {
+    public void updateData(FileDescriptor fd) {
         this.fd = fd;
         if (actionModeCallback == null) {
             actionModeCallback = new ImageViewerActionModeCallback(this.fd);
             startActionMode(actionModeCallback);
         }
-        Uri fileUri = UIUtils.getFileUri(getActivity(), fd.filePath, false);
 
+        updateFileMetadata(fd);
+
+        Uri fileUri = UIUtils.getFileUri(getActivity(), fd.filePath, false);
         progressBar.setVisibility(View.VISIBLE);
         preloadImageView.setVisibility(View.VISIBLE);
         imageView.setVisibility(View.GONE);
-
         ImageLoader imageLoader = ImageLoader.getInstance(getActivity());
-
         // get screen dimensions and orientation once
         int[] dimsAndRot = UIUtils.getScreenDimensionsAndRotation(getActivity());
         final int screenWidth = dimsAndRot[0];
         final int screenHeight = dimsAndRot[1];
         int screenRotation = dimsAndRot[2];
-        final boolean screenIsVertical  = screenRotation == Surface.ROTATION_0 || screenRotation == Surface.ROTATION_180;
-
+        final boolean screenIsVertical = screenRotation == Surface.ROTATION_0 || screenRotation == Surface.ROTATION_180;
         // downsize to bad quality for responsive UI when opening fragment
         int preloadingWidth = screenIsVertical ? 0 : 32;
         int preloadingHeight = screenIsVertical ? 32 : 0;
@@ -126,7 +160,18 @@ public class ImageViewerFragment extends AbstractFragment {
                 getActivity().finish();
             }
         });
+    }
 
+    private void updateFileMetadata(FileDescriptor fd) {
+        fileNameTextView.setText(FilenameUtils.getName(fd.filePath));
+        fileSizeTextView.setText(UIUtils.getBytesInHuman(fd.fileSize));
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(fd.dateAdded*1000);
+        int numMonth = cal.get(Calendar.MONTH) + 1;
+        int numDay = cal.get(Calendar.DAY_OF_MONTH) + 1;
+        String month = numMonth >= 10 ? String.valueOf(numMonth) : "0" + numMonth;
+        String day = numDay >= 10 ? String.valueOf(numDay) : "0" + numDay;
+        fileDateTextView.setText(cal.get(Calendar.YEAR) + "-" + month + "-" + day);
     }
 
     private void onBitmapLoaded(final Bitmap bitmap,
@@ -138,7 +183,6 @@ public class ImageViewerFragment extends AbstractFragment {
             LOG.warn("onBitmapLoaded() -> check your logic. You shouldn't be loading this bitmap on the main thread.");
             return;
         }
-
         int finalHeight = (int) (screenHeight / 3.0);
         int finalWidth = (int) (screenWidth / 3.0);
         // downsize it if you have to
@@ -147,7 +191,6 @@ public class ImageViewerFragment extends AbstractFragment {
         } else if (!screenIsVertical && bitmap.getWidth() > screenWidth) {
             requestCreator.resize(finalWidth, 0);
         }
-
         // final image loading in UI thread
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -168,6 +211,17 @@ public class ImageViewerFragment extends AbstractFragment {
             }
         });
     }
+
+    private void onInfoButtonClick() {
+        ViewGroup.LayoutParams currentParams = metadataLayout.getLayoutParams();
+        if (currentParams.height == EXPANDED_METADATA_LAYOUT_HEIGHT) {
+            currentParams.height = CONTRACTED_METADATA_LAYOUT_HEIGHT;
+        } else {
+            currentParams.height = EXPANDED_METADATA_LAYOUT_HEIGHT;
+        }
+        metadataLayout.setLayoutParams(currentParams);
+    }
+
 
     private class ImageViewerActionModeCallback implements android.support.v7.view.ActionMode.Callback {
         private final FileDescriptor fd;
@@ -224,7 +278,7 @@ public class ImageViewerFragment extends AbstractFragment {
                     new RenameFileMenuAction(context, null, fd, new AbstractDialog.OnDialogClickListener() {
                         @Override
                         public void onDialogClick(String tag, int which) {
-                            if (which==1 && tag !=null) {
+                            if (which == 1 && tag != null) {
                                 onRenameFileMenuDialogOk(tag, fMode);
                             }
                         }
