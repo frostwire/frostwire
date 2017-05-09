@@ -18,8 +18,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 -->
-<android.support.design.widget.TabLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/view_search_input_tab_layout_file_type"
     style="@style/AppTabLayout"
@@ -31,36 +30,30 @@
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_audio"
         style="@style/SearchInputFileTypeButton"
-        android:button="@drawable/browse_peer_audio_icon_selector_off"
-        android:icon="@drawable/browse_peer_audio_icon_selector_off"/>
+        android:icon="@drawable/browse_peer_audio_icon_selector_off" />
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_videos"
         style="@style/SearchInputFileTypeButton"
-        android:button="@drawable/browse_peer_video_icon_selector_off"
-        android:icon="@drawable/browse_peer_video_icon_selector_off"/>
+        android:icon="@drawable/browse_peer_video_icon_selector_off" />
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_pictures"
         style="@style/SearchInputFileTypeButton"
-        android:button="@drawable/browse_peer_picture_icon_selector_off"
-        android:icon="@drawable/browse_peer_picture_icon_selector_off"/>
+        android:icon="@drawable/browse_peer_picture_icon_selector_off" />
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_applications"
         style="@style/SearchInputFileTypeButton"
-        android:button="@drawable/browse_peer_application_icon_selector_off"
-        android:icon="@drawable/browse_peer_application_icon_selector_off"/>
+        android:icon="@drawable/browse_peer_application_icon_selector_off" />
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_documents"
         style="@style/SearchInputFileTypeButton"
-        android:button="@drawable/browse_peer_document_icon_selector_off"
-        android:icon="@drawable/browse_peer_document_icon_selector_off"/>
+        android:icon="@drawable/browse_peer_document_icon_selector_off" />
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_torrents"
         style="@style/SearchInputFileTypeButton"
-        android:button="@drawable/browse_peer_torrent_icon_selector_off"
-        android:icon="@drawable/browse_peer_torrent_icon_selector_off"/>
+        android:icon="@drawable/browse_peer_torrent_icon_selector_off" />
 </android.support.design.widget.TabLayout>
