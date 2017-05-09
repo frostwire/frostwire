@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -204,7 +203,7 @@ public final class SearchFragment extends AbstractFragment implements
         // Whenever we click on a media type radio button this is triggered.
         // it is also triggered when we swip to the left or right, as this gesture
         // is handled by issuing a media type radio button click.
-        searchInput.setOnRadioButtonsListener(new SearchInputView.RadioButtonsListener() {
+        searchInput.setOnTabsListener(new SearchInputView.OnTabsListener() {
             @Override
             public void onClick(int mediaType) {
                 onFileTypeClicked();

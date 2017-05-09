@@ -21,7 +21,6 @@ package com.frostwire.android.gui.views;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.StateListDrawable;
-import android.support.design.widget.TabItem;
 import android.support.design.widget.TabLayout;
 import android.util.AttributeSet;
 import android.util.SparseIntArray;
@@ -54,7 +53,7 @@ public class SearchInputView extends LinearLayout {
     private OnSearchListener onSearchListener;
     private int mediaTypeId;
     private TabLayout.OnTabSelectedListener tabSelectedListener;
-    private RadioButtonsListener radioButtonsListener;
+    private OnTabsListener onTabsListener;
     private TabLayout tabLayout;
     private final SparseIntArray mediaTypeToRadioButtonMap;
     private final Map<Byte, FileTypeTab> toFileTypeTab = new HashMap<>();
@@ -126,8 +125,8 @@ public class SearchInputView extends LinearLayout {
         textInput.setVisibility(View.GONE);
     }
 
-    public void setOnRadioButtonsListener(RadioButtonsListener listener) {
-        radioButtonsListener = listener;
+    public void setOnTabsListener(OnTabsListener listener) {
+        onTabsListener = listener;
     }
 
     @Override
@@ -273,8 +272,8 @@ public class SearchInputView extends LinearLayout {
         SearchInputView.this.mediaTypeId = mediaTypeId;
         ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId);
 
-        if (radioButtonsListener != null) {
-            radioButtonsListener.onClick(mediaTypeId);
+        if (onTabsListener != null) {
+            onTabsListener.onClick(mediaTypeId);
         }
     }
 
@@ -386,7 +385,7 @@ public class SearchInputView extends LinearLayout {
         }
     }
 
-    public interface RadioButtonsListener {
+    public interface OnTabsListener {
         void onClick(int mediaType);
     }
 }
