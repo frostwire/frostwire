@@ -91,7 +91,14 @@ public final class NetworkManager {
 
     // eventually move this to the Platform framework
     public void detectTunnel() {
-        tunnelUp = isValidInterfaceName("tun0");
+        boolean up = isValidInterfaceName("tun0");
+        // if android 7, the above query will fail
+        // see https://issuetracker.google.com/issues/37091475
+        if (!up) {
+            up = interfaceNameExists("tun0") || interfaceNameExists("tun1");
+        }
+
+        tunnelUp = up;
     }
 
     private static boolean isValidInterfaceName(String interfaceName) {
@@ -106,6 +113,17 @@ public final class NetworkManager {
                     return true;
                 }
             }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private static boolean interfaceNameExists(String name) {
+        try {
+            File f = new File("/sys/class/net/" + name);
+            return f.exists();
         } catch (Throwable e) {
             e.printStackTrace();
         }
