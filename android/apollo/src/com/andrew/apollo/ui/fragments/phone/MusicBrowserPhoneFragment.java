@@ -32,7 +32,6 @@ import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.adapters.PagerAdapter.MusicFragments;
 import com.andrew.apollo.ui.fragments.AlbumFragment;
 import com.andrew.apollo.ui.fragments.ArtistFragment;
-import com.andrew.apollo.ui.fragments.RecentFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.ui.fragments.TabFragmentOrder;
 import com.andrew.apollo.utils.MusicUtils;
@@ -40,8 +39,6 @@ import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.andrew.apollo.utils.SortOrder;
 import com.frostwire.android.R;
-import com.viewpagerindicator.TitlePageIndicator;
-import com.viewpagerindicator.TitlePageIndicator.OnCenterItemClickListener;
 
 /**
  * This class is used to hold the {@link ViewPager} used for swiping between the
@@ -56,8 +53,7 @@ import com.viewpagerindicator.TitlePageIndicator.OnCenterItemClickListener;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public final class MusicBrowserPhoneFragment extends Fragment implements
-        OnCenterItemClickListener {
+public final class MusicBrowserPhoneFragment extends Fragment {
 
     /**
      * Pager
@@ -106,14 +102,9 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
         // Start on the last page the user was on
         mViewPager.setCurrentItem(mPreferences.getStartPage());
+        mViewPager.setClickable(true);
 
-        // Initialize the TPI
-        final TitlePageIndicator pageIndicator = (TitlePageIndicator) rootView
-                .findViewById(R.id.fragment_home_phone_pager_titles);
-        // Attach the ViewPager
-        pageIndicator.setViewPager(mViewPager);
-        // Scroll to the current artist, album, or song
-        pageIndicator.setOnCenterItemClickListener(this);
+
         return rootView;
     }
 
@@ -298,22 +289,6 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onCenterItemClick(final int position) {
-        // If on the artist fragment, scrolls to the current artist
-        if (position == TabFragmentOrder.ARTISTS_POSITION) {
-            getArtistFragment().scrollToCurrentArtist();
-            // If on the album fragment, scrolls to the current album
-        } else if (position == TabFragmentOrder.ALBUMS_POSITION) {
-            getAlbumFragment().scrollToCurrentAlbum();
-            // If on the song fragment, scrolls to the current song
-        } else if (position == TabFragmentOrder.SONGS_POSITION) {
-            getSongFragment().scrollToCurrentSong();
-        } else if (position == TabFragmentOrder.RECENT_POSITION) {
-            getRecentFragment().scrollToCurrentAlbum();
-        }
-    }
-
     private boolean isArtistPage() {
         return mViewPager.getCurrentItem() == TabFragmentOrder.ARTISTS_POSITION;
     }
@@ -344,9 +319,5 @@ public final class MusicBrowserPhoneFragment extends Fragment implements
 
     private boolean isPlaylistPage() {
         return mViewPager.getCurrentItem() == TabFragmentOrder.PLAYLISTS_POSITION;
-    }
-
-    private RecentFragment getRecentFragment() {
-        return (RecentFragment) mPagerAdapter.getFragment(TabFragmentOrder.RECENT_POSITION);
     }
 }

@@ -60,7 +60,6 @@ import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
-import com.viewpagerindicator.TitlePageIndicator;
 
 import java.util.List;
 
@@ -158,11 +157,11 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                              final Bundle savedInstanceState) {
         // The View for the fragment's UI
         if (isSimpleLayout()) {
-            mRootView = (ViewGroup) inflater.inflate(R.layout.list_base, null);
+            mRootView = (ViewGroup) inflater.inflate(R.layout.list_base, null, false);
             initListView();
         } else {
             // this inflate here is crashing.
-            mRootView = (ViewGroup) inflater.inflate(R.layout.grid_base, null);
+            mRootView = (ViewGroup) inflater.inflate(R.layout.grid_base, null, false);
             initGridView();
         }
 
@@ -673,7 +672,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     /**
      * Scrolls the list to the currently playing album when the user touches the
-     * header in the {@link TitlePageIndicator}.
+     * header in the PagerTitleStrip
      */
     public void scrollToCurrentAlbum() {
         final int currentAlbumPosition = getItemPositionByAlbum();
@@ -688,7 +687,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     /**
      * Scrolls the list to the currently playing song when the user touches the
-     * header in the {@link TitlePageIndicator}.
+     * header in the PagerTitleStrip
      */
     public void scrollToCurrentSong() {
         final int currentSongPosition = getItemPositionBySong();
