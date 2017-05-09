@@ -32,7 +32,6 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
-import com.viewpagerindicator.TitlePageIndicator;
 
 import java.util.List;
 
@@ -96,7 +95,7 @@ public final class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> 
 
     /**
      * Scrolls the list to the currently playing artist when the user touches
-     * the header in the {@link TitlePageIndicator}.
+     * the header in the PagerTitleStrip.
      */
     public void scrollToCurrentArtist() {
         final int currentArtistPosition = getItemPositionByArtist();
