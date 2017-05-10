@@ -23,37 +23,43 @@
     android:id="@+id/view_search_input_tab_layout_file_type"
     style="@style/AppTabLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="65dp"
     app:tabGravity="fill"
     app:tabMode="fixed">
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_audio"
-        style="@style/SearchInputFileTypeButton"
-        android:icon="@drawable/browse_peer_audio_icon_selector_off" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_audio_icon_tab_selector" />
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_videos"
-        style="@style/SearchInputFileTypeButton"
-        android:icon="@drawable/browse_peer_video_icon_selector_off" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_video_icon_tab_selector" />
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_pictures"
-        style="@style/SearchInputFileTypeButton"
-        android:icon="@drawable/browse_peer_picture_icon_selector_off" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_picture_icon_tab_selector" />
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_applications"
-        style="@style/SearchInputFileTypeButton"
-        android:icon="@drawable/browse_peer_application_icon_selector_off" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_application_icon_tab_selector" />
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_documents"
-        style="@style/SearchInputFileTypeButton"
-        android:icon="@drawable/browse_peer_document_icon_selector_off" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_document_icon_tab_selector" />
 
     <android.support.design.widget.TabItem
         android:id="@+id/view_search_input_tab_torrents"
-        style="@style/SearchInputFileTypeButton"
-        android:icon="@drawable/browse_peer_torrent_icon_selector_off" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_torrent_icon_tab_selector" />
 </android.support.design.widget.TabLayout>
