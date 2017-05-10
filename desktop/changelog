@@ -1,3 +1,8 @@
+frostwire (6.5.1) stable; urgency=high
+  * Romanian translation updated
+	
+ -- FrostWire Team <contact@frostwire.com>  Mon, 10 May 2017 11:01:05 -0600
+
 frostwire (6.5.0) stable; urgency=high
   * Issue where transfers would dissapear until new transfer was added fixed
   * Cleanup, optimizations in transfer managment
