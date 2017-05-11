@@ -150,7 +150,6 @@ public class InstallerUpdater implements Runnable {
 
                 @Override
                 public void onComplete(HttpClient client) {
-
                 }
 
                 @Override
@@ -177,11 +176,7 @@ public class InstallerUpdater implements Runnable {
                 }
             }
             isDownloadingUpdate = false;
-            cleanupOldUpdates();
-
-            if (checkIfDownloaded()) {
-                showUpdateMessage();
-            }
+            downloadComplete();
         } catch (Throwable e) {
             isDownloadingUpdate = false;
             LOG.error("Failed to download installer: " + _updateMessage.getInstallerUrl(), e);
