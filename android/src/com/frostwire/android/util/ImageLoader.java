@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -170,27 +171,33 @@ public final class ImageLoader {
         if (onBitmapLoadedRunner == null) {
             throw new IllegalArgumentException("OnBitmapLoadedCallbackRunner can't be null");
         }
-        Runnable bitmapLoadingRunner = new Runnable() {
+        final RequestCreator requestCreator = picasso.load(imageUri);
+        requestCreator.fetch(new Callback() {
             @Override
-            public void run() {
-                try {
-                    RequestCreator requestCreator = picasso.load(imageUri);
-                    Bitmap bitmap = requestCreator.get();
-                    if (bitmap != null) {
+            public void onSuccess() {
+                requestCreator.into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         onBitmapLoadedRunner.onBitmapLoaded(bitmap, requestCreator);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    onBitmapLoadedRunner.onError();
-                }
-            }
-        };
 
-        if (!UIUtils.isMain()) {
-            bitmapLoadingRunner.run();
-        } else {
-            Engine.instance().getThreadPool().submit(bitmapLoadingRunner);
-        }
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        onBitmapLoadedRunner.onError();
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                    }
+                });
+            }
+
+            @Override
+            public void onError() {
+                LOG.info("loadBitmapAsync::Callback::onError()");
+            }
+        });
+
     }
 
     public void load(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {

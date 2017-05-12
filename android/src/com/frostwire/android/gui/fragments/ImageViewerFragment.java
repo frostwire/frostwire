@@ -73,7 +73,6 @@ public class ImageViewerFragment extends AbstractFragment {
     private ProgressBar progressBar;
     private FileDescriptor fd;
     private ImageViewerActionModeCallback actionModeCallback;
-    private ImageButton infoButton;
     private RelativeLayout metadataLayout;
     private ViewGroup.LayoutParams metadataLayoutParams;
     private TextView fileNameTextView;
@@ -94,7 +93,7 @@ public class ImageViewerFragment extends AbstractFragment {
         progressBar = findView(v, R.id.fragment_image_viewer_progress_bar);
         preloadImageView = findView(v, R.id.fragment_image_viewer_preload_image);
         imageView = findView(v, R.id.fragment_image_viewer_image);
-        infoButton = findView(v, R.id.fragment_image_viewer_info_button);
+        ImageButton infoButton = findView(v, R.id.fragment_image_viewer_info_button);
         metadataLayout = findView(v, R.id.fragment_image_viewer_metadata_layout);
         progressBar.setVisibility(View.VISIBLE);
         preloadImageView.setVisibility(View.VISIBLE);
@@ -151,7 +150,7 @@ public class ImageViewerFragment extends AbstractFragment {
 
         imageLoader.loadBitmapAsync(fileUri, new ImageLoader.OnBitmapLoadedCallbackRunner() {
             @Override
-            public void onBitmapLoaded(Bitmap bitmap, RequestCreator requestCreator) {
+            public void onBitmapLoaded(final Bitmap bitmap, final RequestCreator requestCreator) {
                 ImageViewerFragment.this.onBitmapLoaded(bitmap, requestCreator, screenWidth, screenHeight, screenIsVertical);
             }
 
@@ -177,12 +176,9 @@ public class ImageViewerFragment extends AbstractFragment {
     private void onBitmapLoaded(final Bitmap bitmap,
                                 final RequestCreator requestCreator,
                                 int screenWidth,
-                                int screenHeight, boolean screenIsVertical) {
-        // this should happen in background thread
-        if (UIUtils.isMain()) {
-            LOG.warn("onBitmapLoaded() -> check your logic. You shouldn't be loading this bitmap on the main thread.");
-            return;
-        }
+                                int screenHeight,
+                                boolean screenIsVertical) {
+        LOG.info("onBitmapLoaded() -> Thread -> " + Thread.currentThread().getName());
         int finalHeight = (int) (screenHeight / 3.0);
         int finalWidth = (int) (screenWidth / 3.0);
         // downsize it if you have to
@@ -191,23 +187,17 @@ public class ImageViewerFragment extends AbstractFragment {
         } else if (!screenIsVertical && bitmap.getWidth() > screenWidth) {
             requestCreator.resize(finalWidth, 0);
         }
-        // final image loading in UI thread
-        getActivity().runOnUiThread(new Runnable() {
+        requestCreator.into(imageView, new Callback() {
             @Override
-            public void run() {
-                requestCreator.into(imageView, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        progressBar.setVisibility(View.GONE);
-                        preloadImageView.setVisibility(View.GONE);
-                        imageView.setVisibility(View.VISIBLE);
-                    }
+            public void onSuccess() {
+                progressBar.setVisibility(View.GONE);
+                preloadImageView.setVisibility(View.GONE);
+                imageView.setVisibility(View.VISIBLE);
+            }
 
-                    @Override
-                    public void onError() {
-                    }
-                });
-
+            @Override
+            public void onError() {
+                LOG.info("updateData()::onBitmapLoaded::onError()");
             }
         });
     }
