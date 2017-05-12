@@ -154,13 +154,12 @@ public class EngineService extends Service implements IEngineService {
         enableComponent(pm, EngineBroadcastReceiver.class, enable);
         enableComponent(pm, MediaButtonIntentReceiver.class, enable);
 
+        // third party services
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT)) {
             enableComponent(pm, io.presage.receiver.NetworkChangeReceiver.class, enable);
             enableComponent(pm, io.presage.receiver.AlarmReceiver.class, enable);
+            enableComponent(pm, io.presage.PresageService.class, enable);
         }
-
-        // third party services
-        enableComponent(pm, io.presage.PresageService.class, enable);
     }
 
     private void enableComponent(PackageManager pm, Class<?> clazz, boolean enable) {
