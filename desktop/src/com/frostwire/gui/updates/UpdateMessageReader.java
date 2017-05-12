@@ -367,6 +367,7 @@ final class UpdateMessageReader implements ContentHandler {
             String version = atts.getValue("version");
             String build = atts.getValue("build");
             String src = atts.getValue("src");
+            String saveAs = atts.getValue("saveAs");
 
             _bufferMessage = new UpdateMessage(type, message);
             _bufferMessage.setUrl(url);
@@ -376,6 +377,7 @@ final class UpdateMessageReader implements ContentHandler {
             _bufferMessage.setShowOnce(showOnce);
             _bufferMessage.setVersion(version);
             _bufferMessage.setBuild(build);
+            _bufferMessage.setSaveAs(saveAs);
 
             if (atts.getValue("md5") != null) {
                 _bufferMessage.setRemoteMD5(atts.getValue("md5"));

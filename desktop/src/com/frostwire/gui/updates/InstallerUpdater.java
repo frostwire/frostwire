@@ -86,6 +86,7 @@ public class InstallerUpdater implements Runnable {
         if (!forceUpdate && !UpdateSettings.AUTOMATIC_INSTALLER_DOWNLOAD.getValue()) {
             return;
         }
+        cleanupOldUpdates();
 
         if (checkIfDownloaded()) {
             showUpdateMessage();
@@ -121,11 +122,18 @@ public class InstallerUpdater implements Runnable {
         }
     }
 
+    private String getFileNameFromHttpUrl() {
+        int index = _updateMessage.getInstallerUrl().lastIndexOf('/');
+        return _updateMessage.getInstallerUrl().substring(index + 1);
+    }
+
     private void handleHttpDownload() {
         File updateFolder = UpdateSettings.UPDATES_DIR;
 
-        int index = _updateMessage.getInstallerUrl().lastIndexOf('/');
-        File installerFileLocation = new File(updateFolder, _updateMessage.getInstallerUrl().substring(index + 1));
+        String fileName = _updateMessage.getSaveAs() != null ?
+                _updateMessage.getSaveAs() : getFileNameFromHttpUrl();
+
+        File installerFileLocation = new File(updateFolder, fileName);
 
         if (!updateFolder.exists()) {
             updateFolder.mkdir();
@@ -373,6 +381,17 @@ public class InstallerUpdater implements Runnable {
     }
 
     private void cleanupOldUpdates() {
+        if (_updateMessage.getSaveAs() != null) {
+            File[] files = UpdateSettings.UPDATES_DIR.listFiles();
+            String latestUpdateFileName = _updateMessage.getSaveAs();
+            for (File f : files) {
+                if (!f.getName().equals(latestUpdateFileName)) {
+                    f.delete();
+                    LOG.info("cleanupOldUpdates() - removed old " + f.getName());
+                }
+            }
+        }
+
         final Pattern p = Pattern.compile("^frostwire-([0-9]+[0-9]?\\.[0-9]+[0-9]?\\.[0-9]+[0-9]?)(.*?)(\\.torrent)?$");
         FilenameFilter filenameFilter = new FilenameFilter() {
             @Override
@@ -387,6 +406,7 @@ public class InstallerUpdater implements Runnable {
                 f.delete();
             }
         }
+
     }
 
     private boolean checkIfDownloaded() {

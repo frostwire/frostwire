@@ -43,6 +43,7 @@ final class UpdateMessage implements Serializable {
     private boolean _intro = false; //if overlay should be shown at intro, or after searches.
     private String _lang = "en"; // default language for image
     private String _md5 = ""; // md5 hash code for overlay image
+    private String _saveAs = null; // optional, makes InstallerUpdater set a name for the downloaded file
 
     public String getMessage() { return _message; }
     public void setMessage(String m) { _message = m; }
@@ -230,6 +231,15 @@ final class UpdateMessage implements Serializable {
                 "_showOnce : " + isShownOnce() + ", \n" +
                 "_isIntro : " + isIntro() + ", \n" +
                 "_md5 : " + getRemoteMD5() + ", \n" +
+                "_saveAs : " + getSaveAs() + ", \n" +
                 "}\n";
+    }
+
+    public String getSaveAs() {
+        return _saveAs;
+    }
+
+    public void setSaveAs(String saveAs) {
+        _saveAs = saveAs;
     }
 } //UpdateMessage class
