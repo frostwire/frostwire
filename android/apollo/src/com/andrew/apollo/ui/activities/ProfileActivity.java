@@ -501,6 +501,11 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             if (resultCode == RESULT_OK) {
                 Uri selectedImage = data.getData();
 
+                if (selectedImage == null) {
+                    selectOldPhoto();
+                    return;
+                }
+
                 if (selectedImage.toString().startsWith("content://com.android.providers.media.documents/document/image%3A")) {
                     selectedImage = Uri.parse(selectedImage.toString().replace("com.android.providers.media.documents/document/image%3A", "media/external/images/media/"));
                 }
