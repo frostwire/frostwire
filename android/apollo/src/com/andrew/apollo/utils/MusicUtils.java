@@ -1167,7 +1167,7 @@ public final class MusicUtils {
             values.put(AudioColumns.IS_RINGTONE, "1");
             values.put(AudioColumns.IS_ALARM, "1");
             resolver.update(uri, values, null, null);
-        } catch (final UnsupportedOperationException ignored) {
+        } catch (final Throwable ignored) {
             //return;
             LOG.error(ignored.getMessage(), ignored);
         }
