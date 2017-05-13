@@ -26,17 +26,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.adapters.menu.DeleteFileMenuAction;
+import com.frostwire.android.gui.adapters.menu.FileInformationAction;
 import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
@@ -55,7 +52,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -66,18 +62,11 @@ import java.util.List;
  */
 public class ImageViewerFragment extends AbstractFragment {
     private static final Logger LOG = Logger.getLogger(ImageViewerFragment.class);
-    private static int EXPANDED_METADATA_LAYOUT_HEIGHT;
-    private static final int CONTRACTED_METADATA_LAYOUT_HEIGHT = 100;
     private ImageView preloadImageView; // tried doing this with a single imageviewer, didn't work.
     private TouchImageView imageView;
     private ProgressBar progressBar;
     private FileDescriptor fd;
     private ImageViewerActionModeCallback actionModeCallback;
-    private RelativeLayout metadataLayout;
-    private ViewGroup.LayoutParams metadataLayoutParams;
-    private TextView fileNameTextView;
-    private TextView fileSizeTextView;
-    private TextView fileDateTextView;
 
     public ImageViewerFragment() {
         super(R.layout.fragment_image_viewer);
@@ -87,32 +76,18 @@ public class ImageViewerFragment extends AbstractFragment {
 
     @Override
     protected void initComponents(View v) {
-        fileNameTextView = findView(v, R.id.fragment_image_viewer_metadata_filename);
-        fileSizeTextView = findView(v, R.id.fragment_image_viewer_metadata_filesize);
-        fileDateTextView = findView(v, R.id.fragment_image_viewer_metadata_date_created);
         progressBar = findView(v, R.id.fragment_image_viewer_progress_bar);
         preloadImageView = findView(v, R.id.fragment_image_viewer_preload_image);
         imageView = findView(v, R.id.fragment_image_viewer_image);
-        ImageButton infoButton = findView(v, R.id.fragment_image_viewer_info_button);
-        metadataLayout = findView(v, R.id.fragment_image_viewer_metadata_layout);
         progressBar.setVisibility(View.VISIBLE);
         preloadImageView.setVisibility(View.VISIBLE);
         imageView.setVisibility(View.GONE);
-        metadataLayout.setVisibility(View.VISIBLE);
-        metadataLayoutParams = metadataLayout.getLayoutParams();
-        EXPANDED_METADATA_LAYOUT_HEIGHT = metadataLayoutParams.height;
-
-        infoButton.setOnClickListener(new View.OnClickListener() {
+        imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onInfoButtonClick();
-            }
-        });
-
-        metadataLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onInfoButtonClick();
+                if (fd != null) {
+                    new FileInformationAction(getActivity(), fd).onClick();
+                }
             }
         });
     }
@@ -129,8 +104,6 @@ public class ImageViewerFragment extends AbstractFragment {
             actionModeCallback = new ImageViewerActionModeCallback(this.fd);
             startActionMode(actionModeCallback);
         }
-
-        updateFileMetadata(fd);
 
         Uri fileUri = UIUtils.getFileUri(getActivity(), fd.filePath, false);
         progressBar.setVisibility(View.VISIBLE);
@@ -161,18 +134,6 @@ public class ImageViewerFragment extends AbstractFragment {
         });
     }
 
-    private void updateFileMetadata(FileDescriptor fd) {
-        fileNameTextView.setText(FilenameUtils.getName(fd.filePath));
-        fileSizeTextView.setText(UIUtils.getBytesInHuman(fd.fileSize));
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(fd.dateAdded*1000);
-        int numMonth = cal.get(Calendar.MONTH) + 1;
-        int numDay = cal.get(Calendar.DAY_OF_MONTH) + 1;
-        String month = numMonth >= 10 ? String.valueOf(numMonth) : "0" + numMonth;
-        String day = numDay >= 10 ? String.valueOf(numDay) : "0" + numDay;
-        fileDateTextView.setText(cal.get(Calendar.YEAR) + "-" + month + "-" + day);
-    }
-
     private void onBitmapLoaded(final Bitmap bitmap,
                                 final RequestCreator requestCreator,
                                 int screenWidth,
@@ -201,17 +162,6 @@ public class ImageViewerFragment extends AbstractFragment {
             }
         });
     }
-
-    private void onInfoButtonClick() {
-        ViewGroup.LayoutParams currentParams = metadataLayout.getLayoutParams();
-        if (currentParams.height == EXPANDED_METADATA_LAYOUT_HEIGHT) {
-            currentParams.height = CONTRACTED_METADATA_LAYOUT_HEIGHT;
-        } else {
-            currentParams.height = EXPANDED_METADATA_LAYOUT_HEIGHT;
-        }
-        metadataLayout.setLayoutParams(currentParams);
-    }
-
 
     private class ImageViewerActionModeCallback implements android.support.v7.view.ActionMode.Callback {
         private final FileDescriptor fd;
@@ -258,6 +208,9 @@ public class ImageViewerFragment extends AbstractFragment {
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_open:
                     new OpenMenuAction(context, fd.filePath, fd.mime, fd.fileType).onClick();
+                    break;
+                case R.id.fragment_browse_peer_action_mode_menu_file_information:
+                    new FileInformationAction(context, fd).onClick();
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper:
                     new SetAsWallpaperMenuAction(context, fd).onClick();
@@ -311,6 +264,5 @@ public class ImageViewerFragment extends AbstractFragment {
             fd.filePath = fd.filePath.replace(oldFileName, newFileName) + "." + fileExtension;
             mode.setTitle(FilenameUtils.getName(fd.filePath));
         }
-
     }
 }

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
+ * IMPORTANT: All subclasses must be public, otherwise the dialogs can't be instantiated by android on rotation
  * @author gubatron
  * @author aldenml
  * @author marcelinkaaa

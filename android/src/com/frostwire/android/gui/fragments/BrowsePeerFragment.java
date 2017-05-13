@@ -62,6 +62,7 @@ import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
 import com.frostwire.android.gui.adapters.menu.DeleteFileMenuAction;
+import com.frostwire.android.gui.adapters.menu.FileInformationAction;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter;
 import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
@@ -707,6 +708,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 case R.id.fragment_browse_peer_action_mode_menu_open:
                     new OpenMenuAction(context, fd.filePath, fd.mime, fd.fileType).onClick();
                     break;
+                case R.id.fragment_browse_peer_action_mode_menu_file_information:
+                    new FileInformationAction(context, fd).onClick();
+                    break;
                 case R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone:
                     new SetAsRingtoneMenuAction(context, fd).onClick();
                     break;
@@ -766,6 +770,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             if (numChecked > 1) {
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_seed);
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_open);
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_file_information);
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone);
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper);
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_rename);

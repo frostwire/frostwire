@@ -323,6 +323,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 items.add(new OpenMenuAction(context, fd.filePath, fd.mime, fd.fileType));
             }
 
+            items.add(new FileInformationAction(context, fd));
+
             if ((fd.fileType == Constants.FILE_TYPE_AUDIO && numChecked <= 1) || fd.fileType == Constants.FILE_TYPE_RINGTONES) {
                 items.add(new SetAsRingtoneMenuAction(context, fd));
             }

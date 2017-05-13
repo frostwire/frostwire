@@ -39,6 +39,11 @@
         android:title="@string/open"
         app:showAsAction="never" />
     <item
+        android:id="@+id/fragment_browse_peer_action_mode_menu_file_information"
+        android:icon="@drawable/contextmenu_icon_file"
+        android:title="@string/file_information"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/fragment_browse_peer_action_mode_menu_use_as_ringtone"
         android:icon="@drawable/contextmenu_icon_ringtone"
         android:title="@string/context_menu_use_as_ringtone"
