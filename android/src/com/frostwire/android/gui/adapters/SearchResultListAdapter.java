@@ -160,13 +160,13 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         }
 
         MediaPlaybackStatusOverlayView overlayView = findView(view, R.id.view_bittorrent_search_result_list_item_filetype_icon_media_playback_overlay_view);
-
         fileTypeIcon.setOnClickListener(previewClickListener);
         if (isAudio(sr) || sr instanceof YouTubePackageSearchResult) {
             fileTypeIcon.setTag(sr);
             overlayView.setTag(sr);
             overlayView.setVisibility(View.VISIBLE);
             overlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PREVIEW);
+            overlayView.setOnClickListener(previewClickListener);
         } else {
             fileTypeIcon.setTag(null);
             overlayView.setTag(null);
