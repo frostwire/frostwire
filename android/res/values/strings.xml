@@ -673,4 +673,8 @@
     <string name="vpn_drop_protection_summary">Protect your privacy. Automatically disable BitTorrent transfers unless an encrypted VPN connection is active</string>
     <string name="dismiss">Dismiss</string>
     <string name="fullscreen">fullscreen</string>
+    <string name="size">Size</string>
+    <string name="date">Date</string>
+    <string name="your_android_wall_paper_will_change">Your Android wallpaper will change in a few seconds</string>
+    <string name="file_information">File information</string>
 </resources>

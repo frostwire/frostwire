@@ -24,15 +24,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractListAdapter;
-import com.frostwire.android.gui.views.BrowseThumbnailImageButton;
-import com.frostwire.android.gui.views.MediaPlaybackOverlay;
+import com.frostwire.android.gui.views.MediaPlaybackOverlayPainter;
+import com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.util.Logger;
-import com.squareup.picasso.Callback;
 
 /**
  * @author aldenml
@@ -47,17 +48,25 @@ public final class CheckableImageView<T> extends View implements Checkable {
     private final AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener;
     private final Uri[] imageUris;
     private boolean checked;
-    private BrowseThumbnailImageButton backgroundView;
+    private ImageButton backgroundView;
+    private TextView fileSizeTextView;
     private FrameLayout checkedOverlayView;
     private boolean checkableMode;
     private int width;
     private int height;
 
-    public CheckableImageView(Context context, ViewGroup containerView, int width, int height, Uri[] imageUris, boolean checked, MediaPlaybackOverlay.MediaPlaybackState mediaPlaybackOverlay, AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener) {
+    public CheckableImageView(Context context,
+                              ViewGroup containerView,
+                              MediaPlaybackStatusOverlayView playbackStatusOverlayView,
+                              MediaPlaybackOverlayPainter.MediaPlaybackState mediaPlaybackOverlayState,
+                              int width, int height,
+                              Uri[] imageUris,
+                              boolean checked, boolean showFileSize,
+                              AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener) {
         super(context);
         setClickable(true);
         this.onCheckedChangeListener = onCheckedChangeListener;
-        initComponents(containerView, checked, mediaPlaybackOverlay);
+        initComponents(containerView, playbackStatusOverlayView, mediaPlaybackOverlayState, checked, showFileSize);
         this.onCheckedChangeListener.setEnabled(false);
         setChecked(checked);
         this.onCheckedChangeListener.setEnabled(true);
@@ -70,6 +79,10 @@ public final class CheckableImageView<T> extends View implements Checkable {
     public void loadImages() {
         ImageLoader imageLoader = ImageLoader.getInstance(getContext());
         imageLoader.load(imageUris[0], imageUris[1], backgroundView, width, height);
+    }
+
+    public void setFileSize(long fileSize) {
+        fileSizeTextView.setText(UIUtils.getBytesInHuman(fileSize));
     }
 
     @Override
@@ -92,17 +105,21 @@ public final class CheckableImageView<T> extends View implements Checkable {
         setChecked(!checked);
     }
 
-    private void initComponents(ViewGroup containerView, boolean checked, MediaPlaybackOverlay.MediaPlaybackState overlay) {
+    private void initComponents(ViewGroup containerView,
+                                MediaPlaybackStatusOverlayView playbackStatusOverlayView,
+                                MediaPlaybackOverlayPainter.MediaPlaybackState overlayState,
+                                boolean checked,
+                                boolean showFileSize) {
         if (containerView == null) {
             LOG.error("initComponents() containerView can't be null");
             return;
         }
-        backgroundView = (BrowseThumbnailImageButton) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button);
+        backgroundView = (ImageButton) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button);
         backgroundView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        if (!checked) {
-            backgroundView.setOverlayState(overlay);
-        } else {
-            backgroundView.setOverlayState(MediaPlaybackOverlay.MediaPlaybackState.NONE);
+        fileSizeTextView = (TextView) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_item_filesize);
+        fileSizeTextView.setVisibility(showFileSize ? View.VISIBLE : View.GONE);
+        if (playbackStatusOverlayView != null) {
+            playbackStatusOverlayView.setPlaybackState(!checked ? overlayState : MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
         }
         checkedOverlayView = (FrameLayout) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_overlay_checkmark_framelayout);
     }
@@ -111,7 +128,7 @@ public final class CheckableImageView<T> extends View implements Checkable {
         backgroundView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackgroundViewClick(v);
+                onBackgroundViewClick();
             }
         });
         checkedOverlayView.setOnClickListener(new OnClickListener() {
@@ -122,7 +139,7 @@ public final class CheckableImageView<T> extends View implements Checkable {
         });
     }
 
-    private void onBackgroundViewClick(View v) {
+    private void onBackgroundViewClick() {
         if (checkableMode) {
             setChecked(true);
         }

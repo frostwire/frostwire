@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -40,6 +41,7 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Picasso.Builder;
 import com.squareup.picasso.Request;
+import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.RequestHandler;
 import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
@@ -107,28 +109,26 @@ public final class ImageLoader {
      */
     private static Bitmap getAlbumArt(Context context, String albumId) {
         Bitmap bitmap = null;
-
         try {
-
             Uri albumUri = Uri.withAppendedPath(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, albumId);
             Cursor cursor = context.getContentResolver().query(albumUri, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART}, null, null, null);
-
             try {
                 LOG.info("Using album_art path for uri: " + albumUri);
-                if (cursor.moveToFirst()) {
+                if (cursor != null && cursor.moveToFirst()) {
                     String albumArt = cursor.getString(0);
                     if (albumArt != null) {
                         bitmap = BitmapFactory.decodeFile(albumArt);
                     }
                 }
             } finally {
-                cursor.close();
+                if (cursor != null) {
+                    cursor.close();
+                }
             }
 
         } catch (Throwable e) {
             LOG.error("Error getting album art", e);
         }
-
         return bitmap;
     }
 
@@ -148,12 +148,52 @@ public final class ImageLoader {
         File directory = SystemUtils.getCacheDir(context, "picasso");
         long diskSize = SystemUtils.calculateDiskCacheSize(directory, MIN_DISK_CACHE_SIZE, MAX_DISK_CACHE_SIZE);
         int memSize = SystemUtils.calculateMemoryCacheSize(context);
-
         this.cache = new ImageCache(directory, diskSize, memSize);
         this.picasso = new Builder(context).addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
                 memoryCache(cache).executor(Engine.instance().getThreadPool()).build();
-
         picasso.setIndicatorsEnabled(false);
+    }
+
+    public interface OnBitmapLoadedCallbackRunner {
+        void onBitmapLoaded(final Bitmap bitmap, final RequestCreator requestCreator);
+
+        void onError();
+    }
+
+    public void loadBitmapAsync(final Uri imageUri, final OnBitmapLoadedCallbackRunner onBitmapLoadedRunner) {
+        if (imageUri == null) {
+            throw new IllegalArgumentException("Uri can't be null");
+        }
+        if (onBitmapLoadedRunner == null) {
+            throw new IllegalArgumentException("OnBitmapLoadedCallbackRunner can't be null");
+        }
+        final RequestCreator requestCreator = picasso.load(imageUri);
+        requestCreator.fetch(new Callback() {
+            @Override
+            public void onSuccess() {
+                requestCreator.into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        onBitmapLoadedRunner.onBitmapLoaded(bitmap, requestCreator);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        onBitmapLoadedRunner.onError();
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                    }
+                });
+            }
+
+            @Override
+            public void onError() {
+                LOG.info("loadBitmapAsync::Callback::onError()");
+            }
+        });
+
     }
 
     public void load(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {
@@ -170,7 +210,6 @@ public final class ImageLoader {
                 return filter.params();
             }
         };
-
         Callback.EmptyCallback callback = new Callback.EmptyCallback() {
             @Override
             public void onError() {
@@ -179,7 +218,6 @@ public final class ImageLoader {
                 }
             }
         };
-
         if (cache) {
             picasso.load(primaryUri).fit().transform(transformation).into(imageView, callback);
         } else {
@@ -208,7 +246,7 @@ public final class ImageLoader {
             picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new Callback.EmptyCallback() {
                 @Override
                 public void onError() {
-                        load(uriRetry, target, targetWidth, targetHeight);
+                    load(uriRetry, target, targetWidth, targetHeight);
                 }
             });
         }
@@ -267,17 +305,12 @@ public final class ImageLoader {
 
         @Override
         public boolean canHandleRequest(Request data) {
-            if (data == null || data.uri == null) {
-                return false;
-            }
-
-            return SCHEME_IMAGE.equals(data.uri.getScheme());
+            return !(data == null || data.uri == null) && SCHEME_IMAGE.equals(data.uri.getScheme());
         }
 
         @Override
         public Result load(Request data, int networkPolicy) throws IOException {
             String authority = data.uri.getAuthority();
-
             if (APPLICATION_AUTHORITY.equals(authority)) {
                 return loadApplication(data.uri);
             } else if (ALBUM_AUTHORITY.equals(authority)) {
@@ -293,12 +326,10 @@ public final class ImageLoader {
         private Result loadApplication(Uri uri) throws IOException {
             Result result;
             String packageName = uri.getLastPathSegment();
-
             PackageManager pm = context.getPackageManager();
             try {
                 BitmapDrawable icon = (BitmapDrawable) pm.getApplicationIcon(packageName);
                 Bitmap bmp = icon.getBitmap();
-
                 result = new Result(bmp, Picasso.LoadedFrom.DISK);
             } catch (NameNotFoundException e) {
                 result = null;
@@ -318,11 +349,9 @@ public final class ImageLoader {
         private Result loadFirstArtistAlbum(Uri uri) throws IOException {
             String artistName = uri.getLastPathSegment();
             long albumId = getFirstAlbumIdForArtist(context, artistName);
-
             if (albumId == -1) {
                 return null;
             }
-
             Bitmap bitmap = getAlbumArt(context, String.valueOf(albumId));
             return (bitmap != null) ? new Result(bitmap, Picasso.LoadedFrom.DISK) : null;
         }
@@ -343,19 +372,16 @@ public final class ImageLoader {
                         }, MediaStore.Audio.AlbumColumns.ARTIST + "=?", new String[]{
                                 artistName
                         }, BaseColumns._ID);
-
                 if (cursor != null) {
                     cursor.moveToFirst();
                     if (!cursor.isAfterLast()) {
                         id = cursor.getInt(0);
                     }
                     cursor.close();
-                    cursor = null;
                 }
             } catch (Throwable e) {
                 LOG.error("Error getting first album id for artist: " + artistName, e);
             }
-
             return id;
         }
 
@@ -365,7 +391,6 @@ public final class ImageLoader {
                 return null;
             }
             uri = Uri.parse(seg);
-
             Bitmap bitmap = null;
             MediaMetadataRetriever retriever = null;
             try {
@@ -383,7 +408,6 @@ public final class ImageLoader {
                     retriever.release();
                 }
             }
-
             if (bitmap != null) {
                 return new Result(bitmap, Picasso.LoadedFrom.DISK);
             } else {

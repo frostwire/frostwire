@@ -56,6 +56,7 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
+import com.frostwire.android.gui.activities.internal.NavigationMenu;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.SDPermissionDialog;
@@ -72,7 +73,6 @@ import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
-import com.frostwire.android.gui.activities.internal.NavigationMenu;
 import com.frostwire.android.gui.views.MiniPlayerView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
@@ -120,6 +120,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private SearchFragment search;
     private BrowsePeerFragment library;
     private TransfersFragment transfers;
+
     private Fragment currentFragment;
     private final Stack<Integer> fragmentsStack;
     private TimerSubscription playerSubscription;

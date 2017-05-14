@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,22 @@
 
 package com.frostwire.android.util;
 
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
+
+import com.frostwire.android.util.DiskCache.Entry;
+import com.squareup.picasso.Cache;
+import com.squareup.picasso.LruCache;
+
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
-
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
-import android.graphics.BitmapFactory;
-import android.os.Looper;
-
-import com.frostwire.android.util.DiskCache.Entry;
-import com.squareup.picasso.Cache;
-import com.squareup.picasso.LruCache;
+import static com.frostwire.android.gui.util.UIUtils.isMain;
 
 /**
  * @author gubatron
@@ -147,9 +148,5 @@ final class ImageCache implements Cache {
 
     private int diskMaxSize() {
         return disk != null ? (int) disk.maxSize() : 0;
-    }
-
-    private static boolean isMain() {
-        return Looper.getMainLooper().getThread() == Thread.currentThread();
     }
 }

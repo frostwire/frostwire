@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +26,13 @@ import android.graphics.BitmapFactory;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class SetAsWallpaperMenuAction extends MenuAction {
 
@@ -40,21 +40,25 @@ public class SetAsWallpaperMenuAction extends MenuAction {
 
     public SetAsWallpaperMenuAction(Context context, FileDescriptor fd) {
         super(context, R.drawable.contextmenu_icon_picture, R.string.set_as_wallpaper);
-
         this.fd = fd;
     }
 
     @Override
-    protected void onClick(Context context) {
+    protected void onClick(final Context context) {
         if (fd.fileType != Constants.FILE_TYPE_PICTURES) {
             return;
         }
-
-        try {
-            Bitmap bitmap = BitmapFactory.decodeFile(fd.filePath);
-            WallpaperManager.getInstance(context).setBitmap(bitmap);
-        } catch (Throwable e) {
-            UIUtils.showShortMessage(context, R.string.failed_to_set_wallpaper);
-        }
+        UIUtils.showShortMessage(context, R.string.your_android_wall_paper_will_change);
+        Engine.instance().getThreadPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Bitmap bitmap = BitmapFactory.decodeFile(fd.filePath);
+                    WallpaperManager.getInstance(context).setBitmap(bitmap);
+                } catch (Throwable e) {
+                    UIUtils.showShortMessage(context, R.string.failed_to_set_wallpaper);
+                }
+            }
+        });
     }
 }

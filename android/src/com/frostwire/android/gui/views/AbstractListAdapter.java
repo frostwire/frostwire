@@ -206,7 +206,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     public int getViewPosition(View view) {
         T tag = (T) view.getTag();
         int result = -1;
-        int i=0;
+        int i = 0;
         for (T t : visualList) {
             if (t.equals(tag)) {
                 result = i;
@@ -313,14 +313,12 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     public View getView(int position, View view, ViewGroup parent) {
         T item = getItem(position);
         Context ctx = getContext();
-
         if (view == null && ctx != null) {
             // every list view item is wrapped in a generic container which has a hidden checkbox on the left hand side.
             view = View.inflate(ctx, R.layout.view_selectable_list_item, null);
             LinearLayout container = findView(view, R.id.view_selectable_list_item_container);
             View.inflate(ctx, viewItemId, container);
         }
-
         try {
             initTouchFeedback(view, item);
             initCheckBox(view, item);
@@ -329,7 +327,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         } catch (Throwable e) {
             LOG.error("Fatal error getting view: " + e.getMessage(), e);
         }
-
         return view;
     }
 
@@ -395,14 +392,12 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     protected void onItemChecked(View v, boolean isChecked) {
-        if (v instanceof Checkable) {
-            onCheckboxItemChecked(v, isChecked);
-        } else if (v instanceof RadioButton) {
+        if (v instanceof RadioButton) {
             onRadioButtonItemChecked((RadioButton) v, isChecked);
+        } else if (v instanceof Checkable) {
+            onCheckboxItemChecked(v, isChecked);
         }
-
         notifyDataSetInvalidated();
-
         if (onItemCheckedListener != null) {
             onItemCheckedListener.onItemChecked(v, (T) v.getTag(), isChecked);
         }
@@ -422,7 +417,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     private void updateLastRadioButtonChecked(int position) {
         lastSelectedRadioButtonIndex = position;
-
     }
 
     private void onRadioButtonItemChecked(RadioButton radioButton, boolean isChecked) {
@@ -453,7 +447,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     private View getView(View view, SparseArray<View> h, int id) {
         View v;
-
         int index = h.indexOfKey(id);
         if (index < 0) {
             v = view.findViewById(id);
@@ -461,7 +454,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         } else {
             v = h.valueAt(index);
         }
-
         return v;
     }
 
@@ -504,22 +496,28 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     protected void initTouchFeedback(View v, T item) {
+        initTouchFeedback(v, item, viewOnClickListener, viewOnLongClickListener, viewOnKeyListener);
+    }
+
+    protected void initTouchFeedback(View v,
+                                     T item,
+                                     OnClickListener clickListener,
+                                     OnLongClickListener longClickListener,
+                                     OnKeyListener keyListener) {
         if (v == null || v instanceof CheckBox) {
             return;
         }
-
-        v.setOnClickListener(viewOnClickListener);
-        v.setOnLongClickListener(viewOnLongClickListener);
-        v.setOnKeyListener(viewOnKeyListener);
+        v.setOnClickListener(clickListener);
+        v.setOnLongClickListener(longClickListener);
+        v.setOnKeyListener(keyListener);
         v.setTag(item);
-
         if (v instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) v;
             int count = vg.getChildCount();
             for (int i = 0; i < count; i++) {
                 View child = vg.getChildAt(i);
                 if (child != null) {
-                    initTouchFeedback(child, item);
+                    initTouchFeedback(child, item, clickListener, longClickListener, keyListener);
                 }
             }
         }
@@ -540,8 +538,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * Meant to be overridden. Here you must return a String that shows the sum of all the checked elements
      * and some significant unit. For files, this would be the amount of total bytes if we summed all the selected
      * files. If you had a list of items to purchase, this could be total amount of money and a currency symbol.
-     *
-     * @return
      */
     public String getCheckedSum() {
         return null;
@@ -555,15 +551,23 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         this.onItemCheckedListener = onItemCheckedListener;
     }
 
+    public boolean showMenu(View v) {
+        MenuAdapter adapter = getMenuAdapter(v);
+        if (adapter != null && adapter.getCount() > 0) {
+            trackDialog(new MenuBuilder(adapter).show());
+            return true;
+        }
+        return false;
+    }
+
+
     private final class ViewOnClickListener implements OnClickListener {
         public void onClick(View v) {
             if (showMenuOnClick) {
-                MenuAdapter adapter = getMenuAdapter(v);
-                if (adapter != null && adapter.getCount() > 0) {
-                    trackDialog(new MenuBuilder(adapter).show());
-                    return;
-                }
+                showMenu(v);
+                return;
             }
+            LOG.info("AbstractListAdapter.ViewOnClickListener.onClick()");
             onItemClicked(v);
         }
     }
@@ -571,9 +575,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private final class ViewOnLongClickListener implements OnLongClickListener {
         public boolean onLongClick(View v) {
             if (showMenuOnLongClick) {
-                MenuAdapter adapter = getMenuAdapter(v);
-                if (adapter != null && adapter.getCount() > 0) {
-                    trackDialog(new MenuBuilder(adapter).show());
+                if (showMenu(v)) {
                     return true;
                 }
             }
@@ -583,17 +585,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     private final class ViewOnKeyListener implements OnKeyListener {
         public boolean onKey(View v, int keyCode, KeyEvent event) {
-            boolean handled = false;
-
             switch (keyCode) {
                 case KeyEvent.KEYCODE_DPAD_CENTER:
                 case KeyEvent.KEYCODE_ENTER:
                     if (event.getAction() == KeyEvent.ACTION_UP) {
-                        handled = onItemKeyMaster(v);
+                        return onItemKeyMaster(v);
                     }
             }
-
-            return handled;
+            return false;
         }
     }
 
@@ -636,12 +635,9 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-
             List<T> list = adapter.getList();
-
             FilterResults result = new FilterResults();
             if (filter == null) {
-                /** || StringUtils.isNullOrEmpty(constraint.toString(), true)) { */
                 result.values = list;
                 result.count = list.size();
             } else {
@@ -656,7 +652,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
                 result.values = filtered;
                 result.count = filtered.size();
             }
-
             return result;
         }
 

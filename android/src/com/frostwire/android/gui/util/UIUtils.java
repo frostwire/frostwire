@@ -28,14 +28,17 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.text.Html;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -198,11 +201,9 @@ public final class UIUtils {
     public static Dialog showInformationDialog(Context context, int messageId, int titleId, boolean hideTitle, final OnClickListener positiveListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(messageId);
-
         if (!hideTitle) {
             builder.setTitle(titleId);
         }
-
         builder.setPositiveButton(context.getString(android.R.string.ok), new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -241,24 +242,19 @@ public final class UIUtils {
             LOG.warn("showYesNoDialog() - aborting bullet dialog, no bullets to show.");
             return;
         }
-
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
         // show all bullets pre-checked, prepend
         for (int i = 0; i < bullets.size(); i++) {
             bullets.set(i, String.valueOf(Html.fromHtml("&#8226; " + bullets.get(i))));
         }
-
         ArrayAdapter bulletsAdapter;
         bulletsAdapter = new ArrayAdapter(context,
                 R.layout.dialog_update_bullet,
                 R.id.dialog_update_bullets_checked_text_view,
                 bullets);
-
         ListView bulletsListView = new ListView(context);
         bulletsListView.setAdapter(bulletsAdapter);
         bulletsListView.setOnItemClickListener(bulletsClickListener);
-
         builder.setIcon(iconId).
                 setTitle(titleId).
                 setMessage(message).
@@ -329,12 +325,8 @@ public final class UIUtils {
         try {
             if (filePath != null && !openAudioInternal(filePath)) {
                 Intent i = new Intent(Intent.ACTION_VIEW);
-                Uri uri = useFileProvider ?
-                        FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath)) :
-                        Uri.fromFile(new File(filePath));
-                i.setDataAndType(uri, Intent.normalizeMimeType(mime));
+                i.setDataAndType(getFileUri(context, filePath, useFileProvider), Intent.normalizeMimeType(mime));
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
                 if (mime != null && mime.contains("video")) {
                     if (MusicUtils.isPlaying()) {
                         MusicUtils.playOrPause();
@@ -347,6 +339,12 @@ public final class UIUtils {
             UIUtils.showShortMessage(context, R.string.cant_open_file);
             LOG.error("Failed to open file: " + filePath, e);
         }
+    }
+
+    public static Uri getFileUri(Context context, String filePath, boolean useFileProvider) {
+        return useFileProvider ?
+                FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath)) :
+                Uri.fromFile(new File(filePath));
     }
 
     public static void openFile(Context context, File file) {
@@ -459,39 +457,31 @@ public final class UIUtils {
                 dialog.dismiss();
             }
         });
-
         final AlertDialog socialLinksDialog = builder.create();
         socialLinksDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         socialLinksDialog.setOnDismissListener(dismissListener);
-
         ImageButton fbButton = (ImageButton) customView.findViewById(R.id.view_social_buttons_facebook_button);
         ImageButton twitterButton = (ImageButton) customView.findViewById(R.id.view_social_buttons_twitter_button);
         ImageButton redditButton = (ImageButton) customView.findViewById(R.id.view_social_buttons_reddit_button);
-
         final String referrerParam = "?ref=android_" + ((referrerContextSuffix != null) ? referrerContextSuffix.trim() : "");
-
         fbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
             }
         });
-
         twitterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam);
             }
         });
-
         redditButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam);
             }
         });
-
-
         if (showInstallationCompleteSection) {
             LinearLayout installationCompleteLayout =
                     (LinearLayout) customView.findViewById(R.id.view_social_buttons_installation_complete_layout);
@@ -504,7 +494,6 @@ public final class UIUtils {
                 }
             });
         }
-
         socialLinksDialog.show();
     }
 
@@ -561,19 +550,32 @@ public final class UIUtils {
     public static int randomPitchResId(boolean avoidSupportPitches) {
         int offset1 = 0;
         int offset2 = 2;
-
         int offset = !avoidSupportPitches ? offset1 : offset2;
-        int resId = PITCHES[offset + new Random().nextInt(PITCHES.length - offset)];
-
-        return resId;
+        return PITCHES[offset + new Random().nextInt(PITCHES.length - offset)];
     }
 
     public static double getScreenInches(Activity activity) {
         DisplayMetrics dm = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
-        double x_sq = Math.pow(dm.widthPixels/dm.xdpi, 2);
-        double y_sq = Math.pow(dm.heightPixels/dm.ydpi, 2);
+        double x_sq = Math.pow(dm.widthPixels / dm.xdpi, 2);
+        double y_sq = Math.pow(dm.heightPixels / dm.ydpi, 2);
         // pitagoras
         return Math.sqrt(x_sq + y_sq);
+    }
+
+    /**
+     * @param context
+     * @return a 3 int array with: { widthInPixels, heightInPixels, Surface#ROTATION_XXX value }
+     */
+    public static int[] getScreenDimensionsAndRotation(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+        return new int[]{metrics.widthPixels, metrics.heightPixels, display.getRotation()};
+    }
+
+    public static boolean isMain() {
+        return Looper.getMainLooper().getThread() == Thread.currentThread();
     }
 }

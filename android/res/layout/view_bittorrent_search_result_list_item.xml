@@ -2,7 +2,8 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,14 +26,26 @@
     android:baselineAligned="false"
     android:orientation="horizontal" >
 
-    <com.frostwire.android.gui.views.SearchThumbnailImageView
-        android:id="@+id/view_bittorrent_search_result_list_item_filetype_icon"
-        android:layout_width="52dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center|center_vertical"
-        android:layout_marginLeft="3dp"
-        android:contentDescription="@null"
-         />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/view_bittorrent_search_result_list_item_filetype_icon"
+            android:layout_width="52dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center|center_vertical"
+            android:layout_marginLeft="3dp"
+            android:contentDescription="@null"
+            />
+        <com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView
+            android:id="@+id/view_bittorrent_search_result_list_item_filetype_icon_media_playback_overlay_view"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerInParent="true"
+            android:clickable="true"
+            android:foregroundGravity="center"
+            android:visibility="gone"/>
+    </RelativeLayout>
 
     <ImageView
         android:id="@+id/view_bittorrent_search_result_list_item_download_icon"

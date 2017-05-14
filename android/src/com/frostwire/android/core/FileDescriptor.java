@@ -17,13 +17,13 @@
 
 package com.frostwire.android.core;
 
+import android.os.Bundle;
+
 import com.frostwire.android.gui.util.UIUtils;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public class FileDescriptor implements Cloneable {
 
@@ -40,7 +40,6 @@ public class FileDescriptor implements Cloneable {
      * The title of the content.
      */
     public String title;
-
     // only if audio/video media
 
     /**
@@ -57,7 +56,7 @@ public class FileDescriptor implements Cloneable {
      * The year the media file was recorded, if any
      */
     public String year;
-    
+
     public long albumId;
 
     /**
@@ -82,6 +81,46 @@ public class FileDescriptor implements Cloneable {
         ensureCorrectMimeType(this);
     }
 
+    public FileDescriptor(Bundle bundle) {
+        fromBundle(bundle);
+        ensureCorrectMimeType(this);
+    }
+
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", id);
+        bundle.putString("artist", artist);
+        bundle.putString("title", title);
+        bundle.putString("album", album);
+        bundle.putString("year", year);
+        bundle.putString("filePath", filePath);
+        bundle.putByte("fileType", fileType);
+        bundle.putString("mime", mime);
+        bundle.putLong("fileSize", fileSize);
+        bundle.putLong("dateAdded", dateAdded);
+        bundle.putLong("dateModified", dateModified);
+        bundle.putBoolean("shared", shared);
+        return bundle;
+    }
+
+    public void fromBundle(Bundle bundle) {
+        if (bundle == null) {
+            return;
+        }
+        id = bundle.getInt("id");
+        artist = bundle.getString("artist");
+        title = bundle.getString("title");
+        album = bundle.getString("album");
+        year = bundle.getString("year");
+        filePath = bundle.getString("filePath");
+        fileType = bundle.getByte("fileType");
+        mime = bundle.getString("mime");
+        fileSize = bundle.getLong("fileSize");
+        dateAdded = bundle.getLong("dateAdded");
+        dateModified = bundle.getLong("dateModified");
+        shared = bundle.getBoolean("shared");
+    }
+
     @Override
     public String toString() {
         return "FD(id:" + id + ", ft:" + fileType + ", t:" + title + ", p:" + filePath + ")";
@@ -92,18 +131,8 @@ public class FileDescriptor implements Cloneable {
         if (o == null || !(o instanceof FileDescriptor)) {
             return false;
         }
-
         FileDescriptor fd = (FileDescriptor) o;
-
-        if (this.id == fd.id && this.fileType == fd.fileType) {
-            return true;
-        }
-
-        if (this.filePath != null && fd.filePath != null && this.filePath.equals(fd.filePath)) {
-            return true;
-        }
-
-        return false;
+        return (this.id == fd.id && this.fileType == fd.fileType) || (this.filePath != null && fd.filePath != null && this.filePath.equals(fd.filePath));
     }
 
     @Override
@@ -111,6 +140,7 @@ public class FileDescriptor implements Cloneable {
         return this.id * 1000 + this.fileType;
     }
 
+    @SuppressWarnings("CloneDoesntCallSuperClone")
     @Override
     public FileDescriptor clone() {
         return new FileDescriptor(id, artist, title, album, year, filePath, fileType, mime, fileSize, dateAdded, dateModified, shared);

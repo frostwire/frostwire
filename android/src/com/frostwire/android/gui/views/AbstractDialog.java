@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,11 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
+ * IMPORTANT:
+ *  - All subclasses must be public, otherwise the dialogs can't be instantiated by android on rotation
+ *  - All subclasses must only have an empty constructor. If you feel the need to use a custom constructor
+ *    implement a "newInstance(...)" method that uses the default empty constructor and then set your
+ *    attributes on the object to return.
  * @author gubatron
  * @author aldenml
  * @author marcelinkaaa
@@ -162,6 +167,10 @@ public abstract class AbstractDialog extends DialogFragment {
 
     public void setOnDialogClickListener(OnDialogClickListener onDialogClickListener) {
         this.onDialogClickListener = onDialogClickListener;
+    }
+
+    public OnDialogClickListener getOnDialogClickListener() {
+        return this.onDialogClickListener;
     }
 
     public interface OnDialogClickListener {

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- *            Marcelina Knitter (@marcelinkaaa)
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,6 +62,7 @@ import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
 import com.frostwire.android.gui.adapters.menu.DeleteFileMenuAction;
+import com.frostwire.android.gui.adapters.menu.FileInformationAction;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter;
 import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
@@ -304,22 +305,16 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public void onShow() {
     }
 
-    public boolean getSelectAllMode() {
-        return selectAllModeOn;
-    }
-
     @Override
     protected void initComponents(View v) {
         findView(v, R.id.fragment_browse_peer_select_all_container).setVisibility(View.GONE);
         findView(v, R.id.progressContainer).setVisibility(View.GONE);
-
         selectAllCheckboxListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 onSelectAllChecked(isChecked);
             }
         };
-
         selectAllCheckbox = findView(v, R.id.fragment_browse_peer_select_all_checkbox);
         selectAllCheckboxContainer = findView(v, R.id.fragment_browse_peer_select_all_container);
         swipeRefresh = findView(v, R.id.fragment_browse_peer_swipe_refresh);
@@ -347,7 +342,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 switchToThe(false);
             }
         });
-
         browseTypeRadioGroup = findView(v, R.id.fragment_browse_peer_radiogroup_browse_type);
         initRadioButton(v, R.id.fragment_browse_peer_radio_audio, Constants.FILE_TYPE_AUDIO);
         initRadioButton(v, R.id.fragment_browse_peer_radio_ringtones, Constants.FILE_TYPE_RINGTONES);
@@ -506,7 +500,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 protected void onItemClicked(View v) {
                     onFileItemClicked(v);
                 }
-
             };
             adapter.setCheckboxesVisibility(selectAllModeOn);
             list.setNumColumns(adapter.getNumColumns());
@@ -712,6 +705,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 case R.id.fragment_browse_peer_action_mode_menu_open:
                     new OpenMenuAction(context, fd.filePath, fd.mime, fd.fileType).onClick();
                     break;
+                case R.id.fragment_browse_peer_action_mode_menu_file_information:
+                    new FileInformationAction(context, fd).onClick();
+                    break;
                 case R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone:
                     new SetAsRingtoneMenuAction(context, fd).onClick();
                     break;
@@ -767,10 +763,10 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             List<Integer> actionsToHide = new ArrayList<>();
             FileDescriptor fd = selectedFileDescriptor.fd;
             boolean canOpenFile = fd.mime != null && (fd.mime.contains("audio") || fd.mime.contains("bittorrent") || fd.filePath != null);
-
             if (numChecked > 1) {
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_seed);
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_open);
+                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_file_information);
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone);
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper);
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_rename);

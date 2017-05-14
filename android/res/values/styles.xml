@@ -3,7 +3,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), and
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -588,6 +588,16 @@
         <item name="android:height">1dp</item>
     </style>
 
+    <style name="GridThumbnailText">
+        <item name="android:background">#642b2b2b</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:textSize">@dimen/text_extra_micro</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_text_white</item>
+    </style>
     <!--v21-->
     <style name="MediumText">
         <item name="android:textStyle">normal</item>
