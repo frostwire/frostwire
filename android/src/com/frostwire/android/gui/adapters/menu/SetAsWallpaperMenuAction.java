@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ import com.frostwire.android.gui.views.MenuAction;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class SetAsWallpaperMenuAction extends MenuAction {
 
@@ -41,7 +40,6 @@ public class SetAsWallpaperMenuAction extends MenuAction {
 
     public SetAsWallpaperMenuAction(Context context, FileDescriptor fd) {
         super(context, R.drawable.contextmenu_icon_picture, R.string.set_as_wallpaper);
-
         this.fd = fd;
     }
 

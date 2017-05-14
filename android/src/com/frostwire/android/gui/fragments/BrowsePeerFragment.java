@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- *            Marcelina Knitter (@marcelinkaaa)
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -309,14 +309,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     protected void initComponents(View v) {
         findView(v, R.id.fragment_browse_peer_select_all_container).setVisibility(View.GONE);
         findView(v, R.id.progressContainer).setVisibility(View.GONE);
-
         selectAllCheckboxListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 onSelectAllChecked(isChecked);
             }
         };
-
         selectAllCheckbox = findView(v, R.id.fragment_browse_peer_select_all_checkbox);
         selectAllCheckboxContainer = findView(v, R.id.fragment_browse_peer_select_all_container);
         swipeRefresh = findView(v, R.id.fragment_browse_peer_swipe_refresh);
@@ -344,7 +342,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 switchToThe(false);
             }
         });
-
         browseTypeRadioGroup = findView(v, R.id.fragment_browse_peer_radiogroup_browse_type);
         initRadioButton(v, R.id.fragment_browse_peer_radio_audio, Constants.FILE_TYPE_AUDIO);
         initRadioButton(v, R.id.fragment_browse_peer_radio_ringtones, Constants.FILE_TYPE_RINGTONES);
@@ -766,7 +763,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             List<Integer> actionsToHide = new ArrayList<>();
             FileDescriptor fd = selectedFileDescriptor.fd;
             boolean canOpenFile = fd.mime != null && (fd.mime.contains("audio") || fd.mime.contains("bittorrent") || fd.filePath != null);
-
             if (numChecked > 1) {
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_seed);
                 actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_open);

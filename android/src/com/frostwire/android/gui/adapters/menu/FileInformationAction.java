@@ -19,7 +19,6 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -55,7 +54,7 @@ public final class FileInformationAction extends MenuAction {
 
     @Override
     protected void onClick(Context context) {
-        new FileInformationDialog(fd).show(((Activity) getContext()).getFragmentManager());
+        FileInformationDialog.newInstance(fd).show(((Activity) getContext()).getFragmentManager());
     }
 
     public static class FileInformationDialog extends AbstractDialog {
@@ -69,9 +68,10 @@ public final class FileInformationAction extends MenuAction {
             super(R.layout.dialog_file_information);
         }
 
-        public FileInformationDialog(FileDescriptor fileDescriptor) {
-            super(R.layout.dialog_file_information);
-            this.fileDescriptor = fileDescriptor;
+        public static FileInformationDialog newInstance(FileDescriptor fileDescriptor) {
+            FileInformationDialog dlg = new FileInformationDialog();
+            dlg.fileDescriptor = fileDescriptor;
+            return dlg;
         }
 
         @Override

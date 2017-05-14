@@ -1,5 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,7 +65,7 @@ public class RenameFileMenuAction extends MenuAction {
 
     private void showRenameFileDialog() {
         RenameFileMenuActionDialog.renameAction = this;
-        RenameFileMenuActionDialog.newInstance(getFilePath(), dialogClickListener).show(((Activity) getContext()).getFragmentManager());;
+        RenameFileMenuActionDialog.newInstance(getFilePath(), dialogClickListener).show(((Activity) getContext()).getFragmentManager());
     }
 
     private boolean isValidFileName(String newFileName) {
@@ -128,20 +129,16 @@ public class RenameFileMenuAction extends MenuAction {
             } else if (savedInstanceState != null && filePath == null) {
                 filePath = savedInstanceState.getString("filePath");
             }
-
             TextView title = findView(dlg, R.id.dialog_default_input_title);
             title.setText(R.string.rename);
             String name = FilenameUtils.getBaseName(filePath);
-
             EditText input = findView(dlg, R.id.dialog_default_input_text);
             input.setText(name);
             input.selectAll();
-
             Button yesButton = findView(dlg, R.id.dialog_default_input_button_yes);
             yesButton.setText(android.R.string.ok);
             Button noButton = findView(dlg, R.id.dialog_default_input_button_no);
             noButton.setText(R.string.cancel);
-
             yesButton.setOnClickListener(new ButtonOnClickListener(this, true));
             noButton.setOnClickListener(new ButtonOnClickListener(this, false));
         }

@@ -39,7 +39,11 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
- * IMPORTANT: All subclasses must be public, otherwise the dialogs can't be instantiated by android on rotation
+ * IMPORTANT:
+ *  - All subclasses must be public, otherwise the dialogs can't be instantiated by android on rotation
+ *  - All subclasses must only have an empty constructor. If you feel the need to use a custom constructor
+ *    implement a "newInstance(...)" method that uses the default empty constructor and then set your
+ *    attributes on the object to return.
  * @author gubatron
  * @author aldenml
  * @author marcelinkaaa

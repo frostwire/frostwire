@@ -21,6 +21,8 @@ package com.frostwire.android.gui.fragments;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -75,6 +77,22 @@ public class ImageViewerFragment extends AbstractFragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (outState != null) {
+            outState.putAll(fd.toBundle());
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            fd.fromBundle(savedInstanceState);
+        }
+    }
+
+    @Override
     protected void initComponents(View v) {
         progressBar = findView(v, R.id.fragment_image_viewer_progress_bar);
         preloadImageView = findView(v, R.id.fragment_image_viewer_preload_image);
@@ -95,7 +113,12 @@ public class ImageViewerFragment extends AbstractFragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateData(fd);
+        if (fd != null) {
+            Bundle arguments = getArguments();
+            fd.fromBundle(arguments);
+            updateData(fd);
+        }
+
     }
 
     public void updateData(FileDescriptor fd) {
@@ -104,7 +127,7 @@ public class ImageViewerFragment extends AbstractFragment {
             actionModeCallback = new ImageViewerActionModeCallback(this.fd);
             startActionMode(actionModeCallback);
         }
-
+        actionModeCallback.getActionMode().setTitle(FilenameUtils.getName(fd.filePath));
         Uri fileUri = UIUtils.getFileUri(getActivity(), fd.filePath, false);
         progressBar.setVisibility(View.VISIBLE);
         preloadImageView.setVisibility(View.VISIBLE);
@@ -170,6 +193,10 @@ public class ImageViewerFragment extends AbstractFragment {
 
         public ImageViewerActionModeCallback(FileDescriptor fd) {
             this.fd = fd;
+        }
+
+        public ActionMode getActionMode() {
+            return this.mode;
         }
 
         @Override
@@ -263,6 +290,7 @@ public class ImageViewerFragment extends AbstractFragment {
             String fileExtension = FilenameUtils.getExtension(fd.filePath);
             fd.filePath = fd.filePath.replace(oldFileName, newFileName) + "." + fileExtension;
             mode.setTitle(FilenameUtils.getName(fd.filePath));
+            updateData(fd);
         }
     }
 }

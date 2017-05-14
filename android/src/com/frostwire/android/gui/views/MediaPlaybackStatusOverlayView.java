@@ -32,7 +32,6 @@ import com.frostwire.android.R;
  *         Created on 5/5/17.
  */
 
-
 public class MediaPlaybackStatusOverlayView extends View {
     private MediaPlaybackOverlayPainter mediaPlaybackOverlayPainter;
     private MediaPlaybackOverlayPainter.MediaPlaybackState playbackState;
@@ -60,11 +59,9 @@ public class MediaPlaybackStatusOverlayView extends View {
 
     public void setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState playbackState) {
         this.playbackState = playbackState;
-
         if (mediaPlaybackOverlayPainter != null) {
             mediaPlaybackOverlayPainter.setOverlayState(playbackState);
         }
-
         setVisibility(playbackState != MediaPlaybackOverlayPainter.MediaPlaybackState.NONE ? View.VISIBLE : View.GONE);
         if (playbackState != MediaPlaybackOverlayPainter.MediaPlaybackState.NONE) {
             invalidate();

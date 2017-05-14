@@ -22,10 +22,8 @@ import android.os.Bundle;
 import com.frostwire.android.gui.util.UIUtils;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public class FileDescriptor implements Cloneable {
 
@@ -42,7 +40,6 @@ public class FileDescriptor implements Cloneable {
      * The title of the content.
      */
     public String title;
-
     // only if audio/video media
 
     /**
@@ -59,7 +56,7 @@ public class FileDescriptor implements Cloneable {
      * The year the media file was recorded, if any
      */
     public String year;
-    
+
     public long albumId;
 
     /**
@@ -107,6 +104,9 @@ public class FileDescriptor implements Cloneable {
     }
 
     public void fromBundle(Bundle bundle) {
+        if (bundle == null) {
+            return;
+        }
         id = bundle.getInt("id");
         artist = bundle.getString("artist");
         title = bundle.getString("title");
@@ -131,18 +131,8 @@ public class FileDescriptor implements Cloneable {
         if (o == null || !(o instanceof FileDescriptor)) {
             return false;
         }
-
         FileDescriptor fd = (FileDescriptor) o;
-
-        if (this.id == fd.id && this.fileType == fd.fileType) {
-            return true;
-        }
-
-        if (this.filePath != null && fd.filePath != null && this.filePath.equals(fd.filePath)) {
-            return true;
-        }
-
-        return false;
+        return (this.id == fd.id && this.fileType == fd.fileType) || (this.filePath != null && fd.filePath != null && this.filePath.equals(fd.filePath));
     }
 
     @Override
@@ -150,6 +140,7 @@ public class FileDescriptor implements Cloneable {
         return this.id * 1000 + this.fileType;
     }
 
+    @SuppressWarnings("CloneDoesntCallSuperClone")
     @Override
     public FileDescriptor clone() {
         return new FileDescriptor(id, artist, title, album, year, filePath, fileType, mime, fileSize, dateAdded, dateModified, shared);

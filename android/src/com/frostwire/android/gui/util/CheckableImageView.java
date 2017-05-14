@@ -116,14 +116,11 @@ public final class CheckableImageView<T> extends View implements Checkable {
         }
         backgroundView = (ImageButton) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button);
         backgroundView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
         fileSizeTextView = (TextView) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_item_filesize);
         fileSizeTextView.setVisibility(showFileSize ? View.VISIBLE : View.GONE);
-
         if (playbackStatusOverlayView != null) {
             playbackStatusOverlayView.setPlaybackState(!checked ? overlayState : MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
         }
-
         checkedOverlayView = (FrameLayout) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_overlay_checkmark_framelayout);
     }
 
@@ -131,7 +128,7 @@ public final class CheckableImageView<T> extends View implements Checkable {
         backgroundView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackgroundViewClick(v);
+                onBackgroundViewClick();
             }
         });
         checkedOverlayView.setOnClickListener(new OnClickListener() {
@@ -142,7 +139,7 @@ public final class CheckableImageView<T> extends View implements Checkable {
         });
     }
 
-    private void onBackgroundViewClick(View v) {
+    private void onBackgroundViewClick() {
         if (checkableMode) {
             setChecked(true);
         }
