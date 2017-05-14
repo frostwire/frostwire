@@ -22,6 +22,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        style="@style/divider_line_dark" />
+
+    <include layout="@layout/fragment_browse_peer_tablayout" />
+
     <RadioGroup
         android:id="@+id/fragment_browse_peer_radiogroup_browse_type"
         android:layout_width="match_parent"

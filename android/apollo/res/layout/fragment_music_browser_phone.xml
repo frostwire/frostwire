@@ -28,25 +28,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.viewpagerindicator.TitlePageIndicator
-            android:id="@+id/fragment_home_phone_pager_titles"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/tpi_background"
-            android:textColor="@color/basic_white"
-            android:textSize="@dimen/text_size_micro"
-            app:footerColor="@color/holo_blue_light"
-            app:selectedColor="@color/basic_white"
-            app:footerIndicatorStyle="background"
-            app:footerIndicatorUnderlinePadding="40dp" />
-
         <android.support.v4.view.ViewPager
             android:id="@+id/fragment_home_phone_pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/fragment_home_phone_pager_titles" />
+            android:layout_height="match_parent">
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/fragment_home_phone_pager_tab_layout"
+                style="@style/AppTabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/app_background"
+                app:tabMode="scrollable" />
+
+        </android.support.v4.view.ViewPager>
+
     </RelativeLayout>
 
-    <include layout="@layout/top_shadow" />
+    <View
+        style="@style/divider_line_dark"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
 
 </FrameLayout>

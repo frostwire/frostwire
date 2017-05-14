@@ -26,9 +26,9 @@
     android:orientation="vertical">
 
     <View
-        style="@style/divider_line_dark"
         android:layout_width="match_parent"
-        android:layout_height="1dp" />
+        android:layout_height="1dp"
+        style="@style/divider_line_dark" />
 
     <!-- Dummy item to prevent EditText from receiving focus at startup -->
     <LinearLayout
@@ -49,5 +49,11 @@
         android:layout_marginTop="6dp"
         frostwire:clearable_hint="@string/search_label" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        style="@style/divider_line_dark" />
+
+    <include layout="@layout/view_searchinput_tablayout" />
     <include layout="@layout/view_searchinput_radiogroup" />
 </LinearLayout>
