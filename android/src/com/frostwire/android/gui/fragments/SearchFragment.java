@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -27,7 +26,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -111,25 +109,11 @@ public final class SearchFragment extends AbstractFragment implements
     private ListView list;
     private String currentQuery;
     private final FileTypeCounter fileTypeCounter;
-    private final SparseArray<Byte> toTheRightOf = new SparseArray<>(6);
-    private final SparseArray<Byte> toTheLeftOf = new SparseArray<>(6);
 
     public SearchFragment() {
         super(R.layout.fragment_search);
         fileTypeCounter = new FileTypeCounter();
         currentQuery = null;
-        toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS);
-        toTheRightOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_PICTURES);
-        toTheRightOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_APPLICATIONS);
-        toTheRightOf.put(Constants.FILE_TYPE_APPLICATIONS, Constants.FILE_TYPE_DOCUMENTS);
-        toTheRightOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_TORRENTS);
-        toTheRightOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_AUDIO);
-        toTheLeftOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_TORRENTS);
-        toTheLeftOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_AUDIO);
-        toTheLeftOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_VIDEOS);
-        toTheLeftOf.put(Constants.FILE_TYPE_APPLICATIONS, Constants.FILE_TYPE_PICTURES);
-        toTheLeftOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_APPLICATIONS);
-        toTheLeftOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_DOCUMENTS);
     }
 
     @Override
@@ -200,19 +184,6 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput = findView(view, R.id.fragment_search_input);
         searchInput.setShowKeyboardOnPaste(true);
         searchInput.setOnSearchListener(new SearchInputOnSearchListener((LinearLayout) view, this));
-
-        // Whenever we click on a media type radio button this is triggered.
-        // it is also triggered when we swip to the left or right, as this gesture
-        // is handled by issuing a media type radio button click.
-        searchInput.setOnRadioButtonsListener(new SearchInputView.RadioButtonsListener() {
-            @Override
-            public void onClick(int mediaType) {
-                if (searchProgress.getVisibility() == View.VISIBLE ||
-                    (list != null && list.getFirstVisiblePosition() < 2)) {
-                    onSearchScrollUp();
-                }
-            }
-        });
 
         deepSearchProgress = findView(view, R.id.fragment_search_deepsearch_progress);
         deepSearchProgress.setVisibility(View.GONE);
@@ -358,7 +329,7 @@ public final class SearchFragment extends AbstractFragment implements
         String ytId = extractYTId(query);
         if (ytId != null) {
             searchInput.setText("");
-            searchInput.performClickOnRadioButton(Constants.FILE_TYPE_VIDEOS);
+            searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
             performSearch(ytId, Constants.FILE_TYPE_VIDEOS);
             searchInput.setHint(getActivity().getString(R.string.searching_for) + " youtube:" + ytId);
         }
@@ -572,14 +543,7 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void switchToThe(boolean right) {
-        if (adapter == null) {
-            return;
-        }
-        final byte currentFileType = (byte) adapter.getFileType();
-        if (currentFileType != -1) { // SearchResultListAdapter#NO_FILE_TYPE (refactor this)
-            final byte nextFileType = (right) ? toTheRightOf.get(currentFileType) : toTheLeftOf.get(currentFileType);
-            searchInput.performClickOnRadioButton(nextFileType);
-        }
+        searchInput.switchToThe(right);
     }
 
     private static class SearchInputOnSearchListener implements SearchInputView.OnSearchListener {

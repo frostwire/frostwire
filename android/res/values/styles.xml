@@ -686,4 +686,18 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:backgroundDimEnabled">false</item>
     </style>
+
+    <!-- Music Player View Pager Title -->
+    <style name="AppTabLayout" parent="Widget.Design.TabLayout">
+        <item name="tabBackground">@drawable/tab_background_color_selector</item>
+        <item name="tabTextAppearance">@style/AppTabTextAppearance</item>
+        <item name="tabSelectedTextColor">@color/app_text_white</item>
+        <item name="tabIndicatorColor">@android:color/transparent</item>
+        <item name="tabIndicatorHeight">0dp</item>
+    </style>
+    <style name="AppTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/app_text_white</item>
+        <item name="textAllCaps">true</item>
+    </style>
 </resources>

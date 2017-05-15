@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+* Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+* Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+-->
+<android.support.design.widget.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/view_search_input_tab_layout_file_type"
+    style="@style/AppTabLayout"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    app:tabGravity="fill"
+    app:tabMode="fixed">
+
+    <android.support.design.widget.TabItem
+        android:id="@+id/view_search_input_tab_audio"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_audio_icon_tab_selector" />
+
+    <android.support.design.widget.TabItem
+        android:id="@+id/view_search_input_tab_videos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_video_icon_tab_selector" />
+
+    <android.support.design.widget.TabItem
+        android:id="@+id/view_search_input_tab_pictures"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_picture_icon_tab_selector" />
+
+    <android.support.design.widget.TabItem
+        android:id="@+id/view_search_input_tab_applications"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_application_icon_tab_selector" />
+
+    <android.support.design.widget.TabItem
+        android:id="@+id/view_search_input_tab_documents"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_document_icon_tab_selector" />
+
+    <android.support.design.widget.TabItem
+        android:id="@+id/view_search_input_tab_torrents"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/browse_peer_torrent_icon_tab_selector" />
+</android.support.design.widget.TabLayout>

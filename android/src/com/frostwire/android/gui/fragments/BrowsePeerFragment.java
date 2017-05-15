@@ -26,10 +26,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
-import android.content.res.Resources;
-import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.design.widget.TabLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.SearchView;
@@ -39,13 +38,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Filter;
 import android.widget.GridView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -72,7 +68,6 @@ import com.frostwire.android.gui.adapters.menu.SetAsRingtoneMenuAction;
 import com.frostwire.android.gui.adapters.menu.SetAsWallpaperMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
-import com.frostwire.android.gui.views.FileTypeRadioButtonSelectorFactory;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
@@ -102,7 +97,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private MenuItem checkBoxMenuItem;
     private RelativeLayout selectAllCheckboxContainer;
     private CheckBox selectAllCheckbox;
-    private RadioGroup browseTypeRadioGroup;
+    private TabLayout tabLayout;
     private CompoundButton.OnCheckedChangeListener selectAllCheckboxListener;
     private boolean selectAllModeOn;
     private Peer peer;
@@ -123,9 +118,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             UXAction.LIBRARY_BROWSE_FILE_TYPE_TORRENTS
     };
 
-    private final SparseArray<Byte> toTheRightOf = new SparseArray<>(6);
-    private final SparseArray<Byte> toTheLeftOf = new SparseArray<>(6);
-    private final SparseArray<RadioButton> radioButtonFileTypeMap;
+    private final byte[] tabPositionToFileType = new byte[] {
+            Constants.FILE_TYPE_AUDIO,
+            Constants.FILE_TYPE_RINGTONES,
+            Constants.FILE_TYPE_VIDEOS,
+            Constants.FILE_TYPE_PICTURES,
+            Constants.FILE_TYPE_DOCUMENTS,
+            Constants.FILE_TYPE_TORRENTS };
 
     /**
      * This implements the toolbar's action mode view and its menu
@@ -137,20 +136,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         broadcastReceiver = new LocalBroadcastReceiver();
         setHasOptionsMenu(true);
         this.peer = new Peer();
-        toTheRightOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_RINGTONES);   //0x00 - Audio -> Ringtones
-        toTheRightOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_DOCUMENTS); //0x01 - Pictures -> Documents
-        toTheRightOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_PICTURES);    //0x02 - Videos -> Pictures
-        toTheRightOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_TORRENTS); //0x03 - Documents -> Torrents
-        toTheRightOf.put(Constants.FILE_TYPE_RINGTONES, Constants.FILE_TYPE_VIDEOS);   //0x05 - Ringtones -> Videos
-        toTheRightOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_AUDIO);     //0x06 - Torrents -> Audio
-        toTheLeftOf.put(Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_TORRENTS);     //0x00 - Audio <- Torrents
-        toTheLeftOf.put(Constants.FILE_TYPE_PICTURES, Constants.FILE_TYPE_VIDEOS);    //0x01 - Pictures <- Video
-        toTheLeftOf.put(Constants.FILE_TYPE_VIDEOS, Constants.FILE_TYPE_RINGTONES);   //0x02 - Videos <- Ringtones
-        toTheLeftOf.put(Constants.FILE_TYPE_DOCUMENTS, Constants.FILE_TYPE_PICTURES); //0x03 - Documents <- Pictures
-        toTheLeftOf.put(Constants.FILE_TYPE_RINGTONES, Constants.FILE_TYPE_AUDIO);    //0x05 - Ringtones <- Audio
-        toTheLeftOf.put(Constants.FILE_TYPE_TORRENTS, Constants.FILE_TYPE_DOCUMENTS); //0x06 - Torrents <- Documents
         checkedItemsMap = new SparseArray<>();
-        radioButtonFileTypeMap = new SparseArray<>();  // see initRadioButton(...)
         selectionModeCallback = new MyFilesActionModeCallback();
     }
 
@@ -342,31 +328,28 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 switchToThe(false);
             }
         });
-        browseTypeRadioGroup = findView(v, R.id.fragment_browse_peer_radiogroup_browse_type);
-        initRadioButton(v, R.id.fragment_browse_peer_radio_audio, Constants.FILE_TYPE_AUDIO);
-        initRadioButton(v, R.id.fragment_browse_peer_radio_ringtones, Constants.FILE_TYPE_RINGTONES);
-        initRadioButton(v, R.id.fragment_browse_peer_radio_videos, Constants.FILE_TYPE_VIDEOS);
-        initRadioButton(v, R.id.fragment_browse_peer_radio_pictures, Constants.FILE_TYPE_PICTURES);
-        initRadioButton(v, R.id.fragment_browse_peer_radio_documents, Constants.FILE_TYPE_DOCUMENTS);
-        initRadioButton(v, R.id.fragment_browse_peer_radio_torrents, Constants.FILE_TYPE_TORRENTS);
+
+        tabLayout = findView(v, R.id.fragment_browse_peer_tab_layout_file_type);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                tabClicked(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                tabClicked(tab.getPosition());
+            }
+        });
     }
 
-    private RadioButton initRadioButton(View v, int viewId, final byte fileType) {
-        RadioButton button = findView(v, viewId);
-        button.setButtonDrawable(new StateListDrawable());
-        Resources r = button.getResources();
-        FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory =
-                new FileTypeRadioButtonSelectorFactory(fileType,
-                        r,
-                        FileTypeRadioButtonSelectorFactory.RadioButtonContainerType.BROWSE);
-        fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
-        button.setClickable(true);
-        RadioButtonListener rbListener = new RadioButtonListener(button, fileType, fileTypeRadioButtonSelectorFactory);
-        button.setOnClickListener(rbListener);
-        button.setOnCheckedChangeListener(rbListener);
-        button.setChecked(fileType == Constants.FILE_TYPE_AUDIO);
-        radioButtonFileTypeMap.put(fileType, button);
-        return button;
+    private void tabClicked(int tabPosition) {
+        byte fileType = tabPositionToFileType[tabPosition];
+        browseFilesButtonClick(fileType);
     }
 
     private void browseFilesButtonClick(byte fileType) {
@@ -535,7 +518,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         } else {
             adapter.clearChecked();
         }
-        browseTypeRadioGroup.setVisibility(!selectAllModeOn ? View.VISIBLE : View.GONE);
+        tabLayout.setVisibility(!selectAllModeOn ? View.VISIBLE : View.GONE);
     }
 
     private void autoCheckUnCheckSelectAllCheckbox() {
@@ -622,28 +605,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         return ConfigurationManager.instance().getInt(Constants.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION + fileType);
     }
 
-    private RadioButton getRadioButton(byte fileType) {
-        return radioButtonFileTypeMap.get(fileType);
-    }
-
     private void switchToThe(boolean right) {
-        if (adapter == null) {
-            return;
+        int currentTabPosition = tabLayout.getSelectedTabPosition();
+        int nextTabPosition = (right ? ++currentTabPosition : --currentTabPosition ) % 6;
+        if (nextTabPosition == -1) {
+            nextTabPosition = 5;
         }
-        final byte currentFileType = adapter.getFileType();
-        final byte nextFileType = (right) ? toTheRightOf.get(currentFileType) : toTheLeftOf.get(currentFileType);
-        changeSelectedRadioButton(currentFileType, nextFileType);
-    }
-
-    private void changeSelectedRadioButton(byte currentFileType, byte nextFileType) {
-        // browseFilesButtonClick(currentFileType) isn't enough, it won't update the radio button background.
-        RadioButton currentButton = getRadioButton(currentFileType);
-        RadioButton nextButton = getRadioButton(nextFileType);
-        if (nextButton != null) {
-            currentButton.setChecked(false);
-            nextButton.setChecked(true);
-            nextButton.callOnClick();
-        }
+        tabLayout.getTabAt(nextTabPosition).select();
     }
 
     private class MyFilesActionModeCallback implements android.support.v7.view.ActionMode.Callback {
@@ -809,34 +777,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
         }
     }
-
-    private final class RadioButtonListener implements OnClickListener, CompoundButton.OnCheckedChangeListener {
-        private final RadioButton button;
-        private final byte fileType;
-        private final FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory;
-
-        RadioButtonListener(RadioButton button,
-                            byte fileType,
-                            FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory) {
-            this.button = button;
-            this.fileType = fileType;
-            this.fileTypeRadioButtonSelectorFactory = fileTypeRadioButtonSelectorFactory;
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (button.isChecked()) {
-                browseFilesButtonClick(fileType);
-            }
-            fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
-        }
-
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
-        }
-    }
-
 
     private final class LocalBroadcastReceiver extends BroadcastReceiver {
         @Override

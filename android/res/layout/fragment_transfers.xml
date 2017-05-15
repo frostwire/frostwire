@@ -56,6 +56,8 @@
             frostwire:clearable_hint="@string/add_transfer_label" />
     </LinearLayout>
 
+    <include layout="@layout/fragment_transfers_tablayout" />
+
     <RadioGroup
         android:id="@+id/fragment_transfers_buttons"
         android:layout_width="match_parent"
