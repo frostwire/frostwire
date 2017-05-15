@@ -21,6 +21,7 @@ package com.frostwire.android.gui.views;
 import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -34,9 +35,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
 import com.frostwire.util.Ref;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author gubatron
  * @author aldenml
@@ -49,10 +47,8 @@ public class SearchInputView extends LinearLayout {
     private View dummyFocusView;
     private OnSearchListener onSearchListener;
     private int mediaTypeId;
-    private TabLayout.OnTabSelectedListener tabSelectedListener;
-    private OnTabsListener onTabsListener;
     private TabLayout tabLayout;
-    private final Map<Byte, FileTypeTab> toFileTypeTab = new HashMap<>();
+    private final SparseArray<FileTypeTab> toFileTypeTab;
 
     private enum FileTypeTab {
         TAB_AUDIO(Constants.FILE_TYPE_AUDIO, 0),
@@ -80,6 +76,7 @@ public class SearchInputView extends LinearLayout {
         super(context, set);
         this.textInputListener = new TextInputClickListener(this);
         this.adapter = new SuggestionsAdapter(context);
+        toFileTypeTab = new SparseArray<>();
         toFileTypeTab.put(Constants.FILE_TYPE_AUDIO, FileTypeTab.TAB_AUDIO);
         toFileTypeTab.put(Constants.FILE_TYPE_VIDEOS, FileTypeTab.TAB_VIDEOS);
         toFileTypeTab.put(Constants.FILE_TYPE_PICTURES, FileTypeTab.TAB_PICTURES);
@@ -120,10 +117,6 @@ public class SearchInputView extends LinearLayout {
         textInput.setVisibility(View.GONE);
     }
 
-    public void setOnTabsListener(OnTabsListener listener) {
-        onTabsListener = listener;
-    }
-
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -147,7 +140,7 @@ public class SearchInputView extends LinearLayout {
         updateHint(mediaTypeId);
 
         tabLayout = (TabLayout) findViewById(R.id.view_search_input_tab_layout_file_type);
-        tabSelectedListener = new TabLayout.OnTabSelectedListener() {
+        TabLayout.OnTabSelectedListener tabSelectedListener = new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 tabItemFileTypeClick(FileTypeTab.at(tab.getPosition()).fileType);
@@ -208,6 +201,7 @@ public class SearchInputView extends LinearLayout {
     }
 
     private void updateHint(int fileType) {
+        // TODO: random search hint based on fileType
         final String searchFiles = getContext().getString(R.string.search_label) + " " + getContext().getString(R.string.files);
         final String orEnterYTorSCUrl = getContext().getString(R.string.or_enter_url);
         textInput.setHint(searchFiles + " " + orEnterYTorSCUrl);
@@ -215,6 +209,15 @@ public class SearchInputView extends LinearLayout {
 
     public void selectTabByMediaType(final byte mediaTypeId) {
         tabLayout.getTabAt(toFileTypeTab.get(mediaTypeId).position).select();
+    }
+
+    public void switchToThe(boolean right) {
+        int currentTabPosition = tabLayout.getSelectedTabPosition();
+        int nextTabPosition = (right ? ++currentTabPosition : --currentTabPosition ) % 6;
+        if (nextTabPosition == -1) {
+            nextTabPosition = 5;
+        }
+        tabLayout.getTabAt(nextTabPosition).select();
     }
 
     private void tabItemFileTypeClick(final int fileType) {
@@ -280,9 +283,5 @@ public class SearchInputView extends LinearLayout {
                 ownerRef.get().onClear();
             }
         }
-    }
-
-    public interface OnTabsListener {
-        void onClick(int mediaType);
     }
 }
