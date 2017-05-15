@@ -29,45 +29,6 @@
 
     <include layout="@layout/fragment_browse_peer_tablayout" />
 
-    <RadioGroup
-        android:id="@+id/fragment_browse_peer_radiogroup_browse_type"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/app_background_dark"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/fragment_browse_peer_radio_audio"
-            style="@style/BrowseFileTypeButton"
-            android:button="@drawable/browse_peer_audio_icon_selector_off" />
-
-        <RadioButton
-            android:id="@+id/fragment_browse_peer_radio_ringtones"
-            style="@style/BrowseFileTypeButton"
-            android:button="@drawable/browse_peer_ringtone_icon_selector_off" />
-
-        <RadioButton
-            android:id="@+id/fragment_browse_peer_radio_videos"
-            style="@style/BrowseFileTypeButton"
-            android:button="@drawable/browse_peer_video_icon_selector_off" />
-
-        <RadioButton
-            android:id="@+id/fragment_browse_peer_radio_pictures"
-            style="@style/BrowseFileTypeButton"
-            android:button="@drawable/browse_peer_picture_icon_selector_off" />
-
-        <RadioButton
-            android:id="@+id/fragment_browse_peer_radio_documents"
-            style="@style/BrowseFileTypeButton"
-            android:button="@drawable/browse_peer_document_icon_selector_off" />
-
-        <RadioButton
-            android:id="@+id/fragment_browse_peer_radio_torrents"
-            style="@style/BrowseFileTypeButton"
-            android:button="@drawable/browse_peer_torrent_icon_selector_off" />
-
-    </RadioGroup>
-
     <!-- Checkbox and Search Box for Browse Peer, see view_browse_peer_search_bar.xml -->
     <RelativeLayout
         android:id="@+id/fragment_browse_peer_select_all_container"

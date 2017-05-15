@@ -19,23 +19,20 @@
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.drawable.StateListDrawable;
 import android.support.design.widget.TabLayout;
 import android.util.AttributeSet;
-import android.util.SparseIntArray;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
 import com.frostwire.util.Ref;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +52,6 @@ public class SearchInputView extends LinearLayout {
     private TabLayout.OnTabSelectedListener tabSelectedListener;
     private OnTabsListener onTabsListener;
     private TabLayout tabLayout;
-    private final SparseIntArray mediaTypeToRadioButtonMap;
     private final Map<Byte, FileTypeTab> toFileTypeTab = new HashMap<>();
 
     private enum FileTypeTab {
@@ -84,7 +80,6 @@ public class SearchInputView extends LinearLayout {
         super(context, set);
         this.textInputListener = new TextInputClickListener(this);
         this.adapter = new SuggestionsAdapter(context);
-        mediaTypeToRadioButtonMap = new SparseIntArray(6);
         toFileTypeTab.put(Constants.FILE_TYPE_AUDIO, FileTypeTab.TAB_AUDIO);
         toFileTypeTab.put(Constants.FILE_TYPE_VIDEOS, FileTypeTab.TAB_VIDEOS);
         toFileTypeTab.put(Constants.FILE_TYPE_PICTURES, FileTypeTab.TAB_PICTURES);
@@ -170,14 +165,6 @@ public class SearchInputView extends LinearLayout {
         };
         tabLayout.addOnTabSelectedListener(tabSelectedListener);
         tabItemFileTypeClick(mediaTypeId);
-
-        initRadioButton(R.id.view_search_input_radio_audio, Constants.FILE_TYPE_AUDIO);
-        initRadioButton(R.id.view_search_input_radio_videos, Constants.FILE_TYPE_VIDEOS);
-        initRadioButton(R.id.view_search_input_radio_pictures, Constants.FILE_TYPE_PICTURES);
-        initRadioButton(R.id.view_search_input_radio_applications, Constants.FILE_TYPE_APPLICATIONS);
-        initRadioButton(R.id.view_search_input_radio_documents, Constants.FILE_TYPE_DOCUMENTS);
-        initRadioButton(R.id.view_search_input_radio_torrents, Constants.FILE_TYPE_TORRENTS);
-
         setFileTypeCountersVisible(false);
 
         dummyFocusView = findViewById(R.id.view_search_input_linearlayout_dummy);
@@ -226,35 +213,6 @@ public class SearchInputView extends LinearLayout {
         textInput.setHint(searchFiles + " " + orEnterYTorSCUrl);
     }
 
-    private RadioButton initRadioButton(int viewId, final byte fileType) {
-        mediaTypeToRadioButtonMap.put(fileType, viewId);
-        final RadioButton button = (RadioButton) findViewById(viewId);
-        button.setButtonDrawable(new StateListDrawable());
-        final Resources r = getResources();
-        final FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory =
-                new FileTypeRadioButtonSelectorFactory(fileType,
-                        r,
-                        FileTypeRadioButtonSelectorFactory.RadioButtonContainerType.SEARCH);
-        fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
-        button.setOnClickListener(new RadioButtonListener(this, fileType, button, fileTypeRadioButtonSelectorFactory));
-        button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
-            }
-        });
-
-        if (mediaTypeId == fileType) {
-            button.setChecked(true);
-        }
-        return button;
-    }
-    
-    public void performClickOnRadioButton(final int mediaTypeId) {
-        int viewId = mediaTypeToRadioButtonMap.get(mediaTypeId);
-        final RadioButton button = (RadioButton) findViewById(viewId);
-        button.performClick();
-    }
-
     public void selectTabByMediaType(final byte mediaTypeId) {
         tabLayout.getTabAt(toFileTypeTab.get(mediaTypeId).position).select();
     }
@@ -266,17 +224,6 @@ public class SearchInputView extends LinearLayout {
         ConfigurationManager.instance().setLastMediaTypeFilter(fileType);
     }
 
-    private void radioButtonFileTypeClick(final int mediaTypeId) {
-        updateHint(mediaTypeId);
-        onMediaTypeSelected(mediaTypeId);
-        SearchInputView.this.mediaTypeId = mediaTypeId;
-        ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId);
-
-        if (onTabsListener != null) {
-            onTabsListener.onClick(mediaTypeId);
-        }
-    }
-
     public interface OnSearchListener {
         void onSearch(View v, String query, int mediaTypeId);
         void onMediaTypeSelected(View v, int mediaTypeId);
@@ -285,33 +232,10 @@ public class SearchInputView extends LinearLayout {
 
     public void updateFileTypeCounter(byte fileType, int numFiles) {
         try {
-            int radioId = Constants.FILE_TYPE_AUDIO;
-            switch (fileType) {
-                case Constants.FILE_TYPE_AUDIO:
-                    radioId = R.id.view_search_input_radio_audio;
-                    break;
-                case Constants.FILE_TYPE_VIDEOS:
-                    radioId = R.id.view_search_input_radio_videos;
-                    break;
-                case Constants.FILE_TYPE_PICTURES:
-                    radioId = R.id.view_search_input_radio_pictures;
-                    break;
-                case Constants.FILE_TYPE_APPLICATIONS:
-                    radioId = R.id.view_search_input_radio_applications;
-                    break;
-                case Constants.FILE_TYPE_DOCUMENTS:
-                    radioId = R.id.view_search_input_radio_documents;
-                    break;
-                case Constants.FILE_TYPE_TORRENTS:
-                    radioId = R.id.view_search_input_radio_torrents;
-                    break;
-            }
-            RadioButton rButton = (RadioButton) findViewById(radioId);
             String numFilesStr = String.valueOf(numFiles);
             if (numFiles > 9999) {
                 numFilesStr = "+1k";
             }
-            rButton.setText(numFilesStr);
             tabLayout.getTabAt(toFileTypeTab.get(fileType).position).setText(numFilesStr);
         } catch (Throwable e) {
             // NPE
@@ -319,9 +243,6 @@ public class SearchInputView extends LinearLayout {
     }
 
     public void setFileTypeCountersVisible(boolean fileTypeCountersVisible) {
-        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.view_search_input_radiogroup_file_type);
-        radioGroup.setVisibility(fileTypeCountersVisible ? View.VISIBLE : View.GONE);
-
         TabLayout tabLayout = (TabLayout) findViewById(R.id.view_search_input_tab_layout_file_type);
         tabLayout.setVisibility(fileTypeCountersVisible ? View.VISIBLE : View.GONE);
     }
@@ -358,30 +279,6 @@ public class SearchInputView extends LinearLayout {
             if (Ref.alive(ownerRef)) {
                 ownerRef.get().onClear();
             }
-        }
-    }
-
-    private static final class RadioButtonListener extends ClickAdapter<SearchInputView> {
-
-        private final byte fileType;
-        private final RadioButton button;
-        private final FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory;
-
-        public RadioButtonListener(SearchInputView owner,
-                                   byte fileType,
-                                   RadioButton button,
-                                   FileTypeRadioButtonSelectorFactory fileTypeRadioButtonSelectorFactory) {
-            super(owner);
-            this.fileType = fileType;
-            this.button = button;
-            this.fileTypeRadioButtonSelectorFactory = fileTypeRadioButtonSelectorFactory;
-        }
-
-        @Override
-        public void onClick(SearchInputView owner, View v) {
-            fileTypeRadioButtonSelectorFactory.updateButtonBackground(button);
-            owner.radioButtonFileTypeClick(fileType);
-            UXStats.instance().log(UXAction.SEARCH_RESULT_FILE_TYPE_CLICK);
         }
     }
 

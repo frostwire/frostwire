@@ -361,7 +361,6 @@ public final class SearchFragment extends AbstractFragment implements
         String ytId = extractYTId(query);
         if (ytId != null) {
             searchInput.setText("");
-            searchInput.performClickOnRadioButton(Constants.FILE_TYPE_VIDEOS);
             searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
             performSearch(ytId, Constants.FILE_TYPE_VIDEOS);
             searchInput.setHint(getActivity().getString(R.string.searching_for) + " youtube:" + ytId);
@@ -582,7 +581,6 @@ public final class SearchFragment extends AbstractFragment implements
         final byte currentFileType = (byte) adapter.getFileType();
         if (currentFileType != -1) { // SearchResultListAdapter#NO_FILE_TYPE (refactor this)
             final byte nextFileType = (right) ? toTheRightOf.get(currentFileType) : toTheLeftOf.get(currentFileType);
-            searchInput.performClickOnRadioButton(nextFileType);
             searchInput.selectTabByMediaType(nextFileType);
         }
     }

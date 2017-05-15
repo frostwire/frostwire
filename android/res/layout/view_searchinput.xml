@@ -55,5 +55,4 @@
         style="@style/divider_line_dark" />
 
     <include layout="@layout/view_searchinput_tablayout" />
-    <include layout="@layout/view_searchinput_radiogroup" />
 </LinearLayout>
