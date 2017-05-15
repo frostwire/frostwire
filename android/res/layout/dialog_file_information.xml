@@ -20,24 +20,21 @@
  */
 -->
 <!-- See FileInformationAction.java -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/app_background_white"
     android:clickable="true"
-    android:orientation="vertical"
-    android:padding="0dp">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/dialog_file_information_title"
         style="@style/DefaultDialogTheme.TitleBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/file_information"/>
+        android:text="@string/file_information" />
 
-    <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -46,109 +43,89 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <TextView
+                android:id="@+id/dialog_file_information_title_file_name"
+                style="@style/DefaultDialogTheme.SmallTextMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/name" />
+
+            <TextView
+                android:id="@+id/dialog_file_information_filename"
+                style="@style/DefaultDialogTheme.MainText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="18dp"
+                android:text="[file name goes here]" />
 
             <LinearLayout
+                android:id="@+id/dialog_file_information_size_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:paddingTop="30dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:text="@string/name"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:id="@+id/dialog_file_information_filename"
-                    style="@style/DefaultDialogTheme.MainText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="10dp"
-                    android:text="[file name goes here]"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:paddingTop="30dp"
-                android:weightSum="1.0">
+                android:layout_marginBottom="18dp"
+                android:orientation="horizontal">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".5"
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/dialog_file_information_title_file_size"
+                        style="@style/DefaultDialogTheme.SmallTextMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/size"
-                        android:textStyle="bold"/>
+                        android:text="@string/size" />
 
                     <TextView
                         android:id="@+id/dialog_file_information_filesize"
                         style="@style/DefaultDialogTheme.MainText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingTop="10dp"
-                        android:text="[file size goes here]"/>
+                        android:text="[file size goes here]" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".5"
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/dialog_file_information_title_file_date"
+                        style="@style/DefaultDialogTheme.SmallTextMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/date"
-                        android:textStyle="bold"/>
+                        android:text="@string/date" />
 
                     <TextView
                         android:id="@+id/dialog_file_information_date_created"
                         style="@style/DefaultDialogTheme.MainText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingTop="10dp"
-                        android:text="[date taken goes here]"
-                        />
+                        android:text="[date taken goes here]" />
                 </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/dialog_file_information_title_file_storage_path"
+                style="@style/DefaultDialogTheme.SmallTextMedium"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="30dp"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:paddingTop="30dp">
+                android:maxLines="1"
+                android:text="@string/storage_path" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:text="@string/storage_path"
-                    android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/dialog_file_information_storage_path"
+                style="@style/DefaultDialogTheme.MainText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="[file path goes here]" />
 
-                <TextView
-                    android:id="@+id/dialog_file_information_storage_path"
-                    style="@style/DefaultDialogTheme.MainText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="10dp"
-                    android:text="[file path goes here]"/>
-            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
@@ -159,17 +136,15 @@
         android:background="@color/basic_gray_medium"
         android:orientation="horizontal"
         android:paddingBottom="1dp"
-        android:paddingTop="1dp"
-        android:weightSum="1.0">
+        android:paddingTop="1dp">
 
         <Button
             android:id="@+id/dialog_file_information_button_ok"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="1dp"
-            android:layout_weight="0.5"
             android:background="@color/app_background_white"
-            android:text="@string/dismiss"/>
+            android:text="@string/dismiss" />
     </LinearLayout>
 
 </LinearLayout>
