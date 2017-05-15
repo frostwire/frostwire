@@ -61,6 +61,8 @@ public class KeywordTagView extends LinearLayout {
             keywordFilter = new KeywordFilter(inclusive, keyword);
             attributes.recycle();
         }
+        setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        setVisibility(View.VISIBLE);
     }
 
     public KeywordTagView(Context context, KeywordFilter keywordFilter, int count, boolean dismissable, KeywordTagViewListener listener) {
@@ -69,6 +71,7 @@ public class KeywordTagView extends LinearLayout {
         this.count = count;
         this.dismissable = dismissable;
         this.listener = listener;
+        onFinishInflate();
     }
 
     @Override

@@ -799,7 +799,9 @@ public final class SearchFragment extends AbstractFragment implements
             keywordFilterDrawerView.setKeywordFiltersPipelineListener(this);
             drawerLayout.openDrawer(keywordFilterDrawerView);
             KeywordDetector keywordDetector = keywordDetectors.get(adapter.getFileType());
-            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
+            if (keywordDetector != null) {
+                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
+            }
         }
 
         @Override
