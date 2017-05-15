@@ -297,7 +297,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     @Override
-    protected void initComponents(View v) {
+    protected void initComponents(View v, Bundle savedInstanceState) {
         initStorageRelatedRichNotifications(v);
         tabLayout = findView(v, R.id.fragment_transfers_layout_tab_layout);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

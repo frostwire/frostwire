@@ -292,7 +292,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     @Override
-    protected void initComponents(View v) {
+    protected void initComponents(View v, Bundle savedInstanceState) {
         findView(v, R.id.fragment_browse_peer_select_all_container).setVisibility(View.GONE);
         findView(v, R.id.progressContainer).setVisibility(View.GONE);
         selectAllCheckboxListener = new CompoundButton.OnCheckedChangeListener() {

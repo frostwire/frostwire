@@ -47,7 +47,7 @@ public abstract class AbstractFragment extends Fragment {
         View rootView = inflater.inflate(layoutResId, container, false);
 
         if (!rootView.isInEditMode()) {
-            initComponents(rootView);
+            initComponents(rootView, savedInstanceState);
         }
 
         return rootView;
@@ -78,7 +78,8 @@ public abstract class AbstractFragment extends Fragment {
         ((AppCompatActivity) activity).startSupportActionMode(callback);
     }
 
-    protected void initComponents(View rootView) {
+    @SuppressWarnings("UnusedParameters")
+    protected void initComponents(View rootView, Bundle savedInstanceState) {
     }
 
     @SuppressWarnings("unchecked")

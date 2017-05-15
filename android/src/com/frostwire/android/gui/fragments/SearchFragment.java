@@ -180,7 +180,7 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     @Override
-    protected void initComponents(final View view) {
+    protected void initComponents(final View view, Bundle savedInstanceState) {
         searchInput = findView(view, R.id.fragment_search_input);
         searchInput.setShowKeyboardOnPaste(true);
         searchInput.setOnSearchListener(new SearchInputOnSearchListener((LinearLayout) view, this));

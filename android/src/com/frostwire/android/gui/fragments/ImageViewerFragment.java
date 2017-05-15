@@ -95,7 +95,7 @@ public final class ImageViewerFragment extends AbstractFragment {
     }
 
     @Override
-    protected void initComponents(View v) {
+    protected void initComponents(View v, Bundle savedInstanceState) {
         progressBar = findView(v, R.id.fragment_image_viewer_progress_bar);
         preloadImageView = findView(v, R.id.fragment_image_viewer_preload_image);
         imageView = findView(v, R.id.fragment_image_viewer_image);

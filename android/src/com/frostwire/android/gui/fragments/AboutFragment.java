@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.fragments;
 
 import android.os.Build;
+import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
@@ -49,7 +50,7 @@ public final class AboutFragment extends AbstractFragment {
     }
 
     @Override
-    protected void initComponents(View rootView) {
+    protected void initComponents(View rootView, Bundle savedInstanceState) {
 
         //Title, build number and changelog setup
         TextView title = findView(rootView, R.id.fragment_about_title);
