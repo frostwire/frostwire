@@ -40,7 +40,7 @@ public class MediaPlaybackStatusOverlayView extends View {
     public MediaPlaybackStatusOverlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.MediaPlaybackStatusOverlayView, 0, 0);
-        circleStrokeWidth = attributes.getInteger(R.styleable.MediaPlaybackStatusOverlayView_circleStrokeWidth, 5);
+        circleStrokeWidth = attributes.getInteger(R.styleable.MediaPlaybackStatusOverlayView_circleStrokeWidth, 8);
         attributes.recycle();
     }
 
