@@ -157,14 +157,14 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         flowLayout.removeAllViews();
         for (KeywordFilter filter : keywordFiltersPipeline) {
             int keywordCount = getKeywordCount(filter.getKeyword());
-            //KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, keywordCount, true, this);
-            //flowLayout.addView(keywordTagView, 50, 30);
-            TextView textView = new TextView(getContext());
-            textView.setBackgroundColor(Color.BLACK);
-            textView.setTextColor(Color.WHITE);
-            textView.setVisibility(View.VISIBLE);
-            textView.setText(filter.getKeyword() + " (" + keywordCount + ")");
-            flowLayout.addView(textView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, keywordCount, true, this);
+            flowLayout.addView(keywordTagView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+//            TextView textView = new TextView(getContext());
+//            textView.setBackgroundColor(Color.BLACK);
+//            textView.setTextColor(Color.WHITE);
+//            textView.setVisibility(View.VISIBLE);
+//            textView.setText(filter.getKeyword() + " (" + keywordCount + ")");
+//            flowLayout.addView(textView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         }
         this.keywordFiltersPipeline = keywordFiltersPipeline;
     }
