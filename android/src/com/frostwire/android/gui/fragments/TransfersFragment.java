@@ -25,13 +25,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceActivity;
+import android.support.design.widget.TabLayout;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ExpandableListView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
@@ -53,16 +57,31 @@ import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
-import com.frostwire.android.gui.views.*;
+import com.frostwire.android.gui.views.AbstractFragment;
+import com.frostwire.android.gui.views.ClearableEditTextView;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
+import com.frostwire.android.gui.views.ClickAdapter;
+import com.frostwire.android.gui.views.RichNotification;
+import com.frostwire.android.gui.views.SwipeLayout;
+import com.frostwire.android.gui.views.TimerObserver;
+import com.frostwire.android.gui.views.TimerService;
+import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.transfers.*;
+import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.transfers.HttpDownload;
+import com.frostwire.transfers.SoundcloudDownload;
+import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -74,9 +93,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private final Comparator<Transfer> transferComparator;
     private final ButtonAddTransferListener buttonAddTransferListener;
     private final ButtonMenuListener buttonMenuListener;
-    private Button buttonSelectAll;
-    private Button buttonSelectDownloading;
-    private Button buttonSelectCompleted;
+    private final TransferStatus[] tabPositionToTransferStatus;
+    private TabLayout tabLayout;
     private ExpandableListView list;
     private TextView textDHTPeers;
     private TextView textDownloads;
@@ -101,6 +119,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         this.buttonMenuListener = new ButtonMenuListener(this);
         selectedStatus = TransferStatus.ALL;
         vpnRichToastHandler = new Handler();
+        tabPositionToTransferStatus = new TransferStatus[]{TransferStatus.ALL, TransferStatus.DOWNLOADING, TransferStatus.COMPLETED};
     }
 
     @Override
@@ -158,15 +177,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         } else if (this.getActivity() != null) {
             setupAdapter();
         }
-
         //  format strings
         String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
         String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
-
         // number of uploads (seeding) and downloads
         int downloads = TransferManager.instance().getActiveDownloads();
         int uploads = TransferManager.instance().getActiveUploads();
-
         onCheckDHT();
         updateStatusBar(sDown, sUp, downloads, uploads);
         updateButtonMenuVisibility();
@@ -180,13 +196,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
         boolean wasActiveBefore = isVPNactive && !vpnActive;
-
         isVPNactive = vpnActive;
         final ImageView view = findView(getView(), R.id.fragment_transfers_status_vpn_icon);
         if (view != null) {
             view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
         }
-
         if (wasActiveBefore) {
             showVPNRichToast();
         }
@@ -196,22 +210,18 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (textDHTPeers == null || !TransfersFragment.this.isAdded()) {
             return;
         }
-
         textDHTPeers.setVisibility(View.VISIBLE);
         showTorrentSettingsOnClick = true;
-
         // No Internet
         if (NetworkManager.instance().isInternetDown()) {
             textDHTPeers.setText(R.string.check_internet_connection);
             return;
         }
-
         // Saving Data on Mobile
         if (TransferManager.instance().isMobileAndDataSavingsOn()) {
             textDHTPeers.setText(R.string.bittorrent_off_data_saver_on);
             return;
         }
-
         // BitTorrent Turned off
         if (Engine.instance().isStopped() || Engine.instance().isDisconnected()) {
             // takes you to main settings screen so you can turn it back on.
@@ -219,16 +229,13 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             textDHTPeers.setText(R.string.bittorrent_off);
             return;
         }
-
         boolean dhtEnabled = BTEngine.getInstance().isDhtRunning();
         long dhtPeers = BTEngine.getInstance().stats().dhtNodes();
-
         // No DHT
         if (!dhtEnabled) {
             textDHTPeers.setVisibility(View.INVISIBLE);
             return;
         }
-
         // DHT On.
         textDHTPeers.setText(dhtPeers + " " + TransfersFragment.this.getString(R.string.dht_contacts));
     }
@@ -236,19 +243,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public View getHeader(Activity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
-
         View header = inflater.inflate(R.layout.view_transfers_header, null, false);
-
         TextView text = findView(header, R.id.view_transfers_header_text_title);
         text.setText(R.string.transfers);
-
         buttonMenu = findView(header, R.id.view_transfers_header_button_menu);
         buttonMenu.setOnClickListener(buttonMenuListener);
         updateButtonMenuVisibility();
-
         ImageButton buttonAddTransfer = findView(header, R.id.view_transfers_header_button_add_transfer);
         buttonAddTransfer.setOnClickListener(buttonAddTransferListener);
-
         return header;
     }
 
@@ -260,37 +262,17 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
 
     public void selectStatusTabToThe(boolean right) {
-        final TransferStatus[] allStatusesArray = TransferStatus.getAllStatusesArray();
-        int currentStatusIndex = -1;
-        for (int i = 0; i < allStatusesArray.length; i++) {
-            if (selectedStatus == allStatusesArray[i]) {
-                currentStatusIndex = i;
-                break;
-            }
+        int currentTabPosition = tabLayout.getSelectedTabPosition();
+        int nextTabPosition = (right ? ++currentTabPosition : --currentTabPosition) % tabPositionToTransferStatus.length;
+        if (nextTabPosition == -1) {
+            nextTabPosition = tabPositionToTransferStatus.length - 1;
         }
-        if (currentStatusIndex != -1) {
-            int increment = (right) ? 1 : -1;
-            currentStatusIndex = (currentStatusIndex + increment) % allStatusesArray.length;
-            if (currentStatusIndex < 0) {
-                currentStatusIndex = allStatusesArray.length - 1;
-            }
-            selectStatusTab(allStatusesArray[currentStatusIndex]);
-        }
+        tabLayout.getTabAt(nextTabPosition).select();
     }
 
     public void selectStatusTab(TransferStatus status) {
         selectedStatus = status;
-        switch (selectedStatus) {
-            case ALL:
-                buttonSelectAll.performClick();
-                break;
-            case DOWNLOADING:
-                buttonSelectDownloading.performClick();
-                break;
-            case COMPLETED:
-                buttonSelectCompleted.performClick();
-                break;
-        }
+        onTime();
     }
 
     @Override
@@ -317,16 +299,22 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     protected void initComponents(View v) {
         initStorageRelatedRichNotifications(v);
+        tabLayout = findView(v, R.id.fragment_transfers_layout_tab_layout);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                selectStatusTab(tabPositionToTransferStatus[tab.getPosition()]);
+            }
 
-        buttonSelectAll = findView(v, R.id.fragment_transfers_button_select_all);
-        buttonSelectAll.setOnClickListener(new ButtonTabListener(this, TransferStatus.ALL));
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
 
-        buttonSelectDownloading = findView(v, R.id.fragment_transfers_button_select_downloading);
-        buttonSelectDownloading.setOnClickListener(new ButtonTabListener(this, TransferStatus.DOWNLOADING));
-
-        buttonSelectCompleted = findView(v, R.id.fragment_transfers_button_select_completed);
-        buttonSelectCompleted.setOnClickListener(new ButtonTabListener(this, TransferStatus.COMPLETED));
-
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                selectStatusTab(tabPositionToTransferStatus[tab.getPosition()]);
+            }
+        });
         list = findView(v, R.id.fragment_transfers_list);
         SwipeLayout swipe = findView(v, R.id.fragment_transfers_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
@@ -340,7 +328,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 selectStatusTabToThe(false);
             }
         });
-
         textDHTPeers = findView(v, R.id.fragment_transfers_dht_peers);
         textDHTPeers.setVisibility(View.INVISIBLE);
         textDHTPeers.setOnClickListener(new View.OnClickListener() {
@@ -357,7 +344,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         });
         textDownloads = findView(v, R.id.fragment_transfers_text_downloads);
         textUploads = findView(v, R.id.fragment_transfers_text_uploads);
-
         vpnRichToast = findView(v, R.id.fragment_transfers_vpn_notification);
         vpnRichToast.setVisibility(View.GONE);
         vpnRichToast.setOnClickListener(new View.OnClickListener() {
@@ -392,14 +378,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
         RichNotification sdCardNotification = findView(v, R.id.fragment_transfers_sd_card_notification);
         sdCardNotification.setVisibility(View.GONE);
-
         RichNotification internalMemoryNotification = findView(v, R.id.fragment_transfers_internal_memory_notification);
         internalMemoryNotification.setVisibility(View.GONE);
-
         if (TransferManager.isUsingSDCardPrivateStorage() && !sdCardNotification.wasDismissed()) {
             String currentPath = ConfigurationManager.instance().getStoragePath();
             boolean inPrivateFolder = currentPath.contains("Android/data");
-
             if (inPrivateFolder) {
                 sdCardNotification.setVisibility(View.VISIBLE);
                 sdCardNotification.setOnClickListener(new View.OnClickListener() {
@@ -410,7 +393,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 });
             }
         }
-
         //if you do have an SD Card mounted and you're using internal memory, we'll let you know
         //that you now can use the SD Card. We'll keep this for a few releases.
         File sdCardDir = getBiggestSDCardDir(getActivity());
@@ -439,7 +421,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private List<Transfer> filter(List<Transfer> transfers, TransferStatus status) {
         Iterator<Transfer> it;
-
         switch (status) { // replace this filter by a more functional style
             case DOWNLOADING:
                 it = transfers.iterator();
@@ -501,24 +482,19 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         MenuItem clear = new MenuItem(CLEAR_MENU_DIALOG_ID, R.string.transfers_context_menu_clear_finished, R.drawable.contextmenu_icon_remove_transfer);
         MenuItem pause = new MenuItem(PAUSE_MENU_DIALOG_ID, R.string.transfers_context_menu_pause_stop_all_transfers, R.drawable.contextmenu_icon_pause_transfer);
         MenuItem resume = new MenuItem(RESUME_MENU_DIALOG_ID, R.string.transfers_context_resume_all_torrent_transfers, R.drawable.contextmenu_icon_play);
-
         List<MenuItem> dlgActions = new ArrayList<>();
-
         TransferManager tm = TransferManager.instance();
         boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
         final List<Transfer> transfers = tm.getTransfers();
-
         if (transfers != null && transfers.size() > 0) {
             if (someTransfersComplete(transfers)) {
                 dlgActions.add(clear);
             }
-
             if (!bittorrentDisconnected) {
                 if (someTransfersActive(transfers)) {
                     dlgActions.add(pause);
                 }
             }
-
             //let's show it even if bittorrent is disconnected
             //user should get a message telling them to check why they can't resume.
             //Preferences > Connectivity is disconnected.
@@ -526,7 +502,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 dlgActions.add(resume);
             }
         }
-
         if (dlgActions.size() > 0) {
             MenuDialog dlg = MenuDialog.newInstance(TRANSFERS_DIALOG_ID, dlgActions);
             dlg.show(getFragmentManager());
@@ -641,16 +616,13 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             Item itemAt = primaryClip.getItemAt(0);
             try {
                 CharSequence charSequence = itemAt.getText();
-
                 if (charSequence != null) {
                     String text;
-
                     if (charSequence instanceof String) {
                         text = (String) charSequence;
                     } else {
                         text = charSequence.toString();
                     }
-
                     if (!StringUtils.isNullOrEmpty(text)) {
                         if (text.startsWith("http")) {
                             addTransferUrlTextView.setText(text.trim());
@@ -704,11 +676,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 return null;
             }
             String primaryPath = externalFilesDir.getParent();
-
             long biggestBytesAvailable = -1;
-
             File result = null;
-
             for (File f : com.frostwire.android.util.SystemUtils.getExternalFilesDirs(context)) {
                 if (!f.getAbsolutePath().startsWith(primaryPath)) {
                     long bytesAvailable = com.frostwire.android.util.SystemUtils.getAvailableStorageSize(f);
@@ -725,7 +694,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             // the context could be null due to a UI bad logic or context.getExternalFilesDir(null) could be null
             LOG.error("Error getting the biggest SD card", e);
         }
-
         return null;
     }
 
@@ -742,15 +710,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     public enum TransferStatus {
         ALL, DOWNLOADING, COMPLETED;
-
-        private static TransferStatus[] STATUS_ARRAY = new TransferStatus[]{
-                ALL,
-                DOWNLOADING,
-                COMPLETED};
-
-        public static TransferStatus[] getAllStatusesArray() {
-            return STATUS_ARRAY;
-        }
     }
 
     private static final class ButtonAddTransferListener extends ClickAdapter<TransfersFragment> {
@@ -814,28 +773,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    private static final class ButtonTabListener extends ClickAdapter<TransfersFragment> {
-
-        private final TransferStatus status;
-
-        ButtonTabListener(TransfersFragment f, TransferStatus status) {
-            super(f);
-            this.status = status;
-        }
-
-        @Override
-        public void onClick(TransfersFragment f, View v) {
-            f.selectedStatus = status;
-            f.onTime();
-        }
-    }
-
     private void showStoragePreference() {
         Activity activity = getActivity();
         if (activity == null) {
             return; // quick return
         }
-
         if (AndroidPlatform.saf()) {
             StoragePicker.show(activity);
         } else {

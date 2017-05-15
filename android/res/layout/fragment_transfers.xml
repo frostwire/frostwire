@@ -18,10 +18,10 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:frostwire="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              xmlns:frostwire="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,7 +32,7 @@
         <View
             style="@style/divider_line_dark"
             android:layout_width="match_parent"
-            android:layout_height="1dp" />
+            android:layout_height="1dp"/>
 
         <!-- Dummy item to prevent EditText from receiving focus at startup -->
         <LinearLayout
@@ -41,7 +41,7 @@
             android:layout_height="0px"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:orientation="horizontal" />
+            android:orientation="horizontal"/>
 
         <com.frostwire.android.gui.views.ClearableEditTextView
             android:id="@+id/fragment_transfers_add_transfer_text_input"
@@ -53,39 +53,36 @@
             android:layout_marginTop="6dp"
             android:focusableInTouchMode="true"
             android:visibility="gone"
-            frostwire:clearable_hint="@string/add_transfer_label" />
+            frostwire:clearable_hint="@string/add_transfer_label"/>
     </LinearLayout>
 
-    <include layout="@layout/fragment_transfers_tablayout" />
+    <android.support.design.widget.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             android:id="@+id/fragment_transfers_layout_tab_layout"
+                                             style="@style/AppTabLayout"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="50dp"
+                                             app:tabGravity="fill"
+                                             app:tabMode="fixed">
 
-    <RadioGroup
-        android:id="@+id/fragment_transfers_buttons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="0dp"
-        android:checkedButton="@+id/fragment_transfers_button_select_all"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/fragment_transfers_button_select_all"
-            style="@style/TransfersFileTypeButton"
+        <android.support.design.widget.TabItem
+            android:id="@+id/fragment_transfers_tab_all"
             android:layout_width="match_parent"
-            android:text="@string/transfers_select_all" />
+            android:layout_height="match_parent"
+            android:text="@string/transfers_select_all"/>
 
-        <RadioButton
-            android:id="@+id/fragment_transfers_button_select_downloading"
-            style="@style/TransfersFileTypeButton"
+        <android.support.design.widget.TabItem
+            android:id="@+id/fragment_transfers_tab_downloading"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/transfers_select_downloading" />
+            android:layout_height="match_parent"
+            android:text="@string/transfers_select_downloading"/>
 
-        <RadioButton
-            android:id="@+id/fragment_transfers_button_select_completed"
-            style="@style/TransfersFileTypeButton"
+        <android.support.design.widget.TabItem
+            android:id="@+id/fragment_transfers_tab_completed"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/transfers_select_completed" />
-    </RadioGroup>
+            android:layout_height="match_parent"
+            android:text="@string/transfers_select_completed"/>
+    </android.support.design.widget.TabLayout>
 
     <com.frostwire.android.gui.views.RichNotification
         android:id="@+id/fragment_transfers_sd_card_notification"
@@ -94,7 +91,7 @@
         frostwire:rich_notification_description="@string/android_will_erase_files_if_frostwire_is_uninstalled"
         frostwire:rich_notification_icon="@drawable/sd_card_notification"
         frostwire:rich_notification_title="@string/saving_to_sd_card"
-        frostwire:rich_notification_title_underlined="true" />
+        frostwire:rich_notification_title_underlined="true"/>
 
     <com.frostwire.android.gui.views.RichNotification
         android:id="@+id/fragment_transfers_internal_memory_notification"
@@ -103,7 +100,7 @@
         frostwire:rich_notification_description="@string/saving_to_internal_memory_description"
         frostwire:rich_notification_icon="@drawable/internal_memory_notification"
         frostwire:rich_notification_title="@string/saving_to_internal_memory"
-        frostwire:rich_notification_title_underlined="true" />
+        frostwire:rich_notification_title_underlined="true"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -123,7 +120,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/app_background_body_light"
                 android:fadingEdge="none"
-                android:groupIndicator="@android:color/transparent" />
+                android:groupIndicator="@android:color/transparent"/>
         </com.frostwire.android.gui.views.SwipeLayout>
 
         <TextView
@@ -135,14 +132,14 @@
             android:layout_marginBottom="5dp"
             android:layout_marginLeft="8dp"
             android:background="@drawable/toast_vpn_status_bgd"
-            android:text="@string/vpn_off_toast_notification" />
+            android:text="@string/vpn_off_toast_notification"/>
     </RelativeLayout>
 
     <View
         android:id="@+id/fragment_transfers_indicators_top_border"
         style="@style/divider_line_dark"
         android:layout_width="match_parent"
-        android:layout_height="1dp" />
+        android:layout_height="1dp"/>
 
     <LinearLayout
         android:id="@+id/fragment_transfers_indicators"
@@ -159,12 +156,12 @@
             android:layout_margin="10dp"
             android:background="@color/transparent"
             android:scaleType="fitXY"
-            android:src="@drawable/notification_vpn_off" />
+            android:src="@drawable/notification_vpn_off"/>
 
         <View
             android:layout_width="1px"
             android:layout_height="match_parent"
-            android:background="@color/black" />
+            android:background="@color/black"/>
 
         <!-- DHT peers -->
         <TextView
@@ -177,7 +174,7 @@
             android:gravity="center_vertical"
             android:text="@string/dht_contacts"
             android:textColor="@color/app_text_white"
-            android:textSize="@dimen/text_size_extra_micro" />
+            android:textSize="@dimen/text_size_extra_micro"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -191,7 +188,7 @@
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/transfers_triangle_downward"
                 android:paddingRight="8dp"
-                android:text="@string/dummy_downloads_indicator" />
+                android:text="@string/dummy_downloads_indicator"/>
 
             <TextView
                 android:id="@+id/fragment_transfers_text_uploads"
@@ -200,13 +197,13 @@
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/transfers_triangle_upward"
                 android:paddingRight="8dp"
-                android:text="@string/dummy_uploads_indicator" />
+                android:text="@string/dummy_uploads_indicator"/>
         </LinearLayout>
     </LinearLayout>
 
     <View
         style="@style/divider_line_dark"
         android:layout_width="match_parent"
-        android:layout_height="1dp" />
+        android:layout_height="1dp"/>
 
 </LinearLayout>
