@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
+ *            Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,8 +62,10 @@ import java.util.List;
  * @author marcelinkaaa
  * @author votaguz
  */
-public class ImageViewerFragment extends AbstractFragment {
+public final class ImageViewerFragment extends AbstractFragment {
+
     private static final Logger LOG = Logger.getLogger(ImageViewerFragment.class);
+
     private ImageView preloadImageView; // tried doing this with a single imageviewer, didn't work.
     private TouchImageView imageView;
     private ProgressBar progressBar;
@@ -191,11 +193,11 @@ public class ImageViewerFragment extends AbstractFragment {
         private ActionMode mode;
         private Menu menu;
 
-        public ImageViewerActionModeCallback(FileDescriptor fd) {
+        ImageViewerActionModeCallback(FileDescriptor fd) {
             this.fd = fd;
         }
 
-        public ActionMode getActionMode() {
+        ActionMode getActionMode() {
             return this.mode;
         }
 
