@@ -35,7 +35,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/fragment_browse_peer_action_mode_menu_open"
-        android:icon="@drawable/contextmenu_icon_play"
+        android:icon="@drawable/contextmenu_icon_open"
         android:title="@string/open"
         app:showAsAction="never" />
     <item

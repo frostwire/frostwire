@@ -37,21 +37,21 @@ public class OpenMenuAction extends MenuAction {
     private final byte fileType;
 
     public OpenMenuAction(Context context, String title, String path, String mime) {
-        super(context, R.drawable.contextmenu_icon_play, R.string.open_menu_action, title);
+        super(context, R.drawable.contextmenu_icon_open, R.string.open_menu_action, title);
         this.path = path;
         this.mime = mime;
         this.fileType = -1;
     }
 
     public OpenMenuAction(Context context, String path, String mime) {
-        super(context, R.drawable.contextmenu_icon_play, R.string.open);
+        super(context, R.drawable.contextmenu_icon_open, R.string.open);
         this.path = path;
         this.mime = mime;
         this.fileType = -1;
     }
 
     public OpenMenuAction(Context context, String filePath, String mime, byte fileType) {
-        super(context, R.drawable.contextmenu_icon_play, R.string.open);
+        super(context, R.drawable.contextmenu_icon_open, R.string.open);
         this.path = filePath;
         this.mime = mime;
         this.fileType = fileType;
