@@ -63,9 +63,8 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         }
 
         if (!OGURY_ENABLED) {
-            disableService(context);
             customEventInterstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
-            LOG.info("loadInterstitial() aborted, ogury disabled.");
+            LOG.info("loadInterstitial() aborted, ogury not enabled.");
             return;
         }
 
@@ -73,36 +72,6 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
         startOgury(context); // starts only once
         presage().load(new OguryIADHandler(interstitialListener));
-    }
-
-    private void disableService(Context context) {
-        LOG.info("Ogury.disableService()");
-        PackageManager pm = context.getPackageManager();
-        disableComponent(context, pm, io.presage.PresageService.class);
-    }
-
-    private void disableComponent(Context context, PackageManager pm, Class<?> clazz) {
-        try {
-            ComponentName receiver = new ComponentName(context, clazz);
-            int currentState = pm.getComponentEnabledSetting(receiver);
-            if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-                LOG.info("disableComponent() Receiver " + receiver + " was disabled. ");
-                return;
-            } else {
-                LOG.info("Receiver " + receiver + " was enabled, disabling");
-            }
-            pm.setComponentEnabledSetting(receiver,
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP);
-            currentState = pm.getComponentEnabledSetting(receiver);
-            if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-                LOG.info("Receiver " + receiver + " now is disabled");
-            } else {
-                LOG.info("Receiver " + receiver + " now is enabled, something didn't work");
-            }
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-        }
     }
 
     @Override
