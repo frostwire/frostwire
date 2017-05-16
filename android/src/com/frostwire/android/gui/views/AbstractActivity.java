@@ -167,6 +167,11 @@ public abstract class AbstractActivity extends AppCompatActivity {
         return (T) super.findViewById(id);
     }
 
+    @SuppressWarnings("unchecked")
+    protected final <T extends Fragment> T findFragment(int id) {
+        return (T) getFragmentManager().findFragmentById(id);
+    }
+
     protected final Toolbar findToolbar() {
         return findView(R.id.toolbar_main);
     }

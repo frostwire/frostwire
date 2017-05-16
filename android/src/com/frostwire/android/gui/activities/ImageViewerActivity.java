@@ -38,9 +38,11 @@ public final class ImageViewerActivity extends AbstractActivity {
 
     @Override
     protected void initComponents(Bundle savedInstanceState) {
-        Bundle fileDescriptorBundle = getIntent().getExtras();
-        ImageViewerFragment imageViewerFragment = (ImageViewerFragment) getFragmentManager().findFragmentById(R.id.fragment_image_viewer);
-        FileDescriptor fd = new FileDescriptor(fileDescriptorBundle);
-        imageViewerFragment.updateData(fd);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            ImageViewerFragment imageViewerFragment = findFragment(R.id.fragment_image_viewer);
+            FileDescriptor fd = new FileDescriptor(extras);
+            imageViewerFragment.updateData(fd);
+        }
     }
 }
