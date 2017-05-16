@@ -35,17 +35,10 @@
         android:indeterminate="true"
         />
 
-    <ImageView
-        android:id="@+id/fragment_image_viewer_preload_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/fragment_image_viewer_progress_bar"/>
-
     <com.frostwire.android.gui.views.TouchImageView
         android:id="@+id/fragment_image_viewer_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/fragment_image_viewer_progress_bar"
-        android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        android:layout_centerInParent="true"/>
 </RelativeLayout>

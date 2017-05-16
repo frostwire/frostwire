@@ -26,13 +26,13 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
+import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.squareup.picasso.Callback;
@@ -149,51 +149,29 @@ public final class ImageLoader {
         long diskSize = SystemUtils.calculateDiskCacheSize(directory, MIN_DISK_CACHE_SIZE, MAX_DISK_CACHE_SIZE);
         int memSize = SystemUtils.calculateMemoryCacheSize(context);
         this.cache = new ImageCache(directory, diskSize, memSize);
-        this.picasso = new Builder(context).addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
-                memoryCache(cache).executor(Engine.instance().getThreadPool()).build();
+        this.picasso = new Builder(context).
+                addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
+                memoryCache(cache).
+                executor(Engine.instance().getThreadPool()).
+                build();
         picasso.setIndicatorsEnabled(false);
     }
 
-    public interface OnBitmapLoadedCallbackRunner {
-        void onBitmapLoaded(final Bitmap bitmap, final RequestCreator requestCreator);
-
-        void onError();
-    }
-
-    public void loadBitmapAsync(final Uri imageUri, final OnBitmapLoadedCallbackRunner onBitmapLoadedRunner) {
+    public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, ImageView view, final Callback callback) {
         if (imageUri == null) {
             throw new IllegalArgumentException("Uri can't be null");
         }
-        if (onBitmapLoadedRunner == null) {
-            throw new IllegalArgumentException("OnBitmapLoadedCallbackRunner can't be null");
-        }
         final RequestCreator requestCreator = picasso.load(imageUri);
-        requestCreator.fetch(new Callback() {
-            @Override
-            public void onSuccess() {
-                requestCreator.into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        onBitmapLoadedRunner.onBitmapLoaded(bitmap, requestCreator);
-                    }
-
-                    @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
-                        onBitmapLoadedRunner.onError();
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-                    }
-                });
-            }
-
-            @Override
-            public void onError() {
-                LOG.info("loadBitmapAsync::Callback::onError()");
-            }
-        });
-
+        requestCreator.networkPolicy(NetworkPolicy.OFFLINE);
+        // TODO: @marcelinkaaa please change this to something better or the same with higher resolution
+        requestCreator.placeholder(R.drawable.list_item_torrent_icon);
+        requestCreator.priority(Picasso.Priority.HIGH);
+        requestCreator.resize(resizedWidth, resizedHeight);
+        if (callback != null) {
+            requestCreator.into(view, callback);
+        } else {
+            requestCreator.into(view);
+        }
     }
 
     public void load(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {
