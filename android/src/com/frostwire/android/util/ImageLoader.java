@@ -164,7 +164,7 @@ public final class ImageLoader {
         final RequestCreator requestCreator = picasso.load(imageUri);
         requestCreator.networkPolicy(NetworkPolicy.OFFLINE);
         // TODO: @marcelinkaaa please change this to something better or the same with higher resolution
-        requestCreator.placeholder(R.drawable.list_item_torrent_icon);
+        requestCreator.placeholder(R.drawable.picture_placeholder);
         requestCreator.priority(Picasso.Priority.HIGH);
         requestCreator.resize(resizedWidth, resizedHeight);
         if (callback != null) {
