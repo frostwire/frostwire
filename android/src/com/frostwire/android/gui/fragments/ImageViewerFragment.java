@@ -21,6 +21,7 @@ package com.frostwire.android.gui.fragments;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -67,6 +68,7 @@ public final class ImageViewerFragment extends AbstractFragment {
     private static final Logger LOG = Logger.getLogger(ImageViewerFragment.class);
 
     public static final String EXTRA_FILE_DESCRIPTOR = "com.frostwire.android.extra.FILE_DESCRIPTOR";
+    public static final String EXTRA_IN_FULL_SCREEN_MODE = "com.frostwire.android.extra.IN_FULL_SCREEN_MODE";
 
     private RelativeLayout containerLayout;
     private TouchImageView imageView;
@@ -86,6 +88,7 @@ public final class ImageViewerFragment extends AbstractFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBundle(EXTRA_FILE_DESCRIPTOR, fd.toBundle());
+        outState.putBoolean(EXTRA_IN_FULL_SCREEN_MODE, inFullScreenMode);
     }
 
     @Override
@@ -96,7 +99,6 @@ public final class ImageViewerFragment extends AbstractFragment {
         imageView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
         imageView.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 toggleFullScreen();
@@ -105,8 +107,19 @@ public final class ImageViewerFragment extends AbstractFragment {
 
         if (savedInstanceState != null) {
             Bundle data = savedInstanceState.getBundle(EXTRA_FILE_DESCRIPTOR);
-            if (data != null)
+            if (data != null) {
+                inFullScreenMode = savedInstanceState.getBoolean(EXTRA_IN_FULL_SCREEN_MODE);
                 updateData(new FileDescriptor(data));
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (inFullScreenMode) {
+            inFullScreenMode = !inFullScreenMode;
+            toggleFullScreen();
         }
     }
 
@@ -125,7 +138,9 @@ public final class ImageViewerFragment extends AbstractFragment {
             startActionMode(actionModeCallback);
         }
         Toolbar actionBar = ((AbstractActivity) getActivity()).findToolbar();
-        actionBar.setVisibility(!inFullScreenMode ? View.GONE : View.VISIBLE);
+        if (actionBar != null) {
+            actionBar.setVisibility(!inFullScreenMode ? View.GONE : View.VISIBLE);
+        }
         inFullScreenMode = !inFullScreenMode;
     }
 
