@@ -1,7 +1,7 @@
 frostwire (6.5.1) stable; urgency=high
-  * Romanian, Bulgarian translations updated
+  * Romanian, Bulgarian, Bengali, Danish translations updated
 	
- -- FrostWire Team <contact@frostwire.com>  Mon, 13 May 2017 16:43:05 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 16 May 2017 14:26:56 -0600
 
 frostwire (6.5.0) stable; urgency=high
   * Issue where transfers would dissapear until new transfer was added fixed
