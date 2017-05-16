@@ -172,7 +172,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
         return (T) getFragmentManager().findFragmentById(id);
     }
 
-    protected final Toolbar findToolbar() {
+    public final Toolbar findToolbar() {
         return findView(R.id.toolbar_main);
     }
 

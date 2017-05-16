@@ -22,11 +22,14 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
@@ -39,6 +42,7 @@ import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SetAsWallpaperMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.TouchImageView;
@@ -64,15 +68,16 @@ public final class ImageViewerFragment extends AbstractFragment {
 
     public static final String EXTRA_FILE_DESCRIPTOR = "com.frostwire.android.extra.FILE_DESCRIPTOR";
 
+    private RelativeLayout containerLayout;
     private TouchImageView imageView;
     private ProgressBar progressBar;
     private FileDescriptor fd;
     private ImageViewerActionModeCallback actionModeCallback;
+    boolean inFullScreenMode = false;
 
     public ImageViewerFragment() {
         super(R.layout.fragment_image_viewer);
         setHasOptionsMenu(true);
-
         this.fd = null;
         this.actionModeCallback = null;
     }
@@ -85,16 +90,16 @@ public final class ImageViewerFragment extends AbstractFragment {
 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
+        containerLayout = findView(v, R.id.fragment_image_viewer_container_layout);
         progressBar = findView(v, R.id.fragment_image_viewer_progress_bar);
         imageView = findView(v, R.id.fragment_image_viewer_image);
         imageView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
         imageView.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                if (fd != null) {
-                    new FileInformationAction(getActivity(), fd).onClick();
-                }
+                toggleFullScreen();
             }
         });
 
@@ -103,6 +108,25 @@ public final class ImageViewerFragment extends AbstractFragment {
             if (data != null)
                 updateData(new FileDescriptor(data));
         }
+    }
+
+    private void toggleFullScreen() {
+        int newFlag = inFullScreenMode ? WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN : WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        int clearFlag = inFullScreenMode ? WindowManager.LayoutParams.FLAG_FULLSCREEN : WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN;
+        getActivity().getWindow().clearFlags(clearFlag);
+        getActivity().getWindow().addFlags(newFlag);
+        int backgroundColor = getActivity().getResources().getColor(!inFullScreenMode ? R.color.black : R.color.app_background_body_light);
+        containerLayout.setBackgroundColor(backgroundColor);
+        if (!inFullScreenMode) {
+            actionModeCallback.setInFullScreenMode(true); // so it doesn't finish the activity when destroyed
+            actionModeCallback.getActionMode().finish();
+        } else {
+            actionModeCallback.setInFullScreenMode(false);
+            startActionMode(actionModeCallback);
+        }
+        Toolbar actionBar = ((AbstractActivity) getActivity()).findToolbar();
+        actionBar.setVisibility(!inFullScreenMode ? View.GONE : View.VISIBLE);
+        inFullScreenMode = !inFullScreenMode;
     }
 
     public void updateData(FileDescriptor fd) {
@@ -137,11 +161,11 @@ public final class ImageViewerFragment extends AbstractFragment {
         });
     }
 
-
     private class ImageViewerActionModeCallback implements android.support.v7.view.ActionMode.Callback {
         private final FileDescriptor fd;
         private ActionMode mode;
         private Menu menu;
+        private boolean inFullScreenMode;
 
         ImageViewerActionModeCallback(FileDescriptor fd) {
             this.fd = fd;
@@ -155,6 +179,8 @@ public final class ImageViewerFragment extends AbstractFragment {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             this.mode = mode;
             this.menu = menu;
+
+
             mode.getMenuInflater().inflate(R.menu.fragment_browse_peer_action_mode_menu, menu);
             return true;
         }
@@ -216,7 +242,9 @@ public final class ImageViewerFragment extends AbstractFragment {
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             this.mode.finish();
-            getActivity().finish();
+            if (!inFullScreenMode) {
+                getActivity().finish();
+            }
         }
 
         private void updateMenuActionsVisibility(FileDescriptor fd) {
@@ -243,6 +271,10 @@ public final class ImageViewerFragment extends AbstractFragment {
             fd.filePath = fd.filePath.replace(oldFileName, newFileName) + "." + fileExtension;
             mode.setTitle(FilenameUtils.getName(fd.filePath));
             updateData(fd);
+        }
+
+        public void setInFullScreenMode(boolean inFullScreenMode) {
+            this.inFullScreenMode = inFullScreenMode;
         }
     }
 }
