@@ -22,7 +22,6 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -77,23 +76,15 @@ public final class ImageViewerFragment extends AbstractFragment {
     public ImageViewerFragment() {
         super(R.layout.fragment_image_viewer);
         setHasOptionsMenu(true);
-        actionModeCallback = null;
+
+        this.fd = null;
+        this.actionModeCallback = null;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBundle(EXTRA_FILE_DESCRIPTOR, fd.toBundle());
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            Bundle data = savedInstanceState.getBundle(EXTRA_FILE_DESCRIPTOR);
-            if (data != null)
-                fd.fromBundle(data);
-        }
     }
 
     @Override
@@ -112,6 +103,12 @@ public final class ImageViewerFragment extends AbstractFragment {
                 }
             }
         });
+
+        if (savedInstanceState != null) {
+            Bundle data = savedInstanceState.getBundle(EXTRA_FILE_DESCRIPTOR);
+            if (data != null)
+                updateData(new FileDescriptor(data));
+        }
     }
 
     @Override
@@ -122,7 +119,6 @@ public final class ImageViewerFragment extends AbstractFragment {
             fd.fromBundle(arguments);
             updateData(fd);
         }
-
     }
 
     public void updateData(FileDescriptor fd) {
