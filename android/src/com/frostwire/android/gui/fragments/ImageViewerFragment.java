@@ -111,16 +111,6 @@ public final class ImageViewerFragment extends AbstractFragment {
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (fd != null) {
-            Bundle arguments = getArguments();
-            fd.fromBundle(arguments);
-            updateData(fd);
-        }
-    }
-
     public void updateData(FileDescriptor fd) {
         this.fd = fd;
         if (actionModeCallback == null) {
