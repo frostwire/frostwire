@@ -44,6 +44,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.ImageViewerActivity;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
+import com.frostwire.android.gui.fragments.ImageViewerFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.CheckableImageView;
 import com.frostwire.android.gui.util.UIUtils;
@@ -247,13 +248,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 checkboxOnCheckedChangeListener);
 
         checkboxOnCheckedChangeListener.setEnabled(false);
-            checkableView.setCheckableMode(selectAllMode);
-            checkableView.setTag(item);
-            checkableView.loadImages();
-            if (showFileSize) {
-                checkableView.setFileSize(item.fd.fileSize);
-            }
-            checkableView.setVisibility(View.VISIBLE);
+        checkableView.setCheckableMode(selectAllMode);
+        checkableView.setTag(item);
+        checkableView.loadImages();
+        if (showFileSize) {
+            checkableView.setFileSize(item.fd.fileSize);
+        }
+        checkableView.setVisibility(View.VISIBLE);
         checkboxOnCheckedChangeListener.setEnabled(true);
     }
 
@@ -403,7 +404,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 } else {
                     if (fd.fileType == Constants.FILE_TYPE_PICTURES && ctx instanceof MainActivity) {
                         Intent intent = new Intent(ctx, ImageViewerActivity.class);
-                        intent.putExtras(fd.toBundle());
+                        intent.putExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR, fd.toBundle());
                         ctx.startActivity(intent);
                     } else {
                         UIUtils.openFile(ctx, fd.filePath, fd.mime, true);

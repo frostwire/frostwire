@@ -66,6 +66,8 @@ public final class ImageViewerFragment extends AbstractFragment {
 
     private static final Logger LOG = Logger.getLogger(ImageViewerFragment.class);
 
+    public static final String EXTRA_FILE_DESCRIPTOR = "com.frostwire.android.extra.FILE_DESCRIPTOR";
+
     private ImageView preloadImageView; // tried doing this with a single imageviewer, didn't work.
     private TouchImageView imageView;
     private ProgressBar progressBar;
@@ -80,17 +82,17 @@ public final class ImageViewerFragment extends AbstractFragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (outState != null) {
-            outState.putAll(fd.toBundle());
-        }
         super.onSaveInstanceState(outState);
+        outState.putBundle(EXTRA_FILE_DESCRIPTOR, fd.toBundle());
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
-            fd.fromBundle(savedInstanceState);
+            Bundle data = savedInstanceState.getBundle(EXTRA_FILE_DESCRIPTOR);
+            if (data != null)
+                fd.fromBundle(data);
         }
     }
 
