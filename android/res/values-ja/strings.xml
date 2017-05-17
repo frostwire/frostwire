@@ -646,4 +646,8 @@
     <string name="mobile_data_saving">モバイルデータの保存</string>
     <string name="data_saving_kill_http_warning_title">警告：HTTP転送が進行中です</string>
     <string name="fullscreen">全画面表示</string>
+    <string name="date">日付</string>
+    <string name="size">サイズ</string>
+    <string name="your_android_wall_paper_will_change">あなたのAndroidの壁紙は数秒で変更されます</string>
+    <string name="file_information">ファイル情報</string>
 </resources>

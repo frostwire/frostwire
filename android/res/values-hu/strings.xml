@@ -643,4 +643,9 @@
     <string name="mobile_data_saving">Mobil adatok mentése</string>
     <string name="data_saving_kill_http_warning_title">Figyelmeztetés: Http transzferek folyamatban</string>
     <string name="fullscreen">teljes képernyő</string>
+    <string name="date">Dátum</string>
+    <string name="size">Méret</string>
+    <string name="your_android_wall_paper_will_change">Az Android háttérkép néhány másodpercen belül megváltozik
+    </string>
+    <string name="file_information">Fájlinformációk</string>
 </resources>

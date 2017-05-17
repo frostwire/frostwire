@@ -643,4 +643,6 @@
     <string name="mobile_data_saving">Мобилни данни спестяване</string>
     <string name="data_saving_kill_http_warning_title">Предупреждение: Http трансфери в прогрес</string>
     <string name="fullscreen">цял екран</string>
+    <string name="size">размер</string>
+    <string name="file_information">Информация за файла</string>
 </resources>

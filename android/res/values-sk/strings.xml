@@ -643,4 +643,10 @@
     <string name="mobile_data_saving">Mobilné dátové sporiteľ</string>
     <string name="data_saving_kill_http_warning_title">Výstražné: Http prevody prebiehajúcej</string>
     <string name="fullscreen">celá obrazovka</string>
+    <string name="date">Dátum</string>
+    <string name="size">Veľkosť</string>
+    <string name="your_android_wall_paper_will_change">Vaša tapeta so systémom Android sa po niekoľkých sekundách
+        zmení
+    </string>
+    <string name="file_information">Informácie o súbore</string>
 </resources>

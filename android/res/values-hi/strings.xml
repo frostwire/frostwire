@@ -643,4 +643,7 @@
     <string name="mobile_data_saving">मोबाइल डेटा की बचत</string>
     <string name="data_saving_kill_http_warning_title">चेतावनी: प्रगति में HTTP स्थानान्तरण</string>
     <string name="fullscreen">पूर्ण स्क्रीन</string>
+    <string name="date">तिथि</string>
+    <string name="size">आकार</string>
+    <string name="file_information">फ़ाइल जानकारी</string>
 </resources>

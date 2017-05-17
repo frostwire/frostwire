@@ -643,4 +643,7 @@
     <string name="mobile_data_saving">Điện thoại di động tiết kiệm dữ liệu</string>
     <string name="data_saving_kill_http_warning_title">Cảnh báo: Http chuyển in progress</string>
     <string name="fullscreen">toàn màn hình</string>
+    <string name="date">ngày</string>
+    <string name="your_android_wall_paper_will_change">Hình nền Android của bạn sẽ thay đổi trong vài giây</string>
+    <string name="file_information">Thông tin về tệp</string>
 </resources>

@@ -644,4 +644,8 @@
     <string name="use_magnet_summary">المغناطيس القائمة، ويعمل فقط على واي فاي</string>
     <string name="mobile_data_saving">حفظ البيانات المتنقلة</string>
     <string name="data_saving_kill_http_warning_title">تحذير: المتشعب نقل في التقدم</string>
+    <string name="date">تاريخ</string>
+    <string name="size">حجم</string>
+    <string name="your_android_wall_paper_will_change">سوف خلفية الروبوت الخاص بك تتغير في بضع ثوان</string>
+    <string name="file_information">معلومات الملف</string>
 </resources>
