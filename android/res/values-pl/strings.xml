@@ -631,4 +631,5 @@
     <string name="mobile_data_saving">Oszczędzanie Danych Mobilnych</string>
     <string name="data_saving_kill_http_warning_title">Ostrzeżenie: transfery http w toku</string>
     <string name="fullscreen">pełny ekran</string>
+    <string name="size"></string>
 </resources>

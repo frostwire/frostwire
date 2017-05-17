@@ -645,4 +645,8 @@
     <string name="mobile_data_saving">Mobil Veri Tasarrufu</string>
     <string name="data_saving_kill_http_warning_title">Uyarı: Http aktarımı devam ediyor</string>
     <string name="fullscreen">tam ekran</string>
+    <string name="date">tarih</string>
+    <string name="size">Boyut</string>
+    <string name="your_android_wall_paper_will_change">Android duvar kağıdınız birkaç saniye içinde değişecek</string>
+    <string name="file_information">Dosya bilgileri</string>
 </resources>

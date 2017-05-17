@@ -645,4 +645,8 @@
     <string name="mobile_data_saving">Мобильных данных на летнее</string>
     <string name="data_saving_kill_http_warning_title">Предупреждение: Http переводы в прогрессе</string>
     <string name="fullscreen">полноэкранный</string>
+    <string name="date">дата</string>
+    <string name="size">Размер</string>
+    <string name="your_android_wall_paper_will_change">Ваши обои для Android будут изменены за несколько секунд</string>
+    <string name="file_information">Информация о файле</string>
 </resources>

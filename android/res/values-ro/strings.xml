@@ -643,4 +643,9 @@
     <string name="mobile_data_saving">Salvarea datelor mobile</string>
     <string name="data_saving_kill_http_warning_title">Atenție: Http transferurile în curs de desfășurare</string>
     <string name="fullscreen">ecran complet</string>
+    <string name="date">Data</string>
+    <string name="size">Dimensiune</string>
+    <string name="your_android_wall_paper_will_change">Imaginea dvs. de fundal Android se va schimba în câteva secunde
+    </string>
+    <string name="file_information">Informații despre fișier</string>
 </resources>

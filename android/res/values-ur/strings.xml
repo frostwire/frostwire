@@ -643,4 +643,7 @@
     <string name="mobile_data_saving">موبائل ڈیٹا کی بچت</string>
     <string name="data_saving_kill_http_warning_title">Wانتباہ: پیش رفت میں HTTP ٹرانسفر</string>
     <string name="fullscreen">مکمل اسکرین یا بڑی اسکرین</string>
+    <string name="date">تاریخ</string>
+    <string name="your_android_wall_paper_will_change">آپ لوڈ، اتارنا Android وال پیپر چند لمحوں میں بدل جائے گی</string>
+    <string name="file_information">فائل کی معلومات</string>
 </resources>

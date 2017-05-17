@@ -643,4 +643,8 @@
     <string name="mobile_data_saving">Den mobila data Besparing</string>
     <string name="data_saving_kill_http_warning_title">Varning: Http överföringar pågår</string>
     <string name="fullscreen">fullskärm</string>
+    <string name="date">datum</string>
+    <string name="size">Storlek</string>
+    <string name="your_android_wall_paper_will_change">Din Android-tapet kommer att ändras om några sekunder</string>
+    <string name="file_information">Filinformation</string>
 </resources>

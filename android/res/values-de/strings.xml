@@ -643,4 +643,9 @@
     <string name="mobile_data_saving">Mobile Daten sparen</string>
     <string name="data_saving_kill_http_warning_title">Warnung: Http geht weiter</string>
     <string name="fullscreen">Vollbild</string>
+    <string name="date">Datum</string>
+    <string name="size">Größe</string>
+    <string name="your_android_wall_paper_will_change">Die Tapete deines Android wird sich in wenigen Sekunden ändern
+    </string>
+    <string name="file_information">Dateiinformationen</string>
 </resources>

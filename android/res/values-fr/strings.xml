@@ -644,4 +644,7 @@
     <string name="mobile_data_saving">Économie de données mobile</string>
     <string name="data_saving_kill_http_warning_title">Avertissement: transferts HTTP en cours</string>
     <string name="fullscreen">plein écran</string>
+    <string name="date">Date</string>
+    <string name="size">Taille</string>
+    <string name="file_information">Informations sur le fichier</string>
 </resources>

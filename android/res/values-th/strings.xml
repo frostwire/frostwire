@@ -643,4 +643,8 @@
     <string name="mobile_data_saving">การบันทึกข้อมูลมือถือ</string>
     <string name="data_saving_kill_http_warning_title">คำเตือน: http โอนในความคืบหน้า</string>
     <string name="fullscreen">เต็มจอ</string>
+    <string name="date">วันที่</string>
+    <string name="size">ขนาด</string>
+    <string name="your_android_wall_paper_will_change">วอลล์เปเปอร์ Android ของคุณจะเปลี่ยนไปในไม่กี่วินาที</string>
+    <string name="file_information">ข้อมูลไฟล์</string>
 </resources>

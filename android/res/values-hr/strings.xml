@@ -643,4 +643,9 @@
     <string name="mobile_data_saving">Mobitel Spremanje podataka</string>
     <string name="data_saving_kill_http_warning_title">Upozorenje: http transferi u tijeku</string>
     <string name="fullscreen">puni zaslon</string>
+    <string name="date">Datum</string>
+    <string name="size">Veličina</string>
+    <string name="your_android_wall_paper_will_change">Vaša pozadina za Android promijenit će se za nekoliko sekundi
+    </string>
+    <string name="file_information">Informacije o datotekama</string>
 </resources>

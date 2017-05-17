@@ -645,4 +645,8 @@
     <string name="mobile_data_saving">Κινητό Αποθήκευση δεδομένων</string>
     <string name="data_saving_kill_http_warning_title">Προειδοποίηση: http μεταφορές σε εξέλιξη</string>
     <string name="fullscreen">πλήρους οθόνης</string>
+    <string name="date">Ημερομηνία</string>
+    <string name="size">μέγεθος</string>
+    <string name="your_android_wall_paper_will_change">Η ταπετσαρία σας Android θα αλλάξει σε λίγα δευτερόλεπτα</string>
+    <string name="file_information">Πληροφορίες αρχείου</string>
 </resources>

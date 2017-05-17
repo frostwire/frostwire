@@ -648,4 +648,8 @@
     <string name="mobile_data_saving">Мобиле података Уштеда</string>
     <string name="data_saving_kill_http_warning_title">Упозорење: хттп трансфери у току</string>
     <string name="fullscreen">цео екран</string>
+    <string name="date">датум</string>
+    <string name="size">Величина</string>
+    <string name="your_android_wall_paper_will_change">Андроид тапета ће се променити за неколико секунди</string>
+    <string name="file_information">File информатион</string>
 </resources>

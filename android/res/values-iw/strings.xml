@@ -643,4 +643,8 @@
     <string name="mobile_data_saving">שמירת נתונים ניידת</string>
     <string name="data_saving_kill_http_warning_title">העברות Http בביצוע: אזהרה</string>
     <string name="fullscreen">מסך מלא</string>
+    <string name="date">תאריך</string>
+    <string name="size">גודל</string>
+    <string name="your_android_wall_paper_will_change">טפט Android שלך ישתנה תוך מספר שניות</string>
+    <string name="file_information">פרטי קובץ</string>
 </resources>

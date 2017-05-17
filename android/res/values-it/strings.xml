@@ -643,4 +643,8 @@
     <string name="mobile_data_saving">Salvataggio dei dati mobile</string>
     <string name="data_saving_kill_http_warning_title">Attenzione: Http trasferimenti in corso</string>
     <string name="fullscreen">a schermo intero</string>
+    <string name="date">Data</string>
+    <string name="size">Dimensione</string>
+    <string name="your_android_wall_paper_will_change">La tua carta da parati Android cambierà in pochi secondi</string>
+    <string name="file_information">Informazioni sul file</string>
 </resources>
