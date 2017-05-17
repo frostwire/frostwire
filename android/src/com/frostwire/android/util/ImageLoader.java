@@ -57,8 +57,8 @@ public final class ImageLoader {
 
     private static final Logger LOG = Logger.getLogger(ImageLoader.class);
 
-    private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
-    private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
+    private static final int MIN_DISK_CACHE_SIZE = 8 * 1024 * 1024; // 8MB
+    private static final int MAX_DISK_CACHE_SIZE = 64 * 1024 * 1024; // 64MB
 
     private static final String SCHEME_IMAGE = "image";
 
@@ -156,15 +156,35 @@ public final class ImageLoader {
         picasso.setIndicatorsEnabled(false);
     }
 
-    public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, int placeHolderId, Picasso.Priority priority, ImageView view, final Callback callback) {
+    /**
+     *
+     * @param resizedWidth // if 0 is passed, proportions with respect to height will be calculated. if -1 is passed image will be fitted to view's dimensions
+     * @param resizedHeight // if 0 is passed, proportions with respect to height will be calculated. if -1 is passed image will be fitted to view's dimensions
+     * @param imageUri
+     * @param placeHolderId
+     * @param priority
+     * @param view
+     * @param callback
+     */
+    public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, int placeHolderId, Picasso.Priority priority, boolean useDiskCache, ImageView view, final Callback callback) {
         if (imageUri == null) {
             throw new IllegalArgumentException("Uri can't be null");
         }
         final RequestCreator requestCreator = picasso.load(imageUri);
-        requestCreator.networkPolicy(NetworkPolicy.OFFLINE);
+
+        if (!useDiskCache) {
+            requestCreator.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
+        }
+
         requestCreator.placeholder(placeHolderId);
         requestCreator.priority(priority);
-        requestCreator.resize(resizedWidth, resizedHeight);
+
+        if (!(resizedWidth == -1 && resizedHeight == -1)) {
+            requestCreator.resize(resizedWidth, resizedHeight);
+        } else {
+            requestCreator.fit();
+        }
+
         if (callback != null) {
             requestCreator.into(view, callback);
         } else {

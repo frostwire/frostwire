@@ -62,6 +62,8 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -430,7 +432,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private void populateViewThumbnail(View view, FileDescriptorItem item) {
         FileDescriptor fd = item.fd;
 
-        ImageButton fileThumbnail = findView(view,
+        final ImageButton fileThumbnail = findView(view,
                 inGridMode() ?
                         R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button :
                         R.id.view_browse_peer_thumbnail_list_item_browse_thumbnail_image_button);
@@ -441,8 +443,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 R.id.view_browse_peer_thumbnail_list_item_playback_overlay_view);
 
         boolean inGridMode = inGridMode();
-        int thumbnailDimensions = inGridMode ?
-                128 : 96;
+        final int thumbnailDimensions = inGridMode ?
+                256 : 96;
 
         if (fileType == Constants.FILE_TYPE_APPLICATIONS) {
             Uri uri = Uri.withAppendedPath(ImageLoader.APPLICATION_THUMBNAILS_URI, fd.album);
@@ -469,11 +471,21 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 thumbnailLoader.load(uri, uriRetry, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
             } else if (fd.fileType == Constants.FILE_TYPE_VIDEOS) {
                 Uri uri = ContentUris.withAppendedId(Video.Media.EXTERNAL_CONTENT_URI, fd.id);
-                Uri uriRetry = ImageLoader.getMetadataArtUri(uri);
+                final Uri uriRetry = ImageLoader.getMetadataArtUri(uri);
                 thumbnailLoader.load(uri, uriRetry, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
+                thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uri, R.drawable.picture_placeholder, Picasso.Priority.HIGH, true, fileThumbnail, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                    }
+
+                    @Override
+                    public void onError() {
+                        thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uriRetry, R.drawable.picture_placeholder, Picasso.Priority.HIGH, true, fileThumbnail, null);
+                    }
+                });
             } else if (fd.fileType == Constants.FILE_TYPE_PICTURES) {
                 Uri uri = ContentUris.withAppendedId(Images.Media.EXTERNAL_CONTENT_URI, fd.id);
-                thumbnailLoader.load(uri, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
+                thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uri, R.drawable.picture_placeholder, Picasso.Priority.HIGH, true, fileThumbnail, null);
             }
         }
 

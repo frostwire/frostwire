@@ -184,22 +184,27 @@ public final class ImageViewerFragment extends AbstractFragment {
                 fileUri,
                 R.drawable.picture_placeholder,
                 Picasso.Priority.HIGH,
+                false,
                 imageViewLowRes,
                 new Callback() {
                     @Override
                     public void onSuccess() {
+                        imageViewLowRes.setVisibility(View.VISIBLE);
+                        imageViewLowRes.postInvalidate();
                         imageLoader.loadBitmapAsync(
-                                screenMetrics.highResWidth,
-                                screenMetrics.lowResHeight,
+                                -1,
+                                -1,
                                 fileUri,
                                 R.drawable.picture_placeholder,
                                 Picasso.Priority.NORMAL,
+                                false,
                                 imageViewHighRes, new Callback() {
                                     @Override
                                     public void onSuccess() {
                                         progressBar.setVisibility(View.GONE);
                                         imageViewLowRes.setVisibility(View.GONE);
                                         imageViewHighRes.setVisibility(View.VISIBLE);
+                                        imageViewHighRes.postInvalidate();
                                     }
 
                                     @Override
@@ -220,6 +225,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                 fileUri,
                 R.drawable.picture_placeholder,
                 Picasso.Priority.LOW,
+                false,
                 imageViewFullScreen,
                 new Callback() {
                     @Override
@@ -227,6 +233,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                         progressBar.setVisibility(View.GONE);
                         imageViewHighRes.setVisibility(View.GONE);
                         imageViewFullScreen.setVisibility(View.VISIBLE);
+                        imageViewFullScreen.postInvalidate();
                     }
 
                     @Override
@@ -254,8 +261,8 @@ public final class ImageViewerFragment extends AbstractFragment {
             screenIsVertical = screenRotation == Surface.ROTATION_0 || screenRotation == Surface.ROTATION_180;
             highResWidth = !screenIsVertical ? (int) (screenWidth / 4.0) : 0;
             highResHeight = screenIsVertical ? (int) (screenHeight / 4.0) : 0;
-            lowResWidth = !screenIsVertical ? (int) (screenWidth / 9.0) : 0;
-            lowResHeight = screenIsVertical ? (int) (screenHeight / 9.0) : 0;
+            lowResWidth = !screenIsVertical ? (int) (screenWidth / 20.0) : 0;
+            lowResHeight = screenIsVertical ? (int) (screenHeight / 20.0) : 0;
             fullScreenWidth = !screenIsVertical ? screenWidth : 0;
             fullScreenHeight = screenIsVertical ? screenHeight : 0;
         }
