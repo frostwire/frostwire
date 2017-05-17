@@ -88,6 +88,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private static final Logger LOG = Logger.getLogger(BrowsePeerFragment.class);
     private static final int LOADER_FILES_ID = 0;
+    private static final String EXTRA_LAST_FILE_TYPE_CLICKED = "com.frostwire.android.gui.extras.byte.EXTRA_LAST_FILE_TYPE_CLICKED";
 
     private final BroadcastReceiver broadcastReceiver;
 
@@ -126,10 +127,21 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             Constants.FILE_TYPE_DOCUMENTS,
             Constants.FILE_TYPE_TORRENTS };
 
+    private final int[] fileTypeToTabPosition = new int[] {
+            0,  // 0x0 Audio @ 0
+            3,  // 0x1 Picture @ 3
+            2,  // 0x2 Video @ 2
+            4,  // 0x3 Documents @ 4
+            -1, // 0x4 Application @ N/A on My Files
+            1,  // 0x5 Ringtones @ 1
+            5   //  0x6 Torrents @ 5
+    };
+
     /**
      * This implements the toolbar's action mode view and its menu
      */
     private final MyFilesActionModeCallback selectionModeCallback;
+    private byte lastFileType = Constants.FILE_TYPE_AUDIO;
 
     public BrowsePeerFragment() {
         super(R.layout.fragment_browse_peer);
@@ -143,7 +155,17 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            lastFileType = savedInstanceState.getByte(EXTRA_LAST_FILE_TYPE_CLICKED);
+            clickFileTypeTab(lastFileType);
+        }
         setRetainInstance(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putByte(EXTRA_LAST_FILE_TYPE_CLICKED, lastFileType);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -231,7 +253,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         initBroadcastReceiver();
         if (adapter != null) {
             restorePreviouslyChecked();
-            browseFilesButtonClick(adapter.getFileType());
+            clickFileTypeTab(adapter.getFileType());
         }
         updateHeader();
     }
@@ -349,10 +371,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private void tabClicked(int tabPosition) {
         byte fileType = tabPositionToFileType[tabPosition];
-        browseFilesButtonClick(fileType);
-    }
-
-    private void browseFilesButtonClick(byte fileType) {
+        lastFileType = fileType;
         if (adapter != null) {
             saveListViewVisiblePosition(adapter.getFileType());
             adapter.clear();
@@ -437,10 +456,14 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             total.setText("(" + String.valueOf(numTotal) + ")");
         }
         if (adapter == null) {
-            browseFilesButtonClick(Constants.FILE_TYPE_AUDIO);
+            clickFileTypeTab(lastFileType);
         }
         MusicUtils.stopSimplePlayer();
         restoreListViewScrollPosition();
+    }
+
+    private void clickFileTypeTab(byte lastFileType) {
+        tabLayout.getTabAt(fileTypeToTabPosition[lastFileType]).select();
     }
 
     private void restoreListViewScrollPosition() {
@@ -812,7 +835,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private void refreshSelection() {
         if (adapter != null) {
             lastAdapterRefresh = SystemClock.elapsedRealtime();
-            browseFilesButtonClick(adapter.getFileType());
+            clickFileTypeTab(adapter.getFileType());
         }
     }
 }

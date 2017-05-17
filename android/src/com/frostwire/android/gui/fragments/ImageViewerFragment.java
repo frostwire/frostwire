@@ -160,8 +160,8 @@ public final class ImageViewerFragment extends AbstractFragment {
         final int screenHeight = dimsAndRot[1];
         int screenRotation = dimsAndRot[2];
         final boolean screenIsVertical = screenRotation == Surface.ROTATION_0 || screenRotation == Surface.ROTATION_180;
-        int finalHeight = screenIsVertical ? (int) (screenHeight / 3.0) : 0;
-        int finalWidth = !screenIsVertical ? (int) (screenWidth / 3.0) : 0;
+        int finalHeight = screenIsVertical ? (int) (screenHeight / 2.0) : 0;
+        int finalWidth = !screenIsVertical ? (int) (screenWidth / 2.0) : 0;
 
         imageLoader.loadBitmapAsync(finalWidth, finalHeight, fileUri, imageView, new Callback() {
             @Override
