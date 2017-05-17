@@ -32,7 +32,6 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
-import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.squareup.picasso.Callback;
@@ -157,15 +156,14 @@ public final class ImageLoader {
         picasso.setIndicatorsEnabled(false);
     }
 
-    public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, ImageView view, final Callback callback) {
+    public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, int placeHolderId, Picasso.Priority priority, ImageView view, final Callback callback) {
         if (imageUri == null) {
             throw new IllegalArgumentException("Uri can't be null");
         }
         final RequestCreator requestCreator = picasso.load(imageUri);
         requestCreator.networkPolicy(NetworkPolicy.OFFLINE);
-        // TODO: @marcelinkaaa please change this to something better or the same with higher resolution
-        requestCreator.placeholder(R.drawable.picture_placeholder);
-        requestCreator.priority(Picasso.Priority.HIGH);
+        requestCreator.placeholder(placeHolderId);
+        requestCreator.priority(priority);
         requestCreator.resize(resizedWidth, resizedHeight);
         if (callback != null) {
             requestCreator.into(view, callback);
