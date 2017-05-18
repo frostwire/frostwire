@@ -631,5 +631,8 @@
     <string name="mobile_data_saving">Oszczędzanie Danych Mobilnych</string>
     <string name="data_saving_kill_http_warning_title">Ostrzeżenie: transfery http w toku</string>
     <string name="fullscreen">pełny ekran</string>
-    <string name="size"></string>
+    <string name="size">Rozmiar</string>
+    <string name="date">Data</string>
+    <string name="your_android_wall_paper_will_change">Twoja tapeta telefonu zmieni się za kilka sekund</string>
+    <string name="file_information">Informacje pliku</string>
 </resources>
