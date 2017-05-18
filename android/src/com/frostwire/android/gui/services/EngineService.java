@@ -43,7 +43,9 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
-import com.squareup.okhttp.ConnectionPool;
+import com.frostwire.util.http.OKHTTPClient;
+
+import okhttp3.ConnectionPool;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
@@ -132,7 +134,7 @@ public class EngineService extends Service implements IEngineService {
     // what a bad design to properly shutdown the framework threads!
     // TODO: deal with potentially active connections
     private void stopOkHttp() {
-        ConnectionPool pool = ConnectionPool.getDefault();
+        ConnectionPool pool = OKHTTPClient.CONNECTION_POOL;
         try {
             pool.evictAll();
         } catch (Throwable e) {

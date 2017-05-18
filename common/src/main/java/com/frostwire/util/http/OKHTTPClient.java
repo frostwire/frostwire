@@ -20,7 +20,7 @@ package com.frostwire.util.http;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
-import com.squareup.okhttp.*;
+import okhttp3.*;
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.GzipSink;
@@ -48,21 +48,23 @@ public class OKHTTPClient extends AbstractHttpClient {
     private static final Logger LOG = Logger.getLogger(OKHTTPClient.class);
     private final ThreadPool pool;
 
+    public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(5, 10, TimeUnit.SECONDS);
+
     public OKHTTPClient(final ThreadPool pool) {
         this.pool = pool;
     }
 
     @Override
     public int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders) throws IOException {
-        final OkHttpClient okHttpClient = newOkHttpClient();
-        okHttpClient.setConnectTimeout(connectTimeoutInMillis, TimeUnit.MILLISECONDS);
-        okHttpClient.setFollowRedirects(false);
+        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
+        okHttpClient.connectTimeout(connectTimeoutInMillis, TimeUnit.MILLISECONDS);
+        okHttpClient.followRedirects(false);
         Request req = new Request.Builder().
                 url(url).
                 header("User-Agent", DEFAULT_USER_AGENT).
                 head().
                 build();
-        Response resp = okHttpClient.newCall(req).execute();
+        Response resp = okHttpClient.build().newCall(req).execute();
         copyMultiMap(resp.headers().toMultimap(), outputHeaders);
         return resp.code();
     }
@@ -70,7 +72,7 @@ public class OKHTTPClient extends AbstractHttpClient {
     @Override
     public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies) {
         byte[] result = null;
-        final OkHttpClient okHttpClient = newOkHttpClient();
+        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
         final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, cookies);
         ResponseBody responseBody = null;
         try {
@@ -89,7 +91,7 @@ public class OKHTTPClient extends AbstractHttpClient {
     @Override
     public String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException {
         String result = null;
-        final OkHttpClient okHttpClient = newOkHttpClient();
+        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
         final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, cookie);
         addCustomHeaders(customHeaders, builder);
         ResponseBody responseBody = null;
@@ -122,7 +124,7 @@ public class OKHTTPClient extends AbstractHttpClient {
             rangeStart = -1;
         }
 
-        final OkHttpClient okHttpClient = newOkHttpClient();
+        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
         final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, null);
         addRangeHeader(rangeStart, -1, builder);
         final Response response = getSyncResponse(okHttpClient, builder);
@@ -169,7 +171,7 @@ public class OKHTTPClient extends AbstractHttpClient {
 
     private String post(String url, int timeout, String userAgent, String postContentType, byte[] postData, boolean gzip) throws IOException {
         canceled = false;
-        final OkHttpClient okHttpClient = newOkHttpClient();
+        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
         final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, null, null);
         final RequestBody requestBody = RequestBody.create(MediaType.parse(postContentType), postData);
         prepareOkHttpClientForPost(okHttpClient, gzip);
@@ -179,7 +181,7 @@ public class OKHTTPClient extends AbstractHttpClient {
 
     private String getPostSyncResponse(Request.Builder builder) throws IOException {
         String result = null;
-        final OkHttpClient okHttpClient = newOkHttpClient();
+        final OkHttpClient.Builder okHttpClient = newOkHttpClient();
         final Response response = this.getSyncResponse(okHttpClient, builder);
         try {
             int httpResponseCode = response.code();
@@ -201,8 +203,8 @@ public class OKHTTPClient extends AbstractHttpClient {
         return result;
     }
 
-    private void prepareOkHttpClientForPost(OkHttpClient okHttpClient, boolean gzip) {
-        okHttpClient.setFollowRedirects(false);
+    private void prepareOkHttpClientForPost(OkHttpClient.Builder okHttpClient, boolean gzip) {
+        okHttpClient.followRedirects(false);
         if (gzip) {
             if (okHttpClient.interceptors().size() > 0) {
                 okHttpClient.interceptors().remove(0);
@@ -225,10 +227,10 @@ public class OKHTTPClient extends AbstractHttpClient {
         builderRef.addHeader("Range", sb.toString());
     }
 
-    private Request.Builder prepareRequestBuilder(OkHttpClient okHttpClient, String url, int timeout, String userAgent, String referrer, String cookie) {
-        okHttpClient.setConnectTimeout(timeout, TimeUnit.MILLISECONDS);
-        okHttpClient.setReadTimeout(timeout, TimeUnit.MILLISECONDS);
-        okHttpClient.setWriteTimeout(timeout, TimeUnit.MILLISECONDS);
+    private Request.Builder prepareRequestBuilder(OkHttpClient.Builder okHttpClient, String url, int timeout, String userAgent, String referrer, String cookie) {
+        okHttpClient.connectTimeout(timeout, TimeUnit.MILLISECONDS);
+        okHttpClient.readTimeout(timeout, TimeUnit.MILLISECONDS);
+        okHttpClient.writeTimeout(timeout, TimeUnit.MILLISECONDS);
         okHttpClient.interceptors().clear();
         Request.Builder builder = new Request.Builder();
         builder.url(url);
@@ -256,28 +258,29 @@ public class OKHTTPClient extends AbstractHttpClient {
         }
     }
 
-    private Response getSyncResponse(OkHttpClient okHttpClient, Request.Builder builder) throws IOException {
+    private Response getSyncResponse(OkHttpClient.Builder okHttpClient, Request.Builder builder) throws IOException {
         final Request request = builder.build();
-        return okHttpClient.newCall(request).execute();
+        return okHttpClient.build().newCall(request).execute();
     }
 
-    private OkHttpClient newOkHttpClient() {
+    private OkHttpClient.Builder newOkHttpClient() {
         return newOkHttpClient(pool);
     }
 
-    public static OkHttpClient newOkHttpClient(ThreadPool pool) {
-        OkHttpClient searchClient = new OkHttpClient();
-        searchClient.setDispatcher(new Dispatcher(pool));
-        searchClient.setFollowRedirects(true);
-        searchClient.setFollowSslRedirects(true);
-        searchClient.setHostnameVerifier(new HostnameVerifier() {
+    public static OkHttpClient.Builder newOkHttpClient(ThreadPool pool) {
+        OkHttpClient.Builder searchClient = new OkHttpClient.Builder();
+        searchClient.dispatcher(new Dispatcher(pool));
+        searchClient.connectionPool(CONNECTION_POOL);
+        searchClient.followRedirects(true);
+        searchClient.followSslRedirects(true);
+        searchClient.hostnameVerifier(new HostnameVerifier() {
             @Override
             public boolean verify(String hostname, SSLSession session) {
                 return true;
             }
         });
-        searchClient.setSslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY);
-        searchClient.setConnectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
+        searchClient.sslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY, new AllX509TrustManager());
+        searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
         // Maybe we should use a custom connection pool here. Using default.
         //searchClient.setConnectionPool(?);
         return searchClient;

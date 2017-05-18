@@ -19,12 +19,12 @@
 package com.frostwire.android.util;
 
 import com.frostwire.util.Logger;
-import com.squareup.okhttp.internal.DiskLruCache;
-import com.squareup.okhttp.internal.DiskLruCache.Editor;
-import com.squareup.okhttp.internal.DiskLruCache.Snapshot;
-import com.squareup.okhttp.internal.Util;
-import com.squareup.okhttp.internal.io.FileSystem;
+import okhttp3.internal.cache.DiskLruCache;
+import okhttp3.internal.cache.DiskLruCache.Editor;
+import okhttp3.internal.cache.DiskLruCache.Snapshot;
+import okhttp3.internal.io.FileSystem;
 import okio.BufferedSink;
+import okio.ByteString;
 import okio.Okio;
 import okio.Source;
 
@@ -167,7 +167,7 @@ public final class DiskCache {
     }
 
     private String encodeKey(String key) {
-        return Util.md5Hex(key);
+        return ByteString.encodeUtf8(key).md5().hex();
     }
 
     public static final class Entry implements Closeable {
