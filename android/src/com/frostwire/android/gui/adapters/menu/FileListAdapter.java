@@ -478,7 +478,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                     }
 
                     @Override
-                    public void onError() {
+                    public void onError(Exception e) {
                         thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uriRetry, R.drawable.picture_placeholder, true, fileThumbnail, null);
                     }
                 });

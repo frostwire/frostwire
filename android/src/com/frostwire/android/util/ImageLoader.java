@@ -210,7 +210,7 @@ public final class ImageLoader {
         };
         Callback.EmptyCallback callback = new Callback.EmptyCallback() {
             @Override
-            public void onError() {
+            public void onError(Exception e) {
                 if (secondaryUri != null) {
                     load(secondaryUri, filter, imageView, cache);
                 }
@@ -243,7 +243,7 @@ public final class ImageLoader {
         if (!shutdown) {
             picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new Callback.EmptyCallback() {
                 @Override
-                public void onError() {
+                public void onError(Exception e) {
                     load(uriRetry, target, targetWidth, targetHeight);
                 }
             });

@@ -34,6 +34,9 @@ buildscript {
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
 }
 
 def manifestVersionCode() {
@@ -153,7 +156,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-base:10.2.6'
     compile('com.mopub:mopub-sdk-banner:4.14.0@aar') { transitive = true }
     compile('com.mopub:mopub-sdk-interstitial:4.14.0@aar') { transitive = true }
-    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     compile 'com.frostwire:jlibtorrent-android-arm:1.2.0.9-RC1'
     compile 'com.frostwire:jlibtorrent-android-x86:1.2.0.9-RC1'
     compile fileTree(include: ['*.jar'], dir: 'libs')

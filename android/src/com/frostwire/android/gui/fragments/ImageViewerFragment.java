@@ -19,9 +19,11 @@
 package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -159,7 +161,7 @@ public final class ImageViewerFragment extends AbstractFragment {
             startActionMode(actionModeCallback);
         }
         actionModeCallback.getActionMode().setTitle(FilenameUtils.getName(fd.filePath));
-        fileUri = UIUtils.getFileUri(getActivity(), fd.filePath, false);
+        fileUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, fd.id);
         progressBar.setVisibility(View.VISIBLE);
         highResLoaded = false;
 
@@ -185,7 +187,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                     }
 
                     @Override
-                    public void onError() {
+                    public void onError(Exception e) {
                         LOG.info("updateData()::onError() Could not load imageViewHighRes from " + fileUri);
                         highResLoaded = false;
                         progressBar.setVisibility(View.GONE);
