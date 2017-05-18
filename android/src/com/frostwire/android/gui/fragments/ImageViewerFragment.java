@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
@@ -161,10 +162,16 @@ public final class ImageViewerFragment extends AbstractFragment {
         fileUri = UIUtils.getFileUri(getActivity(), fd.filePath, false);
         progressBar.setVisibility(View.VISIBLE);
         highResLoaded = false;
+
+        // under the assumption that the main image view to render the
+        // picture will cover the main screen, or even go to full screen,
+        // then using the display size as a target is a good idea
+        Point size = displaySize();
+
         // load high res version
         imageLoader.loadBitmapAsync(
-                -1, // fit
-                -1, // fit
+                size.x,
+                size.y,
                 fileUri,
                 R.drawable.picture_placeholder,
                 false,
@@ -302,5 +309,11 @@ public final class ImageViewerFragment extends AbstractFragment {
         public void setInFullScreenMode(boolean inFullScreenMode) {
             this.inFullScreenMode = inFullScreenMode;
         }
+    }
+
+    private Point displaySize() {
+        Point size = new Point();
+        getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+        return size;
     }
 }

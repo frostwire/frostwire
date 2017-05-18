@@ -167,8 +167,7 @@ public final class ImageLoader {
     }
 
     /**
-     *
-     * @param resizedWidth // if 0 is passed, proportions with respect to height will be calculated. if -1 is passed image will be fitted to view's dimensions
+     * @param resizedWidth  // if 0 is passed, proportions with respect to height will be calculated. if -1 is passed image will be fitted to view's dimensions
      * @param resizedHeight // if 0 is passed, proportions with respect to height will be calculated. if -1 is passed image will be fitted to view's dimensions
      * @param imageUri
      * @param placeHolderId
@@ -185,12 +184,8 @@ public final class ImageLoader {
             requestCreator.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
         }
         requestCreator.placeholder(placeHolderId);
-        if (resizedWidth == -1 && resizedWidth == -1) {
-            requestCreator.fit();
-            requestCreator.centerInside();
-        } else {
-            requestCreator.resize(resizedWidth, resizedHeight);
-        }
+        requestCreator.resize(resizedWidth, resizedHeight);
+        requestCreator.centerInside();
 
         if (callback != null) {
             requestCreator.into(view, callback);
