@@ -118,7 +118,7 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
     }
 
     private static void startOgury(Context context) {
-        if (!OGURY_ENABLED) {
+        if (!OGURY_ENABLED || OGURY_STARTED) {
             return;
         }
         try {
