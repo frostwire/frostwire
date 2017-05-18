@@ -48,7 +48,6 @@ import com.frostwire.android.gui.views.TouchImageView;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.util.Logger;
 import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -168,7 +167,6 @@ public final class ImageViewerFragment extends AbstractFragment {
                 -1, // fit
                 fileUri,
                 R.drawable.picture_placeholder,
-                Picasso.Priority.HIGH,
                 false,
                 imageViewHighRes, new Callback() {
                     @Override

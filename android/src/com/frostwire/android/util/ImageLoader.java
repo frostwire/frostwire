@@ -172,11 +172,10 @@ public final class ImageLoader {
      * @param resizedHeight // if 0 is passed, proportions with respect to height will be calculated. if -1 is passed image will be fitted to view's dimensions
      * @param imageUri
      * @param placeHolderId
-     * @param priority
      * @param view
      * @param callback
      */
-    public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, int placeHolderId, Picasso.Priority priority, boolean useDiskCache, ImageView view, final Callback callback) {
+    public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, int placeHolderId, boolean useDiskCache, ImageView view, final Callback callback) {
         if (imageUri == null) {
             throw new IllegalArgumentException("Uri can't be null");
         }
@@ -186,7 +185,6 @@ public final class ImageLoader {
             requestCreator.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
         }
         requestCreator.placeholder(placeHolderId);
-        requestCreator.priority(priority);
         if (resizedWidth == -1 && resizedWidth == -1) {
             requestCreator.fit();
             requestCreator.centerInside();

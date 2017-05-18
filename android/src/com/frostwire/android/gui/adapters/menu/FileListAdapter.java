@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
+ *            Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,7 +63,6 @@ import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -473,19 +472,19 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 Uri uri = ContentUris.withAppendedId(Video.Media.EXTERNAL_CONTENT_URI, fd.id);
                 final Uri uriRetry = ImageLoader.getMetadataArtUri(uri);
                 thumbnailLoader.load(uri, uriRetry, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
-                thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uri, R.drawable.picture_placeholder, Picasso.Priority.HIGH, true, fileThumbnail, new Callback() {
+                thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uri, R.drawable.picture_placeholder, true, fileThumbnail, new Callback() {
                     @Override
                     public void onSuccess() {
                     }
 
                     @Override
                     public void onError() {
-                        thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uriRetry, R.drawable.picture_placeholder, Picasso.Priority.HIGH, true, fileThumbnail, null);
+                        thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uriRetry, R.drawable.picture_placeholder, true, fileThumbnail, null);
                     }
                 });
             } else if (fd.fileType == Constants.FILE_TYPE_PICTURES) {
                 Uri uri = ContentUris.withAppendedId(Images.Media.EXTERNAL_CONTENT_URI, fd.id);
-                thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uri, R.drawable.picture_placeholder, Picasso.Priority.HIGH, true, fileThumbnail, null);
+                thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uri, R.drawable.picture_placeholder, true, fileThumbnail, null);
             }
         }
 
