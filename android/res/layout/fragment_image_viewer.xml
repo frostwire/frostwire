@@ -30,7 +30,6 @@
         style="@style/ProgressBarHolo.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:indeterminate="true" />
 
@@ -38,7 +37,6 @@
         android:id="@+id/fragment_image_viewer_image_highres"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/fragment_image_viewer_progress_bar"
         android:layout_centerInParent="true"
         android:src="@drawable/picture_placeholder"
         android:visibility="visible" />
