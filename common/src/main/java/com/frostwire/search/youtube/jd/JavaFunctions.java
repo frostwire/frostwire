@@ -187,4 +187,8 @@ final class JavaFunctions {
 
         return null;
     }
+
+    public static String remove_quotes(String s) {
+        return s.replaceAll("^\"|\"$", "");
+    }
 }

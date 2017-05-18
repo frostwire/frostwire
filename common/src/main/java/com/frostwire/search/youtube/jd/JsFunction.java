@@ -28,6 +28,7 @@ import static com.frostwire.search.youtube.jd.JavaFunctions.list;
 import static com.frostwire.search.youtube.jd.JavaFunctions.mscpy;
 import static com.frostwire.search.youtube.jd.JavaFunctions.reverse;
 import static com.frostwire.search.youtube.jd.JavaFunctions.slice;
+import static com.frostwire.search.youtube.jd.JavaFunctions.remove_quotes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public final class JsFunction<T> {
 
     // TODO: refactor visibility here
     public final static String WS = "[ \\t\\n\\x0B\\f\\r]"; //whitespaces, line feeds, aka \s.
-    private final static String VAR = "[a-zA-Z$0-9_]+";
+    private final static String VAR = "[a-zA-Z$0-9_\"]+";
     private final static String CODE = "{(?<code>[^\\}]+)\\}";
 
     public JsFunction(String jscode, String funcname) {
@@ -155,7 +156,15 @@ public final class JsFunction<T> {
         }
 
         Matcher m = Pattern.compile("^(?<var>"+VAR+")\\.(?<member>[^\\(]+)(\\((?<args>[^\\(\\)]*)\\))?$").matcher(expr);
-        if (m.find()) {
+        boolean mFind = m.find();
+        if (!mFind) {
+            // maybe it's the new pattern?
+            // oE["do"](a,67)
+            m = Pattern.compile("^(?<var>" + VAR + ")\\[\"(?<member>[^\\(]+)\"\\](\\((?<args>[^\\(\\)]*)\\))?$").matcher(expr);
+            mFind = m.find();
+        }
+
+        if (mFind) {
             String variable = m.group("var");
             String member = m.group("member");
             String arg_str = m.group("args");
@@ -271,7 +280,8 @@ public final class JsFunction<T> {
 
             LambdaN f = build_function(ctx, argnames, fields_m.group("code"));
 
-            obj.functions.put(fields_m.group("key"), f);
+            String field = remove_quotes(fields_m.group("key"));
+            obj.functions.put(field, f);
         }
 
         return obj;
