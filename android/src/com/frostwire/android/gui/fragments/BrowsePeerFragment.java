@@ -577,6 +577,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             boolean wasChecked = checked.contains(v.getTag());
             adapter.setChecked(position, !wasChecked);
             adapter.notifyDataSetInvalidated();
+            autoCheckUnCheckSelectAllCheckbox();
             selectionModeCallback.onItemChecked(getActivity(), adapter.getCheckedCount());
         }
 
