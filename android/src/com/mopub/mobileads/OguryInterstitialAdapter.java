@@ -64,7 +64,6 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         }
 
         if (!OGURY_ENABLED) {
-            customEventInterstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
             LOG.info("loadInterstitial() aborted, ogury not enabled.");
             return;
         }
@@ -94,11 +93,11 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         }
 
         if (presage().canShow()) {
-            presage().adToServe(new OguryIADHandler(interstitialListener));
-            LOG.info("Showing Ogury-Mopub interstitial");
+            LOG.info("showInterstitial() Showing Ogury-Mopub interstitial");
+            presage().show(new OguryIADHandler(interstitialListener));
         } else {
+            LOG.info("showInterstitial() Ogury-Mopub canShow()=false, ad not loaded yet");
             interstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
-            LOG.info("Ogury-Mopub show interstitial failed, ad not loaded yet");
         }
     }
 
@@ -163,7 +162,7 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
         @Override
         public void onAdError(int code) {
-            mopubListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
+            mopubListener.onInterstitialFailed(MoPubErrorCode.NETWORK_INVALID_STATE);
         }
 
         @Override
