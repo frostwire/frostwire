@@ -25,7 +25,6 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
@@ -71,16 +70,16 @@ public final class ImageViewerFragment extends AbstractFragment {
     public static final String EXTRA_IN_FULL_SCREEN_MODE = "com.frostwire.android.extra.boolean.IN_FULL_SCREEN_MODE";
 
     private RelativeLayout containerLayout;
-    private TouchImageView imageViewLowRes;
     private TouchImageView imageViewHighRes;
-    private TouchImageView imageViewFullScreen;
+
     private ProgressBar progressBar;
     private FileDescriptor fd;
     private ImageViewerActionModeCallback actionModeCallback;
     boolean inFullScreenMode = false;
-    private ScreenMetrics screenMetrics;
     private ImageLoader imageLoader;
     private Uri fileUri;
+
+    private boolean highResLoaded = false;
 
     public ImageViewerFragment() {
         super(R.layout.fragment_image_viewer);
@@ -98,34 +97,22 @@ public final class ImageViewerFragment extends AbstractFragment {
 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
-
+        imageLoader = ImageLoader.getInstance(getActivity());
         containerLayout = findView(v, R.id.fragment_image_viewer_container_layout);
         progressBar = findView(v, R.id.fragment_image_viewer_progress_bar);
-
-
         progressBar.setVisibility(View.VISIBLE);
-        imageViewLowRes = findView(v, R.id.fragment_image_viewer_image_lowres);
-        imageViewLowRes.setVisibility(View.VISIBLE);
-
         imageViewHighRes = findView(v, R.id.fragment_image_viewer_image_highres);
-        imageViewHighRes.setVisibility(View.GONE);
-
-        imageViewFullScreen = findView(v, R.id.fragment_image_viewer_image_fullscreen);
-        imageViewFullScreen.setVisibility(View.GONE);
-
         View.OnClickListener toogleFullScreenClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!highResLoaded && !inFullScreenMode) {
+                    LOG.info("Not going into full screen, images not loaded");
+                    return;
+                }
                 toggleFullScreen();
             }
         };
-        imageViewLowRes.setOnClickListener(toogleFullScreenClickListener);
         imageViewHighRes.setOnClickListener(toogleFullScreenClickListener);
-        imageViewFullScreen.setOnClickListener(toogleFullScreenClickListener);
-
-        screenMetrics = new ScreenMetrics();
-        imageLoader = ImageLoader.getInstance(getActivity());
-
         if (savedInstanceState != null) {
             Bundle data = savedInstanceState.getBundle(EXTRA_FILE_DESCRIPTOR);
             if (data != null) {
@@ -154,8 +141,6 @@ public final class ImageViewerFragment extends AbstractFragment {
         if (!inFullScreenMode) {
             actionModeCallback.setInFullScreenMode(true); // so it doesn't finish the activity when destroyed
             actionModeCallback.getActionMode().finish();
-            imageViewHighRes.setVisibility(View.GONE);
-            imageViewFullScreen.setVisibility(View.VISIBLE);
         } else {
             actionModeCallback.setInFullScreenMode(false);
             startActionMode(actionModeCallback);
@@ -167,7 +152,7 @@ public final class ImageViewerFragment extends AbstractFragment {
         inFullScreenMode = !inFullScreenMode;
     }
 
-    public void updateData(FileDescriptor fd) {
+    public void updateData(final FileDescriptor fd) {
         this.fd = fd;
         if (actionModeCallback == null) {
             actionModeCallback = new ImageViewerActionModeCallback(this.fd);
@@ -176,96 +161,34 @@ public final class ImageViewerFragment extends AbstractFragment {
         actionModeCallback.getActionMode().setTitle(FilenameUtils.getName(fd.filePath));
         fileUri = UIUtils.getFileUri(getActivity(), fd.filePath, false);
         progressBar.setVisibility(View.VISIBLE);
-
-        // load low res version
+        highResLoaded = false;
+        // load high res version
         imageLoader.loadBitmapAsync(
-                screenMetrics.lowResWidth,
-                screenMetrics.highResHeight,
+                -1, // fit
+                -1, // fit
                 fileUri,
                 R.drawable.picture_placeholder,
                 Picasso.Priority.HIGH,
                 false,
-                imageViewLowRes,
-                new Callback() {
+                imageViewHighRes, new Callback() {
                     @Override
                     public void onSuccess() {
-                        imageViewLowRes.setVisibility(View.VISIBLE);
-                        imageViewLowRes.postInvalidate();
-                        imageLoader.loadBitmapAsync(
-                                -1,
-                                -1,
-                                fileUri,
-                                R.drawable.picture_placeholder,
-                                Picasso.Priority.NORMAL,
-                                false,
-                                imageViewHighRes, new Callback() {
-                                    @Override
-                                    public void onSuccess() {
-                                        progressBar.setVisibility(View.GONE);
-                                        imageViewLowRes.setVisibility(View.GONE);
-                                        imageViewHighRes.setVisibility(View.VISIBLE);
-                                        imageViewHighRes.postInvalidate();
-                                    }
-
-                                    @Override
-                                    public void onError() {
-                                    }
-                                });
-                    }
-
-                    @Override
-                    public void onError() {
-                    }
-                });
-
-        // load full screen version in background
-        imageLoader.loadBitmapAsync(
-                screenMetrics.fullScreenWidth,
-                screenMetrics.fullScreenHeight,
-                fileUri,
-                R.drawable.picture_placeholder,
-                Picasso.Priority.LOW,
-                false,
-                imageViewFullScreen,
-                new Callback() {
-                    @Override
-                    public void onSuccess() {
+                        LOG.info("updateData()::onSuccess() loaded imageViewHighRes from " + fileUri);
+                        highResLoaded = true;
                         progressBar.setVisibility(View.GONE);
-                        imageViewHighRes.setVisibility(View.GONE);
-                        imageViewFullScreen.setVisibility(View.VISIBLE);
-                        imageViewFullScreen.postInvalidate();
+                        imageViewHighRes.postInvalidate();
                     }
 
                     @Override
                     public void onError() {
+                        LOG.info("updateData()::onError() Could not load imageViewHighRes from " + fileUri);
+                        highResLoaded = false;
+                        progressBar.setVisibility(View.GONE);
+                        imageViewHighRes.setImageDrawable(null);
+                        UIUtils.showShortMessage(getActivity(), "Could not load image");
+                        getActivity().finish();
                     }
                 });
-    }
-
-    private final class ScreenMetrics {
-        public final int screenWidth;
-        public final int screenHeight;
-        public final boolean screenIsVertical;
-        public final int lowResWidth;
-        public final int lowResHeight;
-        public final int highResWidth;
-        public final int highResHeight;
-        public final int fullScreenWidth;
-        public final int fullScreenHeight;
-
-        ScreenMetrics() {
-            int[] dimsAndRot = UIUtils.getScreenDimensionsAndRotation(getActivity());
-            int screenRotation = dimsAndRot[2];
-            screenWidth = dimsAndRot[0];
-            screenHeight = dimsAndRot[1];
-            screenIsVertical = screenRotation == Surface.ROTATION_0 || screenRotation == Surface.ROTATION_180;
-            highResWidth = !screenIsVertical ? (int) (screenWidth / 4.0) : 0;
-            highResHeight = screenIsVertical ? (int) (screenHeight / 4.0) : 0;
-            lowResWidth = !screenIsVertical ? (int) (screenWidth / 20.0) : 0;
-            lowResHeight = screenIsVertical ? (int) (screenHeight / 20.0) : 0;
-            fullScreenWidth = !screenIsVertical ? screenWidth : 0;
-            fullScreenHeight = screenIsVertical ? screenHeight : 0;
-        }
     }
 
     private final class ImageViewerActionModeCallback implements android.support.v7.view.ActionMode.Callback {
@@ -286,8 +209,6 @@ public final class ImageViewerFragment extends AbstractFragment {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             this.mode = mode;
             this.menu = menu;
-
-
             mode.getMenuInflater().inflate(R.menu.fragment_browse_peer_action_mode_menu, menu);
             return true;
         }

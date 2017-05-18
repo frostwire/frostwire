@@ -31,7 +31,6 @@ import com.frostwire.android.gui.views.AbstractActivity;
  * @author votaguz
  */
 public final class ImageViewerActivity extends AbstractActivity {
-
     public ImageViewerActivity() {
         super(R.layout.activity_image_viewer);
     }
@@ -40,8 +39,8 @@ public final class ImageViewerActivity extends AbstractActivity {
     protected void initComponents(Bundle savedInstanceState) {
         Bundle extras = getIntent().getBundleExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR);
         if (extras != null && !extras.isEmpty()) {
-            ImageViewerFragment imageViewerFragment = findFragment(R.id.fragment_image_viewer);
             FileDescriptor fd = new FileDescriptor(extras);
+            ImageViewerFragment imageViewerFragment = findFragment(R.id.fragment_image_viewer);
             imageViewerFragment.updateData(fd);
             extras.clear();
         }

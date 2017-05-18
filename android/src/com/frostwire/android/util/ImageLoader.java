@@ -80,6 +80,8 @@ public final class ImageLoader {
 
     private static final Uri METADATA_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + METADATA_AUTHORITY);
 
+    private static final boolean DEBUG_ERRORS = false;
+
     private final ImageCache cache;
     private final Picasso picasso;
 
@@ -148,12 +150,20 @@ public final class ImageLoader {
         long diskSize = SystemUtils.calculateDiskCacheSize(directory, MIN_DISK_CACHE_SIZE, MAX_DISK_CACHE_SIZE);
         int memSize = SystemUtils.calculateMemoryCacheSize(context);
         this.cache = new ImageCache(directory, diskSize, memSize);
-        this.picasso = new Builder(context).
+        Builder picassoBuilder = new Builder(context).
                 addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
                 memoryCache(cache).
-                executor(Engine.instance().getThreadPool()).
-                build();
-        picasso.setIndicatorsEnabled(false);
+                executor(Engine.instance().getThreadPool());
+        if (DEBUG_ERRORS) {
+            picassoBuilder.listener(new Picasso.Listener() {
+                @Override
+                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                    LOG.error("ImageLoader::onImageLoadFailed(" + uri + ")", exception);
+                }
+            });
+        }
+        this.picasso = picassoBuilder.build();
+        this.picasso.setIndicatorsEnabled(DEBUG_ERRORS);
     }
 
     /**
@@ -175,14 +185,13 @@ public final class ImageLoader {
         if (!useDiskCache) {
             requestCreator.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
         }
-
         requestCreator.placeholder(placeHolderId);
         requestCreator.priority(priority);
-
-        if (!(resizedWidth == -1 && resizedHeight == -1)) {
-            requestCreator.resize(resizedWidth, resizedHeight);
-        } else {
+        if (resizedWidth == -1 && resizedWidth == -1) {
             requestCreator.fit();
+            requestCreator.centerInside();
+        } else {
+            requestCreator.resize(resizedWidth, resizedHeight);
         }
 
         if (callback != null) {
