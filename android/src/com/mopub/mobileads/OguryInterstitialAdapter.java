@@ -119,7 +119,7 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
     }
 
     private static void startOgury(Context context) {
-        if (OGURY_STARTED || !OGURY_ENABLED) {
+        if (!OGURY_ENABLED) {
             return;
         }
         try {
@@ -127,10 +127,10 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
             // presage internally picks the application context
             presage().setContext(context);
             presage().start();
-            LOG.info("Ogury started from Mopub-Ogury adapter");
+            LOG.info("startOgury: Ogury started from Mopub-Ogury adapter");
         } catch (Throwable e) {
             OGURY_STARTED = false;
-            LOG.error("Could not start Ogury from Mopub-Ogury adapter", e);
+            LOG.error("startOgury: Could not start Ogury from Mopub-Ogury adapter", e);
         }
     }
 
