@@ -1,7 +1,9 @@
 frostwire (6.5.1) stable; urgency=high
+  * YT search fixed
+  * Javascript parser updates
   * Romanian, Bulgarian, Bengali, Danish, Greek translations updated
 	
- -- FrostWire Team <contact@frostwire.com>  Wed, 17 May 2017 11:52:48 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 18 May 2017 15:28:55 -0600
 
 frostwire (6.5.0) stable; urgency=high
   * Issue where transfers would dissapear until new transfer was added fixed
