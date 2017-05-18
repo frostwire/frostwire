@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.util.Logger;
 
 import java.util.Map;
@@ -68,8 +69,13 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
             return;
         }
 
-        interstitialListener = customEventInterstitialListener;
+        if (Offers.disabledAds()) {
+            LOG.info("loadInterstitial() aborted, ogury not enabled. PlayStore reports no ads");
+            return;
+        }
 
+        interstitialListener = customEventInterstitialListener;
+        LOG.info("loadInterstitial() starting ogury");
         startOgury(context); // starts only once
         presage().load(new OguryIADHandler(interstitialListener));
     }
