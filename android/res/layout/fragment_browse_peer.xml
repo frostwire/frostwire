@@ -18,59 +18,59 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <View
         style="@style/divider_line_dark"
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="1dp" />
 
     <android.support.design.widget.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             android:id="@+id/fragment_browse_peer_tab_layout_file_type"
-                                             style="@style/AppTabLayout"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="50dp"
-                                             app:tabGravity="fill"
-                                             app:tabMode="fixed">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/fragment_browse_peer_tab_layout_file_type"
+        style="@style/AppTabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:tabGravity="fill"
+        app:tabMode="fixed">
 
         <android.support.design.widget.TabItem
             android:id="@+id/fragment_browse_peer_tab_audio"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_audio_icon_tab_selector"/>
+            android:icon="@drawable/browse_peer_audio_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/fragment_browse_peer_tab_videos"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_ringtone_icon_tab_selector"/>
+            android:icon="@drawable/browse_peer_ringtone_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/fragment_browse_peer_tab_pictures"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_video_icon_tab_selector"/>
+            android:icon="@drawable/browse_peer_video_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/fragment_browse_peer_tab_applications"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_picture_icon_tab_selector"/>
+            android:icon="@drawable/browse_peer_picture_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/fragment_browse_peer_tab_documents"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_document_icon_tab_selector"/>
+            android:icon="@drawable/browse_peer_document_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/fragment_browse_peer_tab_torrents"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_torrent_icon_tab_selector"/>
+            android:icon="@drawable/browse_peer_torrent_icon_tab_selector" />
     </android.support.design.widget.TabLayout>
 
     <!-- Checkbox and Search Box for Browse Peer, see view_browse_peer_search_bar.xml -->
@@ -91,13 +91,13 @@
             android:layout_marginRight="5dp"
             android:gravity="center_vertical"
             android:paddingLeft="5dp"
-            android:text="@string/select_all"/>
+            android:text="@string/select_all" />
 
-        <ImageView
+        <View
+            style="@style/divider_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/divider_line"/>
+            android:layout_alignParentBottom="true" />
 
     </RelativeLayout>
 
@@ -111,21 +111,22 @@
         <ProgressBar
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="4dip"
-            android:singleLine="true"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingTop="4dp"
             android:text="@string/loading"
-            android:textAppearance="?android:attr/textAppearanceSmall"/>
+            android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
 
     <FrameLayout
         android:id="@+id/fragment_browse_peer_grid_container"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:padding="2dp">
 
@@ -144,15 +145,15 @@
                     android:id="@+id/fragment_browse_peer_gridview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/app_background_body_light"
+                    android:background="@color/app_divider"
                     android:fastScrollEnabled="true"
                     android:gravity="center"
-                    android:horizontalSpacing="2dp"
+                    android:horizontalSpacing="1dp"
                     android:numColumns="1"
                     android:stretchMode="columnWidth"
                     android:textFilterEnabled="true"
-                    android:verticalSpacing="2dp"
-                    />
+                    android:verticalSpacing="1dp" />
+
             </android.support.v4.widget.SwipeRefreshLayout>
         </com.frostwire.android.gui.views.SwipeLayout>
 
