@@ -174,7 +174,7 @@ public final class ImageLoader {
      * @param view
      * @param callback
      */
-    public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, int placeHolderId, boolean useDiskCache, ImageView view, final Callback callback) {
+    public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, int placeHolderId, boolean useDiskCache, boolean noFade, ImageView view, final Callback callback) {
         if (imageUri == null) {
             throw new IllegalArgumentException("Uri can't be null");
         }
@@ -182,6 +182,9 @@ public final class ImageLoader {
 
         if (!useDiskCache) {
             requestCreator.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
+        }
+        if (noFade) {
+            requestCreator.noFade();
         }
         requestCreator.placeholder(placeHolderId);
         requestCreator.resize(resizedWidth, resizedHeight);

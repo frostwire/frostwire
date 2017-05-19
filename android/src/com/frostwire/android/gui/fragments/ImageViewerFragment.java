@@ -177,6 +177,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                 fileUri,
                 R.drawable.picture_placeholder,
                 false,
+                false,
                 imageViewHighRes, new Callback() {
                     @Override
                     public void onSuccess() {
