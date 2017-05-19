@@ -26,7 +26,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -35,7 +42,14 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
-import com.frostwire.android.gui.adapters.menu.*;
+import com.frostwire.android.gui.adapters.menu.CancelMenuAction;
+import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
+import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
+import com.frostwire.android.gui.adapters.menu.PauseDownloadMenuAction;
+import com.frostwire.android.gui.adapters.menu.ResumeDownloadMenuAction;
+import com.frostwire.android.gui.adapters.menu.SeedAction;
+import com.frostwire.android.gui.adapters.menu.SendBitcoinTipAction;
+import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
@@ -47,13 +61,24 @@ import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.search.WebSearchPerformer;
-import com.frostwire.transfers.*;
+import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.transfers.HttpDownload;
+import com.frostwire.transfers.SoundcloudDownload;
+import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.TransferItem;
+import com.frostwire.transfers.TransferState;
+import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Logger;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author gubatron
@@ -284,10 +309,15 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
-            if (files != null && files.size() == 1 && !AndroidPlatform.saf(new File(files.get(0).filePath))) {
+            boolean singleFile = files != null && files.size() == 1;
+            if (singleFile && !AndroidPlatform.saf(new File(files.get(0).filePath))) {
                 items.add(new SeedAction(context.get(), files.get(0), download));
             }
-            items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
+            if (singleFile && files.get(0).fileType == Constants.FILE_TYPE_PICTURES) {
+                items.add(new OpenMenuAction(context.get(), download.getDisplayName(), files.get(0)));
+            } else {
+                items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
+            }
         }
         items.add(new CancelMenuAction(context.get(), download, !finishedSuccessfully));
         return title;
