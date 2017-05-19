@@ -20,14 +20,14 @@
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content">
 
     <RelativeLayout
         android:id="@+id/view_browse_peer_thumbnail_list_item_browse_thumbnail_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        >
+        android:gravity="center">
+
         <ImageButton
             android:id="@+id/view_browse_peer_thumbnail_list_item_browse_thumbnail_image_button"
             android:layout_width="65dp"
@@ -43,8 +43,7 @@
             android:layout_height="35dp"
             android:layout_centerInParent="true"
             android:clickable="true"
-            android:visibility="visible"
-            />
+            android:visibility="visible" />
     </RelativeLayout>
 
     <TextView
@@ -75,7 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/view_browse_peer_thumbnail_list_item_browse_thumbnail_container"
         android:layout_alignLeft="@id/view_browse_peer_thumbnail_list_image_item_file_title"
-        android:layout_marginBottom="2dip"
+        android:layout_marginBottom="2dp"
         android:text="@string/dummy_size" />
 
     <ImageView

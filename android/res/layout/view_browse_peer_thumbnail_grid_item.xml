@@ -19,12 +19,12 @@
  */
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:frostwire="http://schemas.android.com/apk/res-auto"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:gravity="center">
+    xmlns:frostwire="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical">
 
     <ImageButton
         android:id="@+id/view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button"
@@ -34,17 +34,17 @@
         android:adjustViewBounds="true"
         android:background="@color/app_browse_thumbnail_background"
         android:contentDescription="@null"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop" />
 
     <com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView
         android:id="@+id/view_browse_peer_thumbnail_grid_item_playback_overlay_view"
-        frostwire:circleStrokeWidth="10"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_centerInParent="true"
         android:clickable="true"
         android:foregroundGravity="center"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        frostwire:circleStrokeWidth="10" />
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -54,12 +54,11 @@
 
         <TextView
             android:id="@+id/view_browse_peer_thumbnail_grid_item_filesize"
+            style="@style/GridThumbnailText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="123.5 KB"
-            android:visibility="gone"
-            style="@style/GridThumbnailText"
-             />
+            android:visibility="gone" />
     </FrameLayout>
 
     <FrameLayout
@@ -69,6 +68,7 @@
         android:background="@color/app_grid_selected_background"
         android:clickable="true"
         android:visibility="gone">
+
         <ImageView
             android:layout_width="30dp"
             android:layout_height="wrap_content"
