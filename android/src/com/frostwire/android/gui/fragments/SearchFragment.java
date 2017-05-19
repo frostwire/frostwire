@@ -157,6 +157,7 @@ public final class SearchFragment extends AbstractFragment implements
 
         if (adapter != null && (adapter.getCount() > 0 || adapter.getTotalCount() > 0)) {
             refreshFileTypeCounters(true);
+            searchInput.selectTabByMediaType((byte) ConfigurationManager.instance().getLastMediaTypeFilter());
         } else {
             setupPromoSlides();
         }
@@ -572,6 +573,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         public void onMediaTypeSelected(View view, int mediaTypeId) {
+            ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId);
             fragment.adapter.setFileType(mediaTypeId);
             fragment.showSearchView(parentView);
         }

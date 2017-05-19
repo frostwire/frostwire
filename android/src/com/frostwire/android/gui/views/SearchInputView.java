@@ -152,7 +152,6 @@ public class SearchInputView extends LinearLayout {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                // necessary while we refactor into TabLayout and out of RadioGroup
                 tabItemFileTypeClick(FileTypeTab.at(tab.getPosition()).fileType);
             }
         };
@@ -176,6 +175,7 @@ public class SearchInputView extends LinearLayout {
     }
 
     private void onSearch(String query, int mediaTypeId) {
+        selectTabByMediaType((byte) mediaTypeId);
         if (onSearchListener != null) {
             onSearchListener.onSearch(this, query, mediaTypeId);
         }
@@ -221,10 +221,10 @@ public class SearchInputView extends LinearLayout {
     }
 
     private void tabItemFileTypeClick(final int fileType) {
-        updateHint(fileType);
-        onMediaTypeSelected(fileType);
         SearchInputView.this.mediaTypeId = fileType;
         ConfigurationManager.instance().setLastMediaTypeFilter(fileType);
+        updateHint(fileType);
+        onMediaTypeSelected(fileType);
     }
 
     public interface OnSearchListener {
