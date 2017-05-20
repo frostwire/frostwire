@@ -248,7 +248,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                     new SeedAction(context, fd, null).onClick();
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_open:
-                    new OpenMenuAction(context, fd.filePath, fd.mime, fd.fileType).onClick();
+                    new OpenMenuAction(context, fd).onClick();
                     break;
                 case R.id.fragment_browse_peer_action_mode_menu_file_information:
                     new FileInformationAction(context, fd).onClick();

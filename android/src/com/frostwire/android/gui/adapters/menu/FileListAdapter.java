@@ -322,7 +322,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
 
             if (canOpenFile) {
-                items.add(new OpenMenuAction(context, fd.filePath, fd.mime, fd.fileType));
+                items.add(new OpenMenuAction(context, fd));
             }
 
             items.add(new FileInformationAction(context, fd));

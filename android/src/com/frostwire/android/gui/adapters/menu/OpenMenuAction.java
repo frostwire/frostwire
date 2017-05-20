@@ -57,13 +57,14 @@ public class OpenMenuAction extends MenuAction {
         this.fd = null;
     }
 
-    public OpenMenuAction(Context context, String filePath, String mime, byte fileType) {
+    public OpenMenuAction(Context context, FileDescriptor fileDescriptor) {
         super(context, R.drawable.contextmenu_icon_open, R.string.open);
-        this.path = filePath;
-        this.mime = mime;
-        this.fileType = fileType;
-        this.fd = null;
+        this.path = fileDescriptor.filePath;
+        this.mime = fileDescriptor.mime;
+        this.fileType = fileDescriptor.fileType;
+        this.fd = fileDescriptor;
     }
+
 
     public OpenMenuAction(Context context, String title, FileDescriptor pictureFileDescriptor) {
         super(context, R.drawable.contextmenu_icon_picture, R.string.open_menu_action, title);
@@ -79,10 +80,15 @@ public class OpenMenuAction extends MenuAction {
             Intent intent = new Intent(context, ImageViewerActivity.class);
             intent.putExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR, fd.toBundle());
             context.startActivity(intent);
-        } else if (fileType != Constants.FILE_TYPE_RINGTONES) {
-            UIUtils.openFile(context, path, mime, true);
+        } else if (fileType == Constants.FILE_TYPE_RINGTONES) {
+            if (MusicUtils.isPlaying()) {
+                MusicUtils.playOrPause();
+            }
+            MusicUtils.playSimple(this.path);
+        } else if (fileType == Constants.FILE_TYPE_AUDIO) {
+            UIUtils.playEphemeralPlaylist(fd);
         } else {
-            MusicUtils.playSimple(path);
+            UIUtils.openFile(context, path, mime, true);
         }
     }
 }
