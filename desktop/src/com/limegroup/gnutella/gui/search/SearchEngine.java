@@ -189,7 +189,20 @@ public abstract class SearchEngine {
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        return Arrays.asList(YOUTUBE, ZOOQLE, TPB, SOUNDCLOUD, FROSTCLICK, MONOVA, ARCHIVEORG, TORLOCK, YIFY, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
+        List<SearchEngine>  list = Arrays.asList(YOUTUBE, ZOOQLE, TPB, SOUNDCLOUD, FROSTCLICK, MONOVA, ARCHIVEORG, TORLOCK, YIFY, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
+
+        // ensure that at leas one is enable
+        boolean oneEnabled = false;
+        for (SearchEngine se : list) {
+            if (se.isEnabled()) {
+                oneEnabled = true;
+            }
+        }
+        if (!oneEnabled) {
+            YOUTUBE._setting.setValue(true);
+        }
+
+        return list;
     }
 
     public abstract SearchPerformer getPerformer(long token, String keywords);
