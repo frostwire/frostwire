@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.search.monova;
@@ -23,7 +22,6 @@ import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * @author gubatron
@@ -32,7 +30,7 @@ import java.util.Date;
 public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSearchResult> {
 
     private static final int MAX_RESULTS = 20;
-    private static final String REGEX = "(?is)<a href=\"//%s/torrent/(?<itemid>[0-9]*?)/(?<filename>.*?)\">";
+    private static final String REGEX = "(?is)<a href=\"//%s/(?<itemid>[A-Fa-f0-9]*?)\">";
     private static final String HTML_REGEX = "(?is)" +
             // filename
             "<div class=\"col-md-12.*?<h1>\\n(?<filename>.*?) </h1>.*?" +
@@ -44,7 +42,7 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
             "<td>Total size:</td>.*?<td>(?<size>.*?)</td>.*?" +
             // download torrent url
             "<a id=\"download-file\" href=\"(?<torrenturl>.*?)\" class=\"btn";
-    private static int SIX_MONTHS_IN_SECS = 15552000;
+    private static final int SIX_MONTHS_IN_SECS = 15552000;
 
     public MonovaSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, String.format(REGEX, domainName), HTML_REGEX);
@@ -67,8 +65,7 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
 
     @Override
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
-        String fileName = matcher.group("filename").replace("&amp;", "&").replace("\n", "");
-        return new MonovaTempSearchResult(getDomainName(), matcher.group("itemid"), fileName);
+        return new MonovaTempSearchResult(getDomainName(), matcher.group("itemid"));
     }
 
     @Override

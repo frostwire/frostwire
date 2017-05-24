@@ -43,7 +43,7 @@ public final class MonovaSearchResult extends AbstractTorrentSearchResult {
     private final long creationTime;
     private final int seeds;
 
-    public MonovaSearchResult(String detailsUrl, SearchMatcher matcher) {
+    MonovaSearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
         this.filename = parseFileName(FilenameUtils.getName(matcher.group("filename")));
         this.displayName = parseDisplayName(HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename)));
@@ -69,14 +69,6 @@ public final class MonovaSearchResult extends AbstractTorrentSearchResult {
         return name + ".torrent";
     }
 
-    private int parseSeeds(String group) {
-        try {
-            return Integer.parseInt(group);
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
     private long parseCreationTime(String dateString) {
         //Apr 10, 2016 06:21:20
         SimpleDateFormat date = new SimpleDateFormat("MMM d, yyyy HH:mm:ss", Locale.US);
@@ -84,6 +76,7 @@ public final class MonovaSearchResult extends AbstractTorrentSearchResult {
         try {
             result = date.parse(dateString).getTime();
         } catch (ParseException e) {
+            // ignore
         }
         return result;
     }
