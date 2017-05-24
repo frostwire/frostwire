@@ -90,6 +90,28 @@ public abstract class SearchEngine {
     }
 
     public static List<SearchEngine> getEngines() {
+        // ensure that at leas one is enable
+        boolean oneEnabled = false;
+        for (SearchEngine se : ALL_ENGINES) {
+            if (se.isEnabled()) {
+                oneEnabled = true;
+            }
+        }
+        if (!oneEnabled) {
+            SearchEngine engineToEnable;
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+                engineToEnable = EZTV;
+            } else {
+                engineToEnable = YOUTUBE;
+            }
+
+            // null check in case the logic above changes
+            if (engineToEnable != null) {
+                String prefKey = engineToEnable.getPreferenceKey();
+                ConfigurationManager.instance().setBoolean(prefKey, true);
+            }
+        }
+
         return ALL_ENGINES;
     }
 
