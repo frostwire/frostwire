@@ -224,7 +224,6 @@
     <string name="media_player_failed">미디어플레이어 실패</string>
     <string name="activity_media_player_name">미디어플레이어</string>
     <string name="search_settings">설정 검색</string>
-    <string name="use_extratorrent">ExtraTorrent.com사용</string>
     <string name="use_zooqle">Zooqle.com사용</string>
     <string name="use_tpb">ThePirateBay.org사용</string>
     <string name="activity_media_player_image_description">미디어 이미지</string>

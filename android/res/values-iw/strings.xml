@@ -355,7 +355,6 @@
     <string name="available">זמין</string>
     <string name="leaving_already">כבר הולך?</string>
     <string name="are_you_sure_wifi_sharing_off">כיבוי שיתוף האינטרנט אלחוטי יעשה את כל הקבצים שלך באופן מקומי המשותפים לא זמינים למשתמשים אחרים ברשת Wifi הסמוכה.</string>
-    <string name="use_extratorrent">השתמש ExtraTorrent.com</string>
     <string name="check_internet_connection">בדוק את החיבור לאינטרנט</string>
     <string name="azureus_manager_item_stopped">עצר</string>
     <string name="cheaper_than_coffee">זול יותר מאשר קפה</string>

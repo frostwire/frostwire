@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_MAX_TORRENT_FILES_TO_INDEX, 100); // no ultra big torrents here
         defaultValues.put(Constants.PREF_KEY_SEARCH_FULLTEXT_SEARCH_RESULTS_LIMIT, 256);
 
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_EXTRATORRENT, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_VERTOR, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ZOOQLE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YOUTUBE, true);

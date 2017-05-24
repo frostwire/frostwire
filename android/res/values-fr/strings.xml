@@ -222,7 +222,6 @@
     <string name="media_player_failed">Le lecteur multimédia a échoué </string>
     <string name="activity_media_player_name">Lecteur multimédia </string>
     <string name="search_settings">Paramètres de recherche</string>
-    <string name="use_extratorrent">Avec ExtraTorrent.com</string>
     <string name="use_zooqle">Avec Zooqle.com</string>
     <string name="use_tpb">Avec ThePirateBay.org</string>
     <string name="activity_media_player_image_description">Image médiatique </string>

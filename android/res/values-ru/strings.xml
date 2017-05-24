@@ -221,7 +221,6 @@
     <string name="media_player_failed">Не удалось запустить медиаплеер</string>
     <string name="activity_media_player_name">Медиаплеер</string>
     <string name="search_settings">Настройки поиска</string>
-    <string name="use_extratorrent">Использовать ExtraTorrent.com</string>
     <string name="use_zooqle">Использовать Zooqle.com</string>
     <string name="use_tpb">Использовать ThePirateBay.org</string>
     <string name="activity_media_player_image_description">Медиа изображение</string>

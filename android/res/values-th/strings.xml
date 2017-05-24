@@ -351,7 +351,6 @@
     <string name="available">ใช้ได้</string>
     <string name="leaving_already">ออกจากแล้วหรือยัง?</string>
     <string name="are_you_sure_wifi_sharing_off">การปิดการใช้งานร่วมกัน Wi-Fi จะทำให้ไฟล์ทั้งหมดของคุณที่ใช้ร่วมกันในประเทศไม่สามารถใช้ได้กับผู้ใช้งานอื่น ๆ บนเครือข่ายไร้สายในบริเวณใกล้เคียง</string>
-    <string name="use_extratorrent">ใช้ ExtraTorrent.com</string>
     <string name="check_internet_connection">ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต</string>
     <string name="azureus_manager_item_stopped">หยุด</string>
     <string name="cheaper_than_coffee">ราคาถูกกว่ากาแฟ</string>

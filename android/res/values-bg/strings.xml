@@ -351,7 +351,6 @@
     <string name="available">на разположение</string>
     <string name="leaving_already">Оставянето вече?</string>
     <string name="are_you_sure_wifi_sharing_off">Изключване споделяне Wi-Fi ще направи всички ваши локално споделени файлове недостъпни за други потребители на близката Wi-Fi мрежа.</string>
-    <string name="use_extratorrent">Използвайте ExtraTorrent.com</string>
     <string name="check_internet_connection">Проверете интернет връзката</string>
     <string name="azureus_manager_item_stopped">Спряна</string>
     <string name="cheaper_than_coffee">По-евтини, отколкото Кафе</string>

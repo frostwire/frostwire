@@ -221,7 +221,6 @@
     <string name="media_player_failed">Media Player ist fehlgeschlagen</string>
     <string name="activity_media_player_name">Media Player</string>
     <string name="search_settings">Einstellungen durchsuchen</string>
-    <string name="use_extratorrent">Benutze ExtraTorrent.com</string>
     <string name="use_zooqle">Benutze Zooqle.com</string>
     <string name="use_tpb">Benutze ThePirateBay.org</string>
     <string name="use_torlock">Benutze TorLock</string>

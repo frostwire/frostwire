@@ -346,7 +346,6 @@
     <string name="available">rendelkezésre áll</string>
     <string name="leaving_already">Elhagyva már?</string>
     <string name="are_you_sure_wifi_sharing_off">Kikapcsolása Wi-Fi megosztás teszi minden helyileg megosztott fájlok nem érhetők el más felhasználók a közeli Wi-Fi hálózat.</string>
-    <string name="use_extratorrent">Használja ExtraTorrent.com</string>
     <string name="check_internet_connection">Internetkapcsolat ellenőrzése</string>
     <string name="azureus_manager_item_stopped">Megállt</string>
     <string name="cheaper_than_coffee">Olcsóbb, mint a kávé</string>

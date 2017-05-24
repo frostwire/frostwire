@@ -357,7 +357,6 @@
     <string name="available">tillgängliga</string>
     <string name="leaving_already">Lämnar redan?</string>
     <string name="are_you_sure_wifi_sharing_off">Stänga Wi-Fi dela kommer att göra alla dina lokala delade filer inte är tillgängliga för andra användare på den närbelägna WiFi-nätverk.</string>
-    <string name="use_extratorrent">Använda ExtraTorrent.com</string>
     <string name="check_internet_connection">Kontrollera Internet-anslutningen</string>
     <string name="azureus_manager_item_stopped">Stoppad</string>
     <string name="cheaper_than_coffee">Billigare än kaffe</string>

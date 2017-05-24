@@ -357,7 +357,6 @@
     <string name="available">saatavissa</string>
     <string name="leaving_already">Poistuminen jo?</string>
     <string name="are_you_sure_wifi_sharing_off">Sammuttaminen Wi-Fi jakaminen tekee kaikki paikallisesti jaetut tiedostot ole muiden käyttäjien läheisellä Wi-Fi-verkkoon.</string>
-    <string name="use_extratorrent">Käytä ExtraTorrent.com</string>
     <string name="check_internet_connection">Tarkista Internet-yhteys</string>
     <string name="azureus_manager_item_stopped">Pysäytetty</string>
     <string name="cheaper_than_coffee">Halvempi kuin kahvi</string>

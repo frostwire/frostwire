@@ -220,7 +220,6 @@
     <string name="media_player_failed">Nghe nhạc thất bại</string>
     <string name="activity_media_player_name">Trình nghe nhạc</string>
     <string name="search_settings">Thiết lập tìm kiếm</string>
-    <string name="use_extratorrent">Chọn ExtraTorrent.com</string>
     <string name="use_zooqle">Chọn Zooqle.com</string>
     <string name="use_tpb">Chọn ThePirateBay.org</string>
     <string name="activity_media_player_image_description">Biểu tượng chơi nhạc</string>

@@ -42,7 +42,6 @@ public interface AppSettings {
 
     // keys
 
-    String SEARCH_EXTRATORRENT_ENABLED = "search_extratorrent_enabled";
     String SEARCH_ZOOQLE_ENABLED = "search_zooqle_enabled";
     String SEARCH_YOUTUBE_ENABLED = "search_youtube_enabled";
     String SEARCH_SOUNDCLOUD_ENABLED = "search_soundcloud_enabled";

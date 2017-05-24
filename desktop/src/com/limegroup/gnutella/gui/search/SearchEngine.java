@@ -1,26 +1,24 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
-import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
@@ -56,7 +54,6 @@ public abstract class SearchEngine {
     private final String _domainName;
     private final BooleanSetting _setting;
 
-    private static final int EXTRATORRENT_ID = 4;
     private static final int TPB_ID = 6;
     private static final int MONOVA_ID = 7;
     private static final int YOUTUBE_ID = 9;
@@ -70,13 +67,6 @@ public abstract class SearchEngine {
     private static final int TORRENTDOWNLOADS_ID = 19;
     private static final int LIMETORRENTS_ID = 20;
     private static final int ZOOQLE_ID = 21;
-
-    private static final SearchEngine EXTRATORRENT = new SearchEngine(EXTRATORRENT_ID, "Extratorrent", SearchEnginesSettings.EXTRATORRENT_SEARCH_ENABLED, "extratorrent.cc") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new ExtratorrentSearchPerformer(EXTRATORRENT.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
 
     private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, "thepiratebay.se") {
         @Override
@@ -199,7 +189,7 @@ public abstract class SearchEngine {
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        return Arrays.asList(YOUTUBE, ZOOQLE, EXTRATORRENT, TPB, SOUNDCLOUD, FROSTCLICK, MONOVA, ARCHIVEORG, TORLOCK, YIFY, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
+        return Arrays.asList(YOUTUBE, ZOOQLE, TPB, SOUNDCLOUD, FROSTCLICK, MONOVA, ARCHIVEORG, TORLOCK, YIFY, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
     }
 
     public abstract SearchPerformer getPerformer(long token, String keywords);

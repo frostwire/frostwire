@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui;
@@ -21,7 +20,6 @@ package com.frostwire.android.gui;
 import android.text.Html;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.search.*;
-import com.frostwire.search.extratorrent.ExtratorrentSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.StringUtils;
@@ -187,11 +185,6 @@ public final class LocalSearchEngine {
                         long creationTime = sr.getCreationTime();
                         long age = System.currentTimeMillis() - creationTime;
                         if (age > 31536000000l) {
-                            continue;
-                        }
-                    } else if (sr instanceof ExtratorrentSearchResult) {
-                        // TODO: Search architecture hack, gotta abstract these guys.
-                        if (((TorrentSearchResult) sr).getSeeds() < KAT_MIN_SEEDS_TORRENT_RESULT) {
                             continue;
                         }
                     } else if (sr instanceof ScrapedTorrentFileSearchResult) {

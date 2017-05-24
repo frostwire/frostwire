@@ -346,7 +346,6 @@
     <string name="available">доступний</string>
     <string name="leaving_already">Залишаючи Уже?</string>
     <string name="are_you_sure_wifi_sharing_off">Відключення спільного використання Wi-Fi зробить все ваші загальні файли локально недоступними для інших користувачів на прилеглій мережі Wi-Fi.</string>
-    <string name="use_extratorrent">користування ExtraTorrent.com</string>
     <string name="check_internet_connection">Перевірте з\'єднання з Інтернетом</string>
     <string name="azureus_manager_item_stopped">Зупинився</string>
     <string name="cheaper_than_coffee">Дешевше, ніж кава</string>

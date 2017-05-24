@@ -227,7 +227,6 @@
     <string name="media_player_failed">El Reproductor Multimedia ha fallado</string>
     <string name="activity_media_player_name">Reproductor Multimedia</string>
     <string name="search_settings">Ajustes de Búsqueda</string>
-    <string name="use_extratorrent">Usar ExtraTorrent.com</string>
     <string name="use_zooqle">Usar Zooqle.com</string>
     <string name="use_tpb">Usar TPB</string>
     <string name="activity_media_player_image_description">Imagen</string>

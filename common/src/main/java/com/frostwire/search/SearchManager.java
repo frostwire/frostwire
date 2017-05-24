@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- 
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,6 @@ package com.frostwire.search;
 
 import com.frostwire.platform.AppSettings;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
-import com.frostwire.search.extratorrent.ExtratorrentSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.filter.SearchTable;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
@@ -333,13 +332,6 @@ public final class SearchManager {
 
     private static final int DEFAULT_SEARCH_PERFORMER_TIMEOUT = 10000;
 
-    private static final SearchEngine EXTRATORRENT = new SearchEngine("Extratorrent", AppSettings.SEARCH_EXTRATORRENT_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new ExtratorrentSearchPerformer("extratorrent.cc", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
     private static final SearchEngine YOUTUBE = new SearchEngine("YouTube", AppSettings.SEARCH_YOUTUBE_ENABLED) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
@@ -425,5 +417,5 @@ public final class SearchManager {
     };
 
     @SuppressWarnings("unused")
-    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(EXTRATORRENT, YIFY, YOUTUBE, FROSTCLICK, MONOVA, ZOOQLE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, EZTV, LIMETORRENTS);
+    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(YIFY, YOUTUBE, FROSTCLICK, MONOVA, ZOOQLE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, EZTV, LIMETORRENTS);
 }

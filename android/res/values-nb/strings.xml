@@ -357,7 +357,6 @@
     <string name="available">tilgjengelig</string>
     <string name="leaving_already">Du lar allerede?</string>
     <string name="are_you_sure_wifi_sharing_off">Slå av Wi-Fi-deling vil gjøre alle dine lokalt delte filer tilgjengelig for andre brukere på den nærliggende Wi-Fi-nettverk.</string>
-    <string name="use_extratorrent">Bruk ExtraTorrent.com</string>
     <string name="check_internet_connection">Sjekk Internett-tilkobling</string>
     <string name="azureus_manager_item_stopped">Stoppet</string>
     <string name="cheaper_than_coffee">Billigere enn kaffe</string>
