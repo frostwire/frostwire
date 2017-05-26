@@ -34,7 +34,6 @@ import android.widget.ImageView;
 
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -194,7 +193,7 @@ public final class ImageLoader {
             if (Debug.hasContext(callback)) {
                 //throw new RuntimeException("Possible context leak");
             }
-            requestCreator.into(view, callback);
+            requestCreator.into(view, new CallbackWrapper(callback));
         } else {
             requestCreator.into(view);
         }
@@ -214,7 +213,7 @@ public final class ImageLoader {
                 return filter.params();
             }
         };
-        Callback.EmptyCallback callback = new Callback.EmptyCallback() {
+        com.squareup.picasso.Callback.EmptyCallback callback = new com.squareup.picasso.Callback.EmptyCallback() {
             @Override
             public void onError(Exception e) {
                 if (secondaryUri != null) {
@@ -247,7 +246,7 @@ public final class ImageLoader {
 
     public void load(final Uri uri, final Uri uriRetry, final ImageView target, final int targetWidth, final int targetHeight) {
         if (!shutdown) {
-            picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new Callback.EmptyCallback() {
+            picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new com.squareup.picasso.Callback.EmptyCallback() {
                 @Override
                 public void onError(Exception e) {
                     load(uriRetry, target, targetWidth, targetHeight);
@@ -291,10 +290,37 @@ public final class ImageLoader {
         picasso.shutdown();
     }
 
+    public interface Callback {
+
+        void onSuccess();
+
+        void onError(Exception e);
+    }
+
     public interface Filter {
         Bitmap filter(Bitmap source);
 
         String params();
+    }
+
+    private static final class CallbackWrapper implements
+            com.squareup.picasso.Callback {
+
+        private final Callback cb;
+
+        CallbackWrapper(Callback cb) {
+            this.cb = cb;
+        }
+
+        @Override
+        public void onSuccess() {
+            cb.onSuccess();
+        }
+
+        @Override
+        public void onError(Exception e) {
+            cb.onError(e);
+        }
     }
 
     private static final class ImageRequestHandler extends RequestHandler {

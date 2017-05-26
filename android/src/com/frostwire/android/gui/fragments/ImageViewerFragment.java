@@ -49,8 +49,8 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.TouchImageView;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.ImageLoader.Callback;
 import com.frostwire.util.Logger;
-import com.squareup.picasso.Callback;
 
 import org.apache.commons.io.FilenameUtils;
 
