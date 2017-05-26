@@ -123,7 +123,7 @@ msgstr "Pausa"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:206
 msgid "Pause Selected Downloads"
-msgstr "Pausa valda hämtningar"
+msgstr "Pausa markerade hämtningar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:232
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:233
@@ -141,7 +141,7 @@ msgstr "Ta bort torrent"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:238
 msgid "Remove Torrent from selected downloads"
-msgstr "Ta bort torrent från valda hämtningar"
+msgstr "Ta bort torrent från markerade hämtningar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:240
 msgid "Remove Download"
@@ -155,7 +155,7 @@ msgstr "Ta bort"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:242
 msgid "Remove Selected Downloads"
-msgstr "Ta bort hämtade hämtningar"
+msgstr "Ta bort markerade hämtningar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:253
 msgid ""
@@ -203,7 +203,7 @@ msgstr "Kopiera magnet"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:346
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:347
 msgid "Copy Infohash"
-msgstr "Kopiera Infohash"
+msgstr "Kopiera infohash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:372
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:373
@@ -325,7 +325,7 @@ msgstr "Jämlikar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:135
 msgid "Share Ratio"
-msgstr "Delningsratio"
+msgstr "Delningsförhållande"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:137
 msgid "Seeds/Peers"
@@ -448,7 +448,7 @@ msgstr "Okänd status"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:319
 msgid "ETA"
-msgstr "ETA"
+msgstr "Klar om"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:412
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryFilesTableMediator.java:704
@@ -505,7 +505,7 @@ msgstr "Avbryt"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediator.java:519
 msgid "Cancel Selected Downloads"
-msgstr "Avbryt vald hämtning"
+msgstr "Avbryt markerad hämtningar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediator.java:620
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediator.java:687
@@ -544,7 +544,7 @@ msgstr "Inaktivera"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:150
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:161
 msgid "Unlimited"
-msgstr "Obegränsat"
+msgstr "Obegränsad"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:265
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:373
@@ -660,7 +660,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:100
 msgid "album name, movie title, book title, game title."
-msgstr "albumnamn, filmtitel, booktitel, speltitel."
+msgstr "albumnamn, filmtitel, boktitel, speltitel."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:102
 msgid "Attribution URL"
@@ -680,7 +680,7 @@ msgid ""
 "public but only under certain conditions."
 msgstr ""
 "Ett erbjuda ditt arbete under Creative Commons betyder inte att du ger upp "
-"din upphovsrätt. Det betyder att du erbjuder din en del av dina rättigheter "
+"din upphovsrätt. Det betyder att du erbjuder en del av dina rättigheter "
 "offentligt, men bara under vissa villkor."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:118
@@ -709,7 +709,7 @@ msgid ""
 "based upon it."
 msgstr ""
 "<strong>Ingen remix tillåten</strong><br>Du låter andra kopiera, "
-"distribuera, visa och skapa endast kopior av ditt verk, inga derivatverk är "
+"distribuera, visa och skapa endast exakta kopior av ditt verk, inga derivatverk är "
 "tillåtna."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:124
@@ -717,7 +717,7 @@ msgid ""
 "You allow others to distribute derivative works only under a license "
 "identical to the license that governs your work."
 msgstr ""
-"Du låter andra distribuera derivatverk endast under en licens identiskt med "
+"Du låter andra distribuera derivatverk endast under en licens identisk med "
 "licensen som omfattar ditt arbete."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:139
@@ -737,7 +737,7 @@ msgid ""
 msgstr ""
 "Personen som associerade ett verk med denna handling har gett verket "
 "till allmän egendom genom att avstå alla hens rättigheter till verket "
-"globalt under upphovsrättslag, omfattande alla närliggande och relaterande "
+"globalt under upphovsrättslag, omfattande alla närliggande och relaterade "
 "rättigheter som omfattas av lagen."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:227
@@ -785,7 +785,7 @@ msgstr "Skapa ny torrent"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:199
 msgid "Torrent Contents"
-msgstr "Ignorera pornografiskt innehåll"
+msgstr "Torrentinnehåll"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:202
 msgid ""
@@ -793,7 +793,7 @@ msgid ""
 "Either a file, or the contents of a folder."
 msgstr ""
 "Denna ruta visar innehållet du har valt för din nya .torrent.\n"
-"Antagligen en fil eller innehållet i en mapp."
+"Antingen en fil eller innehållet i en mapp."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:206
 msgid "Select File"
@@ -1001,11 +1001,11 @@ msgstr "Webbdistributör ej nåbar."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:823
 msgid "Saving Torrent..."
-msgstr "Sparar Torrent…"
+msgstr "Sparar torrent…"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PartialFilesDialog.java:75
 msgid "Select files to download"
-msgstr "Töm på valda nerladdningar"
+msgstr "Markera filer att hämta"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PartialFilesDialog.java:148
 msgid "Download Selected Files Only"
@@ -1053,7 +1053,7 @@ msgid ""
 "infringement."
 msgstr ""
 "Jag förstår att gagnas ekonomiskt av oauktoriserade upphovsrättsverk kan "
-"göra mig skyldig till bedrägeri och kriminellt intrång på upphovsrättsverk."
+"göra mig skyldig till bedrägeri och brott mot upphovsrätten."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsPanel.java:103
 msgid "<strong>Bitcoin</strong> receiving wallet address"
@@ -1259,7 +1259,7 @@ msgstr "Välj en annan mapp"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java:53
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentSeedingSettingPaneItem.java:37
 msgid "Seeding Settings"
-msgstr "Distribuerar inställningar"
+msgstr "Distributionsinställningar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java:71
 msgid ""
@@ -1268,7 +1268,7 @@ msgid ""
 "(Recommended)"
 msgstr ""
 "<strong>Distribuera slutförda hämtningar.</strong> BitTorrentanvändare på "
-"Internet kommer att kunna<br/> hämta fildelar av datan din torrent delar. "
+"internet kommer att kunna<br/> hämta fildelar av datan din torrent delar. "
 "(rekommenderat)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java:72
@@ -1279,22 +1279,22 @@ msgid ""
 "this Leeching behavior</strong>."
 msgstr ""
 "<strong>Distribuera ej slutförda hämtningar.</strong> BitTorrentanvändare på "
-"Internet kan<br/> endast hämta fildelar torrenten medan du hämtar dess<br/"
+"internet kan<br/> endast hämta fildelar från torrenten medan du hämtar dess<br/"
 ">datafiler. <strong>En del trackers kommer att straffa detta "
-"reciprokörsbeteende."
+"reciprokörsbeteende</strong>."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentUtil.java:174
 msgid ""
 "One of the transfers is complete and resuming will cause it to start seeding"
 msgstr ""
 "En av överföringarna är slutförda och att återuppta den kommer att medföra "
-"att den börja distribueras"
+"att den börjar distribueras"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentUtil.java:174
 msgid ""
 "This transfer is already complete, resuming it will cause it to start seeding"
 msgstr ""
-"Överföringen är nästan slutförd, att återuppta den kommer att få den att "
+"Överföringen är redan slutförd, att återuppta den kommer att få den att "
 "börja distribueras"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentUtil.java:177
@@ -1531,7 +1531,7 @@ msgstr "Kör valda filer i"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableMediator.java:703
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/actions/FileMenuActions.java:335
 msgid "Create a new .torrent file"
-msgstr "Skapa en ny .torrent fil"
+msgstr "Skapa en ny .torrent-fil"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryFilesTableMediator.java:809
 msgid "Delete Selected Files"
@@ -1591,7 +1591,7 @@ msgstr "Skapa en ny spellista"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/StarredDirectoryHolder.java:47
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/StarredDirectoryHolder.java:51
 msgid "Starred"
-msgstr "Delad"
+msgstr "Stjärnmärkt"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylists.java:215
 msgid "Show all starred items"
@@ -1946,7 +1946,7 @@ msgstr ""
 "<br><br>För att installera <b>mplayer</b> i Ubuntu, öppna ett "
 "terminalfönster och skriv in ”<b>sudo apt-get install mplayer</b>”.<br><br>"
 "Om du redan har installerat mplayer på en annan plats, <b>försäkra dig om "
-"att du har en symlink som pekar på din mplayer-binär</b> <b><font color=\""
+"att du har en symlänk som pekar på din mplayer-binär</b> <b><font color=\""
 "blue\">"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/player/MediaPlayerLinux.java:33
@@ -1959,7 +1959,7 @@ msgstr ""
 "<br><br>För att installera <b>mplayer</b> i Fedora, öppna ett "
 "terminalfönster och skriv in ”<b>sudo yum install mplayer</b>”.<br><br>Om du "
 "redan har installerat mplayer på en annan plats, <b>försäkra dig om att du "
-"har en symlink som pekar på din mplayer-binär</b> <b><font color=\"blue\">"
+"har en symlännk som pekar på din mplayer-binär</b> <b><font color=\"blue\">"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/player/MediaPlayerLinux.java:37
 msgid ""
@@ -2050,13 +2050,13 @@ msgid ""
 "Browse, Search and Play files in your computer. Wi-Fi sharing, Internet "
 "Radio and more."
 msgstr ""
-"Bläddra, sök och spela filer från din dator. Dela trådlöst, Internetradio "
+"Bläddra, sök och spela filer från din dator. Dela trådlöst, internetradio "
 "och mer."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/SearchTab.java:29
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/SearchTransfersTab.java:43
 msgid "Search and Download Files from the Internet."
-msgstr "Sök och hämta filer från Internet."
+msgstr "Sök och hämta filer från internet."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:40
 msgid "filter transfers here"
@@ -2462,7 +2462,7 @@ msgstr ""
 "Din maskin verkar inte ha en aktiv internetanslutning eller så blockerar en "
 "brandvägg FrostWire från att komma åt internet. FrostWire kommer "
 "automatiskt att försöka ansluta till nätverket om du inte väljer \"Koppla ifrån"
-"\" från Arkiv menyn."
+"\" från arkivmenyn."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/GUIMediator.java:112
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/GUIMediator.java:114
@@ -2505,7 +2505,7 @@ msgstr ""
 "Högerklicka på FrostWire-ikonen på ditt skrivbord och välj ”Inställningar” i poppuppmenyn. "
 "Klicka på fliken ”Kompatibilitet” högst upp, klicka sedan i kryssrutan ”Kör detta "
 "program i kompatibilitetsläge för” och välj sedan "
-"”Windows 2000” i rutan under rutan du nyss kryssrutan. Klicka sedan på knappen ”OK”"
+"”Windows 2000” under rutan du nyss kryssat i. Klicka sedan på knappen ”OK”"
 "längst ned och starta om FrostWire."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/GUIMediator.java:1157
@@ -2532,7 +2532,7 @@ msgid ""
 msgstr ""
 "FrostWire kunde inte använda den specificerade filen.\n"
 "\n"
-"Exekvera kommando: {0}."
+"Exekverat kommando: {0}."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/GUIMediator.java:1180
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/GUIMediator.java:1202
@@ -2633,7 +2633,7 @@ msgid ""
 "version is known to have caused problems with FrostWire. Please upgrade to "
 "the final 1.6.0 release.\n"
 msgstr ""
-"Du använder för tillfället en beta eller försläppt vertion av java 1.6.0. "
+"Du använder för tillfället en beta eller försläppt version av java 1.6.0. "
 "Denna version är känd för att skapa problem med FrostWire. Var vänlig "
 "uppgradera till den slutgiltiga versionen av 1.6.0.\n"
 
@@ -2704,7 +2704,7 @@ msgstr "Hjälp till att översätta FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/LanguageWindow.java:212
 msgid "Show Language in status bar"
-msgstr "Visa språk i status ruta"
+msgstr "Visa språk i statusfältet"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/MessageService.java:67
 msgid "Loading Messages..."
@@ -2765,7 +2765,7 @@ msgstr "Skapa donationsknappar så att du kan hjälpa oss…"
 #. make icons and panels for connection quality
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:124
 msgid "Creating Connection Quality Indicator..."
-msgstr "Skapar indikator för anslutningskvalitét…"
+msgstr "Skapar indikator för anslutningskvalitet…"
 
 #. make the 'Language' button
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:134
@@ -2846,7 +2846,7 @@ msgstr "Ej ansluten"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:581
 msgid "Check your internet connection, FrostWire can't connect."
-msgstr "Kontrollera din Internetanslutning, FrostWire kan inte ansluta."
+msgstr "Kontrollera din internetanslutning, FrostWire kan inte ansluta."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:584
 msgid "Turbo-Charged"
@@ -2862,7 +2862,7 @@ msgstr "noder"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:695
 msgid "Show Connection Quality"
-msgstr "Visa anslutningskvalitét"
+msgstr "Visa anslutningskvalitet"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:710
 msgid "Show Connection Privacy Status"
@@ -2933,7 +2933,7 @@ msgstr "Nästa tips"
 #.
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMediator.java:91
 msgid "Previous Tip"
-msgstr "Föregåenede tips"
+msgstr "Föregående tips"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMediator.java:340
 msgid "Loading tips..."
@@ -2956,7 +2956,7 @@ msgid ""
 "You can change the look and feel of FrostWire by going to View &gt; Use "
 "Small Icons, Show Icon Text and Increase-Decrease the Font Size."
 msgstr ""
-"Du kan ändra FrostWire utseende och känsla genom att till Visa &gt; Använd "
+"Du kan ändra FrostWires utseende och känsla genom att gå till Visa &gt; Använd "
 "små ikoner, Visa ikontext och Öka-minska typsnittsstorleken."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:24
@@ -2969,7 +2969,7 @@ msgstr ""
 "Du kan sortera dina sökresultat genom att klicka på en kolumn. Den mest "
 "användbara kolumnen att klicka på är ”Distributör” om du letar efter en "
 "torrent. Distributör representerar ett ungefärligt antal datorer som "
-"antingen hela filen eller är anslutna till internet."
+"har antingen hela filen och är anslutna till internet."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:25
 msgid ""
@@ -3008,7 +3008,7 @@ msgid ""
 "buddy is sharing 'Frosty' but you searched for 'My Frosty', your buddy's "
 "file will still be found."
 msgstr ""
-"Små variationer i sök texten fungerar ändå. Till exempel, om din kompis "
+"Små variationer i söktexten fungerar ändå. Till exempel, om din kompis "
 "delar ut ”bok” men du sökte på ”min bok”, så kommer du ändå att hitta din "
 "kompis fil."
 
@@ -3018,9 +3018,9 @@ msgid ""
 "look for the globe. If there is a brick wall in front of it, your Internet "
 "connection is firewalled."
 msgstr ""
-"Sitter du bakom en brandvägg? Leta efter en jordglob längst ner i statusrutan. "
-"Om det är en tegelvägg framför den så betyder det att ditt internet är "
-"skyddat av en brandvägg."
+"Sitter du bakom en brandvägg? Leta efter en jordglob längst ner i statsfältet. "
+"Om det är en tegelvägg framför den så betyder det att din internetanslutning är "
+"skyddad av en brandvägg."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:30
 msgid ""
@@ -3028,7 +3028,7 @@ msgid ""
 "of FrostWire show how fast all of your files are downloading or uploading "
 "combined."
 msgstr ""
-"Siffrorna brevid upp- och nedpilarna i statusrutan längst ner i fönstret visar "
+"Siffrorna brevid upp- och nedpilarna i statusfältet längst ner i fönstret visar "
 "hur snabbt alla dina filer hämtas eller skickas upp."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:31
@@ -3037,7 +3037,7 @@ msgid ""
 "<font color=\"185ea8\">Increase Font Size</font>."
 msgstr ""
 "Du kan öka textstorleken via <font color=\"185ea8\">Visa</font> &gt; <font "
-"color=\"185ea8\">Öka typsnittstorlek</font>."
+"color=\"185ea8\">Öka typsnittsstorlek</font>."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:34
 msgid ""
@@ -3066,7 +3066,7 @@ msgid ""
 "your friend(s) are downloading. They can pause and resume the download all "
 "they want as long as you or somebody else is seeding the same content."
 msgstr ""
-"Vill du dela en stor fil? Skicka flera hundra gigbyte utan problem, men "
+"Vill du dela en stor fil? Skicka flera hundra gigabyte utan problem, men "
 "försäkra dig om att du lämnar FrostWire igång och distribuerande medan dina "
 "vänner hämtar. De kan pausa och återuppta hämtningen så mycket som de vill "
 "så länge som du eller någon annan distribuerar samma innehåll."
@@ -3124,7 +3124,7 @@ msgid ""
 msgstr ""
 "Vill du se dialoger för frågor som du tidigare markerat ”Visa inte detta "
 "meddelande igen” eller ”Visa alltid detta svar”? Gå till Verktyg &gt; "
-"Alternativ och kontrollera ”Återställ till standard” under Visa &gt; "
+"Alternativ och kryssa i ”Återställ till standard” under Visa &gt; "
 "FrostWire-poppupper."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:53
@@ -3176,7 +3176,7 @@ msgid ""
 "FrostWire' from the FrostWire menu."
 msgstr ""
 "Du kan ta reda på vilken version av FrostWire du använder genom att välja "
-"'Om FrostWire' från Hjälpmenyn."
+"'Om FrostWire' från FrostWire-menyn."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:68
 msgid ""
@@ -3197,7 +3197,7 @@ msgid ""
 msgstr ""
 "Vill du se dialoger för frågor som du tidigare markerat ”Visa inte detta "
 "meddelande igen” eller ”Använd alltid detta svar”? Gå till FrostWire &gt; "
-"Verktyg,Alternativ och kontrollera ”Återställ till standard” under Visa &gt; "
+"Verktyg,Alternativ och kryssa i ”Återställ till standard” under Visa &gt; "
 "FrostWire-poppupper."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:70
@@ -3220,7 +3220,7 @@ msgstr ""
 "Hatar du inforutor? Älskar du inforutor? Du kan slå på/av dem i de flesta "
 "tabeller genom att Ctrl-klicka på kolumnrubrikerna och välja ”Fler "
 "alternativ”. Du kan växla andra alternativ här också, som huruvida tabeller "
-"ska sorteras automatiskt eller inte om du fördrar att raderna är randiga."
+"ska sorteras automatiskt eller inte samt om du fördrar att raderna är randiga."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:72
 msgid ""
@@ -3232,7 +3232,7 @@ msgstr ""
 "Du kan sortera sändningar, hämtningar och så vidare… genom att klicka på "
 "en kolumn. Tabellen fortsätter att sortera om allt eftersom informationen "
 "ändras. Du kan slå av detta automatiska sorteringsbeteende genom att "
-"högerklicka på en kolumnrubrik, välja ”Fler alternativ” och kryssa ur "
+"Ctrl-klicka på en kolumnrubrik, välja ”Fler alternativ” och kryssa ur "
 "”Sortera automatiskt”."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:73
@@ -3253,7 +3253,7 @@ msgid ""
 "to 'Tools' on FrostWire menu and select the option 'Play with native media "
 "player'."
 msgstr ""
-"Vill du spela musik in standardmediaspelare istället för i FrostWire? Gå "
+"Vill du spela musik i din standardmediaspelare istället för i FrostWire? Gå "
 "till ”Verktyg” i FrostWire-menyn och välj alternativet “Spela upp med inbyggd "
 "mediaspelare”."
 
@@ -3302,7 +3302,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:112
 msgid "Thank you for using FrostWire"
-msgstr "Hjälp för att använda FrostWire"
+msgstr "Tack för att du använder FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:113
 msgid "Visit us at www.frostwire.com"
@@ -3447,10 +3447,10 @@ msgid ""
 "'Review' to look at the information that will be sent. Thank you."
 msgstr ""
 "FrostWire har stött på ett internt fel. Det är möjligt för FrostWire att "
-"återställa och förtsätta fungera normalt. För att hjälpa till med att lösa "
-"buggar: klicka på 'Sänd' för att informera FrostWire om problemet. om du är "
+"återställa och fortsätta fungera normalt. För att hjälpa till med att lösa "
+"buggar: klicka på 'Sänd' för att informera FrostWire om problemet. Om du är "
 "osäker, kan du klicka på 'Förhandsvisa' för att titta på informationen som "
-"kommer bil sänd. Tack."
+"kommer bli sänd. Tack."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/bugs/BugManager.java:324
 msgid ""
@@ -3560,7 +3560,7 @@ msgid ""
 "is using the file. Please close the other program and retry the download."
 msgstr ""
 "FrostWire kunde inte hämta den valda filen, filen används av ett annat "
-"program. Stäng programmet och försök hämta ett nytt."
+"program. Stäng programmet och försök hämta filen på nytt."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/bugs/BugManager.java:655
 msgid ""
@@ -3572,7 +3572,7 @@ msgstr ""
 "FrostWire kunde inte skapa eller fortsätta skriva en ofärdig fil för den "
 "markerade hämtningen därför att du har inte har behörighet att "
 "skapa filer i mappen ofärdiga filer. För att fortsätta använda FrostWire, "
-"välj en annan spara som mapp."
+"välj en annan mapp att spara i."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/bugs/BugManager.java:657
 msgid ""
@@ -3580,7 +3580,7 @@ msgid ""
 "because the filename contains characters which are not supported by your "
 "operating system."
 msgstr ""
-"FrostWire kunde inte öppna den ofullständiga filen för den valda hämtningen "
+"FrostWire kunde inte öppna den ofullständiga filen för den markerade hämtningen "
 "eftersom filnamnet innehåller tecken som ditt operativsystem inte stöder."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/AssociationsWindow.java:51
@@ -3747,7 +3747,7 @@ msgid ""
 "channels for quick feedback, support, ideas or just to say hello."
 msgstr ""
 "Anslut dig till FrostWire-gemenskapen och hjälp oss att sprida FrostWire för "
-"att fortsätta ha ett fritt och ocensurerat Internet. Håll kontakten på "
+"att fortsätta ha ett fritt och ocensurerat internet. Håll kontakten på "
 "sociala mediekanaler för snabb återkoppling, stöd, idéer eller bara för att "
 "säga hej."
 
@@ -3781,8 +3781,8 @@ msgid ""
 "features that require your configuration. FrostWire will guide you through a "
 "series of steps to configure these new features."
 msgstr ""
-"Välkommen till FrostWire:s installationsguide. FrostWire has nyligen lagt till "
-"nya egenskaper som kräver din konfiguraton. FrostWire kommer att guida dig "
+"Välkommen till FrostWires installationsguide. FrostWire has nyligen lagt till "
+"nya egenskaper som kräver din konfiguration. FrostWire kommer att guida dig "
 "genom ett antal steg för att konfigurera dessa nya funktioner."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/WelcomeWindow.java:47
@@ -3790,7 +3790,7 @@ msgid ""
 "Welcome to the FrostWire setup wizard. FrostWire will guide you through a "
 "series of steps to configure FrostWire for optimum performance."
 msgstr ""
-"Välkommen till FrostWire:s installationsguide. FrostWire kommer att guida "
+"Välkommen till FrostWires installationsguide. FrostWire kommer att guida "
 "dig igenom ett antal steg för att kunna optimera din prestanda och ditt "
 "användande."
 
@@ -3844,7 +3844,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:58
 msgid "Order FrostWire Stickers"
-msgstr "Beställ FrostWire-klistermärken,"
+msgstr "Beställ FrostWire-klistermärken"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:58
 msgid "Order FrostWire stickers, we ship worldwide."
@@ -3943,7 +3943,7 @@ msgid ""
 msgstr ""
 "Detta kommer att ta bort din ”FrostWire”-spellista i iTunes och ersätta\n"
 "den med en spellista innehållandes alla iTunes-kompatibla filer i din\n"
-"FrostWire ”torrentdatamapp”\n"
+"”torrentdatamapp” för FrostWire\n"
 "\n"
 "Observera att det också kommer att lägga till filer till iTunes-biblioteket\n"
 "och att det kan medföra duplicerade filer i ditt iTunes-biblioteket\n"
@@ -4016,19 +4016,19 @@ msgstr "Visa text under ikoner"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:44
 msgid "&Increase Font Size"
-msgstr "&Öka typsnittstorleken"
+msgstr "&Öka typsnittsstorleken"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:44
 msgid "Increases the Table Font Size"
-msgstr "Öka typsnittstorleken på tabellen"
+msgstr "Öka typsnittsstorleken på tabellen"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:45
 msgid "&Decrease Font Size"
-msgstr "&Minska typsnittstorleken"
+msgstr "&Minska typsnittsstorleken"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:45
 msgid "Decreases the Table Font Size"
-msgstr "Minska typsnittstorleken"
+msgstr "Minska typsnittsstorleken på tabellen"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:52
 msgid "C&hange Language"
@@ -4098,7 +4098,7 @@ msgstr "Sökning"
 #. status bar
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/OptionsConstructor.java:222
 msgid "Status Bar"
-msgstr "Statusraden"
+msgstr "Statusfältet"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/OptionsConstructor.java:226
 msgid "iTunes"
@@ -4365,7 +4365,7 @@ msgstr ""
 "FrostWire kan konfigurera sig självt till att arbeta bakom en brandvägg "
 "eller router. Med Universal Plug 'n Play (UPnP) och andra NAT-"
 "traverseringstekniker kan FrostWire automatiskt konfigurera din router eller "
-"brandvägg för optimal prestanda. Om din router inte stödjer UPnp kan "
+"brandvägg för optimal prestanda. Om din router inte stödjer UPnP kan "
 "FrostWire ställas in till att annonsera en extern port manuellt. (Du kanske "
 "också måste konfigurera din router om du väljer manuell konfiguration, men "
 "FrostWire kommer att försöka sitt bästa för det så att du inte behöver.)"
@@ -4546,7 +4546,7 @@ msgid ""
 "Redisplay messages for which you have chosen 'Do not display this message "
 "again' or 'Always use this answer'."
 msgstr ""
-"Åter visa meddelanden för vilka du valt ”Visa inte detta meddelande igen” eller "
+"Visa åter meddelanden för vilka du valt ”Visa inte detta meddelande igen” eller "
 "”Använd alltid detta svar”."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/PopupsPaneItem.java:28
@@ -4575,11 +4575,11 @@ msgstr "Lösenord:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ProxyPaneItem.java:36
 msgid "Proxy Options"
-msgstr "Uppspelningsinställningar"
+msgstr "Proxyinställningar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ProxyPaneItem.java:38
 msgid "Configure Proxy Options for FrostWire."
-msgstr "Konfigurera proxyalternativ för FrostWire."
+msgstr "Konfigurera proxyinställningar för FrostWire."
 
 #. *
 #. * Constant for the key of the locale-specific <tt>String</tt> for the
@@ -4624,7 +4624,7 @@ msgid ""
 msgstr ""
 "Genom att aktivera denna funktion går du med på att ta emot sponsrade "
 "erbjudanden från FrostWire och programrekommendationer för att komplettera "
-"ditt erbjudande."
+"din upplevelse."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ShowFrostWireRecommendationsPaneItem.java:43
 msgid "Enable FrostWire Recommendations (highly recommended):"
@@ -4644,7 +4644,7 @@ msgid ""
 msgstr ""
 "Du kan aktivera eller inaktivera FrostClick-marknadsföring på välkomstskärmen. "
 "FrostClick-marknadsföring hjälper artister och innehållsskapare att distribuera "
-"deras innehåll lagligt och fritt till hundratusentals människor visa "
+"deras innehåll lagligt och fritt till hundratusentals människor via "
 "FrostWire, BitTorrent och Gnutella. Håll detta alternativ öppet för att "
 "stödja fildelning och framtiden för innehållsdistribution."
 
@@ -4674,7 +4674,7 @@ msgstr "Visa bekräftelsedialog innan avslut"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:23
 msgid "Smart Search"
-msgstr "Stop sökning"
+msgstr "Smartsökning"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:25
 msgid ""
@@ -4703,7 +4703,7 @@ msgid ""
 "{0} torrents that FrostWire has learned to speed up your search results.\n"
 "Do you wish to continue?"
 msgstr ""
-"Om du fortsätter kommer du att ta bort alla information relaterade till\n"
+"Om du fortsätter kommer du att ta bort all information relaterade till\n"
 "{0} torrenter som FrostWire har lärt sig för att snabba upp dina "
 "sökresultat.\n"
 "Vill du fortsätta?"
@@ -4726,7 +4726,7 @@ msgstr "Bandbreddsindikator"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StatusBarBandwidthPaneItem.java:35
 msgid "You can display your bandwidth consumption in the status bar."
-msgstr "Du kan visa din bredbandsanvändning i statusraden."
+msgstr "Du kan visa din bandbreddsanvändning i statusfältet."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StatusBarBandwidthPaneItem.java:42
 msgid "Show Bandwidth Indicator:"
@@ -4734,16 +4734,16 @@ msgstr "Visa bandbreddsindikator:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StatusBarConnectionQualityPaneItem.java:20
 msgid "Connection Quality Indicator"
-msgstr "Kvalitétsindikator för anslutning"
+msgstr "Kvalitetsindikator för anslutning"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StatusBarConnectionQualityPaneItem.java:22
 msgid ""
 "You can display a measurement of your connection quality in the status bar."
-msgstr "Du kan visa en mätning av din anslutningskvalité i statusraden."
+msgstr "Du kan visa en mätning av din anslutningskvalitet i statusfältet."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StatusBarConnectionQualityPaneItem.java:29
 msgid "Show Connection Quality Indicator:"
-msgstr "Visa kvalitétsindikator för anslutning:"
+msgstr "Visa kvalitetsindikator för anslutning:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StatusBarFirewallPaneItem.java:20
 msgid "Firewall Indicator"
@@ -4751,7 +4751,7 @@ msgstr "Brandväggsindikator"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StatusBarFirewallPaneItem.java:22
 msgid "You can display your firewall status in the status bar."
-msgstr "Du kan visa din brandväggsstatus i statusraden."
+msgstr "Du kan visa din brandväggsstatus i statusfältet."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StatusBarFirewallPaneItem.java:29
 msgid "Show Firewall Indicator:"
@@ -4766,7 +4766,7 @@ msgid ""
 "Adjust connection settings to make better use of your internet connection"
 msgstr ""
 "Justera anslutningsinställningar för att bättre använda din "
-"internatanslutning"
+"internetanslutning"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java:32
 msgid "Maximum active downloads"
@@ -4888,7 +4888,7 @@ msgstr "Videospelare"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/iTunesPreferencePaneItem.java:39
 msgid "You can have FrostWire import newly downloaded songs into iTunes."
-msgstr "Du kan få FrostWire att importera nyligen hämta låtar i iTunes."
+msgstr "Du kan få FrostWire att importera nyligen hämtade låtar till iTunes."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/iTunesPreferencePaneItem.java:41
 msgid "Enable iTunes importing:"
@@ -5021,7 +5021,7 @@ msgid ""
 "has been disabled on your FrostWire Search Options. (Go to Tools > Options > "
 "Search to enable)"
 msgstr ""
-"har inaktiverat dina FrostWire-sökalternativ. (Gå till Verktyg > Alternativ "
+"har inaktiverats i dina FrostWire-sökalternativ. (Gå till Verktyg > Alternativ "
 "> Sökning för att aktivera)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultActionsRenderer.java:109
@@ -5065,7 +5065,7 @@ msgstr "FrostWire-torrent"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/shell/FrostAssociations.java:103
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/shell/FrostAssociations.java:115
 msgid "\".torrent\" files"
-msgstr "\".torrent\" filer"
+msgstr "\".torrent\"-filer"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/shell/FrostAssociations.java:127
 msgid "\"magnet:\" links"
