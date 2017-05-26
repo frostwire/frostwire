@@ -98,7 +98,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
     /**
      * Filter used to blur image in ImageLoader
      */
-    private class BlurFilter implements ImageLoader.Filter {
+    private static class BlurFilter implements ImageLoader.Filter {
         @Override
         public Bitmap filter(Bitmap source) {
             // scale down image to operate in less pixels

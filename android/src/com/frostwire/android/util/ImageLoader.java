@@ -200,7 +200,11 @@ public final class ImageLoader {
     }
 
     public void load(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {
+        if (Debug.hasContext(filter)) {
+            throw new RuntimeException("Possible context leak");
+        }
         Transformation transformation = new FilterWrapper(filter);
+        // TODO: need one more static callback here
         com.squareup.picasso.Callback.EmptyCallback callback = new com.squareup.picasso.Callback.EmptyCallback() {
             @Override
             public void onError(Exception e) {
