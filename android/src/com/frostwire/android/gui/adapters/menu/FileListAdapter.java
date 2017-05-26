@@ -470,21 +470,11 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 thumbnailLoader.load(uri, uriRetry, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
             } else if (fd.fileType == Constants.FILE_TYPE_VIDEOS) {
                 Uri uri = ContentUris.withAppendedId(Video.Media.EXTERNAL_CONTENT_URI, fd.id);
-                final Uri uriRetry = ImageLoader.getMetadataArtUri(uri);
+                Uri uriRetry = ImageLoader.getMetadataArtUri(uri);
                 thumbnailLoader.load(uri, uriRetry, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
-                thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uri, R.drawable.picture_placeholder, true, true, fileThumbnail, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uriRetry, R.drawable.picture_placeholder, true, true, fileThumbnail, null);
-                    }
-                });
             } else if (fd.fileType == Constants.FILE_TYPE_PICTURES) {
                 Uri uri = ContentUris.withAppendedId(Images.Media.EXTERNAL_CONTENT_URI, fd.id);
-                thumbnailLoader.loadBitmapAsync(thumbnailDimensions, thumbnailDimensions, uri, R.drawable.picture_placeholder, true, true, fileThumbnail, null);
+                thumbnailLoader.load(uri, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
             }
         }
 
