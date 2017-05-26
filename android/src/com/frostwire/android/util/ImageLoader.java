@@ -191,6 +191,9 @@ public final class ImageLoader {
         requestCreator.centerInside();
 
         if (callback != null) {
+            if (Debug.hasContext(callback)) {
+                //throw new RuntimeException("Possible context leak");
+            }
             requestCreator.into(view, callback);
         } else {
             requestCreator.into(view);
