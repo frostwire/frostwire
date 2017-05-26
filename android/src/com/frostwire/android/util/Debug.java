@@ -23,6 +23,7 @@ import android.view.View;
 
 import com.frostwire.android.BuildConfig;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 
 /**
@@ -68,6 +69,10 @@ public final class Debug {
         }
 
         try {
+            if (hasNoContext(obj)) {
+                return false;
+            }
+
             Class<?> clazz = obj.getClass();
             Field[] fields = clazz.getDeclaredFields();
 
@@ -75,7 +80,9 @@ public final class Debug {
 
             // noinspection ForLoopReplaceableByForEach
             for (int i = 0; i < fields.length; i++) {
-                Object value = fields[i].get(obj);
+                Field f = fields[i];
+                f.setAccessible(true); // let's hope java 9 ideas don't get inside android
+                Object value = f.get(obj);
 
                 if (value instanceof Context) {
                     return true;
@@ -90,7 +97,9 @@ public final class Debug {
 
             // noinspection ForLoopReplaceableByForEach
             for (int i = 0; i < fields.length; i++) {
-                Object value = fields[i].get(obj);
+                Field f = fields[i];
+                f.setAccessible(true);
+                Object value = f.get(obj);
 
                 if (hasContext(value)) {
                     return true;
@@ -104,5 +113,19 @@ public final class Debug {
             // check under debug, just let it run
             return false;
         }
+    }
+
+    private static boolean hasNoContext(Object obj) {
+        if (obj == null) {
+            return true;
+        } else if (obj instanceof WeakReference<?>) {
+            return true;
+        } else if (obj instanceof Number) {
+            return true;
+        } else if (obj instanceof String) {
+            return true;
+        }
+
+        return false;
     }
 }

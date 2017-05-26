@@ -51,10 +51,12 @@ import com.frostwire.android.gui.views.TouchImageView;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.ImageLoader.Callback;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -178,25 +180,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                 R.drawable.picture_placeholder,
                 false,
                 false,
-                imageViewHighRes, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        LOG.info("updateData()::onSuccess() loaded imageViewHighRes from " + fileUri);
-                        highResLoaded = true;
-                        progressBar.setVisibility(View.GONE);
-                        imageViewHighRes.postInvalidate();
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        LOG.info("updateData()::onError() Could not load imageViewHighRes from " + fileUri);
-                        highResLoaded = false;
-                        progressBar.setVisibility(View.GONE);
-                        imageViewHighRes.setImageDrawable(null);
-                        UIUtils.showShortMessage(getActivity(), "Could not load image");
-                        getActivity().finish();
-                    }
-                });
+                imageViewHighRes, new LoadImageCallback(this));
     }
 
     private final class ImageViewerActionModeCallback implements android.support.v7.view.ActionMode.Callback {
@@ -318,5 +302,42 @@ public final class ImageViewerFragment extends AbstractFragment {
         Point size = new Point();
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
         return size;
+    }
+
+    private static final class LoadImageCallback implements Callback {
+
+        private final WeakReference<ImageViewerFragment> ref;
+
+        LoadImageCallback(ImageViewerFragment f) {
+            this.ref = Ref.weak(f);
+        }
+
+        @Override
+        public void onSuccess() {
+            if (!Ref.alive(ref)) {
+                return;
+            }
+            ImageViewerFragment f = ref.get();
+
+            LOG.info("Loaded imageViewHighRes from " + f.fileUri);
+            f.highResLoaded = true;
+            f.progressBar.setVisibility(View.GONE);
+            f.imageViewHighRes.postInvalidate();
+        }
+
+        @Override
+        public void onError(Exception e) {
+            if (!Ref.alive(ref)) {
+                return;
+            }
+            ImageViewerFragment f = ref.get();
+
+            LOG.info("Could not load imageViewHighRes from " + f.fileUri);
+            f.highResLoaded = false;
+            f.progressBar.setVisibility(View.GONE);
+            f.imageViewHighRes.setImageDrawable(null);
+            UIUtils.showShortMessage(f.getActivity(), "Could not load image");
+            f.getActivity().finish();
+        }
     }
 }

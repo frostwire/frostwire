@@ -191,7 +191,7 @@ public final class ImageLoader {
 
         if (callback != null) {
             if (Debug.hasContext(callback)) {
-                //throw new RuntimeException("Possible context leak");
+                throw new RuntimeException("Possible context leak");
             }
             requestCreator.into(view, new CallbackWrapper(callback));
         } else {
