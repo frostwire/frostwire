@@ -200,19 +200,7 @@ public final class ImageLoader {
     }
 
     public void load(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {
-        Transformation transformation = new Transformation() {
-            @Override
-            public Bitmap transform(Bitmap source) {
-                Bitmap transformed = filter.filter(source);
-                source.recycle();
-                return transformed;
-            }
-
-            @Override
-            public String key() {
-                return filter.params();
-            }
-        };
+        Transformation transformation = new FilterWrapper(filter);
         com.squareup.picasso.Callback.EmptyCallback callback = new com.squareup.picasso.Callback.EmptyCallback() {
             @Override
             public void onError(Exception e) {
@@ -298,6 +286,7 @@ public final class ImageLoader {
     }
 
     public interface Filter {
+
         Bitmap filter(Bitmap source);
 
         String params();
@@ -320,6 +309,27 @@ public final class ImageLoader {
         @Override
         public void onError(Exception e) {
             cb.onError(e);
+        }
+    }
+
+    private static final class FilterWrapper implements Transformation {
+
+        private final Filter filter;
+
+        FilterWrapper(Filter filter) {
+            this.filter = filter;
+        }
+
+        @Override
+        public Bitmap transform(Bitmap bitmap) {
+            Bitmap transformed = filter.filter(bitmap);
+            bitmap.recycle();
+            return transformed;
+        }
+
+        @Override
+        public String key() {
+            return filter.params();
         }
     }
 
