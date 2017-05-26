@@ -231,7 +231,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         MediaPlaybackStatusOverlayView playbackStatusOverlayView = findView(view, R.id.view_browse_peer_thumbnail_grid_item_playback_overlay_view);
         MediaPlaybackOverlayPainter.MediaPlaybackState overlayPlaybackState = MediaPlaybackOverlayPainter.MediaPlaybackState.NONE;
 
-        int thumbnailResizeHeight = (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) ? 96 : 196;
+        int thumbnailResizeWidth = (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) ? 512 : 196;
         if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS && !selectAllMode) {
             overlayPlaybackState = MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY;
             showFileSize = true;
@@ -241,8 +241,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 view,
                 playbackStatusOverlayView,
                 overlayPlaybackState,
-                0, // re-sizes while keeping aspect ratio based only on given height
-                thumbnailResizeHeight,
+                thumbnailResizeWidth, // re-sizes while keeping aspect ratio based only on given height
+                0,
                 uris,
                 isChecked,
                 showFileSize,
