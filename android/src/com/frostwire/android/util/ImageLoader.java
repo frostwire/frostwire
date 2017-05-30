@@ -76,7 +76,7 @@ public final class ImageLoader {
 
     public static final Uri ALBUM_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ALBUM_AUTHORITY);
 
-    public static final Uri ARTIST_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ARTIST_AUTHORITY);
+    private static final Uri ARTIST_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ARTIST_AUTHORITY);
 
     private static final Uri METADATA_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + METADATA_AUTHORITY);
 
@@ -98,15 +98,13 @@ public final class ImageLoader {
 
     /**
      * WARNING: this method does not make use of the cache.
-     * it is here to be used only (so far) on the notification window view and the RC Interface (things like Lock Screen, Android Wear),
-     * which run on another process space. If you try to use a cached image there, you will get some
-     * nasty exceptions, therefore you will need this.
-     * <p/>
-     * For loading album art inside the application Activities/Views/Fragments, take a look at FileListAdapter and how it uses the ImageLoader.
-     *
-     * @param context
-     * @param albumId
-     * @return
+     * it is here to be used only (so far) on the notification window view and the RC Interface
+     * (things like Lock Screen, Android Wear), which run on another process space. If you try
+     * to use a cached image there, you will get some nasty exceptions, therefore you will need
+     * this.
+     * <p>
+     * For loading album art inside the application Activities/Views/Fragments, take a look at
+     * FileListAdapter and how it uses the ImageLoader.
      */
     private static Bitmap getAlbumArt(Context context, String albumId) {
         Bitmap bitmap = null;
@@ -211,10 +209,6 @@ public final class ImageLoader {
         }
 
         load(primaryUri, target, p);
-    }
-
-    public void load(Uri uri, Filter filter, ImageView imageView, boolean cache) {
-        load(uri, null, filter, imageView, cache);
     }
 
     public void load(Uri uri, ImageView target) {
@@ -422,7 +416,7 @@ public final class ImageLoader {
         private final Context context;
         private final HashSet<String> failed;
 
-        public ImageRequestHandler(Context context) {
+        ImageRequestHandler(Context context) {
             this.context = context;
             this.failed = new HashSet<>();
         }
