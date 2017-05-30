@@ -167,6 +167,10 @@ public final class ImageLoader {
 
     public void loadBitmapAsync(Uri uri, ImageView target, int targetWidth, int targetHeight,
                                 int placeholderResId, boolean useDiskCache, boolean noFade, final Callback callback) {
+        if (shutdown) {
+            return;
+        }
+
         if (uri == null) {
             throw new IllegalArgumentException("Uri can't be null");
         }
@@ -193,6 +197,10 @@ public final class ImageLoader {
     }
 
     public void load(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {
+        if (shutdown) {
+            return;
+        }
+
         if (Debug.hasContext(filter)) {
             throw new RuntimeException("Possible context leak");
         }
@@ -220,7 +228,9 @@ public final class ImageLoader {
     }
 
     public void load(Uri uri, ImageView target) {
-        picasso.load(uri).noFade().into(target);
+        if (!shutdown) {
+            picasso.load(uri).noFade().into(target);
+        }
     }
 
     public void load(Uri uri, ImageView target, int targetWidth, int targetHeight) {
