@@ -229,7 +229,7 @@ public final class ImageLoader {
     }
 
     public void load(Uri uri, ImageView target) {
-        load(uri, target, true);
+        load(uri, target, 0, 0, 0, true);
     }
 
     public void load(Uri uri, ImageView target, int targetWidth, int targetHeight) {
@@ -257,12 +257,10 @@ public final class ImageLoader {
     }
 
     public void load(Uri uri, ImageView target, int targetWidth, int targetHeight, int placeholderResId) {
-        if (!shutdown) {
-            picasso.load(uri).noFade().resize(targetWidth, targetHeight).placeholder(placeholderResId).into(target);
-        }
+        load(uri, target, targetWidth, targetHeight, placeholderResId, true);
     }
 
-    private void load(Uri uri, ImageView target, boolean noFade) {
+    private void load(Uri uri, ImageView target, int targetWidth, int targetHeight, int placeholderResId, boolean noFade) {
         if (shutdown) {
             return;
         }
@@ -273,6 +271,8 @@ public final class ImageLoader {
 
         RequestCreator rc = picasso.load(uri);
 
+        if (targetWidth != 0 || targetHeight != 0) rc.resize(targetWidth, targetHeight);
+        if (placeholderResId != 0) rc.placeholder(placeholderResId);
         if (noFade) rc.noFade();
 
         rc.into(target);
