@@ -203,7 +203,12 @@ public final class ImageLoader {
         p.targetWidth = targetWidth;
         p.targetHeight = targetHeight;
         p.noFade = true;
-        load(uri, retryUri, target, p);
+
+        if (retryUri != null) {
+            p.callback = new RetryCallback(this, retryUri, target, p);
+        }
+
+        load(uri, target, p);
     }
 
     public void load(Uri uri, ImageView target, int placeholderResId) {
@@ -219,14 +224,6 @@ public final class ImageLoader {
         p.targetHeight = targetHeight;
         p.placeholderResId = placeholderResId;
         p.noFade = true;
-        load(uri, target, p);
-    }
-
-    public void load(Uri uri, Uri retryUri, ImageView target, Params p) {
-        if (retryUri != null) {
-            p.callback = new RetryCallback(this, retryUri, target, p);
-        }
-
         load(uri, target, p);
     }
 
