@@ -293,7 +293,17 @@ public final class ImageLoader {
 
         if (p.targetWidth != 0 || p.targetHeight != 0) rc.resize(p.targetWidth, p.targetHeight);
         if (p.placeholderResId != 0) rc.placeholder(p.placeholderResId);
+        if (p.fit) rc.fit();
         if (p.noFade) rc.noFade();
+
+        if (p.noCache) {
+            rc.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
+            rc.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
+        }
+
+        if (p.filter != null) {
+            rc.transform(new FilterWrapper(p.filter));
+        }
 
         if (p.callback != null) {
             rc.into(target, new CallbackWrapper(p.callback));
@@ -323,7 +333,10 @@ public final class ImageLoader {
         public int targetWidth = 0;
         public int targetHeight = 0;
         public int placeholderResId = 0;
+        public boolean fit = false;
         public boolean noFade = false;
+        public boolean noCache = false;
+        public Filter filter = null;
         public Callback callback = null;
     }
 
