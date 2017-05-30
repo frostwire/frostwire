@@ -134,7 +134,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
                     ImageLoader.getAlbumArtUri(MusicUtils.getIdForAlbum(context, album, artist)),
                     filter,
                     mPhoto,
-                    false);
+                    true);
     }
 
     /**

@@ -35,7 +35,6 @@ import android.widget.ImageView;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.squareup.picasso.Callback.EmptyCallback;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -199,31 +198,19 @@ public final class ImageLoader {
         }
     }
 
-    public void load(final Uri primaryUri, final Uri secondaryUri, final Filter filter, final ImageView imageView, final boolean cache) {
-        if (shutdown) {
-            return;
-        }
-
+    public void load(Uri primaryUri, Uri secondaryUri, Filter filter, ImageView target, boolean noCache) {
         if (Debug.hasContext(filter)) {
             throw new RuntimeException("Possible context leak");
         }
-        Transformation transformation = new FilterWrapper(filter);
-        // TODO: need one more static callback here
-        EmptyCallback callback = new EmptyCallback() {
-            @Override
-            public void onError(Exception e) {
-                if (secondaryUri != null) {
-                    load(secondaryUri, filter, imageView, cache);
-                }
-            }
-        };
-        if (cache) {
-            picasso.load(primaryUri).fit().transform(transformation).into(imageView, callback);
-        } else {
-            picasso.load(primaryUri).fit().transform(transformation)
-                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
-                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE).into(imageView, callback);
+        Params p = new Params();
+        p.noCache = noCache;
+        p.filter = filter;
+
+        if (secondaryUri != null) {
+            p.callback = new RetryCallback(this, secondaryUri, target, p);
         }
+
+        load(primaryUri, target, p);
     }
 
     public void load(Uri uri, Filter filter, ImageView imageView, boolean cache) {
