@@ -173,13 +173,14 @@ public final class ImageViewerFragment extends AbstractFragment {
         Point size = displaySize();
 
         // load high res version
-        imageLoader.loadBitmapAsync(fileUri, imageViewHighRes,
-                size.x,
-                size.y,
-                R.drawable.picture_placeholder,
-                false,
-                false,
-                new LoadImageCallback(this));
+        ImageLoader.Params params = new ImageLoader.Params();
+        params.targetWidth = size.x;
+        params.targetHeight = size.y;
+        params.placeholderResId = R.drawable.picture_placeholder;
+        params.centerInside = true;
+        params.noCache = true;
+        params.callback = new LoadImageCallback(this);
+        imageLoader.load(fileUri, imageViewHighRes, params);
     }
 
     private final class ImageViewerActionModeCallback implements android.support.v7.view.ActionMode.Callback {

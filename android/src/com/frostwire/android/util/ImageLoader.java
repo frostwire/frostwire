@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.util;
@@ -164,42 +163,11 @@ public final class ImageLoader {
         this.picasso.setIndicatorsEnabled(DEBUG_ERRORS);
     }
 
-    public void loadBitmapAsync(Uri uri, ImageView target, int targetWidth, int targetHeight,
-                                int placeholderResId, boolean useDiskCache, boolean noFade,
-                                Callback callback) {
-        if (shutdown) {
-            return;
-        }
-
-        if (uri == null) {
-            throw new IllegalArgumentException("Uri can't be null");
-        }
-        final RequestCreator requestCreator = picasso.load(uri);
-
-        if (!useDiskCache) {
-            requestCreator.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
-        }
-        if (noFade) {
-            requestCreator.noFade();
-        }
-        requestCreator.placeholder(placeholderResId);
-        requestCreator.resize(targetWidth, targetHeight);
-        requestCreator.centerInside();
-
-        if (callback != null) {
-            if (Debug.hasContext(callback)) {
-                throw new RuntimeException("Possible context leak");
-            }
-            requestCreator.into(target, new CallbackWrapper(callback));
-        } else {
-            requestCreator.into(target);
-        }
-    }
-
     public void load(Uri primaryUri, Uri secondaryUri, Filter filter, ImageView target, boolean noCache) {
         if (Debug.hasContext(filter)) {
             throw new RuntimeException("Possible context leak");
         }
+
         Params p = new Params();
         p.noCache = noCache;
         p.filter = filter;
@@ -255,7 +223,7 @@ public final class ImageLoader {
         load(uri, target, p);
     }
 
-    private void load(Uri uri, ImageView target, Params p) {
+    public void load(Uri uri, ImageView target, Params p) {
         if (shutdown) {
             return;
         }
@@ -269,12 +237,17 @@ public final class ImageLoader {
         if (p == null) {
             throw new IllegalArgumentException("Params to load image can't be null");
         }
+        if (!(p.callback instanceof RetryCallback) && // don't ask this recursively
+                Debug.hasContext(p.callback)) {
+            throw new RuntimeException("Possible context leak");
+        }
 
         RequestCreator rc = picasso.load(uri);
 
         if (p.targetWidth != 0 || p.targetHeight != 0) rc.resize(p.targetWidth, p.targetHeight);
         if (p.placeholderResId != 0) rc.placeholder(p.placeholderResId);
         if (p.fit) rc.fit();
+        if (p.centerInside) rc.centerInside();
         if (p.noFade) rc.noFade();
 
         if (p.noCache) {
@@ -310,11 +283,13 @@ public final class ImageLoader {
         picasso.shutdown();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static final class Params {
         public int targetWidth = 0;
         public int targetHeight = 0;
         public int placeholderResId = 0;
         public boolean fit = false;
+        public boolean centerInside = false;
         public boolean noFade = false;
         public boolean noCache = false;
         public Filter filter = null;
