@@ -245,6 +245,9 @@ public final class ImageLoader {
                 Debug.hasContext(p.callback)) {
             throw new RuntimeException("Possible context leak");
         }
+        if (Debug.hasContext(p.filter)) {
+            throw new RuntimeException("Possible context leak");
+        }
 
         RequestCreator rc = picasso.load(uri);
 
