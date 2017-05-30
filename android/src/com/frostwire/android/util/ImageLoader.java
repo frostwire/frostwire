@@ -42,7 +42,6 @@ import com.squareup.picasso.Picasso.Builder;
 import com.squareup.picasso.Request;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.RequestHandler;
-import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
 
 import java.io.File;
@@ -230,9 +229,7 @@ public final class ImageLoader {
     }
 
     public void load(Uri uri, ImageView target) {
-        if (!shutdown) {
-            picasso.load(uri).noFade().into(target);
-        }
+        load(uri, target, true);
     }
 
     public void load(Uri uri, ImageView target, int targetWidth, int targetHeight) {
@@ -265,10 +262,20 @@ public final class ImageLoader {
         }
     }
 
-    public void load(Uri uri, Target target) {
-        if (!shutdown) {
-            picasso.load(uri).into(target);
+    private void load(Uri uri, ImageView target, boolean noFade) {
+        if (shutdown) {
+            return;
         }
+
+        if (uri == null) {
+            throw new IllegalArgumentException("Uri can't be null");
+        }
+
+        RequestCreator rc = picasso.load(uri);
+
+        if (noFade) rc.noFade();
+
+        rc.into(target);
     }
 
     public Bitmap get(Uri uri) {
