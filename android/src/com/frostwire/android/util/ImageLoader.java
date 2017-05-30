@@ -34,6 +34,7 @@ import android.widget.ImageView;
 
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
+import com.squareup.picasso.Callback.EmptyCallback;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -132,7 +133,7 @@ public final class ImageLoader {
         return bitmap;
     }
 
-    public static Uri getAlbumArtUri(final long albumId) {
+    public static Uri getAlbumArtUri(long albumId) {
         return ContentUris.withAppendedId(ImageLoader.ALBUM_THUMBNAILS_URI, albumId);
     }
 
@@ -166,7 +167,8 @@ public final class ImageLoader {
     }
 
     public void loadBitmapAsync(Uri uri, ImageView target, int targetWidth, int targetHeight,
-                                int placeholderResId, boolean useDiskCache, boolean noFade, final Callback callback) {
+                                int placeholderResId, boolean useDiskCache, boolean noFade,
+                                Callback callback) {
         if (shutdown) {
             return;
         }
@@ -206,7 +208,7 @@ public final class ImageLoader {
         }
         Transformation transformation = new FilterWrapper(filter);
         // TODO: need one more static callback here
-        com.squareup.picasso.Callback.EmptyCallback callback = new com.squareup.picasso.Callback.EmptyCallback() {
+        EmptyCallback callback = new EmptyCallback() {
             @Override
             public void onError(Exception e) {
                 if (secondaryUri != null) {
@@ -239,9 +241,10 @@ public final class ImageLoader {
         }
     }
 
-    public void load(final Uri uri, final Uri uriRetry, final ImageView target, final int targetWidth, final int targetHeight) {
+    public void load(Uri uri, final Uri uriRetry, final ImageView target,
+                     final int targetWidth, final int targetHeight) {
         if (!shutdown) {
-            picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new com.squareup.picasso.Callback.EmptyCallback() {
+            picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new EmptyCallback() {
                 @Override
                 public void onError(Exception e) {
                     load(uriRetry, target, targetWidth, targetHeight);
@@ -400,7 +403,7 @@ public final class ImageLoader {
                 return null;
             }
             Bitmap bitmap = getAlbumArt(context, String.valueOf(albumId));
-            return (bitmap != null) ? new Result(bitmap, Picasso.LoadedFrom.DISK) : null;
+            return bitmap != null ? new Result(bitmap, Picasso.LoadedFrom.DISK) : null;
         }
 
         /**
@@ -410,7 +413,7 @@ public final class ImageLoader {
          * @param artistName The name of the artist
          * @return The ID for an album.
          */
-        private static long getFirstAlbumIdForArtist(final Context context, final String artistName) {
+        private static long getFirstAlbumIdForArtist(Context context, String artistName) {
             int id = -1;
             try {
                 Cursor cursor = context.getContentResolver().query(
