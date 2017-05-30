@@ -165,11 +165,12 @@ public final class ImageLoader {
         this.picasso.setIndicatorsEnabled(DEBUG_ERRORS);
     }
 
-    public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, int placeHolderId, boolean useDiskCache, boolean noFade, ImageView view, final Callback callback) {
-        if (imageUri == null) {
+    public void loadBitmapAsync(Uri uri, ImageView target, int targetWidth, int targetHeight,
+                                int placeholderResId, boolean useDiskCache, boolean noFade, final Callback callback) {
+        if (uri == null) {
             throw new IllegalArgumentException("Uri can't be null");
         }
-        final RequestCreator requestCreator = picasso.load(imageUri);
+        final RequestCreator requestCreator = picasso.load(uri);
 
         if (!useDiskCache) {
             requestCreator.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
@@ -177,17 +178,17 @@ public final class ImageLoader {
         if (noFade) {
             requestCreator.noFade();
         }
-        requestCreator.placeholder(placeHolderId);
-        requestCreator.resize(resizedWidth, resizedHeight);
+        requestCreator.placeholder(placeholderResId);
+        requestCreator.resize(targetWidth, targetHeight);
         requestCreator.centerInside();
 
         if (callback != null) {
             if (Debug.hasContext(callback)) {
                 throw new RuntimeException("Possible context leak");
             }
-            requestCreator.into(view, new CallbackWrapper(callback));
+            requestCreator.into(target, new CallbackWrapper(callback));
         } else {
-            requestCreator.into(view);
+            requestCreator.into(target);
         }
     }
 
