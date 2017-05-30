@@ -233,9 +233,7 @@ public final class ImageLoader {
     }
 
     public void load(Uri uri, ImageView target, int targetWidth, int targetHeight) {
-        if (!shutdown) {
-            picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target);
-        }
+        load(uri, target, targetWidth, targetHeight, 0, true);
     }
 
     public void load(Uri uri, final Uri uriRetry, final ImageView target,
@@ -251,9 +249,7 @@ public final class ImageLoader {
     }
 
     public void load(Uri uri, ImageView target, int placeholderResId) {
-        if (!shutdown) {
-            picasso.load(uri).noFade().placeholder(placeholderResId).into(target);
-        }
+        load(uri, target, 0, 0, placeholderResId, true);
     }
 
     public void load(Uri uri, ImageView target, int targetWidth, int targetHeight, int placeholderResId) {
