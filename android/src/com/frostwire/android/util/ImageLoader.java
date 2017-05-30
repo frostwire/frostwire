@@ -71,9 +71,9 @@ public final class ImageLoader {
 
     private static final String METADATA_AUTHORITY = "metadata";
 
-    public static final Uri APPLICATION_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + APPLICATION_AUTHORITY);
+    private static final Uri APPLICATION_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + APPLICATION_AUTHORITY);
 
-    public static final Uri ALBUM_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ALBUM_AUTHORITY);
+    private static final Uri ALBUM_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ALBUM_AUTHORITY);
 
     private static final Uri ARTIST_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ARTIST_AUTHORITY);
 
@@ -130,16 +130,20 @@ public final class ImageLoader {
         return bitmap;
     }
 
+    public static Uri getApplicationArtUri(String packageName) {
+        return Uri.withAppendedPath(APPLICATION_THUMBNAILS_URI, packageName);
+    }
+
     public static Uri getAlbumArtUri(long albumId) {
-        return ContentUris.withAppendedId(ImageLoader.ALBUM_THUMBNAILS_URI, albumId);
+        return ContentUris.withAppendedId(ALBUM_THUMBNAILS_URI, albumId);
     }
 
     public static Uri getArtistArtUri(String artistName) {
-        return Uri.withAppendedPath(ImageLoader.ARTIST_THUMBNAILS_URI, artistName);
+        return Uri.withAppendedPath(ARTIST_THUMBNAILS_URI, artistName);
     }
 
     public static Uri getMetadataArtUri(Uri uri) {
-        return Uri.withAppendedPath(ImageLoader.METADATA_THUMBNAILS_URI, Uri.encode(uri.toString()));
+        return Uri.withAppendedPath(METADATA_THUMBNAILS_URI, Uri.encode(uri.toString()));
     }
 
     private ImageLoader(Context context) {

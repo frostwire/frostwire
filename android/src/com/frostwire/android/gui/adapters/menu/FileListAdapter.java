@@ -446,7 +446,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 256 : 96;
 
         if (fileType == Constants.FILE_TYPE_APPLICATIONS) {
-            Uri uri = Uri.withAppendedPath(ImageLoader.APPLICATION_THUMBNAILS_URI, fd.album);
+            Uri uri = ImageLoader.getApplicationArtUri(fd.album);
             thumbnailLoader.load(uri, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
         } else {
             if (in(fileType, Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS)) {
@@ -464,7 +464,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
 
             if (fd.fileType == Constants.FILE_TYPE_AUDIO) {
-                Uri uri = ContentUris.withAppendedId(ImageLoader.ALBUM_THUMBNAILS_URI, fd.albumId);
+                Uri uri = ImageLoader.getAlbumArtUri(fd.albumId);
                 Uri uriRetry = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, fd.id);
                 uriRetry = ImageLoader.getMetadataArtUri(uriRetry);
                 thumbnailLoader.load(uri, uriRetry, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
