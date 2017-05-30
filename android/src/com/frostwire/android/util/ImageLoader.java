@@ -165,14 +165,6 @@ public final class ImageLoader {
         this.picasso.setIndicatorsEnabled(DEBUG_ERRORS);
     }
 
-    /**
-     * @param resizedWidth  // if 0 is passed, proportions with respect to height will be calculated. if -1 is passed image will be fitted to view's dimensions
-     * @param resizedHeight // if 0 is passed, proportions with respect to height will be calculated. if -1 is passed image will be fitted to view's dimensions
-     * @param imageUri
-     * @param placeHolderId
-     * @param view
-     * @param callback
-     */
     public void loadBitmapAsync(final int resizedWidth, final int resizedHeight, final Uri imageUri, int placeHolderId, boolean useDiskCache, boolean noFade, ImageView view, final Callback callback) {
         if (imageUri == null) {
             throw new IllegalArgumentException("Uri can't be null");
