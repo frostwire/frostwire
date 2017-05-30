@@ -34,6 +34,7 @@ import android.widget.ImageView;
 
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 import com.squareup.picasso.Callback.EmptyCallback;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
@@ -46,6 +47,7 @@ import com.squareup.picasso.Transformation;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 
 /**
@@ -242,16 +244,18 @@ public final class ImageLoader {
         load(uri, target, p);
     }
 
-    public void load(Uri uri, final Uri uriRetry, final ImageView target,
-                     final int targetWidth, final int targetHeight) {
-        if (!shutdown) {
-            picasso.load(uri).noFade().resize(targetWidth, targetHeight).into(target, new EmptyCallback() {
-                @Override
-                public void onError(Exception e) {
-                    load(uriRetry, target, targetWidth, targetHeight);
-                }
-            });
+    public void load(Uri uri, Uri uriRetry, ImageView target,
+                     int targetWidth, int targetHeight) {
+        Params p = new Params();
+        p.targetWidth = targetWidth;
+        p.targetHeight = targetHeight;
+        p.noFade = true;
+
+        if (uriRetry != null) {
+            p.callback = new RetryCallback(this, uriRetry, target, p);
         }
+
+        load(uri, target, p);
     }
 
     public void load(Uri uri, ImageView target, int placeholderResId) {
@@ -291,7 +295,11 @@ public final class ImageLoader {
         if (p.placeholderResId != 0) rc.placeholder(p.placeholderResId);
         if (p.noFade) rc.noFade();
 
-        rc.into(target);
+        if (p.callback != null) {
+            rc.into(target, new CallbackWrapper(p.callback));
+        } else {
+            rc.into(target);
+        }
     }
 
     public Bitmap get(Uri uri) {
@@ -316,6 +324,7 @@ public final class ImageLoader {
         public int targetHeight = 0;
         public int placeholderResId = 0;
         public boolean noFade = false;
+        public Callback callback = null;
     }
 
     public interface Callback {
@@ -349,6 +358,41 @@ public final class ImageLoader {
         @Override
         public void onError(Exception e) {
             cb.onError(e);
+        }
+    }
+
+    /**
+     * This class is necessary, because passing an anonymous inline
+     * class pin the ImageView target to memory with a hard reference
+     * in the background thread pool, creating a potential memory leak.
+     * Picasso already creates a weak reference to the target while
+     * creating and submitting the callable to the background.
+     */
+    private static final class RetryCallback implements Callback {
+
+        // ImageLoader is a singleton already
+        private final ImageLoader loader;
+        private final Uri uri;
+        private final WeakReference<ImageView> target;
+        private final Params params;
+
+        RetryCallback(ImageLoader loader, Uri uri, ImageView target, Params params) {
+            this.loader = loader;
+            this.uri = uri;
+            this.target = Ref.weak(target);
+            this.params = params;
+        }
+
+        @Override
+        public void onSuccess() {
+        }
+
+        @Override
+        public void onError(Exception e) {
+            if (Ref.alive(target)) {
+                params.callback = null; // avoid recursion
+                loader.load(uri, target.get(), params);
+            }
         }
     }
 
