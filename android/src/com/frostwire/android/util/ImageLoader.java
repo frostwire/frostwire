@@ -229,11 +229,17 @@ public final class ImageLoader {
     }
 
     public void load(Uri uri, ImageView target) {
-        load(uri, target, 0, 0, 0, true);
+        Params p = new Params();
+        p.noFade = true;
+        load(uri, target, p);
     }
 
     public void load(Uri uri, ImageView target, int targetWidth, int targetHeight) {
-        load(uri, target, targetWidth, targetHeight, 0, true);
+        Params p = new Params();
+        p.targetWidth = targetWidth;
+        p.targetHeight = targetHeight;
+        p.noFade = true;
+        load(uri, target, p);
     }
 
     public void load(Uri uri, final Uri uriRetry, final ImageView target,
@@ -249,14 +255,22 @@ public final class ImageLoader {
     }
 
     public void load(Uri uri, ImageView target, int placeholderResId) {
-        load(uri, target, 0, 0, placeholderResId, true);
+        Params p = new Params();
+        p.placeholderResId = placeholderResId;
+        p.noFade = true;
+        load(uri, target, p);
     }
 
     public void load(Uri uri, ImageView target, int targetWidth, int targetHeight, int placeholderResId) {
-        load(uri, target, targetWidth, targetHeight, placeholderResId, true);
+        Params p = new Params();
+        p.targetWidth = targetWidth;
+        p.targetHeight = targetHeight;
+        p.placeholderResId = placeholderResId;
+        p.noFade = true;
+        load(uri, target, p);
     }
 
-    private void load(Uri uri, ImageView target, int targetWidth, int targetHeight, int placeholderResId, boolean noFade) {
+    private void load(Uri uri, ImageView target, Params p) {
         if (shutdown) {
             return;
         }
@@ -264,12 +278,18 @@ public final class ImageLoader {
         if (uri == null) {
             throw new IllegalArgumentException("Uri can't be null");
         }
+        if (target == null) {
+            throw new IllegalArgumentException("Target image view can't be null");
+        }
+        if (p == null) {
+            throw new IllegalArgumentException("Params to load image can't be null");
+        }
 
         RequestCreator rc = picasso.load(uri);
 
-        if (targetWidth != 0 || targetHeight != 0) rc.resize(targetWidth, targetHeight);
-        if (placeholderResId != 0) rc.placeholder(placeholderResId);
-        if (noFade) rc.noFade();
+        if (p.targetWidth != 0 || p.targetHeight != 0) rc.resize(p.targetWidth, p.targetHeight);
+        if (p.placeholderResId != 0) rc.placeholder(p.placeholderResId);
+        if (p.noFade) rc.noFade();
 
         rc.into(target);
     }
@@ -289,6 +309,13 @@ public final class ImageLoader {
     public void shutdown() {
         shutdown = true;
         picasso.shutdown();
+    }
+
+    public static final class Params {
+        public int targetWidth = 0;
+        public int targetHeight = 0;
+        public int placeholderResId = 0;
+        public boolean noFade = false;
     }
 
     public interface Callback {
