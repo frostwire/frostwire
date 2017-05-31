@@ -1,4 +1,6 @@
 frostwire (6.5.2) stable; urgency=high
+  * Monova search fixed
+  * ExtraTorrent search discontinued, RIP
   * Swedish translations updated
 	
  -- FrostWire Team <contact@frostwire.com>  Tue, 30 May 2017 19:57:55 -0600
