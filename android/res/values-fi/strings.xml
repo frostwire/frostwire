@@ -645,4 +645,5 @@
     <string name="date">Treffi</string>
     <string name="size">Koko</string>
     <string name="file_information">Tiedoston tiedot</string>
+    <string name="use_btjunkie">Käytä BTJunkie</string>
 </resources>

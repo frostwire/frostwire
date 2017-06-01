@@ -46,6 +46,7 @@ public interface AppSettings {
     String SEARCH_YOUTUBE_ENABLED = "search_youtube_enabled";
     String SEARCH_SOUNDCLOUD_ENABLED = "search_soundcloud_enabled";
     String SEARCH_ARCHIVE_ENABLED = "search_archive_enabled";
+    String SEARCH_BTJUNKIE_ENABLED = "search_btjunkie_enabled";
     String SEARCH_FROSTCLICK_ENABLED = "search_frostclick_enabled";
     String SEARCH_TORLOCK_ENABLED = "search_torlock_enabled";
     String SEARCH_EZTV_ENABLED = "search_eztv_enabled";

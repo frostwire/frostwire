@@ -27,6 +27,11 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_archiveorg" />
     <android.support.v7.preference.CheckBoxPreference
+        android:key="frostwire.prefs.search.use_btjunkie"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_btjunkie"
+        />
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_eztv"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_eztv" />

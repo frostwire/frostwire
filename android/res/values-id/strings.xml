@@ -645,4 +645,5 @@
     <string name="date">tanggal</string>
     <string name="size">Ukuran</string>
     <string name="file_information">Informasi file</string>
+    <string name="use_btjunkie">Gunakan BTJunkie</string>
 </resources>

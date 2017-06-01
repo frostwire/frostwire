@@ -644,7 +644,7 @@
     <string name="fullscreen">Vollbild</string>
     <string name="date">Datum</string>
     <string name="size">Größe</string>
-    <string name="your_android_wall_paper_will_change">Die Tapete deines Android wird sich in wenigen Sekunden ändern
-    </string>
+    <string name="your_android_wall_paper_will_change">Die Tapete deines Android wird sich in wenigen Sekunden ändern</string>
     <string name="file_information">Dateiinformationen</string>
+    <string name="use_btjunkie">Benutze BTJunkie</string>
 </resources>

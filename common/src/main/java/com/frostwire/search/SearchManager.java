@@ -19,6 +19,7 @@ package com.frostwire.search;
 
 import com.frostwire.platform.AppSettings;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
+import com.frostwire.search.btjunkie.BtjunkieSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.filter.SearchTable;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
@@ -416,6 +417,13 @@ public final class SearchManager {
         }
     };
 
+    static final SearchEngine BTJUNKIE = new SearchEngine("Btjunkie", AppSettings.SEARCH_BTJUNKIE_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new BtjunkieSearchPerformer("btjunkie.eu", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
     @SuppressWarnings("unused")
-    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(YIFY, YOUTUBE, FROSTCLICK, MONOVA, ZOOQLE, TPB, SOUNCLOUD, ARCHIVE, TORLOCK, TORRENTDOWNLOADS, EZTV, LIMETORRENTS);
+    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(YIFY, YOUTUBE, FROSTCLICK, BTJUNKIE, TPB, MONOVA, ZOOQLE, SOUNCLOUD, ARCHIVE, LIMETORRENTS, TORLOCK, TORRENTDOWNLOADS, EZTV);
 }

@@ -644,4 +644,5 @@
     <string name="fullscreen">цял екран</string>
     <string name="size">размер</string>
     <string name="file_information">Информация за файла</string>
+    <string name="use_btjunkie">Използвайте BTJunkie</string>
 </resources>

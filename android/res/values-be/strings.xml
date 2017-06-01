@@ -644,4 +644,5 @@
     <string name="date">дата</string>
     <string name="size">памер</string>
     <string name="file_information">інфармацыя аб файле</string>
+    <string name="use_btjunkie">Выкарыстоўвайце BTJunkie</string>
 </resources>

@@ -645,4 +645,5 @@
     <string name="date">तिथि</string>
     <string name="size">आकार</string>
     <string name="file_information">फ़ाइल जानकारी</string>
+    <string name="use_btjunkie">उपयोग BTJunkie</string>
 </resources>

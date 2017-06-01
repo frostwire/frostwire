@@ -651,4 +651,5 @@
     <string name="size">Величина</string>
     <string name="your_android_wall_paper_will_change">Андроид тапета ће се променити за неколико секунди</string>
     <string name="file_information">File информатион</string>
+    <string name="use_btjunkie">Користе BTJunkie</string>
 </resources>

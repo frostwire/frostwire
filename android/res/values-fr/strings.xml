@@ -646,4 +646,5 @@
     <string name="date">Date</string>
     <string name="size">Taille</string>
     <string name="file_information">Informations sur le fichier</string>
+    <string name="use_btjunkie">Utilisez BTJunkie</string>
 </resources>
