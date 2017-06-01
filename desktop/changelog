@@ -1,9 +1,10 @@
 frostwire (6.5.2) stable; urgency=high
+  * BTJunkie search resurrected
   * Monova search fixed
   * ExtraTorrent search discontinued, RIP
   * Swedish translations updated
 	
- -- FrostWire Team <contact@frostwire.com>  Tue, 30 May 2017 19:57:55 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 31 May 2017 23:39:42 -0600
 
 frostwire (6.5.1) stable; urgency=high
   * YT search fixed
