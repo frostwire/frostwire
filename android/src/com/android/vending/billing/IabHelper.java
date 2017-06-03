@@ -945,6 +945,13 @@ public class IabHelper {
 
         do {
             logDebug("Calling getPurchases with continuation token: " + continueToken);
+
+            if (mService == null) {
+                // service can be disposed during these iterations.
+                logDebug("queryPurchases: aborted. mService disconnected or un-initialized.");
+                return IABHELPER_SERVICE_IS_NULL;
+            }
+
             Bundle ownedItems = mService.getPurchases(3, mContext.getPackageName(),
                     itemType, continueToken);
 
