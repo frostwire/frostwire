@@ -87,16 +87,21 @@ public class ArtistLoader extends WrappedAsyncTaskLoader<List<Artist>> {
      * @return The {@link Cursor} used to run the artist query.
      */
     public static Cursor makeArtistCursor(final Context context) {
-        return context.getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
-                new String[] {
+        try {
+            return context.getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
+                    new String[]{
                         /* 0 */
-                        BaseColumns._ID,
+                            BaseColumns._ID,
                         /* 1 */
-                        ArtistColumns.ARTIST,
+                            ArtistColumns.ARTIST,
                         /* 2 */
-                        ArtistColumns.NUMBER_OF_ALBUMS,
+                            ArtistColumns.NUMBER_OF_ALBUMS,
                         /* 3 */
-                        ArtistColumns.NUMBER_OF_TRACKS
-                }, null, null, PreferenceUtils.getInstance(context).getArtistSortOrder());
+                            ArtistColumns.NUMBER_OF_TRACKS
+                    }, null, null, PreferenceUtils.getInstance(context).getArtistSortOrder());
+        } catch (Throwable ignored) {
+            // can throw SecurityException which then ends up in RuntimeException crash
+            return null;
+        }
     }
 }
