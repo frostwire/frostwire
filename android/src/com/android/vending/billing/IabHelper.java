@@ -625,7 +625,11 @@ public class IabHelper {
             }
 
             if (querySkuDetails) {
-                r = querySkuDetails(ITEM_TYPE_INAPP, inv, moreItemSkus);
+                try {
+                    r = querySkuDetails(ITEM_TYPE_INAPP, inv, moreItemSkus);
+                } catch (Throwable t) {
+                    r = BILLING_RESPONSE_RESULT_ERROR;
+                }
                 if (r != BILLING_RESPONSE_RESULT_OK) {
                     throw new IabException(r, "Error refreshing inventory (querying prices of items).");
                 }
@@ -639,7 +643,11 @@ public class IabHelper {
                 }
 
                 if (querySkuDetails) {
-                    r = querySkuDetails(ITEM_TYPE_SUBS, inv, moreSubsSkus);
+                    try {
+                        r = querySkuDetails(ITEM_TYPE_SUBS, inv, moreSubsSkus);
+                    } catch (Throwable t) {
+                        r = BILLING_RESPONSE_RESULT_ERROR;
+                    }
                     if (r != BILLING_RESPONSE_RESULT_OK) {
                         throw new IabException(r, "Error refreshing inventory (querying prices of subscriptions).");
                     }
@@ -1009,7 +1017,7 @@ public class IabHelper {
     int querySkuDetails(String itemType, Inventory inv, List<String> moreSkus)
             throws RemoteException, JSONException {
         logDebug("Querying SKU details.");
-        ArrayList<String> skuList = new ArrayList<String>();
+        ArrayList<String> skuList = new ArrayList<>();
         skuList.addAll(inv.getAllOwnedSkus(itemType));
         if (moreSkus != null) {
             for (String sku : moreSkus) {
@@ -1025,19 +1033,19 @@ public class IabHelper {
         }
 
         // Split the sku list in blocks of no more than 20 elements.
-        ArrayList<ArrayList<String>> packs = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<String>> packs = new ArrayList<>();
         ArrayList<String> tempList;
         int n = skuList.size() / 20;
         int mod = skuList.size() % 20;
         for (int i = 0; i < n; i++) {
-            tempList = new ArrayList<String>();
+            tempList = new ArrayList<>();
             for (String s : skuList.subList(i * 20, i * 20 + 20)) {
                 tempList.add(s);
             }
             packs.add(tempList);
         }
         if (mod != 0) {
-            tempList = new ArrayList<String>();
+            tempList = new ArrayList<>();
             for (String s : skuList.subList(n * 20, n * 20 + mod)) {
                 tempList.add(s);
             }
