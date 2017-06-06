@@ -62,6 +62,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -493,7 +495,11 @@ public final class SoftwareUpdater {
         @Override
         public void onClick(View v) {
             Engine.instance().stopServices(false);
-            UIUtils.openFile(context, getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, false);
+            // since Nougat, a naked file path can't be put directly inside
+            // an intent
+            boolean useFileProvider = hasNougatOrNewer();
+            UIUtils.openFile(context, getUpdateApk().getAbsolutePath(),
+                    Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
             newSoftwareUpdaterDialog.dismiss();
         }
     }

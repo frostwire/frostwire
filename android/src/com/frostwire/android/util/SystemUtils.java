@@ -24,6 +24,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.os.EnvironmentCompat;
+
 import com.frostwire.util.Logger;
 
 import java.io.File;
@@ -43,7 +44,8 @@ public final class SystemUtils {
 
     private static final Logger LOG = Logger.getLogger(SystemUtils.class);
 
-    private static final int VERSION_CODE_KITKAT = 19;
+    private static final int VERSION_SDK_KITKAT_4_4 = 19;
+    private static final int VERSION_SDK_NOUGAT_7_0 = 24;
 
     private SystemUtils() {
     }
@@ -146,7 +148,6 @@ public final class SystemUtils {
 
     /**
      * Use this instead ContextCompat
-     *
      */
     public static File[] getExternalFilesDirs(Context context) {
         if (hasKitKatOrNewer()) {
@@ -186,22 +187,32 @@ public final class SystemUtils {
 
     /**
      * Used to determine if the device is running
-     * KitKat (Android 4.4) or greater
+     * KitKat (Android 4.4) or greater.
      *
-     * @return True if the device is running KitKat or greater,
-     * false otherwise
+     * @return {@code true} if the device is running KitKat or greater,
+     * {@code false} otherwise
      */
     public static boolean hasKitKatOrNewer() {
-        return hasSdkOrNewer(VERSION_CODE_KITKAT);
+        return hasSdkOrNewer(VERSION_SDK_KITKAT_4_4);
     }
 
     /**
+     * Used to determine if the device is running
+     * Nougat (Android 7.0) or greater.
      *
+     * @return {@code true} if the device is running KitKat or greater,
+     * {@code false} otherwise
+     */
+    public static boolean hasNougatOrNewer() {
+        return hasSdkOrNewer(VERSION_SDK_NOUGAT_7_0);
+    }
+
+    /**
      * @param context
-     * @param timeout timeout in ms. set to -1 to wait forever.
+     * @param timeout        timeout in ms. set to -1 to wait forever.
      * @param serviceClasses
      */
-    public static void waitWhileServicesAreRunning(Context context, long timeout, Class<?> ... serviceClasses) {
+    public static void waitWhileServicesAreRunning(Context context, long timeout, Class<?>... serviceClasses) {
         final long startTime = System.currentTimeMillis();
         Set<Class<?>> serviceClassesNotRunningAnymore = new HashSet<>();
         while (serviceClasses.length != serviceClassesNotRunningAnymore.size()) {
