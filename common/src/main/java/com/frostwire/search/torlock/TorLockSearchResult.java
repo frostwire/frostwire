@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.search.torlock;
@@ -33,20 +32,20 @@ import java.util.Locale;
  * @author gubatron
  * @author aldenml
  */
-public class TorLockSearchResult extends AbstractTorrentSearchResult {
+public final class TorLockSearchResult extends AbstractTorrentSearchResult {
 
-    private String filename;
-    private String displayName;
-    private String detailsUrl;
-    private String torrentUrl;
-    private String infoHash;
-    private long size;
-    private long creationTime;
-    private int seeds;
+    private final String filename;
+    private final String displayName;
+    private final String detailsUrl;
+    private final String torrentUrl;
+    private final String infoHash;
+    private final long size;
+    private final long creationTime;
+    private final int seeds;
 
     public TorLockSearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-        this.infoHash = null;
+        this.infoHash = matcher.group("infohash");
         this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl));
         this.size = parseSize(matcher.group("filesize"));
         this.creationTime = parseCreationTime(matcher.group("time"));
