@@ -1,8 +1,9 @@
-FrostWire 1.9.5 - JUN/01/2017
+FrostWire 1.9.5 - JUN/06/2017
  - BTJunkie search resurrected
- - Monova search fixed
+ - Monova, Torlock search fixed
  - ExtraTorrent search discontinued, RIP
  - ImageLoader memory/performance optimizations
+ - Update issue on Android 7 devices fixed
 
 FrostWire 1.9.4 - MAY/18/2017
  - New Gridview for Pictures and Videos in My Files
