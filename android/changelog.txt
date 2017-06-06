@@ -4,6 +4,7 @@ FrostWire 1.9.5 - JUN/06/2017
  - ExtraTorrent search discontinued, RIP
  - ImageLoader memory/performance optimizations
  - Update issue on Android 7 devices fixed
+ - UX-fix: Navigation menu was hard coded in English
 
 FrostWire 1.9.4 - MAY/18/2017
  - New Gridview for Pictures and Videos in My Files
