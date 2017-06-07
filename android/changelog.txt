@@ -1,5 +1,7 @@
-FrostWire 1.9.6 - JUN/06/2017
+FrostWire 1.9.6 - JUN/07/2017
+ - Performance and stability improvements
  - New jlibtorrent 1.2.0.9-RC5
+ - Ogury 2.1.6
 
 FrostWire 1.9.5 - JUN/06/2017
  - BTJunkie search resurrected
