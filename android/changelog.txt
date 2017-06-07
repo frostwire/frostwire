@@ -1,3 +1,6 @@
+FrostWire 1.9.6 - JUN/06/2017
+ - New jlibtorrent 1.2.0.9-RC5
+
 FrostWire 1.9.5 - JUN/06/2017
  - BTJunkie search resurrected
  - Monova, Torlock search fixed
