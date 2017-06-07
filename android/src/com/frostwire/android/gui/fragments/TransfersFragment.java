@@ -102,9 +102,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private boolean isVPNactive;
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
-
     private boolean showTorrentSettingsOnClick;
-
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -142,13 +140,17 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        TransferManager tm = TransferManager.instance();
-        boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
-        final List<Transfer> transfers = tm.getTransfers();
-
         menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(false);
         menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(false);
         menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(false);
+        updateMenuItemVisibility(menu);
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    private void updateMenuItemVisibility(Menu menu) {
+        TransferManager tm = TransferManager.instance();
+        boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
+        final List<Transfer> transfers = tm.getTransfers();
 
         if (transfers != null && transfers.size() > 0) {
             if (someTransfersComplete(transfers)) {
@@ -168,8 +170,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
             }
         }
-
-        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -180,9 +180,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         switch (item.getItemId()) {
             case R.id.fragment_transfers_menu_add_transfer:
                 toggleAddTransferControls();
+                getActivity().invalidateOptionsMenu();
                 return true;
             case R.id.fragment_transfers_menu_clear_all:
                 TransferManager.instance().clearComplete();
+                getActivity().invalidateOptionsMenu();
                 return true;
             case R.id.fragment_transfers_menu_pause_stop_all:
                 TransferManager.instance().stopHttpTransfers();
