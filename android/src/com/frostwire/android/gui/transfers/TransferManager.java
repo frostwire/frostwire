@@ -459,6 +459,20 @@ public final class TransferManager {
             for (Transfer t : transfers) {
                 if (t instanceof BittorrentDownload) {
                     BittorrentDownload bt = (BittorrentDownload) t;
+
+                    // torrents that are finished because seeding is
+                    // not enabled, are actually paused
+                    if (bt.isFinished()) {
+                        if (!isSeedingEnabled()) {
+                            // this implies !isSeedingEnabledOnlyForWifi
+                            continue;
+                        }
+                        // TODO: find a better way to express relationship with isSeedingEnabled
+                        if (isSeedingEnabledOnlyForWifi() && !NetworkManager.instance().isDataWIFIUp()) {
+                            continue;
+                        }
+                    }
+
                     if (bt.isPaused()) {
                         bt.resume();
                     }
