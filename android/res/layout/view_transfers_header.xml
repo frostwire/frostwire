@@ -22,32 +22,6 @@
     android:layout_height="wrap_content"
     android:baselineAligned="false">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="8dp">
-
-        <ImageButton
-            android:id="@+id/view_transfers_header_button_add_transfer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:contentDescription="@null"
-            android:src="@drawable/add_transfer" />
-
-        <ImageButton
-            android:id="@+id/view_transfers_header_button_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:background="@null"
-            android:contentDescription="@null"
-            android:src="@drawable/ic_menu_moreoverflow"
-            android:visibility="visible" />
-
-    </LinearLayout>
-
     <TextView
         android:id="@+id/view_transfers_header_text_title"
         style="@style/ToolbarMainHeaderTitle"

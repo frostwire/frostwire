@@ -479,6 +479,7 @@
     <string name="torrent_transfer_aborted_on_mobile_data">Torrent transfers will not start until you connect to a Wi-Fi network.(Check your Network Settings regarding 3G/4G data usage)</string>
     <string name="cloud_download_aborted_on_mobile_data">Current setting prevents downloading when not on Wi-Fi network</string>
     <string name="torrent_transfer_consuming_mobile_data">Warning: This torrent transfer is using your 3G/4G data. (Check your Network Settings if you wish to use BitTorrent only on WiFi)</string>
+    <string name="add_transfer">Add transfer</string>
     <string name="add_transfer_label">Paste a magnet or torrent URL</string>
     <string name="please_enter_valid_url">Please enter a valid URL</string>
     <string name="magnet_url_added">Magnet URL added to transfers. (Magnets work best on Wi-Fi)</string>
