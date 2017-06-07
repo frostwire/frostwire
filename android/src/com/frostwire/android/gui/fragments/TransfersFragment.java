@@ -28,12 +28,13 @@ import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -48,15 +49,12 @@ import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
-import com.frostwire.android.gui.dialogs.MenuDialog;
-import com.frostwire.android.gui.dialogs.MenuDialog.MenuItem;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.fragments.preference.TorrentFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.ClearableEditTextView;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
@@ -77,7 +75,6 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -87,12 +84,10 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment, OnDialogClickListener {
+public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
     private final Comparator<Transfer> transferComparator;
-    private final ButtonAddTransferListener buttonAddTransferListener;
-    private final ButtonMenuListener buttonMenuListener;
     private final TransferStatus[] tabPositionToTransferStatus;
     private TabLayout tabLayout;
     private ExpandableListView list;
@@ -109,14 +104,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private Handler vpnRichToastHandler;
 
     private boolean showTorrentSettingsOnClick;
-    private ImageButton buttonMenu;
 
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
         this.transferComparator = new TransferComparator();
-        this.buttonAddTransferListener = new ButtonAddTransferListener(this);
-        this.buttonMenuListener = new ButtonMenuListener(this);
+        setHasOptionsMenu(true);
         selectedStatus = TransferStatus.ALL;
         vpnRichToastHandler = new Handler();
         tabPositionToTransferStatus = new TransferStatus[]{TransferStatus.ALL, TransferStatus.DOWNLOADING, TransferStatus.COMPLETED};
@@ -139,6 +132,78 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         subscription = TimerService.subscribe(this, 2);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_transfers_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        TransferManager tm = TransferManager.instance();
+        boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
+        final List<Transfer> transfers = tm.getTransfers();
+
+        menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(false);
+        menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(false);
+        menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(false);
+
+        if (transfers != null && transfers.size() > 0) {
+            if (someTransfersComplete(transfers)) {
+                menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
+            }
+
+            if (!bittorrentDisconnected) {
+                if (someTransfersActive(transfers)) {
+                    menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
+                }
+            }
+
+            //let's show it even if bittorrent is disconnected
+            //user should get a message telling them to check why they can't resume.
+            //Preferences > Connectivity is disconnected.
+            if (someTransfersInactive(transfers)) {
+                menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
+            }
+        }
+
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        // Handle item selection
+        setupAdapter();
+
+        switch (item.getItemId()) {
+            case R.id.fragment_transfers_menu_add_transfer:
+                toggleAddTransferControls();
+                return true;
+            case R.id.fragment_transfers_menu_clear_all:
+                TransferManager.instance().clearComplete();
+                return true;
+            case R.id.fragment_transfers_menu_pause_stop_all:
+                TransferManager.instance().stopHttpTransfers();
+                TransferManager.instance().pauseTorrents();
+                return true;
+            case R.id.fragment_transfers_menu_resume_all:
+                boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
+                if (bittorrentDisconnected) {
+                    UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
+                } else {
+                    if (NetworkManager.instance().isDataUp()) {
+                        TransferManager.instance().resumeResumableTransfers();
+                    } else {
+                        UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
+                    }
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
     @Override
@@ -185,7 +250,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         int uploads = TransferManager.instance().getActiveUploads();
         onCheckDHT();
         updateStatusBar(sDown, sUp, downloads, uploads);
-        updateButtonMenuVisibility();
     }
 
     private void updateStatusBar(String sDown, String sUp, int downloads, int uploads) {
@@ -246,20 +310,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         View header = inflater.inflate(R.layout.view_transfers_header, null, false);
         TextView text = findView(header, R.id.view_transfers_header_text_title);
         text.setText(R.string.transfers);
-        buttonMenu = findView(header, R.id.view_transfers_header_button_menu);
-        buttonMenu.setOnClickListener(buttonMenuListener);
-        updateButtonMenuVisibility();
-        ImageButton buttonAddTransfer = findView(header, R.id.view_transfers_header_button_add_transfer);
-        buttonAddTransfer.setOnClickListener(buttonAddTransferListener);
         return header;
     }
-
-    private void updateButtonMenuVisibility() {
-        if (buttonMenu != null) {
-            buttonMenu.setVisibility(TransferManager.instance().getTransfers().size() > 0 ? View.VISIBLE : View.GONE);
-        }
-    }
-
 
     public void selectStatusTabToThe(boolean right) {
         int currentTabPosition = tabLayout.getSelectedTabPosition();
@@ -443,71 +495,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    private static final String TRANSFERS_DIALOG_ID = "transfers_dialog";
-
-    private static final int CLEAR_MENU_DIALOG_ID = 0;
-    private static final int PAUSE_MENU_DIALOG_ID = 1;
-    private static final int RESUME_MENU_DIALOG_ID = 2;
-
-    @Override
-    public void onDialogClick(String tag, int which) {
-        if (tag.equals(TRANSFERS_DIALOG_ID)) {
-            switch (which) {
-                case CLEAR_MENU_DIALOG_ID:
-                    TransferManager.instance().clearComplete();
-                    break;
-                case PAUSE_MENU_DIALOG_ID:
-                    TransferManager.instance().stopHttpTransfers();
-                    TransferManager.instance().pauseTorrents();
-                    break;
-                case RESUME_MENU_DIALOG_ID:
-                    boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
-                    if (bittorrentDisconnected) {
-                        UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
-                    } else {
-                        if (NetworkManager.instance().isDataUp()) {
-                            TransferManager.instance().resumeResumableTransfers();
-                        } else {
-                            UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
-                        }
-                    }
-                    break;
-            }
-            setupAdapter();
-            updateButtonMenuVisibility();
-        }
-    }
-
-    private void showContextMenu() {
-        MenuItem clear = new MenuItem(CLEAR_MENU_DIALOG_ID, R.string.transfers_context_menu_clear_finished, R.drawable.contextmenu_icon_remove_transfer);
-        MenuItem pause = new MenuItem(PAUSE_MENU_DIALOG_ID, R.string.transfers_context_menu_pause_stop_all_transfers, R.drawable.contextmenu_icon_pause_transfer);
-        MenuItem resume = new MenuItem(RESUME_MENU_DIALOG_ID, R.string.transfers_context_resume_all_torrent_transfers, R.drawable.contextmenu_icon_play);
-        List<MenuItem> dlgActions = new ArrayList<>();
-        TransferManager tm = TransferManager.instance();
-        boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
-        final List<Transfer> transfers = tm.getTransfers();
-        if (transfers != null && transfers.size() > 0) {
-            if (someTransfersComplete(transfers)) {
-                dlgActions.add(clear);
-            }
-            if (!bittorrentDisconnected) {
-                if (someTransfersActive(transfers)) {
-                    dlgActions.add(pause);
-                }
-            }
-            //let's show it even if bittorrent is disconnected
-            //user should get a message telling them to check why they can't resume.
-            //Preferences > Connectivity is disconnected.
-            if (someTransfersInactive(transfers)) {
-                dlgActions.add(resume);
-            }
-        }
-        if (dlgActions.size() > 0) {
-            MenuDialog dlg = MenuDialog.newInstance(TRANSFERS_DIALOG_ID, dlgActions);
-            dlg.show(getFragmentManager());
-        }
-    }
-
     private boolean someTransfersInactive(List<Transfer> transfers) {
         for (Transfer t : transfers) {
             if (t instanceof BittorrentDownload) {
@@ -587,7 +574,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         } else {
             UIUtils.showLongMessage(getActivity(), R.string.please_enter_valid_url);
         }
-        updateButtonMenuVisibility();
     }
 
     private void startCloudTransfer(String text) {
@@ -633,7 +619,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                             UIUtils.showLongMessage(getActivity(), R.string.magnet_url_added);
                             clipboard.setPrimaryClip(ClipData.newPlainText("", ""));
                             toggleAddTransferControls();
-                            updateButtonMenuVisibility();
                         }
                     }
                 }
@@ -712,28 +697,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         ALL, DOWNLOADING, COMPLETED;
     }
 
-    private static final class ButtonAddTransferListener extends ClickAdapter<TransfersFragment> {
 
-        ButtonAddTransferListener(TransfersFragment f) {
-            super(f);
-        }
-
-        @Override
-        public void onClick(TransfersFragment f, View v) {
-            f.toggleAddTransferControls();
-        }
-    }
-
-    private static final class ButtonMenuListener extends ClickAdapter<TransfersFragment> {
-
-        ButtonMenuListener(TransfersFragment f) {
-            super(f);
-        }
-
-        @Override
-        public void onClick(TransfersFragment f, View v) {
-            f.showContextMenu();
-        }
+    public void onClick(TransfersFragment f, View v) {
+        f.toggleAddTransferControls();
     }
 
     private static final class AddTransferTextListener extends ClickAdapter<TransfersFragment> implements OnItemClickListener, OnActionListener {
