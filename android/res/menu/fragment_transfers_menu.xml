@@ -24,7 +24,7 @@
         android:id="@+id/fragment_transfers_menu_add_transfer"
         android:icon="@drawable/add_transfer"
         android:orderInCategory="1"
-        android:title="Add magnet"
+        android:title="@string/add_transfer"
         app:showAsAction="always"/>
     <item
         android:id="@+id/fragment_transfers_menu_clear_all"
