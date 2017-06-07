@@ -806,6 +806,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            if (context instanceof Activity) {
+                ((Activity) context).invalidateOptionsMenu();
+            }
             if (action.equals(Constants.ACTION_MEDIA_PLAYER_PLAY) ||
                     action.equals(Constants.ACTION_MEDIA_PLAYER_STOPPED) ||
                     action.equals(Constants.ACTION_MEDIA_PLAYER_PAUSED) ||
