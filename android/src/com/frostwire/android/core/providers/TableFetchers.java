@@ -25,6 +25,7 @@ import android.provider.MediaStore.Audio.AudioColumns;
 import android.provider.MediaStore.Files.FileColumns;
 import android.provider.MediaStore.Images.ImageColumns;
 import android.provider.MediaStore.Video.VideoColumns;
+
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 
@@ -282,10 +283,13 @@ public final class TableFetchers {
         final static String extensionsWhereSubClause = getExtsWhereSubClause();
 
         private static String getExtsWhereSubClause() {
-            final String[] exts = new String[]{"jpg", "jpeg", "gif", "backup", "ticr", "aac", "mp3" , "mp4", "js", "dat", "bak", "png", "mrpr", "webm", "idx", "apnx", "db", "phl", "asc", "torrent", "xlog", "3gp", "alrbackup", "bin", "gz", "db-journal"};
+            final String[] exts = new String[]{"jpg", "jpeg", "gif", "backup", "ticr",
+                    "aac", "mp3", "mp4", "js", "dat", "bak", "png", "mrpr", "webm", "idx",
+                    "apnx", "db", "phl", "asc", "torrent", "xlog", "3gp", "alrbackup", "bin",
+                    "gz", "db-journal"};
             StringBuilder sb = new StringBuilder();
             for (String ext : exts) {
-                sb.append(FileColumns.DATA + " NOT LIKE '%."+ext+"' AND ");
+                sb.append(FileColumns.DATA + " NOT LIKE '%." + ext + "' AND ");
             }
             return sb.toString();
         }
