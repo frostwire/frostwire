@@ -162,8 +162,11 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                 } else {
                     profileType = ProfileType.OTHER;
                 }
-                PhotoSelectionDialog.newInstance(isArtist() ? mArtistName : mProfileName,
-                        profileType).show(getSupportFragmentManager(), "PhotoSelectionDialog");
+                try {
+                    PhotoSelectionDialog.newInstance(isArtist() ? mArtistName : mProfileName,
+                            profileType).show(getSupportFragmentManager(), "PhotoSelectionDialog");
+                } catch (Throwable ignored) {
+                }
             }
         });
         // Set up the action bar
