@@ -415,7 +415,11 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 return null;
             }
         };
-        loader.forceLoad();
+        try {
+            loader.forceLoad();
+        } catch (Throwable t) {
+            LOG.warn("createLoaderFiles(fileType="+fileType+") loader.forceLoad() failed. Continuing.", t);
+        }
         return loader;
     }
 
