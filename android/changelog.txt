@@ -1,10 +1,11 @@
-FrostWire 1.9.6 - JUN/07/2017
+FrostWire 1.9.6 - JUN/08/2017
  - Performance and stability improvements
  - New jlibtorrent 1.2.0.9-RC5
  - Ogury 2.1.6
  - AppLovin 7.2.0
  - Fixes Seeding setting bug
  - Improves and fixes bugs in Transfer's action bar menu options
+ - Fixes issue with documents query filter
 
 FrostWire 1.9.5 - JUN/06/2017
  - BTJunkie search resurrected
