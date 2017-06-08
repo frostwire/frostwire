@@ -179,7 +179,10 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                             } else {
                                 if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) {
                                     LOG.info("getGridItemView() Background ImageView.onClick(), show the menu");
-                                    new MenuBuilder(getMenuAdapter(v)).show();
+                                    MenuAdapter menuAdapter = getMenuAdapter(v);
+                                    if (menuAdapter != null) {
+                                        new MenuBuilder(menuAdapter).show();
+                                    }
                                 } else {
                                     localPlay(item.fd, v);
                                 }
@@ -413,8 +416,11 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 }
             } else {
                 // it will automatically remove the 'Open' entry.
-                new MenuBuilder(getMenuAdapter(view)).show();
-                UIUtils.showShortMessage(ctx, R.string.cant_open_file);
+                MenuAdapter menuAdapter = getMenuAdapter(view);
+                if (menuAdapter != null) {
+                    new MenuBuilder(menuAdapter).show();
+                    UIUtils.showShortMessage(ctx, R.string.cant_open_file);
+                }
             }
         }
     }
