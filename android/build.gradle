@@ -77,8 +77,8 @@ project.ext.versionName = manifestVersionName()
 
 android {
 
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
 
     defaultConfig {
         versionName project.ext.versionName
