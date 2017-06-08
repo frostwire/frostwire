@@ -28,6 +28,7 @@ import android.provider.MediaStore.Video.VideoColumns;
 
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.MediaType;
 
 /**
  * Help yourself with TableFetchers.
@@ -283,14 +284,21 @@ public final class TableFetchers {
         final static String extensionsWhereSubClause = getExtsWhereSubClause();
 
         private static String getExtsWhereSubClause() {
-            final String[] exts = new String[]{"jpg", "jpeg", "gif", "backup", "ticr",
-                    "aac", "mp3", "mp4", "js", "dat", "bak", "png", "mrpr", "webm", "idx",
-                    "apnx", "db", "phl", "asc", "torrent", "xlog", "3gp", "alrbackup", "bin",
-                    "gz", "db-journal"};
+            final String[] exts = MediaType.getDocumentMediaType().getExtensions().toArray(new String[0]);
             StringBuilder sb = new StringBuilder();
-            for (String ext : exts) {
-                sb.append(FileColumns.DATA + " NOT LIKE '%." + ext + "' AND ");
+            sb.append('(');
+            int index = 0;
+            while (index < exts.length) {
+                sb.append(FileColumns.DATA);
+                sb.append(" LIKE '%.");
+                sb.append(exts[index]);
+                sb.append('\'');
+                if (index < exts.length - 1) {
+                    sb.append(" OR ");
+                }
+                index++;
             }
+            sb.append(") AND ");
             return sb.toString();
         }
 

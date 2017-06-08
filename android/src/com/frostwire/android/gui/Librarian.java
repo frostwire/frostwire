@@ -339,10 +339,7 @@ public final class Librarian {
             int count = 1;
             do {
                 FileDescriptor fd = fetcher.fetch(c);
-
-                if (!isInvalidDocument(fd)) {
-                    result.add(fd);
-                }
+                result.add(fd);
             } while (c.moveToNext() && count++ < pageSize);
         } catch (Throwable e) {
             Log.e(TAG, "General failure getting files", e);
@@ -352,14 +349,6 @@ public final class Librarian {
             }
         }
         return result;
-    }
-
-    /**
-     * @param fd
-     * @return true if file is catalogued as a Document and has no .extension.
-     */
-    public static boolean isInvalidDocument(FileDescriptor fd) {
-        return fd.fileType == Constants.FILE_TYPE_DOCUMENTS && StringUtils.isNullOrEmpty(FilenameUtils.getExtension(fd.filePath));
     }
 
     public List<FileDescriptor> getFiles(String filepath, boolean exactPathMatch) {
