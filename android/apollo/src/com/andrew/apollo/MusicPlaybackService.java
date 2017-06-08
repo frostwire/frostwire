@@ -1609,17 +1609,20 @@ public class MusicPlaybackService extends Service {
                 // UI thread portion
                 Runnable postExecute = new Runnable() {
                     public void run() {
-                        mRemoteControlClient
-                                .editMetadata(true)
-                                .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, getArtistName())
-                                .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST,
-                                        getAlbumArtistName())
-                                .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, getAlbumName())
-                                .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, getTrackName())
-                                .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration())
-                                .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy)
-                                .apply();
-
+                        try {
+                            mRemoteControlClient
+                                    .editMetadata(true)
+                                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, getArtistName())
+                                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST,
+                                            getAlbumArtistName())
+                                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, getAlbumName())
+                                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, getTrackName())
+                                    .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration())
+                                    .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy)
+                                    .apply();
+                        } catch (Throwable t) {
+                            // possible NPE on android.media.RemoteControlClient$MetadataEditor.apply()
+                        }
                         // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
                         // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
                         mRemoteControlClient.setPlaybackState(playState);
