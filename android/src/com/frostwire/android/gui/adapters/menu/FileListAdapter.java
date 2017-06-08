@@ -56,7 +56,6 @@ import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.android.util.ImageLoader;
-import com.frostwire.android.util.ImageLoader.Callback;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -309,6 +308,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
 
         if (checkIfNotExists(fd)) {
+            notifyDataSetInvalidated();
             return null;
         }
 
