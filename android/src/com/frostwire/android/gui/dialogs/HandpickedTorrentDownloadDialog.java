@@ -281,8 +281,12 @@ public class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<H
 
                 if (!checked.isEmpty()) {
                     LOG.info("about to startTorrentPartialDownload()");
+                    try {
+                        dlg.dismiss();
+                    } catch (Throwable ignored) {
+                        // FragmentManager might throw illegal state exception after dialog is dismissed checking state loss
+                    }
                     startTorrentPartialDownload(ctxRef.get(), checked);
-                    dlg.dismiss();
 
                     if (ctxRef.get() instanceof Activity) {
                         Offers.showInterstitialOfferIfNecessary((Activity) ctxRef.get(), Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
