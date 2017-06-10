@@ -35,6 +35,9 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
+        url "https://maven.google.com"
+    }
+    maven {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
 }
@@ -77,7 +80,7 @@ project.ext.versionName = manifestVersionName()
 
 android {
 
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion "26.0.0"
 
     defaultConfig {
@@ -149,9 +152,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:preference-v14:25.3.1'
-    compile 'com.android.support:support-v13:25.3.1'
+    compile 'com.android.support:design:25.4.0'
+    compile 'com.android.support:preference-v14:25.4.0'
+    compile 'com.android.support:support-v13:25.4.0'
     compile 'com.google.android.gms:play-services-ads-lite:11.0.0'
     compile 'com.google.android.gms:play-services-base:11.0.0'
     compile('com.mopub:mopub-sdk-banner:4.14.0@aar') { transitive = true }
