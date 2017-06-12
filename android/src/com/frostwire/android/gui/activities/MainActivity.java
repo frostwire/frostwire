@@ -179,16 +179,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
         Engine.instance().shutdown();
-        MusicUtils.requestMusicPlaybackServiceShutdown(MainActivity.this);
-        // we make sure all services have finished shutting down before we kill our own process.
-        new Thread("shutdown-halt") {
-            @Override
-            public void run() {
-                SystemUtils.waitWhileServicesAreRunning(MainActivity.this, 15000, MusicPlaybackService.class, EngineService.class);
-                LOG.info("MainActivity::shutdown()/shutdown-halt thread: android.os.Process.killProcess(" + android.os.Process.myPid() + ")");
-                android.os.Process.killProcess(android.os.Process.myPid());
-            }
-        }.start();
+        MusicUtils.requestMusicPlaybackServiceShutdown(this);
+        SystemUtils.requestKillProcess(this);
     }
 
     @Override

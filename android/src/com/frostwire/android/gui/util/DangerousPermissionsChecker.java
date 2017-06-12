@@ -33,6 +33,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -283,5 +284,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         Offers.stopAdNetworks(activity);
         activity.finish();
         Engine.instance().shutdown();
+        MusicUtils.requestMusicPlaybackServiceShutdown(activity);
+        SystemUtils.requestKillProcess(activity);
     }
 }

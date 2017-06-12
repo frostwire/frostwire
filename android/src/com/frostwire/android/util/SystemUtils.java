@@ -21,10 +21,13 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Process;
 import android.os.StatFs;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.os.EnvironmentCompat;
 
+import com.andrew.apollo.MusicPlaybackService;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.util.Logger;
 
 import java.io.File;
@@ -255,5 +258,26 @@ public final class SystemUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * This method schedule a hard kill process in a background thread.
+     * <p>
+     * It first waits for major components like services to shutdown to alleviate
+     * the problem that the android OS restarts the application.
+     */
+    public static void requestKillProcess(final Context context) {
+        // we make sure all services have finished shutting down before we kill our own process.
+        Thread t = new Thread("shutdown-halt") {
+            @Override
+            public void run() {
+                SystemUtils.waitWhileServicesAreRunning(context, 15000, MusicPlaybackService.class, EngineService.class);
+                LOG.info("MainActivity::shutdown()/shutdown-halt thread: android.os.Process.killProcess(" + Process.myPid() + ")");
+                Process.killProcess(android.os.Process.myPid());
+            }
+        };
+
+        t.setDaemon(true);
+        t.start();
     }
 }
