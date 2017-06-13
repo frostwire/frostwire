@@ -23,8 +23,8 @@ import com.frostwire.search.SearchResult;
 import javax.swing.*;
 
 /**
- * A single SearchResult. These are returned in the {@link SearchInputPanel} and
- * are used to create {@link SearchResultDataLine}s to show search results. *
+ * A single SearchResult. These are used to create
+ * {@link SearchResultDataLine}s to show search results.
  */
 public interface UISearchResult {
 

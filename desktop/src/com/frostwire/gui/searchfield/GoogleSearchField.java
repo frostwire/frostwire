@@ -48,7 +48,7 @@ public class GoogleSearchField extends SearchField {
 
     private SuggestionsThread suggestionsThread;
 
-    public GoogleSearchField() {
+    protected GoogleSearchField() {
         this.dict = createDefaultDictionary();
 
         setPrompt(I18n.tr("Hints by Google"));

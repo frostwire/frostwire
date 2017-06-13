@@ -127,7 +127,7 @@ public class SearchField extends JXSearchField {
         enableEvents(AWTEvent.KEY_EVENT_MASK);
         enableEvents(AWTEvent.HIERARCHY_EVENT_MASK);
         enableEvents(AWTEvent.FOCUS_EVENT_MASK);
-        
+
         ThemeMediator.fixKeyStrokes(this);
     }
 
