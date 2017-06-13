@@ -646,4 +646,6 @@
     <string name="size">Koko</string>
     <string name="file_information">Tiedoston tiedot</string>
     <string name="use_btjunkie">Käytä BTJunkie</string>
+    <string name="add_transfer">Lisää siirto</string>
+    <string name="your_android_wall_paper_will_change">Android-taustakuva muuttuu muutamassa sekunnissa</string>
 </resources>

@@ -645,4 +645,8 @@
     <string name="size">Saiz</string>
     <string name="file_information">Maklumat fail</string>
     <string name="use_btjunkie">Gunakan BTJunkie</string>
+    <string name="add_transfer">Menambah pemindahan</string>
+    <string name="your_android_wall_paper_will_change">kertas dinding Android anda akan berubah dalam masa beberapa
+        saat
+    </string>
 </resources>
