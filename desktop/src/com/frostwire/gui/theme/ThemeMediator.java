@@ -176,6 +176,7 @@ public final class ThemeMediator {
             fixKeyStroke(textField, "caret-end-line", KeyEvent.VK_RIGHT, 0);
             fixKeyStroke(textField, "selection-begin-line", KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK);
             fixKeyStroke(textField, "selection-end-line", KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK);
+            fixKeyStroke(textField, "select-all", KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
         }
     }
 
