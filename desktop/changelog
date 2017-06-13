@@ -1,3 +1,9 @@
+frostwire (6.5.3) stable; urgency=high
+  * New jlibtorrent 1.2.0.10
+  * Fixed Thread pool max size issue	
+	
+ -- FrostWire Team <contact@frostwire.com>  Mon, 12 Jun 2017 19:43:32 -0600
+
 frostwire (6.5.2) stable; urgency=high
   * New jlibtorrent 1.2.0.9-RC5
   * BTJunkie search resurrected

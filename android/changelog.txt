@@ -1,3 +1,8 @@
+FrostWire 1.9.7 - JUN/12/2017
+ - New jlibtorrent 1.2.0.10
+ - Fixed Thread pool max size issue
+ - Fixed possible app shutdown issues
+
 FrostWire 1.9.6 - JUN/09/2017
  - Performance and stability improvements
  - New jlibtorrent 1.2.0.9
