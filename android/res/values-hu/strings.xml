@@ -647,5 +647,6 @@
     <string name="your_android_wall_paper_will_change">Az Android háttérkép néhány másodpercen belül megváltozik</string>
     <string name="file_information">Fájlinformációk</string>
     <string name="use_btjunkie">Használja BTJunkie</string>
+    <string name="add_transfer">Átvitel hozzáadása</string>
 
 </resources>

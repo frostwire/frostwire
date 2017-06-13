@@ -650,4 +650,5 @@
     <string name="your_android_wall_paper_will_change">あなたのAndroidの壁紙は数秒で変更されます</string>
     <string name="file_information">ファイル情報</string>
     <string name="use_btjunkie">BTJunkieを使用する</string>
+    <string name="add_transfer">転送を追加</string>
 </resources>

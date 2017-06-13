@@ -646,4 +646,6 @@
     <string name="size">आकार</string>
     <string name="file_information">फ़ाइल जानकारी</string>
     <string name="use_btjunkie">उपयोग BTJunkie</string>
+    <string name="your_android_wall_paper_will_change">आपका एंड्रॉइड वॉलपेपर कुछ ही सेकंड में बदल जाएगा</string>
+    <string name="add_transfer">स्थानांतरण जोड़ें</string>
 </resources>
