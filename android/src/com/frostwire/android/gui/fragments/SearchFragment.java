@@ -332,7 +332,7 @@ public final class SearchFragment extends AbstractFragment implements
             searchInput.setText("");
             searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
             performSearch(ytId, Constants.FILE_TYPE_VIDEOS);
-            searchInput.setHint(getActivity().getString(R.string.searching_for) + " youtube:" + ytId);
+            searchInput.setText("youtube:" + ytId);
         }
     }
 
