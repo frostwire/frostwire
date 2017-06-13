@@ -255,9 +255,6 @@ public final class SearchResultDisplayer implements RefreshListener {
         // XXX: LWC-1088 (hack)
         try {
             tabbedPane.setSelectedIndex(entries.size() - 1);
-        } catch (java.lang.ArrayIndexOutOfBoundsException aioobe) {
-            resetTabbedPane();
-            tabbedPane.setSelectedIndex(entries.size() - 1);
         } catch (java.lang.IndexOutOfBoundsException ioobe) {
             resetTabbedPane();
             tabbedPane.setSelectedIndex(entries.size() - 1);

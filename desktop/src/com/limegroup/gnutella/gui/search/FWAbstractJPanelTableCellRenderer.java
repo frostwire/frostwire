@@ -59,7 +59,7 @@ abstract public class FWAbstractJPanelTableCellRenderer extends JPanel implement
         setOpaque(true);
         setEnabled(table.isEnabled());
         updateRowBackgroundColor(isSelected, row);
-        initializeDefaultMouseListeners(table);
+        initializeDefaultMouseListeners();
         return this;
     }
 
@@ -73,7 +73,7 @@ abstract public class FWAbstractJPanelTableCellRenderer extends JPanel implement
     }
 
 
-    private void initializeDefaultMouseListeners(final JTable table) {
+    private void initializeDefaultMouseListeners() {
         if (getMouseListeners() == null || getMouseListeners().length == 0) {
             addMouseMotionListener(new MouseAdapter() {
                 @Override

@@ -63,7 +63,7 @@ public class TableRowFilteredModel extends ResultPanelModel {
         }
 
         FILTER = f;
-        HIDDEN = new ArrayList<SearchResultDataLine>();
+        HIDDEN = new ArrayList<>();
         _numResults = 0;
     }
 
@@ -142,8 +142,8 @@ public class TableRowFilteredModel extends ResultPanelModel {
      * Rebuilds the internal map to denote a new filter.
      */
     private void rebuild() {
-        List<SearchResultDataLine> existing = new ArrayList<SearchResultDataLine>(_list);
-        List<SearchResultDataLine> hidden = new ArrayList<SearchResultDataLine>(HIDDEN);
+        List<SearchResultDataLine> existing = new ArrayList<>(_list);
+        List<SearchResultDataLine> hidden = new ArrayList<>(HIDDEN);
         simpleClear();
 
         // For stuff in _list, we can just re-add the DataLines as-is.
@@ -158,7 +158,7 @@ public class TableRowFilteredModel extends ResultPanelModel {
         }
 
         // Merge the hidden TableLines
-        Map<String, SearchResultDataLine> mergeMap = new HashMap<String, SearchResultDataLine>();
+        Map<String, SearchResultDataLine> mergeMap = new HashMap<>();
         for (int i = 0; i < hidden.size(); i++) {
             SearchResultDataLine tl = hidden.get(i);
             //SearchResult sr = tl.getInitializeObject();

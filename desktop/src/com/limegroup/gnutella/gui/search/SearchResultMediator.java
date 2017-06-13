@@ -219,11 +219,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         return new SearchColumnPreferenceHandler(TABLE);
     }
 
-    @Override
-    protected void addListeners() {
-        super.addListeners();
-    }
-
     /**
      * Sets all the listeners.
      */
@@ -377,14 +372,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * Do not allow removal of rows.
      */
     public void removeSelection() {
-    }
-
-    /**
-     * Clears the table and converts the download button into a
-     * wish list button.
-     */
-    public void clearTable() {
-        super.clearTable();
     }
 
     /**

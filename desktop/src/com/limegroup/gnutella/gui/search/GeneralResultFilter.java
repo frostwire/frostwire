@@ -20,7 +20,6 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.filters.TableLineFilter;
 import com.limegroup.gnutella.gui.GUIUtils;
-import com.limegroup.gnutella.gui.LabeledTextField;
 
 /**
  * 
@@ -46,7 +45,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
 
     private String _keywords;
 
-    public GeneralResultFilter(SearchResultMediator rp, LabeledRangeSlider rangeSliderSeeds, LabeledRangeSlider rangeSliderSize, LabeledTextField keywordTextField) {
+    public GeneralResultFilter(SearchResultMediator rp, LabeledRangeSlider rangeSliderSeeds, LabeledRangeSlider rangeSliderSize) {
         _rp = rp;
         _rangeSliderSeeds = rangeSliderSeeds;
         _rangeSliderSize = rangeSliderSize;

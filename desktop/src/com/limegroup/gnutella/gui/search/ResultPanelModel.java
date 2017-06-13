@@ -137,7 +137,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
         _numResults += 1;
         String sha1 = tl.getHash();
         if (sha1 != null)
-            _indexes.put(sha1, new Integer(row));
+            _indexes.put(sha1, row);
         int addedAt = super.add(tl, row);
         remapIndexes(addedAt + 1);
         return addedAt;
@@ -197,7 +197,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
         for (int i = start; i < end; i++) {
             String sha1 = getHash(i);
             if (sha1 != null)
-                _indexes.put(sha1, new Integer(i));
+                _indexes.put(sha1, i);
         }
     }
 

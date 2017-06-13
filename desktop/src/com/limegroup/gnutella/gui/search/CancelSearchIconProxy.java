@@ -75,10 +75,6 @@ final class CancelSearchIconProxy implements Icon {
         return new CancelSearchIconProxy(SELECTED);
     }
 
-    static CancelSearchIconProxy createArmed() {
-        return new CancelSearchIconProxy(ARMED);
-    }
-
     /**
      * the constructor loads the image icon and stores the location
      * and dimensions.
@@ -188,9 +184,6 @@ final class CancelSearchIconProxy implements Icon {
         int yMax = _y + _height;
         if (!((x >= _x) && (x <= xMax)))
             return false;
-        if (!((y >= _y) && (y <= yMax)))
-            return false;
-
-        return true;
+        return (y >= _y) && (y <= yMax);
     }
 }

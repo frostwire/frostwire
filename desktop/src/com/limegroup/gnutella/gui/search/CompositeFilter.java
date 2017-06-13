@@ -34,7 +34,7 @@ class CompositeFilter implements TableLineFilter<SearchResultDataLine> {
      * By default, all the filters are an AllowFilter.
      */
     CompositeFilter(int depth) {
-        this.delegates = new ArrayList<TableLineFilter<SearchResultDataLine>>(depth);
+        this.delegates = new ArrayList<>(depth);
         for (int i = 0; i < depth; i++) {
             this.delegates.add(null);
         }

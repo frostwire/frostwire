@@ -57,7 +57,7 @@ final class SearchResultNameHolder extends NameHolder {
                     if (i + token.length() <= str.length()) {
                         String s = str.substring(i, token.length() + i);
                         if (s.equalsIgnoreCase(token)) {
-                            sb.append("<b>" + s + "</b>");
+                            sb.append("<b>").append(s).append("</b>");
                             i += s.length();
                         } else {
                             sb.append(str.charAt(i));

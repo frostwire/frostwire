@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.limegroup.gnutella.gui.search;
 
 import java.awt.datatransfer.Transferable;

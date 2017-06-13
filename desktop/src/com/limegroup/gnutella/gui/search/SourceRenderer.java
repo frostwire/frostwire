@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class SourceRenderer extends DefaultTableBevelledCellRenderer implements TableCellRenderer {
 
-    private static final Map<String, ImageIcon> sourceIcons = new HashMap<String, ImageIcon>();
+    private static final Map<String, ImageIcon> sourceIcons = new HashMap<>();
 
     static {
         try {

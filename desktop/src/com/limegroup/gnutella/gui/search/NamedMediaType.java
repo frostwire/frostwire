@@ -46,7 +46,7 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
      * The cached mapping of description -> media type,
      * for easy looking up from incoming results.
      */
-    private static final Map<String, NamedMediaType> CACHED_TYPES = new HashMap<String, NamedMediaType>();
+    private static final Map<String, NamedMediaType> CACHED_TYPES = new HashMap<>();
 
     /**
      * The MediaType this is describing.
@@ -116,10 +116,7 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof NamedMediaType)) {
-            return false;
-        }
-        return _name.equals(((NamedMediaType) obj)._name);
+        return obj instanceof NamedMediaType && _name.equals(((NamedMediaType) obj)._name);
     }
     
     @Override
@@ -163,7 +160,7 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
      * Retrieves all possible media types, wrapped in a NamedMediaType.
      */
     public static List<NamedMediaType> getAllNamedMediaTypes() {
-        List<NamedMediaType> allSchemas = new LinkedList<NamedMediaType>();
+        List<NamedMediaType> allSchemas = new LinkedList<>();
 
         //Add any default media types that haven't been added already.
         MediaType allTypes[] = MediaType.getDefaultMediaTypes();

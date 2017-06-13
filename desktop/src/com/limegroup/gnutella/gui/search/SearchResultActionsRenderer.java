@@ -123,10 +123,10 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     @Override
     protected void updateUIData(Object dataHolder, JTable table, int row, int column) {
-        updateUIData((SearchResultActionsHolder) dataHolder, table, row, column);
+        updateUIData((SearchResultActionsHolder) dataHolder, table, row);
     }
 
-    private void updateUIData(SearchResultActionsHolder actionsHolder, JTable table, int row, int column) {
+    private void updateUIData(SearchResultActionsHolder actionsHolder, JTable table, int row) {
         cancelEdit();
         if (actionsHolder == null) {
             return;
@@ -208,9 +208,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     private boolean isStreamableSourceBeingPlayed(UISearchResult sr) {
         SearchResult delegateSearchResult = sr.getSearchResult();
-        if (!(delegateSearchResult instanceof StreamableSearchResult)) {
-            return false;
-        }
-        return MediaPlayer.instance().isThisBeingPlayed(((StreamableSearchResult)delegateSearchResult).getStreamUrl());
+        return delegateSearchResult instanceof StreamableSearchResult && MediaPlayer.instance().isThisBeingPlayed(((StreamableSearchResult) delegateSearchResult).getStreamUrl());
     }
 }

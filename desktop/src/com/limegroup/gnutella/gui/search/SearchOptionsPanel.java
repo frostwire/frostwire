@@ -86,7 +86,7 @@ final class SearchOptionsPanel extends JPanel {
     }
 
     void updateFiltersPanel() {
-        generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize, textFieldKeywords);
+        generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
         updateCheckboxes(SearchEngine.getEngines());
         resultPanel.filterChanged(new SearchEngineFilter(engineCheckboxes), 0);
         resultPanel.filterChanged(generalFilter, 1);
@@ -138,7 +138,7 @@ final class SearchOptionsPanel extends JPanel {
         textField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                textFieldKeywords_keyReleased(e);
+                textFieldKeywords_keyReleased();
             }
         });
 
@@ -150,7 +150,7 @@ final class SearchOptionsPanel extends JPanel {
         slider.setPreferredSize(new Dimension(240, (int) slider.getPreferredSize().getHeight()));
         slider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                sliderSize_stateChanged(e);
+                sliderSize_stateChanged();
             }
         });
 
@@ -162,7 +162,7 @@ final class SearchOptionsPanel extends JPanel {
         slider.setPreferredSize(new Dimension(240, (int) slider.getPreferredSize().getHeight()));
         slider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                sliderSeeds_stateChanged(e);
+                sliderSeeds_stateChanged();
             }
         });
 
@@ -215,19 +215,19 @@ final class SearchOptionsPanel extends JPanel {
         return true;
     }
 
-    private void textFieldKeywords_keyReleased(KeyEvent e) {
+    private void textFieldKeywords_keyReleased() {
         if (generalFilter != null) {
             generalFilter.updateKeywordFiltering(textFieldKeywords.getText());
         }
     }
 
-    private void sliderSize_stateChanged(ChangeEvent e) {
+    private void sliderSize_stateChanged() {
         if (generalFilter != null) {
             generalFilter.setRangeSize(sliderSize.getLowerValue(), sliderSize.getUpperValue());
         }
     }
 
-    private void sliderSeeds_stateChanged(ChangeEvent e) {
+    private void sliderSeeds_stateChanged() {
         if (generalFilter != null) {
             generalFilter.setRangeSeeds(sliderSeeds.getLowerValue(), sliderSeeds.getUpperValue());
         }

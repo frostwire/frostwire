@@ -17,8 +17,6 @@ final class SearchButtons {
 	 */
 	private final ButtonRow BUTTONS;
 
-	static final int CONFIGURE_SHARING_BUTTON_INDEX = 0;
-
 	/**
 	 * The index of the WishList / Download Button.
 	 */

@@ -247,7 +247,7 @@ public class MagnetClipboardListener extends WindowAdapter {
      * @return
      */
     private static MagnetOptions[] extractDownloadableMagnets(MagnetOptions[] magnets) {
-        List<MagnetOptions> dls = new ArrayList<MagnetOptions>(magnets.length);
+        List<MagnetOptions> dls = new ArrayList<>(magnets.length);
         for (int i = 0; i < magnets.length; i++) {
             MagnetOptions magnet = magnets[i];
             if (!magnet.isKeywordTopicOnly()) {

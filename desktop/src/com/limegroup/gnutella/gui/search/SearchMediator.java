@@ -278,7 +278,7 @@ public final class SearchMediator {
     }
 
     private List<SearchResult> filter2(List<? extends SearchResult> results, List<String> searchTokens) {
-        List<SearchResult> list = new LinkedList<SearchResult>();
+        List<SearchResult> list = new LinkedList<>();
 
         try {
             for (SearchResult sr : results) {
@@ -286,7 +286,7 @@ public final class SearchMediator {
                     // special case for youtube
                     if (sr instanceof YouTubeCrawledSearchResult) {
                         list.add(sr);
-                    } else if (filter(new LinkedList<String>(searchTokens), sr)) {
+                    } else if (filter(new LinkedList<>(searchTokens), sr)) {
                         list.add(sr);
                     }
                 } else {
@@ -344,13 +344,13 @@ public final class SearchMediator {
     private List<String> tokenize(String keywords) {
         keywords = sanitize(keywords);
 
-        Set<String> tokens = new HashSet<String>(Arrays.asList(keywords.toLowerCase(Locale.US).split(" ")));
+        Set<String> tokens = new HashSet<>(Arrays.asList(keywords.toLowerCase(Locale.US).split(" ")));
 
-        return new ArrayList<String>(normalizeTokens(tokens));
+        return new ArrayList<>(normalizeTokens(tokens));
     }
 
     private Set<String> normalizeTokens(Set<String> tokens) {
-        Set<String> normalizedTokens = new HashSet<String>();
+        Set<String> normalizedTokens = new HashSet<>();
 
         for (String token : tokens) {
             String norm = normalize(token);
@@ -381,7 +381,7 @@ public final class SearchMediator {
 
     private static List<UISearchResult> convertResults(List<? extends SearchResult> results, SearchEngine engine, String query) {
 
-        List<UISearchResult> result = new ArrayList<UISearchResult>();
+        List<UISearchResult> result = new ArrayList<>();
 
         for (SearchResult sr : results) {
 
@@ -578,7 +578,7 @@ public final class SearchMediator {
     public void clearCache() {
         try {
             CrawlPagedWebSearchPerformer.clearCache();
-        } catch (Throwable t) {
+        } catch (Throwable ignored) {
         }
     }
 
@@ -586,7 +586,7 @@ public final class SearchMediator {
         long r = 0;
         try {
             r = CrawlPagedWebSearchPerformer.getCacheSize();
-        } catch (Throwable t) {
+        } catch (Throwable ignored) {
 
         }
         return r;

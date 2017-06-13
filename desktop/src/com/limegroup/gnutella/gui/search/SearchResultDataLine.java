@@ -96,11 +96,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     }
 
     private boolean isDownloading() {
-        if (RESULT.getHash() != null) {
-            return BTDownloadMediator.instance().isDownloading(RESULT.getHash());
-        } else {
-            return false;
-        }
+        return RESULT.getHash() != null && BTDownloadMediator.instance().isDownloading(RESULT.getHash());
     }
 
     /**

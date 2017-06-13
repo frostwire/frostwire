@@ -68,24 +68,16 @@ final class SchemaBox extends JPanel {
     /**
      * Constructs the SchemaBox.
      */
-    public SchemaBox(SearchResultMediator resultPanel) {
+    SchemaBox(SearchResultMediator resultPanel) {
         this.resultPanel = resultPanel;
 
         this.buttonGroup = new ButtonGroup();
-        this.buttonsMap = new HashMap<NamedMediaType, JToggleButton>();
-        this.tooltipPlaceHolders = new HashMap<NamedMediaType, String>();
+        this.buttonsMap = new HashMap<>();
+        this.tooltipPlaceHolders = new HashMap<>();
 
-        //setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         setLayout(new BorderLayout());
-//        setBackground(Color.GRAY);
-        //setOpaque(true);
         addSchemas();
-        //add(Box.createHorizontalGlue());
-
-        //Border colorBorder = BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR);
-        Border marginBorder = BorderFactory.createEmptyBorder(3, 4, 0, 0);
-        Border border = marginBorder;//BorderFactory.createCompoundBorder(colorBorder, marginBorder);
-        setBorder(border);
+        setBorder(BorderFactory.createEmptyBorder(3, 4, 0, 0));
 
         Dimension dim = new Dimension(10, 30);
         setPreferredSize(dim);
@@ -93,7 +85,7 @@ final class SchemaBox extends JPanel {
         setMaximumSize(new Dimension(100000, 30));
     }
 
-    public void applyFilters() {
+    void applyFilters() {
         AbstractButton button = getSelectedButton();
 
         if (button != null) {
@@ -101,7 +93,7 @@ final class SchemaBox extends JPanel {
         }
     }
 
-    public void updateCounters(UISearchResult sr) {
+    void updateCounters(UISearchResult sr) {
         NamedMediaType nmt = NamedMediaType.getFromExtension(sr.getExtension());
         if (nmt != null && buttonsMap.containsKey(nmt)) {
             JToggleButton button = buttonsMap.get(nmt);
@@ -109,7 +101,7 @@ final class SchemaBox extends JPanel {
         }
     }
     
-    public void resetCounters() {
+    void resetCounters() {
         Collection<JToggleButton> values = buttonsMap.values();
         for (JToggleButton button : values) {
             button.setText("0");
@@ -233,9 +225,8 @@ final class SchemaBox extends JPanel {
     /**
      * Use this if you want to programmatically change the current file type being displayed for a search.
      * @see SearchResultMediator#selectSchemaBoxByMediaType(NamedMediaType)
-     * @param type
      */
-    public void selectMediaType(NamedMediaType type) {
+    void selectMediaType(NamedMediaType type) {
         JToggleButton mediaTypeButton = buttonsMap.get(type);
         if (mediaTypeButton != null) {
             mediaTypeButton.doClick(); //setSelected doesn't fire the proper events.
@@ -275,7 +266,7 @@ final class SchemaBox extends JPanel {
         private final NamedMediaType nmt;
         private final MediaTypeFilter filter;
 
-        public SchemaButtonActionListener(NamedMediaType nmt) {
+        SchemaButtonActionListener(NamedMediaType nmt) {
             this.nmt = nmt;
 
             this.filter = new MediaTypeFilter(nmt);
@@ -319,9 +310,9 @@ final class SchemaBox extends JPanel {
 
         private final JToggleButton button;
 
-        protected final SchemaButtonBackgroundPainter backgroundPainter;
+        final SchemaButtonBackgroundPainter backgroundPainter;
 
-        public SchemaButtonUI(JToggleButton button) {
+        SchemaButtonUI(JToggleButton button) {
             this.button = button;
             this.backgroundPainter = new SchemaButtonBackgroundPainter();
         }

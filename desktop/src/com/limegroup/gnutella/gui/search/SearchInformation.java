@@ -11,7 +11,6 @@ import com.limegroup.gnutella.MediaType;
  * Simple struct-like class containing information about a search.
  */
 public class SearchInformation {
-    /** Constants used to serialize the search information to Map. */
     /** Key in map which holds property {@link #type}. */
     private static final String MAP_TYPE  = "type";
     /** Key in map which holds property {@link #query}. */
@@ -128,14 +127,7 @@ public class SearchInformation {
     public String getQuery() {
         return query;
     }
-    
-    /**
-     * Retrieves the XML portion of the search.
-     */
-    public String getXML() {
-        return xml;
-    }
-    
+
     /**
      * Retrieves the MediaType of the search.
      */
@@ -174,8 +166,8 @@ public class SearchInformation {
      * @see SearchInformation(Map)
      */
     public Map<String, Serializable> toMap() {
-        Map<String, Serializable> map = new HashMap<String, Serializable>(5);
-        map.put(MAP_TYPE, new Integer(type));
+        Map<String, Serializable> map = new HashMap<>(5);
+        map.put(MAP_TYPE, type);
         map.put(MAP_QUERY, query);
         map.put(MAP_XML, xml);
         map.put(MAP_MEDIA, media);
@@ -183,14 +175,4 @@ public class SearchInformation {
         return map;
     }
 
-    /**
-     * Creates a new keyword, but state is loaded from map generated
-     * by {@link toMap()}.
-     * @param map The map with storred state.
-     * @see toMap()
-     * @see SearchInformation(Map)
-     */
-    public static SearchInformation createFromMap(Map<?, ?> map) {
-        return new SearchInformation(map);
-    }
 }
