@@ -195,6 +195,7 @@ public final class ThemeMediator {
         for (Object k : actionMap.allKeys()) {
             if (k.equals(name)) {
                 action = actionMap.get(k);
+                break;
             }
         }
 
