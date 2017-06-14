@@ -442,14 +442,11 @@ public final class TransferManager {
     }
 
     public void enableSeeding() {
-        CM.setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, true);
+        ConfigurationManager.instance().setSeedFinishedTorrents(true);
         TransferManager.instance().resumeResumableTransfers();
     }
 
-    public boolean isSeedingEnabled() {
-        return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
-    }
-
+    // TODO: move configuration methods to ConfigurationManager
     public boolean isSeedingEnabledOnlyForWifi() {
         return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
     }
@@ -469,7 +466,7 @@ public final class TransferManager {
                     // torrents that are finished because seeding is
                     // not enabled, are actually paused
                     if (bt.isFinished()) {
-                        if (!isSeedingEnabled()) {
+                        if (!CM.isSeedFinishedTorrents()) {
                             // this implies !isSeedingEnabledOnlyForWifi
                             continue;
                         }

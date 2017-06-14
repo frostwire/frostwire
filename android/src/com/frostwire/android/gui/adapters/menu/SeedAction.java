@@ -129,7 +129,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
         // 1. If Seeding is turned off let's ask the user if they want to
         //    turn seeding on, or else cancel this.
-        if (!TransferManager.instance().isSeedingEnabled()) {
+        if (!ConfigurationManager.instance().isSeedFinishedTorrents()) {
             showSeedingDialog();
         } else {
             seedEm();
@@ -187,7 +187,9 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private boolean seedingOnlyOnWifiButNoWifi() {
-        return TransferManager.instance().isSeedingEnabled() && TransferManager.instance().isSeedingEnabledOnlyForWifi() && !NetworkManager.instance().isDataWIFIUp();
+        return ConfigurationManager.instance().isSeedFinishedTorrents() &&
+                TransferManager.instance().isSeedingEnabledOnlyForWifi() &&
+                !NetworkManager.instance().isDataWIFIUp();
     }
 
     private void seedEm() {

@@ -29,8 +29,6 @@ import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -92,7 +90,8 @@ public class ConfigurationManager {
         try {
             editor.remove(key);
             editor.commit();
-        } catch (Throwable ignore) {}
+        } catch (Throwable ignore) {
+        }
     }
 
     public String getString(String key) {
@@ -227,6 +226,14 @@ public class ConfigurationManager {
         if (path != null && path.length() > 0) { // minor verifications
             setString(Constants.PREF_KEY_STORAGE_PATH, path);
         }
+    }
+
+    public boolean isSeedFinishedTorrents() {
+        return getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
+    }
+
+    public void setSeedFinishedTorrents(boolean value) {
+        setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, value);
     }
 
     private void initPreferences() {
