@@ -189,16 +189,8 @@ public final class ThemeMediator {
     }
 
     private static void fixKeyStroke(JTextComponent textField, String name, int vk, int mask) {
-        Action action = null;
-
-        ActionMap actionMap = textField.getActionMap();
-        for (Object k : actionMap.allKeys()) {
-            if (k.equals(name)) {
-                action = actionMap.get(k);
-                break;
-            }
-        }
-
+        Action action = textField.getActionMap().get(name);
+        
         if (action != null) {
             InputMap[] inputMaps = new InputMap[] { textField.getInputMap(JComponent.WHEN_FOCUSED), textField.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT), textField.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW) };
 
