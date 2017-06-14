@@ -23,6 +23,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -31,7 +32,6 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineAdapter;
-import com.frostwire.util.Logger;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchResult;
@@ -39,7 +39,13 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
-import com.frostwire.transfers.*;
+import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.transfers.HttpDownload;
+import com.frostwire.transfers.SoundcloudDownload;
+import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.YouTubeDownload;
+import com.frostwire.util.Logger;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -315,9 +321,9 @@ public final class TransferManager {
             Uri u = Uri.parse(url);
 
             if (!u.getScheme().equalsIgnoreCase("file") &&
-                !u.getScheme().equalsIgnoreCase("http") &&
-                !u.getScheme().equalsIgnoreCase("https") &&
-                !u.getScheme().equalsIgnoreCase("magnet")) {
+                    !u.getScheme().equalsIgnoreCase("http") &&
+                    !u.getScheme().equalsIgnoreCase("https") &&
+                    !u.getScheme().equalsIgnoreCase("magnet")) {
                 LOG.warn("Invalid URI scheme: " + u.toString());
                 return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
             }
@@ -490,7 +496,7 @@ public final class TransferManager {
 
     public boolean isHttpDownloadInProgress() {
         for (Transfer httpDownload : httpDownloads) {
-            if(httpDownload.isDownloading()) {
+            if (httpDownload.isDownloading()) {
                 return true;
             }
         }
