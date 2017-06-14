@@ -263,7 +263,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void onSeedingEnabled() {
-        TransferManager.instance().enableSeeding();
+        ConfigurationManager.instance().setSeedFinishedTorrents(true);
         seedEm();
         UIUtils.showTransfersOnDownloadStart(getContext());
     }

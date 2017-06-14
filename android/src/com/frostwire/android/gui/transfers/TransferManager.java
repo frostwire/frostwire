@@ -441,11 +441,6 @@ public final class TransferManager {
         return Engine.instance().isStopped() || Engine.instance().isStopping() || Engine.instance().isDisconnected();
     }
 
-    public void enableSeeding() {
-        ConfigurationManager.instance().setSeedFinishedTorrents(true);
-        TransferManager.instance().resumeResumableTransfers();
-    }
-
     // TODO: move configuration methods to ConfigurationManager
     public boolean isSeedingEnabledOnlyForWifi() {
         return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
