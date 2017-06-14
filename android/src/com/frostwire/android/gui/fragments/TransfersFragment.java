@@ -69,6 +69,7 @@ import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.TransferState;
 import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -243,6 +244,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             adapter.updateList(transfers);
         } else if (this.getActivity() != null) {
             setupAdapter();
+        }
+        // TODO: optimize these calls
+        if (getActivity() != null) {
+            getActivity().invalidateOptionsMenu();
         }
         //  format strings
         String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
@@ -501,7 +506,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         for (Transfer t : transfers) {
             if (t instanceof BittorrentDownload) {
                 BittorrentDownload bt = (BittorrentDownload) t;
-                if (!bt.isDownloading() && !bt.isSeeding()) {
+                if (TransferManager.isResumable(bt)) {
                     return true;
                 }
             } else if (t instanceof HttpDownload) {
@@ -538,7 +543,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         for (Transfer t : transfers) {
             if (t instanceof BittorrentDownload) {
                 BittorrentDownload bt = (BittorrentDownload) t;
-                if (bt.isDownloading() || bt.isSeeding()) {
+                if (bt.isDownloading() ||
+                        bt.getState() == TransferState.SEEDING ||
+                        bt.getState() == TransferState.DOWNLOADING) {
                     return true;
                 }
             } else if (t instanceof HttpDownload) {

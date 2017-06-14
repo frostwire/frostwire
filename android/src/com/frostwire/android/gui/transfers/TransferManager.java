@@ -449,6 +449,25 @@ public final class TransferManager {
         return CM.getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES);
     }
 
+    public static boolean isResumable(BittorrentDownload bt) {
+        // torrents that are finished because seeding is
+        // not enabled, are actually paused
+        if (bt.isFinished()) {
+            if (!ConfigurationManager.instance().isSeedFinishedTorrents()) {
+                // this implies !isSeedingEnabledOnlyForWifi
+                return false;
+            }
+            boolean isSeedingEnabledOnlyForWifi = ConfigurationManager.
+                    instance().isSeedFinishedTorrents();
+            // TODO: find a better way to express relationship with isSeedingEnabled
+            if (isSeedingEnabledOnlyForWifi && !NetworkManager.instance().isDataWIFIUp()) {
+                return false;
+            }
+        }
+
+        return bt.isPaused();
+    }
+
     public void resumeResumableTransfers() {
         List<Transfer> transfers = getTransfers();
 
@@ -457,17 +476,8 @@ public final class TransferManager {
                 if (t instanceof BittorrentDownload) {
                     BittorrentDownload bt = (BittorrentDownload) t;
 
-                    // torrents that are finished because seeding is
-                    // not enabled, are actually paused
-                    if (bt.isFinished()) {
-                        if (!CM.isSeedFinishedTorrents()) {
-                            // this implies !isSeedingEnabledOnlyForWifi
-                            continue;
-                        }
-                        // TODO: find a better way to express relationship with isSeedingEnabled
-                        if (isSeedingEnabledOnlyForWifi() && !NetworkManager.instance().isDataWIFIUp()) {
-                            continue;
-                        }
+                    if (!isResumable(bt)) {
+                        continue;
                     }
 
                     if (bt.isPaused()) {
