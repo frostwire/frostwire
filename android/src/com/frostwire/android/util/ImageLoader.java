@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.frostwire.util.ThreadPool;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -47,6 +48,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author gubatron
@@ -81,6 +83,7 @@ public final class ImageLoader {
 
     private static final boolean DEBUG_ERRORS = false;
 
+    private final ExecutorService threadPool = ThreadPool.newThreadPool("Picasso", 4, true);
     private final ImageCache cache;
     private final Picasso picasso;
 
@@ -154,7 +157,7 @@ public final class ImageLoader {
         Builder picassoBuilder = new Builder(context).
                 addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
                 memoryCache(cache).
-                executor(Engine.instance().getThreadPool());
+                executor(threadPool);
         if (DEBUG_ERRORS) {
             picassoBuilder.listener(new Picasso.Listener() {
                 @Override
