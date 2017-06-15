@@ -509,7 +509,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 if (TransferManager.isResumable(bt)) {
                     return true;
                 }
-            } else if (t instanceof HttpDownload) {
+            }
+            // TODO: restore part of this logic
+            // when HTTP can pause/resume
+            /*else if (t instanceof HttpDownload) {
                 HttpDownload ht = (HttpDownload) t;
                 if (ht.isComplete() || !ht.isDownloading()) {
                     return true;
@@ -525,7 +528,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 if (sd.isComplete() || !sd.isDownloading()) {
                     return true;
                 }
-            }
+            }*/
         }
         return false;
     }
