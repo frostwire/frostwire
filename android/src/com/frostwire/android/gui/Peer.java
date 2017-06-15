@@ -58,8 +58,13 @@ public final class Peer {
         Engine.instance().getThreadPool().submit(new Runnable() {
             @Override
             public void run() {
-                Finger finger = Librarian.instance().finger();
-                callback.onFinger(finger);
+                try {
+                    Finger finger = Librarian.instance().finger();
+                    callback.onFinger(finger);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    // TODO: fix this the right way!!
+                }
             }
         });
     }
