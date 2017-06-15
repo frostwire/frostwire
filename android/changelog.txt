@@ -1,9 +1,11 @@
-FrostWire 1.9.7 - JUN/14/2017
+FrostWire 1.9.7 - JUN/15/2017
  - New jlibtorrent 1.2.0.10
  - Fixed Thread pool max size issue
  - Fixed possible app shutdown issues
  - Fixed seeding enablement issue
  - Ogury 2.1.8
+ - Fixed possible freeze refreshing file count in My Files
+ - Fixed possible crash browsing images
 
 FrostWire 1.9.6 - JUN/09/2017
  - Performance and stability improvements
