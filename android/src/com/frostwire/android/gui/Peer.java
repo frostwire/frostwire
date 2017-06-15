@@ -18,13 +18,11 @@
 
 package com.frostwire.android.gui;
 
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.services.Engine;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * @author gubatron
@@ -56,10 +54,6 @@ public final class Peer {
         this.hashCode = key.hashCode();
     }
 
-    public String getAddress() {
-        return address;
-    }
-
     public void finger(final Finger.FingerCallback callback) {
         Engine.instance().getThreadPool().submit(new Runnable() {
             @Override
@@ -85,7 +79,7 @@ public final class Peer {
             return false;
         }
 
-        return hashCode() == ((Peer) o).hashCode();
+        return hashCode() == o.hashCode();
     }
 
     @Override
