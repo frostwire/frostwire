@@ -440,11 +440,6 @@ public final class TransferManager {
         return Engine.instance().isStopped() || Engine.instance().isStopping() || Engine.instance().isDisconnected();
     }
 
-    // TODO: move configuration methods to ConfigurationManager
-    public boolean isSeedingEnabledOnlyForWifi() {
-        return CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
-    }
-
     public boolean isDeleteStartedTorrentEnabled() {
         return CM.getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES);
     }
@@ -457,8 +452,7 @@ public final class TransferManager {
                 // this implies !isSeedingEnabledOnlyForWifi
                 return false;
             }
-            boolean isSeedingEnabledOnlyForWifi = ConfigurationManager.
-                    instance().isSeedFinishedTorrents();
+            boolean isSeedingEnabledOnlyForWifi = ConfigurationManager.instance().isSeedingEnabledOnlyForWifi();
             // TODO: find a better way to express relationship with isSeedingEnabled
             if (isSeedingEnabledOnlyForWifi && !NetworkManager.instance().isDataWIFIUp()) {
                 return false;
