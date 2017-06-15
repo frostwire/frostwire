@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,33 +23,35 @@ package com.frostwire.android.gui;
  * @author aldenml
  */
 public final class Finger {
-    // total data
+    public interface FingerCallback {
+        void onFinger(final Finger finger);
+    }
 
-    public int numTotalAudioFiles;
+    public final int numTotalAudioFiles;
+    public final int numTotalVideoFiles;
+    public final int numTotalPictureFiles;
+    public final int numTotalDocumentFiles;
+    public final int numTotalTorrentFiles;
+    public final int numTotalRingtoneFiles;
 
-    public int numTotalVideoFiles;
-
-    public int numTotalPictureFiles;
-
-    public int numTotalDocumentFiles;
-
-    public int numTotalTorrentFiles;
-
-    public int numTotalRingtoneFiles;
+    public Finger(int numAudio, int numVideo, int numPics, int numDocs, int numTorrents, int numRingtones) {
+        numTotalAudioFiles = numAudio;
+        numTotalVideoFiles = numVideo;
+        numTotalPictureFiles = numPics;
+        numTotalDocumentFiles = numDocs;
+        numTotalTorrentFiles = numTorrents;
+        numTotalRingtoneFiles = numRingtones;
+    }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("(");
-        sb.append("aud:" + numTotalAudioFiles + ", ");
-        sb.append("vid:" + numTotalVideoFiles + ", ");
-        sb.append("pic:" + numTotalPictureFiles + ", ");
-        sb.append("doc:" + numTotalDocumentFiles + ", ");
-        sb.append("app:" + numTotalTorrentFiles + ", ");
-        sb.append("rng:" + numTotalRingtoneFiles);
-        sb.append(")");
-
-        return sb.toString();
+        return "(" +
+                "aud:" + numTotalAudioFiles + ", " +
+                "vid:" + numTotalVideoFiles + ", " +
+                "pic:" + numTotalPictureFiles + ", " +
+                "doc:" + numTotalDocumentFiles + ", " +
+                "app:" + numTotalTorrentFiles + ", " +
+                "rng:" + numTotalRingtoneFiles +
+                ")";
     }
 }

@@ -192,13 +192,12 @@ public final class Librarian {
     }
 
     public Finger finger() {
-        Finger finger = new Finger();
-        finger.numTotalAudioFiles = getNumFiles(Constants.FILE_TYPE_AUDIO);
-        finger.numTotalVideoFiles = getNumFiles(Constants.FILE_TYPE_VIDEOS);
-        finger.numTotalPictureFiles = getNumFiles(Constants.FILE_TYPE_PICTURES);
-        finger.numTotalDocumentFiles = getNumFiles(Constants.FILE_TYPE_DOCUMENTS);
-        finger.numTotalTorrentFiles = getNumFiles(Constants.FILE_TYPE_TORRENTS);
-        finger.numTotalRingtoneFiles = getNumFiles(Constants.FILE_TYPE_RINGTONES);
+        Finger finger = new Finger(getNumFiles(Constants.FILE_TYPE_AUDIO),
+                getNumFiles(Constants.FILE_TYPE_VIDEOS),
+                getNumFiles(Constants.FILE_TYPE_PICTURES),
+                getNumFiles(Constants.FILE_TYPE_DOCUMENTS),
+                getNumFiles(Constants.FILE_TYPE_TORRENTS),
+                getNumFiles(Constants.FILE_TYPE_RINGTONES));
         return finger;
     }
 
