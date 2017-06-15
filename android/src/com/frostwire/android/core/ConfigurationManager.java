@@ -235,6 +235,10 @@ public class ConfigurationManager {
         setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, value);
     }
 
+    public boolean isSeedingEnabledOnlyForWifi() {
+        return getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
+    }
+
     private void initPreferences() {
         for (Entry<String, Object> entry : defaults.getDefaultValues().entrySet()) {
             String key = entry.getKey();
