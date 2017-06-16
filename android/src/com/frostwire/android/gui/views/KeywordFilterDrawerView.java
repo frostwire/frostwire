@@ -33,23 +33,28 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
+import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- * Created on 3/23/17.
+ *         Created on 3/23/17.
  */
 
 public final class KeywordFilterDrawerView extends LinearLayout implements KeywordTagView.KeywordTagViewListener {
+    private static Logger LOG = Logger.getLogger(KeywordFilterDrawerView.class);
     private KeywordFiltersPipelineListener listener;
     private List<KeywordFilter> keywordFiltersPipeline;
-    private Map<KeywordDetector.Feature, Map.Entry<String, Integer>[]> histograms;
+    private Map<KeywordDetector.Feature, Entry<String, Integer>[]> histograms;
     private static Map<KeywordDetector.Feature, Integer> featureContainerIds = new HashMap<>();
 
     static {
@@ -72,15 +77,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     protected void onFinishInflate() {
         super.onFinishInflate();
         View.inflate(getContext(), R.layout.view_drawer_search_filters, this);
-
         TextView clearAllTextView = (TextView) findViewById(R.id.view_drawer_search_filters_clear_all);
         clearAllTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                clearAll();
+                clearAppliedFilters();
             }
         });
-
         EditText keywordEditText = (EditText) findViewById(R.id.view_drawer_search_filters_keyword_edittext);
         keywordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -111,33 +114,61 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         return true;
     }
 
-    private void clearAll() {
+    private void clearAppliedFilters() {
         FlowLayout flowLayout = (FlowLayout) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
-
-        flowLayout = (FlowLayout) findViewById(featureContainerIds.get(KeywordDetector.Feature.SEARCH_SOURCE));
-        flowLayout.removeAllViews();
-
-        if (listener != null) {
-            listener.onPipelineUpdate(new ArrayList<KeywordFilter>());
-        }
+        updateAppliedKeywordFilters(new ArrayList<KeywordFilter>());
     }
 
-    public void updateData(List<KeywordFilter> keywordFiltersPipeline, KeywordDetector.Feature feature, Map.Entry<String, Integer>[] histogram) {
+    public void updateData(List<KeywordFilter> keywordFiltersPipeline, KeywordDetector.Feature feature, Entry<String, Integer>[] histogram) {
         if (keywordFiltersPipeline != null) {
             updateAppliedKeywordFilters(keywordFiltersPipeline);
         }
         if (feature != null && histogram != null && histogram.length > 0) {
-            updateSuggestedKeywordFilters(feature, histogram);
+            // TODO: use different threshold depending on the feature. File extensions might be different for instance
+            Entry<String, Integer>[] filteredHistogram = highPassFilter(histogram, 0.015f);
+            updateSuggestedKeywordFilters(feature, filteredHistogram);
         }
     }
 
-    private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, Map.Entry<String, Integer>[] histogram) {
+    private Entry<String, Integer>[] highPassFilter(Entry<String, Integer>[] histogram, float threshold) {
+        int high = 0;
+        for (Entry<String, Integer> entry : histogram) {
+            int count = entry.getValue();
+            if (count > high) {
+                high = count;
+            }
+        }
+        List<Entry<String, Integer>> filteredValues = new LinkedList<>();
+        for (Entry<String, Integer> entry : histogram) {
+            float rate = (float) entry.getValue()/high;
+            // 1.5% of the most popular keyword is the sweet spot
+            if (rate >= threshold) {
+                filteredValues.add(entry);
+                LOG.info("<<< highPassFilter(high=" + high + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is IN");
+            } else {
+                LOG.info(">>> highPassFilter(high=" + high + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is OUT");
+            }
+        }
+        // sort'em!
+        filteredValues.sort(new Comparator<Entry<String, Integer>>() {
+            @Override
+            public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+                if (o1.getValue() == o2.getValue()) {
+                    return 0;
+                }
+                return (o2.getValue() > o1.getValue()) ? 1 : -1;
+            }
+        });
+        return filteredValues.toArray(new Entry[0]);
+    }
+
+    private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, Entry<String, Integer>[] histogram) {
         histograms.put(feature, histogram);
         Integer containerId = featureContainerIds.get(feature);
         FlowLayout container = (FlowLayout) findViewById(containerId);
         container.removeAllViews();
-        for(Map.Entry<String, Integer> entry : histogram) {
+        for (Entry<String, Integer> entry : histogram) {
             KeywordTagView keywordTagView = new KeywordTagView(getContext(), new KeywordFilter(true, entry.getKey()), entry.getValue(), false, this);
             container.addView(keywordTagView);
         }
@@ -147,18 +178,21 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         FlowLayout flowLayout = (FlowLayout) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
         for (KeywordFilter filter : keywordFiltersPipeline) {
-            int keywordCount = getKeywordCount(filter.getKeyword());
-            KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, keywordCount, true, this);
+            KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, -1, true, this);
             flowLayout.addView(keywordTagView);
         }
         this.keywordFiltersPipeline = keywordFiltersPipeline;
+        if (listener != null) {
+            listener.onPipelineUpdate(keywordFiltersPipeline);
+        }
+
     }
 
     private int getKeywordCount(String keyword) {
         // TODO: Gotta do this better later
         for (KeywordDetector.Feature feature : histograms.keySet()) {
-            Map.Entry<String, Integer>[] entries = histograms.get(feature);
-            for (Map.Entry<String, Integer> entry : entries) {
+            Entry<String, Integer>[] entries = histograms.get(feature);
+            for (Entry<String, Integer> entry : entries) {
                 if (entry.getKey().equals(keyword)) {
                     return entry.getValue();
                 }
@@ -167,46 +201,42 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         return 0;
     }
 
-    /** KeywordTagViewListener.onDismissed */
+    /**
+     * KeywordTagViewListener.onDismissed
+     */
     @Override
     public void onKeywordTagViewDismissed(KeywordTagView view) {
         FlowLayout flowLayout = (FlowLayout) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeView(view);
         keywordFiltersPipeline.remove(view.getKeywordFilter());
-        if (listener != null) {
-            try {
-                listener.onPipelineUpdate(keywordFiltersPipeline);
-            } catch (Throwable ignore) {
-            }
-        }
+        updateAppliedKeywordFilters(keywordFiltersPipeline);
     }
 
     @Override
     public void onKeywordTagViewTouched(KeywordTagView view) {
         // if it's a dismissible one it's one of the applied filters
         KeywordFilter keywordFilter = view.getKeywordFilter();
-        if (view.isDismissable()) {
+        if (view.isDismissible()) {
             int oldIndex = keywordFiltersPipeline.indexOf(keywordFilter);
             keywordFilter = view.toogleFilterInclusionMode();
             keywordFiltersPipeline.add(oldIndex, keywordFilter);
-            keywordFiltersPipeline.remove(oldIndex+1);
+            keywordFiltersPipeline.remove(oldIndex + 1);
         } else {
             // attempt to add to pipeline
             if (!keywordFiltersPipeline.contains(keywordFilter)) {
                 keywordFiltersPipeline.add(keywordFilter);
             }
         }
-
         updateAppliedKeywordFilters(keywordFiltersPipeline);
-        if (listener != null) {
-            listener.onPipelineUpdate(keywordFiltersPipeline);
-        }
     }
 
     public interface KeywordFiltersPipelineListener {
         void onPipelineUpdate(List<KeywordFilter> pipeline);
+
         void onAddKeywordFilter(KeywordFilter keywordFilter);
+
         void onRemoveKeywordFilter(KeywordFilter keywordFilter);
+
         void clearPipeline();
     }
 }
