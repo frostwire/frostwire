@@ -277,8 +277,9 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public void setKeywordFiltersPipeline(List<KeywordFilter> keywordFiltersPipeline) {
         if (keywordFiltersPipeline != this.keywordFiltersPipeline) {
             this.keywordFiltersPipeline.clear();
+            this.keywordFiltersPipeline.addAll(keywordFiltersPipeline);
         }
-        this.keywordFiltersPipeline.addAll(keywordFiltersPipeline);
+
         filter();
     }
 

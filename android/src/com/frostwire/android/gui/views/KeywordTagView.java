@@ -23,7 +23,6 @@ import android.content.res.TypedArray;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -40,7 +39,7 @@ import com.frostwire.util.Logger;
 public class KeywordTagView extends LinearLayout {
 
     private static Logger LOG = Logger.getLogger(KeywordTagView.class);
-    private boolean dismissable;
+    private boolean dismissible;
     private KeywordFilter keywordFilter;
     private int count;
     private KeywordTagViewListener listener;
@@ -57,7 +56,7 @@ public class KeywordTagView extends LinearLayout {
             String keyword = attributes.getString(R.styleable.KeywordTagView_keyword_tag_keyword);
             count = attributes.getInteger(R.styleable.KeywordTagView_keyword_tag_count, 0);
             boolean inclusive = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_inclusive, true);
-            dismissable = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_dismissable, true);
+            dismissible = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_dismissable, true);
             keywordFilter = new KeywordFilter(inclusive, keyword);
             attributes.recycle();
         }
@@ -65,37 +64,13 @@ public class KeywordTagView extends LinearLayout {
         setVisibility(View.VISIBLE);
     }
 
-    public KeywordTagView(Context context, KeywordFilter keywordFilter, int count, boolean dismissable, KeywordTagViewListener listener) {
+    public KeywordTagView(Context context, KeywordFilter keywordFilter, int count, boolean dismissible, KeywordTagViewListener listener) {
         this(context, null);
         this.keywordFilter = keywordFilter;
         this.count = count;
-        this.dismissable = dismissable;
+        this.dismissible = dismissible;
         this.listener = listener;
         onFinishInflate();
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        System.out.println("KeywordTagView.onMeasure(wSpec=" + widthMeasureSpec + ", hSpec=" + heightMeasureSpec + ")");
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        System.out.println("KeywordTagView.onLayout(changed=" + changed + ", l=" + l + ", t=" + t + ", r=" + r + ", b=" + b + ")");
-        super.onLayout(changed, l, t, r, b);
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        System.out.println("KeywordTagView.onAttachedToWindow()");
-        super.onAttachedToWindow();
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        System.out.println("KeywordTagView.onDetachedFromWindow()");
-        super.onDetachedFromWindow();
     }
 
     @Override
@@ -109,11 +84,14 @@ public class KeywordTagView extends LinearLayout {
         TextView inclusiveIndicatorTextView = (TextView) findViewById(R.id.view_keyword_tag_inclusive_indicator);
         TextView keywordTextView = (TextView) findViewById(R.id.view_keyword_tag_keyword);
         TextView countTextView = (TextView) findViewById(R.id.view_keyword_tag_count);
+        if (count == -1) {
+            countTextView.setVisibility(View.GONE);
+        }
         TextView dismissTextView = (TextView) findViewById(R.id.view_keyword_tag_dismiss);
         inclusiveIndicatorTextView.setText(keywordFilter.isInclusive() ? "+":"-");
         keywordTextView.setText(keywordFilter.getKeyword());
         countTextView.setText("(" + String.valueOf(count) + ")");
-        if (dismissable) {
+        if (dismissible) {
             dismissTextView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -148,8 +126,8 @@ public class KeywordTagView extends LinearLayout {
         return count;
     }
 
-    public boolean isDismissable() {
-        return dismissable;
+    public boolean isDismissible() {
+        return dismissible;
     }
 
     /** Replaces instance of internal KeywordFilter with one that toggles the previous one's inclusive mode */
