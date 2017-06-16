@@ -99,6 +99,7 @@ import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -764,21 +765,23 @@ public final class SearchFragment extends AbstractFragment implements
     private class FilterToolbarButton implements KeywordDetector.KeywordDetectorListener, KeywordFilterDrawerView.KeywordFiltersPipelineListener {
         private ImageButton imageButton;
         private TextView counterTextView;
-        private int tagCounter;
+        private int appliedTagsCounter;
 
         FilterToolbarButton(ImageButton imageButton, TextView counterTextView) {
             this.imageButton = imageButton;
             this.counterTextView = counterTextView;
-            tagCounter = 0;
+            appliedTagsCounter = 0;
             initListeners();
         }
 
         public void setVisible(boolean visible) {
             int visibility = visible ? View.VISIBLE : View.GONE;
-            counterTextView.setVisibility(visibility);
             imageButton.setVisibility(visibility);
-            if (visible && tagCounter > 0) {
-                counterTextView.setText(String.valueOf(tagCounter));
+            if (visible) {
+                counterTextView.setVisibility(appliedTagsCounter > 0 ? View.VISIBLE : View.GONE);
+                counterTextView.setText(String.valueOf(appliedTagsCounter));
+            } else {
+                counterTextView.setVisibility(View.GONE);
             }
         }
 
@@ -806,21 +809,17 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void onSearchReceived(final KeywordDetector detector, final KeywordDetector.Feature feature, int numSearchesProcessed) {
-            LOG.info("FilterToolbarButton.onSearchReceived() - detector: " + detector.toString() + " - feature:" + feature.name() + " searchesProcessed: " + numSearchesProcessed);
+            //LOG.info("FilterToolbarButton.onSearchReceived() - detector: " + detector.toString() + " - feature:" + feature.name() + " searchesProcessed: " + numSearchesProcessed);
         }
 
         @Override
-        public void onHistogramUpdate(final KeywordDetector detector, final KeywordDetector.Feature feature, final Map.Entry<String, Integer>[] histogram) {
-            tagCounter = histogram == null ? 0 : histogram.length;
+        public void onHistogramUpdate(final KeywordDetector detector, final KeywordDetector.Feature feature, final Entry<String, Integer>[] histogram) {
             boolean onMainThread = Looper.myLooper() == Looper.getMainLooper();
             Runnable uiRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    LOG.info("FilterToolbarButton.onHistogramUpdate() - detector: " + detector.toString() + " - feature:" + feature.name());
-                    if (histogram != null && histogram.length > 0) {
-                        setVisible(true);
-                        counterTextView.setText(String.valueOf(tagCounter));
-                    }
+                    LOG.info("FilterToolbarButton.onHistogramUpdate() - detector: " + detector.toString() + " - feature:" + feature.name() + " - appliedCounter: " + appliedTagsCounter);
+                    setVisible(histogram != null && histogram.length > 0);
                     keywordFilterDrawerView.updateData(adapter.getKeywordFiltersPipeline(), feature, histogram);
                 }
             };
@@ -845,7 +844,6 @@ public final class SearchFragment extends AbstractFragment implements
 
         public void reset(boolean hide) {
             setVisible(!hide);
-            tagCounter = 0;
             if (keywordFilterDrawerView != null) {
                 drawerLayout.closeDrawer(keywordFilterDrawerView);
             }
@@ -859,6 +857,11 @@ public final class SearchFragment extends AbstractFragment implements
         @Override
         public void onPipelineUpdate(List<KeywordFilter> pipeline) {
             adapter.setKeywordFiltersPipeline(pipeline);
+            appliedTagsCounter = adapter.getKeywordFiltersPipeline().size();
+            counterTextView.setVisibility(appliedTagsCounter > 0 ? View.VISIBLE : View.GONE);
+            if (appliedTagsCounter > 0) {
+                counterTextView.setText(""+appliedTagsCounter);
+            }
         }
 
         @Override
