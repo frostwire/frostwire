@@ -138,60 +138,64 @@
         android:layout_height="0.5dp"
         android:background="@color/black"></LinearLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.85"
-        android:orientation="vertical"
-        android:background="@color/basic_white">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/search_sources"
-            android:padding="15dp"
-            android:textStyle="bold"/>
-
-        <com.frostwire.android.gui.views.FlowLayout
-            android:id="@+id/view_drawer_search_filters_search_sources"
+        android:layout_height="match_parent" android:fillViewport="true">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <com.frostwire.android.gui.views.KeywordTagView
+            android:layout_height="0dp"
+            android:layout_weight="0.85"
+            android:orientation="vertical"
+            android:background="@color/basic_white">
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                frostwire:keyword_tag_count="30"
-                frostwire:keyword_tag_inclusive="true"
-                frostwire:keyword_tag_dismissable="false"
-                frostwire:keyword_tag_keyword="youtube"
-                />
+                android:text="@string/search_sources"
+                android:padding="15dp"
+                android:textStyle="bold"/>
 
-        </com.frostwire.android.gui.views.FlowLayout>
+            <com.frostwire.android.gui.views.FlowLayout
+                android:id="@+id/view_drawer_search_filters_search_sources"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <com.frostwire.android.gui.views.KeywordTagView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    frostwire:keyword_tag_count="30"
+                    frostwire:keyword_tag_inclusive="true"
+                    frostwire:keyword_tag_dismissable="false"
+                    frostwire:keyword_tag_keyword="youtube"
+                    />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/file_extensions"
-            android:padding="15dp"
-            android:textStyle="bold"/>
+            </com.frostwire.android.gui.views.FlowLayout>
 
-        <com.frostwire.android.gui.views.FlowLayout
-            android:id="@+id/view_drawer_search_filters_file_extensions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </com.frostwire.android.gui.views.FlowLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/file_extensions"
+                android:padding="15dp"
+                android:textStyle="bold"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/file_names"
-            android:padding="15dp"
-            android:textStyle="bold"/>
+            <com.frostwire.android.gui.views.FlowLayout
+                android:id="@+id/view_drawer_search_filters_file_extensions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </com.frostwire.android.gui.views.FlowLayout>
 
-        <com.frostwire.android.gui.views.FlowLayout
-            android:id="@+id/view_drawer_search_filters_file_names"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </com.frostwire.android.gui.views.FlowLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/file_names"
+                android:padding="15dp"
+                android:textStyle="bold"/>
 
-    </LinearLayout>
+            <com.frostwire.android.gui.views.FlowLayout
+                android:id="@+id/view_drawer_search_filters_file_names"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </com.frostwire.android.gui.views.FlowLayout>
+
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>
